@@ -60,7 +60,18 @@ export const postType = defineType({
       title: 'Body',
       type: 'array',
       of: [
-        { type: 'block' },
+        { 
+          type: 'block',
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'Justify', value: 'justify' },
+            { title: 'Heading 1', value: 'h1' },
+            { title: 'Heading 2', value: 'h2' },
+            { title: 'Heading 3', value: 'h3' },
+            { title: 'Heading 4', value: 'h4' },
+            { title: 'Quote', value: 'blockquote' },
+          ]
+        },
         {
           type: 'image',
           options: { hotspot: true },
