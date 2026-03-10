@@ -6,6 +6,8 @@ import { PostHeader } from "@/app/_components/post-header";
 import { PostBody } from "@/app/_components/portable-text-body";
 import { SocialShare } from "@/app/_components/social-share";
 
+export const revalidate = 60;
+
 export default async function Post(props: Params) {
   const params = await props.params;
   const post = await getPostBySlug(params.slug);

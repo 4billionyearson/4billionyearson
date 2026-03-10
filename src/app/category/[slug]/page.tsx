@@ -6,6 +6,8 @@ import { getCategoryBySlug, getPostsByCategory, getAllCategories } from '@/lib/a
 import Container from '@/app/_components/container'
 import DateFormatter from '@/app/_components/date-formatter'
 
+export const revalidate = 60;
+
 type Params = { params: Promise<{ slug: string }> }
 
 export default async function CategoryPage({ params }: Params) {
