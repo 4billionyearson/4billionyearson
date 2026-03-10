@@ -18,8 +18,8 @@ export default async function Post(props: Params) {
 
   return (
     <main>
-      <div className="container mx-auto px-3 md:px-4 pb-8">
-        <div className="bg-[#FFF5E8] rounded-xl shadow-xl min-h-screen p-3 sm:p-6 md:p-10 lg:p-14 xl:p-16">
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
+        <div className="bg-[#FFF5E8] rounded-xl shadow-xl min-h-screen p-3 sm:p-5 md:p-7 lg:p-8 xl:p-10">
           <div>
             <article className="mb-8">
               <PostHeader
