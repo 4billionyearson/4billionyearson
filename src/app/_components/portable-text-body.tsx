@@ -42,6 +42,11 @@ const components = {
     h3: ({ children }: any) => <h3 className="text-2xl font-bold mt-6 mb-3">{children}</h3>,
     h4: ({ children }: any) => <h4 className="text-xl font-bold mt-6 mb-3">{children}</h4>,
     normal: ({ children }: any) => <p className="mb-4 leading-relaxed">{children}</p>,
+    chatBubble: ({ children }: any) => (
+      <div className="bg-gray-100 p-5 rounded-3xl rounded-br-sm ml-auto max-w-[85%] text-left text-gray-800 my-6 shadow-sm">
+        <p className="m-0 leading-relaxed">{children}</p>
+      </div>
+    ),
     blockquote: ({ children }: any) => (
       <blockquote className="border-l-4 border-gray-300 pl-4 italic my-6 text-gray-600">
         {children}
