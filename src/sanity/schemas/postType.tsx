@@ -1,6 +1,5 @@
 import { defineField, defineType } from 'sanity'
 import React from 'react'
-import { AlignLeftIcon, AlignCenterIcon, AlignRightIcon, AlignJustifyIcon } from '@sanity/icons'
 
 const LeftStyle = (props: any) => <span style={{ display: 'block', textAlign: 'left', width: '100%' }}>{props.children}</span>
 const CenterStyle = (props: any) => <span style={{ display: 'block', textAlign: 'center', width: '100%' }}>{props.children}</span>
@@ -91,10 +90,10 @@ export const postType = defineType({
               { title: 'Code', value: 'code' },
               { title: 'Underline', value: 'underline' },
               { title: 'Strike', value: 'strike-through' },
-              { title: 'Left Align', value: 'left', icon: AlignLeftIcon, component: LeftStyle },
-              { title: 'Center Align', value: 'center', icon: AlignCenterIcon, component: CenterStyle },
-              { title: 'Right Align', value: 'right', icon: AlignRightIcon, component: RightStyle },
-              { title: 'Justify Align', value: 'justify', icon: AlignJustifyIcon, component: JustifyStyle }
+              { title: 'Left Align', value: 'left', component: LeftStyle },
+              { title: 'Center Align', value: 'center', component: CenterStyle },
+              { title: 'Right Align', value: 'right', component: RightStyle },
+              { title: 'Justify Align', value: 'justify', component: JustifyStyle }
             ]
           }
         },
