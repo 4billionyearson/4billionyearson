@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Mono } from "next/font/google";
 import cn from "classnames";
 import { ThemeSwitcher } from "./_components/theme-switcher";
+import { Analytics } from "@vercel/analytics/next";
 
 import CookieBanner from "./_components/cookie-banner";
 
@@ -86,6 +87,7 @@ export default function RootLayout({
           <Footer />
         </div>
         <CookieBanner />
+        <Analytics />
       </body>
     </html>
   );
