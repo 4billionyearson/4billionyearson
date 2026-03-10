@@ -21,7 +21,7 @@ export default async function Post(props: Params) {
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
         <div className="bg-[#FFF5E8] rounded-xl shadow-xl min-h-screen p-3 sm:p-5 md:p-7 lg:p-8 xl:p-10">
           <div>
-            <article className="mb-8">
+            <article className="mb-8 mt-0 sm:-mt-1 md:-mt-2 lg:-mt-3 xl:-mt-4">
               <PostHeader
                 title={post.title}
                 coverImage={post.coverImage}

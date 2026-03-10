@@ -24,7 +24,7 @@ export default async function CategoryPage({ params }: Params) {
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
-        <div className="bg-[#FFF5E8] rounded-xl shadow-xl min-h-screen px-0 py-3 sm:p-4 md:p-8 lg:p-12 xl:p-14">
+        <div className="bg-[#FFF5E8] rounded-xl shadow-xl min-h-screen px-0 py-3 sm:px-2 sm:py-4 md:px-4 md:py-6 lg:px-5 lg:py-7 xl:px-6 xl:py-8">
           <Container>
             <div className="rounded-lg p-6 md:p-8 mb-4 shadow-sm" style={{ backgroundColor: accentHex }}>
               <h1 className={`text-3xl md:text-4xl font-extrabold -mt-3 -ml-2 -mr-2 mb-3 drop-shadow-sm font-mono tracking-tight ${slug === 'biotechnology' ? 'text-[#D26742]' : slug === 'renewable-energy' ? 'text-[#2C5263]' : slug === 'climate-change' ? 'text-[#745630]' : 'text-[#FFF5E8]'}`}>{category.title}</h1>
