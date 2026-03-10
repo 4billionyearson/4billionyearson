@@ -6,10 +6,17 @@ export type Post = {
   date: string;
   coverImage: string;
   author: Author;
+  category?: {
+    title: string;
+    slug: string;
+    accentColor?: string;
+  };
   excerpt: string;
-  ogImage: {
+  ogImage?: {
     url: string;
   };
-  content: string;
+  body: any;
   preview?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
 };

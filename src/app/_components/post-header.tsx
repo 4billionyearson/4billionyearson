@@ -3,31 +3,46 @@ import CoverImage from "./cover-image";
 import DateFormatter from "./date-formatter";
 import { PostTitle } from "@/app/_components/post-title";
 import { type Author } from "@/interfaces/author";
+import Link from "next/link";
 
 type Props = {
   title: string;
   coverImage: string;
   date: string;
   author: Author;
+  category?: {
+    title: string;
+    slug: string;
+    accentColor?: string;
+  };
 };
 
-export function PostHeader({ title, coverImage, date, author }: Props) {
+export function PostHeader({ title, coverImage, date, author, category }: Props) {
+  const accentHex = (category?.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#7ec8e3';
+
   return (
     <>
       <PostTitle>{title}</PostTitle>
-      <div className="hidden md:block md:mb-12">
-        <Avatar name={author.name} picture={author.picture} />
-      </div>
-      <div className="mb-8 md:mb-16 sm:mx-0">
+      <div className="mb-4">
         <CoverImage title={title} src={coverImage} />
       </div>
-      <div className="max-w-2xl mx-auto">
-        <div className="block md:hidden mb-6">
-          <Avatar name={author.name} picture={author.picture} />
-        </div>
-        <div className="mb-6 text-lg">
-          <DateFormatter dateString={date} />
-        </div>
+      <div className="mb-2">
+        <Avatar name={author.name} picture={author.picture} />
+      </div>
+      <div className="mb-6 flex flex-row items-center gap-3 text-gray-500 text-sm">
+        <DateFormatter dateString={date} />
+        {category && (
+          <>
+            <span className="text-gray-300">|</span>
+            <Link
+              href={`/category/${category.slug}`}
+              className="font-bold uppercase tracking-wider hover:underline"
+              style={{ color: accentHex }}
+            >
+              {category.title}
+            </Link>
+          </>
+        )}
       </div>
     </>
   );

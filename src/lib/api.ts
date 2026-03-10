@@ -1,28 +1,41 @@
-import { Post } from "@/interfaces/post";
-import fs from "fs";
-import matter from "gray-matter";
-import { join } from "path";
+import { client } from '@/sanity/client'
+import {
+  allPostsQuery,
+  postBySlugQuery,
+  allPostSlugsQuery,
+  allCategoriesQuery,
+  postsByCategoryQuery,
+  categoryBySlugQuery,
+  searchPostsQuery,
+} from '@/sanity/queries'
+import { Post } from '@/interfaces/post'
 
-const postsDirectory = join(process.cwd(), "_posts");
-
-export function getPostSlugs() {
-  return fs.readdirSync(postsDirectory);
+export async function getAllPosts(): Promise<Post[]> {
+  return await client.fetch(allPostsQuery)
 }
 
-export function getPostBySlug(slug: string) {
-  const realSlug = slug.replace(/\.md$/, "");
-  const fullPath = join(postsDirectory, `${realSlug}.md`);
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const { data, content } = matter(fileContents);
-
-  return { ...data, slug: realSlug, content } as Post;
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  return await client.fetch(postBySlugQuery, { slug })
 }
 
-export function getAllPosts(): Post[] {
-  const slugs = getPostSlugs();
-  const posts = slugs
-    .map((slug) => getPostBySlug(slug))
-    // sort posts by date in descending order
-    .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
-  return posts;
+export async function getAllPostSlugs(): Promise<{ slug: string }[]> {
+  return await client.fetch(allPostSlugsQuery)
 }
+
+export async function getAllCategories() {
+  return await client.fetch(allCategoriesQuery)
+}
+
+export async function getPostsByCategory(slug: string): Promise<Post[]> {
+  return await client.fetch(postsByCategoryQuery, { slug })
+}
+
+export async function getCategoryBySlug(slug: string) {
+  return await client.fetch(categoryBySlugQuery, { slug })
+}
+
+export async function searchPosts(query: string): Promise<Post[]> {
+  const searchTerm = `*${query}*`
+  return await client.fetch(searchPostsQuery, { query: searchTerm })
+}
+
