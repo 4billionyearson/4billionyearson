@@ -7,7 +7,7 @@ const RightStyle = (props: any) => <span style={{ display: 'block', textAlign: '
 const JustifyStyle = (props: any) => <span style={{ display: 'block', textAlign: 'justify', width: '100%' }}>{props.children}</span>
 
 const AIChatStyle = (props: any) => (
-  <div style={{ backgroundColor: '#f3f4f6', padding: '1rem', borderRadius: '1rem', borderBottomRightRadius: '0.25rem', marginLeft: 'auto', maxWidth: '85%', textAlign: 'left', color: '#1f2937', marginTop: '1rem', marginBottom: '1rem' }}>
+  <div style={{ backgroundColor: '#e5e7eb', padding: '1rem', borderRadius: '1rem', borderBottomRightRadius: '0.25rem', marginLeft: 'auto', maxWidth: '85%', textAlign: 'left', color: '#1f2937', marginTop: '1rem', marginBottom: '1rem' }}>
     <p style={{ margin: 0 }}>{props.children}</p>
   </div>
 )

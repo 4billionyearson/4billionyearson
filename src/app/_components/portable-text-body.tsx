@@ -43,7 +43,7 @@ const components = {
     h4: ({ children }: any) => <h4 className="text-xl font-bold mt-6 mb-3">{children}</h4>,
     normal: ({ children }: any) => <p className="mb-4 leading-relaxed">{children}</p>,
     chatBubble: ({ children }: any) => (
-      <div className="bg-gray-100 p-5 rounded-3xl rounded-br-sm ml-auto max-w-[85%] text-left text-gray-800 my-6 shadow-sm">
+      <div className="bg-gray-200 p-5 rounded-3xl rounded-br-sm ml-auto max-w-[85%] text-left text-gray-800 my-6 shadow-sm">
         <p className="m-0 leading-relaxed">{children}</p>
       </div>
     ),
