@@ -15,12 +15,12 @@ export function SocialShare({ title }: { title: string }) {
   return (
     <div className="mt-8 -mb-7 pt-2 border-t border-gray-300">
       <h3 className="text-lg font-bold mb-2 font-mono text-gray-800">Share this post</h3>
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex gap-3 items-center flex-wrap">
         <a
           href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-[#1877F2] text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-8 h-8"
+          className="bg-[#1877F2] text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-10 h-10"
           aria-label="Share on Facebook"
         >
           <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
@@ -32,7 +32,7 @@ export function SocialShare({ title }: { title: string }) {
           href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-black text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-8 h-8"
+          className="bg-black text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-10 h-10"
           aria-label="Share on X"
         >
           <svg fill="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
@@ -44,7 +44,7 @@ export function SocialShare({ title }: { title: string }) {
           href={`https://reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-[#FF4500] text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-8 h-8"
+          className="bg-[#FF4500] text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-10 h-10"
           aria-label="Share on Reddit"
         >
           <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
@@ -56,7 +56,7 @@ export function SocialShare({ title }: { title: string }) {
           href={`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-[#25D366] text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-8 h-8"
+          className="bg-[#25D366] text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-10 h-10"
           aria-label="Share on WhatsApp"
         >
           <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
@@ -68,7 +68,7 @@ export function SocialShare({ title }: { title: string }) {
           href={`mailto:?subject=${encodedTitle}&body=${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-gray-600 text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-8 h-8"
+          className="bg-gray-600 text-white p-2.5 rounded-full hover:opacity-80 transition-opacity flex items-center justify-center w-10 h-10"
           aria-label="Share via Email"
         >
           <svg fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
