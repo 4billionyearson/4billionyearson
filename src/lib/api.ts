@@ -36,6 +36,6 @@ export async function getCategoryBySlug(slug: string) {
 
 export async function searchPosts(query: string): Promise<Post[]> {
   const searchTerm = `*${query}*`
-  return await client.fetch(searchPostsQuery as string, { query: searchTerm })
+  return await client.fetch(searchPostsQuery, { query: searchTerm } as any)
 }
 
