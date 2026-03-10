@@ -23,10 +23,10 @@ export function PostHeader({ title, coverImage, date, author, category }: Props)
   return (
     <>
       <PostTitle>{title}</PostTitle>
-      <div className="mb-4">
+      <div className="mb-4 -mt-2">
         <CoverImage title={title} src={coverImage} />
       </div>
-      <div className="mb-2">
+      <div className="mb-2 -ml-1.5">
         <Avatar name={author.name} picture={author.picture} />
       </div>
       <div className="mb-6 flex flex-row items-center gap-3 text-gray-500 text-sm">
