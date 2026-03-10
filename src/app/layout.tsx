@@ -7,6 +7,8 @@ import cn from "classnames";
 import { ThemeSwitcher } from "./_components/theme-switcher";
 
 import CookieBanner from "./_components/cookie-banner";
+import { Analytics } from "@vercel/analytics/react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 import "./globals.css";
 
@@ -86,6 +88,8 @@ export default function RootLayout({
           <Footer />
         </div>
         <CookieBanner />
+        <Analytics />
+        <GoogleAnalytics gaId="G-XYZ123ABC" />
       </body>
     </html>
   );
