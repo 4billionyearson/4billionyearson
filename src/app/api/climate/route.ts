@@ -110,7 +110,7 @@ export async function GET(request: Request) {
     }
 
     // 4. Format Yearly Data ready for Recharts
-    let yearlyArray = Object.values(yearlyStats).map((y: any) => ({
+    let yearlyArray: any[] = Object.values(yearlyStats).map((y: any) => ({
         year: y.year,
         maxTemp: Number((y.maxSum / y.days).toFixed(2)),
         minTemp: Number((y.minSum / y.days).toFixed(2)),
