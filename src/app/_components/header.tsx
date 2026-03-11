@@ -52,6 +52,11 @@ const Header = () => {
           
           <div className="w-px h-4 bg-gray-600 shadow-xl"></div>
 
+          
+          <Link href="/climate-dashboard" className="text-gray-400 hover:text-white transition-colors whitespace-nowrap [text-shadow:0_2px_4px_black]">
+            Data Dashboard
+          </Link>
+
           <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors whitespace-nowrap [text-shadow:0_2px_4px_black]">
             Privacy
           </Link>
@@ -92,6 +97,14 @@ const Header = () => {
               Home
             </Link>
             
+            <Link 
+              href="/climate-dashboard" 
+              className={`text-base px-6 py-4 border-b border-gray-600/50 w-full transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-300 hover:text-white'}`} 
+              onClick={closeMenu}
+            >
+              Data Dashboard
+            </Link>
+
             <Link href="/category/artificial-intelligence" className={`text-base px-6 py-4 border-b border-gray-600/50 w-full transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD]' : 'text-gray-300 hover:text-[#89DEFD]'}`} onClick={closeMenu}>
               AI
             </Link>
