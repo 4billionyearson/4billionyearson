@@ -43,8 +43,8 @@ const components = {
     h4: ({ children }: any) => <h4 className="text-xl font-bold mt-6 mb-3 text-white">{children}</h4>,
     normal: ({ children }: any) => <p className="mb-4 leading-relaxed">{children}</p>,
     chatBubble: ({ children }: any) => (
-      <div className="bg-gray-800/60 p-5 rounded-3xl rounded-br-sm ml-auto max-w-[85%] text-left text-gray-200 my-6 shadow-sm">
-        <p className="m-0 leading-relaxed">{children}</p>
+      <div className="bg-gray-700/50 border border-gray-600/40 p-5 rounded-3xl rounded-br-sm ml-auto max-w-[85%] text-left text-gray-200 my-6 shadow-md">
+        <p className="m-0 leading-relaxed font-medium">{children}</p>
       </div>
     ),
     blockquote: ({ children }: any) => (

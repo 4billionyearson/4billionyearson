@@ -63,7 +63,7 @@ export default function RootLayout({
         </div>
         <CookieBanner />
         <Analytics />
-        <GoogleAnalytics gaId="G-XYZ123ABC" />
+        <GoogleAnalytics gaId="G-VRE23E652Z" />
       </body>
     </html>
   );
