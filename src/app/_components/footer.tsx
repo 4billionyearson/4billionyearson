@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="bg-black text-white mt-16">
+    <footer className="bg-gray-950/90 backdrop-blur-md border-t border-gray-800 text-white mt-16">
       <div className="container mx-auto px-5 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <nav className="flex gap-6 text-sm">
           <Link href="/about" className="hover:text-gray-300 transition-colors">About Us</Link>

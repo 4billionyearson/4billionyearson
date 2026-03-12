@@ -43,24 +43,23 @@ export default async function Index() {
         </section>
       )}
 
-      {/* Posts — container card */}
+      {/* Posts */}
       <div className="container mx-auto px-3 md:px-4 pb-8">
-        <div className="bg-[#FFF5E8] rounded-xl shadow-xl min-h-screen p-3">
-          <div>
-            {heroPost && (
-              <HeroPost
-                title={heroPost.title}
-                coverImage={heroPost.coverImage}
-                date={heroPost.date}
-                author={heroPost.author}
-                slug={heroPost.slug}
-                excerpt={heroPost.excerpt}
-                category={heroPost.category}
-              />
-            )}
-            {morePosts.length > 0 && <MoreStories posts={morePosts} />}
-          </div>
-        </div>
+        {heroPost && (
+          <>
+            <h2 className="text-2xl md:text-3xl font-bold font-mono tracking-wide text-white mb-4">Latest Post</h2>
+            <HeroPost
+              title={heroPost.title}
+              coverImage={heroPost.coverImage}
+              date={heroPost.date}
+              author={heroPost.author}
+              slug={heroPost.slug}
+              excerpt={heroPost.excerpt}
+              category={heroPost.category}
+            />
+          </>
+        )}
+        {morePosts.length > 0 && <MoreStories posts={morePosts} />}
       </div>
     </main>
   );

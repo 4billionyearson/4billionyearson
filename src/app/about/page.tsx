@@ -9,13 +9,13 @@ export default function AboutPage() {
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
-        <div className="bg-[#FFF5E8] rounded-xl shadow-xl min-h-screen px-2 md:px-6 py-4 md:py-6">
+        <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-800 px-4 md:px-8 py-4 md:py-6">
           <Container>
             <div>
-              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-8 text-gray-900 font-mono inline-block">
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-8 text-white font-mono inline-block">
                 About Us
               </h1>
-              <div className="prose prose-lg max-w-none text-gray-800 space-y-6">
+              <div className="prose prose-lg prose-invert max-w-none text-gray-300 space-y-6">
                 <p>
                   Welcome to <strong>4 Billion Years On</strong>, a platform dedicated to exploring the incredible journey of our universe, our planet, and the technological horizons that lie ahead.
                 </p>

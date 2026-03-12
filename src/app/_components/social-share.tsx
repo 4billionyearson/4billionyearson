@@ -13,8 +13,8 @@ export function SocialShare({ title }: { title: string }) {
   const encodedTitle = encodeURIComponent(title);
 
   return (
-    <div className="mt-8 -mb-7 pt-2 border-t border-gray-300">
-      <h3 className="text-lg font-bold mb-2 font-mono text-gray-800">Share this post</h3>
+    <div className="mt-8 -mb-7 pt-2 border-t border-gray-700">
+      <h3 className="text-lg font-bold mb-2 font-mono text-gray-200">Share this post</h3>
       <div className="flex gap-3 items-center flex-wrap">
         <a
           href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}

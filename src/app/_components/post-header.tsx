@@ -29,11 +29,11 @@ export function PostHeader({ title, coverImage, date, author, category }: Props)
       <div className="mb-2 -ml-1.5">
         <Avatar name={author.name} picture={author.picture} />
       </div>
-      <div className="mb-6 flex flex-row items-center gap-3 text-gray-500 text-sm">
+      <div className="mb-6 flex flex-row items-center gap-3 text-gray-400 text-sm">
         <DateFormatter dateString={date} />
         {category && (
           <>
-            <span className="text-gray-300">|</span>
+            <span className="text-gray-600">|</span>
             <Link
               href={`/category/${category.slug}`}
               className="font-bold uppercase tracking-wider hover:underline"

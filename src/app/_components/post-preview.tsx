@@ -39,13 +39,13 @@ export function PostPreview({
             src={coverImage}
             alt={title}
             fill
-            className="object-cover opacity-90 mix-blend-overlay group-hover:scale-105 transition-transform duration-500"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/80 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 pointer-events-none" />
 
-        <div className="relative z-10 p-5 md:p-8 flex flex-col justify-between h-full">
+        <div className="relative z-10 p-5 md:p-8 flex flex-col justify-between h-full text-outline">
           <div>
             <div className="text-[#FFF5E8]/80 uppercase tracking-widest text-xs font-bold mb-2 flex flex-row items-center gap-2 drop-shadow-md">
               <DateFormatter dateString={date} />

@@ -37,18 +37,18 @@ const components = {
     },
   },
   block: {
-    h1: ({ children }: any) => <h1 className="text-4xl font-bold mt-8 mb-4">{children}</h1>,
-    h2: ({ children }: any) => <h2 className="text-3xl font-bold mt-8 mb-4">{children}</h2>,
-    h3: ({ children }: any) => <h3 className="text-2xl font-bold mt-6 mb-3">{children}</h3>,
-    h4: ({ children }: any) => <h4 className="text-xl font-bold mt-6 mb-3">{children}</h4>,
+    h1: ({ children }: any) => <h1 className="text-4xl font-bold mt-8 mb-4 text-white">{children}</h1>,
+    h2: ({ children }: any) => <h2 className="text-3xl font-bold mt-8 mb-4 text-white">{children}</h2>,
+    h3: ({ children }: any) => <h3 className="text-2xl font-bold mt-6 mb-3 text-white">{children}</h3>,
+    h4: ({ children }: any) => <h4 className="text-xl font-bold mt-6 mb-3 text-white">{children}</h4>,
     normal: ({ children }: any) => <p className="mb-4 leading-relaxed">{children}</p>,
     chatBubble: ({ children }: any) => (
-      <div className="bg-gray-200 p-5 rounded-3xl rounded-br-sm ml-auto max-w-[85%] text-left text-gray-800 my-6 shadow-sm">
+      <div className="bg-gray-800/60 p-5 rounded-3xl rounded-br-sm ml-auto max-w-[85%] text-left text-gray-200 my-6 shadow-sm">
         <p className="m-0 leading-relaxed">{children}</p>
       </div>
     ),
     blockquote: ({ children }: any) => (
-      <blockquote className="border-l-4 border-gray-300 pl-4 italic my-6 text-gray-600">
+      <blockquote className="border-l-4 border-gray-600 pl-4 italic my-6 text-gray-400">
         {children}
       </blockquote>
     ),
@@ -62,13 +62,13 @@ const components = {
     em: ({ children }: any) => <em className="italic">{children}</em>,
     underline: ({ children }: any) => <u className="underline">{children}</u>,
     'strike-through': ({ children }: any) => <s className="line-through">{children}</s>,
-    code: ({ children }: any) => <code className="bg-gray-100 rounded px-1">{children}</code>,
+    code: ({ children }: any) => <code className="bg-gray-800 text-gray-200 rounded px-1">{children}</code>,
     left: ({ children }: any) => <span className="block text-left w-full">{children}</span>,
     center: ({ children }: any) => <span className="block text-center w-full">{children}</span>,
     right: ({ children }: any) => <span className="block text-right w-full">{children}</span>,
     justify: ({ children }: any) => <span className="block text-justify w-full">{children}</span>,
     link: ({ value, children }: any) => (
-      <a href={value?.href} className="underline hover:text-blue-600" target="_blank" rel="noopener noreferrer">
+      <a href={value?.href} className="text-blue-400 underline hover:text-blue-300" target="_blank" rel="noopener noreferrer">
         {children}
       </a>
     ),
@@ -81,7 +81,7 @@ type Props = {
 
 export function PostBody({ content }: Props) {
   return (
-    <div className="prose prose-lg max-w-none">
+    <div className="prose prose-lg prose-invert max-w-none text-gray-300">
       <PortableText value={content} components={components} />
     </div>
   )

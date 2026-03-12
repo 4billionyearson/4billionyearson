@@ -16,10 +16,12 @@ export default async function Post(props: Params) {
     return notFound();
   }
 
+  const accentHex = (post.category?.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#374151';
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
-        <div className="bg-[#FFF5E8] rounded-xl shadow-xl min-h-screen p-3 sm:p-5 md:p-7 lg:p-8 xl:p-10">
+        <div className="bg-gray-950/100 backdrop-blur-md rounded-2xl shadow-xl border-2 p-3 sm:p-5 md:p-7 lg:p-8 xl:p-10" style={{ borderColor: accentHex }}>
           <div>
             <article className="mb-8 mt-0 sm:-mt-1 md:-mt-2 lg:-mt-3 xl:-mt-4">
               <PostHeader

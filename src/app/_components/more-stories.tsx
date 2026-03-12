@@ -7,11 +7,11 @@ type Props = {
   hideTitle?: boolean;
 };
 
-export function MoreStories({ posts, title = "More Stories", hideTitle = false }: Props) {
+export function MoreStories({ posts, title = "More Posts", hideTitle = false }: Props) {
   return (
     <section>
       {!hideTitle && (
-        <h2 className="mb-8 text-3xl md:text-5xl font-extrabold tracking-tight font-mono inline-block">
+        <h2 className="text-2xl md:text-3xl font-bold font-mono tracking-wide text-white mb-4">
           {title}
         </h2>
       )}

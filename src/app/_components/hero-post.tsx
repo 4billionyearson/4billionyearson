@@ -40,13 +40,13 @@ export function HeroPost({
               src={coverImage}
               alt={title}
               fill
-              className="object-cover opacity-90 mix-blend-overlay group-hover:scale-105 transition-transform duration-500"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/80 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 pointer-events-none" />
 
-          <div className="relative z-10 p-6 md:p-10 flex flex-col justify-between min-h-[400px] md:min-h-[500px]">
+          <div className="relative z-10 p-6 md:p-10 flex flex-col justify-between min-h-[400px] md:min-h-[500px] text-outline">
             <div>
               <div className="text-[#FFF5E8]/80 uppercase tracking-widest text-xs md:text-sm font-bold mb-3 flex flex-row items-center gap-3 drop-shadow-md">
                 <DateFormatter dateString={date} />
