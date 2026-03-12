@@ -50,6 +50,19 @@ export default function PrivacyPage() {
               <p>
                 You can choose to disable cookies through your individual browser options. To know more detailed information about cookie management with specific web browsers, it can be found at the browsers' respective websites.
               </p>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Analytics</h2>
+              <p>
+                This website uses <strong>Google Analytics</strong> and <strong>Vercel Analytics</strong> to collect anonymous usage data such as page views, session duration, and general geographic location. This information helps us understand how visitors use our site and improve the experience. No personally identifiable information is collected through these services. You can opt out of Google Analytics by installing the <a href="https://tools.google.com/dlpage/gaoptout" className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a>.
+              </p>
+
+              <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Climate Data &amp; Third-Party APIs</h2>
+              <p>
+                Our Climate Dashboard and Planetary Boundaries pages display environmental data sourced from third-party APIs, including <a href="https://global-warming.org" className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">global-warming.org</a>. These requests are made server-side — no personal information about you is shared with these external services.
+              </p>
+              <p>
+                To improve performance, climate data responses are temporarily cached using <strong>Upstash Redis</strong>, a server-side caching service. This cache stores only environmental data (such as CO₂ levels and temperature readings) and does not contain any user or visitor information.
+              </p>
             </div>
             </div>
           </Container>
