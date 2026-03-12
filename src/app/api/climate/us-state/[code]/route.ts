@@ -70,8 +70,9 @@ function buildYearlyFromMonthly(monthlyData: Record<string, number>, param: stri
   }
 
   const years = Object.keys(byYear).map(Number).sort();
+  const currentYear = new Date().getFullYear();
   const yearly = years
-    .filter(y => byYear[y].length >= 6)
+    .filter(y => y < currentYear && byYear[y].length >= 6)
     .map(y => {
       const vals = byYear[y];
       const avg = param === 'pcp'
@@ -109,7 +110,7 @@ function buildMonthlyComparison(monthlyData: Record<string, number>, param: stri
   }
 
   const comparison = [];
-  for (let i = 11; i >= 0; i--) {
+  for (let i = 12; i >= 1; i--) {
     let m = currentMonth - i;
     let y = currentYear;
     if (m <= 0) { m += 12; y--; }

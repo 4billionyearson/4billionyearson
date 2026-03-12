@@ -41,8 +41,9 @@ function buildYearlyData(monthly: MonthlyPoint[]) {
   }
 
   const years = Object.keys(byYear).map(Number).sort();
+  const currentYear = new Date().getFullYear();
   const yearlyData = years
-    .filter(y => byYear[y].length >= 6) // need at least 6 months
+    .filter(y => y < currentYear && byYear[y].length >= 6) // exclude current (incomplete) year
     .map(y => {
       const temps = byYear[y];
       return {
@@ -88,9 +89,9 @@ function buildMonthlyComparison(monthly: MonthlyPoint[]) {
     }
   }
 
-  // Last 12 months
+  // Last 12 completed months (exclude current incomplete month)
   const recent12: MonthlyPoint[] = [];
-  for (let i = 0; i < 12; i++) {
+  for (let i = 1; i <= 12; i++) {
     let m = currentMonth - i;
     let y = currentYear;
     if (m <= 0) { m += 12; y--; }

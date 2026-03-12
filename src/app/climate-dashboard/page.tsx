@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
@@ -75,7 +75,7 @@ function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingCo
   units: string;
   color: string;
   rollingColor: string;
-  thresholds?: { value: number; label: string; color: string }[];
+  thresholds?: { value: number; label: string; color: string; labelPosition?: string }[];
 }) {
   return (
     <div className="h-[380px] w-full">
@@ -83,12 +83,12 @@ function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingCo
         <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} domain={['auto', 'auto']} unit={units === '°C' ? '°' : ''} />
+          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D1D5DB', fontSize: 12 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D1D5DB', fontSize: 12, paddingTop: 10 }} />
           {thresholds?.map((t, i) => (
             <ReferenceLine key={i} y={t.value} stroke={t.color} strokeDasharray="4 4" strokeWidth={1.5}
-              label={{ position: 'insideTopLeft', value: t.label, fill: t.color, fontSize: 11, fontWeight: 600 }} />
+              label={{ position: (t.labelPosition || 'insideTopLeft'), value: t.label, fill: t.color, fontSize: 11, fontWeight: 600 } as any} />
           ))}
           <Line type="monotone" dataKey={dataKey} name={label} stroke={color} strokeWidth={1} dot={false} />
           {rollingKey && <Line type="monotone" dataKey={rollingKey} name="10-Yr Rolling Avg" stroke={rollingColor} strokeWidth={3} dot={false} />}
@@ -116,7 +116,7 @@ function ComparisonChart({ data, recentKey, label, units, barColor }: {
         <BarChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
           <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} domain={['auto', 'auto']} unit={units === '°C' ? '°' : ''} />
+          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<ComparisonTooltip />} cursor={{ fill: '#1F2937' }} />
           <Legend iconType="circle" wrapperStyle={{ color: '#D1D5DB', fontSize: 12 }} />
           <Bar dataKey={recentKey} name={`Recent ${label}`} fill={barColor} radius={[4, 4, 0, 0]} />
@@ -127,12 +127,108 @@ function ComparisonChart({ data, recentKey, label, units, barColor }: {
   );
 }
 
+// ─── Multi-Series Chart ──────────────────────────────────────────────────────
+
+function MultiLineChart({ data, series, thresholds }: {
+  data: any[];
+  series: { dataKey: string; rollingKey?: string; label: string; color: string; rollingColor: string }[];
+  thresholds?: { value: number; label: string; color: string; labelPosition?: string }[];
+}) {
+  const lines: React.ReactNode[] = [];
+  series.forEach((s, i) => {
+    lines.push(
+      <Line key={`data-${i}`} type="monotone" dataKey={s.dataKey} name={s.label} stroke={s.color} strokeWidth={1} dot={false} connectNulls />
+    );
+    if (s.rollingKey) {
+      lines.push(
+        <Line key={`rolling-${i}`} type="monotone" dataKey={s.rollingKey} name={`${s.label} (10-Yr Avg)`} stroke={s.rollingColor} strokeWidth={3} dot={false} connectNulls />
+      );
+    }
+  });
+
+  return (
+    <div className="h-[380px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={CHART_MARGIN}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+          <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit="°" />
+          <Tooltip content={<DarkTooltip />} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D1D5DB', fontSize: 12, paddingTop: 10 }} />
+          {thresholds?.map((t, i) => (
+            <ReferenceLine key={i} y={t.value} stroke={t.color} strokeDasharray="4 4" strokeWidth={1.5}
+              label={{ position: (t.labelPosition || 'insideTopLeft'), value: t.label, fill: t.color, fontSize: 11, fontWeight: 600 } as any} />
+          ))}
+          {lines}
+          <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+            <LineChart data={data}>
+              <Line type="monotone" dataKey={series[0].dataKey} stroke={series[0].color} dot={false} strokeWidth={1} />
+            </LineChart>
+          </Brush>
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ─── Merge helpers ───────────────────────────────────────────────────────────
+
+function mergeTempData(countryYearly: any[], regionYearly: any[], globalYearly?: any[]): any[] {
+  const map = new Map<number, any>();
+  for (const e of countryYearly) {
+    map.set(e.year, { year: e.year, countryTemp: e.avgTemp, countryRolling: e.rollingAvg });
+  }
+  for (const e of regionYearly) {
+    const row = map.get(e.year) || { year: e.year };
+    row.regionTemp = e.value;
+    row.regionRolling = e.rollingAvg;
+    map.set(e.year, row);
+  }
+  if (globalYearly) {
+    for (const e of globalYearly) {
+      const row = map.get(e.year) || { year: e.year };
+      row.globalTemp = e.absoluteTemp;
+      row.globalRolling = e.rollingAvg;
+      map.set(e.year, row);
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => a.year - b.year);
+}
+
+function mergeMinMaxData(maxYearly: any[], minYearly: any[]): any[] {
+  const map = new Map<number, any>();
+  for (const e of maxYearly) {
+    map.set(e.year, { year: e.year, maxTemp: e.value, maxRolling: e.rollingAvg });
+  }
+  for (const e of minYearly) {
+    const row = map.get(e.year) || { year: e.year };
+    row.minTemp = e.value;
+    row.minRolling = e.rollingAvg;
+    map.set(e.year, row);
+  }
+  return Array.from(map.values()).sort((a, b) => a.year - b.year);
+}
+
+function mergeMetricData(regionYearly: any[], countryYearly: any[]): any[] {
+  const map = new Map<number, any>();
+  for (const e of regionYearly) {
+    map.set(e.year, { year: e.year, regionValue: e.value, regionRolling: e.rollingAvg });
+  }
+  for (const e of countryYearly) {
+    const row = map.get(e.year) || { year: e.year };
+    row.countryValue = e.value;
+    row.countryRolling = e.rollingAvg;
+    map.set(e.year, row);
+  }
+  return Array.from(map.values()).sort((a, b) => a.year - b.year);
+}
+
 // ─── Section Card ────────────────────────────────────────────────────────────
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-black/60 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-gray-800">
-      <h2 className="text-xl font-bold text-gray-200 mb-5 flex items-center gap-2">
+    <div className="bg-gray-950/90 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-gray-800">
+      <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
         {icon}
         {title}
       </h2>
@@ -144,7 +240,7 @@ function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: 
 function SubSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-6 first:mt-0">
-      <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">{title}</h3>
+      <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-3">{title}</h3>
       {children}
     </div>
   );
@@ -152,12 +248,12 @@ function SubSection({ title, children }: { title: string; children: React.ReactN
 
 function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <div className="flex items-center gap-4 my-4">
-      <div className="h-px bg-gray-800 flex-1" />
-      <h2 className="text-xl font-bold text-gray-400 flex items-center gap-2">
+    <div className="flex items-center gap-4 my-6">
+      <div className="h-px bg-gray-700 flex-1" />
+      <h2 className="text-lg font-bold text-gray-200 flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-gray-700 shadow-lg">
         {icon} {title}
       </h2>
-      <div className="h-px bg-gray-800 flex-1" />
+      <div className="h-px bg-gray-700 flex-1" />
     </div>
   );
 }
@@ -175,7 +271,9 @@ export default function ClimateDashboard() {
   const [countryData, setCountryData] = useState<any>(null);
   const [usStateData, setUsStateData] = useState<any>(null);
   const [ukRegionData, setUkRegionData] = useState<any>(null);
+  const [ukCountryData, setUkCountryData] = useState<any>(null);
   const [globalData, setGlobalData] = useState<any>(null);
+  const [showGlobalOverlay, setShowGlobalOverlay] = useState(false);
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,6 +305,7 @@ export default function ClimateDashboard() {
     setCountryData(null);
     setUsStateData(null);
     setUkRegionData(null);
+    setUkCountryData(null);
     setGlobalData(null);
 
     try {
@@ -228,6 +327,7 @@ export default function ClimateDashboard() {
       } else if (location.type === 'uk-region') {
         fetches.push(fetch(`/api/climate/uk-region/${location.id}`).then(r => r.json()).catch(() => null));
         fetches.push(fetch('/api/climate/country/GBR').then(r => r.json()).catch(() => null));
+        fetches.push(fetch('/api/climate/uk-region/uk-uk').then(r => r.json()).catch(() => null));
       }
 
       const results = await Promise.all(fetches);
@@ -244,6 +344,7 @@ export default function ClimateDashboard() {
       } else if (location.type === 'uk-region') {
         if (results[1] && !results[1].error) setUkRegionData(results[1]);
         if (results[2] && !results[2].error) setCountryData(results[2]);
+        if (results[3] && !results[3].error) setUkCountryData(results[3]);
       }
 
       if (!results.some((r, i) => i > 0 && r && !r.error)) {
@@ -263,41 +364,91 @@ export default function ClimateDashboard() {
     return selectedLocation.name;
   };
 
+  // Merged datasets for combined charts
+  const countryLabel = countryData?.country || '';
+  const regionLabel = usStateData?.state || ukRegionData?.region || '';
+  const ukCountryLabel = ukCountryData?.region || 'United Kingdom';
+
+  const combinedAvgTempData = useMemo(() => {
+    if (!countryData?.yearlyData) return null;
+    const regionYearly = usStateData?.paramData?.tavg?.yearly || ukRegionData?.varData?.Tmean?.yearly;
+    // If we have region data OR global overlay is active, use the multi-line merge
+    if (!regionYearly && !(showGlobalOverlay && globalData?.yearlyData)) return null;
+    return mergeTempData(countryData.yearlyData, regionYearly || [], showGlobalOverlay ? globalData?.yearlyData : undefined);
+  }, [countryData, usStateData, ukRegionData, showGlobalOverlay, globalData]);
+
+  const combinedMinMaxData = useMemo(() => {
+    const maxYearly = usStateData?.paramData?.tmax?.yearly || ukRegionData?.varData?.Tmax?.yearly;
+    const minYearly = usStateData?.paramData?.tmin?.yearly || ukRegionData?.varData?.Tmin?.yearly;
+    if (!maxYearly || !minYearly) return null;
+    return mergeMinMaxData(maxYearly, minYearly);
+  }, [usStateData, ukRegionData]);
+
+  // Combined additional metrics (UK region vs UK-wide)
+  const combinedSunshineData = useMemo(() => {
+    const regionData = ukRegionData?.varData?.Sunshine?.yearly;
+    const countryData = ukCountryData?.varData?.Sunshine?.yearly;
+    if (!regionData || !countryData) return null;
+    return mergeMetricData(regionData, countryData);
+  }, [ukRegionData, ukCountryData]);
+
+  const combinedRainfallData = useMemo(() => {
+    const regionData = ukRegionData?.varData?.Rainfall?.yearly;
+    const countryData = ukCountryData?.varData?.Rainfall?.yearly;
+    if (!regionData || !countryData) return null;
+    return mergeMetricData(regionData, countryData);
+  }, [ukRegionData, ukCountryData]);
+
+  const combinedFrostData = useMemo(() => {
+    const regionData = ukRegionData?.varData?.AirFrost?.yearly;
+    const countryData = ukCountryData?.varData?.AirFrost?.yearly;
+    if (!regionData || !countryData) return null;
+    return mergeMetricData(regionData, countryData);
+  }, [ukRegionData, ukCountryData]);
+
+  const combinedRaindaysData = useMemo(() => {
+    const regionData = ukRegionData?.varData?.Raindays1mm?.yearly;
+    const countryData = ukCountryData?.varData?.Raindays1mm?.yearly;
+    if (!regionData || !countryData) return null;
+    return mergeMetricData(regionData, countryData);
+  }, [ukRegionData, ukCountryData]);
+
   const hasData = countryData || usStateData || ukRegionData;
 
   return (
-    <div className="min-h-screen p-4 md:p-8 font-sans text-gray-200 mt-[60px]">
+    <main>
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
       <div className="max-w-5xl mx-auto space-y-6">
 
         {/* ─── Header & Search ──────────────────────────────────────── */}
-        <div className="bg-black/60 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-gray-800">
-          <h1 className="text-3xl font-bold text-white mb-2">🌍 Climate Data Dashboard</h1>
-          <p className="text-gray-400 mb-6">
+        <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border border-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide text-white mb-1">🌍 Local Climate Data</h1>
+          <p className="text-gray-400 text-sm mb-4">
             Search for any country, US state, or UK region to explore decades of climate data.
           </p>
 
           <div className="relative w-full">
             <form onSubmit={handleSearch} className="flex gap-2">
               <div className="relative flex-1">
-                <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
                 <input
                   type="text"
                   value={searchInput}
                   onChange={(e) => { setSearchInput(e.target.value); if (e.target.value.length < 2) setShowDropdown(false); }}
                   onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
                   placeholder="Search country, city, US state, UK region..."
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-800 bg-gray-900/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-800 bg-gray-900/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   autoComplete="off"
                 />
               </div>
               <button type="submit" disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center min-w-[110px] transition-colors">
+                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium flex items-center justify-center min-w-[100px] transition-colors">
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
               </button>
             </form>
 
             {showDropdown && searchResults.length > 0 && (
-              <div className="absolute z-20 w-full mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden max-h-80 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-2 bg-gray-950 border border-gray-700 rounded-xl shadow-2xl overflow-hidden max-h-80 overflow-y-auto">
                 {searchResults.map((result, i) => (
                   <button
                     key={result.id + i}
@@ -329,7 +480,7 @@ export default function ClimateDashboard() {
 
         {/* ─── Loading ──────────────────────────────────────────────── */}
         {loading && (
-          <div className="bg-black/60 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4">
+          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-blue-400" />
             <p className="text-gray-400">Loading climate data — this may take a moment for first-time locations...</p>
           </div>
@@ -339,7 +490,7 @@ export default function ClimateDashboard() {
         {hasData && !loading && (
           <>
             {/* Location Banner */}
-            <div className="flex items-center gap-2 text-green-400 bg-green-900/30 p-4 rounded-xl border border-green-800/50">
+            <div className="flex items-center gap-2 text-green-400 bg-green-950/90 p-4 rounded-xl border border-green-800/50">
               <MapPin className="h-5 w-5 flex-shrink-0" />
               <span className="font-medium">{getLocationLabel()}</span>
               <span className="ml-auto text-xs text-gray-500">
@@ -350,81 +501,147 @@ export default function ClimateDashboard() {
             {/* ═══ TEMPERATURE ═══ */}
             <Divider icon={<ThermometerSun className="h-5 w-5" />} title="Temperature" />
 
-            {countryData?.yearlyData && (
+            {(countryData?.yearlyData || usStateData?.paramData?.tavg || ukRegionData?.varData?.Tmean) && (
               <SectionCard
                 icon={<TrendingUp className="h-5 w-5 text-red-400" />}
-                title={`${countryData.country} — Average Temperature`}
+                title={combinedAvgTempData
+                  ? `${countryLabel} + ${regionLabel} — Average Temperature`
+                  : countryData?.yearlyData
+                    ? `${countryLabel} — Average Temperature`
+                    : `${regionLabel} — Average Temperature`
+                }
               >
-                <SubSection title="Annual average — full history (drag slider to zoom)">
-                  <YearlyChart
-                    data={countryData.yearlyData}
-                    dataKey="avgTemp"
-                    rollingKey="rollingAvg"
-                    label="Avg Temperature"
-                    units="°C"
-                    color="#fca5a5"
-                    rollingColor="#ef4444"
-                    thresholds={globalData ? [
-                      { value: globalData.keyThresholds.plus1_5, label: '+1.5°C Paris limit', color: '#f59e0b' },
-                      { value: globalData.keyThresholds.plus2_0, label: '+2.0°C Critical limit', color: '#ef4444' },
-                    ] : undefined}
-                  />
-                </SubSection>
-                <SubSection title="Last 12 months vs 1961-1990 baseline">
-                  <ComparisonChart data={countryData.monthlyComparison} recentKey="recentTemp" label="Temperature" units="°C" barColor="#ef4444" />
-                </SubSection>
+                {/* Global overlay toggle */}
+                {globalData?.yearlyData && (
+                  <div className="flex items-center gap-3 mb-4">
+                    <button
+                      onClick={() => setShowGlobalOverlay(v => !v)}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                        showGlobalOverlay
+                          ? 'bg-emerald-900/40 border-emerald-700 text-emerald-300'
+                          : 'bg-gray-900/40 border-gray-700 text-gray-400 hover:text-gray-300 hover:border-gray-600'
+                      }`}
+                      type="button"
+                    >
+                      <Globe className="h-3.5 w-3.5" />
+                      {showGlobalOverlay ? 'Hide' : 'Show'} Global Temperature
+                    </button>
+                    {showGlobalOverlay && (
+                      <span className="text-[11px] text-gray-500">Global avg + Paris Agreement thresholds overlaid</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Annual average — combined or standalone */}
+                {combinedAvgTempData ? (
+                  <SubSection title="Annual average — full history (drag slider to zoom)">
+                    <MultiLineChart
+                      data={combinedAvgTempData}
+                      series={[
+                        { dataKey: 'countryTemp', rollingKey: 'countryRolling', label: countryLabel, color: '#fca5a5', rollingColor: '#dc2626' },
+                        ...((usStateData?.paramData?.tavg?.yearly || ukRegionData?.varData?.Tmean?.yearly) ? [{ dataKey: 'regionTemp', rollingKey: 'regionRolling', label: regionLabel, color: '#fdcc74', rollingColor: '#f59e0b' }] : []),
+                        ...(showGlobalOverlay ? [{ dataKey: 'globalTemp', rollingKey: 'globalRolling', label: 'Global', color: '#6ee7b7', rollingColor: '#10b981' }] : []),
+                      ]}
+                      thresholds={showGlobalOverlay && globalData ? [
+                        { value: globalData.keyThresholds.plus1_5, label: '+1.5°C Paris limit', color: '#f59e0b', labelPosition: 'insideTopLeft' },
+                        { value: globalData.keyThresholds.plus2_0, label: '+2.0°C Critical limit', color: '#ef4444', labelPosition: 'insideBottomLeft' },
+                      ] : undefined}
+                    />
+                  </SubSection>
+                ) : countryData?.yearlyData ? (
+                  <SubSection title="Annual average — full history (drag slider to zoom)">
+                    <YearlyChart
+                      data={countryData.yearlyData}
+                      dataKey="avgTemp"
+                      rollingKey="rollingAvg"
+                      label="Avg Temperature"
+                      units="°C"
+                      color="#fca5a5"
+                      rollingColor="#ef4444"
+                    />
+                  </SubSection>
+                ) : (
+                  <SubSection title="Annual average temperature">
+                    <YearlyChart
+                      data={(usStateData?.paramData?.tavg || ukRegionData?.varData?.Tmean).yearly}
+                      dataKey="value" rollingKey="rollingAvg"
+                      label="Avg Temperature" units="°C" color="#fdcc74" rollingColor="#f59e0b"
+                    />
+                  </SubSection>
+                )}
+
+                {/* Monthly comparisons */}
+                {countryData?.monthlyComparison && (
+                  <SubSection title={`${countryLabel} — Last 12 months vs 1961-1990 baseline`}>
+                    <ComparisonChart data={countryData.monthlyComparison} recentKey="recentTemp" label="Temperature" units="°C" barColor="#ef4444" />
+                  </SubSection>
+                )}
+                {usStateData?.paramData?.tavg?.monthlyComparison && (
+                  <SubSection title={`${usStateData.state} — Last 12 months vs historic average`}>
+                    <ComparisonChart data={usStateData.paramData.tavg.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#ea580c" />
+                  </SubSection>
+                )}
+                {ukRegionData?.varData?.Tmean?.monthlyComparison && (
+                  <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                    <ComparisonChart data={ukRegionData.varData.Tmean.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#d97706" />
+                  </SubSection>
+                )}
+
+                {/* Combined Min/Max temperature */}
+                {combinedMinMaxData && (
+                  <SubSection title={`${regionLabel} — Max & Min temperature trends`}>
+                    <MultiLineChart
+                      data={combinedMinMaxData}
+                      series={[
+                        { dataKey: 'maxTemp', rollingKey: 'maxRolling', label: 'Max Temp', color: '#fca5a5', rollingColor: '#dc2626' },
+                        { dataKey: 'minTemp', rollingKey: 'minRolling', label: 'Min Temp', color: '#93c5fd', rollingColor: '#2563eb' },
+                      ]}
+                    />
+                  </SubSection>
+                )}
               </SectionCard>
             )}
 
-            {usStateData?.paramData?.tavg && (
-              <SectionCard
-                icon={<ThermometerSun className="h-5 w-5 text-orange-400" />}
-                title={`${usStateData.state} — State Temperature`}
-              >
-                <SubSection title="Annual average temperature">
-                  <YearlyChart data={usStateData.paramData.tavg.yearly} dataKey="value" rollingKey="rollingAvg" label="Avg Temperature" units="°C" color="#fdba74" rollingColor="#ea580c" />
-                </SubSection>
-                <SubSection title="Last 12 months vs historic average">
-                  <ComparisonChart data={usStateData.paramData.tavg.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#ea580c" />
-                </SubSection>
-                {usStateData.paramData.tmax && (
-                  <SubSection title="Max temperature trend">
-                    <YearlyChart data={usStateData.paramData.tmax.yearly} dataKey="value" rollingKey="rollingAvg" label="Max Temp" units="°C" color="#fca5a5" rollingColor="#dc2626" />
+            {/* ═══ SUNSHINE ═══ */}
+            {(ukRegionData?.varData?.Sunshine) && (
+              <>
+                <Divider icon={<Sun className="h-5 w-5" />} title="Sunshine" />
+
+                <SectionCard
+                  icon={<Sun className="h-5 w-5 text-yellow-400" />}
+                  title={combinedSunshineData
+                    ? `${regionLabel} + ${ukCountryLabel} — Sunshine Hours`
+                    : `${ukRegionData.region} — Sunshine Hours`
+                  }
+                >
+                  <SubSection title="Annual total sunshine hours">
+                    {combinedSunshineData ? (
+                      <MultiLineChart
+                        data={combinedSunshineData}
+                        series={[
+                          { dataKey: 'regionValue', rollingKey: 'regionRolling', label: regionLabel, color: '#fde047', rollingColor: '#ca8a04' },
+                          { dataKey: 'countryValue', rollingKey: 'countryRolling', label: ukCountryLabel, color: '#fdba74', rollingColor: '#ea580c' },
+                        ]}
+                      />
+                    ) : (
+                      <YearlyChart data={ukRegionData.varData.Sunshine.yearly} dataKey="value" rollingKey="rollingAvg" label="Sunshine" units="hours" color="#fde047" rollingColor="#ca8a04" />
+                    )}
                   </SubSection>
-                )}
-                {usStateData.paramData.tmin && (
-                  <SubSection title="Min temperature trend">
-                    <YearlyChart data={usStateData.paramData.tmin.yearly} dataKey="value" rollingKey="rollingAvg" label="Min Temp" units="°C" color="#93c5fd" rollingColor="#2563eb" />
-                  </SubSection>
-                )}
-              </SectionCard>
+                  {ukRegionData.varData.Sunshine.monthlyComparison && (
+                    <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                      <ComparisonChart data={ukRegionData.varData.Sunshine.monthlyComparison} recentKey="recent" label="Sunshine" units="hours" barColor="#eab308" />
+                    </SubSection>
+                  )}
+                  {ukCountryData?.varData?.Sunshine?.monthlyComparison && (
+                    <SubSection title={`${ukCountryLabel} — Last 12 months vs historic average`}>
+                      <ComparisonChart data={ukCountryData.varData.Sunshine.monthlyComparison} recentKey="recent" label="Sunshine" units="hours" barColor="#ea580c" />
+                    </SubSection>
+                  )}
+                </SectionCard>
+              </>
             )}
 
-            {ukRegionData?.varData?.Tmean && (
-              <SectionCard
-                icon={<ThermometerSun className="h-5 w-5 text-amber-400" />}
-                title={`${ukRegionData.region} — Regional Temperature`}
-              >
-                <SubSection title="Annual mean temperature">
-                  <YearlyChart data={ukRegionData.varData.Tmean.yearly} dataKey="value" rollingKey="rollingAvg" label="Mean Temp" units="°C" color="#fcd34d" rollingColor="#d97706" />
-                </SubSection>
-                <SubSection title="Last 12 months vs historic average">
-                  <ComparisonChart data={ukRegionData.varData.Tmean.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#d97706" />
-                </SubSection>
-                {ukRegionData.varData.Tmax && (
-                  <SubSection title="Max temperature trend">
-                    <YearlyChart data={ukRegionData.varData.Tmax.yearly} dataKey="value" rollingKey="rollingAvg" label="Max Temp" units="°C" color="#fca5a5" rollingColor="#dc2626" />
-                  </SubSection>
-                )}
-                {ukRegionData.varData.Tmin && (
-                  <SubSection title="Min temperature trend">
-                    <YearlyChart data={ukRegionData.varData.Tmin.yearly} dataKey="value" rollingKey="rollingAvg" label="Min Temp" units="°C" color="#93c5fd" rollingColor="#2563eb" />
-                  </SubSection>
-                )}
-              </SectionCard>
-            )}
-
-            {/* ═══ RAINFALL ═══ */}
+            {/* ═══ RAINFALL & PRECIPITATION ═══ */}
             {(usStateData?.paramData?.pcp || ukRegionData?.varData?.Rainfall) && (
               <>
                 <Divider icon={<Droplets className="h-5 w-5" />} title="Rainfall & Precipitation" />
@@ -441,52 +658,111 @@ export default function ClimateDashboard() {
                 )}
 
                 {ukRegionData?.varData?.Rainfall && (
-                  <SectionCard icon={<Droplets className="h-5 w-5 text-blue-400" />} title={`${ukRegionData.region} — Rainfall`}>
+                  <SectionCard
+                    icon={<Droplets className="h-5 w-5 text-blue-400" />}
+                    title={combinedRainfallData
+                      ? `${regionLabel} + ${ukCountryLabel} — Rainfall`
+                      : `${ukRegionData.region} — Rainfall`
+                    }
+                  >
                     <SubSection title="Annual total rainfall (mm)">
-                      <YearlyChart data={ukRegionData.varData.Rainfall.yearly} dataKey="value" rollingKey="rollingAvg" label="Rainfall" units="mm" color="#60a5fa" rollingColor="#2563eb" />
+                      {combinedRainfallData ? (
+                        <MultiLineChart
+                          data={combinedRainfallData}
+                          series={[
+                            { dataKey: 'regionValue', rollingKey: 'regionRolling', label: regionLabel, color: '#60a5fa', rollingColor: '#2563eb' },
+                            { dataKey: 'countryValue', rollingKey: 'countryRolling', label: ukCountryLabel, color: '#a78bfa', rollingColor: '#7c3aed' },
+                          ]}
+                        />
+                      ) : (
+                        <YearlyChart data={ukRegionData.varData.Rainfall.yearly} dataKey="value" rollingKey="rollingAvg" label="Rainfall" units="mm" color="#60a5fa" rollingColor="#2563eb" />
+                      )}
                     </SubSection>
-                    <SubSection title="Last 12 months vs historic average">
-                      <ComparisonChart data={ukRegionData.varData.Rainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#3b82f6" />
+                    {ukRegionData.varData.Rainfall.monthlyComparison && (
+                      <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                        <ComparisonChart data={ukRegionData.varData.Rainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#3b82f6" />
+                      </SubSection>
+                    )}
+                    {ukCountryData?.varData?.Rainfall?.monthlyComparison && (
+                      <SubSection title={`${ukCountryLabel} — Last 12 months vs historic average`}>
+                        <ComparisonChart data={ukCountryData.varData.Rainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#7c3aed" />
+                      </SubSection>
+                    )}
+                  </SectionCard>
+                )}
+
+                {ukRegionData?.varData?.Raindays1mm && (
+                  <SectionCard
+                    icon={<Droplets className="h-5 w-5 text-indigo-400" />}
+                    title={combinedRaindaysData
+                      ? `${regionLabel} + ${ukCountryLabel} — Rain Days (≥1mm)`
+                      : `${ukRegionData.region} — Rain Days (≥1mm)`
+                    }
+                  >
+                    <SubSection title="Annual total rain days">
+                      {combinedRaindaysData ? (
+                        <MultiLineChart
+                          data={combinedRaindaysData}
+                          series={[
+                            { dataKey: 'regionValue', rollingKey: 'regionRolling', label: regionLabel, color: '#a5b4fc', rollingColor: '#6366f1' },
+                            { dataKey: 'countryValue', rollingKey: 'countryRolling', label: ukCountryLabel, color: '#c4b5fd', rollingColor: '#8b5cf6' },
+                          ]}
+                        />
+                      ) : (
+                        <YearlyChart data={ukRegionData.varData.Raindays1mm.yearly} dataKey="value" rollingKey="rollingAvg" label="Rain Days" units="days" color="#a5b4fc" rollingColor="#6366f1" />
+                      )}
                     </SubSection>
+                    {ukRegionData.varData.Raindays1mm.monthlyComparison && (
+                      <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                        <ComparisonChart data={ukRegionData.varData.Raindays1mm.monthlyComparison} recentKey="recent" label="Rain Days" units="days" barColor="#6366f1" />
+                      </SubSection>
+                    )}
+                    {ukCountryData?.varData?.Raindays1mm?.monthlyComparison && (
+                      <SubSection title={`${ukCountryLabel} — Last 12 months vs historic average`}>
+                        <ComparisonChart data={ukCountryData.varData.Raindays1mm.monthlyComparison} recentKey="recent" label="Rain Days" units="days" barColor="#8b5cf6" />
+                      </SubSection>
+                    )}
                   </SectionCard>
                 )}
               </>
             )}
 
-            {/* ═══ ADDITIONAL UK METRICS ═══ */}
-            {ukRegionData && (ukRegionData.varData?.Sunshine || ukRegionData.varData?.AirFrost || ukRegionData.varData?.Raindays1mm) && (
+            {/* ═══ FROST ═══ */}
+            {ukRegionData?.varData?.AirFrost && (
               <>
-                <Divider icon={<Sun className="h-5 w-5" />} title="Additional UK Metrics" />
+                <Divider icon={<Snowflake className="h-5 w-5" />} title="Frost" />
 
-                {ukRegionData.varData?.Sunshine && (
-                  <SectionCard icon={<Sun className="h-5 w-5 text-yellow-400" />} title={`${ukRegionData.region} — Sunshine Hours`}>
-                    <SubSection title="Annual total sunshine hours">
-                      <YearlyChart data={ukRegionData.varData.Sunshine.yearly} dataKey="value" rollingKey="rollingAvg" label="Sunshine" units="hours" color="#fde047" rollingColor="#ca8a04" />
-                    </SubSection>
-                    <SubSection title="Last 12 months vs historic average">
-                      <ComparisonChart data={ukRegionData.varData.Sunshine.monthlyComparison} recentKey="recent" label="Sunshine" units="hours" barColor="#eab308" />
-                    </SubSection>
-                  </SectionCard>
-                )}
-
-                {ukRegionData.varData?.AirFrost && (
-                  <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title={`${ukRegionData.region} — Air Frost Days`}>
-                    <SubSection title="Annual total frost days">
+                <SectionCard
+                  icon={<Snowflake className="h-5 w-5 text-cyan-400" />}
+                  title={combinedFrostData
+                    ? `${regionLabel} + ${ukCountryLabel} — Air Frost Days`
+                    : `${ukRegionData.region} — Air Frost Days`
+                  }
+                >
+                  <SubSection title="Annual total frost days">
+                    {combinedFrostData ? (
+                      <MultiLineChart
+                        data={combinedFrostData}
+                        series={[
+                          { dataKey: 'regionValue', rollingKey: 'regionRolling', label: regionLabel, color: '#67e8f9', rollingColor: '#06b6d4' },
+                          { dataKey: 'countryValue', rollingKey: 'countryRolling', label: ukCountryLabel, color: '#d8b4fe', rollingColor: '#a855f7' },
+                        ]}
+                      />
+                    ) : (
                       <YearlyChart data={ukRegionData.varData.AirFrost.yearly} dataKey="value" rollingKey="rollingAvg" label="Frost Days" units="days" color="#67e8f9" rollingColor="#06b6d4" />
-                    </SubSection>
-                    <SubSection title="Last 12 months vs historic average">
+                    )}
+                  </SubSection>
+                  {ukRegionData.varData.AirFrost.monthlyComparison && (
+                    <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
                       <ComparisonChart data={ukRegionData.varData.AirFrost.monthlyComparison} recentKey="recent" label="Frost Days" units="days" barColor="#06b6d4" />
                     </SubSection>
-                  </SectionCard>
-                )}
-
-                {ukRegionData.varData?.Raindays1mm && (
-                  <SectionCard icon={<Droplets className="h-5 w-5 text-indigo-400" />} title={`${ukRegionData.region} — Rain Days (≥1mm)`}>
-                    <SubSection title="Annual total rain days">
-                      <YearlyChart data={ukRegionData.varData.Raindays1mm.yearly} dataKey="value" rollingKey="rollingAvg" label="Rain Days" units="days" color="#a5b4fc" rollingColor="#6366f1" />
+                  )}
+                  {ukCountryData?.varData?.AirFrost?.monthlyComparison && (
+                    <SubSection title={`${ukCountryLabel} — Last 12 months vs historic average`}>
+                      <ComparisonChart data={ukCountryData.varData.AirFrost.monthlyComparison} recentKey="recent" label="Frost Days" units="days" barColor="#a855f7" />
                     </SubSection>
-                  </SectionCard>
-                )}
+                  )}
+                </SectionCard>
               </>
             )}
 
@@ -517,9 +793,9 @@ export default function ClimateDashboard() {
                         <BarChart data={globalData.yearlyData} margin={CHART_MARGIN}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
-                          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} unit="°" domain={['auto', 'auto']} />
+                          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} unit="°" domain={[(d: number) => Math.floor((d - 0.3) * 4) / 4, (d: number) => Math.ceil((d + 0.3) * 4) / 4]} />
                           <Tooltip content={<DarkTooltip />} cursor={{ fill: '#1F2937' }} />
-                          <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 12 }} />
+                          <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 12, paddingTop: 10 }} />
                           <ReferenceLine y={0} stroke="#6B7280" />
                           <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4"
                             label={{ position: 'right', value: '+1.5°C', fill: '#f59e0b', fontSize: 11 }} />
@@ -538,8 +814,8 @@ export default function ClimateDashboard() {
             )}
 
             {/* ─── Attribution ───────────────────────────────────────── */}
-            <div className="bg-black/40 backdrop-blur-sm p-4 rounded-xl border border-gray-800/50 text-xs text-gray-500 space-y-1">
-              <p><strong>Data sources & attribution:</strong></p>
+            <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
+              <p className="font-semibold text-gray-300">Data sources & attribution:</p>
               {countryData && <p>• Country temperatures: Our World in Data / Copernicus ERA5 reanalysis (CC-BY)</p>}
               {usStateData && <p>• US state data: NOAA National Centers for Environmental Information (public domain)</p>}
               {ukRegionData && <p>• UK regional data: Contains Met Office data © Crown copyright (Open Government Licence)</p>}
@@ -550,7 +826,7 @@ export default function ClimateDashboard() {
 
         {/* ─── Empty State ──────────────────────────────────────────── */}
         {!hasData && !loading && !error && (
-          <div className="bg-black/40 backdrop-blur-md p-12 rounded-2xl border border-gray-800 text-center">
+          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl border border-gray-800 text-center">
             <Globe className="h-16 w-16 text-gray-600 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-400 mb-2">Search for a location to get started</h2>
             <p className="text-gray-500 text-sm max-w-md mx-auto">
@@ -559,6 +835,7 @@ export default function ClimateDashboard() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </main>
   );
 }

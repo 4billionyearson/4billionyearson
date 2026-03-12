@@ -12,29 +12,20 @@ export async function GET(request: Request) {
       token: process.env.KV_REST_API_TOKEN,
     });
 
-    // Fetch all keys that match our climate grid pattern
-    const keys = await redis.keys('climate:grid:*');
-    
-    let cacheList = [];
-    
-    // Fetch metadata for each key
-    for (const key of keys) {
-      const data: any = await redis.get(key);
-      if (data && data.metadata) {
-        cacheList.push({
-          key,
-          latitude: data.metadata.gridLat,
-          longitude: data.metadata.gridLon,
-          lastFetched: data.metadata.lastFetched,
-          targetEndDate: data.metadata.targetEndDate,
-          dataPoints: data.yearlyData?.length + data.monthlyData?.length || 0,
-        });
-      }
-    }
+    // Fetch all climate cache keys
+    const [countryKeys, usStateKeys, ukRegionKeys, globalExists] = await Promise.all([
+      redis.keys('climate:country:*'),
+      redis.keys('climate:usstate:*'),
+      redis.keys('climate:ukregion:*'),
+      redis.exists('climate:global'),
+    ]);
 
-    return NextResponse.json({ 
-      totalGridsCached: keys.length,
-      grids: cacheList.sort((a, b) => new Date(b.lastFetched).getTime() - new Date(a.lastFetched).getTime())
+    return NextResponse.json({
+      countryKeys: countryKeys.sort(),
+      usStateKeys: usStateKeys.sort(),
+      ukRegionKeys: ukRegionKeys.sort(),
+      hasGlobal: !!globalExists,
+      totalCached: countryKeys.length + usStateKeys.length + ukRegionKeys.length + (globalExists ? 1 : 0),
     });
 
   } catch (error: any) {
@@ -61,12 +52,22 @@ export async function DELETE(request: Request) {
       await redis.del(key);
       return NextResponse.json({ success: true, message: `Deleted ${key}` });
     } else {
-      // Clear all
-      const keys = await redis.keys('climate:grid:*');
-      if (keys.length > 0) {
-        await redis.del(...keys);
+      // Clear all climate caches
+      const patterns = ['climate:grid:*', 'climate:country:*', 'climate:usstate:*', 'climate:ukregion:*', 'climate:global'];
+      let totalDeleted = 0;
+      for (const pattern of patterns) {
+        if (pattern === 'climate:global') {
+          const deleted = await redis.del('climate:global');
+          totalDeleted += deleted;
+        } else {
+          const keys = await redis.keys(pattern);
+          if (keys.length > 0) {
+            await redis.del(...keys);
+            totalDeleted += keys.length;
+          }
+        }
       }
-      return NextResponse.json({ success: true, message: `Cleared all ${keys.length} grid caches` });
+      return NextResponse.json({ success: true, message: `Cleared ${totalDeleted} climate cache entries` });
     }
 
   } catch (error: any) {

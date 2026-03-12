@@ -72,8 +72,9 @@ function buildYearly(points: MonthlyDataPoint[], isSum: boolean) {
   }
 
   const years = Object.keys(byYear).map(Number).sort();
+  const currentYear = new Date().getFullYear();
   const yearly = years
-    .filter(y => byYear[y].length >= 6)
+    .filter(y => y < currentYear && byYear[y].length >= 6)
     .map(y => {
       const vals = byYear[y];
       const agg = isSum
@@ -107,7 +108,7 @@ function buildComparison(points: MonthlyDataPoint[]) {
   }
 
   const comparison = [];
-  for (let i = 11; i >= 0; i--) {
+  for (let i = 12; i >= 1; i--) {
     let m = currentMonth - i;
     let y = currentYear;
     if (m <= 0) { m += 12; y--; }
