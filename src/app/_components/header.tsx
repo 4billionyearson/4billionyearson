@@ -28,7 +28,7 @@ const Header = () => {
 
   return (
     <header className="w-full bg-transparent py-2 relative z-50">
-      <div className="container mx-auto pt-2 md:pt-4 px-0.5 md:px-2 flex items-center justify-between relative z-50">
+      <div className="container mx-auto pt-1 md:pt-4 px-0.5 md:px-2 flex items-center justify-between relative z-50">
         <Link href="/" className="flex items-center hover:opacity-80 transition-opacity" onClick={closeMenu}>
           <Image
             src="/header-logo.png"
@@ -116,7 +116,7 @@ const Header = () => {
 
         {/* Mobile Menu Button */}
         <button 
-          className="xl:hidden text-white text-4xl leading-none mt-2 mr-2.5 outline-none hover:text-gray-300" 
+          className="xl:hidden text-white text-4xl leading-none mt-1 md:mt-2 mr-2.5 outline-none hover:text-gray-300" 
           aria-label="Menu"
           onClick={toggleMenu}
         >
