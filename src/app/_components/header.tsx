@@ -28,7 +28,7 @@ const Header = () => {
 
   return (
     <header className="w-full bg-transparent py-2 relative z-50">
-      <div className="container mx-auto pt-4 px-0.5 md:px-2 flex items-center justify-between relative z-50">
+      <div className="container mx-auto md:pt-4 px-0.5 md:px-2 flex items-center justify-between relative z-50">
         <Link href="/" className="flex items-center hover:opacity-80 transition-opacity" onClick={closeMenu}>
           <Image
             src="/header-logo.png"
