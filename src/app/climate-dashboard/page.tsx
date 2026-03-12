@@ -82,10 +82,10 @@ function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingCo
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
-          <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
+          <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D1D5DB', fontSize: 12, paddingTop: 10 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
           {thresholds?.map((t, i) => (
             <ReferenceLine key={i} y={t.value} stroke={t.color} strokeDasharray="4 4" strokeWidth={1.5}
               label={{ position: (t.labelPosition || 'insideTopLeft'), value: t.label, fill: t.color, fontSize: 11, fontWeight: 600 } as any} />
@@ -115,12 +115,12 @@ function ComparisonChart({ data, recentKey, label, units, barColor }: {
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
-          <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
+          <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<ComparisonTooltip />} cursor={{ fill: '#1F2937' }} />
-          <Legend iconType="circle" wrapperStyle={{ color: '#D1D5DB', fontSize: 12 }} />
+          <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12 }} />
           <Bar dataKey={recentKey} name={`Recent ${label}`} fill={barColor} radius={[4, 4, 0, 0]} />
-          <Bar dataKey="historicAvg" name="Historic Avg (1961-1990)" fill="#6B7280" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="historicAvg" name="Historic Avg (1961-1990)" fill="#7A6E63" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -151,10 +151,10 @@ function MultiLineChart({ data, series, thresholds }: {
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
-          <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit="°" />
+          <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit="°" />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D1D5DB', fontSize: 12, paddingTop: 10 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
           {thresholds?.map((t, i) => (
             <ReferenceLine key={i} y={t.value} stroke={t.color} strokeDasharray="4 4" strokeWidth={1.5}
               label={{ position: (t.labelPosition || 'insideTopLeft'), value: t.label, fill: t.color, fontSize: 11, fontWeight: 600 } as any} />
@@ -228,7 +228,7 @@ function mergeMetricData(regionYearly: any[], countryYearly: any[]): any[] {
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-gray-800">
-      <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
+      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2">
         {icon}
         {title}
       </h2>
@@ -250,7 +250,7 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-4 my-6">
       <div className="h-px bg-gray-700 flex-1" />
-      <h2 className="text-lg font-bold text-gray-200 flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-gray-700 shadow-lg">
+      <h2 className="text-lg font-bold font-mono text-gray-200 flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-gray-700 shadow-lg">
         {icon} {title}
       </h2>
       <div className="h-px bg-gray-700 flex-1" />
@@ -424,7 +424,7 @@ export default function ClimateDashboard() {
         <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border border-gray-800">
           <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide text-white mb-1">🌍 Local Climate Data</h1>
           <p className="text-gray-400 text-sm mb-4">
-            Search for any country, US state, or UK region to explore decades of climate data.
+            Search for any country, US state, or UK region to explore decades of climate data. Data is updated monthly.
           </p>
 
           <div className="relative w-full">
@@ -779,7 +779,7 @@ export default function ClimateDashboard() {
                       rollingKey="rollingAvg"
                       label="Global Avg Temp"
                       units="°C"
-                      color="#d1d5db"
+                      color="#D3C8BB"
                       rollingColor="#10b981"
                       thresholds={[
                         { value: globalData.keyThresholds.plus1_5, label: 'Paris +1.5°C limit', color: '#f59e0b' },
@@ -792,11 +792,11 @@ export default function ClimateDashboard() {
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={globalData.yearlyData} margin={CHART_MARGIN}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
-                          <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
-                          <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} tickLine={false} axisLine={false} unit="°" domain={[(d: number) => Math.floor((d - 0.3) * 4) / 4, (d: number) => Math.ceil((d + 0.3) * 4) / 4]} />
+                          <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="°" domain={[(d: number) => Math.floor((d - 0.3) * 4) / 4, (d: number) => Math.ceil((d + 0.3) * 4) / 4]} />
                           <Tooltip content={<DarkTooltip />} cursor={{ fill: '#1F2937' }} />
-                          <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 12, paddingTop: 10 }} />
-                          <ReferenceLine y={0} stroke="#6B7280" />
+                          <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                          <ReferenceLine y={0} stroke="#7A6E63" />
                           <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4"
                             label={{ position: 'right', value: '+1.5°C', fill: '#f59e0b', fontSize: 11 }} />
                           <Bar dataKey="anomaly" name="Temperature Anomaly (°C)">
@@ -827,7 +827,7 @@ export default function ClimateDashboard() {
         {/* ─── Empty State ──────────────────────────────────────────── */}
         {!hasData && !loading && !error && (
           <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl border border-gray-800 text-center">
-            <Globe className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+            <Globe className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-400 mb-2">Search for a location to get started</h2>
             <p className="text-gray-500 text-sm max-w-md mx-auto">
               Try &quot;United Kingdom&quot;, &quot;London&quot;, &quot;California&quot;, &quot;France&quot;, or any country, US state, or UK region.

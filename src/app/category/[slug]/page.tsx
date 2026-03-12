@@ -21,15 +21,22 @@ export default async function CategoryPage({ params }: Params) {
 
   const accentHex = (category.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#7ec8e3'
 
+  const fallbackDescriptions: Record<string, string> = {
+    'artificial-intelligence': 'A computer based entity that can perform tasks typically requiring human intelligence.',
+    'biotechnology': 'The engineering of biological systems to develop new technologies, medicines, and solutions for humanity.',
+    'climate-change': 'The long-term shift in global temperatures and weather patterns driven by human activity.',
+    'renewable-energy': 'Clean, sustainable energy harnessed from natural sources that replenish faster than they are consumed.',
+  };
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
         <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl shadow-xl border-2 overflow-hidden" style={{ borderColor: accentHex }}>
           <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: accentHex }}>
-              <h1 className={`text-3xl md:text-4xl font-extrabold mb-3 drop-shadow-sm font-mono tracking-tight ${slug === 'biotechnology' ? 'text-[#D26742]' : slug === 'renewable-energy' ? 'text-[#2C5263]' : slug === 'climate-change' ? 'text-[#745630]' : 'text-[#FFF5E8]'}`}>{category.title}</h1>
-              {(category.description || (slug === 'artificial-intelligence' && "A computer based entity that can perform tasks typically requiring human intelligence.")) && (
-                <p className={`text-sm md:text-lg font-medium max-w-3xl drop-shadow-sm ${slug === 'biotechnology' ? 'text-[#D26742]' : slug === 'renewable-energy' ? 'text-[#2C5263]' : slug === 'climate-change' ? 'text-[#745630]' : 'text-[#FFF5E8]'}`}>
-                  {category.description || (slug === 'artificial-intelligence' ? "A computer based entity that can perform tasks typically requiring human intelligence." : "")}
+              <h1 className={`text-3xl md:text-4xl font-extrabold mb-3 drop-shadow-sm font-mono tracking-tight ${slug === 'biotechnology' ? 'text-[#D26742]' : slug === 'renewable-energy' ? 'text-[#2C5263]' : slug === 'climate-change' ? 'text-[#745630]' : 'text-[#FFF5E7]'}`}>{category.title}</h1>
+              {(category.description || fallbackDescriptions[slug]) && (
+                <p className={`text-sm md:text-lg font-medium max-w-3xl drop-shadow-sm ${slug === 'biotechnology' ? 'text-[#D26742]' : slug === 'renewable-energy' ? 'text-[#2C5263]' : slug === 'climate-change' ? 'text-[#745630]' : 'text-[#FFF5E7]'}`}>
+                  {category.description || fallbackDescriptions[slug]}
                 </p>
               )}
           </div>
@@ -58,16 +65,16 @@ export default async function CategoryPage({ params }: Params) {
 
                       <div className="relative z-10 p-6 md:p-10 flex flex-col justify-between min-h-[400px] md:min-h-[500px] text-outline">
                         <div>
-                          <div className="text-[#FFF5E8]/80 uppercase tracking-widest text-xs md:text-sm font-bold mb-3 drop-shadow-md">
+                          <div className="text-[#FFF5E7]/80 uppercase tracking-widest text-xs md:text-sm font-bold mb-3 drop-shadow-md">
                             <DateFormatter dateString={post.date} />
                           </div>
-                          <h2 className="text-[#FFF5E8] text-3xl md:text-5xl font-bold font-mono tracking-tight leading-tight mb-4 max-w-4xl drop-shadow-md">
+                          <h2 className="text-[#FFF5E7] text-3xl md:text-5xl font-bold font-mono tracking-tight leading-tight mb-4 max-w-4xl drop-shadow-md">
                             {post.title}
                           </h2>
                         </div>
                         
                         {post.excerpt && (
-                          <p className="text-[#FFF5E8]/90 text-sm md:text-lg leading-relaxed max-w-3xl drop-shadow-md line-clamp-3 mt-auto">
+                          <p className="text-[#FFF5E7]/90 text-sm md:text-lg leading-relaxed max-w-3xl drop-shadow-md line-clamp-3 mt-auto">
                             {post.excerpt}
                           </p>
                         )}

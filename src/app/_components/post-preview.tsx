@@ -47,21 +47,21 @@ export function PostPreview({
 
         <div className="relative z-10 p-5 md:p-8 flex flex-col justify-between h-full text-outline">
           <div>
-            <div className="text-[#FFF5E8]/80 uppercase tracking-widest text-xs font-bold mb-2 flex flex-row items-center gap-2 drop-shadow-md">
+            <div className="text-[#FFF5E7]/80 uppercase tracking-widest text-xs font-bold mb-2 flex flex-row items-center gap-2 drop-shadow-md">
               <DateFormatter dateString={date} />
               {category && (
                 <>
-                  <span className="text-[#FFF5E8]/40">|</span>
+                  <span className="text-[#FFF5E7]/40">|</span>
                   <span style={{ color: accentHex }}>{category.title}</span>
                 </>
               )}
             </div>
-            <h3 className="text-[#FFF5E8] text-2xl md:text-3xl font-bold font-mono tracking-tight leading-snug mb-3 drop-shadow-md">
+            <h3 className="text-[#FFF5E7] text-2xl md:text-3xl font-bold font-mono tracking-tight leading-snug mb-3 drop-shadow-md">
               {title}
             </h3>
           </div>
           
-          <p className="text-[#FFF5E8]/90 text-sm md:text-base leading-relaxed line-clamp-3 mt-auto drop-shadow-md">
+          <p className="text-[#FFF5E7]/90 text-sm md:text-base leading-relaxed line-clamp-3 mt-auto drop-shadow-md">
             {excerpt}
           </p>
         </div>

@@ -15,8 +15,8 @@ export default async function Index() {
 
   return (
     <main>
-      {/* Category tiles — float on background */}
-      {categories.length > 0 && (
+      {/* Category tiles — hidden for now */}
+      {/* {categories.length > 0 && (
         <section className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 w-full">
             {categories.map((cat: any) => {
@@ -41,13 +41,12 @@ export default async function Index() {
             })}
           </div>
         </section>
-      )}
+      )} */}
 
       {/* Posts */}
-      <div className="container mx-auto px-3 md:px-4 pb-8">
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
         {heroPost && (
           <>
-            <h2 className="text-2xl md:text-3xl font-bold font-mono tracking-wide text-white mb-4">Latest Post</h2>
             <HeroPost
               title={heroPost.title}
               coverImage={heroPost.coverImage}

@@ -28,7 +28,7 @@ const Header = () => {
 
   return (
     <header className="w-full bg-transparent py-2 relative z-50">
-      <div className="container mx-auto px-0.5 md:px-2 flex items-center justify-between relative z-50">
+      <div className="container mx-auto pt-4 px-0.5 md:px-2 flex items-center justify-between relative z-50">
         <Link href="/" className="flex items-center hover:opacity-80 transition-opacity" onClick={closeMenu}>
           <Image
             src="/header-logo.png"
@@ -44,12 +44,13 @@ const Header = () => {
           {/* Blog Dropdown */}
           <div className="relative" onMouseEnter={() => setIsBlogOpen(true)} onMouseLeave={() => setIsBlogOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname?.startsWith('/category/') ? 'text-white' : 'text-[#FFF5E8] hover:text-white'
+              pathname?.startsWith('/category/') ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Blog ▾
             </button>
             {isBlogOpen && (
-              <div className="absolute top-full left-0 mt-1 bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[160px] z-50">
+              <div className="absolute top-full left-0 pt-1 z-50">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[160px]">
                 <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD] bg-gray-900' : 'text-gray-300 hover:text-[#89DEFD] hover:bg-gray-900'}`} onClick={closeMenu}>
                   AI
                 </Link>
@@ -62,6 +63,7 @@ const Header = () => {
                 <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
                   Renewables
                 </Link>
+                </div>
               </div>
             )}
           </div>
@@ -69,18 +71,20 @@ const Header = () => {
           {/* Climate Change Dropdown */}
           <div className="relative" onMouseEnter={() => setIsClimateChangeOpen(true)} onMouseLeave={() => setIsClimateChangeOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' ? 'text-white' : 'text-[#FFF5E8] hover:text-white'
+              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Climate Change ▾
             </button>
             {isClimateChangeOpen && (
-              <div className="absolute top-full left-0 mt-1 bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px] z-50">
+              <div className="absolute top-full left-0 pt-1 z-50">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[220px]">
                 <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
                   Local Climate Data
                 </Link>
                 <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   The Nine Factors
                 </Link>
+                </div>
               </div>
             )}
           </div>
@@ -129,7 +133,7 @@ const Header = () => {
             
             {/* Mobile Blog Accordion */}
             <button
-              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E8] flex items-center justify-between"
+              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
               onClick={() => setMobileBlogOpen(!mobileBlogOpen)}
             >
               Blog
@@ -154,7 +158,7 @@ const Header = () => {
 
             {/* Mobile Climate Change Accordion */}
             <button
-              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E8] flex items-center justify-between"
+              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
               onClick={() => setMobileClimateOpen(!mobileClimateOpen)}
             >
               Climate Change

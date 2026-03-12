@@ -415,7 +415,7 @@ export default function PlanetaryBoundariesPage() {
             <div className="mt-6 bg-gray-900/60 border border-orange-500/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Thermometer className="w-5 h-5 text-orange-400" />
-                <h3 className="text-white font-semibold">
+                <h3 className="text-white font-semibold font-mono">
                   Global Temperature Anomaly
                 </h3>
               </div>
@@ -491,7 +491,7 @@ export default function PlanetaryBoundariesPage() {
                       {/* 0°C baseline */}
                       {minY < 0 && (() => {
                         const zeroY = h - ((0 - minY) / range) * (h - 4) - 2;
-                        return <line x1="0" y1={zeroY} x2={w} y2={zeroY} stroke="#6b7280" strokeWidth="0.2" strokeDasharray="1,1" />;
+                        return <line x1="0" y1={zeroY} x2={w} y2={zeroY} stroke="#7A6E63" strokeWidth="0.2" strokeDasharray="1,1" />;
                       })()}
                       {/* Area fill */}
                       <polygon
@@ -560,7 +560,7 @@ export default function PlanetaryBoundariesPage() {
                         <span style={{ color: b.color }}>{b.icon}</span>
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 className="text-lg font-semibold font-mono text-white">
                           {b.name}
                         </h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
@@ -732,7 +732,7 @@ export default function PlanetaryBoundariesPage() {
       {/* ── Framework context ────────────────────────────────────────────── */}
       <div className="mt-6 bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
           <div className="max-w-3xl">
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2 className="text-2xl font-bold font-mono text-white mb-6">
               About the Planetary Boundaries Framework
             </h2>
             <div className="space-y-4 text-gray-300 leading-relaxed">
@@ -783,7 +783,7 @@ export default function PlanetaryBoundariesPage() {
               <div className="mt-10 bg-gray-900/80 border border-gray-700/50 rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-green-400 animate-pulse" />
-                  <h3 className="text-white font-semibold">
+                  <h3 className="text-white font-semibold font-mono">
                     Live Earth System Data
                   </h3>
                 </div>
