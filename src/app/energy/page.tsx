@@ -200,7 +200,7 @@ function CountrySearch({ onSelect, loading }: { onSelect: (name: string) => void
     <div className="relative w-full max-w-lg">
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
-          <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
           <input
             type="text"
             value={query}
@@ -247,6 +247,19 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
       }));
   }, [data.yearly]);
 
+  // Country stacked area: fossil vs renewables vs nuclear (TWh)
+  const countryMixData = useMemo(() => {
+    if (!countryData) return null;
+    return countryData.yearly
+      .filter(y => y.fossil != null || y.renewables != null || y.nuclear != null)
+      .map(y => ({
+        year: y.year,
+        Fossil: y.fossil,
+        Renewables: y.renewables,
+        Nuclear: y.nuclear,
+      }));
+  }, [countryData]);
+
   // Share % over time
   const shareData = useMemo(() => {
     return data.yearly
@@ -280,12 +293,12 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
     <>
       <Divider icon={<Flame className="h-5 w-5" />} title="Energy Mix" />
 
-      <SectionCard icon={<BarChart3 className="h-5 w-5 text-orange-400" />} title={`${data.name} — Primary Energy Consumption`}>
+      <SectionCard icon={<BarChart3 className="h-5 w-5 text-orange-400" />} title="Primary Energy Consumption">
         <p className="text-sm text-gray-400 mb-4">
           Total primary energy consumption broken down by source. The world remains heavily dependent on
           fossil fuels, though renewables are the <span className="text-emerald-400 font-medium">fastest-growing</span> segment.
         </p>
-        <SubSection title="Primary energy by source (TWh) — drag slider to zoom">
+        <SubSection title="World — primary energy by source (TWh) — drag slider to zoom">
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={mixData} margin={CHART_MARGIN}>
@@ -302,6 +315,27 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
             </ResponsiveContainer>
           </div>
         </SubSection>
+
+        {/* Country stacked area */}
+        {countryMixData && countryMixData.length > 0 && countryData && (
+          <SubSection title={`${countryData.name} — primary energy by source (TWh)`}>
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={countryMixData} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
+                  <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
+                  <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        )}
 
         {shareData.length > 0 && (
           <SubSection title="Share of primary energy (%)">
@@ -471,6 +505,19 @@ function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; c
       }));
   }, [data.yearly]);
 
+  // Country renewables stacked area
+  const countryRenewData = useMemo(() => {
+    if (!countryData) return null;
+    return countryData.yearly
+      .filter(y => y.solarShareElec != null || y.windShareElec != null || y.hydroShareElec != null)
+      .map(y => ({
+        year: y.year,
+        Solar: y.solarShareElec,
+        Wind: y.windShareElec,
+        Hydro: y.hydroShareElec,
+      }));
+  }, [countryData]);
+
   // Comparison: total renewables share of electricity
   const renewCompData = useMemo(() => {
     if (!countryData) return null;
@@ -532,6 +579,27 @@ function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; c
             </ResponsiveContainer>
           </div>
         </SubSection>
+
+        {/* Country renewables stacked area */}
+        {countryRenewData && countryRenewData.length > 0 && countryData && (
+          <SubSection title={`${countryData.name} — share of electricity from renewables (%)`}>
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={countryRenewData} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Area type="monotone" dataKey="Hydro" stackId="1" stroke={COLORS.hydro} fill={COLORS.hydro} fillOpacity={0.6} />
+                  <Area type="monotone" dataKey="Wind" stackId="1" stroke={COLORS.wind} fill={COLORS.wind} fillOpacity={0.6} />
+                  <Area type="monotone" dataKey="Solar" stackId="1" stroke={COLORS.solar} fill={COLORS.solar} fillOpacity={0.6} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        )}
 
         {/* Comparison: total renewables share */}
         {renewCompData && renewCompData.length > 0 && countryData && (
