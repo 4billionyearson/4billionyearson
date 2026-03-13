@@ -366,13 +366,13 @@ export default function PlanetaryBoundariesPage() {
           <p className="text-sm uppercase tracking-[0.3em] text-red-400 font-mono mb-4">
             Climate Change
           </p>
-          <h1 className="text-4xl md:text-6xl font-bold font-mono tracking-wide text-white leading-tight mb-6">
+          <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-6">
             The Nine Planetary{" "}
             <span className="bg-gradient-to-r from-red-400 via-amber-400 to-emerald-400 bg-clip-text text-transparent">
               Boundaries
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed mb-8">
+          <p className="text-base md:text-xl text-gray-300 max-w-3xl leading-relaxed mb-8">
             In 2009, a team of Earth system scientists led by{" "}
             <span className="text-white font-medium">Johan Rockström</span>{" "}
             identified nine processes that regulate the stability of the Earth
@@ -385,28 +385,16 @@ export default function PlanetaryBoundariesPage() {
           </p>
 
           {/* Summary counters */}
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="bg-red-950/50 border border-red-500/30 rounded-xl px-5 py-3 flex items-center gap-3">
-              <XCircle className="w-6 h-6 text-red-400" />
-              <div>
-                <div className="text-2xl font-bold text-red-400">
-                  {transgressedCount}
-                </div>
-                <div className="text-xs text-red-300/70 uppercase tracking-wider">
-                  Boundaries Crossed
-                </div>
-              </div>
+          <div className="flex gap-3 mb-6">
+            <div className="bg-red-950/50 border border-red-500/30 rounded-xl px-4 py-2.5 flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-red-400 shrink-0" />
+              <span className="text-xl font-bold text-red-400">{transgressedCount}</span>
+              <span className="text-xs text-red-300/70 uppercase tracking-wider">Crossed</span>
             </div>
-            <div className="bg-emerald-950/50 border border-emerald-500/30 rounded-xl px-5 py-3 flex items-center gap-3">
-              <CheckCircle2 className="w-6 h-6 text-emerald-400" />
-              <div>
-                <div className="text-2xl font-bold text-emerald-400">
-                  {9 - transgressedCount}
-                </div>
-                <div className="text-xs text-emerald-300/70 uppercase tracking-wider">
-                  Within Safe Limits
-                </div>
-              </div>
+            <div className="bg-emerald-950/50 border border-emerald-500/30 rounded-xl px-4 py-2.5 flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+              <span className="text-xl font-bold text-emerald-400">{9 - transgressedCount}</span>
+              <span className="text-xs text-emerald-300/70 uppercase tracking-wider">Safe</span>
             </div>
           </div>
 

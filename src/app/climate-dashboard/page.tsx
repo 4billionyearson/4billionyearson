@@ -64,7 +64,7 @@ const ComparisonTooltip = ({ active, payload, label }: any) => {
 
 // ─── Reusable Chart Components ───────────────────────────────────────────────
 
-const CHART_MARGIN = { top: 10, right: 10, left: -10, bottom: 0 };
+const CHART_MARGIN = { top: 10, right: 0, left: -30, bottom: 0 };
 const BRUSH_HEIGHT = 30;
 
 function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingColor, thresholds }: {
@@ -424,7 +424,7 @@ export default function ClimateDashboard() {
         <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border border-gray-800">
           <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide text-white mb-1">🌍 Local Climate Data</h1>
           <p className="text-gray-400 text-sm mb-4">
-            Search for any country, US state, or UK region to explore decades of climate data. Data is updated monthly.
+            Search for any country, US state, or UK city/region.
           </p>
 
           <div className="relative w-full">
@@ -436,13 +436,13 @@ export default function ClimateDashboard() {
                   value={searchInput}
                   onChange={(e) => { setSearchInput(e.target.value); if (e.target.value.length < 2) setShowDropdown(false); }}
                   onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
-                  placeholder="Search country, city, US state, UK region..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-800 bg-gray-900/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  placeholder="Search..."
+                  className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   autoComplete="off"
                 />
               </div>
               <button type="submit" disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium flex items-center justify-center min-w-[100px] transition-colors">
+                className="bg-blue-600 hover:bg-blue-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center justify-center min-w-[100px] transition-colors">
                 {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
               </button>
             </form>
@@ -492,7 +492,7 @@ export default function ClimateDashboard() {
             {/* Location Banner */}
             <div className="flex items-center gap-2 text-green-400 bg-green-950/90 p-4 rounded-xl border border-green-800/50">
               <MapPin className="h-5 w-5 flex-shrink-0" />
-              <span className="font-medium">{getLocationLabel()}</span>
+              <span className="font-medium text-sm">{getLocationLabel()}</span>
               <span className="ml-auto text-xs text-gray-500">
                 {(countryData?.source || usStateData?.source || ukRegionData?.source) === 'cache' ? '⚡ Cached' : '🔄 Fresh'}
               </span>
@@ -526,9 +526,6 @@ export default function ClimateDashboard() {
                       <Globe className="h-3.5 w-3.5" />
                       {showGlobalOverlay ? 'Hide' : 'Show'} Global Temperature
                     </button>
-                    {showGlobalOverlay && (
-                      <span className="text-[11px] text-gray-500">Global avg + Paris Agreement thresholds overlaid</span>
-                    )}
                   </div>
                 )}
 
