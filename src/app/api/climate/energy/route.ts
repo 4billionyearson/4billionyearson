@@ -44,6 +44,7 @@ interface EnergyYearlyPoint {
   // Carbon
   carbonIntensity: number | null;
   ghgEmissions: number | null;
+  ghgPerCapita: number | null;
   // Per capita
   energyPerCapita: number | null;
   perCapitaElectricity: number | null;
@@ -127,6 +128,7 @@ function extractYearly(records: OwidYearRecord[]): EnergyYearlyPoint[] {
       electricityGeneration: num(r.electricity_generation),
       carbonIntensity: num(r.carbon_intensity_elec),
       ghgEmissions: num(r.greenhouse_gas_emissions),
+      ghgPerCapita: num(r.ghg_per_capita),
       energyPerCapita: num(r.energy_per_capita),
       perCapitaElectricity: num(r.per_capita_electricity),
       primaryEnergy: num(r.primary_energy_consumption),

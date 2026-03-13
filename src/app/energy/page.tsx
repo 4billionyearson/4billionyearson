@@ -39,6 +39,7 @@ interface EnergyYearlyPoint {
   electricityGeneration: number | null;
   carbonIntensity: number | null;
   ghgEmissions: number | null;
+  ghgPerCapita: number | null;
   energyPerCapita: number | null;
   perCapitaElectricity: number | null;
   primaryEnergy: number | null;
@@ -702,25 +703,47 @@ function CarbonIntensitySection({ data, countryData }: { data: CountryEnergy; co
 }
 
 function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
-  const chartData = useMemo(() => {
-    const worldMap = new Map(data.yearly.filter(y => y.ghgEmissions != null).map(y => [y.year, y.ghgEmissions]));
-    if (countryData) {
-      const countryMap = new Map(countryData.yearly.filter(y => y.ghgEmissions != null).map(y => [y.year, y.ghgEmissions]));
-      const years = new Set([...worldMap.keys(), ...countryMap.keys()]);
-      return Array.from(years)
-        .sort((a, b) => a - b)
-        .map(year => ({
-          year,
-          World: worldMap.get(year) ?? null,
-          [countryData.name]: countryMap.get(year) ?? null,
-        }));
-    }
-    return Array.from(worldMap.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([year, val]) => ({ year, World: val }));
+  // World emissions area
+  const worldData = useMemo(() => {
+    return data.yearly
+      .filter(y => y.ghgEmissions != null)
+      .map(y => ({ year: y.year, Emissions: y.ghgEmissions }));
+  }, [data.yearly]);
+
+  // Country emissions area (own scale)
+  const countryEmData = useMemo(() => {
+    if (!countryData) return null;
+    return countryData.yearly
+      .filter(y => y.ghgEmissions != null)
+      .map(y => ({ year: y.year, Emissions: y.ghgEmissions }));
+  }, [countryData]);
+
+  // Per-capita comparison (tonnes per person) — normalises the scale difference
+  const perCapitaComp = useMemo(() => {
+    if (!countryData) return null;
+    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    return countryData.yearly
+      .filter(y => y.ghgPerCapita != null && worldMap.has(y.year) && worldMap.get(y.year)!.ghgPerCapita != null)
+      .map(y => ({
+        year: y.year,
+        [countryData.name]: y.ghgPerCapita,
+        World: worldMap.get(y.year)!.ghgPerCapita,
+      }));
   }, [data.yearly, countryData]);
 
-  if (chartData.length === 0) return null;
+  // Share of global emissions
+  const shareData = useMemo(() => {
+    if (!countryData) return null;
+    const worldMap = new Map(data.yearly.filter(y => y.ghgEmissions != null).map(y => [y.year, y.ghgEmissions!]));
+    return countryData.yearly
+      .filter(y => y.ghgEmissions != null && worldMap.has(y.year) && worldMap.get(y.year)! > 0)
+      .map(y => ({
+        year: y.year,
+        Share: Number(((y.ghgEmissions! / worldMap.get(y.year)!) * 100).toFixed(2)),
+      }));
+  }, [data.yearly, countryData]);
+
+  if (worldData.length === 0) return null;
 
   return (
     <>
@@ -731,24 +754,81 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
           Total greenhouse gas emissions from energy production and consumption (Mt CO₂ equivalent).
           Despite renewable growth, global emissions continue to rise as energy demand outpaces the transition.
         </p>
-        <SubSection title="Annual GHG emissions (Mt CO₂eq) — drag slider to zoom">
+
+        {/* World emissions */}
+        <SubSection title="World — annual GHG emissions (Mt CO₂eq)">
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={CHART_MARGIN}>
+              <AreaChart data={worldData} margin={CHART_MARGIN}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                 <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
                 <Tooltip content={<DarkTooltip />} />
                 <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
-                <Area type="monotone" dataKey="World" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} />
-                {countryData && (
-                  <Area type="monotone" dataKey={countryData.name} stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.3} strokeWidth={2} />
-                )}
+                <Area type="monotone" dataKey="Emissions" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} />
                 <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </SubSection>
+
+        {/* Country emissions at its own scale */}
+        {countryEmData && countryEmData.length > 0 && countryData && (
+          <SubSection title={`${countryData.name} — annual GHG emissions (Mt CO₂eq)`}>
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={countryEmData} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Area type="monotone" dataKey="Emissions" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.3} strokeWidth={2} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        )}
+
+        {/* Per-capita comparison — fair like-for-like */}
+        {perCapitaComp && perCapitaComp.length > 0 && countryData && (
+          <SubSection title={`${countryData.name} vs World — GHG emissions per capita (tonnes CO₂eq)`}>
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={perCapitaComp} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Line type="monotone" dataKey={countryData.name} stroke="#f59e0b" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="World" stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        )}
+
+        {/* Country share of global emissions */}
+        {shareData && shareData.length > 0 && countryData && (
+          <SubSection title={`${countryData.name} — share of global GHG emissions (%)`}>
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={shareData} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Area type="monotone" dataKey="Share" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.3} strokeWidth={2} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        )}
       </SectionCard>
     </>
   );
