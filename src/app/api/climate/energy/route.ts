@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:energy:v1';
+const CACHE_KEY = 'climate:energy:v2';
 const CACHE_TTL_HOURS = 24;
 
 const OWID_URL = 'https://owid-public.owid.io/data/energy/owid-energy-data.json';
@@ -128,7 +128,11 @@ function extractYearly(records: OwidYearRecord[]): EnergyYearlyPoint[] {
       electricityGeneration: num(r.electricity_generation),
       carbonIntensity: num(r.carbon_intensity_elec),
       ghgEmissions: num(r.greenhouse_gas_emissions),
-      ghgPerCapita: num(r.ghg_per_capita),
+      ghgPerCapita: (() => {
+        const ghg = num(r.greenhouse_gas_emissions);
+        const pop = num(r.population);
+        return ghg != null && pop != null && pop > 0 ? Number(((ghg * 1e6) / pop).toFixed(2)) : null;
+      })(),
       energyPerCapita: num(r.energy_per_capita),
       perCapitaElectricity: num(r.per_capita_electricity),
       primaryEnergy: num(r.primary_energy_consumption),
@@ -225,7 +229,7 @@ export async function GET(request: Request) {
 async function fetchCountryResponse(countryName: string, worldData: EnergyData) {
   // We need to fetch the full OWID dataset again for the country
   // Check country cache first
-  const countryKey = `climate:energy:country:${countryName.toLowerCase().replace(/\s+/g, '-')}`;
+  const countryKey = `climate:energy:v2:country:${countryName.toLowerCase().replace(/\s+/g, '-')}`;
   const cached = await getCached<CountryEnergy>(countryKey);
   if (cached) {
     return NextResponse.json({ world: worldData.world, country: cached, fetchedAt: worldData.fetchedAt });

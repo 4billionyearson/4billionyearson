@@ -261,7 +261,7 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
       }));
   }, [countryData]);
 
-  // Share % over time
+  // World share % over time
   const shareData = useMemo(() => {
     return data.yearly
       .filter(y => y.fossilShareEnergy != null)
@@ -272,6 +272,19 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
         Nuclear: y.nuclearShareEnergy,
       }));
   }, [data.yearly]);
+
+  // Country share % over time
+  const countryShareData = useMemo(() => {
+    if (!countryData) return null;
+    return countryData.yearly
+      .filter(y => y.fossilShareEnergy != null)
+      .map(y => ({
+        year: y.year,
+        Fossil: y.fossilShareEnergy,
+        Renewables: y.renewablesShareEnergy,
+        Nuclear: y.nuclearShareEnergy,
+      }));
+  }, [countryData]);
 
   // Country comparison share data
   const comparisonData = useMemo(() => {
@@ -339,10 +352,30 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
         )}
 
         {shareData.length > 0 && (
-          <SubSection title="Share of primary energy (%)">
+          <SubSection title="World — share of primary energy (%)">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={shareData} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
+                  <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
+                  <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        )}
+
+        {countryShareData && countryShareData.length > 0 && countryData && (
+          <SubSection title={`${countryData.name} — share of primary energy (%)`}>
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={countryShareData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
