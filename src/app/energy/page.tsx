@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import {
   Loader2, Zap, Flame, Sun, Wind, Atom, Droplets, Factory,
-  TrendingUp, BarChart3, Search, MapPin, Globe,
+  TrendingUp, BarChart3, Search, MapPin, Globe, Users,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -150,7 +150,7 @@ function StatCard({ label, value, unit, color, icon, countryValue, countryName }
       {countryValue && countryName ? (
         <>
           <p className="text-[10px] text-gray-500 mt-0.5">World</p>
-          <p className={`text-lg font-bold font-mono text-emerald-400 mt-1`}>{countryValue}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
+          <p className={`text-2xl font-bold font-mono ${color} mt-1`}>{countryValue}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
           <p className="text-[10px] text-gray-500 mt-0.5">{countryName}</p>
           <p className="text-xs text-gray-400 mt-1">{label}</p>
         </>
@@ -744,6 +744,135 @@ function CarbonIntensitySection({ data, countryData }: { data: CountryEnergy; co
   );
 }
 
+function EnergyPerCapitaSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
+  // Energy per capita (kWh/person)
+  const worldPerCapita = useMemo(() => {
+    return data.yearly
+      .filter(y => y.energyPerCapita != null)
+      .map(y => ({ year: y.year, World: y.energyPerCapita }));
+  }, [data.yearly]);
+
+  // Comparison: energy per capita
+  const compData = useMemo(() => {
+    if (!countryData) return null;
+    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    return countryData.yearly
+      .filter(y => y.energyPerCapita != null && worldMap.has(y.year) && worldMap.get(y.year)!.energyPerCapita != null)
+      .map(y => ({
+        year: y.year,
+        [countryData.name]: y.energyPerCapita,
+        World: worldMap.get(y.year)!.energyPerCapita,
+      }));
+  }, [data.yearly, countryData]);
+
+  // Electricity per capita (kWh/person)
+  const elecCompData = useMemo(() => {
+    if (!countryData) return null;
+    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    return countryData.yearly
+      .filter(y => y.perCapitaElectricity != null && worldMap.has(y.year) && worldMap.get(y.year)!.perCapitaElectricity != null)
+      .map(y => ({
+        year: y.year,
+        [countryData.name]: y.perCapitaElectricity,
+        World: worldMap.get(y.year)!.perCapitaElectricity,
+      }));
+  }, [data.yearly, countryData]);
+
+  const worldElecPerCapita = useMemo(() => {
+    return data.yearly
+      .filter(y => y.perCapitaElectricity != null)
+      .map(y => ({ year: y.year, World: y.perCapitaElectricity }));
+  }, [data.yearly]);
+
+  if (worldPerCapita.length === 0) return null;
+
+  return (
+    <>
+      <Divider icon={<Users className="h-5 w-5" />} title="Per Capita" />
+
+      <SectionCard icon={<Users className="h-5 w-5 text-blue-400" />} title="Energy Use Per Capita">
+        <p className="text-sm text-gray-400 mb-4">
+          Energy consumption per person reveals vast inequalities between nations.
+          High-income countries use many times more energy per capita than the global average,
+          though efficiency gains are <span className="text-emerald-400 font-medium">narrowing the gap</span>.
+        </p>
+
+        {/* Energy per capita */}
+        {compData && compData.length > 0 && countryData ? (
+          <SubSection title={`${countryData.name} vs World — primary energy per capita (kWh/person)`}>
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={compData} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Line type="monotone" dataKey={countryData.name} stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="World" stroke="#93c5fd" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        ) : (
+          <SubSection title="World — primary energy per capita (kWh/person)">
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={worldPerCapita} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Area type="monotone" dataKey="World" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} strokeWidth={2} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        )}
+
+        {/* Electricity per capita */}
+        {elecCompData && elecCompData.length > 0 && countryData ? (
+          <SubSection title={`${countryData.name} vs World — electricity per capita (kWh/person)`}>
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={elecCompData} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Line type="monotone" dataKey={countryData.name} stroke="#a855f7" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="World" stroke="#c4b5fd" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        ) : worldElecPerCapita.length > 0 && (
+          <SubSection title="World — electricity per capita (kWh/person)">
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={worldElecPerCapita} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Area type="monotone" dataKey="World" stroke="#a855f7" fill="#a855f7" fillOpacity={0.3} strokeWidth={2} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        )}
+      </SectionCard>
+    </>
+  );
+}
+
 function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
   // World emissions area
   const worldData = useMemo(() => {
@@ -1136,6 +1265,7 @@ export default function EnergyPage() {
           <RenewablesGrowthSection data={w} countryData={countryData} />
           <FossilFuelBreakdownSection data={w} countryData={countryData} />
           <CarbonIntensitySection data={w} countryData={countryData} />
+          <EnergyPerCapitaSection data={w} countryData={countryData} />
           <EmissionsSection data={w} countryData={countryData} />
 
           {/* ─── Attribution ─────────────────────────────────────────── */}
