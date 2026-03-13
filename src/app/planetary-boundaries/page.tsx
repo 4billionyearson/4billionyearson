@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer, ReferenceLine,
+} from "recharts";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -362,8 +366,9 @@ export default function PlanetaryBoundariesPage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section>
         <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 text-gray-200">
+        <div className="max-w-7xl mx-auto space-y-6">
          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
-          <p className="text-sm uppercase tracking-[0.3em] text-red-400 font-mono mb-4">
+          <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: 'linear-gradient(to right, #f87171, #fbbf24, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Climate Change
           </p>
           <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-6">
@@ -398,7 +403,7 @@ export default function PlanetaryBoundariesPage() {
             </div>
           </div>
 
-          {/* ── Temperature Anomaly expanded section ── */}
+          {/* ── Temperature Anomaly stats ── */}
           {liveData?.temperature && (
             <div className="mt-6 bg-gray-900/60 border border-orange-500/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
@@ -409,7 +414,7 @@ export default function PlanetaryBoundariesPage() {
               </div>
 
               {/* Context & targets */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="bg-gray-800/60 rounded-lg p-3">
                   <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">
                     Paris Target
@@ -445,70 +450,6 @@ export default function PlanetaryBoundariesPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Mini sparkline chart using SVG */}
-              {liveData.temperature.history?.length > 5 && (() => {
-                const hist = liveData.temperature!.history;
-                const minY = Math.min(...hist.map(h => h.anomaly));
-                const maxY = Math.max(...hist.map(h => h.anomaly), 2);
-                const range = maxY - minY || 1;
-                const w = 100; // percentage-based viewBox
-                const h = 40;
-                const points = hist.map((p, i) => {
-                  const x = (i / (hist.length - 1)) * w;
-                  const y = h - ((p.anomaly - minY) / range) * (h - 4) - 2;
-                  return `${x},${y}`;
-                });
-                const parisY = h - ((1.5 - minY) / range) * (h - 4) - 2;
-                const upperY = h - ((2.0 - minY) / range) * (h - 4) - 2;
-                const firstYear = hist[0].year;
-                const lastYear = hist[hist.length - 1].year;
-                const midYear = hist[Math.floor(hist.length / 2)].year;
-                return (
-                  <div>
-                    <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">
-                      Annual Global Temperature Anomaly ({firstYear}–{lastYear})
-                    </div>
-                    <svg viewBox={`0 0 ${w} ${h + 6}`} className="w-full h-28" preserveAspectRatio="none">
-                      {/* 1.5°C Paris target line */}
-                      <line x1="0" y1={parisY} x2={w} y2={parisY} stroke="#10b981" strokeWidth="0.3" strokeDasharray="2,1" />
-                      <text x={w - 1} y={parisY - 1} textAnchor="end" className="fill-emerald-500" style={{ fontSize: '2.5px' }}>1.5°C</text>
-                      {/* 2.0°C upper limit line */}
-                      <line x1="0" y1={upperY} x2={w} y2={upperY} stroke="#f59e0b" strokeWidth="0.3" strokeDasharray="2,1" />
-                      <text x={w - 1} y={upperY - 1} textAnchor="end" className="fill-amber-500" style={{ fontSize: '2.5px' }}>2.0°C</text>
-                      {/* 0°C baseline */}
-                      {minY < 0 && (() => {
-                        const zeroY = h - ((0 - minY) / range) * (h - 4) - 2;
-                        return <line x1="0" y1={zeroY} x2={w} y2={zeroY} stroke="#7A6E63" strokeWidth="0.2" strokeDasharray="1,1" />;
-                      })()}
-                      {/* Area fill */}
-                      <polygon
-                        points={`0,${h} ${points.join(' ')} ${w},${h}`}
-                        fill="url(#tempGradient)"
-                        opacity="0.3"
-                      />
-                      {/* Gradient definition */}
-                      <defs>
-                        <linearGradient id="tempGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#f97316" />
-                          <stop offset="100%" stopColor="#f9731600" />
-                        </linearGradient>
-                      </defs>
-                      {/* Line */}
-                      <polyline points={points.join(' ')} fill="none" stroke="#f97316" strokeWidth="0.5" />
-                    </svg>
-                    <div className="flex justify-between text-[10px] text-gray-600 mt-1">
-                      <span>{firstYear}</span>
-                      <span>{midYear}</span>
-                      <span>{lastYear}</span>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              <p className="text-xs text-gray-500 mt-3">
-                Data: NASA GISS Surface Temperature Analysis (GISTEMP) via NOAA &middot; Anomaly relative to 1951–1980 average
-              </p>
             </div>
           )}
 
@@ -517,6 +458,54 @@ export default function PlanetaryBoundariesPage() {
             2025 &middot; Richardson et al. (2023)
           </p>
          </div>
+
+          {/* ── Temperature Chart (separate card) ── */}
+          {liveData?.temperature?.history && liveData.temperature.history.length > 5 && (
+            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+              <div className="flex items-center gap-2 mb-4">
+                <Thermometer className="w-5 h-5 text-orange-400" />
+                <h3 className="text-white font-semibold font-mono">
+                  Annual Global Temperature Anomaly
+                </h3>
+              </div>
+              <div className="h-[320px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={liveData.temperature.history} margin={{ top: 10, right: 0, left: -30, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="pbTempGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                    <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="°" domain={['auto', 2.3]} />
+                    <Tooltip
+                      content={({ active, payload, label }: any) => {
+                        if (!active || !payload?.length) return null;
+                        return (
+                          <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[160px]">
+                            <p className="font-semibold text-gray-200 mb-1 text-sm">{label}</p>
+                            <p className="text-sm text-orange-400">Anomaly: {payload[0].value.toFixed(2)}°C</p>
+                          </div>
+                        );
+                      }}
+                    />
+                    <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                    <ReferenceLine y={1.5} stroke="#10b981" strokeDasharray="6 3" strokeWidth={1.5}
+                      label={{ position: 'insideTopLeft', value: 'Paris 1.5°C', fill: '#10b981', fontSize: 11, fontWeight: 600 } as any} />
+                    <ReferenceLine y={2.0} stroke="#f59e0b" strokeDasharray="6 3" strokeWidth={1.5}
+                      label={{ position: 'insideTopLeft', value: 'Paris 2.0°C', fill: '#f59e0b', fontSize: 11, fontWeight: 600 } as any} />
+                    <Area type="monotone" dataKey="anomaly" name="Temp Anomaly (°C)" stroke="#f97316" strokeWidth={2}
+                      fill="url(#pbTempGrad)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-xs text-gray-500 mt-3">
+                Data: NASA GISS Surface Temperature Analysis (GISTEMP) via NOAA &middot; Anomaly relative to 1951–1980 average
+              </p>
+            </div>
+          )}
 
       {/* ── Boundary cards ───────────────────────────────────────────────── */}
       <div className="mt-6">
@@ -719,7 +708,7 @@ export default function PlanetaryBoundariesPage() {
 
       {/* ── Framework context ────────────────────────────────────────────── */}
       <div className="mt-6 bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
-          <div className="max-w-3xl">
+          <div>
             <h2 className="text-2xl font-bold font-mono text-white mb-6">
               About the Planetary Boundaries Framework
             </h2>
@@ -899,6 +888,7 @@ export default function PlanetaryBoundariesPage() {
               </ul>
             </div>
           </div>
+        </div>
         </div>
         </div>
       </section>

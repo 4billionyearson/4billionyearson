@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:greenhouse-gases:v2';
+const CACHE_KEY = 'climate:greenhouse-gases:v3';
 const CACHE_TTL_HOURS = 12;
 
 interface MonthlyPoint {
@@ -35,6 +35,7 @@ interface GHGData {
   temperature: { current: { anomaly: number; date: string }; yearly: TempPoint[] } | null;
   arcticIce: { current: { extent: number; anomaly: number; date: string }; yearly: YearlyPoint[] } | null;
   oceanWarming: { current: { anomaly: number; year: string }; yearly: YearlyPoint[] } | null;
+  seaLevel: { current: { value: number; year: string }; rate: string; yearly: YearlyPoint[] } | null;
   fetchedAt: string;
 }
 
@@ -108,7 +109,7 @@ function buildYearlyAverages(monthly: MonthlyPoint[]): YearlyPoint[] {
 }
 
 async function fetchGHGData(): Promise<GHGData> {
-  const [co2Text, co2Raw, tempRaw, methaneRaw, n2oRaw, arcticRaw, oceanRaw] = await Promise.all([
+  const [co2Text, co2Raw, tempRaw, methaneRaw, n2oRaw, arcticRaw, oceanRaw, seaLevelText] = await Promise.all([
     fetchText('https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.txt'),
     fetchJSON('https://global-warming.org/api/co2-api'),       // fallback for current reading
     fetchJSON('https://global-warming.org/api/temperature-api'),
@@ -116,6 +117,7 @@ async function fetchGHGData(): Promise<GHGData> {
     fetchJSON('https://global-warming.org/api/nitrous-oxide-api'),
     fetchJSON('https://global-warming.org/api/arctic-api'),
     fetchJSON('https://global-warming.org/api/ocean-warming-api'),
+    fetchText('https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/slr/slr_sla_gbl_keep_all_66.csv'),
   ]);
 
   // ── CO₂ (NOAA Mauna Loa — 1958-present, fallback to global-warming.org) ──
@@ -274,7 +276,52 @@ async function fetchGHGData(): Promise<GHGData> {
     };
   }
 
-  return { co2, methane, n2o, temperature, arcticIce, oceanWarming, fetchedAt: new Date().toISOString() };
+  // ── Sea Level (NOAA STAR satellite altimetry) ──
+  let seaLevel: GHGData['seaLevel'] = null;
+  if (seaLevelText) {
+    // Extract rate from header comment
+    let rate = '3.4';
+    const rateMatch = seaLevelText.match(/#trend\s*=\s*([\d.]+)\s*mm\/year/);
+    if (rateMatch) rate = rateMatch[1];
+
+    // Parse CSV: columns are year, TOPEX/Poseidon, Jason-1, Jason-2, Jason-3, Sentinel-6MF
+    const byYear: Record<number, number[]> = {};
+    let lastValue = 0;
+    let lastYearDecimal = 0;
+    for (const line of seaLevelText.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('year')) continue;
+      const cols = trimmed.split(',');
+      if (cols.length < 2) continue;
+      const yearDecimal = parseFloat(cols[0]);
+      if (isNaN(yearDecimal)) continue;
+      // Take the first non-empty satellite value
+      let val: number | null = null;
+      for (let i = 1; i < cols.length; i++) {
+        const v = parseFloat(cols[i]);
+        if (!isNaN(v)) { val = v; break; }
+      }
+      if (val === null) continue;
+      const yr = Math.floor(yearDecimal);
+      (byYear[yr] ??= []).push(val);
+      if (yearDecimal > lastYearDecimal) {
+        lastYearDecimal = yearDecimal;
+        lastValue = val;
+      }
+    }
+    const yearly: YearlyPoint[] = Object.entries(byYear)
+      .map(([y, vals]) => ({ year: Number(y), value: vals.reduce((a, b) => a + b, 0) / vals.length }))
+      .sort((a, b) => a.year - b.year);
+    if (yearly.length > 0) {
+      seaLevel = {
+        current: { value: lastValue, year: Math.floor(lastYearDecimal).toString() },
+        rate: `${rate} mm/year`,
+        yearly,
+      };
+    }
+  }
+
+  return { co2, methane, n2o, temperature, arcticIce, oceanWarming, seaLevel, fetchedAt: new Date().toISOString() };
 }
 
 export async function GET() {

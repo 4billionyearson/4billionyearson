@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
@@ -260,6 +260,8 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
 
 // ─── Main Dashboard ──────────────────────────────────────────────────────────
 
+const CLIMATE_CACHE_KEY = 'climate-dashboard-cache';
+
 export default function ClimateDashboard() {
   const [searchInput, setSearchInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -274,6 +276,33 @@ export default function ClimateDashboard() {
   const [ukCountryData, setUkCountryData] = useState<any>(null);
   const [globalData, setGlobalData] = useState<any>(null);
   const [showGlobalOverlay, setShowGlobalOverlay] = useState(false);
+
+  // Restore cached data on mount
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(CLIMATE_CACHE_KEY);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (cached.selectedLocation) setSelectedLocation(cached.selectedLocation);
+        if (cached.countryData) setCountryData(cached.countryData);
+        if (cached.usStateData) setUsStateData(cached.usStateData);
+        if (cached.ukRegionData) setUkRegionData(cached.ukRegionData);
+        if (cached.ukCountryData) setUkCountryData(cached.ukCountryData);
+        if (cached.globalData) setGlobalData(cached.globalData);
+        if (cached.searchInput) setSearchInput(cached.searchInput);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Persist to sessionStorage whenever data changes
+  useEffect(() => {
+    if (!selectedLocation) return;
+    try {
+      sessionStorage.setItem(CLIMATE_CACHE_KEY, JSON.stringify({
+        selectedLocation, countryData, usStateData, ukRegionData, ukCountryData, globalData, searchInput,
+      }));
+    } catch { /* quota exceeded — ignore */ }
+  }, [selectedLocation, countryData, usStateData, ukRegionData, ukCountryData, globalData, searchInput]);
 
   const handleSearch = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -418,12 +447,20 @@ export default function ClimateDashboard() {
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
 
         {/* ─── Header & Search ──────────────────────────────────────── */}
-        <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border border-gray-800">
-          <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide text-white mb-1">🌍 Local Climate Data</h1>
-          <p className="text-gray-400 text-sm mb-4">
+        <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-800">
+          <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: 'linear-gradient(to right, #60a5fa, #818cf8, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            Climate Change
+          </p>
+          <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
+            Global & Local{" "}
+            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              Climate Data
+            </span>
+          </h1>
+          <p className="text-gray-400 text-sm md:text-base mb-4">
             Search for any country, US state, or UK city/region.
           </p>
 
@@ -484,6 +521,18 @@ export default function ClimateDashboard() {
               <span className="ml-auto text-xs text-gray-500">
                 {(countryData?.source || usStateData?.source || ukRegionData?.source) === 'cache' ? '⚡ Cached' : '🔄 Fresh'}
               </span>
+              <button
+                onClick={() => {
+                  setCountryData(null);
+                  setUsStateData(null);
+                  setUkRegionData(null);
+                  setSelectedLocation(null);
+                  setSearchInput('');
+                }}
+                className="text-xs text-gray-500 hover:text-gray-300"
+              >
+                ✕ Clear
+              </button>
             </div>
           )}
         </div>

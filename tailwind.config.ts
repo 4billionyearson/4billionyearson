@@ -8,6 +8,10 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    container: {
+      center: true,
+      screens: { xl: "1280px" },
+    },
     extend: {
       fontFamily: {
         mono: ['var(--font-space-mono)', 'monospace'],

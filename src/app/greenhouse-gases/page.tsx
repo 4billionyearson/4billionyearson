@@ -29,6 +29,7 @@ interface GHGData {
   temperature: { current: { anomaly: number; date: string }; yearly: TempPoint[] } | null;
   arcticIce: { current: { extent: number; anomaly: number; date: string }; yearly: YearlyPoint[] } | null;
   oceanWarming: { current: { anomaly: number; year: string }; yearly: YearlyPoint[] } | null;
+  seaLevel: { current: { value: number; year: string }; rate: string; yearly: YearlyPoint[] } | null;
   fetchedAt: string;
 }
 
@@ -440,6 +441,8 @@ function OverviewSection({ data }: { data: GHGData }) {
           </SubSection>
         </SectionCard>
       )}
+
+
     </>
   );
 }
@@ -466,11 +469,11 @@ export default function GreenhouseGasesPage() {
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
           <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
-            <p className="text-sm uppercase tracking-[0.3em] text-amber-400 font-mono mb-4">
+            <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: 'linear-gradient(to right, #f59e0b, #fb923c, #f87171)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Climate Change
             </p>
             <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">

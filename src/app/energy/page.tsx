@@ -208,7 +208,7 @@ function CountrySearch({ onSelect, loading }: { onSelect: (name: string) => void
   };
 
   return (
-    <div className="relative w-full max-w-lg">
+    <div className="relative w-full">
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -218,13 +218,13 @@ function CountrySearch({ onSelect, loading }: { onSelect: (name: string) => void
             onChange={(e) => handleSearch(e.target.value)}
             onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
             placeholder="Compare with a country..."
-            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-sm"
+            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
             autoComplete="off"
           />
         </div>
         <button type="submit" disabled={loading}
-          className="bg-emerald-600 hover:bg-emerald-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition-colors">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4" />Compare</>}
+          className="bg-emerald-600 hover:bg-emerald-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center gap-1.5 min-w-[100px] justify-center transition-colors">
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Compare</>}
         </button>
       </form>
       {showDropdown && suggestions.length > 0 && (
@@ -1127,6 +1127,8 @@ function FossilFuelBreakdownSection({ data, countryData }: { data: CountryEnergy
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
+const ENERGY_CACHE_KEY = 'energy-page-cache';
+
 export default function EnergyPage() {
   const [data, setData] = useState<EnergyData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1135,12 +1137,30 @@ export default function EnergyPage() {
   const [countryLoading, setCountryLoading] = useState(false);
 
   useEffect(() => {
+    // Try restoring from sessionStorage first
+    try {
+      const raw = sessionStorage.getItem(ENERGY_CACHE_KEY);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (cached.data) { setData(cached.data); setLoading(false); }
+        if (cached.countryData) setCountryData(cached.countryData);
+        if (cached.data) return; // skip fetch if we have cached world data
+      }
+    } catch { /* ignore */ }
     fetch('/api/climate/energy')
       .then(r => r.json())
       .then(d => { if (d.error) throw new Error(d.error); setData(d); })
       .catch(e => setError(e.message || 'Failed to load data'))
       .finally(() => setLoading(false));
   }, []);
+
+  // Persist to sessionStorage whenever data changes
+  useEffect(() => {
+    if (!data) return;
+    try {
+      sessionStorage.setItem(ENERGY_CACHE_KEY, JSON.stringify({ data, countryData }));
+    } catch { /* quota exceeded — ignore */ }
+  }, [data, countryData]);
 
   const handleCountrySelect = useCallback(async (name: string) => {
     setCountryLoading(true);
@@ -1163,7 +1183,7 @@ export default function EnergyPage() {
     return (
       <main>
         <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 font-sans text-gray-200">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4 mt-6">
               <Loader2 className="h-10 w-10 animate-spin text-emerald-400" />
               <p className="text-gray-400">Loading global energy data...</p>
@@ -1178,7 +1198,7 @@ export default function EnergyPage() {
     return (
       <main>
         <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 font-sans text-gray-200">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="bg-red-950/50 border border-red-800 p-8 rounded-2xl text-center mt-6">
               <p className="text-red-400 font-medium">{error || 'Failed to load energy data'}</p>
             </div>
@@ -1194,14 +1214,20 @@ export default function EnergyPage() {
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ───────────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border border-gray-800">
-            <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide text-white mb-1">
-              ⚡ Global Energy
+          <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-800">
+            <p className="text-sm uppercase tracking-[0.3em] text-emerald-400 font-mono mb-4">
+              Renewables
+            </p>
+            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
+              Global & Country{" "}
+              <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
+                Energy
+              </span>
             </h1>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-gray-400 text-sm md:text-base mb-4">
               Tracking the world&apos;s energy transition — from fossil fuels to renewables.
               Data from <span className="text-gray-300">Our World in Data</span> (CC-BY).
             </p>

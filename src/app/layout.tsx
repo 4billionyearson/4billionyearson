@@ -49,7 +49,7 @@ export default function RootLayout({
             backgroundColor: "#000000",
             backgroundImage: "url('/background.png')",
             backgroundSize: "cover",
-            backgroundPosition: "calc(50% + 7px) top",
+            backgroundPosition: "center top",
             backgroundRepeat: "no-repeat",
           }}
         />

@@ -7,10 +7,16 @@ import { useRouter, usePathname } from "next/navigation";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isBlogOpen, setIsBlogOpen] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(false);
+  const [isRenewablesOpen, setIsRenewablesOpen] = useState(false);
   const [isClimateChangeOpen, setIsClimateChangeOpen] = useState(false);
-  const [mobileBlogOpen, setMobileBlogOpen] = useState(false);
+  const [isBiotechOpen, setIsBiotechOpen] = useState(false);
+  const [isBlogOpen, setIsBlogOpen] = useState(false);
+  const [mobileAIOpen, setMobileAIOpen] = useState(false);
+  const [mobileRenewablesOpen, setMobileRenewablesOpen] = useState(false);
   const [mobileClimateOpen, setMobileClimateOpen] = useState(false);
+  const [mobileBiotechOpen, setMobileBiotechOpen] = useState(false);
+  const [mobileBlogOpen, setMobileBlogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const pathname = usePathname();
@@ -41,6 +47,97 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden xl:flex items-center gap-6 font-mono tracking-widest text-sm ml-auto mr-4 mt-3">
+          {/* AI Dropdown */}
+          <div className="relative" onMouseEnter={() => setIsAIOpen(true)} onMouseLeave={() => setIsAIOpen(false)}>
+            <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
+              pathname === '/category/artificial-intelligence' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+            }`}>
+              AI ▾
+            </button>
+            {isAIOpen && (
+              <div className="absolute top-full left-0 pt-1 z-50">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
+                <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD] bg-gray-900' : 'text-gray-300 hover:text-[#89DEFD] hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Blog Articles
+                </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Renewables Dropdown */}
+          <div className="relative" onMouseEnter={() => setIsRenewablesOpen(true)} onMouseLeave={() => setIsRenewablesOpen(false)}>
+            <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
+              pathname === '/energy' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+            }`}>
+              Renewables ▾
+            </button>
+            {isRenewablesOpen && (
+              <div className="absolute top-full left-0 pt-1 z-50">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[260px]">
+                <Link href="/energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Global & Country Energy Data
+                </Link>
+                <div className="border-t border-gray-700/50">
+                <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Blog Articles
+                </Link>
+                </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Climate Change Dropdown */}
+          <div className="relative" onMouseEnter={() => setIsClimateChangeOpen(true)} onMouseLeave={() => setIsClimateChangeOpen(false)}>
+            <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
+              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+            }`}>
+              Climate Change ▾
+            </button>
+            {isClimateChangeOpen && (
+              <div className="absolute top-full left-0 pt-1 z-50">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[240px]">
+                <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Global & Local Climate Data
+                </Link>
+                <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  The Nine Factors
+                </Link>
+                <Link href="/greenhouse-gases" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400 bg-gray-900' : 'text-gray-300 hover:text-amber-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Greenhouse Gases
+                </Link>
+                <Link href="/sea-levels-ice" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400 bg-gray-900' : 'text-gray-300 hover:text-teal-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Sea Levels & Ice
+                </Link>
+                <div className="border-t border-gray-700/50">
+                <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Blog Articles
+                </Link>
+                </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Biotech Dropdown */}
+          <div className="relative" onMouseEnter={() => setIsBiotechOpen(true)} onMouseLeave={() => setIsBiotechOpen(false)}>
+            <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
+              pathname === '/category/biotechnology' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+            }`}>
+              Biotech ▾
+            </button>
+            {isBiotechOpen && (
+              <div className="absolute top-full left-0 pt-1 z-50">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
+                <Link href="/category/biotechnology" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742] bg-gray-900' : 'text-gray-300 hover:text-[#D26742] hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Blog Articles
+                </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Blog Dropdown */}
           <div className="relative" onMouseEnter={() => setIsBlogOpen(true)} onMouseLeave={() => setIsBlogOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
@@ -67,42 +164,6 @@ const Header = () => {
               </div>
             )}
           </div>
-
-          {/* Climate Change Dropdown */}
-          <div className="relative" onMouseEnter={() => setIsClimateChangeOpen(true)} onMouseLeave={() => setIsClimateChangeOpen(false)}>
-            <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
-            }`}>
-              Climate Change ▾
-            </button>
-            {isClimateChangeOpen && (
-              <div className="absolute top-full left-0 pt-1 z-50">
-                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[220px]">
-                <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Local Climate Data
-                </Link>
-                <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  The Nine Factors
-                </Link>
-                <Link href="/greenhouse-gases" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400 bg-gray-900' : 'text-gray-300 hover:text-amber-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Greenhouse Gases
-                </Link>
-                <Link href="/energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Global Energy
-                </Link>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="w-px h-4 bg-gray-600 shadow-xl"></div>
-
-          <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors whitespace-nowrap [text-shadow:0_2px_4px_black]">
-            Privacy
-          </Link>
-          <Link href="/about" className="text-gray-400 hover:text-white transition-colors whitespace-nowrap [text-shadow:0_2px_4px_black]">
-            About Us
-          </Link>
 
           <form onSubmit={handleSearch} className="flex border border-gray-600 rounded overflow-hidden bg-black/30 ml-2 hover:border-gray-400 transition-colors">
             <input 
@@ -137,6 +198,85 @@ const Header = () => {
               Home
             </Link>
             
+            {/* Mobile AI Accordion */}
+            <button
+              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
+              onClick={() => setMobileAIOpen(!mobileAIOpen)}
+            >
+              AI
+              <span className={`transition-transform ${mobileAIOpen ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+            {mobileAIOpen && (
+              <div className="bg-gray-950/50">
+                <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD]' : 'text-gray-400 hover:text-[#89DEFD]'}`} onClick={closeMenu}>
+                  Blog Articles
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile Renewables Accordion */}
+            <button
+              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
+              onClick={() => setMobileRenewablesOpen(!mobileRenewablesOpen)}
+            >
+              Renewables
+              <span className={`transition-transform ${mobileRenewablesOpen ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+            {mobileRenewablesOpen && (
+              <div className="bg-gray-950/50">
+                <Link href="/energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy' ? 'text-emerald-400' : 'text-gray-400 hover:text-emerald-400'}`} onClick={closeMenu}>
+                  Global & Country Energy Data
+                </Link>
+                <Link href="/category/renewable-energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368]' : 'text-gray-400 hover:text-[#D1E368]'}`} onClick={closeMenu}>
+                  Blog Articles
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile Climate Change Accordion */}
+            <button
+              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
+              onClick={() => setMobileClimateOpen(!mobileClimateOpen)}
+            >
+              Climate Change
+              <span className={`transition-transform ${mobileClimateOpen ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+            {mobileClimateOpen && (
+              <div className="bg-gray-950/50">
+                <Link href="/climate-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={closeMenu}>
+                  Global & Local Climate Data
+                </Link>
+                <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`} onClick={closeMenu}>
+                  The Nine Factors
+                </Link>
+                <Link href="/greenhouse-gases" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400' : 'text-gray-400 hover:text-amber-400'}`} onClick={closeMenu}>
+                  Greenhouse Gases
+                </Link>
+                <Link href="/sea-levels-ice" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400' : 'text-gray-400 hover:text-teal-400'}`} onClick={closeMenu}>
+                  Sea Levels & Ice
+                </Link>
+                <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-400 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
+                  Blog Articles
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile Biotech Accordion */}
+            <button
+              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
+              onClick={() => setMobileBiotechOpen(!mobileBiotechOpen)}
+            >
+              Biotech
+              <span className={`transition-transform ${mobileBiotechOpen ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+            {mobileBiotechOpen && (
+              <div className="bg-gray-950/50">
+                <Link href="/category/biotechnology" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742]' : 'text-gray-400 hover:text-[#D26742]'}`} onClick={closeMenu}>
+                  Blog Articles
+                </Link>
+              </div>
+            )}
+
             {/* Mobile Blog Accordion */}
             <button
               className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
@@ -161,38 +301,6 @@ const Header = () => {
                 </Link>
               </div>
             )}
-
-            {/* Mobile Climate Change Accordion */}
-            <button
-              className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
-              onClick={() => setMobileClimateOpen(!mobileClimateOpen)}
-            >
-              Climate Change
-              <span className={`transition-transform ${mobileClimateOpen ? 'rotate-180' : ''}`}>▾</span>
-            </button>
-            {mobileClimateOpen && (
-              <div className="bg-gray-950/50">
-                <Link href="/climate-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={closeMenu}>
-                  Local Climate Data
-                </Link>
-                <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`} onClick={closeMenu}>
-                  The Nine Factors
-                </Link>
-                <Link href="/greenhouse-gases" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400' : 'text-gray-400 hover:text-amber-400'}`} onClick={closeMenu}>
-                  Greenhouse Gases
-                </Link>
-                <Link href="/energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/energy' ? 'text-emerald-400' : 'text-gray-400 hover:text-emerald-400'}`} onClick={closeMenu}>
-                  Global Energy
-                </Link>
-              </div>
-            )}
-            
-            <Link href="/privacy" className="text-gray-400 text-sm hover:text-white px-6 py-4 border-b border-gray-600/50 w-full" onClick={closeMenu}>
-              Privacy
-            </Link>
-            <Link href="/about" className="text-gray-400 text-sm hover:text-white px-6 py-4 border-b border-gray-600/50 w-full" onClick={closeMenu}>
-              About Us
-            </Link>
 
             <div className="px-6 py-6 w-full max-w-md">
               <form onSubmit={handleSearch} className="flex border border-gray-400 rounded-md overflow-hidden bg-black/50">
