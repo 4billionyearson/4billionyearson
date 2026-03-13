@@ -227,7 +227,7 @@ function mergeMetricData(regionYearly: any[], countryYearly: any[]): any[] {
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-gray-800">
+    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
       <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2">
         {icon}
         {title}
@@ -827,7 +827,7 @@ export default function ClimateDashboard() {
             <Globe className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-400 mb-2">Search for a location to get started</h2>
             <p className="text-gray-500 text-sm max-w-md mx-auto">
-              Try &quot;United Kingdom&quot;, &quot;London&quot;, &quot;California&quot;, &quot;France&quot;, or any country, US state, or UK region.
+              Try &quot;United Kingdom&quot;, &quot;London&quot;, &quot;California&quot;, &quot;France&quot;, or any country, US state, or UK city/region.
             </p>
           </div>
         )}

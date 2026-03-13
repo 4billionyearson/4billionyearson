@@ -71,7 +71,7 @@ const Header = () => {
           {/* Climate Change Dropdown */}
           <div className="relative" onMouseEnter={() => setIsClimateChangeOpen(true)} onMouseLeave={() => setIsClimateChangeOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Climate Change ▾
             </button>
@@ -83,6 +83,9 @@ const Header = () => {
                 </Link>
                 <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   The Nine Factors
+                </Link>
+                <Link href="/greenhouse-gases" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400 bg-gray-900' : 'text-gray-300 hover:text-amber-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Greenhouse Gases
                 </Link>
                 </div>
               </div>
@@ -169,8 +172,11 @@ const Header = () => {
                 <Link href="/climate-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={closeMenu}>
                   Local Climate Data
                 </Link>
-                <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`} onClick={closeMenu}>
+                <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`} onClick={closeMenu}>
                   The Nine Factors
+                </Link>
+                <Link href="/greenhouse-gases" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400' : 'text-gray-400 hover:text-amber-400'}`} onClick={closeMenu}>
+                  Greenhouse Gases
                 </Link>
               </div>
             )}
