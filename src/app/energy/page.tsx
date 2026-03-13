@@ -142,12 +142,21 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
-function StatCard({ label, value, unit, color, icon }: { label: string; value: string; unit?: string; color: string; icon: React.ReactNode }) {
+function StatCard({ label, value, unit, color, icon, countryValue, countryName }: { label: string; value: string; unit?: string; color: string; icon: React.ReactNode; countryValue?: string; countryName?: string }) {
   return (
     <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center">
       <div className={`mb-2 ${color}`}>{icon}</div>
       <p className={`text-2xl font-bold font-mono ${color}`}>{value}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
-      <p className="text-xs text-gray-400 mt-1">{label}</p>
+      {countryValue && countryName ? (
+        <>
+          <p className="text-[10px] text-gray-500 mt-0.5">World</p>
+          <p className={`text-lg font-bold font-mono text-emerald-400 mt-1`}>{countryValue}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
+          <p className="text-[10px] text-gray-500 mt-0.5">{countryName}</p>
+          <p className="text-xs text-gray-400 mt-1">{label}</p>
+        </>
+      ) : (
+        <p className="text-xs text-gray-400 mt-1">{label}</p>
+      )}
     </div>
   );
 }
@@ -751,6 +760,13 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
       .map(y => ({ year: y.year, Emissions: y.ghgEmissions }));
   }, [countryData]);
 
+  // World per-capita data (always shown)
+  const worldPerCapita = useMemo(() => {
+    return data.yearly
+      .filter(y => y.ghgPerCapita != null)
+      .map(y => ({ year: y.year, World: y.ghgPerCapita }));
+  }, [data.yearly]);
+
   // Per-capita comparison (tonnes per person) — normalises the scale difference
   const perCapitaComp = useMemo(() => {
     if (!countryData) return null;
@@ -825,7 +841,7 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
         )}
 
         {/* Per-capita comparison — fair like-for-like */}
-        {perCapitaComp && perCapitaComp.length > 0 && countryData && (
+        {perCapitaComp && perCapitaComp.length > 0 && countryData ? (
           <SubSection title={`${countryData.name} vs World — GHG emissions per capita (tonnes CO₂eq)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -839,6 +855,22 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
                   <Line type="monotone" dataKey="World" stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </SubSection>
+        ) : worldPerCapita.length > 0 && (
+          <SubSection title="World — GHG emissions per capita (tonnes CO₂eq)">
+            <div className="h-[380px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={worldPerCapita} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Area type="monotone" dataKey="World" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </SubSection>
@@ -1065,6 +1097,8 @@ export default function EnergyPage() {
                 unit="%"
                 color="text-red-400"
                 icon={<Flame className="h-5 w-5" />}
+                countryValue={countryData?.latest?.fossilShare?.toFixed(1)}
+                countryName={countryData?.name}
               />
               <StatCard
                 label={`Renewables share (${latest.year})`}
@@ -1072,6 +1106,8 @@ export default function EnergyPage() {
                 unit="%"
                 color="text-emerald-400"
                 icon={<Zap className="h-5 w-5" />}
+                countryValue={countryData?.latest?.renewablesShare?.toFixed(1)}
+                countryName={countryData?.name}
               />
               <StatCard
                 label={`Solar electricity (${latest.year})`}
@@ -1079,6 +1115,8 @@ export default function EnergyPage() {
                 unit="%"
                 color="text-yellow-400"
                 icon={<Sun className="h-5 w-5" />}
+                countryValue={countryData?.latest?.solarShareElec?.toFixed(1)}
+                countryName={countryData?.name}
               />
               <StatCard
                 label={`Wind electricity (${latest.year})`}
@@ -1086,6 +1124,8 @@ export default function EnergyPage() {
                 unit="%"
                 color="text-cyan-400"
                 icon={<Wind className="h-5 w-5" />}
+                countryValue={countryData?.latest?.windShareElec?.toFixed(1)}
+                countryName={countryData?.name}
               />
             </div>
           )}
