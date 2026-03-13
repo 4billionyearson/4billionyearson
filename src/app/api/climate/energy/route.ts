@@ -200,7 +200,7 @@ export async function GET(request: Request) {
         if (country) {
           return await fetchCountryResponse(country, cached);
         }
-        return NextResponse.json(cached);
+        return NextResponse.json({ ...cached, source: 'cache' });
       }
     }
 
@@ -212,7 +212,7 @@ export async function GET(request: Request) {
       return await fetchCountryResponse(country, data);
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json({ ...data, source: 'fresh' });
   } catch (err: any) {
     // Serve stale cache on error
     const stale = await getCached<EnergyData>(CACHE_KEY);
@@ -220,7 +220,7 @@ export async function GET(request: Request) {
       if (country) {
         return await fetchCountryResponse(country, stale);
       }
-      return NextResponse.json(stale);
+      return NextResponse.json({ ...stale, source: 'stale-cache' });
     }
     return NextResponse.json({ error: err.message || 'Failed to fetch energy data' }, { status: 500 });
   }
@@ -232,16 +232,16 @@ async function fetchCountryResponse(countryName: string, worldData: EnergyData) 
   const countryKey = `climate:energy:v2:country:${countryName.toLowerCase().replace(/\s+/g, '-')}`;
   const cached = await getCached<CountryEnergy>(countryKey);
   if (cached) {
-    return NextResponse.json({ world: worldData.world, country: cached, fetchedAt: worldData.fetchedAt });
+    return NextResponse.json({ world: worldData.world, country: cached, fetchedAt: worldData.fetchedAt, source: 'cache' });
   }
 
   const raw = await fetchJSON(OWID_URL);
   if (!raw || !raw[countryName]?.data) {
-    return NextResponse.json({ world: worldData.world, country: null, fetchedAt: worldData.fetchedAt });
+    return NextResponse.json({ world: worldData.world, country: null, fetchedAt: worldData.fetchedAt, source: 'fresh' });
   }
 
   const countryData = buildCountryEnergy(countryName, raw[countryName].data);
   await setShortTerm(countryKey, countryData);
 
-  return NextResponse.json({ world: worldData.world, country: countryData, fetchedAt: worldData.fetchedAt });
+  return NextResponse.json({ world: worldData.world, country: countryData, fetchedAt: worldData.fetchedAt, source: 'fresh' });
 }

@@ -67,6 +67,7 @@ interface CountryEnergy {
 interface EnergyData {
   world: CountryEnergy;
   country?: CountryEnergy | null;
+  source?: string;
   fetchedAt: string;
 }
 
@@ -1209,10 +1210,13 @@ export default function EnergyPage() {
             <CountrySearch onSelect={handleCountrySelect} loading={countryLoading} />
 
             {countryData && (
-              <div className="flex items-center gap-2 mt-3 text-emerald-400 bg-emerald-950/40 p-3 rounded-lg border border-emerald-800/50">
+              <div className="flex items-center gap-2 mt-3 text-emerald-400 bg-emerald-950/40 py-2 px-4 rounded-lg border border-emerald-800/50">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
-                <span className="text-sm font-medium">Comparing with {countryData.name}</span>
-                <button onClick={() => setCountryData(null)} className="ml-auto text-xs text-gray-500 hover:text-gray-300">✕ Clear</button>
+                <span className="text-sm font-medium">Comparing Global Energy with {countryData.name}</span>
+                <span className="ml-auto text-xs text-gray-500">
+                  {data?.source === 'cache' ? '⚡ Cached' : '🔄 Fresh'}
+                </span>
+                <button onClick={() => setCountryData(null)} className="text-xs text-gray-500 hover:text-gray-300">✕ Clear</button>
               </div>
             )}
           </div>

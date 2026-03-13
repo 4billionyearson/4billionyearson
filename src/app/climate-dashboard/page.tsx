@@ -476,6 +476,16 @@ export default function ClimateDashboard() {
               {error}
             </div>
           )}
+
+          {hasData && !loading && (
+            <div className="flex items-center gap-2 mt-3 text-green-400 bg-green-950/40 py-2 px-4 rounded-lg border border-green-800/50">
+              <MapPin className="h-4 w-4 flex-shrink-0" />
+              <span className="font-medium text-sm">{getLocationLabel()}</span>
+              <span className="ml-auto text-xs text-gray-500">
+                {(countryData?.source || usStateData?.source || ukRegionData?.source) === 'cache' ? '⚡ Cached' : '🔄 Fresh'}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* ─── Loading ──────────────────────────────────────────────── */}
@@ -489,15 +499,6 @@ export default function ClimateDashboard() {
         {/* ─── Data Display ─────────────────────────────────────────── */}
         {hasData && !loading && (
           <>
-            {/* Location Banner */}
-            <div className="flex items-center gap-2 text-green-400 bg-green-950/90 p-4 rounded-xl border border-green-800/50">
-              <MapPin className="h-5 w-5 flex-shrink-0" />
-              <span className="font-medium text-sm">{getLocationLabel()}</span>
-              <span className="ml-auto text-xs text-gray-500">
-                {(countryData?.source || usStateData?.source || ukRegionData?.source) === 'cache' ? '⚡ Cached' : '🔄 Fresh'}
-              </span>
-            </div>
-
             {/* ═══ TEMPERATURE ═══ */}
             <Divider icon={<ThermometerSun className="h-5 w-5" />} title="Temperature" />
 
