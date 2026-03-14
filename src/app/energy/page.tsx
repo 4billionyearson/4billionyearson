@@ -73,8 +73,10 @@ interface EnergyData {
 
 // ─── Chart config ────────────────────────────────────────────────────────────
 
-const CHART_MARGIN = { top: 10, right: 0, left: -20, bottom: 0 };
+const CHART_MARGIN = { top: 10, right: 0, left: -15, bottom: 0 };
 const BRUSH_HEIGHT = 30;
+
+const formatTWh = (v: number) => v >= 1000 ? `${Math.round(v / 1000)}k` : String(v);
 
 // ─── Colour palette ─────────────────────────────────────────────────────────
 
@@ -113,7 +115,7 @@ const DarkTooltip = ({ active, payload, label }: any) => {
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
-      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2">
+      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
       </h2>
@@ -143,14 +145,14 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
-function StatCard({ label, value, unit, color, icon, countryValue, countryName }: { label: string; value: string; unit?: string; color: string; icon: React.ReactNode; countryValue?: string; countryName?: string }) {
+function StatCard({ label, value, unit, color, icon, countryValue, countryName, baseLabel = 'World' }: { label: string; value: string; unit?: string; color: string; icon: React.ReactNode; countryValue?: string; countryName?: string; baseLabel?: string }) {
   return (
-    <div className="bg-gray-900/60 border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center">
+    <div className="bg-gray-950/90 backdrop-blur-md border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center shadow-xl">
       <div className={`mb-2 ${color}`}>{icon}</div>
       <p className={`text-2xl font-bold font-mono ${color}`}>{value}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
       {countryValue && countryName ? (
         <>
-          <p className="text-[10px] text-gray-500 mt-0.5">World</p>
+          <p className="text-[10px] text-gray-500 mt-0.5">{baseLabel}</p>
           <p className={`text-2xl font-bold font-mono ${color} mt-1`}>{countryValue}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
           <p className="text-[10px] text-gray-500 mt-0.5">{countryName}</p>
           <p className="text-xs text-gray-400 mt-1">{label}</p>
@@ -162,29 +164,48 @@ function StatCard({ label, value, unit, color, icon, countryValue, countryName }
   );
 }
 
-// ─── Country Search (reusing climate dashboard location search) ──────────────
+// ─── Location Search (countries + US states) ────────────────────────────────
 
 const POPULAR_COUNTRIES = [
   'United Kingdom', 'United States', 'China', 'India', 'Germany',
   'France', 'Brazil', 'Japan', 'Australia', 'Canada',
 ];
 
-function CountrySearch({ onSelect, loading }: { onSelect: (name: string) => void; loading: boolean }) {
-  const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [allCountries, setAllCountries] = useState<string[]>([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+const US_STATES_ENERGY: { code: string; name: string }[] = [
+  { code: 'AL', name: 'Alabama' }, { code: 'AK', name: 'Alaska' }, { code: 'AZ', name: 'Arizona' },
+  { code: 'AR', name: 'Arkansas' }, { code: 'CA', name: 'California' }, { code: 'CO', name: 'Colorado' },
+  { code: 'CT', name: 'Connecticut' }, { code: 'DE', name: 'Delaware' }, { code: 'FL', name: 'Florida' },
+  { code: 'GA', name: 'Georgia' }, { code: 'HI', name: 'Hawaii' }, { code: 'ID', name: 'Idaho' },
+  { code: 'IL', name: 'Illinois' }, { code: 'IN', name: 'Indiana' }, { code: 'IA', name: 'Iowa' },
+  { code: 'KS', name: 'Kansas' }, { code: 'KY', name: 'Kentucky' }, { code: 'LA', name: 'Louisiana' },
+  { code: 'ME', name: 'Maine' }, { code: 'MD', name: 'Maryland' }, { code: 'MA', name: 'Massachusetts' },
+  { code: 'MI', name: 'Michigan' }, { code: 'MN', name: 'Minnesota' }, { code: 'MS', name: 'Mississippi' },
+  { code: 'MO', name: 'Missouri' }, { code: 'MT', name: 'Montana' }, { code: 'NE', name: 'Nebraska' },
+  { code: 'NV', name: 'Nevada' }, { code: 'NH', name: 'New Hampshire' }, { code: 'NJ', name: 'New Jersey' },
+  { code: 'NM', name: 'New Mexico' }, { code: 'NY', name: 'New York' }, { code: 'NC', name: 'North Carolina' },
+  { code: 'ND', name: 'North Dakota' }, { code: 'OH', name: 'Ohio' }, { code: 'OK', name: 'Oklahoma' },
+  { code: 'OR', name: 'Oregon' }, { code: 'PA', name: 'Pennsylvania' }, { code: 'RI', name: 'Rhode Island' },
+  { code: 'SC', name: 'South Carolina' }, { code: 'SD', name: 'South Dakota' }, { code: 'TN', name: 'Tennessee' },
+  { code: 'TX', name: 'Texas' }, { code: 'UT', name: 'Utah' }, { code: 'VT', name: 'Vermont' },
+  { code: 'VA', name: 'Virginia' }, { code: 'WA', name: 'Washington' }, { code: 'WV', name: 'West Virginia' },
+  { code: 'WI', name: 'Wisconsin' }, { code: 'WY', name: 'Wyoming' },
+];
 
-  useEffect(() => {
-    // Fetch country list from cached energy data
-    fetch('/api/climate/energy')
-      .then(r => r.json())
-      .then(() => {
-        // We'll use the OWID data keys — for now use popular countries
-        // Full list would need a separate endpoint
-      })
-      .catch(() => {});
-  }, []);
+interface LocationSuggestion {
+  label: string;
+  type: 'country' | 'us-state';
+  value: string; // country name or state code
+  stateName?: string;
+}
+
+function LocationSearch({ onSelect, loading, error }: {
+  onSelect: (loc: LocationSuggestion) => void;
+  loading: boolean;
+  error?: string | null;
+}) {
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const handleSearch = useCallback((value: string) => {
     setQuery(value);
@@ -194,15 +215,36 @@ function CountrySearch({ onSelect, loading }: { onSelect: (name: string) => void
       return;
     }
     const lower = value.toLowerCase();
-    const matches = POPULAR_COUNTRIES.filter(c => c.toLowerCase().includes(lower));
-    setSuggestions(matches);
-    setShowDropdown(matches.length > 0);
+    const results: LocationSuggestion[] = [];
+
+    // Match US states
+    for (const st of US_STATES_ENERGY) {
+      if (st.name.toLowerCase().includes(lower)) {
+        results.push({ label: `🇺🇸 ${st.name}`, type: 'us-state', value: st.code, stateName: st.name });
+      }
+    }
+
+    // Match countries
+    for (const c of POPULAR_COUNTRIES) {
+      if (c.toLowerCase().includes(lower)) {
+        results.push({ label: `🌍 ${c}`, type: 'country', value: c });
+      }
+    }
+
+    setSuggestions(results.slice(0, 10));
+    setShowDropdown(results.length > 0);
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      onSelect(query.trim());
+      // Check if it's a US state name
+      const stateMatch = US_STATES_ENERGY.find(s => s.name.toLowerCase() === query.trim().toLowerCase());
+      if (stateMatch) {
+        onSelect({ label: stateMatch.name, type: 'us-state', value: stateMatch.code, stateName: stateMatch.name });
+      } else {
+        onSelect({ label: query.trim(), type: 'country', value: query.trim() });
+      }
       setShowDropdown(false);
     }
   };
@@ -217,8 +259,8 @@ function CountrySearch({ onSelect, loading }: { onSelect: (name: string) => void
             value={query}
             onChange={(e) => handleSearch(e.target.value)}
             onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
-            placeholder="Compare with a country..."
-            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+            placeholder="Compare with a country or US state..."
+            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
             autoComplete="off"
           />
         </div>
@@ -229,15 +271,23 @@ function CountrySearch({ onSelect, loading }: { onSelect: (name: string) => void
       </form>
       {showDropdown && suggestions.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-gray-950 border border-gray-700 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
-          {suggestions.map((name) => (
+          {suggestions.map((s, i) => (
             <button
-              key={name}
-              onClick={() => { setQuery(name); onSelect(name); setShowDropdown(false); }}
-              className="w-full text-left px-4 py-2.5 hover:bg-gray-800 text-sm text-gray-200 border-b border-gray-800 last:border-0 transition-colors"
+              key={`${s.value}-${i}`}
+              onClick={() => { setQuery(s.stateName || s.value); onSelect(s); setShowDropdown(false); }}
+              className="w-full text-left px-4 py-2.5 hover:bg-gray-800 text-sm text-gray-200 border-b border-gray-800 last:border-0 transition-colors flex items-center gap-2"
               type="button"
-            >{name}</button>
+            >
+              <span>{s.label}</span>
+              <span className="text-xs text-gray-500 ml-auto">
+                {s.type === 'us-state' ? 'US State' : 'Country'}
+              </span>
+            </button>
           ))}
         </div>
+      )}
+      {error && (
+        <p className="mt-2 text-sm text-orange-400">{error}</p>
       )}
     </div>
   );
@@ -245,7 +295,7 @@ function CountrySearch({ onSelect, loading }: { onSelect: (name: string) => void
 
 // ─── Chart Sections ──────────────────────────────────────────────────────────
 
-function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
+function EnergyMixSection({ data, countryData, baseLabel = 'World' }: { data: CountryEnergy; countryData?: CountryEnergy | null; baseLabel?: string }) {
   // Stacked area: fossil vs renewables vs nuclear (TWh)
   const mixData = useMemo(() => {
     return data.yearly
@@ -271,7 +321,7 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
       }));
   }, [countryData]);
 
-  // World share % over time
+  // Base share % over time
   const shareData = useMemo(() => {
     return data.yearly
       .filter(y => y.fossilShareEnergy != null)
@@ -299,17 +349,17 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
   // Country comparison share data
   const comparisonData = useMemo(() => {
     if (!countryData) return null;
-    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    const baseMap = new Map(data.yearly.map(y => [y.year, y]));
     return countryData.yearly
-      .filter(y => y.fossilShareEnergy != null && worldMap.has(y.year))
+      .filter(y => y.fossilShareEnergy != null && baseMap.has(y.year))
       .map(y => ({
         year: y.year,
         [`${countryData.name} Fossil`]: y.fossilShareEnergy,
         [`${countryData.name} Renewables`]: y.renewablesShareEnergy,
-        ['World Fossil']: worldMap.get(y.year)?.fossilShareEnergy,
-        ['World Renewables']: worldMap.get(y.year)?.renewablesShareEnergy,
+        [`${baseLabel} Fossil`]: baseMap.get(y.year)?.fossilShareEnergy,
+        [`${baseLabel} Renewables`]: baseMap.get(y.year)?.renewablesShareEnergy,
       }));
-  }, [data.yearly, countryData]);
+  }, [data.yearly, countryData, baseLabel]);
 
   if (mixData.length === 0) return null;
 
@@ -322,15 +372,15 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
           Total primary energy consumption broken down by source. The world remains heavily dependent on
           fossil fuels, though renewables are the <span className="text-emerald-400 font-medium">fastest-growing</span> segment.
         </p>
-        <SubSection title="World — primary energy by source (TWh) — drag slider to zoom">
+        <SubSection title={`${baseLabel} — primary energy by source (TWh) — drag slider to zoom`}>
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={mixData} margin={CHART_MARGIN}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                 <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                 <Tooltip content={<DarkTooltip />} />
-                <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                 <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
                 <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
                 <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
@@ -348,9 +398,9 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
                 <AreaChart data={countryMixData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
@@ -362,15 +412,15 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
         )}
 
         {shareData.length > 0 && (
-          <SubSection title="World — share of primary energy (%)">
+          <SubSection title={`${baseLabel} — share of primary energy (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={shareData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
@@ -388,9 +438,9 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
                 <AreaChart data={countryShareData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
@@ -403,7 +453,7 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
       </SectionCard>
 
       {comparisonData && comparisonData.length > 0 && countryData && (
-        <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title={`${countryData.name} vs World — Energy Share`}>
+        <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title={`${countryData.name} vs ${baseLabel} — Energy Share`}>
           <p className="text-sm text-gray-400 mb-4">
             Comparing <span className="text-white font-medium">{countryData.name}</span>&apos;s fossil and renewable energy share against the global average.
           </p>
@@ -413,13 +463,13 @@ function EnergyMixSection({ data, countryData }: { data: CountryEnergy; countryD
                 <LineChart data={comparisonData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={`${countryData.name} Fossil`} stroke="#ef4444" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World Fossil" stroke="#fca5a5" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey={`${baseLabel} Fossil`} stroke="#fca5a5" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Line type="monotone" dataKey={`${countryData.name} Renewables`} stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World Renewables" stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey={`${baseLabel} Renewables`} stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </LineChart>
               </ResponsiveContainer>
@@ -454,9 +504,9 @@ function ElecStackedChart({ data: yearly, label }: { data: EnergyYearlyPoint[]; 
           <AreaChart data={elecShareData} margin={CHART_MARGIN}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
             <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
+            <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
             <Tooltip content={<DarkTooltip />} />
-            <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+            <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
             <Area type="monotone" dataKey="Coal" stackId="1" stroke={COLORS.coal} fill={COLORS.coal} fillOpacity={0.8} />
             <Area type="monotone" dataKey="Oil" stackId="1" stroke={COLORS.oil} fill={COLORS.oil} fillOpacity={0.8} />
             <Area type="monotone" dataKey="Gas" stackId="1" stroke={COLORS.gas} fill={COLORS.gas} fillOpacity={0.8} />
@@ -472,24 +522,24 @@ function ElecStackedChart({ data: yearly, label }: { data: EnergyYearlyPoint[]; 
   );
 }
 
-function ElectricityMixSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
+function ElectricityMixSection({ data, countryData, baseLabel = 'World' }: { data: CountryEnergy; countryData?: CountryEnergy | null; baseLabel?: string }) {
   // Comparison line chart: fossil vs renewables share of electricity
   const comparisonData = useMemo(() => {
     if (!countryData) return null;
-    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    const baseMap = new Map(data.yearly.map(y => [y.year, y]));
     return countryData.yearly
-      .filter(y => (y.fossilShareElec != null || y.renewablesShareElec != null) && worldMap.has(y.year))
+      .filter(y => (y.fossilShareElec != null || y.renewablesShareElec != null) && baseMap.has(y.year))
       .map(y => {
-        const w = worldMap.get(y.year);
+        const w = baseMap.get(y.year);
         return {
           year: y.year,
           [`${countryData.name} Fossil`]: y.fossilShareElec,
           [`${countryData.name} Renewables`]: y.renewablesShareElec,
-          ['World Fossil']: w?.fossilShareElec ?? null,
-          ['World Renewables']: w?.renewablesShareElec ?? null,
+          [`${baseLabel} Fossil`]: w?.fossilShareElec ?? null,
+          [`${baseLabel} Renewables`]: w?.renewablesShareElec ?? null,
         };
       });
-  }, [data.yearly, countryData]);
+  }, [data.yearly, countryData, baseLabel]);
 
   const hasWorldElec = data.yearly.some(y => y.coalShareElec != null || y.gasShareElec != null);
   if (!hasWorldElec) return null;
@@ -504,27 +554,27 @@ function ElectricityMixSection({ data, countryData }: { data: CountryEnergy; cou
           to wind, solar, hydro and nuclear is the key to decarbonising the grid.
         </p>
 
-        {/* Always show World */}
-        <ElecStackedChart data={data.yearly} label="World" />
+        {/* Always show base data */}
+        <ElecStackedChart data={data.yearly} label={baseLabel} />
 
         {/* Show country alongside when selected */}
         {countryData && <ElecStackedChart data={countryData.yearly} label={countryData.name} />}
 
         {/* Comparison: fossil vs renewables share */}
         {comparisonData && comparisonData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} vs World — fossil & renewable electricity share (%)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} — fossil & renewable electricity share (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={comparisonData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={`${countryData.name} Fossil`} stroke="#ef4444" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World Fossil" stroke="#fca5a5" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey={`${baseLabel} Fossil`} stroke="#fca5a5" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Line type="monotone" dataKey={`${countryData.name} Renewables`} stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World Renewables" stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey={`${baseLabel} Renewables`} stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </LineChart>
               </ResponsiveContainer>
@@ -536,8 +586,8 @@ function ElectricityMixSection({ data, countryData }: { data: CountryEnergy; cou
   );
 }
 
-function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
-  // World renewables stacked area
+function RenewablesGrowthSection({ data, countryData, baseLabel = 'World' }: { data: CountryEnergy; countryData?: CountryEnergy | null; baseLabel?: string }) {
+  // Base renewables stacked area
   const worldRenewData = useMemo(() => {
     return data.yearly
       .filter(y => y.solarShareElec != null || y.windShareElec != null || y.hydroShareElec != null)
@@ -565,33 +615,33 @@ function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; c
   // Comparison: total renewables share of electricity
   const renewCompData = useMemo(() => {
     if (!countryData) return null;
-    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    const baseMap = new Map(data.yearly.map(y => [y.year, y]));
     return countryData.yearly
-      .filter(y => y.renewablesShareElec != null && worldMap.has(y.year))
+      .filter(y => y.renewablesShareElec != null && baseMap.has(y.year))
       .map(y => ({
         year: y.year,
         [countryData.name]: y.renewablesShareElec,
-        World: worldMap.get(y.year)?.renewablesShareElec ?? null,
+        [baseLabel]: baseMap.get(y.year)?.renewablesShareElec ?? null,
       }));
-  }, [data.yearly, countryData]);
+  }, [data.yearly, countryData, baseLabel]);
 
   // Comparison: solar + wind share side by side
   const solarWindCompData = useMemo(() => {
     if (!countryData) return null;
-    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    const baseMap = new Map(data.yearly.map(y => [y.year, y]));
     return countryData.yearly
-      .filter(y => (y.solarShareElec != null || y.windShareElec != null) && worldMap.has(y.year))
+      .filter(y => (y.solarShareElec != null || y.windShareElec != null) && baseMap.has(y.year))
       .map(y => {
-        const w = worldMap.get(y.year);
+        const w = baseMap.get(y.year);
         return {
           year: y.year,
           [`${countryData.name} Solar`]: y.solarShareElec,
           [`${countryData.name} Wind`]: y.windShareElec,
-          ['World Solar']: w?.solarShareElec ?? null,
-          ['World Wind']: w?.windShareElec ?? null,
+          [`${baseLabel} Solar`]: w?.solarShareElec ?? null,
+          [`${baseLabel} Wind`]: w?.windShareElec ?? null,
         };
       });
-  }, [data.yearly, countryData]);
+  }, [data.yearly, countryData, baseLabel]);
 
   if (worldRenewData.length === 0) return null;
 
@@ -605,16 +655,16 @@ function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; c
           has grown from near-zero to over 6% of global generation in just 15 years.
         </p>
 
-        {/* World renewables stacked area */}
-        <SubSection title="World — share of electricity from renewables (%)">
+        {/* Base renewables stacked area */}
+        <SubSection title={`${baseLabel} — share of electricity from renewables (%)`}>
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={worldRenewData} margin={CHART_MARGIN}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                 <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                 <Tooltip content={<DarkTooltip />} />
-                <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                 <Area type="monotone" dataKey="Hydro" stackId="1" stroke={COLORS.hydro} fill={COLORS.hydro} fillOpacity={0.6} />
                 <Area type="monotone" dataKey="Wind" stackId="1" stroke={COLORS.wind} fill={COLORS.wind} fillOpacity={0.6} />
                 <Area type="monotone" dataKey="Solar" stackId="1" stroke={COLORS.solar} fill={COLORS.solar} fillOpacity={0.6} />
@@ -632,9 +682,9 @@ function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; c
                 <AreaChart data={countryRenewData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey="Hydro" stackId="1" stroke={COLORS.hydro} fill={COLORS.hydro} fillOpacity={0.6} />
                   <Area type="monotone" dataKey="Wind" stackId="1" stroke={COLORS.wind} fill={COLORS.wind} fillOpacity={0.6} />
                   <Area type="monotone" dataKey="Solar" stackId="1" stroke={COLORS.solar} fill={COLORS.solar} fillOpacity={0.6} />
@@ -647,17 +697,17 @@ function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; c
 
         {/* Comparison: total renewables share */}
         {renewCompData && renewCompData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} vs World — total renewable electricity share (%)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} — total renewable electricity share (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={renewCompData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={countryData.name} stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World" stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey={baseLabel} stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </LineChart>
               </ResponsiveContainer>
@@ -667,19 +717,19 @@ function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; c
 
         {/* Comparison: solar & wind share */}
         {solarWindCompData && solarWindCompData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} vs World — solar & wind electricity share (%)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} — solar & wind electricity share (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={solarWindCompData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={`${countryData.name} Solar`} stroke={COLORS.solar} strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World Solar" stroke={COLORS.solar} strokeWidth={2} dot={false} strokeDasharray="6 3" opacity={0.5} />
+                  <Line type="monotone" dataKey={`${baseLabel} Solar`} stroke={COLORS.solar} strokeWidth={2} dot={false} strokeDasharray="6 3" opacity={0.5} />
                   <Line type="monotone" dataKey={`${countryData.name} Wind`} stroke={COLORS.wind} strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World Wind" stroke={COLORS.wind} strokeWidth={2} dot={false} strokeDasharray="6 3" opacity={0.5} />
+                  <Line type="monotone" dataKey={`${baseLabel} Wind`} stroke={COLORS.wind} strokeWidth={2} dot={false} strokeDasharray="6 3" opacity={0.5} />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </LineChart>
               </ResponsiveContainer>
@@ -691,24 +741,24 @@ function RenewablesGrowthSection({ data, countryData }: { data: CountryEnergy; c
   );
 }
 
-function CarbonIntensitySection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
+function CarbonIntensitySection({ data, countryData, baseLabel = 'World' }: { data: CountryEnergy; countryData?: CountryEnergy | null; baseLabel?: string }) {
   const chartData = useMemo(() => {
-    const worldMap = new Map(data.yearly.filter(y => y.carbonIntensity != null).map(y => [y.year, y.carbonIntensity]));
+    const baseMap = new Map(data.yearly.filter(y => y.carbonIntensity != null).map(y => [y.year, y.carbonIntensity]));
     if (countryData) {
       const countryMap = new Map(countryData.yearly.filter(y => y.carbonIntensity != null).map(y => [y.year, y.carbonIntensity]));
-      const years = new Set([...worldMap.keys(), ...countryMap.keys()]);
+      const years = new Set([...baseMap.keys(), ...countryMap.keys()]);
       return Array.from(years)
         .sort((a, b) => a - b)
         .map(year => ({
           year,
-          World: worldMap.get(year) ?? null,
+          [baseLabel]: baseMap.get(year) ?? null,
           [countryData.name]: countryMap.get(year) ?? null,
         }));
     }
-    return Array.from(worldMap.entries())
+    return Array.from(baseMap.entries())
       .sort(([a], [b]) => a - b)
-      .map(([year, val]) => ({ year, World: val }));
-  }, [data.yearly, countryData]);
+      .map(([year, val]) => ({ year, [baseLabel]: val }));
+  }, [data.yearly, countryData, baseLabel]);
 
   if (chartData.length === 0) return null;
 
@@ -728,10 +778,10 @@ function CarbonIntensitySection({ data, countryData }: { data: CountryEnergy; co
               <LineChart data={chartData} margin={CHART_MARGIN}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                 <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                 <Tooltip content={<DarkTooltip />} />
-                <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
-                <Line type="monotone" dataKey="World" stroke="#D3C8BB" strokeWidth={2} dot={false} />
+                <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
+                <Line type="monotone" dataKey={baseLabel} stroke="#D3C8BB" strokeWidth={2} dot={false} />
                 {countryData && (
                   <Line type="monotone" dataKey={countryData.name} stroke="#10b981" strokeWidth={2} dot={false} />
                 )}
@@ -745,45 +795,45 @@ function CarbonIntensitySection({ data, countryData }: { data: CountryEnergy; co
   );
 }
 
-function EnergyPerCapitaSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
+function EnergyPerCapitaSection({ data, countryData, baseLabel = 'World' }: { data: CountryEnergy; countryData?: CountryEnergy | null; baseLabel?: string }) {
   // Energy per capita (kWh/person)
   const worldPerCapita = useMemo(() => {
     return data.yearly
       .filter(y => y.energyPerCapita != null)
-      .map(y => ({ year: y.year, World: y.energyPerCapita }));
-  }, [data.yearly]);
+      .map(y => ({ year: y.year, [baseLabel]: y.energyPerCapita }));
+  }, [data.yearly, baseLabel]);
 
   // Comparison: energy per capita
   const compData = useMemo(() => {
     if (!countryData) return null;
-    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    const baseMap = new Map(data.yearly.map(y => [y.year, y]));
     return countryData.yearly
-      .filter(y => y.energyPerCapita != null && worldMap.has(y.year) && worldMap.get(y.year)!.energyPerCapita != null)
+      .filter(y => y.energyPerCapita != null && baseMap.has(y.year) && baseMap.get(y.year)!.energyPerCapita != null)
       .map(y => ({
         year: y.year,
         [countryData.name]: y.energyPerCapita,
-        World: worldMap.get(y.year)!.energyPerCapita,
+        [baseLabel]: baseMap.get(y.year)!.energyPerCapita,
       }));
-  }, [data.yearly, countryData]);
+  }, [data.yearly, countryData, baseLabel]);
 
   // Electricity per capita (kWh/person)
   const elecCompData = useMemo(() => {
     if (!countryData) return null;
-    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    const baseMap = new Map(data.yearly.map(y => [y.year, y]));
     return countryData.yearly
-      .filter(y => y.perCapitaElectricity != null && worldMap.has(y.year) && worldMap.get(y.year)!.perCapitaElectricity != null)
+      .filter(y => y.perCapitaElectricity != null && baseMap.has(y.year) && baseMap.get(y.year)!.perCapitaElectricity != null)
       .map(y => ({
         year: y.year,
         [countryData.name]: y.perCapitaElectricity,
-        World: worldMap.get(y.year)!.perCapitaElectricity,
+        [baseLabel]: baseMap.get(y.year)!.perCapitaElectricity,
       }));
-  }, [data.yearly, countryData]);
+  }, [data.yearly, countryData, baseLabel]);
 
   const worldElecPerCapita = useMemo(() => {
     return data.yearly
       .filter(y => y.perCapitaElectricity != null)
-      .map(y => ({ year: y.year, World: y.perCapitaElectricity }));
-  }, [data.yearly]);
+      .map(y => ({ year: y.year, [baseLabel]: y.perCapitaElectricity }));
+  }, [data.yearly, baseLabel]);
 
   if (worldPerCapita.length === 0) return null;
 
@@ -800,33 +850,33 @@ function EnergyPerCapitaSection({ data, countryData }: { data: CountryEnergy; co
 
         {/* Energy per capita */}
         {compData && compData.length > 0 && countryData ? (
-          <SubSection title={`${countryData.name} vs World — primary energy per capita (kWh/person)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} — primary energy per capita (kWh/person)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={compData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={countryData.name} stroke="#3b82f6" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World" stroke="#93c5fd" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey={baseLabel} stroke="#93c5fd" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </SubSection>
         ) : (
-          <SubSection title="World — primary energy per capita (kWh/person)">
+          <SubSection title={`${baseLabel} — primary energy per capita (kWh/person)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={worldPerCapita} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
-                  <Area type="monotone" dataKey="World" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} strokeWidth={2} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
+                  <Area type="monotone" dataKey={baseLabel} stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} strokeWidth={2} />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -836,33 +886,33 @@ function EnergyPerCapitaSection({ data, countryData }: { data: CountryEnergy; co
 
         {/* Electricity per capita */}
         {elecCompData && elecCompData.length > 0 && countryData ? (
-          <SubSection title={`${countryData.name} vs World — electricity per capita (kWh/person)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} — electricity per capita (kWh/person)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={elecCompData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={countryData.name} stroke="#a855f7" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World" stroke="#c4b5fd" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey={baseLabel} stroke="#c4b5fd" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </SubSection>
         ) : worldElecPerCapita.length > 0 && (
-          <SubSection title="World — electricity per capita (kWh/person)">
+          <SubSection title={`${baseLabel} — electricity per capita (kWh/person)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={worldElecPerCapita} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
-                  <Area type="monotone" dataKey="World" stroke="#a855f7" fill="#a855f7" fillOpacity={0.3} strokeWidth={2} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
+                  <Area type="monotone" dataKey={baseLabel} stroke="#a855f7" fill="#a855f7" fillOpacity={0.3} strokeWidth={2} />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -874,8 +924,8 @@ function EnergyPerCapitaSection({ data, countryData }: { data: CountryEnergy; co
   );
 }
 
-function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
-  // World emissions area
+function EmissionsSection({ data, countryData, baseLabel = 'World' }: { data: CountryEnergy; countryData?: CountryEnergy | null; baseLabel?: string }) {
+  // Base emissions area
   const worldData = useMemo(() => {
     return data.yearly
       .filter(y => y.ghgEmissions != null)
@@ -890,25 +940,25 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
       .map(y => ({ year: y.year, Emissions: y.ghgEmissions }));
   }, [countryData]);
 
-  // World per-capita data (always shown)
+  // Base per-capita data (always shown)
   const worldPerCapita = useMemo(() => {
     return data.yearly
       .filter(y => y.ghgPerCapita != null)
-      .map(y => ({ year: y.year, World: y.ghgPerCapita }));
-  }, [data.yearly]);
+      .map(y => ({ year: y.year, [baseLabel]: y.ghgPerCapita }));
+  }, [data.yearly, baseLabel]);
 
-  // Per-capita comparison (tonnes per person) — normalises the scale difference
+  // Per-capita comparison (tonnes per person)
   const perCapitaComp = useMemo(() => {
     if (!countryData) return null;
-    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    const baseMap = new Map(data.yearly.map(y => [y.year, y]));
     return countryData.yearly
-      .filter(y => y.ghgPerCapita != null && worldMap.has(y.year) && worldMap.get(y.year)!.ghgPerCapita != null)
+      .filter(y => y.ghgPerCapita != null && baseMap.has(y.year) && baseMap.get(y.year)!.ghgPerCapita != null)
       .map(y => ({
         year: y.year,
         [countryData.name]: y.ghgPerCapita,
-        World: worldMap.get(y.year)!.ghgPerCapita,
+        [baseLabel]: baseMap.get(y.year)!.ghgPerCapita,
       }));
-  }, [data.yearly, countryData]);
+  }, [data.yearly, countryData, baseLabel]);
 
   // Share of global emissions
   const shareData = useMemo(() => {
@@ -934,16 +984,16 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
           Despite renewable growth, global emissions continue to rise as energy demand outpaces the transition.
         </p>
 
-        {/* World emissions */}
-        <SubSection title="World — annual GHG emissions (Mt CO₂eq)">
+        {/* Base emissions */}
+        <SubSection title={`${baseLabel} — annual GHG emissions (Mt CO₂eq)`}>
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={worldData} margin={CHART_MARGIN}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                 <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                 <Tooltip content={<DarkTooltip />} />
-                <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                 <Area type="monotone" dataKey="Emissions" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} />
                 <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
               </AreaChart>
@@ -959,9 +1009,9 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
                 <AreaChart data={countryEmData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey="Emissions" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.3} strokeWidth={2} />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </AreaChart>
@@ -972,33 +1022,33 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
 
         {/* Per-capita comparison — fair like-for-like */}
         {perCapitaComp && perCapitaComp.length > 0 && countryData ? (
-          <SubSection title={`${countryData.name} vs World — GHG emissions per capita (tonnes CO₂eq)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} — GHG emissions per capita (tonnes CO₂eq)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={perCapitaComp} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={countryData.name} stroke="#f59e0b" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="World" stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                  <Line type="monotone" dataKey={baseLabel} stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </SubSection>
         ) : worldPerCapita.length > 0 && (
-          <SubSection title="World — GHG emissions per capita (tonnes CO₂eq)">
+          <SubSection title={`${baseLabel} — GHG emissions per capita (tonnes CO₂eq)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={worldPerCapita} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
-                  <Area type="monotone" dataKey="World" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
+                  <Area type="monotone" dataKey={baseLabel} stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -1014,9 +1064,9 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
                 <AreaChart data={shareData} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                   <Tooltip content={<DarkTooltip />} />
-                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey="Share" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.3} strokeWidth={2} />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
                 </AreaChart>
@@ -1029,8 +1079,8 @@ function EmissionsSection({ data, countryData }: { data: CountryEnergy; countryD
   );
 }
 
-function FossilFuelBreakdownSection({ data, countryData }: { data: CountryEnergy; countryData?: CountryEnergy | null }) {
-  // World fossil stacked area
+function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'World' }: { data: CountryEnergy; countryData?: CountryEnergy | null; baseLabel?: string }) {
+  // Base fossil stacked area
   const worldFossilData = useMemo(() => {
     return data.yearly
       .filter(y => y.coal != null || y.oil != null || y.gas != null)
@@ -1058,15 +1108,15 @@ function FossilFuelBreakdownSection({ data, countryData }: { data: CountryEnergy
   // Comparison: total fossil share of primary energy
   const fossilShareComp = useMemo(() => {
     if (!countryData) return null;
-    const worldMap = new Map(data.yearly.map(y => [y.year, y]));
+    const baseMap = new Map(data.yearly.map(y => [y.year, y]));
     return countryData.yearly
-      .filter(y => y.fossilShareEnergy != null && worldMap.has(y.year))
+      .filter(y => y.fossilShareEnergy != null && baseMap.has(y.year))
       .map(y => ({
         year: y.year,
         [countryData.name]: y.fossilShareEnergy,
-        World: worldMap.get(y.year)?.fossilShareEnergy ?? null,
+        [baseLabel]: baseMap.get(y.year)?.fossilShareEnergy ?? null,
       }));
-  }, [data.yearly, countryData]);
+  }, [data.yearly, countryData, baseLabel]);
 
   if (worldFossilData.length === 0) return null;
 
@@ -1077,9 +1127,9 @@ function FossilFuelBreakdownSection({ data, countryData }: { data: CountryEnergy
           <AreaChart data={chartData} margin={CHART_MARGIN}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
             <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={formatTWh} />
             <Tooltip content={<DarkTooltip />} />
-            <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+            <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
             <Area type="monotone" dataKey="Coal" stackId="1" stroke={COLORS.coal} fill={COLORS.coal} fillOpacity={0.7} />
             <Area type="monotone" dataKey="Oil" stackId="1" stroke={COLORS.oil} fill={COLORS.oil} fillOpacity={0.7} />
             <Area type="monotone" dataKey="Gas" stackId="1" stroke={COLORS.gas} fill={COLORS.gas} fillOpacity={0.7} />
@@ -1097,24 +1147,24 @@ function FossilFuelBreakdownSection({ data, countryData }: { data: CountryEnergy
         Coal is the dirtiest, while gas produces roughly half the CO₂ per unit of energy.
       </p>
 
-      <FossilStackedChart chartData={worldFossilData} title="World — fossil fuel consumption by type (TWh)" />
+      <FossilStackedChart chartData={worldFossilData} title={`${baseLabel} — fossil fuel consumption by type (TWh)`} />
 
       {countryFossilData && countryFossilData.length > 0 && countryData && (
         <FossilStackedChart chartData={countryFossilData} title={`${countryData.name} — fossil fuel consumption by type (TWh)`} />
       )}
 
       {fossilShareComp && fossilShareComp.length > 0 && countryData && (
-        <SubSection title={`${countryData.name} vs World — fossil share of primary energy (%)`}>
+        <SubSection title={`${countryData.name} vs ${baseLabel} — fossil share of primary energy (%)`}>
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={fossilShareComp} margin={CHART_MARGIN}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                 <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
+                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} allowDataOverflow />
                 <Tooltip content={<DarkTooltip />} />
-                <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                 <Line type="monotone" dataKey={countryData.name} stroke={COLORS.fossil} strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="World" stroke="#f87171" strokeWidth={2} dot={false} strokeDasharray="6 3" />
+                <Line type="monotone" dataKey={baseLabel} stroke="#f87171" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                 <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
               </LineChart>
             </ResponsiveContainer>
@@ -1134,7 +1184,10 @@ export default function EnergyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [countryData, setCountryData] = useState<CountryEnergy | null>(null);
+  const [usStateData, setUsStateData] = useState<CountryEnergy | null>(null);
   const [countryLoading, setCountryLoading] = useState(false);
+  const [countryError, setCountryError] = useState<string | null>(null);
+  const [locationType, setLocationType] = useState<'country' | 'us-state' | null>(null);
 
   useEffect(() => {
     // Try restoring from sessionStorage first
@@ -1144,6 +1197,8 @@ export default function EnergyPage() {
         const cached = JSON.parse(raw);
         if (cached.data) { setData(cached.data); setLoading(false); }
         if (cached.countryData) setCountryData(cached.countryData);
+        if (cached.usStateData) setUsStateData(cached.usStateData);
+        if (cached.locationType) setLocationType(cached.locationType);
         if (cached.data) return; // skip fetch if we have cached world data
       }
     } catch { /* ignore */ }
@@ -1158,22 +1213,43 @@ export default function EnergyPage() {
   useEffect(() => {
     if (!data) return;
     try {
-      sessionStorage.setItem(ENERGY_CACHE_KEY, JSON.stringify({ data, countryData }));
+      sessionStorage.setItem(ENERGY_CACHE_KEY, JSON.stringify({ data, countryData, usStateData, locationType }));
     } catch { /* quota exceeded — ignore */ }
-  }, [data, countryData]);
+  }, [data, countryData, usStateData, locationType]);
 
-  const handleCountrySelect = useCallback(async (name: string) => {
+  const handleLocationSelect = useCallback(async (loc: LocationSuggestion) => {
     setCountryLoading(true);
+    setCountryError(null);
     try {
-      const res = await fetch(`/api/climate/energy?country=${encodeURIComponent(name)}`);
-      const d = await res.json();
-      if (d.country) {
-        setCountryData(d.country);
+      if (loc.type === 'us-state') {
+        const res = await fetch(`/api/climate/energy?state=${encodeURIComponent(loc.value)}&stateName=${encodeURIComponent(loc.stateName || loc.value)}`);
+        const d = await res.json();
+        if (d.usState) {
+          setCountryData(d.country || null); // USA totals
+          setUsStateData(d.usState);
+          setLocationType('us-state');
+        } else {
+          setCountryData(null);
+          setUsStateData(null);
+          setLocationType(null);
+          setCountryError(`No energy data found for "${loc.stateName || loc.value}".`);
+        }
       } else {
-        setCountryData(null);
+        const res = await fetch(`/api/climate/energy?country=${encodeURIComponent(loc.value)}`);
+        const d = await res.json();
+        if (d.country) {
+          setCountryData(d.country);
+          setUsStateData(null);
+          setLocationType('country');
+        } else {
+          setCountryData(null);
+          setUsStateData(null);
+          setLocationType(null);
+          setCountryError(`No energy data found for "${loc.value}". Try a country name like "United Kingdom" or "Germany".`);
+        }
       }
     } catch {
-      // silently fail
+      setCountryError('Failed to fetch data. Please try again.');
     } finally {
       setCountryLoading(false);
     }
@@ -1222,81 +1298,113 @@ export default function EnergyPage() {
               Renewables
             </p>
             <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              Global & Country{" "}
+              Global &amp; Country{" "}
               <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
                 Energy
               </span>
             </h1>
             <p className="text-gray-400 text-sm md:text-base mb-4">
               Tracking the world&apos;s energy transition — from fossil fuels to renewables.
-              Data from <span className="text-gray-300">Our World in Data</span> (CC-BY).
+              Data from <span className="text-gray-300">Our World in Data</span> (CC-BY){locationType === 'us-state' && <> and <span className="text-gray-300">U.S. EIA</span></>}.
             </p>
 
-            {/* Country search */}
-            <CountrySearch onSelect={handleCountrySelect} loading={countryLoading} />
+            {/* Location search */}
+            {!countryData && !usStateData && (
+              <LocationSearch onSelect={handleLocationSelect} loading={countryLoading} error={countryError} />
+            )}
 
-            {countryData && (
-              <div className="flex items-center gap-2 mt-3 text-emerald-400 bg-emerald-950/40 py-2 px-4 rounded-lg border border-emerald-800/50">
-                <MapPin className="h-4 w-4 flex-shrink-0" />
-                <span className="text-sm font-medium">Comparing Global Energy with {countryData.name}</span>
-                <span className="ml-auto text-xs text-gray-500">
-                  {data?.source === 'cache' ? '⚡ Cached' : '🔄 Fresh'}
-                </span>
-                <button onClick={() => setCountryData(null)} className="text-xs text-gray-500 hover:text-gray-300">✕ Clear</button>
+            {(countryData || usStateData) && (
+              <div className="flex gap-2 mt-3">
+                <div className="flex items-center gap-1.5 flex-1 text-emerald-400 bg-emerald-950/40 py-1.5 px-4 rounded-lg border border-emerald-800/50">
+                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm font-medium">
+                    {usStateData
+                      ? `Comparing ${usStateData.name} with United States`
+                      : `Comparing with ${countryData?.name}`}
+                  </span>
+                </div>
+                <button
+                  onClick={() => { setCountryData(null); setUsStateData(null); setLocationType(null); }}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium min-w-[100px] transition-colors"
+                >
+                  Change
+                </button>
               </div>
             )}
           </div>
 
           {/* ─── Live Stats ─────────────────────────────────────────── */}
-          {latest && (
+          {latest && (() => {
+            const compData = usStateData || countryData;
+            const compName = compData?.name;
+            const statBaseLabel = usStateData ? 'United States' : 'World';
+            // For US states, show USA values as the "main" stat, state as comparison
+            const mainLatest = usStateData ? countryData?.latest : latest;
+            return (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard
-                label={`Fossil share (${latest.year})`}
-                value={latest.fossilShare?.toFixed(1) || '—'}
+                label={`Fossil share (${(mainLatest || latest).year})`}
+                value={(mainLatest || latest).fossilShare?.toFixed(1) || '—'}
                 unit="%"
                 color="text-red-400"
                 icon={<Flame className="h-5 w-5" />}
-                countryValue={countryData?.latest?.fossilShare?.toFixed(1)}
-                countryName={countryData?.name}
+                countryValue={compData?.latest?.fossilShare?.toFixed(1)}
+                countryName={compName}
+                baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Renewables share (${latest.year})`}
-                value={latest.renewablesShare?.toFixed(1) || '—'}
+                label={`Renewables share (${(mainLatest || latest).year})`}
+                value={(mainLatest || latest).renewablesShare?.toFixed(1) || '—'}
                 unit="%"
                 color="text-emerald-400"
                 icon={<Zap className="h-5 w-5" />}
-                countryValue={countryData?.latest?.renewablesShare?.toFixed(1)}
-                countryName={countryData?.name}
+                countryValue={compData?.latest?.renewablesShare?.toFixed(1)}
+                countryName={compName}
+                baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Solar electricity (${latest.year})`}
-                value={latest.solarShareElec?.toFixed(1) || '—'}
+                label={`Solar electricity (${(mainLatest || latest).year})`}
+                value={(mainLatest || latest).solarShareElec?.toFixed(1) || '—'}
                 unit="%"
                 color="text-yellow-400"
                 icon={<Sun className="h-5 w-5" />}
-                countryValue={countryData?.latest?.solarShareElec?.toFixed(1)}
-                countryName={countryData?.name}
+                countryValue={compData?.latest?.solarShareElec?.toFixed(1)}
+                countryName={compName}
+                baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Wind electricity (${latest.year})`}
-                value={latest.windShareElec?.toFixed(1) || '—'}
+                label={`Wind electricity (${(mainLatest || latest).year})`}
+                value={(mainLatest || latest).windShareElec?.toFixed(1) || '—'}
                 unit="%"
                 color="text-cyan-400"
                 icon={<Wind className="h-5 w-5" />}
-                countryValue={countryData?.latest?.windShareElec?.toFixed(1)}
-                countryName={countryData?.name}
+                countryValue={compData?.latest?.windShareElec?.toFixed(1)}
+                countryName={compName}
+                baseLabel={statBaseLabel}
               />
             </div>
-          )}
+            );
+          })()}
 
           {/* ─── Chart Sections ─────────────────────────────────────── */}
-          <EnergyMixSection data={w} countryData={countryData} />
-          <ElectricityMixSection data={w} countryData={countryData} />
-          <RenewablesGrowthSection data={w} countryData={countryData} />
-          <FossilFuelBreakdownSection data={w} countryData={countryData} />
-          <CarbonIntensitySection data={w} countryData={countryData} />
-          <EnergyPerCapitaSection data={w} countryData={countryData} />
-          <EmissionsSection data={w} countryData={countryData} />
+          {(() => {
+            // For US states: base = USA data, comparison = state data, label = "United States"
+            // For countries: base = World data, comparison = country data, label = "World"
+            const baseData = usStateData ? countryData! : w;
+            const compData = usStateData || countryData;
+            const bl = usStateData ? 'United States' : undefined;
+            return (
+              <>
+                <EnergyMixSection data={baseData} countryData={compData} baseLabel={bl} />
+                <ElectricityMixSection data={baseData} countryData={compData} baseLabel={bl} />
+                <RenewablesGrowthSection data={baseData} countryData={compData} baseLabel={bl} />
+                <FossilFuelBreakdownSection data={baseData} countryData={compData} baseLabel={bl} />
+                <CarbonIntensitySection data={baseData} countryData={compData} baseLabel={bl} />
+                <EnergyPerCapitaSection data={baseData} countryData={compData} baseLabel={bl} />
+                <EmissionsSection data={baseData} countryData={compData} baseLabel={bl} />
+              </>
+            );
+          })()}
 
           {/* ─── Attribution ─────────────────────────────────────────── */}
           <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
@@ -1304,6 +1412,9 @@ export default function EnergyPage() {
             <p>• Energy data: Our World in Data / Energy Institute Statistical Review (CC-BY)</p>
             <p>• Electricity data: Ember Global Electricity Review (CC-BY)</p>
             <p>• Emissions: Climate Analysis Indicators Tool (CAIT)</p>
+            {locationType === 'us-state' && (
+              <p>• US state energy data: U.S. Energy Information Administration (EIA) State Energy Data System</p>
+            )}
           </div>
         </div>
       </div>

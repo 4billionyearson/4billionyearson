@@ -470,7 +470,7 @@ export default function PlanetaryBoundariesPage() {
               </div>
               <div className="h-[320px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={liveData.temperature.history} margin={{ top: 10, right: 0, left: -30, bottom: 0 }}>
+                  <AreaChart data={liveData.temperature.history} margin={{ top: 10, right: 0, left: -15, bottom: 0 }}>
                     <defs>
                       <linearGradient id="pbTempGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
@@ -491,7 +491,7 @@ export default function PlanetaryBoundariesPage() {
                         );
                       }}
                     />
-                    <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                    <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                     <ReferenceLine y={1.5} stroke="#10b981" strokeDasharray="6 3" strokeWidth={1.5}
                       label={{ position: 'insideTopLeft', value: 'Paris 1.5°C', fill: '#10b981', fontSize: 11, fontWeight: 600 } as any} />
                     <ReferenceLine y={2.0} stroke="#f59e0b" strokeDasharray="6 3" strokeWidth={1.5}

@@ -235,7 +235,7 @@ export function searchLocations(query: string, limit = 10): LocationResult[] {
   if (ukRegionId) {
     const region = UK_REGIONS.find(r => r.id === ukRegionId);
     if (region) {
-      results.push({ ...region, name: `${query} → ${region.name} (Met Office region)` });
+      results.push({ ...region, name: `${query} → ${region.name}` });
       seen.add(region.id);
     }
   }
@@ -244,7 +244,7 @@ export function searchLocations(query: string, limit = 10): LocationResult[] {
   if (usStateId) {
     const state = US_STATES.find(s => s.id === usStateId);
     if (state) {
-      results.push({ ...state, name: `${query} → ${state.name} (US state)` });
+      results.push({ ...state, name: `${query} → ${state.name}` });
       seen.add(state.id);
     }
   }

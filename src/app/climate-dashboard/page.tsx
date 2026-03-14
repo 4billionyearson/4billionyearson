@@ -64,7 +64,7 @@ const ComparisonTooltip = ({ active, payload, label }: any) => {
 
 // ─── Reusable Chart Components ───────────────────────────────────────────────
 
-const CHART_MARGIN = { top: 10, right: 0, left: -30, bottom: 0 };
+const CHART_MARGIN = { top: 10, right: 0, left: -15, bottom: 0 };
 const BRUSH_HEIGHT = 30;
 
 function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingColor, thresholds }: {
@@ -85,7 +85,7 @@ function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingCo
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {thresholds?.map((t, i) => (
             <ReferenceLine key={i} y={t.value} stroke={t.color} strokeDasharray="4 4" strokeWidth={1.5}
               label={{ position: (t.labelPosition || 'insideTopLeft'), value: t.label, fill: t.color, fontSize: 11, fontWeight: 600 } as any} />
@@ -118,7 +118,7 @@ function ComparisonChart({ data, recentKey, label, units, barColor }: {
           <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<ComparisonTooltip />} cursor={{ fill: '#1F2937' }} />
-          <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12 }} />
+          <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, left: 0, right: 0 }} />
           <Bar dataKey={recentKey} name={`Recent ${label}`} fill={barColor} radius={[4, 4, 0, 0]} />
           <Bar dataKey="historicAvg" name="Historic Avg (1961-1990)" fill="#7A6E63" radius={[4, 4, 0, 0]} />
         </BarChart>
@@ -154,7 +154,7 @@ function MultiLineChart({ data, series, thresholds }: {
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit="°" />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {thresholds?.map((t, i) => (
             <ReferenceLine key={i} y={t.value} stroke={t.color} strokeDasharray="4 4" strokeWidth={1.5}
               label={{ position: (t.labelPosition || 'insideTopLeft'), value: t.label, fill: t.color, fontSize: 11, fontWeight: 600 } as any} />
@@ -228,7 +228,7 @@ function mergeMetricData(regionYearly: any[], countryYearly: any[]): any[] {
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
-      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2">
+      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
       </h2>
@@ -388,8 +388,8 @@ export default function ClimateDashboard() {
 
   const getLocationLabel = () => {
     if (!selectedLocation) return '';
-    if (selectedLocation.type === 'uk-region') return `${selectedLocation.name}, UK (Met Office region)`;
-    if (selectedLocation.type === 'us-state') return `${selectedLocation.name}, USA (NOAA state data)`;
+    if (selectedLocation.type === 'uk-region') return `${selectedLocation.name}, UK`;
+    if (selectedLocation.type === 'us-state') return `${selectedLocation.name}, USA`;
     return selectedLocation.name;
   };
 
@@ -464,49 +464,51 @@ export default function ClimateDashboard() {
             Search for any country, US state, or UK city/region.
           </p>
 
-          <div className="relative w-full">
-            <form onSubmit={handleSearch} className="flex gap-2">
-              <div className="relative flex-1">
-                <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
-                <input
-                  type="text"
-                  value={searchInput}
-                  onChange={(e) => { setSearchInput(e.target.value); if (e.target.value.length < 2) setShowDropdown(false); }}
-                  onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
-                  placeholder="Search..."
-                  className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  autoComplete="off"
-                />
-              </div>
-              <button type="submit" disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center justify-center min-w-[100px] transition-colors">
-                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
-              </button>
-            </form>
+          {!(hasData && !loading) && (
+            <div className="relative w-full">
+              <form onSubmit={handleSearch} className="flex gap-2">
+                <div className="relative flex-1">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <input
+                    type="text"
+                    value={searchInput}
+                    onChange={(e) => { setSearchInput(e.target.value); if (e.target.value.length < 2) setShowDropdown(false); }}
+                    onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
+                    placeholder="Search..."
+                    className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    autoComplete="off"
+                  />
+                </div>
+                <button type="submit" disabled={loading}
+                  className="bg-blue-600 hover:bg-blue-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center justify-center min-w-[100px] transition-colors">
+                  {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
+                </button>
+              </form>
 
-            {showDropdown && searchResults.length > 0 && (
-              <div className="absolute z-50 w-full mt-2 bg-gray-950 border border-gray-700 rounded-xl shadow-2xl overflow-hidden max-h-80 overflow-y-auto">
-                {searchResults.map((result, i) => (
-                  <button
-                    key={result.id + i}
-                    onClick={() => { setSearchInput(result.name.split(' → ')[0]); handleSelectLocation(result); }}
-                    className="w-full text-left px-4 py-3 hover:bg-gray-800 flex items-center gap-3 border-b border-gray-800 last:border-0 transition-colors"
-                    type="button"
-                  >
-                    <span className="text-lg">
-                      {result.type === 'country' ? '🌍' : result.type === 'us-state' ? '🇺🇸' : '🇬🇧'}
-                    </span>
-                    <div>
-                      <span className="font-medium text-gray-200">{result.name}</span>
-                      <span className="text-xs text-gray-500 ml-2">
-                        {result.type === 'country' ? 'Country' : result.type === 'us-state' ? 'US State' : 'UK Region'}
+              {showDropdown && searchResults.length > 0 && (
+                <div className="absolute z-50 w-full mt-2 bg-gray-950 border border-gray-700 rounded-xl shadow-2xl overflow-hidden max-h-80 overflow-y-auto">
+                  {searchResults.map((result, i) => (
+                    <button
+                      key={result.id + i}
+                      onClick={() => { setSearchInput(result.name.split(' → ')[0]); handleSelectLocation(result); }}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-800 flex items-center gap-3 border-b border-gray-800 last:border-0 transition-colors"
+                      type="button"
+                    >
+                      <span className="text-lg">
+                        {result.type === 'country' ? '🌍' : result.type === 'us-state' ? '🇺🇸' : '🇬🇧'}
                       </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+                      <div>
+                        <span className="font-medium text-gray-200">{result.name}</span>
+                        <span className="text-xs text-gray-500 ml-2">
+                          {result.type === 'country' ? 'Country' : result.type === 'us-state' ? 'US State' : 'UK Region'}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {error && (
             <div className="mt-4 p-4 bg-orange-900/30 text-orange-400 border border-orange-800/50 rounded-lg text-sm">
@@ -515,12 +517,11 @@ export default function ClimateDashboard() {
           )}
 
           {hasData && !loading && (
-            <div className="flex items-center gap-2 mt-3 text-green-400 bg-green-950/40 py-2 px-4 rounded-lg border border-green-800/50">
-              <MapPin className="h-4 w-4 flex-shrink-0" />
-              <span className="font-medium text-sm">{getLocationLabel()}</span>
-              <span className="ml-auto text-xs text-gray-500">
-                {(countryData?.source || usStateData?.source || ukRegionData?.source) === 'cache' ? '⚡ Cached' : '🔄 Fresh'}
-              </span>
+            <div className="flex gap-2 mt-3">
+              <div className="flex items-center gap-1.5 flex-1 text-green-400 bg-green-950/40 py-1.5 px-4 rounded-lg border border-green-800/50">
+                <MapPin className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium text-sm">{getLocationLabel()}</span>
+              </div>
               <button
                 onClick={() => {
                   setCountryData(null);
@@ -529,9 +530,9 @@ export default function ClimateDashboard() {
                   setSelectedLocation(null);
                   setSearchInput('');
                 }}
-                className="text-xs text-gray-500 hover:text-gray-300"
+                className="bg-blue-600 hover:bg-blue-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium min-w-[100px] transition-colors"
               >
-                ✕ Clear
+                Change
               </button>
             </div>
           )}
@@ -842,7 +843,7 @@ export default function ClimateDashboard() {
                           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
                           <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="°" domain={[(d: number) => Math.floor((d - 0.3) * 4) / 4, (d: number) => Math.ceil((d + 0.3) * 4) / 4]} />
                           <Tooltip content={<DarkTooltip />} cursor={{ fill: '#1F2937' }} />
-                          <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                          <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                           <ReferenceLine y={0} stroke="#7A6E63" />
                           <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4"
                             label={{ position: 'right', value: '+1.5°C', fill: '#f59e0b', fontSize: 11 }} />

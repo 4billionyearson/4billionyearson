@@ -23,7 +23,7 @@ interface GHGData {
 
 // ─── Chart config ────────────────────────────────────────────────────────────
 
-const CHART_MARGIN = { top: 10, right: 0, left: -30, bottom: 0 };
+const CHART_MARGIN = { top: 10, right: 0, left: -15, bottom: 0 };
 const BRUSH_HEIGHT = 30;
 
 // ─── Tooltips ────────────────────────────────────────────────────────────────
@@ -47,7 +47,7 @@ const DarkTooltip = ({ active, payload, label }: any) => {
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
-      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2">
+      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
       </h2>
@@ -116,7 +116,7 @@ function SimpleYearlyChart({ data, dataKey, label, unit, color, fillColor }: {
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit={unit === '°C' ? '°' : ''} />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           <Area type="monotone" dataKey={dataKey} name={`${label} (${unit})`} stroke={color} strokeWidth={2}
             fill={`url(#grad-sl-${dataKey})`} dot={false} />
           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
@@ -307,7 +307,7 @@ export default function SeaLevelsIcePage() {
                           <YAxis yAxisId="temp" tick={{ fontSize: 11, fill: '#f59e0b' }} tickLine={false} axisLine={false} unit="°" />
                           <YAxis yAxisId="sl" orientation="right" tick={{ fontSize: 11, fill: '#14b8a6' }} tickLine={false} axisLine={false} />
                           <Tooltip content={<CorrelationTooltip />} />
-                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                           <ReferenceLine yAxisId="temp" y={1.5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5}
                             label={{ position: 'insideTopLeft', value: 'Paris +1.5°C', fill: '#f59e0b', fontSize: 10, fontWeight: 600 } as any} />
                           <Line yAxisId="temp" type="monotone" dataKey="temp" name="Temp Anomaly (°C)" stroke="#f59e0b" strokeWidth={2} dot={false} />
@@ -339,7 +339,7 @@ export default function SeaLevelsIcePage() {
                           <YAxis yAxisId="ice" tick={{ fontSize: 11, fill: '#22d3ee' }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                           <YAxis yAxisId="sl" orientation="right" tick={{ fontSize: 11, fill: '#14b8a6' }} tickLine={false} axisLine={false} />
                           <Tooltip content={<CorrelationTooltip />} />
-                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                           <Line yAxisId="ice" type="monotone" dataKey="ice" name="Arctic Ice (M km²)" stroke="#22d3ee" strokeWidth={2} dot={false} />
                           <Line yAxisId="sl" type="monotone" dataKey="seaLevel" name="Sea Level (mm)" stroke="#14b8a6" strokeWidth={2} dot={false} />
                           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
@@ -369,7 +369,7 @@ export default function SeaLevelsIcePage() {
                           <YAxis yAxisId="temp" tick={{ fontSize: 11, fill: '#f59e0b' }} tickLine={false} axisLine={false} unit="°" />
                           <YAxis yAxisId="ice" orientation="right" tick={{ fontSize: 11, fill: '#22d3ee' }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                           <Tooltip content={<CorrelationTooltip />} />
-                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                           <ReferenceLine yAxisId="temp" y={1.5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5}
                             label={{ position: 'insideTopLeft', value: 'Paris +1.5°C', fill: '#f59e0b', fontSize: 10, fontWeight: 600 } as any} />
                           <Line yAxisId="temp" type="monotone" dataKey="temp" name="Temp Anomaly (°C)" stroke="#f59e0b" strokeWidth={2} dot={false} />
@@ -401,7 +401,7 @@ export default function SeaLevelsIcePage() {
                           <YAxis yAxisId="ocean" tick={{ fontSize: 11, fill: '#3b82f6' }} tickLine={false} axisLine={false} unit="°" />
                           <YAxis yAxisId="sl" orientation="right" tick={{ fontSize: 11, fill: '#14b8a6' }} tickLine={false} axisLine={false} />
                           <Tooltip content={<CorrelationTooltip />} />
-                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                           <Line yAxisId="ocean" type="monotone" dataKey="ocean" name="Ocean Anomaly (°C)" stroke="#3b82f6" strokeWidth={2} dot={false} />
                           <Line yAxisId="sl" type="monotone" dataKey="seaLevel" name="Sea Level (mm)" stroke="#14b8a6" strokeWidth={2} dot={false} />
                           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
@@ -431,7 +431,7 @@ export default function SeaLevelsIcePage() {
                           <YAxis yAxisId="co2" tick={{ fontSize: 11, fill: '#ef4444' }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                           <YAxis yAxisId="sl" orientation="right" tick={{ fontSize: 11, fill: '#14b8a6' }} tickLine={false} axisLine={false} />
                           <Tooltip content={<CorrelationTooltip />} />
-                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                           <Line yAxisId="co2" type="monotone" dataKey="co2" name="CO₂ (ppm)" stroke="#ef4444" strokeWidth={2} dot={false} />
                           <Line yAxisId="sl" type="monotone" dataKey="seaLevel" name="Sea Level (mm)" stroke="#14b8a6" strokeWidth={2} dot={false} />
                           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>

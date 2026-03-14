@@ -35,7 +35,7 @@ interface GHGData {
 
 // ─── Chart config ────────────────────────────────────────────────────────────
 
-const CHART_MARGIN = { top: 10, right: 0, left: -30, bottom: 0 };
+const CHART_MARGIN = { top: 10, right: 0, left: -15, bottom: 0 };
 const BRUSH_HEIGHT = 30;
 
 // ─── Tooltips ────────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ const DarkTooltip = ({ active, payload, label }: any) => {
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
-      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2">
+      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
       </h2>
@@ -132,7 +132,7 @@ function GasYearlyChart({ data, label, unit, color, fillColor, preindustrial, pr
           <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false}
             domain={['auto', 'auto']} />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {preindustrial != null && (
             <ReferenceLine y={preindustrial} stroke="#7A6E63" strokeDasharray="6 3" strokeWidth={1.5}
               label={{ position: 'insideTopLeft', value: preindustrialLabel || `Pre-industrial: ${preindustrial}`, fill: '#7A6E63', fontSize: 11, fontWeight: 600 } as any} />
@@ -167,7 +167,7 @@ function TempAnomalyChart({ data }: { data: TempPoint[] }) {
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="°" />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           <ReferenceLine y={0} stroke="#7A6E63" />
           <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5}
             label={{ position: 'insideTopLeft', value: 'Paris +1.5°C', fill: '#f59e0b', fontSize: 11, fontWeight: 600 } as any} />
@@ -210,7 +210,7 @@ function SimpleYearlyChart({ data, dataKey, label, unit, color, fillColor }: {
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit={unit === '°C' ? '°' : ''} />
           <Tooltip content={<DarkTooltip />} />
-          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           <Area type="monotone" dataKey={dataKey} name={`${label} (${unit})`} stroke={color} strokeWidth={2}
             fill={`url(#grad-${dataKey})`} dot={false} />
           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
@@ -316,7 +316,7 @@ function OverviewSection({ data }: { data: GHGData }) {
                   <YAxis yAxisId="co2" tick={{ fontSize: 11, fill: '#ef4444' }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <YAxis yAxisId="temp" orientation="right" tick={{ fontSize: 11, fill: '#f59e0b' }} tickLine={false} axisLine={false} unit="°" />
                   <Tooltip content={<CorrelationTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <ReferenceLine yAxisId="co2" y={350} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5}
                     label={{ position: 'insideBottomRight', value: 'CO₂ safe boundary: 350 ppm', fill: '#ef4444', fontSize: 10, fontWeight: 600, dy: 17} as any} />
                   <ReferenceLine yAxisId="co2" y={280} stroke="#7A6E63" strokeDasharray="6 3" strokeWidth={1}
@@ -353,7 +353,7 @@ function OverviewSection({ data }: { data: GHGData }) {
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
                   <Tooltip content={<CorrelationTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <ReferenceLine y={0} stroke="#7A6E63" strokeDasharray="3 3"
                     label={{ position: 'insideBottomLeft', value: 'Pre-industrial level', fill: '#7A6E63', fontSize: 10 } as any} />
                   <ReferenceLine y={((350 - 280) / 280) * 100} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5}
@@ -387,7 +387,7 @@ function OverviewSection({ data }: { data: GHGData }) {
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="°" />
                   <Tooltip content={<CorrelationTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <ReferenceLine y={0} stroke="#7A6E63" strokeDasharray="3 3"
                     label={{ position: 'insideBottomLeft', value: 'Baseline (0°C)', fill: '#7A6E63', fontSize: 10 } as any} />
                   <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5}
@@ -423,7 +423,7 @@ function OverviewSection({ data }: { data: GHGData }) {
                   <YAxis yAxisId="co2" tick={{ fontSize: 11, fill: '#ef4444' }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <YAxis yAxisId="ice" orientation="right" tick={{ fontSize: 11, fill: '#22d3ee' }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CorrelationTooltip />} />
-                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10 }} />
+                  <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <ReferenceLine yAxisId="co2" y={350} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5}
                     label={{ position: 'insideBottom', value: 'CO₂ safe boundary: 350 ppm', fill: '#ef4444', fontSize: 10, fontWeight: 600, dy: 17} as any} />
                   <ReferenceLine yAxisId="co2" y={280} stroke="#7A6E63" strokeDasharray="6 3" strokeWidth={1}
