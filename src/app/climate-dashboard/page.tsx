@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
@@ -35,10 +35,12 @@ const DarkTooltip = ({ active, payload, label }: any) => {
 
 const ComparisonTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
-  const recent = payload.find((p: any) => p.dataKey === 'recent' || p.dataKey === 'recentTemp')?.value;
+  const recentEntry = payload.find((p: any) => p.dataKey === 'recent' || p.dataKey === 'recentTemp');
+  const recent = recentEntry?.value;
   const historic = payload.find((p: any) => p.dataKey === 'historicAvg')?.value;
+  const isPending = recentEntry?.payload?.pending;
   let diffEl = null;
-  if (recent != null && historic != null) {
+  if (recent != null && historic != null && !isPending) {
     const diff = recent - historic;
     const pct = historic !== 0 ? (diff / Math.abs(historic)) * 100 : 0;
     const sign = diff > 0 ? '+' : '';
@@ -52,11 +54,16 @@ const ComparisonTooltip = ({ active, payload, label }: any) => {
   return (
     <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[200px]">
       <p className="font-semibold text-gray-200 mb-1 text-sm">{label}</p>
-      {payload.map((p: any, i: number) => (
-        <p key={i} style={{ color: p.color || p.fill }} className="text-sm">
-          {p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}
-        </p>
-      ))}
+      {payload.map((p: any, i: number) => {
+        if ((p.dataKey === 'recent' || p.dataKey === 'recentTemp') && p.payload?.pending) {
+          return <p key={i} style={{ color: p.color || p.fill }} className="text-sm italic">Recent: data not yet available</p>;
+        }
+        return (
+          <p key={i} style={{ color: p.color || p.fill }} className="text-sm">
+            {p.name}: {typeof p.value === 'number' ? p.value.toFixed(2) : p.value}
+          </p>
+        );
+      })}
       {diffEl}
     </div>
   );
@@ -64,7 +71,7 @@ const ComparisonTooltip = ({ active, payload, label }: any) => {
 
 // ─── Reusable Chart Components ───────────────────────────────────────────────
 
-const CHART_MARGIN = { top: 10, right: 0, left: -15, bottom: 0 };
+const CHART_MARGIN = { top: 10, right: 0, left: -20, bottom: 0 };
 const BRUSH_HEIGHT = 30;
 
 function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingColor, thresholds }: {
@@ -83,7 +90,7 @@ function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingCo
         <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
+          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<DarkTooltip />} />
           <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {thresholds?.map((t, i) => (
@@ -110,16 +117,35 @@ function ComparisonChart({ data, recentKey, label, units, barColor }: {
   units: string;
   barColor: string;
 }) {
+  // Mark pending months and give them a placeholder value so the bar renders
+  const chartData = data.map(d => ({
+    ...d,
+    pending: d[recentKey] == null,
+    [recentKey]: d[recentKey] != null ? d[recentKey] : d.historicAvg ?? 0,
+  }));
+
+  // Custom bar shape: dashed outline for pending months, solid fill for real data
+  const PendingBarShape = (props: any) => {
+    const { x, y, width, height, payload } = props;
+    if (!payload?.pending) return <rect x={x} y={y} width={width} height={height} fill={barColor} rx={4} ry={4} />;
+    return (
+      <g>
+        <rect x={x} y={y} width={width} height={height} fill="none" stroke="#6b7280" strokeWidth={1} strokeDasharray="4 3" rx={4} ry={4} />
+        <text x={x + width / 2} y={y + height / 2 + 3} textAnchor="middle" fontSize={8} fill="#6b7280" fontStyle="italic">N/A</text>
+      </g>
+    );
+  };
+
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={CHART_MARGIN}>
+        <BarChart data={chartData} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
           <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit={units === '°C' ? '°' : ''} />
+          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<ComparisonTooltip />} cursor={{ fill: '#1F2937' }} />
           <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, left: 0, right: 0 }} />
-          <Bar dataKey={recentKey} name={`Recent ${label}`} fill={barColor} radius={[4, 4, 0, 0]} />
+          <Bar dataKey={recentKey} name={`Recent ${label}`} fill={barColor} radius={[4, 4, 0, 0]} shape={<PendingBarShape />} />
           <Bar dataKey="historicAvg" name="Historic Avg (1961-1990)" fill="#7A6E63" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
@@ -152,7 +178,7 @@ function MultiLineChart({ data, series, thresholds }: {
         <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} domain={[(d: number) => Math.floor((d - 0.5) * 2) / 2, (d: number) => Math.ceil((d + 0.5) * 2) / 2]} unit="°" />
+          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} unit="°" />
           <Tooltip content={<DarkTooltip />} />
           <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {thresholds?.map((t, i) => (
@@ -304,26 +330,47 @@ export default function ClimateDashboard() {
     } catch { /* quota exceeded — ignore */ }
   }, [selectedLocation, countryData, usStateData, ukRegionData, ukCountryData, globalData, searchInput]);
 
-  const handleSearch = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchInput.trim() || searchInput.trim().length < 2) return;
+  // Debounced search-as-you-type
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim() || q.trim().length < 2) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
     setError(null);
     try {
-      const res = await fetch(`/api/climate/search?q=${encodeURIComponent(searchInput.trim())}`);
+      const res = await fetch(`/api/climate/search?q=${encodeURIComponent(q.trim())}`);
       const data = await res.json();
       if (data.results?.length > 0) {
         setSearchResults(data.results);
         setShowDropdown(true);
       } else {
-        setError('No locations found. Try a country name, US state, or UK city/region.');
         setSearchResults([]);
         setShowDropdown(false);
       }
     } catch {
-      setError('Search failed. Please try again.');
+      // Silently fail for type-ahead; user can retry
     }
-  }, [searchInput]);
+  }, []);
+
+  const handleInputChange = useCallback((value: string) => {
+    setSearchInput(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (value.trim().length < 2) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    debounceRef.current = setTimeout(() => doSearch(value), 300);
+  }, [doSearch]);
+
+  const handleSearch = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    doSearch(searchInput);
+  }, [searchInput, doSearch]);
 
   const handleSelectLocation = useCallback(async (location: LocationResult) => {
     setShowDropdown(false);
@@ -472,7 +519,7 @@ export default function ClimateDashboard() {
                   <input
                     type="text"
                     value={searchInput}
-                    onChange={(e) => { setSearchInput(e.target.value); if (e.target.value.length < 2) setShowDropdown(false); }}
+                    onChange={(e) => handleInputChange(e.target.value)}
                     onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
                     placeholder="Search..."
                     className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
@@ -841,7 +888,7 @@ export default function ClimateDashboard() {
                         <BarChart data={globalData.yearlyData} margin={CHART_MARGIN}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="°" domain={[(d: number) => Math.floor((d - 0.3) * 4) / 4, (d: number) => Math.ceil((d + 0.3) * 4) / 4]} />
+                          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} unit="°" domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} />
                           <Tooltip content={<DarkTooltip />} cursor={{ fill: '#1F2937' }} />
                           <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                           <ReferenceLine y={0} stroke="#7A6E63" />
@@ -864,10 +911,10 @@ export default function ClimateDashboard() {
             {/* ─── Attribution ───────────────────────────────────────── */}
             <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
               <p className="font-semibold text-gray-300">Data sources & attribution:</p>
-              {countryData && <p>• Country temperatures: Our World in Data / Copernicus ERA5 reanalysis (CC-BY)</p>}
-              {usStateData && <p>• US state data: NOAA National Centers for Environmental Information (public domain)</p>}
-              {ukRegionData && <p>• UK regional data: Contains Met Office data © Crown copyright (Open Government Licence)</p>}
-              {globalData && <p>• Global temperatures: NOAA Climate at a Glance (public domain)</p>}
+              {countryData && <p>• Country temperatures: <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Copernicus ERA5 reanalysis</a> (CC-BY)</p>}
+              {usStateData && <p>• US state data: <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA National Centers for Environmental Information</a> (public domain)</p>}
+              {ukRegionData && <p>• UK regional data: Contains <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Met Office</a> data © Crown copyright (Open Government Licence)</p>}
+              {globalData && <p>• Global temperatures: <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Climate at a Glance</a> (public domain)</p>}
             </div>
           </>
         )}

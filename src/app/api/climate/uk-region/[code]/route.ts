@@ -114,7 +114,6 @@ function buildComparison(points: MonthlyDataPoint[]) {
     if (m <= 0) { m += 12; y--; }
 
     const point = points.find(p => p.year === y && p.month === m);
-    if (!point) continue;
 
     const historic = historicByMonth[m];
     const historicAvg = historic && historic.length > 0
@@ -125,9 +124,9 @@ function buildComparison(points: MonthlyDataPoint[]) {
       monthLabel: `${monthNames[m - 1]} ${y}`,
       month: m,
       year: y,
-      recent: point.value,
+      recent: point ? point.value : null,
       historicAvg,
-      diff: historicAvg !== null ? Math.round((point.value - historicAvg) * 100) / 100 : null,
+      diff: point && historicAvg !== null ? Math.round((point.value - historicAvg) * 100) / 100 : null,
     });
   }
 

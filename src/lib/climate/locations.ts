@@ -224,28 +224,58 @@ export function searchLocations(query: string, limit = 10): LocationResult[] {
   const q = query.toLowerCase().trim();
   if (!q) return [];
 
-  // Check city mappings first
-  const ukRegionId = UK_CITY_REGION_MAP[q];
-  const usStateId = US_CITY_STATE_MAP[q];
+  // Check city mappings - exact and partial matches
+  const ukCityExact = UK_CITY_REGION_MAP[q];
+  const usCityExact = US_CITY_STATE_MAP[q];
+
+  // Also check partial city name matches
+  const partialUkCities = q.length >= 2
+    ? Object.entries(UK_CITY_REGION_MAP).filter(([city]) => city.startsWith(q) && city !== q)
+    : [];
+  const partialUsCities = q.length >= 2
+    ? Object.entries(US_CITY_STATE_MAP).filter(([city]) => city.startsWith(q) && city !== q)
+    : [];
 
   const results: LocationResult[] = [];
   const seen = new Set<string>();
 
-  // If a UK city matches, add the region
-  if (ukRegionId) {
-    const region = UK_REGIONS.find(r => r.id === ukRegionId);
+  // If a UK city matches exactly, add the region
+  if (ukCityExact) {
+    const region = UK_REGIONS.find(r => r.id === ukCityExact);
     if (region) {
       results.push({ ...region, name: `${query} → ${region.name}` });
       seen.add(region.id);
     }
   }
 
-  // If a US city matches, add the state
-  if (usStateId) {
-    const state = US_STATES.find(s => s.id === usStateId);
+  // If a US city matches exactly, add the state
+  if (usCityExact) {
+    const state = US_STATES.find(s => s.id === usCityExact);
     if (state) {
       results.push({ ...state, name: `${query} → ${state.name}` });
       seen.add(state.id);
+    }
+  }
+
+  // Partial UK city matches
+  for (const [city, regionId] of partialUkCities) {
+    if (seen.has(`city-${city}`)) continue;
+    const region = UK_REGIONS.find(r => r.id === regionId);
+    if (region && !seen.has(region.id)) {
+      results.push({ ...region, name: `${city.charAt(0).toUpperCase() + city.slice(1)} → ${region.name}` });
+      seen.add(region.id);
+      seen.add(`city-${city}`);
+    }
+  }
+
+  // Partial US city matches
+  for (const [city, stateId] of partialUsCities) {
+    if (seen.has(`city-${city}`)) continue;
+    const state = US_STATES.find(s => s.id === stateId);
+    if (state && !seen.has(state.id)) {
+      results.push({ ...state, name: `${city.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')} → ${state.name}` });
+      seen.add(state.id);
+      seen.add(`city-${city}`);
     }
   }
 

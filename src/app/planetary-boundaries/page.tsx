@@ -454,8 +454,8 @@ export default function PlanetaryBoundariesPage() {
           )}
 
           <p className="text-sm text-gray-500 italic mt-6">
-            Source: Stockholm Resilience Centre &middot; Planetary Health Check
-            2025 &middot; Richardson et al. (2023)
+            Source: <a href="https://www.stockholmresilience.org/research/planetary-boundaries.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">Stockholm Resilience Centre</a> &middot; <a href="https://www.planetaryhealthcheck.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">Planetary Health Check
+            2025</a> &middot; <a href="https://www.science.org/doi/10.1126/sciadv.adh2458" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">Richardson et al. (2023)</a>
           </p>
          </div>
 
@@ -502,7 +502,7 @@ export default function PlanetaryBoundariesPage() {
                 </ResponsiveContainer>
               </div>
               <p className="text-xs text-gray-500 mt-3">
-                Data: NASA GISS Surface Temperature Analysis (GISTEMP) via NOAA &middot; Anomaly relative to 1951–1980 average
+                Data: <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">NASA GISS Surface Temperature Analysis (GISTEMP)</a> via <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">NOAA</a> &middot; Anomaly relative to 1951–1980 average
               </p>
             </div>
           )}
@@ -838,7 +838,7 @@ export default function PlanetaryBoundariesPage() {
                   )}
                 </div>
                 <p className="text-xs text-gray-600 mt-4">
-                  Data from NOAA, NASA GISS, and global monitoring stations
+                  Data from <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">NOAA</a>, <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">NASA GISS</a>, and global monitoring stations
                   &middot; Updated{" "}
                   {loading
                     ? "..."
@@ -855,35 +855,29 @@ export default function PlanetaryBoundariesPage() {
                 Key References
               </h3>
               <ul className="space-y-2 text-sm text-gray-500">
-                <li className="flex items-start gap-2">
-                  <ExternalLink className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-                  <span>
-                    Rockström et al. (2009). &ldquo;A safe operating space for
-                    humanity.&rdquo; <em>Nature</em> 461, 472–475.
-                  </span>
+                <li>
+                  <a href="https://doi.org/10.1038/461472a" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 hover:text-gray-300 transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                    <span>Rockström et al. (2009). &ldquo;A safe operating space for humanity.&rdquo; <em>Nature</em> 461, 472–475.</span>
+                  </a>
                 </li>
-                <li className="flex items-start gap-2">
-                  <ExternalLink className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-                  <span>
-                    Steffen et al. (2015). &ldquo;Planetary boundaries: Guiding
-                    human development on a changing planet.&rdquo;{" "}
-                    <em>Science</em> 347(6223).
-                  </span>
+                <li>
+                  <a href="https://doi.org/10.1126/science.1259855" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 hover:text-gray-300 transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                    <span>Steffen et al. (2015). &ldquo;Planetary boundaries: Guiding human development on a changing planet.&rdquo; <em>Science</em> 347(6223).</span>
+                  </a>
                 </li>
-                <li className="flex items-start gap-2">
-                  <ExternalLink className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-                  <span>
-                    Richardson et al. (2023). &ldquo;Earth beyond six of nine
-                    planetary boundaries.&rdquo; <em>Science Advances</em>{" "}
-                    9(37).
-                  </span>
+                <li>
+                  <a href="https://doi.org/10.1126/sciadv.adh2458" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 hover:text-gray-300 transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                    <span>Richardson et al. (2023). &ldquo;Earth beyond six of nine planetary boundaries.&rdquo; <em>Science Advances</em> 9(37).</span>
+                  </a>
                 </li>
-                <li className="flex items-start gap-2">
-                  <ExternalLink className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-                  <span>
-                    Sakschewski et al. (2025). Planetary Health Check 2025.
-                    Potsdam Institute for Climate Impact Research.
-                  </span>
+                <li>
+                  <a href="https://www.planetaryhealthcheck.org" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 hover:text-gray-300 transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                    <span>Sakschewski et al. (2025). Planetary Health Check 2025. Potsdam Institute for Climate Impact Research.</span>
+                  </a>
                 </li>
               </ul>
             </div>

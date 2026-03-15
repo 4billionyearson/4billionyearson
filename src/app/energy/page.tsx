@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, Brush,
@@ -166,31 +166,6 @@ function StatCard({ label, value, unit, color, icon, countryValue, countryName, 
 
 // ─── Location Search (countries + US states) ────────────────────────────────
 
-const POPULAR_COUNTRIES = [
-  'United Kingdom', 'United States', 'China', 'India', 'Germany',
-  'France', 'Brazil', 'Japan', 'Australia', 'Canada',
-];
-
-const US_STATES_ENERGY: { code: string; name: string }[] = [
-  { code: 'AL', name: 'Alabama' }, { code: 'AK', name: 'Alaska' }, { code: 'AZ', name: 'Arizona' },
-  { code: 'AR', name: 'Arkansas' }, { code: 'CA', name: 'California' }, { code: 'CO', name: 'Colorado' },
-  { code: 'CT', name: 'Connecticut' }, { code: 'DE', name: 'Delaware' }, { code: 'FL', name: 'Florida' },
-  { code: 'GA', name: 'Georgia' }, { code: 'HI', name: 'Hawaii' }, { code: 'ID', name: 'Idaho' },
-  { code: 'IL', name: 'Illinois' }, { code: 'IN', name: 'Indiana' }, { code: 'IA', name: 'Iowa' },
-  { code: 'KS', name: 'Kansas' }, { code: 'KY', name: 'Kentucky' }, { code: 'LA', name: 'Louisiana' },
-  { code: 'ME', name: 'Maine' }, { code: 'MD', name: 'Maryland' }, { code: 'MA', name: 'Massachusetts' },
-  { code: 'MI', name: 'Michigan' }, { code: 'MN', name: 'Minnesota' }, { code: 'MS', name: 'Mississippi' },
-  { code: 'MO', name: 'Missouri' }, { code: 'MT', name: 'Montana' }, { code: 'NE', name: 'Nebraska' },
-  { code: 'NV', name: 'Nevada' }, { code: 'NH', name: 'New Hampshire' }, { code: 'NJ', name: 'New Jersey' },
-  { code: 'NM', name: 'New Mexico' }, { code: 'NY', name: 'New York' }, { code: 'NC', name: 'North Carolina' },
-  { code: 'ND', name: 'North Dakota' }, { code: 'OH', name: 'Ohio' }, { code: 'OK', name: 'Oklahoma' },
-  { code: 'OR', name: 'Oregon' }, { code: 'PA', name: 'Pennsylvania' }, { code: 'RI', name: 'Rhode Island' },
-  { code: 'SC', name: 'South Carolina' }, { code: 'SD', name: 'South Dakota' }, { code: 'TN', name: 'Tennessee' },
-  { code: 'TX', name: 'Texas' }, { code: 'UT', name: 'Utah' }, { code: 'VT', name: 'Vermont' },
-  { code: 'VA', name: 'Virginia' }, { code: 'WA', name: 'Washington' }, { code: 'WV', name: 'West Virginia' },
-  { code: 'WI', name: 'Wisconsin' }, { code: 'WY', name: 'Wyoming' },
-];
-
 interface LocationSuggestion {
   label: string;
   type: 'country' | 'us-state';
@@ -206,47 +181,70 @@ function LocationSearch({ onSelect, loading, error }: {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleSearch = useCallback((value: string) => {
-    setQuery(value);
-    if (value.length < 2) {
+  const doSearch = useCallback(async (value: string) => {
+    if (value.trim().length < 2) {
       setSuggestions([]);
       setShowDropdown(false);
       return;
     }
-    const lower = value.toLowerCase();
-    const results: LocationSuggestion[] = [];
-
-    // Match US states
-    for (const st of US_STATES_ENERGY) {
-      if (st.name.toLowerCase().includes(lower)) {
-        results.push({ label: `🇺🇸 ${st.name}`, type: 'us-state', value: st.code, stateName: st.name });
+    try {
+      const res = await fetch(`/api/climate/search?q=${encodeURIComponent(value.trim())}`);
+      const data = await res.json();
+      if (data.results?.length > 0) {
+        const mapped: LocationSuggestion[] = [];
+        const seen = new Set<string>();
+        for (const r of data.results) {
+          if (r.owidCode === 'OWID_WRL') continue;
+          // Skip city-mapped results (e.g. "london → ...")
+          const isCityMapping = r.name.includes(' → ');
+          if (r.type === 'uk-region') {
+            // Map UK regions/countries to United Kingdom, but skip city mappings
+            if (isCityMapping) continue;
+            if (!seen.has('United Kingdom')) {
+              mapped.push({ label: `🇬🇧 ${r.name} → United Kingdom`, type: 'country', value: 'United Kingdom' });
+              seen.add('United Kingdom');
+            }
+          } else if (r.type === 'country' || r.type === 'us-state') {
+            if (isCityMapping) continue;
+            const key = r.type === 'us-state' ? r.id : r.name;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            mapped.push({
+              label: `${r.type === 'us-state' ? '🇺🇸' : '🌍'} ${r.name}`,
+              type: r.type as 'country' | 'us-state',
+              value: r.type === 'us-state' ? r.id.replace('us-', '').toUpperCase() : r.name,
+              stateName: r.type === 'us-state' ? r.name : undefined,
+            });
+          }
+        }
+        setSuggestions(mapped.slice(0, 10));
+        setShowDropdown(mapped.length > 0);
+      } else {
+        setSuggestions([]);
+        setShowDropdown(false);
       }
+    } catch {
+      // Silently fail for type-ahead
     }
-
-    // Match countries
-    for (const c of POPULAR_COUNTRIES) {
-      if (c.toLowerCase().includes(lower)) {
-        results.push({ label: `🌍 ${c}`, type: 'country', value: c });
-      }
-    }
-
-    setSuggestions(results.slice(0, 10));
-    setShowDropdown(results.length > 0);
   }, []);
+
+  const handleInputChange = useCallback((value: string) => {
+    setQuery(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (value.trim().length < 2) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+    debounceRef.current = setTimeout(() => doSearch(value), 300);
+  }, [doSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      // Check if it's a US state name
-      const stateMatch = US_STATES_ENERGY.find(s => s.name.toLowerCase() === query.trim().toLowerCase());
-      if (stateMatch) {
-        onSelect({ label: stateMatch.name, type: 'us-state', value: stateMatch.code, stateName: stateMatch.name });
-      } else {
-        onSelect({ label: query.trim(), type: 'country', value: query.trim() });
-      }
-      setShowDropdown(false);
-    }
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    doSearch(query);
   };
 
   return (
@@ -257,16 +255,16 @@ function LocationSearch({ onSelect, loading, error }: {
           <input
             type="text"
             value={query}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
-            placeholder="Compare with a country or US state..."
+            placeholder="Search..."
             className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
             autoComplete="off"
           />
         </div>
         <button type="submit" disabled={loading}
-          className="bg-emerald-600 hover:bg-emerald-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center gap-1.5 min-w-[100px] justify-center transition-colors">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Compare</>}
+          className="bg-emerald-600 hover:bg-emerald-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center justify-center min-w-[100px] transition-colors">
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
         </button>
       </form>
       {showDropdown && suggestions.length > 0 && (
@@ -1293,7 +1291,7 @@ export default function EnergyPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ───────────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-800">
+          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-800">
             <p className="text-sm uppercase tracking-[0.3em] text-emerald-400 font-mono mb-4">
               Renewables
             </p>
@@ -1304,8 +1302,7 @@ export default function EnergyPage() {
               </span>
             </h1>
             <p className="text-gray-400 text-sm md:text-base mb-4">
-              Tracking the world&apos;s energy transition — from fossil fuels to renewables.
-              Data from <span className="text-gray-300">Our World in Data</span> (CC-BY){locationType === 'us-state' && <> and <span className="text-gray-300">U.S. EIA</span></>}.
+              Search for any country, or USA state.
             </p>
 
             {/* Location search */}
@@ -1409,11 +1406,11 @@ export default function EnergyPage() {
           {/* ─── Attribution ─────────────────────────────────────────── */}
           <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
             <p className="font-semibold text-gray-300">Data sources & attribution:</p>
-            <p>• Energy data: Our World in Data / Energy Institute Statistical Review (CC-BY)</p>
-            <p>• Electricity data: Ember Global Electricity Review (CC-BY)</p>
-            <p>• Emissions: Climate Analysis Indicators Tool (CAIT)</p>
+            <p>• Energy data: <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Energy Institute Statistical Review</a> (CC-BY)</p>
+            <p>• Electricity data: <a href="https://ember-climate.org/data/data-tools/data-explorer/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Ember Global Electricity Review</a> (CC-BY)</p>
+            <p>• Emissions: <a href="https://www.climatewatchdata.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Climate Analysis Indicators Tool (CAIT)</a></p>
             {locationType === 'us-state' && (
-              <p>• US state energy data: U.S. Energy Information Administration (EIA) State Energy Data System</p>
+              <p>• US state energy data: <a href="https://www.eia.gov/state/seds/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">U.S. Energy Information Administration (EIA)</a> State Energy Data System</p>
             )}
           </div>
         </div>

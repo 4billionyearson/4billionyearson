@@ -705,11 +705,11 @@ export default function GreenhouseGasesPage() {
               {/* ─── Attribution ──────────────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources & attribution:</p>
-                <p>• CO₂: NOAA Global Monitoring Laboratory — Mauna Loa Observatory (1958-present)</p>
-                <p>• Methane, N₂O: NOAA Global Monitoring Laboratory via global-warming.org</p>
-                <p>• Temperature anomaly: NASA GISS / NOAA via global-warming.org</p>
-                <p>• Arctic sea ice: NSIDC / NOAA via global-warming.org</p>
-                <p>• Ocean warming: NOAA via global-warming.org</p>
+                <p>• CO₂: <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> — Mauna Loa Observatory (1958-present)</p>
+                <p>• Methane, N₂O: <a href="https://gml.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
+                <p>• Temperature anomaly: <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NASA GISS</a> / <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
+                <p>• Arctic sea ice: <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC</a> / NOAA via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
+                <p>• Ocean warming: <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
                 <p className="text-xs text-gray-600 pt-2">
                   Data refreshed automatically every 12 hours. Last updated: {new Date(data.fetchedAt).toLocaleString()}
                 </p>

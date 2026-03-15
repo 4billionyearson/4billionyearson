@@ -121,16 +121,14 @@ function buildMonthlyComparison(monthlyData: Record<string, number>, param: stri
       ? Math.round((historic.reduce((a, b) => a + b, 0) / historic.length) * 100) / 100
       : null;
 
-    if (recent !== undefined) {
-      comparison.push({
-        monthLabel: `${monthNames[m - 1]} ${y}`,
-        month: m,
-        year: y,
-        recent,
-        historicAvg,
-        diff: historicAvg !== null ? Math.round((recent - historicAvg) * 100) / 100 : null,
-      });
-    }
+    comparison.push({
+      monthLabel: `${monthNames[m - 1]} ${y}`,
+      month: m,
+      year: y,
+      recent: recent !== undefined ? recent : null,
+      historicAvg,
+      diff: recent !== undefined && historicAvg !== null ? Math.round((recent - historicAvg) * 100) / 100 : null,
+    });
   }
 
   return comparison;
