@@ -13,3 +13,22 @@ html {
     paint-order: stroke fill;
   }
 }
+
+/* Leaflet popup overrides for dark theme */
+.leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+}
+.leaflet-popup-tip {
+  display: none !important;
+}
+
+/* Brighten map labels so country/place names stand out */
+.leaflet-labels-bright {
+  filter: brightness(1.0) contrast(0.95);
+}

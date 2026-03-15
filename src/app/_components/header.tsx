@@ -91,7 +91,7 @@ const Header = () => {
           {/* Climate Change Dropdown */}
           <div className="relative" onMouseEnter={() => setIsClimateChangeOpen(true)} onMouseLeave={() => setIsClimateChangeOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/extreme-weather' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Climate Change ▾
             </button>
@@ -109,6 +109,9 @@ const Header = () => {
                 </Link>
                 <Link href="/sea-levels-ice" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400 bg-gray-900' : 'text-gray-300 hover:text-teal-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Sea Levels & Ice
+                </Link>
+                <Link href="/extreme-weather" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400 bg-gray-900' : 'text-gray-300 hover:text-orange-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Extreme Weather
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
@@ -254,6 +257,9 @@ const Header = () => {
                 </Link>
                 <Link href="/sea-levels-ice" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400' : 'text-gray-400 hover:text-teal-400'}`} onClick={closeMenu}>
                   Sea Levels & Ice
+                </Link>
+                <Link href="/extreme-weather" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400' : 'text-gray-400 hover:text-orange-400'}`} onClick={closeMenu}>
+                  Extreme Weather
                 </Link>
                 <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-400 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
                   Blog Articles
