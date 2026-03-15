@@ -75,7 +75,7 @@ const Header = () => {
           {/* Renewables Dropdown */}
           <div className="relative" onMouseEnter={() => setIsRenewablesOpen(true)} onMouseLeave={() => setIsRenewablesOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/energy' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/energy' || pathname === '/energy-explained' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Renewables ▾
             </button>
@@ -86,6 +86,9 @@ const Header = () => {
                   Global & Country Energy Data<LiveBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
+                <Link href="/energy-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300 bg-gray-900' : 'text-gray-300 hover:text-emerald-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Energy Explained
+                </Link>
                 <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
                   Blog Articles
                 </Link>
@@ -98,7 +101,7 @@ const Header = () => {
           {/* Climate Change Dropdown */}
           <div className="relative" onMouseEnter={() => setIsClimateChangeOpen(true)} onMouseLeave={() => setIsClimateChangeOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/extreme-weather' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/extreme-weather' || pathname === '/emissions' || pathname === '/climate-explained' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Climate Change ▾
             </button>
@@ -120,7 +123,13 @@ const Header = () => {
                 <Link href="/extreme-weather" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400 bg-gray-900' : 'text-gray-300 hover:text-orange-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
                 </Link>
+                <Link href="/emissions" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/emissions' ? 'text-rose-400 bg-gray-900' : 'text-gray-300 hover:text-rose-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  CO₂ Emissions<LiveBadge />
+                </Link>
                 <div className="border-t border-gray-700/50">
+                <Link href="/climate-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-explained' ? 'text-sky-400 bg-gray-900' : 'text-gray-300 hover:text-sky-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Climate Explained
+                </Link>
                 <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
                   Blog Articles
                 </Link>
@@ -237,6 +246,9 @@ const Header = () => {
                 <Link href="/energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy' ? 'text-emerald-400' : 'text-gray-400 hover:text-emerald-400'}`} onClick={closeMenu}>
                   Global & Country Energy Data<LiveBadge />
                 </Link>
+                <Link href="/energy-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300' : 'text-gray-400 hover:text-emerald-300'}`} onClick={closeMenu}>
+                  Energy Explained
+                </Link>
                 <Link href="/category/renewable-energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368]' : 'text-gray-400 hover:text-[#D1E368]'}`} onClick={closeMenu}>
                   Blog Articles
                 </Link>
@@ -267,6 +279,12 @@ const Header = () => {
                 </Link>
                 <Link href="/extreme-weather" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400' : 'text-gray-400 hover:text-orange-400'}`} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
+                </Link>
+                <Link href="/emissions" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/emissions' ? 'text-rose-400' : 'text-gray-400 hover:text-rose-400'}`} onClick={closeMenu}>
+                  CO₂ Emissions<LiveBadge />
+                </Link>
+                <Link href="/climate-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-explained' ? 'text-sky-400' : 'text-gray-400 hover:text-sky-400'}`} onClick={closeMenu}>
+                  Climate Explained
                 </Link>
                 <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-400 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
                   Blog Articles

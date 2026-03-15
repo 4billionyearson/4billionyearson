@@ -1,14 +1,18 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import 'leaflet/dist/leaflet.css';
 import {
-  AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, Brush,
+  AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer, Brush, Cell,
 } from 'recharts';
 import {
   Loader2, Zap, Flame, Sun, Wind, Atom, Droplets, Factory,
   TrendingUp, BarChart3, Search, MapPin, Globe, Users,
 } from 'lucide-react';
+
+const EnergyChoroplethMap = dynamic(() => import('@/app/_components/energy-choropleth-map'), { ssr: false });
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1173,6 +1177,155 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'World' }: 
   );
 }
 
+// ─── Top 10 Rankings Section ─────────────────────────────────────────────────
+
+interface RankEntry { name: string; value: number; year: number }
+
+interface Top10Data {
+  top10RenewableTWh: RankEntry[];
+  top10RenewableShare: RankEntry[];
+  top10Solar: RankEntry[];
+  top10Wind: RankEntry[];
+  top10Electricity: RankEntry[];
+  top10EnergyPerCapita: RankEntry[];
+  cleanestGrids: RankEntry[];
+  mostFossil: RankEntry[];
+}
+
+const RANK_COLORS = [
+  '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5',
+  '#bef264', '#a3e635', '#84cc16', '#65a30d', '#4d7c0f',
+];
+
+function Top10BarChart({ data, label, unit, formatFn }: {
+  data: RankEntry[];
+  label: string;
+  unit: string;
+  formatFn?: (v: number) => string;
+}) {
+  const fmt = formatFn || ((v: number) => v >= 1000 ? `${Math.round(v / 1000)}k` : String(Math.round(v)));
+  const chartData = data.map((d) => ({ name: d.name, value: d.value }));
+  return (
+    <div className="h-[400px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#374151" />
+          <XAxis type="number" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false}
+            tickFormatter={(v) => fmt(v)} />
+          <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11, fill: '#D3C8BB' }} tickLine={false} axisLine={false} />
+          <Tooltip content={({ active, payload, label: l }: any) => {
+            if (!active || !payload?.length) return null;
+            return (
+              <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl">
+                <p className="font-semibold text-gray-200 text-sm">{l}</p>
+                <p style={{ color: payload[0]?.fill }} className="text-sm">
+                  {fmt(payload[0]?.value)} {unit}
+                </p>
+              </div>
+            );
+          }} />
+          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+            {chartData.map((_, i) => (
+              <Cell key={i} fill={RANK_COLORS[i] || '#10b981'} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function Top10Rankings() {
+  const [top10, setTop10] = useState<Top10Data | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/climate/energy/top10')
+      .then((r) => r.json())
+      .then((d) => { if (!d.error) setTop10(d); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
+        <p className="text-gray-400 text-sm">Loading global rankings...</p>
+      </div>
+    );
+  }
+
+  if (!top10) return null;
+
+  return (
+    <>
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title="Global Rankings" />
+
+      {/* Top 10 Renewable Energy (TWh) */}
+      <SectionCard icon={<Sun className="h-5 w-5 text-emerald-400" />} title="Top 10 Renewable Energy Producers">
+        <p className="text-sm text-gray-400 mb-4">
+          The countries producing the most renewable energy in absolute terms (TWh). Large economies dominate 
+          because of their massive energy needs, but their investment signals where the global energy 
+          transition is gathering pace.
+        </p>
+        <Top10BarChart data={top10.top10RenewableTWh} label="Renewable Energy" unit="TWh" formatFn={formatTWh} />
+      </SectionCard>
+
+      {/* Top 10 Renewable Share (%) */}
+      <SectionCard icon={<Globe className="h-5 w-5 text-green-400" />} title="Top 10 by Renewable Energy Share">
+        <p className="text-sm text-gray-400 mb-4">
+          Countries with the highest share of renewables in their total energy mix. These nations are 
+          leading the transition away from fossil fuels — many leveraging abundant hydro, geothermal, 
+          or wind resources.
+        </p>
+        <Top10BarChart data={top10.top10RenewableShare} label="Renewable Share" unit="%"
+          formatFn={(v) => `${v.toFixed(1)}%`} />
+      </SectionCard>
+
+      {/* Top 10 Solar */}
+      <SectionCard icon={<Sun className="h-5 w-5 text-yellow-400" />} title="Top 10 Solar Energy Producers">
+        <p className="text-sm text-gray-400 mb-4">
+          Solar energy has experienced exponential growth over the past decade. China alone now produces 
+          more solar energy than the rest of the world combined, followed by the US, India, and Japan.
+        </p>
+        <Top10BarChart data={top10.top10Solar} label="Solar Energy" unit="TWh" formatFn={formatTWh} />
+      </SectionCard>
+
+      {/* Top 10 Wind */}
+      <SectionCard icon={<Wind className="h-5 w-5 text-cyan-400" />} title="Top 10 Wind Energy Producers">
+        <p className="text-sm text-gray-400 mb-4">
+          Wind power is the second-largest renewable source globally. China and the US lead by a wide margin, 
+          with European nations punching above their weight thanks to offshore wind investment.
+        </p>
+        <Top10BarChart data={top10.top10Wind} label="Wind Energy" unit="TWh" formatFn={formatTWh} />
+      </SectionCard>
+
+      {/* Cleanest Grids */}
+      <SectionCard icon={<Zap className="h-5 w-5 text-green-400" />} title="Cleanest Electricity Grids">
+        <p className="text-sm text-gray-400 mb-4">
+          Countries with the lowest carbon intensity of electricity (gCO₂/kWh). These nations have 
+          decarbonised their power grids through a combination of hydro, nuclear, wind, and solar — 
+          providing a model for the rest of the world.
+        </p>
+        <Top10BarChart data={top10.cleanestGrids} label="Carbon Intensity" unit="gCO₂/kWh"
+          formatFn={(v) => `${Math.round(v)}`} />
+      </SectionCard>
+
+      {/* Most Fossil-Dependent */}
+      <SectionCard icon={<Flame className="h-5 w-5 text-red-400" />} title="Most Fossil-Dependent Nations">
+        <p className="text-sm text-gray-400 mb-4">
+          Countries with the highest share of fossil fuels in their energy mix. These economies face 
+          the biggest challenge in transitioning to clean energy, often due to abundant domestic 
+          oil, gas, or coal reserves.
+        </p>
+        <Top10BarChart data={top10.mostFossil} label="Fossil Share" unit="%"
+          formatFn={(v) => `${v.toFixed(1)}%`} />
+      </SectionCard>
+    </>
+  );
+}
+
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 const ENERGY_CACHE_KEY = 'energy-page-cache';
@@ -1402,6 +1555,17 @@ export default function EnergyPage() {
               </>
             );
           })()}
+
+          {/* ─── World Renewable Energy Map ─────────────────────────── */}
+          <SectionCard icon={<Globe className="h-5 w-5 text-emerald-400" />} title="Renewable Energy Share by Country">
+            <p className="text-gray-400 text-sm mb-4">
+              Percentage of primary energy from renewable sources. Hover over a country to see its renewable share.
+            </p>
+            <EnergyChoroplethMap />
+          </SectionCard>
+
+          {/* ─── Top 10 Global Rankings ───────────────────────────────── */}
+          <Top10Rankings />
 
           {/* ─── Attribution ─────────────────────────────────────────── */}
           <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">

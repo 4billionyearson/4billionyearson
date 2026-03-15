@@ -255,6 +255,98 @@ function TotalTrendChart({
   );
 }
 
+/* ─── Top 10 Most-Hit Countries ──────────────────────────────────────────── */
+
+const RANK_COLOURS = [
+  "#f97316", "#fb923c", "#fdba74", "#fed7aa", "#ffedd5",
+  "#fef3c7", "#fef9c3", "#fefce8", "#ecfccb", "#dcfce7",
+];
+
+const EW_EXCLUDE = new Set([
+  "World", "Africa", "Asia", "Europe", "North America", "South America", "Oceania",
+  "European Union (27)", "High-income countries", "Upper-middle-income countries",
+  "Lower-middle-income countries", "Low-income countries",
+]);
+
+function Top10Countries() {
+  const [ranking, setRanking] = useState<{ name: string; value: number }[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [dataRes, metaRes] = await Promise.all([
+          fetch("https://api.ourworldindata.org/v1/indicators/1119245.data.json"),
+          fetch("https://api.ourworldindata.org/v1/indicators/1119245.metadata.json"),
+        ]);
+        const data = await dataRes.json();
+        const meta = await metaRes.json();
+        const entityMap: Record<number, string> = {};
+        for (const e of meta?.dimensions?.entities?.values ?? []) entityMap[e.id] = e.name;
+
+        // Sum disasters in last 20 years per country
+        const cutoff = new Date().getFullYear() - 20;
+        const totals: Record<string, number> = {};
+        for (let i = 0; i < data.years.length; i++) {
+          if (data.years[i] < cutoff) continue;
+          const name = entityMap[data.entities[i]];
+          if (!name || EW_EXCLUDE.has(name)) continue;
+          totals[name] = (totals[name] || 0) + (data.values[i] || 0);
+        }
+        const sorted = Object.entries(totals)
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => b.value - a.value)
+          .slice(0, 10);
+        setRanking(sorted);
+      } catch { /* silent */ }
+      setLoading(false);
+    })();
+  }, []);
+
+  if (loading) {
+    return (
+      <SectionCard icon={<AlertTriangle className="h-5 w-5 text-orange-400" />} title="Most-Affected Countries (Last 20 Years)">
+        <div className="flex justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-orange-400" />
+        </div>
+      </SectionCard>
+    );
+  }
+  if (!ranking || ranking.length === 0) return null;
+
+  return (
+    <SectionCard icon={<AlertTriangle className="h-5 w-5 text-orange-400" />} title="Most-Affected Countries (Last 20 Years)">
+      <p className="text-sm text-gray-400 mb-4">
+        Countries that have experienced the highest total number of reported extreme weather events
+        (floods, storms, droughts, wildfires) over the past two decades according to the EM-DAT international disaster database.
+      </p>
+      <div className="h-[400px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={ranking} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#374151" />
+            <XAxis type="number" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
+            <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 11, fill: "#D3C8BB" }} tickLine={false} axisLine={false} />
+            <Tooltip content={({ active, payload, label: l }: any) => {
+              if (!active || !payload?.length) return null;
+              return (
+                <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl">
+                  <p className="font-semibold text-gray-200 text-sm">{l}</p>
+                  <p className="text-orange-400 text-sm">{payload[0]?.value?.toLocaleString()} events</p>
+                </div>
+              );
+            }} />
+            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+              {ranking.map((_, i) => (
+                <Cell key={i} fill={RANK_COLOURS[i] || "#f97316"} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </SectionCard>
+  );
+}
+
 /* ─── Map (SSR-safe dynamic import) ──────────────────────────────────────── */
 
 const EventsMap = dynamic(
@@ -669,6 +761,9 @@ export default function ExtremeWeatherPage() {
                   />
                 </div>
               </SectionCard>
+
+              {/* ─── Top 10 Most-Hit Countries ──────────────────── */}
+              <Top10Countries />
 
               {/* ─── Data Sources ──────────────────────────────────── */}
               <div className="bg-gray-950/70 rounded-xl border border-gray-800/50 p-4 text-xs text-gray-500 space-y-1">

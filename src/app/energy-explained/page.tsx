@@ -1,0 +1,225 @@
+import { Metadata } from "next";
+import {
+  Zap, Sun, Wind, Droplets, Atom, Flame, Factory,
+  ArrowUpRight, BookOpen, ExternalLink, Battery, Lightbulb,
+} from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Energy Explained | 4 Billion Years On",
+  description:
+    "A plain-English guide to global energy: fossil fuels vs renewables, how electricity grids work, energy units explained, and the transition to clean power.",
+  openGraph: {
+    title: "Energy Explained | 4 Billion Years On",
+    description:
+      "A plain-English guide to global energy: fossil fuels vs renewables, how electricity grids work, energy units explained, and the transition to clean power.",
+  },
+};
+
+/* ─── Data ────────────────────────────────────────────────────────────────── */
+
+const GLOSSARY: { term: string; definition: string }[] = [
+  { term: "Primary energy", definition: "The total energy extracted from natural sources before any conversion. Includes fossil fuels burned directly for heat, plus the fuel inputs to power stations — not just the electricity they produce." },
+  { term: "Final energy", definition: "Energy delivered to end users (homes, factories, vehicles) after conversion losses. Roughly two-thirds of primary energy is lost as waste heat during conversion and transmission." },
+  { term: "TWh (terawatt-hour)", definition: "A unit of energy equal to 1 billion kilowatt-hours. Global electricity generation is roughly 29,000 TWh per year. One TWh could power about 150,000 UK homes for a year." },
+  { term: "kWh (kilowatt-hour)", definition: "The standard unit for household energy bills. One kWh = using a 1,000-watt appliance for one hour. A UK home uses roughly 3,500 kWh of electricity per year." },
+  { term: "Capacity vs generation", definition: "Capacity (measured in GW) is the maximum a power plant can produce. Generation (TWh) is what it actually produces. Solar panels may have 20% capacity factor (produce 20% of theoretical maximum) because the sun doesn't always shine." },
+  { term: "Capacity factor", definition: "The ratio of actual energy output to the theoretical maximum over a period. Nuclear ≈ 90%, wind ≈ 25-45%, solar ≈ 15-25%, depending on location." },
+  { term: "Fossil fuels", definition: "Coal, oil, and natural gas — formed from ancient organic matter over millions of years. When burned, they release stored carbon as CO₂. They still supply about 80% of global primary energy." },
+  { term: "Renewable energy", definition: "Energy from sources that replenish naturally: solar, wind, hydropower, geothermal, and biomass. Renewables now generate around 30% of global electricity." },
+  { term: "Solar PV", definition: "Photovoltaic panels that convert sunlight directly to electricity. The fastest-growing energy source — solar generation has roughly doubled every 3 years over the past decade." },
+  { term: "Wind power", definition: "Turbines converting kinetic energy from wind to electricity. Onshore wind is one of the cheapest new electricity sources globally. Offshore wind is growing rapidly." },
+  { term: "Hydropower", definition: "Electricity from flowing water, usually via dams. The largest source of renewable electricity globally, but limited by geography and environmental concerns." },
+  { term: "Nuclear energy", definition: "Electricity from nuclear fission (splitting heavy atoms like uranium). Produces minimal greenhouse gases during operation, but faces challenges around cost, waste, and public perception." },
+  { term: "Grid", definition: "The interconnected network of power stations, transmission lines, and distribution systems that deliver electricity from generators to consumers." },
+  { term: "Baseload", definition: "The minimum level of electricity demand over a 24-hour period. Traditionally met by coal or nuclear; renewables + storage are increasingly filling this role." },
+  { term: "Intermittency", definition: "The variability of wind and solar output due to weather and daylight. Addressed through grid storage (batteries), interconnection, flexible demand, and backup generation." },
+  { term: "Energy storage", definition: "Technologies that store excess energy for later use. Lithium-ion batteries dominate short-term storage; pumped hydro provides 90% of current grid-scale storage." },
+  { term: "Electrification", definition: "Switching end uses (heating, transport, industry) from fossil fuels to electricity, ideally from clean sources. A key decarbonisation strategy." },
+  { term: "Carbon intensity of electricity", definition: "Grams of CO₂ emitted per kWh of electricity generated. Ranges from ~0 g (hydro, nuclear, wind, solar) to ~900 g (coal). The global average is about 440 g/kWh." },
+  { term: "LCOE", definition: "Levelised Cost of Energy — the average cost per kWh over a power plant's lifetime, including construction and fuel. Solar and onshore wind are now the cheapest new-build electricity sources in most of the world." },
+  { term: "Energy transition", definition: "The global shift from fossil fuels to cleaner energy sources. Involves scaling renewables, improving efficiency, electrifying transport and heat, and developing storage and hydrogen." },
+  { term: "Green hydrogen", definition: "Hydrogen produced by splitting water using renewable electricity (electrolysis). Potential zero-carbon fuel for heavy industry, shipping, and aviation." },
+  { term: "Energy per capita", definition: "Total energy consumption divided by population. High-income countries typically use 5-10× more energy per person than low-income countries." },
+];
+
+const KEY_FACTS: { icon: React.ReactNode; text: string }[] = [
+  { icon: <Flame className="h-5 w-5 text-red-400 flex-shrink-0" />, text: "Fossil fuels still provide about 80% of global primary energy, though their share of electricity is declining." },
+  { icon: <Sun className="h-5 w-5 text-yellow-400 flex-shrink-0" />, text: "Solar is the fastest-growing energy source in history. In 2023, more solar capacity was installed than all other sources combined." },
+  { icon: <Wind className="h-5 w-5 text-sky-400 flex-shrink-0" />, text: "Wind and solar together now generate over 12% of global electricity, up from less than 2% a decade ago." },
+  { icon: <Zap className="h-5 w-5 text-emerald-400 flex-shrink-0" />, text: "Renewables (including hydro) produce roughly 30% of the world's electricity — and the share is rising fast." },
+  { icon: <Battery className="h-5 w-5 text-purple-400 flex-shrink-0" />, text: "Battery storage costs have fallen ~90% since 2010, making variable renewables increasingly dispatchable." },
+  { icon: <Atom className="h-5 w-5 text-cyan-400 flex-shrink-0" />, text: "Nuclear provides about 10% of global electricity — the largest source of non-fossil baseload power." },
+  { icon: <Factory className="h-5 w-5 text-gray-400 flex-shrink-0" />, text: "The power sector accounts for roughly 40% of global CO₂ emissions — the single largest source." },
+  { icon: <Lightbulb className="h-5 w-5 text-amber-400 flex-shrink-0" />, text: "LED lighting uses ~75% less energy than incandescent bulbs — a simple efficiency gain that saves ~5% of global electricity." },
+];
+
+const RESOURCES: { name: string; url: string; desc: string }[] = [
+  { name: "IEA World Energy Outlook", url: "https://www.iea.org/reports/world-energy-outlook-2024", desc: "The International Energy Agency's flagship annual report on global energy trends and forecasts." },
+  { name: "Our World in Data — Energy", url: "https://ourworldindata.org/energy", desc: "Comprehensive interactive charts on global & national energy production, consumption, and mix." },
+  { name: "Ember Global Electricity Review", url: "https://ember-climate.org/insights/research/global-electricity-review-2024/", desc: "Annual analysis of electricity generation trends worldwide, with a focus on the coal-to-clean transition." },
+  { name: "Energy Institute Statistical Review", url: "https://www.energyinst.org/statistical-review", desc: "Formerly the BP Statistical Review — the most widely cited dataset on global energy supply and demand." },
+  { name: "IRENA", url: "https://www.irena.org/", desc: "The International Renewable Energy Agency — data and analysis on renewable deployment, costs, and policy." },
+  { name: "Carbon Brief — Energy", url: "https://www.carbonbrief.org/category/energy/", desc: "Detailed, data-driven articles on the energy transition, grid decarbonisation, and technology trends." },
+  { name: "BloombergNEF", url: "https://about.bnef.com/", desc: "Leading source for clean energy investment data and technology cost analysis." },
+  { name: "US EIA", url: "https://www.eia.gov/", desc: "The U.S. Energy Information Administration — extensive data on American and international energy markets." },
+];
+
+/* ─── Page ────────────────────────────────────────────────────────────────── */
+
+export default function EnergyExplainedPage() {
+  return (
+    <main>
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
+        <div className="max-w-4xl mx-auto space-y-6">
+
+          {/* Hero */}
+          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+            <div className="flex items-center gap-3 mb-4">
+              <BookOpen className="h-6 w-6 text-emerald-400" />
+              <p className="text-sm uppercase tracking-[0.3em] text-emerald-400 font-mono">Explainer</p>
+            </div>
+            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
+              Energy{" "}
+              <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
+                Explained
+              </span>
+            </h1>
+            <p className="text-gray-400 text-sm md:text-base max-w-2xl">
+              A plain-English guide to global energy — how we generate power, what the numbers mean, and how the transition to clean energy is unfolding.
+            </p>
+          </div>
+
+          {/* Key facts */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
+            <div className="grid gap-3">
+              {KEY_FACTS.map(({ icon, text }, i) => (
+                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60">
+                  {icon}
+                  <p className="text-sm text-gray-300 leading-relaxed">{text}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* How energy works */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">How Global Energy Works</h2>
+            <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
+              <p>
+                Everything that moves, heats, lights, or computes uses energy. Globally, we consume roughly 580 exajoules (EJ) of primary energy every year. The vast majority — about 80% — still comes from fossil fuels: oil (for transport), gas (for heat and electricity), and coal (mainly for electricity and steel).
+              </p>
+              <p>
+                <strong className="text-white">Electricity</strong> is only one slice of the energy system — around 20% of final energy use — but it&apos;s the most important slice for decarbonisation, because clean alternatives (solar, wind, nuclear, hydro) can replace fossil fuels directly. The rest of the energy system (transport, heating, industry) is harder to decarbonise and increasingly relies on <strong className="text-white">electrification</strong>: replacing petrol cars with EVs, gas boilers with heat pumps, and coal furnaces with electric arc furnaces.
+              </p>
+              <p>
+                The <strong className="text-white">energy transition</strong> is the generational shift away from fossil fuels. It&apos;s driven by three forces: climate policy (Paris Agreement targets), economics (solar and wind are now the cheapest new-build electricity in most regions), and energy security (countries want to reduce dependence on imported oil and gas).
+              </p>
+              <p>
+                The challenge is speed. Even though renewables are growing exponentially, total energy demand is also rising — especially in developing nations. The atmosphere doesn&apos;t care about renewable <em>share</em>; it cares about absolute emissions. As long as total fossil-fuel use keeps rising, emissions keep rising. The inflection point — where global fossil use starts declining, not just growing more slowly — has not yet arrived.
+              </p>
+              <p>
+                <strong className="text-white">Energy storage</strong> and <strong className="text-white">grid flexibility</strong> are the missing pieces. Wind and solar are intermittent — they produce power when conditions allow, not necessarily when demand peaks. Batteries, pumped hydro, demand response, and interconnectors between regions are all part of the solution. Green hydrogen may eventually decarbonise sectors that electricity can&apos;t easily reach.
+              </p>
+            </div>
+          </section>
+
+          {/* Units explained */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Understanding Energy Units</h2>
+            <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
+              <p>
+                Energy data can be confusing because different sources use different units. Here&apos;s a quick guide:
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-700">
+                      <th className="text-left py-2 pr-4 text-gray-400 font-medium">Unit</th>
+                      <th className="text-left py-2 pr-4 text-gray-400 font-medium">What it means</th>
+                      <th className="text-left py-2 text-gray-400 font-medium">Typical use</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800/60">
+                    <tr><td className="py-2 pr-4 text-white font-medium">kWh</td><td className="py-2 pr-4">Kilowatt-hour</td><td className="py-2">Household electricity bills</td></tr>
+                    <tr><td className="py-2 pr-4 text-white font-medium">MWh</td><td className="py-2 pr-4">1,000 kWh</td><td className="py-2">Small solar farms</td></tr>
+                    <tr><td className="py-2 pr-4 text-white font-medium">GWh</td><td className="py-2 pr-4">1 million kWh</td><td className="py-2">Power station annual output</td></tr>
+                    <tr><td className="py-2 pr-4 text-white font-medium">TWh</td><td className="py-2 pr-4">1 billion kWh</td><td className="py-2">Country-level generation</td></tr>
+                    <tr><td className="py-2 pr-4 text-white font-medium">EJ</td><td className="py-2 pr-4">Exajoule (278 TWh)</td><td className="py-2">Global energy statistics</td></tr>
+                    <tr><td className="py-2 pr-4 text-white font-medium">GW</td><td className="py-2 pr-4">Gigawatt (power, not energy)</td><td className="py-2">Installed capacity</td></tr>
+                    <tr><td className="py-2 pr-4 text-white font-medium">gCO₂/kWh</td><td className="py-2 pr-4">Carbon intensity</td><td className="py-2">Grid cleanliness</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-gray-500 text-xs mt-2">
+                Power (W, kW, GW) = rate of energy use at a moment. Energy (Wh, kWh, TWh) = total energy consumed over time. A 100 W lightbulb running for 10 hours uses 1 kWh.
+              </p>
+            </div>
+          </section>
+
+          {/* Glossary */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Glossary</h2>
+            <div className="divide-y divide-gray-800/60">
+              {GLOSSARY.map(({ term, definition }) => (
+                <div key={term} className="py-3 first:pt-0 last:pb-0">
+                  <dt className="font-semibold text-white text-sm mb-0.5">{term}</dt>
+                  <dd className="text-sm text-gray-400 leading-relaxed">{definition}</dd>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Explore our data pages */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Explore Energy Data</h2>
+            <p className="text-sm text-gray-400 mb-4">See these concepts in action with real data on our dashboard pages:</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                { href: "/energy", label: "Global & Country Energy", color: "text-emerald-400", desc: "Energy mix, renewables, electricity generation" },
+                { href: "/emissions", label: "CO₂ Emissions", color: "text-rose-400", desc: "Country rankings & global trends" },
+                { href: "/climate-dashboard", label: "Climate Dashboard", color: "text-white", desc: "Temperature, CO₂ & weather data" },
+                { href: "/greenhouse-gases", label: "Greenhouse Gases", color: "text-amber-400", desc: "CO₂, methane & N₂O concentrations" },
+              ].map(({ href, label, color, desc }) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60 hover:border-gray-600 transition-colors group"
+                >
+                  <ArrowUpRight className={`h-4 w-4 ${color} flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
+                  <div>
+                    <p className={`text-sm font-semibold ${color}`}>{label}</p>
+                    <p className="text-xs text-gray-500">{desc}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          {/* Further reading */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Further Reading</h2>
+            <div className="grid gap-3">
+              {RESOURCES.map(({ name, url, desc }) => (
+                <a
+                  key={name}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60 hover:border-emerald-800/60 transition-colors group"
+                >
+                  <ExternalLink className="h-4 w-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-emerald-400 group-hover:text-emerald-300 transition-colors">{name}</p>
+                    <p className="text-xs text-gray-500">{desc}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </main>
+  );
+}

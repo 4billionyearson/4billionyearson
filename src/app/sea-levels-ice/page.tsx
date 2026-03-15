@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush,
 } from 'recharts';
-import { Loader2, Activity, Snowflake, Waves, Thermometer, ArrowUp, Link2 } from 'lucide-react';
+import { Loader2, Activity, Snowflake, Waves, Thermometer, ArrowUp, Link2, MapPin } from 'lucide-react';
+
+const ArcticIceMap = dynamic(() => import("@/app/_components/arctic-ice-map"), { ssr: false });
+const ICE_YEARS = ["1979","1985","1990","1995","2000","2005","2010","2012","2015","2020","2024"];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -152,6 +156,8 @@ export default function SeaLevelsIcePage() {
   const [data, setData] = useState<GHGData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeIceYear, setActiveIceYear] = useState<string>("1979");
+  const handleIceYearChange = useCallback((y: string) => setActiveIceYear(y), []);
 
   useEffect(() => {
     fetch('/api/climate/greenhouse-gases')
@@ -202,6 +208,23 @@ export default function SeaLevelsIcePage() {
       .filter(c => slMap.has(c.year))
       .map(c => ({ year: c.year, co2: c.value, seaLevel: slMap.get(c.year)! }));
   }, [data?.co2, data?.seaLevel]);
+
+  // ─── Anomaly data aligned to ice map years ──────────────────────────────
+  const iceYearAnomalies = useMemo(() => {
+    if (!data) return null;
+    const tempMap = new Map(data.temperature?.yearly.map(t => [t.year, t.anomaly]));
+    const oceanMap = new Map(data.oceanWarming?.yearly.map(o => [o.year, o.value]));
+    const slMap = new Map(data.seaLevel?.yearly.map(s => [s.year, s.value]));
+    return ICE_YEARS.map(y => {
+      const yr = Number(y);
+      return {
+        year: yr,
+        temp: tempMap.get(yr) ?? null,
+        ocean: oceanMap.get(yr) ?? null,
+        seaLevel: slMap.get(yr) ?? null,
+      };
+    }).filter(d => d.temp !== null || d.ocean !== null || d.seaLevel !== null);
+  }, [data]);
 
   return (
     <main>
@@ -288,6 +311,54 @@ export default function SeaLevelsIcePage() {
                   )}
                 </div>
               </div>
+
+              {/* ═══ ICE EXTENT + ANOMALY PANEL ═══ */}
+              <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="September Ice Extent: Arctic & Antarctic 1979 – 2024">
+                <p className="text-sm text-gray-400 mb-4">
+                  Every September the Arctic sea ice reaches its annual minimum while Antarctic ice nears its maximum. Press play to see how both poles have changed over 45 years — the Arctic has <span className="text-white font-medium">dramatically shrunk</span> from 7.2 to 4.3 million km², while Antarctic extent has also declined in recent years. The lighter the colour, the greater the extent. Drag to rotate each globe.
+                </p>
+                <ArcticIceMap onYearChange={handleIceYearChange} />
+
+                {/* Combined anomaly chart for the same years */}
+                {iceYearAnomalies && iceYearAnomalies.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-3">
+                      Temperature &amp; Sea Level for the Same Years
+                    </h3>
+                    <div className="h-[320px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={iceYearAnomalies} margin={{ top: 10, right: 0, left: -15, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                          <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                          <YAxis yAxisId="temp" tick={{ fontSize: 11, fill: '#f59e0b' }} tickLine={false} axisLine={false} unit="°" />
+                          <YAxis yAxisId="sl" orientation="right" tick={{ fontSize: 11, fill: '#14b8a6' }} tickLine={false} axisLine={false} unit="mm" />
+                          <Tooltip content={<CorrelationTooltip />} />
+                          <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
+                          <ReferenceLine yAxisId="temp" y={0} stroke="#4B5563" strokeDasharray="3 3" />
+                          {iceYearAnomalies.map((d) => (
+                            String(d.year) === activeIceYear ? (
+                              <ReferenceLine
+                                key={d.year}
+                                x={d.year}
+                                yAxisId="temp"
+                                stroke="#22d3ee"
+                                strokeWidth={2}
+                                strokeDasharray="4 4"
+                              />
+                            ) : null
+                          ))}
+                          <Line yAxisId="temp" type="monotone" dataKey="temp" name="Air Temp Anomaly (°C)" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line yAxisId="temp" type="monotone" dataKey="ocean" name="Ocean Temp Anomaly (°C)" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line yAxisId="sl" type="monotone" dataKey="seaLevel" name="Sea Level (mm)" stroke="#14b8a6" strokeWidth={2} dot={{ r: 3 }} connectNulls />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-gray-600 mt-3">
+                  Source: <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">NSIDC Sea Ice Index v4.0</a> — September monthly polygon shapefiles · NASA GISS · NOAA
+                </p>
+              </SectionCard>
 
               {/* ═══ HOW IT ALL CONNECTS ═══ */}
               <Divider icon={<Link2 className="h-5 w-5" />} title="How It All Connects" />
@@ -474,6 +545,7 @@ export default function SeaLevelsIcePage() {
               {data.arcticIce && data.arcticIce.yearly.length > 0 && (
                 <>
                   <Divider icon={<Snowflake className="h-5 w-5" />} title="Arctic Sea Ice" />
+
                   <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Arctic Sea Ice Extent">
                     <p className="text-sm text-gray-400 mb-4">
                       Arctic sea ice acts as a giant reflector, bouncing sunlight back into space. As it melts, the darker ocean absorbs more heat, accelerating warming in a dangerous feedback loop. Current extent is <span className="text-white font-medium">{data.arcticIce.current.extent.toFixed(1)} million km²</span>. Scientists project ice-free Arctic summers could occur within the next few decades.
@@ -497,6 +569,7 @@ export default function SeaLevelsIcePage() {
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
                 <p>• Sea level: <a href="https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Laboratory for Satellite Altimetry</a> (1993-present)</p>
                 <p>• Arctic sea ice: <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC</a> / NOAA via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
+                <p>• Arctic ice extent map: <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC Sea Ice Index v4.0</a> — September monthly shapefiles (1979-2024)</p>
                 <p>• Temperature anomaly: <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NASA GISS</a> / <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
                 <p>• Ocean warming: <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
                 <p>• CO₂: <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> — Mauna Loa Observatory</p>
