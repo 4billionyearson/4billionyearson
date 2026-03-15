@@ -482,7 +482,7 @@ export default function GreenhouseGasesPage() {
                 Gases
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
               Live atmospheric concentrations of the key greenhouse gases driving climate change — carbon dioxide, methane, and nitrous oxide — along with their historical trends and climate impacts.
             </p>
           </div>

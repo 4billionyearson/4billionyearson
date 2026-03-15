@@ -6,6 +6,13 @@ import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 const Header = () => {
+  const LiveBadge = () => (
+    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-red-400">
+      <span className="live-dot w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
+      Live
+    </span>
+  );
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isRenewablesOpen, setIsRenewablesOpen] = useState(false);
@@ -76,7 +83,7 @@ const Header = () => {
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[260px]">
                 <Link href="/energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Global & Country Energy Data
+                  Global & Country Energy Data<LiveBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
@@ -99,19 +106,19 @@ const Header = () => {
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[240px]">
                 <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Global & Local Climate Data
+                  Global & Local Climate Data<LiveBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  The Nine Factors
+                  The Nine Factors<LiveBadge />
                 </Link>
                 <Link href="/greenhouse-gases" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400 bg-gray-900' : 'text-gray-300 hover:text-amber-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Greenhouse Gases
+                  Greenhouse Gases<LiveBadge />
                 </Link>
                 <Link href="/sea-levels-ice" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400 bg-gray-900' : 'text-gray-300 hover:text-teal-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Sea Levels & Ice
+                  Sea Levels & Ice<LiveBadge />
                 </Link>
                 <Link href="/extreme-weather" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400 bg-gray-900' : 'text-gray-300 hover:text-orange-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Extreme Weather
+                  Extreme Weather<LiveBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
@@ -228,7 +235,7 @@ const Header = () => {
             {mobileRenewablesOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy' ? 'text-emerald-400' : 'text-gray-400 hover:text-emerald-400'}`} onClick={closeMenu}>
-                  Global & Country Energy Data
+                  Global & Country Energy Data<LiveBadge />
                 </Link>
                 <Link href="/category/renewable-energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368]' : 'text-gray-400 hover:text-[#D1E368]'}`} onClick={closeMenu}>
                   Blog Articles
@@ -247,19 +254,19 @@ const Header = () => {
             {mobileClimateOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/climate-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={closeMenu}>
-                  Global & Local Climate Data
+                  Global & Local Climate Data<LiveBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`} onClick={closeMenu}>
-                  The Nine Factors
+                  The Nine Factors<LiveBadge />
                 </Link>
                 <Link href="/greenhouse-gases" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400' : 'text-gray-400 hover:text-amber-400'}`} onClick={closeMenu}>
-                  Greenhouse Gases
+                  Greenhouse Gases<LiveBadge />
                 </Link>
                 <Link href="/sea-levels-ice" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400' : 'text-gray-400 hover:text-teal-400'}`} onClick={closeMenu}>
-                  Sea Levels & Ice
+                  Sea Levels & Ice<LiveBadge />
                 </Link>
                 <Link href="/extreme-weather" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400' : 'text-gray-400 hover:text-orange-400'}`} onClick={closeMenu}>
-                  Extreme Weather
+                  Extreme Weather<LiveBadge />
                 </Link>
                 <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-400 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
                   Blog Articles

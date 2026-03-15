@@ -517,7 +517,7 @@ export default function ExtremeWeatherPage() {
                 Events
               </span>
             </h1>
-            <p className="text-gray-400 max-w-3xl text-sm md:text-base leading-relaxed">
+            <p className="text-gray-400 text-sm md:text-base leading-relaxed">
               Tracking extreme weather events worldwide — from historical trends over the past century to live alerts today.
               Data sourced from{" "}
               <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">

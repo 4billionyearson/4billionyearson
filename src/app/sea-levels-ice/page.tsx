@@ -219,7 +219,7 @@ export default function SeaLevelsIcePage() {
                 &amp; Ice
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
               Rising temperatures are melting polar ice and driving sea levels higher. As the planet warms, two forces push the oceans upward: thermal expansion of warming water and the vast quantities of meltwater from glaciers and ice sheets. This page tracks both, and shows how they&apos;re connected.
             </p>
           </div>

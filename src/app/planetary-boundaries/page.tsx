@@ -377,7 +377,7 @@ export default function PlanetaryBoundariesPage() {
               Boundaries
             </span>
           </h1>
-          <p className="text-base md:text-xl text-gray-300 max-w-3xl leading-relaxed mb-8">
+          <p className="text-base md:text-xl text-gray-300 leading-relaxed mb-8">
             In 2009, a team of Earth system scientists led by{" "}
             <span className="text-white font-medium">Johan Rockström</span>{" "}
             identified nine processes that regulate the stability of the Earth
