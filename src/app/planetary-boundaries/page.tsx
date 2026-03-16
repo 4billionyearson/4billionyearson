@@ -80,7 +80,7 @@ const boundaries: Boundary[] = [
     currentValue: ">100 E/MSY",
     preindustrial: "1 E/MSY",
     description:
-      "Species are going extinct at more than 100 times the natural background rate — the most dramatic loss of life since the dinosaurs disappeared 66 million years ago.",
+      "Species are going extinct at more than 100 times the natural background rate – the most dramatic loss of life since the dinosaurs disappeared 66 million years ago.",
     details:
       "Both genetic diversity (extinction rate >100x backdrop) and functional diversity (30% of net primary production appropriated by humans vs 10% boundary) are critically transgressed. Biodiversity underpins every ecosystem service humanity depends on, from pollination to water purification.",
     color: "#a855f7",
@@ -97,7 +97,7 @@ const boundaries: Boundary[] = [
     description:
       "Forests, wetlands and other natural ecosystems are being converted to farmland and urban areas faster than they can recover, disrupting carbon, water and nutrient cycles.",
     details:
-      "Only 59% of the world's original forest cover remains intact, well below the 75% boundary. Tropical and boreal forests — critical carbon sinks and biodiversity reservoirs — are under the greatest pressure. Deforestation accounts for ~10% of global CO₂ emissions.",
+      "Only 59% of the world's original forest cover remains intact, well below the 75% boundary. Tropical and boreal forests – critical carbon sinks and biodiversity reservoirs – are under the greatest pressure. Deforestation accounts for ~10% of global CO₂ emissions.",
     color: "#22c55e",
   },
   {
@@ -156,7 +156,7 @@ const boundaries: Boundary[] = [
     currentValue: "Transgressed",
     preindustrial: "0",
     description:
-      "Over 350,000 synthetic chemicals — plastics, pesticides, PFAS 'forever chemicals' and more — are being released into the environment faster than we can assess their safety.",
+      "Over 350,000 synthetic chemicals – plastics, pesticides, PFAS 'forever chemicals' and more – are being released into the environment faster than we can assess their safety.",
     details:
       "Chemical production has increased 50-fold since 1950 and is projected to triple again by 2050. PFAS contamination is now found in rainwater worldwide at levels exceeding safety guidelines. Plastics alone contain >10,000 chemicals. In January 2022, scientists confirmed this boundary has been exceeded.",
     color: "#ec4899",
@@ -171,7 +171,7 @@ const boundaries: Boundary[] = [
     currentValue: "0.063",
     preindustrial: "0.03",
     description:
-      "Airborne particles from burning fossil fuels and biomass affect climate, monsoon patterns and human health — but globally this boundary remains within safe limits.",
+      "Airborne particles from burning fossil fuels and biomass affect climate, monsoon patterns and human health – but globally this boundary remains within safe limits.",
     details:
       "While the global boundary is not yet transgressed (0.063 vs 0.1 limit), aerosol pollution causes ~800,000 premature deaths per year. Regional hotspots in South and East Asia experience severe air quality issues that affect monsoon patterns and crop yields. This boundary is difficult to quantify globally.",
     color: "#64748b",
@@ -186,7 +186,7 @@ const boundaries: Boundary[] = [
     currentValue: "285.7 DU",
     preindustrial: "290 DU",
     description:
-      "Thanks to the 1987 Montreal Protocol — the most successful environmental treaty in history — the ozone layer is recovering and this boundary remains within safe limits.",
+      "Thanks to the 1987 Montreal Protocol – the most successful environmental treaty in history – the ozone layer is recovering and this boundary remains within safe limits.",
     details:
       "The ozone layer protects life from harmful UV radiation. After the discovery of the Antarctic ozone hole, the Montreal Protocol banned CFCs and related chemicals. The ozone layer is now on track to fully recover by ~2066. This success story demonstrates that coordinated global action on planetary boundaries is possible.",
     color: "#8b5cf6",
@@ -336,10 +336,10 @@ const gaugeData: Record<
 > = {
   1: { preindustrial: 280, boundary: 350, current: 423 }, // CO2 ppm
   2: { preindustrial: 1, boundary: 10, current: 100 }, // Extinction rate E/MSY
-  3: { preindustrial: 100, boundary: 75, current: 59 }, // Forest % — inverse
+  3: { preindustrial: 100, boundary: 75, current: 59 }, // Forest % – inverse
   5: { preindustrial: 0, boundary: 62, current: 165 }, // Nitrogen Tg/yr
-  6: { preindustrial: 3.44, boundary: 2.86, current: 2.84 }, // Aragonite — inverse
-  9: { preindustrial: 290, boundary: 277, current: 285.7 }, // Ozone DU — inverse
+  6: { preindustrial: 3.44, boundary: 2.86, current: 2.84 }, // Aragonite – inverse
+  9: { preindustrial: 290, boundary: 277, current: 285.7 }, // Ozone DU – inverse
 };
 
 /* ─── Page ───────────────────────────────────────────────────────────────── */
@@ -385,7 +385,7 @@ export default function PlanetaryBoundariesPage() {
             <span className="text-white font-medium">
               &ldquo;safe operating space&rdquo;
             </span>{" "}
-            for humanity — thresholds that, once crossed, risk triggering
+            for humanity – thresholds that, once crossed, risk triggering
             abrupt, irreversible environmental change.
           </p>
 
@@ -722,8 +722,8 @@ export default function PlanetaryBoundariesPage() {
                 Australian National University.
               </p>
               <p>
-                For the past 10,000 years — the{" "}
-                <strong className="text-white">Holocene</strong> epoch — Earth
+                For the past 10,000 years – the{" "}
+                <strong className="text-white">Holocene</strong> epoch – Earth
                 has remained in a remarkably stable environmental state. Human
                 civilisation, agriculture, and technology all developed within
                 this narrow window of stability. The framework identifies nine
@@ -747,9 +747,9 @@ export default function PlanetaryBoundariesPage() {
                 state of all other processes.
               </p>
               <p>
-                The ozone layer recovery — driven by the{" "}
+                The ozone layer recovery – driven by the{" "}
                 <strong className="text-white">Montreal Protocol</strong>{" "}
-                (1987) — provides a powerful precedent: when the world acts
+                (1987) – provides a powerful precedent: when the world acts
                 decisively with clear scientific evidence, we can pull back
                 from the brink.
               </p>

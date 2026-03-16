@@ -340,7 +340,7 @@ export default function ClimateDashboard() {
     if (!selectedLocation) {
       try {
         sessionStorage.setItem(CLIMATE_CACHE_KEY, JSON.stringify({ globalData }));
-      } catch { /* quota exceeded — ignore */ }
+      } catch { /* quota exceeded – ignore */ }
       return;
     }
     try {
@@ -349,7 +349,7 @@ export default function ClimateDashboard() {
         ukCountryData: selectedLocation?.id === 'uk-uk' ? null : ukCountryData,
         usNationalData, globalData, searchInput,
       }));
-    } catch { /* quota exceeded — ignore */ }
+    } catch { /* quota exceeded – ignore */ }
   }, [selectedLocation, countryData, usStateData, ukRegionData, ukCountryData, usNationalData, globalData, searchInput]);
 
   // Debounced search-as-you-type
@@ -473,7 +473,7 @@ export default function ClimateDashboard() {
   const regionLabel = (selectedLocation?.type === 'us-state' ? usStateData?.state : null) || (isUkSubRegion ? ukRegionData?.region : null) || '';
   const ukCountryLabel = ukCountryData?.region || 'United Kingdom';
 
-  // NOAA national temperature comparison (prefer over OWID for USA — more current)
+  // NOAA national temperature comparison (prefer over OWID for USA – more current)
   const noaaNationalTempComparison = selectedLocation?.type === 'country' && selectedLocation?.owidCode === 'USA'
     ? usStateData?.paramData?.tavg?.monthlyComparison
     : usNationalData?.paramData?.tavg?.monthlyComparison;
@@ -629,7 +629,7 @@ export default function ClimateDashboard() {
         {loading && (
           <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-blue-400" />
-            <p className="text-gray-400">Loading climate data — this may take a moment for first-time locations...</p>
+            <p className="text-gray-400">Loading climate data – this may take a moment for first-time locations...</p>
           </div>
         )}
 
@@ -648,7 +648,7 @@ export default function ClimateDashboard() {
                   if (countryData?.yearlyData && countryLabel) parts.push(countryLabel);
                   else if (regionLabel && !combinedAvgTempData) parts.push(regionLabel);
                   if (showGlobalOverlay && globalData?.landYearlyData) parts.push('Global (Land)');
-                  return `${parts.join(' + ')} — Average Temperature`;
+                  return `${parts.join(' + ')} – Average Temperature`;
                 })()}
               >
                 {/* Global overlay toggle */}
@@ -669,9 +669,9 @@ export default function ClimateDashboard() {
                   </div>
                 )}
 
-                {/* Annual average — combined or standalone */}
+                {/* Annual average – combined or standalone */}
                 {combinedAvgTempData ? (
-                  <SubSection title="Annual average — full history (drag slider to zoom)">
+                  <SubSection title="Annual average – full history (drag slider to zoom)">
                     <MultiLineChart
                       data={combinedAvgTempData}
                       series={[
@@ -686,7 +686,7 @@ export default function ClimateDashboard() {
                     />
                   </SubSection>
                 ) : countryData?.yearlyData ? (
-                  <SubSection title="Annual average — full history (drag slider to zoom)">
+                  <SubSection title="Annual average – full history (drag slider to zoom)">
                     <YearlyChart
                       data={countryData.yearlyData}
                       dataKey="avgTemp"
@@ -709,29 +709,29 @@ export default function ClimateDashboard() {
 
                 {/* Monthly comparisons */}
                 {selectedLocation?.type === 'us-state' && usStateData?.paramData?.tavg?.monthlyComparison && (
-                  <SubSection title={`${usStateData.state} — Last 12 months vs historic average`}>
+                  <SubSection title={`${usStateData.state} – Last 12 months vs historic average`}>
                     <ComparisonChart data={usStateData.paramData.tavg.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#ea580c" />
                   </SubSection>
                 )}
                 {isUkSubRegion && ukRegionData?.varData?.Tmean?.monthlyComparison && (
-                  <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                  <SubSection title={`${ukRegionData.region} – Last 12 months vs historic average`}>
                     <ComparisonChart data={ukRegionData.varData.Tmean.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#d97706" />
                   </SubSection>
                 )}
                 {(noaaNationalTempComparison || countryData?.monthlyComparison) && (
-                  <SubSection title={`${countryLabel || 'United States'} — Last 12 months vs 1961-1990 baseline`}>
+                  <SubSection title={`${countryLabel || 'United States'} – Last 12 months vs 1961-1990 baseline`}>
                     <ComparisonChart data={noaaNationalTempComparison || countryData.monthlyComparison} recentKey={noaaNationalTempComparison ? "recent" : "recentTemp"} label="Temperature" units="°C" barColor="#ef4444" />
                   </SubSection>
                 )}
                 {showGlobalOverlay && globalData?.landMonthlyComparison && (
-                  <SubSection title="Global (Land) — Last 12 months vs 1961-1990 baseline">
+                  <SubSection title="Global (Land) – Last 12 months vs 1961-1990 baseline">
                     <ComparisonChart data={globalData.landMonthlyComparison} recentKey="recentTemp" label="Temperature" units="°C" barColor="#10b981" />
                   </SubSection>
                 )}
 
                 {/* Combined Min/Max temperature */}
                 {combinedMinMaxData && (
-                  <SubSection title={`${regionLabel} — Max & Min temperature trends`}>
+                  <SubSection title={`${regionLabel} – Max & Min temperature trends`}>
                     <MultiLineChart
                       data={combinedMinMaxData}
                       series={[
@@ -752,8 +752,8 @@ export default function ClimateDashboard() {
                 <SectionCard
                   icon={<Sun className="h-5 w-5 text-yellow-400" />}
                   title={combinedSunshineData
-                    ? `${regionLabel} + ${ukCountryLabel} — Sunshine Hours`
-                    : `${ukRegionData.region} — Sunshine Hours`
+                    ? `${regionLabel} + ${ukCountryLabel} – Sunshine Hours`
+                    : `${ukRegionData.region} – Sunshine Hours`
                   }
                 >
                   <SubSection title="Annual total sunshine hours">
@@ -770,12 +770,12 @@ export default function ClimateDashboard() {
                     )}
                   </SubSection>
                   {ukRegionData.varData.Sunshine.monthlyComparison && (
-                    <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                    <SubSection title={`${ukRegionData.region} – Last 12 months vs historic average`}>
                       <ComparisonChart data={ukRegionData.varData.Sunshine.monthlyComparison} recentKey="recent" label="Sunshine" units="hours" barColor="#eab308" />
                     </SubSection>
                   )}
                   {ukCountryData?.varData?.Sunshine?.monthlyComparison && (
-                    <SubSection title={`${ukCountryLabel} — Last 12 months vs historic average`}>
+                    <SubSection title={`${ukCountryLabel} – Last 12 months vs historic average`}>
                       <ComparisonChart data={ukCountryData.varData.Sunshine.monthlyComparison} recentKey="recent" label="Sunshine" units="hours" barColor="#ea580c" />
                     </SubSection>
                   )}
@@ -791,7 +791,7 @@ export default function ClimateDashboard() {
                 {countryData?.precipYearly && !usStateData?.paramData?.pcp && !ukRegionData?.varData?.Rainfall && (
                   <SectionCard
                     icon={<Droplets className="h-5 w-5 text-blue-400" />}
-                    title={`${countryLabel} — Annual Precipitation`}
+                    title={`${countryLabel} – Annual Precipitation`}
                   >
                     <SubSection title="Annual total precipitation (mm)">
                       <YearlyChart data={countryData.precipYearly} dataKey="value" rollingKey="rollingAvg" label="Precipitation" units="mm" color="#60a5fa" rollingColor="#2563eb" />
@@ -803,8 +803,8 @@ export default function ClimateDashboard() {
                   <SectionCard
                     icon={<Droplets className="h-5 w-5 text-blue-400" />}
                     title={combinedPrecipData
-                      ? `${usStateData.state} + United States — Precipitation`
-                      : `${usStateData.state} — Precipitation`
+                      ? `${usStateData.state} + United States – Precipitation`
+                      : `${usStateData.state} – Precipitation`
                     }
                   >
                     <SubSection title="Annual total precipitation (mm)">
@@ -820,11 +820,11 @@ export default function ClimateDashboard() {
                         <YearlyChart data={usStateData.paramData.pcp.yearly} dataKey="value" rollingKey="rollingAvg" label="Precipitation" units="mm" color="#60a5fa" rollingColor="#2563eb" />
                       )}
                     </SubSection>
-                    <SubSection title={`${usStateData.state} — Last 12 months vs historic average`}>
+                    <SubSection title={`${usStateData.state} – Last 12 months vs historic average`}>
                       <ComparisonChart data={usStateData.paramData.pcp.monthlyComparison} recentKey="recent" label="Precipitation" units="mm" barColor="#3b82f6" />
                     </SubSection>
                     {usNationalData?.paramData?.pcp?.monthlyComparison && (
-                      <SubSection title="United States — Last 12 months vs historic average">
+                      <SubSection title="United States – Last 12 months vs historic average">
                         <ComparisonChart data={usNationalData.paramData.pcp.monthlyComparison} recentKey="recent" label="Precipitation" units="mm" barColor="#7c3aed" />
                       </SubSection>
                     )}
@@ -835,8 +835,8 @@ export default function ClimateDashboard() {
                   <SectionCard
                     icon={<Droplets className="h-5 w-5 text-blue-400" />}
                     title={combinedRainfallData
-                      ? `${regionLabel} + ${ukCountryLabel} — Rainfall`
-                      : `${ukRegionData.region} — Rainfall`
+                      ? `${regionLabel} + ${ukCountryLabel} – Rainfall`
+                      : `${ukRegionData.region} – Rainfall`
                     }
                   >
                     <SubSection title="Annual total rainfall (mm)">
@@ -853,12 +853,12 @@ export default function ClimateDashboard() {
                       )}
                     </SubSection>
                     {ukRegionData.varData.Rainfall.monthlyComparison && (
-                      <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                      <SubSection title={`${ukRegionData.region} – Last 12 months vs historic average`}>
                         <ComparisonChart data={ukRegionData.varData.Rainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#3b82f6" />
                       </SubSection>
                     )}
                     {ukCountryData?.varData?.Rainfall?.monthlyComparison && (
-                      <SubSection title={`${ukCountryLabel} — Last 12 months vs historic average`}>
+                      <SubSection title={`${ukCountryLabel} – Last 12 months vs historic average`}>
                         <ComparisonChart data={ukCountryData.varData.Rainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#7c3aed" />
                       </SubSection>
                     )}
@@ -869,8 +869,8 @@ export default function ClimateDashboard() {
                   <SectionCard
                     icon={<Droplets className="h-5 w-5 text-indigo-400" />}
                     title={combinedRaindaysData
-                      ? `${regionLabel} + ${ukCountryLabel} — Rain Days (≥1mm)`
-                      : `${ukRegionData.region} — Rain Days (≥1mm)`
+                      ? `${regionLabel} + ${ukCountryLabel} – Rain Days (≥1mm)`
+                      : `${ukRegionData.region} – Rain Days (≥1mm)`
                     }
                   >
                     <SubSection title="Annual total rain days">
@@ -887,12 +887,12 @@ export default function ClimateDashboard() {
                       )}
                     </SubSection>
                     {ukRegionData.varData.Raindays1mm.monthlyComparison && (
-                      <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                      <SubSection title={`${ukRegionData.region} – Last 12 months vs historic average`}>
                         <ComparisonChart data={ukRegionData.varData.Raindays1mm.monthlyComparison} recentKey="recent" label="Rain Days" units="days" barColor="#6366f1" />
                       </SubSection>
                     )}
                     {ukCountryData?.varData?.Raindays1mm?.monthlyComparison && (
-                      <SubSection title={`${ukCountryLabel} — Last 12 months vs historic average`}>
+                      <SubSection title={`${ukCountryLabel} – Last 12 months vs historic average`}>
                         <ComparisonChart data={ukCountryData.varData.Raindays1mm.monthlyComparison} recentKey="recent" label="Rain Days" units="days" barColor="#8b5cf6" />
                       </SubSection>
                     )}
@@ -909,8 +909,8 @@ export default function ClimateDashboard() {
                 <SectionCard
                   icon={<Snowflake className="h-5 w-5 text-cyan-400" />}
                   title={combinedFrostData
-                    ? `${regionLabel} + ${ukCountryLabel} — Air Frost Days`
-                    : `${ukRegionData.region} — Air Frost Days`
+                    ? `${regionLabel} + ${ukCountryLabel} – Air Frost Days`
+                    : `${ukRegionData.region} – Air Frost Days`
                   }
                 >
                   <SubSection title="Annual total frost days">
@@ -927,12 +927,12 @@ export default function ClimateDashboard() {
                     )}
                   </SubSection>
                   {ukRegionData.varData.AirFrost.monthlyComparison && (
-                    <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
+                    <SubSection title={`${ukRegionData.region} – Last 12 months vs historic average`}>
                       <ComparisonChart data={ukRegionData.varData.AirFrost.monthlyComparison} recentKey="recent" label="Frost Days" units="days" barColor="#06b6d4" />
                     </SubSection>
                   )}
                   {ukCountryData?.varData?.AirFrost?.monthlyComparison && (
-                    <SubSection title={`${ukCountryLabel} — Last 12 months vs historic average`}>
+                    <SubSection title={`${ukCountryLabel} – Last 12 months vs historic average`}>
                       <ComparisonChart data={ukCountryData.varData.AirFrost.monthlyComparison} recentKey="recent" label="Frost Days" units="days" barColor="#a855f7" />
                     </SubSection>
                   )}
@@ -941,10 +941,10 @@ export default function ClimateDashboard() {
             )}
 
             {/* ═══ GLOBAL CONTEXT ═══ */}
-            {/* (moved outside hasData gate — see below) */}
+            {/* (moved outside hasData gate – see below) */}
 
             {/* ─── Attribution ───────────────────────────────────────── */}
-            {/* (moved outside hasData gate — see below) */}
+            {/* (moved outside hasData gate – see below) */}
           </>
         )}
 
@@ -953,7 +953,7 @@ export default function ClimateDashboard() {
           <>
             {hasData && !loading && <Divider icon={<Globe className="h-5 w-5" />} title="Global Context" />}
 
-                <SectionCard icon={<Globe className="h-5 w-5 text-emerald-400" />} title="Global Average Temperature — NOAA (Land + Ocean)">
+                <SectionCard icon={<Globe className="h-5 w-5 text-emerald-400" />} title="Global Average Temperature – NOAA (Land + Ocean)">
                   <SubSection title="Annual global land + ocean temperature vs Paris Agreement thresholds">
                     <YearlyChart
                       data={globalData.yearlyData}
@@ -996,13 +996,13 @@ export default function ClimateDashboard() {
                 </SectionCard>
 
                 {globalData?.landVsOceanMonthly && (
-                  <SectionCard icon={<ThermometerSun className="h-5 w-5 text-amber-400" />} title="Global Land vs Land + Ocean — Monthly Comparison">
+                  <SectionCard icon={<ThermometerSun className="h-5 w-5 text-amber-400" />} title="Global Land vs Land + Ocean – Monthly Comparison">
                     <p className="text-sm text-gray-400 mb-4">
                       Land surface temperatures run warmer and swing more with the seasons than the combined land + ocean average.
                       Country data on this page uses <span className="text-emerald-400">land surface temperature</span> from Copernicus ERA5, while
-                      the global trend chart above uses <span className="text-amber-400">land + ocean</span> from NOAA — the standard measure for climate policy.
+                      the global trend chart above uses <span className="text-amber-400">land + ocean</span> from NOAA – the standard measure for climate policy.
                     </p>
-                    <SubSection title="Last 12 months — absolute temperature (°C)">
+                    <SubSection title="Last 12 months – absolute temperature (°C)">
                       <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={globalData.landVsOceanMonthly} margin={CHART_MARGIN}>

@@ -41,6 +41,8 @@ interface EnergyYearlyPoint {
   nuclearShareElec: number | null;
   renewablesShareElec: number | null;
   fossilShareElec: number | null;
+  biofuelShareElec: number | null;
+  otherRenewShareElecExcBiofuel: number | null;
   electricityGeneration: number | null;
   carbonIntensity: number | null;
   ghgEmissions: number | null;
@@ -86,14 +88,15 @@ const formatTWh = (v: number) => v >= 1000 ? `${Math.round(v / 1000)}k` : String
 // ─── Colour palette ─────────────────────────────────────────────────────────
 
 const COLORS = {
-  coal: '#6b7280',
-  oil: '#92400e',
+  coal: '#9ca3af',
+  oil: '#78716c',
   gas: '#d97706',
   nuclear: '#a855f7',
   hydro: '#3b82f6',
   wind: '#06b6d4',
   solar: '#eab308',
-  biofuel: '#22c55e',
+  biofuel: '#92400e',
+  otherRenew: '#0d9488',
   fossil: '#ef4444',
   renewables: '#10b981',
   lowCarbon: '#6366f1',
@@ -107,8 +110,9 @@ const DarkTooltip = ({ active, payload, label }: any) => {
     <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[180px]">
       <p className="font-semibold text-gray-200 mb-1 text-sm">{label}</p>
       {payload.filter((p: any) => p.value != null).map((p: any, i: number) => (
-        <p key={i} style={{ color: p.color || p.stroke || p.fill }} className="text-sm">
-          {p.name}: {typeof p.value === 'number' ? p.value.toFixed(1) : p.value}
+        <p key={i} className="text-sm flex items-center gap-1.5">
+          <span className="inline-block w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: p.color || p.stroke || p.fill }} />
+          <span className="text-gray-200">{p.name}: {typeof p.value === 'number' ? p.value.toFixed(1) : p.value}</span>
         </p>
       ))}
     </div>
@@ -150,7 +154,7 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
-function StatCard({ label, value, unit, color, icon, countryValue, countryName, baseLabel = 'Global' }: { label: string; value: string; unit?: string; color: string; icon: React.ReactNode; countryValue?: string; countryName?: string; baseLabel?: string }) {
+function StatCard({ label, value, unit, color, icon, countryValue, countryName, baseLabel = 'Global', subtitle }: { label: string; value: string; unit?: string; color: string; icon: React.ReactNode; countryValue?: string; countryName?: string; baseLabel?: string; subtitle?: string }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center shadow-xl">
       <div className={`mb-2 ${color}`}>{icon}</div>
@@ -161,11 +165,13 @@ function StatCard({ label, value, unit, color, icon, countryValue, countryName, 
           <p className={`text-2xl font-bold font-mono ${color} mt-1`}>{value}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
           <p className="text-[10px] text-gray-500 mt-0.5">{baseLabel}</p>
           <p className="text-xs text-gray-400 mt-1">{label}</p>
+          {subtitle && <p className="text-[10px] text-gray-600 mt-0.5">{subtitle}</p>}
         </>
       ) : (
         <>
           <p className={`text-2xl font-bold font-mono ${color}`}>{value}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
           <p className="text-xs text-gray-400 mt-1">{label}</p>
+          {subtitle && <p className="text-[10px] text-gray-600 mt-0.5">{subtitle}</p>}
         </>
       )}
     </div>
@@ -380,7 +386,7 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
         </p>
         {/* Country stacked area */}
         {countryMixData && countryMixData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} — primary energy by source (TWh)`}>
+          <SubSection title={`${countryData.name} – primary energy by source (TWh)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={countryMixData} margin={CHART_MARGIN}>
@@ -399,7 +405,7 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
           </SubSection>
         )}
 
-        <SubSection title={`${baseLabel} — primary energy by source (TWh) — drag slider to zoom`}>
+        <SubSection title={`${baseLabel} – primary energy by source (TWh) – drag slider to zoom`}>
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={mixData} margin={CHART_MARGIN}>
@@ -418,7 +424,7 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
         </SubSection>
 
         {countryShareData && countryShareData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} — share of primary energy (%)`}>
+          <SubSection title={`${countryData.name} – share of primary energy (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={countryShareData} margin={CHART_MARGIN}>
@@ -438,7 +444,7 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
         )}
 
         {shareData.length > 0 && (
-          <SubSection title={`${baseLabel} — share of primary energy (%)`}>
+          <SubSection title={`${baseLabel} – share of primary energy (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={shareData} margin={CHART_MARGIN}>
@@ -459,7 +465,7 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
       </SectionCard>
 
       {comparisonData && comparisonData.length > 0 && countryData && (
-        <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title={`${countryData.name} vs ${baseLabel} — Energy Share`}>
+        <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title={`${countryData.name} vs ${baseLabel} – Energy Share`}>
           <p className="text-sm text-gray-400 mb-4">
             Comparing <span className="text-white font-medium">{countryData.name}</span>&apos;s fossil and renewable energy share against the global average.
           </p>
@@ -500,11 +506,13 @@ function ElecStackedChart({ data: yearly, label }: { data: EnergyYearlyPoint[]; 
         Hydro: y.hydroShareElec,
         Wind: y.windShareElec,
         Solar: y.solarShareElec,
+        Biofuel: y.biofuelShareElec,
+        Other: y.otherRenewShareElecExcBiofuel,
       }));
   }, [yearly]);
   if (elecShareData.length === 0) return null;
   return (
-    <SubSection title={`${label} — share of electricity generation (%)`}>
+    <SubSection title={`${label} – share of electricity generation (%)`}>
       <div className="h-[420px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={elecShareData} margin={CHART_MARGIN}>
@@ -520,6 +528,8 @@ function ElecStackedChart({ data: yearly, label }: { data: EnergyYearlyPoint[]; 
             <Area type="monotone" dataKey="Hydro" stackId="1" stroke={COLORS.hydro} fill={COLORS.hydro} fillOpacity={0.8} />
             <Area type="monotone" dataKey="Wind" stackId="1" stroke={COLORS.wind} fill={COLORS.wind} fillOpacity={0.8} />
             <Area type="monotone" dataKey="Solar" stackId="1" stroke={COLORS.solar} fill={COLORS.solar} fillOpacity={0.8} />
+            <Area type="monotone" dataKey="Biofuel" stackId="1" stroke={COLORS.biofuel} fill={COLORS.biofuel} fillOpacity={0.8} />
+            <Area type="monotone" dataKey="Other" stackId="1" stroke={COLORS.otherRenew} fill={COLORS.otherRenew} fillOpacity={0.8} />
             <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
           </AreaChart>
         </ResponsiveContainer>
@@ -568,7 +578,7 @@ function ElectricityMixSection({ data, countryData, baseLabel = 'Global' }: { da
 
         {/* Comparison: fossil vs renewables share */}
         {comparisonData && comparisonData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} vs ${baseLabel} — fossil & renewable electricity share (%)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} – fossil & renewable electricity share (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={comparisonData} margin={CHART_MARGIN}>
@@ -663,7 +673,7 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
 
         {/* Country renewables stacked area */}
         {countryRenewData && countryRenewData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} — share of electricity from renewables (%)`}>
+          <SubSection title={`${countryData.name} – share of electricity from renewables (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={countryRenewData} margin={CHART_MARGIN}>
@@ -683,7 +693,7 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
         )}
 
         {/* Base renewables stacked area */}
-        <SubSection title={`${baseLabel} — share of electricity from renewables (%)`}>
+        <SubSection title={`${baseLabel} – share of electricity from renewables (%)`}>
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={worldRenewData} margin={CHART_MARGIN}>
@@ -703,7 +713,7 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
 
         {/* Comparison: total renewables share */}
         {renewCompData && renewCompData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} vs ${baseLabel} — total renewable electricity share (%)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} – total renewable electricity share (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={renewCompData} margin={CHART_MARGIN}>
@@ -723,7 +733,7 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
 
         {/* Comparison: solar & wind share */}
         {solarWindCompData && solarWindCompData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} vs ${baseLabel} — solar & wind electricity share (%)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} – solar & wind electricity share (%)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={solarWindCompData} margin={CHART_MARGIN}>
@@ -778,7 +788,7 @@ function CarbonIntensitySection({ data, countryData, baseLabel = 'Global' }: { d
           The global average has been slowly declining as renewables displace coal, but the pace
           must <span className="text-red-400 font-medium">accelerate dramatically</span> to meet climate goals.
         </p>
-        <SubSection title="gCO₂ per kWh — drag slider to zoom">
+        <SubSection title="gCO₂ per kWh – drag slider to zoom">
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={CHART_MARGIN}>
@@ -856,7 +866,7 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
 
         {/* Energy per capita */}
         {compData && compData.length > 0 && countryData ? (
-          <SubSection title={`${countryData.name} vs ${baseLabel} — primary energy per capita (kWh/person)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} – primary energy per capita (kWh/person)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={compData} margin={CHART_MARGIN}>
@@ -873,7 +883,7 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
             </div>
           </SubSection>
         ) : (
-          <SubSection title={`${baseLabel} — primary energy per capita (kWh/person)`}>
+          <SubSection title={`${baseLabel} – primary energy per capita (kWh/person)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={worldPerCapita} margin={CHART_MARGIN}>
@@ -892,7 +902,7 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
 
         {/* Electricity per capita */}
         {elecCompData && elecCompData.length > 0 && countryData ? (
-          <SubSection title={`${countryData.name} vs ${baseLabel} — electricity per capita (kWh/person)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} – electricity per capita (kWh/person)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={elecCompData} margin={CHART_MARGIN}>
@@ -909,7 +919,7 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
             </div>
           </SubSection>
         ) : worldElecPerCapita.length > 0 && (
-          <SubSection title={`${baseLabel} — electricity per capita (kWh/person)`}>
+          <SubSection title={`${baseLabel} – electricity per capita (kWh/person)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={worldElecPerCapita} margin={CHART_MARGIN}>
@@ -980,7 +990,7 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
 
         {/* Country emissions at its own scale */}
         {countryEmData && countryEmData.length > 0 && countryData && (
-          <SubSection title={`${countryData.name} — annual GHG emissions (Mt CO₂eq)`}>
+          <SubSection title={`${countryData.name} – annual GHG emissions (Mt CO₂eq)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={countryEmData} margin={CHART_MARGIN}>
@@ -998,7 +1008,7 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
         )}
 
         {/* Base emissions */}
-        <SubSection title={`${baseLabel} — annual GHG emissions (Mt CO₂eq)`}>
+        <SubSection title={`${baseLabel} – annual GHG emissions (Mt CO₂eq)`}>
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={worldData} margin={CHART_MARGIN}>
@@ -1014,9 +1024,9 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
           </div>
         </SubSection>
 
-        {/* Per-capita comparison — fair like-for-like */}
+        {/* Per-capita comparison – fair like-for-like */}
         {perCapitaComp && perCapitaComp.length > 0 && countryData ? (
-          <SubSection title={`${countryData.name} vs ${baseLabel} — GHG emissions per capita (tonnes CO₂eq)`}>
+          <SubSection title={`${countryData.name} vs ${baseLabel} – GHG emissions per capita (tonnes CO₂eq)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={perCapitaComp} margin={CHART_MARGIN}>
@@ -1033,7 +1043,7 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
             </div>
           </SubSection>
         ) : worldPerCapita.length > 0 && (
-          <SubSection title={`${baseLabel} — GHG emissions per capita (tonnes CO₂eq)`}>
+          <SubSection title={`${baseLabel} – GHG emissions per capita (tonnes CO₂eq)`}>
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={worldPerCapita} margin={CHART_MARGIN}>
@@ -1119,18 +1129,18 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'Global' }:
   return (
     <SectionCard icon={<Flame className="h-5 w-5 text-orange-400" />} title="Fossil Fuel Breakdown">
       <p className="text-sm text-gray-400 mb-4">
-        The three fossil fuels — coal, oil, and gas — broken down individually.
+        The three fossil fuels – coal, oil, and gas – broken down individually.
         Coal is the dirtiest, while gas produces roughly half the CO₂ per unit of energy.
       </p>
 
       {countryFossilData && countryFossilData.length > 0 && countryData && (
-        <FossilStackedChart chartData={countryFossilData} title={`${countryData.name} — fossil fuel consumption by type (TWh)`} />
+        <FossilStackedChart chartData={countryFossilData} title={`${countryData.name} – fossil fuel consumption by type (TWh)`} />
       )}
 
-      <FossilStackedChart chartData={worldFossilData} title={`${baseLabel} — fossil fuel consumption by type (TWh)`} />
+      <FossilStackedChart chartData={worldFossilData} title={`${baseLabel} – fossil fuel consumption by type (TWh)`} />
 
       {fossilShareComp && fossilShareComp.length > 0 && countryData && (
-        <SubSection title={`${countryData.name} vs ${baseLabel} — fossil share of primary energy (%)`}>
+        <SubSection title={`${countryData.name} vs ${baseLabel} – fossil share of primary energy (%)`}>
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={fossilShareComp} margin={CHART_MARGIN}>
@@ -1153,7 +1163,7 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'Global' }:
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
-const ENERGY_CACHE_KEY = 'energy-page-cache';
+const ENERGY_CACHE_KEY = 'energy-page-cache-v2';
 
 export default function EnergyPage() {
   const [data, setData] = useState<EnergyData | null>(null);
@@ -1190,7 +1200,7 @@ export default function EnergyPage() {
     if (!data) return;
     try {
       sessionStorage.setItem(ENERGY_CACHE_KEY, JSON.stringify({ data, countryData, usStateData, locationType }));
-    } catch { /* quota exceeded — ignore */ }
+    } catch { /* quota exceeded – ignore */ }
   }, [data, countryData, usStateData, locationType]);
 
   const handleLocationSelect = useCallback(async (loc: LocationSuggestion) => {
@@ -1315,8 +1325,9 @@ export default function EnergyPage() {
             return (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard
-                label={`Fossil share (${(mainLatest || latest).year})`}
-                value={(mainLatest || latest).fossilShare?.toFixed(1) || '—'}
+                label={`Fossil – primary energy (${(mainLatest || latest).year})`}
+                subtitle="Coal, oil & gas. Rest is renewables + nuclear."
+                value={(mainLatest || latest).fossilShare?.toFixed(1) || '–'}
                 unit="%"
                 color="text-red-400"
                 icon={<Flame className="h-5 w-5" />}
@@ -1325,8 +1336,9 @@ export default function EnergyPage() {
                 baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Renewables share (${(mainLatest || latest).year})`}
-                value={(mainLatest || latest).renewablesShare?.toFixed(1) || '—'}
+                label={`Renewables – primary energy (${(mainLatest || latest).year})`}
+                subtitle="Solar, wind, hydro, biomass & other."
+                value={(mainLatest || latest).renewablesShare?.toFixed(1) || '–'}
                 unit="%"
                 color="text-emerald-400"
                 icon={<Zap className="h-5 w-5" />}
@@ -1335,8 +1347,9 @@ export default function EnergyPage() {
                 baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Solar electricity (${(mainLatest || latest).year})`}
-                value={(mainLatest || latest).solarShareElec?.toFixed(1) || '—'}
+                label={`Solar – share of electricity (${(mainLatest || latest).year})`}
+                subtitle="% of all electricity generated."
+                value={(mainLatest || latest).solarShareElec?.toFixed(1) || '–'}
                 unit="%"
                 color="text-yellow-400"
                 icon={<Sun className="h-5 w-5" />}
@@ -1345,10 +1358,11 @@ export default function EnergyPage() {
                 baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Wind electricity (${(mainLatest || latest).year})`}
-                value={(mainLatest || latest).windShareElec?.toFixed(1) || '—'}
+                label={`Wind – share of electricity (${(mainLatest || latest).year})`}
+                subtitle="% of all electricity generated."
+                value={(mainLatest || latest).windShareElec?.toFixed(1) || '–'}
                 unit="%"
-                color="text-cyan-400"
+                color="text-[#06b6d4]"
                 icon={<Wind className="h-5 w-5" />}
                 countryValue={compData?.latest?.windShareElec?.toFixed(1)}
                 countryName={compName}

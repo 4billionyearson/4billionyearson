@@ -104,7 +104,7 @@ export async function GET() {
       .sort((a, b) => b.value - a.value)
       .slice(0, 20);
 
-    // Lowest carbon intensity (cleanest grids) — filter out tiny producers
+    // Lowest carbon intensity (cleanest grids) – filter out tiny producers
     const cleanestGrids = [...carbonIntensity]
       .filter(c => {
         const elec = electricityGen.find(e => e.name === c.name);

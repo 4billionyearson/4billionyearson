@@ -123,7 +123,7 @@ export default function EnergyRankingsPage() {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Which countries lead the clean energy transition — and which remain most dependent on fossil fuels?
+              Which countries lead the clean energy transition – and which remain most dependent on fossil fuels?
               Rankings are based on the latest available data from Our World in Data and the Energy Institute.
             </p>
           </div>
@@ -157,7 +157,7 @@ export default function EnergyRankingsPage() {
             <SectionCard icon={<Globe className="h-5 w-5 text-green-400" />} title="Top 20 by Renewable Energy Share">
               <p className="text-sm text-gray-400 mb-4">
                 Countries with the highest share of renewables in their total energy mix. These nations are
-                leading the transition away from fossil fuels — many leveraging abundant hydro, geothermal,
+                leading the transition away from fossil fuels – many leveraging abundant hydro, geothermal,
                 or wind resources.
               </p>
               <Top10BarChart data={top10.top10RenewableShare} label="Renewable Share" unit="%"
@@ -187,7 +187,7 @@ export default function EnergyRankingsPage() {
             <SectionCard icon={<Zap className="h-5 w-5 text-green-400" />} title="Cleanest Electricity Grids">
               <p className="text-sm text-gray-400 mb-4">
                 Countries with the lowest carbon intensity of electricity (gCO₂/kWh). These nations have
-                decarbonised their power grids through a combination of hydro, nuclear, wind, and solar —
+                decarbonised their power grids through a combination of hydro, nuclear, wind, and solar –
                 providing a model for the rest of the world.
               </p>
               <Top10BarChart data={top10.cleanestGrids} label="Carbon Intensity" unit="gCO₂/kWh"

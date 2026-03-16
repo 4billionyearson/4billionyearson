@@ -315,7 +315,7 @@ export default function SeaLevelsIcePage() {
               {/* ═══ ICE EXTENT + ANOMALY PANEL ═══ */}
               <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="September Ice Extent: Arctic & Antarctic 1979 – 2024">
                 <p className="text-sm text-gray-400 mb-4">
-                  Every September the Arctic sea ice reaches its annual minimum while Antarctic ice nears its maximum. Press play to see how both poles have changed over 45 years — the Arctic has <span className="text-white font-medium">dramatically shrunk</span> from 7.2 to 4.3 million km², while Antarctic extent has also declined in recent years. The lighter the colour, the greater the extent. Drag to rotate each globe.
+                  Every September the Arctic sea ice reaches its annual minimum while Antarctic ice nears its maximum. Press play to see how both poles have changed over 45 years – the Arctic has <span className="text-white font-medium">dramatically shrunk</span> from 7.2 to 4.3 million km², while Antarctic extent has also declined in recent years. The lighter the colour, the greater the extent. Drag to rotate each globe.
                 </p>
                 <ArcticIceMap onYearChange={handleIceYearChange} />
 
@@ -356,7 +356,7 @@ export default function SeaLevelsIcePage() {
                   </div>
                 )}
                 <p className="text-xs text-gray-600 mt-3">
-                  Source: <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">NSIDC Sea Ice Index v4.0</a> — September monthly polygon shapefiles · NASA GISS · NOAA
+                  Source: <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">NSIDC Sea Ice Index v4.0</a> – September monthly polygon shapefiles · NASA GISS · NOAA
                 </p>
               </SectionCard>
 
@@ -367,7 +367,7 @@ export default function SeaLevelsIcePage() {
               {tempSeaLevelData && tempSeaLevelData.length > 0 && (
                 <SectionCard icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Warming Drives Rising Seas">
                   <p className="text-sm text-gray-400 mb-4">
-                    Rising global temperatures are the root cause of sea level rise. Warmer air melts ice sheets and glaciers, adding water to the oceans. At the same time, warmer water <span className="text-white font-medium">expands</span> — thermal expansion accounts for roughly a third of observed sea level rise. This chart shows the tight correlation between temperature anomaly and sea level since satellite measurement began.
+                    Rising global temperatures are the root cause of sea level rise. Warmer air melts ice sheets and glaciers, adding water to the oceans. At the same time, warmer water <span className="text-white font-medium">expands</span> – thermal expansion accounts for roughly a third of observed sea level rise. This chart shows the tight correlation between temperature anomaly and sea level since satellite measurement began.
                   </p>
                   <SubSection title="Temperature anomaly (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
@@ -399,7 +399,7 @@ export default function SeaLevelsIcePage() {
               {iceSeaLevelData && iceSeaLevelData.length > 0 && (
                 <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Melting Ice, Rising Seas">
                   <p className="text-sm text-gray-400 mb-4">
-                    As Arctic sea ice extent declines, it signals broader ice loss across Greenland, Antarctica, and mountain glaciers — all of which contribute directly to sea level rise. While sea ice itself (floating on water) doesn&apos;t raise levels when it melts, its loss <span className="text-white font-medium">accelerates warming</span> through the ice-albedo feedback, driving further ice sheet melt from land-based glaciers.
+                    As Arctic sea ice extent declines, it signals broader ice loss across Greenland, Antarctica, and mountain glaciers – all of which contribute directly to sea level rise. While sea ice itself (floating on water) doesn&apos;t raise levels when it melts, its loss <span className="text-white font-medium">accelerates warming</span> through the ice-albedo feedback, driving further ice sheet melt from land-based glaciers.
                   </p>
                   <SubSection title="Arctic ice extent in M km² (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
@@ -429,7 +429,7 @@ export default function SeaLevelsIcePage() {
               {tempIceData && tempIceData.length > 0 && (
                 <SectionCard icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Warming Destroys Ice">
                   <p className="text-sm text-gray-400 mb-4">
-                    The mechanism is straightforward: higher temperatures melt ice. This chart shows how rising global temperatures have driven a steady decline in Arctic sea ice extent — a trend that feeds on itself as exposed dark ocean absorbs more solar energy, amplifying the warming that caused the melt in the first place.
+                    The mechanism is straightforward: higher temperatures melt ice. This chart shows how rising global temperatures have driven a steady decline in Arctic sea ice extent – a trend that feeds on itself as exposed dark ocean absorbs more solar energy, amplifying the warming that caused the melt in the first place.
                   </p>
                   <SubSection title="Temperature anomaly (left axis) vs Arctic ice extent in M km² (right axis)">
                     <div className="h-[380px] w-full">
@@ -461,7 +461,7 @@ export default function SeaLevelsIcePage() {
               {oceanSeaLevelData && oceanSeaLevelData.length > 0 && (
                 <SectionCard icon={<Waves className="h-5 w-5 text-blue-400" />} title="Warmer Oceans, Higher Seas">
                   <p className="text-sm text-gray-400 mb-4">
-                    Oceans absorb over <span className="text-white font-medium">90% of excess heat</span> trapped by greenhouse gases. As ocean water warms, it physically expands — a process called <span className="text-white font-medium">thermal expansion</span> — pushing sea levels up even without any additional meltwater. This is the single largest contributor to observed sea level rise to date.
+                    Oceans absorb over <span className="text-white font-medium">90% of excess heat</span> trapped by greenhouse gases. As ocean water warms, it physically expands – a process called <span className="text-white font-medium">thermal expansion</span> – pushing sea levels up even without any additional meltwater. This is the single largest contributor to observed sea level rise to date.
                   </p>
                   <SubSection title="Ocean surface anomaly (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
@@ -491,7 +491,7 @@ export default function SeaLevelsIcePage() {
               {co2SeaLevelData && co2SeaLevelData.length > 0 && (
                 <SectionCard icon={<ArrowUp className="h-5 w-5 text-teal-400" />} title="Rising Carbon, Rising Seas">
                   <p className="text-sm text-gray-400 mb-4">
-                    The chain of cause and effect begins with CO₂. Fossil fuel emissions trap heat, that heat warms oceans and melts ice, and both processes raise sea levels. Since satellite measurements began in 1993, global mean sea level has risen by over <span className="text-white font-medium">{data.seaLevel?.current.value.toFixed(0)} mm</span> — an accelerating trend with profound implications for coastal communities worldwide.
+                    The chain of cause and effect begins with CO₂. Fossil fuel emissions trap heat, that heat warms oceans and melts ice, and both processes raise sea levels. Since satellite measurements began in 1993, global mean sea level has risen by over <span className="text-white font-medium">{data.seaLevel?.current.value.toFixed(0)} mm</span> – an accelerating trend with profound implications for coastal communities worldwide.
                   </p>
                   <SubSection title="CO₂ concentration (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
@@ -527,7 +527,7 @@ export default function SeaLevelsIcePage() {
                     <p className="text-sm text-gray-400 mb-4">
                       Satellite altimetry has tracked global mean sea level since 1993, revealing an accelerating rise. The current level is approximately <span className="text-white font-medium">+{data.seaLevel.current.value.toFixed(0)} mm</span> above the 1993 baseline, rising at <span className="text-white font-medium">{data.seaLevel.rate}</span>. At this pace, sea levels could rise by 0.3–1.0 metres by 2100, threatening hundreds of millions of people in low-lying coastal areas.
                     </p>
-                    <SubSection title="Annual average sea level change (mm) — satellite era">
+                    <SubSection title="Annual average sea level change (mm) – satellite era">
                       <SimpleYearlyChart
                         data={data.seaLevel.yearly}
                         dataKey="value"
@@ -569,10 +569,10 @@ export default function SeaLevelsIcePage() {
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
                 <p>• Sea level: <a href="https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Laboratory for Satellite Altimetry</a> (1993-present)</p>
                 <p>• Arctic sea ice: <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC</a> / NOAA via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p>• Arctic ice extent map: <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC Sea Ice Index v4.0</a> — September monthly shapefiles (1979-2024)</p>
+                <p>• Arctic ice extent map: <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC Sea Ice Index v4.0</a> – September monthly shapefiles (1979-2024)</p>
                 <p>• Temperature anomaly: <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NASA GISS</a> / <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
                 <p>• Ocean warming: <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p>• CO₂: <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> — Mauna Loa Observatory</p>
+                <p>• CO₂: <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> – Mauna Loa Observatory</p>
                 <p className="text-xs text-gray-600 pt-2">
                   Data refreshed automatically every 12 hours. Last updated: {new Date(data.fetchedAt).toLocaleString()}
                 </p>

@@ -610,7 +610,7 @@ export default function ExtremeWeatherPage() {
               </span>
             </h1>
             <p className="text-gray-400 text-sm md:text-base leading-relaxed">
-              Tracking extreme weather events worldwide — from historical trends over the past century to live alerts today.
+              Tracking extreme weather events worldwide – from historical trends over the past century to live alerts today.
               Data sourced from{" "}
               <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                 EM-DAT
@@ -647,20 +647,20 @@ export default function ExtremeWeatherPage() {
               {/* ─── Summary Stats ──────────────────────────────────── */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard
-                  label={`Disasters (${stats.latest?.year || "—"})`}
-                  value={stats.latest?.value?.toLocaleString() || "—"}
+                  label={`Disasters (${stats.latest?.year || "–"})`}
+                  value={stats.latest?.value?.toLocaleString() || "–"}
                   unit="events"
                   subtext={`2010–2019 avg: ${stats.decadeAvg}`}
                   color="text-orange-400"
                 />
                 <StatCard
-                  label={`Deaths (${stats.latestDeaths?.year || "—"})`}
-                  value={stats.latestDeaths?.value?.toLocaleString() || "—"}
+                  label={`Deaths (${stats.latestDeaths?.year || "–"})`}
+                  value={stats.latestDeaths?.value?.toLocaleString() || "–"}
                   unit="people"
                   color="text-red-400"
                 />
                 <StatCard
-                  label={`Affected (${stats.latestAffected?.year || "—"})`}
+                  label={`Affected (${stats.latestAffected?.year || "–"})`}
                   value={
                     stats.latestAffected?.value
                       ? stats.latestAffected.value >= 1e9
@@ -668,17 +668,17 @@ export default function ExtremeWeatherPage() {
                         : stats.latestAffected.value >= 1e6
                         ? `${(stats.latestAffected.value / 1e6).toFixed(1)}M`
                         : stats.latestAffected.value.toLocaleString()
-                      : "—"
+                      : "–"
                   }
                   unit="people"
                   color="text-amber-400"
                 />
                 <StatCard
-                  label={`Damages (${stats.latestDamages?.year || "—"})`}
+                  label={`Damages (${stats.latestDamages?.year || "–"})`}
                   value={
                     stats.latestDamages?.value
                       ? `$${(stats.latestDamages.value / 1e9).toFixed(0)}B`
-                      : "—"
+                      : "–"
                   }
                   unit="USD"
                   color="text-emerald-400"
@@ -689,7 +689,7 @@ export default function ExtremeWeatherPage() {
               {data.gdacsEvents.length > 0 && (
                 <SectionCard icon={<Activity />} title="Live Extreme Weather Alerts (GDACS)">
                   <p className="text-xs text-gray-500 mb-4">
-                    Real-time extreme weather alerts from the Global Disaster Alert and Coordination System (EU/JRC) — last 12 months.
+                    Real-time extreme weather alerts from the Global Disaster Alert and Coordination System (EU/JRC) – last 12 months.
                     Click any event for the full{" "}
                     <a href="https://www.gdacs.org/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                       GDACS <ExternalLink className="inline w-3 h-3" />
@@ -772,15 +772,15 @@ export default function ExtremeWeatherPage() {
                 </div>
                 <p>
                   <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">EM-DAT</a>{" "}
-                  — The International Disaster Database, Centre for Research on the Epidemiology of Disasters (CRED), UCLouvain, Brussels.
+                  – The International Disaster Database, Centre for Research on the Epidemiology of Disasters (CRED), UCLouvain, Brussels.
                 </p>
                 <p>
                   <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}
-                  — Extreme Weather dataset, based on EM-DAT data.
+                  – Extreme Weather dataset, based on EM-DAT data.
                 </p>
                 <p>
                   <a href="https://www.gdacs.org/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">GDACS</a>{" "}
-                  — Global Disaster Alert and Coordination System, European Commission Joint Research Centre (JRC).
+                  – Global Disaster Alert and Coordination System, European Commission Joint Research Centre (JRC).
                 </p>
               </div>
             </>

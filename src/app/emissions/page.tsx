@@ -372,7 +372,7 @@ export default function EmissionsPage() {
               <SectionCard icon={<Globe className="h-5 w-5 text-yellow-400" />} title="Cumulative Global CO₂ Emissions">
                 <p className="text-sm text-gray-400 mb-4">
                   Since the industrial revolution, humanity has released over <span className="text-white font-medium">{formatTonnes(data.stats.latestCumulative)}</span> of 
-                  CO₂ into the atmosphere. This cumulative burden determines long-term warming — even if emissions 
+                  CO₂ into the atmosphere. This cumulative burden determines long-term warming – even if emissions 
                   stopped today, the CO₂ already released would continue warming the planet for centuries.
                 </p>
                 <div className="h-[380px] w-full">
@@ -404,9 +404,9 @@ export default function EmissionsPage() {
               {/* ─── Attribution ──────────────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
-                <p>• CO₂ emissions: <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> — Global Carbon Project</p>
-                <p>• Per capita emissions: <a href="https://ourworldindata.org/per-capita-co2" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> — Global Carbon Project</p>
-                <p>• Cumulative emissions: <a href="https://ourworldindata.org/contributed-most-global-co2" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> — Global Carbon Project</p>
+                <p>• CO₂ emissions: <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>
+                <p>• Per capita emissions: <a href="https://ourworldindata.org/per-capita-co2" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>
+                <p>• Cumulative emissions: <a href="https://ourworldindata.org/contributed-most-global-co2" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>
                 <p className="text-xs text-gray-600 pt-2">
                   Data refreshed automatically every 30 days. Last updated: {new Date(data.fetchedAt).toLocaleString()}
                 </p>

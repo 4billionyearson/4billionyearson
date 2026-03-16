@@ -120,7 +120,7 @@ async function fetchGHGData(): Promise<GHGData> {
     fetchText('https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/slr/slr_sla_gbl_keep_all_66.csv'),
   ]);
 
-  // ── CO₂ (NOAA Mauna Loa — 1958-present, fallback to global-warming.org) ──
+  // ── CO₂ (NOAA Mauna Loa – 1958-present, fallback to global-warming.org) ──
   let co2: GHGData['co2'] = null;
   const noaaCO2 = co2Text ? parseNOAACO2(co2Text) : null;
   if (noaaCO2 && noaaCO2.monthly.length > 0) {

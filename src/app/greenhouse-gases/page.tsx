@@ -305,7 +305,7 @@ function OverviewSection({ data }: { data: GHGData }) {
       {co2TempData && co2TempData.length > 0 && (
         <SectionCard icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="CO₂ & Global Temperature">
           <p className="text-sm text-gray-400 mb-4">
-            The fundamental cause-and-effect of climate change. As atmospheric CO₂ has risen from <span className="text-white font-medium">~315 ppm</span> in 1958 to over <span className="text-white font-medium">{data.co2?.current.value.toFixed(0)} ppm</span> today, global temperatures have tracked upward in near-lockstep — a correlation that holds across every timescale.
+            The fundamental cause-and-effect of climate change. As atmospheric CO₂ has risen from <span className="text-white font-medium">~315 ppm</span> in 1958 to over <span className="text-white font-medium">{data.co2?.current.value.toFixed(0)} ppm</span> today, global temperatures have tracked upward in near-lockstep – a correlation that holds across every timescale.
           </p>
           <SubSection title="CO₂ concentration (left axis) vs temperature anomaly (right axis)">
             <div className="h-[380px] w-full">
@@ -341,11 +341,11 @@ function OverviewSection({ data }: { data: GHGData }) {
 
       {/* ── All Gases Normalised ── */}
       {normalisedGasData.length > 0 && (
-        <SectionCard icon={<TrendingUp className="h-5 w-5 text-rose-400" />} title="All Greenhouse Gases — Percentage Rise">
+        <SectionCard icon={<TrendingUp className="h-5 w-5 text-rose-400" />} title="All Greenhouse Gases – Percentage Rise">
           <p className="text-sm text-gray-400 mb-4">
-            All three major greenhouse gases plotted on the same scale as <span className="text-white font-medium">percentage increase above pre-industrial levels</span>. This reveals how methane has risen the fastest in relative terms, followed by CO₂ and nitrous oxide — each amplifying the others&apos; warming effect.
+            All three major greenhouse gases plotted on the same scale as <span className="text-white font-medium">percentage increase above pre-industrial levels</span>. This reveals how methane has risen the fastest in relative terms, followed by CO₂ and nitrous oxide – each amplifying the others&apos; warming effect.
           </p>
-          <SubSection title="% above pre-industrial level — drag slider to zoom">
+          <SubSection title="% above pre-industrial level – drag slider to zoom">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={normalisedGasData} margin={CHART_MARGIN}>
@@ -375,9 +375,9 @@ function OverviewSection({ data }: { data: GHGData }) {
 
       {/* ── Temperature + Ocean ── */}
       {tempOceanData && tempOceanData.length > 0 && (
-        <SectionCard icon={<Waves className="h-5 w-5 text-blue-400" />} title="Global Warming — Land & Sea">
+        <SectionCard icon={<Waves className="h-5 w-5 text-blue-400" />} title="Global Warming – Land & Sea">
           <p className="text-sm text-gray-400 mb-4">
-            The atmosphere and oceans are warming in tandem. While the ocean absorbs over 90% of excess heat, its surface temperature anomaly tracks closely with global land temperatures — confirming that warming is not a local phenomenon but a whole-Earth system shift.
+            The atmosphere and oceans are warming in tandem. While the ocean absorbs over 90% of excess heat, its surface temperature anomaly tracks closely with global land temperatures – confirming that warming is not a local phenomenon but a whole-Earth system shift.
           </p>
           <SubSection title="Temperature anomaly: land (NASA/NOAA) vs ocean surface (NOAA)">
             <div className="h-[380px] w-full">
@@ -412,7 +412,7 @@ function OverviewSection({ data }: { data: GHGData }) {
       {co2IceData && co2IceData.length > 0 && (
         <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Rising Carbon, Vanishing Ice">
           <p className="text-sm text-gray-400 mb-4">
-            One of the starkest visualisations of climate change. As CO₂ concentrations climb, Arctic sea ice extent drops — a feedback loop where lost ice exposes dark ocean, absorbing more heat, melting more ice, and accelerating warming further.
+            One of the starkest visualisations of climate change. As CO₂ concentrations climb, Arctic sea ice extent drops – a feedback loop where lost ice exposes dark ocean, absorbing more heat, melting more ice, and accelerating warming further.
           </p>
           <SubSection title="CO₂ concentration (left axis) vs Arctic sea ice extent (right axis)">
             <div className="h-[380px] w-full">
@@ -483,7 +483,7 @@ export default function GreenhouseGasesPage() {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Live atmospheric concentrations of the key greenhouse gases driving climate change — carbon dioxide, methane, and nitrous oxide — along with their historical trends and climate impacts.
+              Live atmospheric concentrations of the key greenhouse gases driving climate change – carbon dioxide, methane, and nitrous oxide – along with their historical trends and climate impacts.
             </p>
           </div>
 
@@ -582,7 +582,7 @@ export default function GreenhouseGasesPage() {
                       CO₂ is the primary driver of climate change, responsible for about two-thirds of the total warming effect. Continuous measurements from Mauna Loa Observatory date back to <span className="text-white font-medium">1958</span>.
                       The current level of <span className="text-white font-medium">{data.co2.current.value.toFixed(1)} ppm</span> is {pctAbovePreindustrial(data.co2.current.value, 280)}% above the pre-industrial level of 280 ppm and well beyond the safe planetary boundary of 350 ppm.
                     </p>
-                    <SubSection title="Yearly average CO₂ concentration (ppm) — drag slider to zoom">
+                    <SubSection title="Yearly average CO₂ concentration (ppm) – drag slider to zoom">
                       <GasYearlyChart
                         data={data.co2.yearly}
                         label="CO₂"
@@ -603,9 +603,9 @@ export default function GreenhouseGasesPage() {
                   <Divider icon={<Wind className="h-5 w-5" />} title="Methane (CH₄)" />
                   <SectionCard icon={<Wind className="h-5 w-5 text-amber-400" />} title="Atmospheric Methane Concentration">
                     <p className="text-sm text-gray-400 mb-4">
-                      Methane is over 80× more potent than CO₂ over a 20-year period. Its concentration has risen from a pre-industrial level of 722 ppb to <span className="text-white font-medium">{data.methane.current.value.toFixed(0)} ppb</span> — a {pctAbovePreindustrial(data.methane.current.value, 722)}% increase. Major sources include agriculture, fossil fuel extraction, and wetlands.
+                      Methane is over 80× more potent than CO₂ over a 20-year period. Its concentration has risen from a pre-industrial level of 722 ppb to <span className="text-white font-medium">{data.methane.current.value.toFixed(0)} ppb</span> – a {pctAbovePreindustrial(data.methane.current.value, 722)}% increase. Major sources include agriculture, fossil fuel extraction, and wetlands.
                     </p>
-                    <SubSection title="Yearly average methane concentration (ppb) — drag slider to zoom">
+                    <SubSection title="Yearly average methane concentration (ppb) – drag slider to zoom">
                       <GasYearlyChart
                         data={data.methane.yearly}
                         label="CH₄"
@@ -628,7 +628,7 @@ export default function GreenhouseGasesPage() {
                     <p className="text-sm text-gray-400 mb-4">
                       Nitrous oxide has nearly 300× the warming potential of CO₂ over 100 years and also depletes the ozone layer. Its concentration has risen from 270 ppb to <span className="text-white font-medium">{data.n2o.current.value.toFixed(1)} ppb</span>. The primary source is agricultural fertiliser use.
                     </p>
-                    <SubSection title="Yearly average N₂O concentration (ppb) — drag slider to zoom">
+                    <SubSection title="Yearly average N₂O concentration (ppb) – drag slider to zoom">
                       <GasYearlyChart
                         data={data.n2o.yearly}
                         label="N₂O"
@@ -705,7 +705,7 @@ export default function GreenhouseGasesPage() {
               {/* ─── Attribution ──────────────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources & attribution:</p>
-                <p>• CO₂: <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> — Mauna Loa Observatory (1958-present)</p>
+                <p>• CO₂: <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> – Mauna Loa Observatory (1958-present)</p>
                 <p>• Methane, N₂O: <a href="https://gml.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
                 <p>• Temperature anomaly: <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NASA GISS</a> / <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
                 <p>• Arctic sea ice: <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC</a> / NOAA via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>

@@ -58,7 +58,7 @@ export default function PrivacyPage() {
 
               <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Climate Data &amp; Third-Party APIs</h2>
               <p>
-                Our Climate Dashboard and Planetary Boundaries pages display environmental data sourced from third-party APIs, including <a href="https://global-warming.org" className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">global-warming.org</a>. These requests are made server-side — no personal information about you is shared with these external services.
+                Our Climate Dashboard and Planetary Boundaries pages display environmental data sourced from third-party APIs, including <a href="https://global-warming.org" className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">global-warming.org</a>. These requests are made server-side – no personal information about you is shared with these external services.
               </p>
               <p>
                 To improve performance, climate data responses are temporarily cached using <strong>Upstash Redis</strong>, a server-side caching service. This cache stores only environmental data (such as CO₂ levels and temperature readings) and does not contain any user or visitor information.

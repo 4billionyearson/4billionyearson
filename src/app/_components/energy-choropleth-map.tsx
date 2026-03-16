@@ -63,7 +63,7 @@ const CONTINENT_LABELS: { name: string; pos: [number, number] }[] = [
   { name: "Oceania", pos: [-25, 135] },
 ];
 
-/* Major countries shown at mid zoom (3) — skip small countries */
+/* Major countries shown at mid zoom (3) – skip small countries */
 const MAJOR_COUNTRIES = new Set([
   "United States of America", "Canada", "Mexico", "Brazil", "Argentina",
   "Colombia", "Peru", "Chile", "Venezuela",

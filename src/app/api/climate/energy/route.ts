@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:energy:v2';
+const CACHE_KEY = 'climate:energy:v5';
 const CACHE_TTL_HOURS = 24;
 
 const OWID_URL = 'https://owid-public.owid.io/data/energy/owid-energy-data.json';
@@ -39,6 +39,8 @@ interface EnergyYearlyPoint {
   nuclearShareElec: number | null;
   renewablesShareElec: number | null;
   fossilShareElec: number | null;
+  biofuelShareElec: number | null;
+  otherRenewShareElecExcBiofuel: number | null;
   // Electricity generation (TWh)
   electricityGeneration: number | null;
   // Carbon
@@ -125,6 +127,8 @@ function extractYearly(records: OwidYearRecord[]): EnergyYearlyPoint[] {
       nuclearShareElec: num(r.nuclear_share_elec),
       renewablesShareElec: num(r.renewables_share_elec),
       fossilShareElec: num(r.fossil_share_elec),
+      biofuelShareElec: num(r.biofuel_share_elec),
+      otherRenewShareElecExcBiofuel: num(r.other_renewables_share_elec_exc_biofuel),
       electricityGeneration: num(r.electricity_generation),
       carbonIntensity: num(r.carbon_intensity_elec),
       ghgEmissions: num(r.greenhouse_gas_emissions),
@@ -239,7 +243,7 @@ export async function GET(request: Request) {
 async function fetchCountryResponse(countryName: string, worldData: EnergyData) {
   // We need to fetch the full OWID dataset again for the country
   // Check country cache first
-  const countryKey = `climate:energy:v2:country:${countryName.toLowerCase().replace(/\s+/g, '-')}`;
+  const countryKey = `climate:energy:v5:country:${countryName.toLowerCase().replace(/\s+/g, '-')}`;
   const cached = await getCached<CountryEnergy>(countryKey);
   if (cached) {
     return NextResponse.json({ world: worldData.world, country: cached, fetchedAt: worldData.fetchedAt, source: 'cache' });
@@ -277,13 +281,13 @@ const EIA_SERIES = [
   'FFTCE', // Fossil fuel CO2 emissions (million metric tons)
   'ESTCB', // Electricity total consumption (billion BTU)
   // Electric power sector by source (for electricity mix)
-  'CLEIB', // Coal — electric power sector (billion BTU)
-  'NGEIB', // Natural gas — electric power sector
-  'PAEIB', // Petroleum — electric power sector
-  'NUEGB', // Nuclear — electricity generation (billion BTU)
-  'SOEGB', // Solar — electricity generation (billion BTU)
-  'WYEGB', // Wind — electricity generation (billion BTU)
-  'HYEGB', // Hydroelectric — electricity generation (billion BTU)
+  'CLEIB', // Coal – electric power sector (billion BTU)
+  'NGEIB', // Natural gas – electric power sector
+  'PAEIB', // Petroleum – electric power sector
+  'NUEGB', // Nuclear – electricity generation (billion BTU)
+  'SOEGB', // Solar – electricity generation (billion BTU)
+  'WYEGB', // Wind – electricity generation (billion BTU)
+  'HYEGB', // Hydroelectric – electricity generation (billion BTU)
   // Per capita & population
   'TPOPP', // Resident population (thousands)
   'TETPB', // Total energy consumption per capita (million BTU/person)
@@ -411,6 +415,8 @@ function buildEIACountryEnergy(name: string, rows: EIARow[]): CountryEnergy {
       nuclearShareElec,
       renewablesShareElec,
       fossilShareElec,
+      biofuelShareElec: null, // Not available from EIA SEDS
+      otherRenewShareElecExcBiofuel: null,
       electricityGeneration: d.ESTCB != null ? Number((d.ESTCB * BTU_TO_TWH).toFixed(1)) : null,
       carbonIntensity: null, // Not directly available from SEDS
       ghgEmissions: d.FFTCE != null ? Number(Number(d.FFTCE).toFixed(1)) : null, // million metric tons CO2

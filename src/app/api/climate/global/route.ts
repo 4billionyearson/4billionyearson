@@ -185,7 +185,7 @@ export async function GET() {
           return { monthLabel: `${monthNames[month - 1]} ${year}`, month, year, recentTemp: temp, historicAvg, diff };
         });
 
-        // Land vs Land+Ocean — merged monthly comparison for the last 12 months
+        // Land vs Land+Ocean – merged monthly comparison for the last 12 months
         landVsOceanMonthly = landRecent12.map(({ month, year, temp: landTemp }) => {
           const noaaPoint = recent12.find(r => r.month === month && r.year === year);
           return {
@@ -194,7 +194,7 @@ export async function GET() {
             landOceanTemp: noaaPoint?.temp ?? null,
           };
         });
-      } catch { /* OWID parsing failed — continue without land data */ }
+      } catch { /* OWID parsing failed – continue without land data */ }
     }
 
     const result = {

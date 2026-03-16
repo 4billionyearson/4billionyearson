@@ -20,7 +20,7 @@ export default function AboutPage() {
                   Welcome to <strong>4 Billion Years On</strong>, a platform dedicated to exploring the incredible journey of our universe, our planet, and the technological horizons that lie ahead.
                 </p>
                 <p>
-                  Our mission is to make complex topics—ranging from Artificial Intelligence and Biotechnology to Climate Change and Renewable Energy—accessible, engaging, and thought-provoking. We believe that understanding our past, which stretches back roughly 4 billion years to the dawn of life on Earth, is essential to navigating the challenges and opportunities of our future.
+                  Our mission is to make complex topics–ranging from Artificial Intelligence and Biotechnology to Climate Change and Renewable Energy–accessible, engaging, and thought-provoking. We believe that understanding our past, which stretches back roughly 4 billion years to the dawn of life on Earth, is essential to navigating the challenges and opportunities of our future.
                 </p>
                 <p>
                   Whether we are dissecting the latest breakthroughs in AI, examining sustainable solutions to protect our global ecosystems, or marveling at the sheer resilience of life, our goal is to inspire curiosity.

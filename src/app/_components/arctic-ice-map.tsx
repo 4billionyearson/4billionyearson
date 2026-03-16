@@ -239,7 +239,7 @@ export default function ArcticIceMap({ onYearChange }: { onYearChange?: (year: s
 
   useEffect(() => { return () => { if (intervalRef.current) clearInterval(intervalRef.current); }; }, []);
 
-  // Drag handlers — Arctic
+  // Drag handlers – Arctic
   const handleArcticDown = useCallback((e: React.PointerEvent) => {
     arcticDragRef.current = { x: e.clientX, y: e.clientY, rot: [...arcticRot] as [number, number] };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -257,7 +257,7 @@ export default function ArcticIceMap({ onYearChange }: { onYearChange?: (year: s
 
   const handleArcticUp = useCallback(() => { arcticDragRef.current = null; }, []);
 
-  // Drag handlers — Antarctic
+  // Drag handlers – Antarctic
   const handleAntarcticDown = useCallback((e: React.PointerEvent) => {
     antarcticDragRef.current = { x: e.clientX, y: e.clientY, rot: [...antarcticRot] as [number, number] };
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -295,7 +295,7 @@ export default function ArcticIceMap({ onYearChange }: { onYearChange?: (year: s
 
   return (
     <div>
-      {/* Year badge — centred above globes */}
+      {/* Year badge – centred above globes */}
       <div className="flex justify-center mb-3">
         <div className="bg-gray-950/80 backdrop-blur-sm border border-gray-700 rounded-lg px-5 py-2 text-center">
           <div className="text-xs text-gray-400 uppercase tracking-wider">September</div>
