@@ -35,7 +35,7 @@ function parseMetOfficeText(text: string): MonthlyDataPoint[] {
 
     // Split by whitespace - format is: Year Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec Win Spr Sum Aut Ann
     const parts = trimmed.split(/\s+/);
-    if (parts.length < 13) continue;
+    if (parts.length < 2) continue;
 
     const year = parseInt(parts[0]);
     if (isNaN(year) || year < 1900) continue;
@@ -147,7 +147,7 @@ export async function GET(
 
   const cacheKey = `climate:ukregion:${regionId}`;
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v3`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {

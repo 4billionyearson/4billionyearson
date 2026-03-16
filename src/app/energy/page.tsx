@@ -1464,7 +1464,7 @@ export default function EnergyPage() {
             )}
 
             {(countryData || usStateData) && (
-              <div className="flex gap-2 mt-3">
+              <div className="flex items-start gap-2 mt-3">
                 <div className="flex items-center gap-1.5 flex-1 text-emerald-400 bg-emerald-950/40 py-1.5 px-4 rounded-lg border border-emerald-800/50">
                   <MapPin className="h-4 w-4 flex-shrink-0" />
                   <span className="text-sm font-medium">

@@ -1,6 +1,29 @@
 // Static location data for climate dashboard
 // Maps searchable names to data source identifiers
 
+// Convert ISO 3166-1 alpha-3 to flag emoji via alpha-2
+const ALPHA3_TO_ALPHA2: Record<string, string> = {
+  GBR: 'GB', FRA: 'FR', DEU: 'DE', USA: 'US', JPN: 'JP', ARG: 'AR', AUS: 'AU',
+  BOL: 'BO', BRA: 'BR', SOM: 'SO', PER: 'PE', PAK: 'PK', NGA: 'NG', NIC: 'NI',
+  MAR: 'MA', MYS: 'MY', MWI: 'MW', LBN: 'LB', KOR: 'KR', PRK: 'KP', KEN: 'KE',
+  ISR: 'IL', IDN: 'ID', IND: 'IN', PSE: 'PS', GUY: 'GY', ETH: 'ET', CYP: 'CY',
+  CRI: 'CR', COG: 'CG', CHN: 'CN', CHL: 'CL', SUR: 'SR', SSD: 'SS',
+  ITA: 'IT', ESP: 'ES', CAN: 'CA', MEX: 'MX', RUS: 'RU', ZAF: 'ZA', EGY: 'EG',
+  TUR: 'TR', THA: 'TH', VNM: 'VN', PHL: 'PH', COL: 'CO', POL: 'PL', NLD: 'NL',
+  BEL: 'BE', SWE: 'SE', NOR: 'NO', DNK: 'DK', FIN: 'FI', IRL: 'IE', PRT: 'PT',
+  GRC: 'GR', AUT: 'AT', CHE: 'CH', NZL: 'NZ', SGP: 'SG', SAU: 'SA', ARE: 'AE',
+  IRQ: 'IQ', IRN: 'IR', BGD: 'BD', LKA: 'LK', MMR: 'MM', UKR: 'UA', ROU: 'RO',
+  HUN: 'HU', CZE: 'CZ', TZA: 'TZ', GHA: 'GH', UGA: 'UG', COD: 'CD', DZA: 'DZ',
+  SYR: 'SY', JAM: 'JM', ISL: 'IS',
+};
+
+export function countryFlag(owidCode?: string): string {
+  if (!owidCode) return '🌍';
+  const alpha2 = ALPHA3_TO_ALPHA2[owidCode];
+  if (!alpha2) return '🌍';
+  return String.fromCodePoint(...[...alpha2].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
 export interface LocationResult {
   id: string;
   name: string;
@@ -216,8 +239,8 @@ export const COUNTRIES: LocationResult[] = [
   { id: 'c-isl', name: 'Iceland', type: 'country', owidEntityId: 130, owidCode: 'ISL' },
 ];
 
-// All locations combined for search
-export const ALL_LOCATIONS = [...COUNTRIES, ...US_STATES, ...UK_REGIONS];
+// All locations combined for search (sub-national first so they take priority over same-name countries)
+export const ALL_LOCATIONS = [...UK_REGIONS, ...US_STATES, ...COUNTRIES];
 
 // Search function with fuzzy matching
 export function searchLocations(query: string, limit = 10): LocationResult[] {
@@ -238,6 +261,7 @@ export function searchLocations(query: string, limit = 10): LocationResult[] {
 
   const results: LocationResult[] = [];
   const seen = new Set<string>();
+  const seenNames = new Set<string>();
 
   // If a UK city matches exactly, add the region
   if (ukCityExact) {
@@ -282,18 +306,24 @@ export function searchLocations(query: string, limit = 10): LocationResult[] {
   // Exact prefix matches first
   for (const loc of ALL_LOCATIONS) {
     if (seen.has(loc.id)) continue;
-    if (loc.name.toLowerCase().startsWith(q)) {
+    const normalizedName = loc.name.toLowerCase();
+    if (seenNames.has(normalizedName)) continue;
+    if (normalizedName.startsWith(q)) {
       results.push(loc);
       seen.add(loc.id);
+      seenNames.add(normalizedName);
     }
   }
 
   // Then partial matches
   for (const loc of ALL_LOCATIONS) {
     if (seen.has(loc.id)) continue;
-    if (loc.name.toLowerCase().includes(q)) {
+    const normalizedName = loc.name.toLowerCase();
+    if (seenNames.has(normalizedName)) continue;
+    if (normalizedName.includes(q)) {
       results.push(loc);
       seen.add(loc.id);
+      seenNames.add(normalizedName);
     }
   }
 

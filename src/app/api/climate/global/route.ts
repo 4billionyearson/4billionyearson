@@ -7,7 +7,7 @@ const PRE_INDUSTRIAL_BASELINE = 13.5; // Approximate pre-industrial (1850-1900) 
 export async function GET() {
   const cacheKey = 'climate:global';
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v2`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {
@@ -72,8 +72,39 @@ export async function GET() {
       }
     }
 
+    // Monthly comparison: last 12 months vs 1961-1990 baseline
+    const historicByMonth: Record<number, number[]> = {};
+    for (const p of monthlyData) {
+      if (p.year >= 1961 && p.year <= 1990) {
+        if (!historicByMonth[p.month]) historicByMonth[p.month] = [];
+        historicByMonth[p.month].push(p.absoluteTemp);
+      }
+    }
+
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const recent12: { month: number; year: number; temp: number | null }[] = [];
+    for (let i = 1; i <= 12; i++) {
+      let m = currentMonth - i;
+      let y = currentYear;
+      if (m <= 0) { m += 12; y--; }
+      const point = monthlyData.find(p => p.year === y && p.month === m);
+      recent12.unshift({ month: m, year: y, temp: point ? point.absoluteTemp : null });
+    }
+
+    const monthlyComparison = recent12.map(({ month, year, temp }) => {
+      const historic = historicByMonth[month];
+      const historicAvg = historic && historic.length > 0
+        ? Math.round((historic.reduce((a, b) => a + b, 0) / historic.length) * 100) / 100
+        : null;
+      const diff = temp !== null && historicAvg !== null ? Math.round((temp - historicAvg) * 100) / 100 : null;
+      return { monthLabel: `${monthNames[month - 1]} ${year}`, month, year, recentTemp: temp, historicAvg, diff };
+    });
+
     const result = {
       yearlyData,
+      monthlyComparison,
       globalBaseline: GLOBAL_BASELINE,
       preIndustrialBaseline: PRE_INDUSTRIAL_BASELINE,
       keyThresholds: {

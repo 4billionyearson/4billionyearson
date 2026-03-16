@@ -19,13 +19,25 @@ function parseOwidData(data: OwidDataResponse, entityId: number): MonthlyPoint[]
   const epoch = new Date(1950, 0, 1);
   const points: MonthlyPoint[] = [];
 
+  // OWID data can include projected/modeled values into the future.
+  // Exclude the current (incomplete) month and anything beyond it.
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // 1-indexed
+
   for (let i = 0; i < data.years.length; i++) {
     if (data.entities[i] !== entityId) continue;
     const d = new Date(epoch.getTime() + data.years[i] * 86400000);
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+
+    // Skip current month (incomplete) and anything in the future
+    if (year > currentYear || (year === currentYear && month >= currentMonth)) continue;
+
     points.push({
-      date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
-      year: d.getFullYear(),
-      month: d.getMonth() + 1,
+      date: `${year}-${String(month).padStart(2, '0')}`,
+      year,
+      month,
       temp: Math.round(data.values[i] * 100) / 100,
     });
   }
@@ -90,35 +102,30 @@ function buildMonthlyComparison(monthly: MonthlyPoint[]) {
   }
 
   // Last 12 completed months (exclude current incomplete month)
-  const recent12: MonthlyPoint[] = [];
+  const recent12: { point: MonthlyPoint | null; month: number; year: number }[] = [];
   for (let i = 1; i <= 12; i++) {
     let m = currentMonth - i;
     let y = currentYear;
     if (m <= 0) { m += 12; y--; }
-    const point = monthly.find(p => p.year === y && p.month === m);
-    if (!point) {
-      // Try previous year
-      const fallback = monthly.find(p => p.year === y - 1 && p.month === m);
-      if (fallback) recent12.unshift(fallback);
-    } else {
-      recent12.unshift(point);
-    }
+    const point = monthly.find(p => p.year === y && p.month === m) || null;
+    recent12.unshift({ point, month: m, year: y });
   }
 
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  return recent12.map(p => {
-    const historic = historicByMonth[p.month];
+  return recent12.map(({ point, month, year }) => {
+    const historic = historicByMonth[month];
     const historicAvg = historic && historic.length > 0
       ? Math.round((historic.reduce((a, b) => a + b, 0) / historic.length) * 100) / 100
       : null;
-    const diff = historicAvg !== null ? Math.round((p.temp - historicAvg) * 100) / 100 : null;
+    const recentTemp = point ? point.temp : null;
+    const diff = recentTemp !== null && historicAvg !== null ? Math.round((recentTemp - historicAvg) * 100) / 100 : null;
 
     return {
-      monthLabel: `${monthNames[p.month - 1]} ${p.year}`,
-      month: p.month,
-      year: p.year,
-      recentTemp: p.temp,
+      monthLabel: `${monthNames[month - 1]} ${year}`,
+      month,
+      year,
+      recentTemp,
       historicAvg,
       diff,
     };
@@ -140,7 +147,7 @@ export async function GET(
 
   const cacheKey = `climate:country:${upperCode}`;
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v4`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
@@ -149,13 +156,14 @@ export async function GET(
   }
 
   try {
-    // Fetch from OWID API
-    const res = await fetch('https://api.ourworldindata.org/v1/indicators/1005195.data.json', {
-      next: { revalidate: 86400 }, // revalidate once per day
-    });
+    // Fetch temperature and precipitation data from OWID in parallel
+    const [tempRes, precipRes] = await Promise.all([
+      fetch('https://api.ourworldindata.org/v1/indicators/1005195.data.json', { next: { revalidate: 86400 } }),
+      fetch('https://api.ourworldindata.org/v1/indicators/1005182.data.json', { next: { revalidate: 86400 } }),
+    ]);
 
-    if (!res.ok) throw new Error(`OWID API returned ${res.status}`);
-    const data: OwidDataResponse = await res.json();
+    if (!tempRes.ok) throw new Error(`OWID API returned ${tempRes.status}`);
+    const data: OwidDataResponse = await tempRes.json();
 
     const monthly = parseOwidData(data, country.owidEntityId);
     if (monthly.length === 0) {
@@ -165,11 +173,38 @@ export async function GET(
     const yearlyData = buildYearlyData(monthly);
     const monthlyComparison = buildMonthlyComparison(monthly);
 
+    // Parse precipitation data (annual, years are actual year values not epoch-days)
+    let precipYearly: { year: number; value: number; rollingAvg?: number }[] | null = null;
+    if (precipRes.ok) {
+      const precipData: OwidDataResponse = await precipRes.json();
+      const precipPoints: { year: number; value: number }[] = [];
+      for (let i = 0; i < precipData.years.length; i++) {
+        if (precipData.entities[i] !== country.owidEntityId) continue;
+        precipPoints.push({
+          year: precipData.years[i],
+          value: Math.round(precipData.values[i] * 10) / 10,
+        });
+      }
+      precipPoints.sort((a, b) => a.year - b.year);
+
+      if (precipPoints.length > 0) {
+        precipYearly = precipPoints.map((p, i, arr) => {
+          let rollingAvg: number | undefined;
+          if (i >= 9) {
+            const slice = arr.slice(i - 9, i + 1);
+            rollingAvg = Math.round((slice.reduce((a, b) => a + b.value, 0) / slice.length) * 10) / 10;
+          }
+          return { ...p, rollingAvg };
+        });
+      }
+    }
+
     const result = {
       country: country.name,
       code: upperCode,
       yearlyData,
       monthlyComparison,
+      precipYearly,
       dataPoints: monthly.length,
       dateRange: `${monthly[0].date} to ${monthly[monthly.length - 1].date}`,
       lastUpdated: currentMonthKey,
