@@ -190,7 +190,6 @@ export const COUNTRIES: LocationResult[] = [
   { id: 'c-chl', name: 'Chile', type: 'country', owidEntityId: 172, owidCode: 'CHL' },
   { id: 'c-sur', name: 'Suriname', type: 'country', owidEntityId: 234, owidCode: 'SUR' },
   { id: 'c-ssd', name: 'South Sudan', type: 'country', owidEntityId: 258, owidCode: 'SSD' },
-  { id: 'c-wld', name: 'World (Global Average)', type: 'country', owidEntityId: 355, owidCode: 'OWID_WRL' },
   // Additional major countries - IDs will be resolved dynamically from OWID metadata
   { id: 'c-ita', name: 'Italy', type: 'country', owidEntityId: 8, owidCode: 'ITA' },
   { id: 'c-esp', name: 'Spain', type: 'country', owidEntityId: 9, owidCode: 'ESP' },

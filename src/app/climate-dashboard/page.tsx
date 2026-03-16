@@ -217,7 +217,7 @@ function mergeTempData(countryYearly: any[], regionYearly: any[], globalYearly?:
   if (globalYearly) {
     for (const e of globalYearly) {
       const row = map.get(e.year) || { year: e.year };
-      row.globalTemp = e.absoluteTemp;
+      row.globalTemp = e.avgTemp;
       row.globalRolling = e.rollingAvg;
       map.set(e.year, row);
     }
@@ -326,9 +326,23 @@ export default function ClimateDashboard() {
     } catch { /* ignore */ }
   }, []);
 
+  // Fetch global data on mount if not already cached
+  useEffect(() => {
+    if (globalData) return;
+    fetch('/api/climate/global').then(r => r.json()).then(data => {
+      if (data && !data.error) setGlobalData(data);
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Persist to sessionStorage whenever data changes
   useEffect(() => {
-    if (!selectedLocation) return;
+    if (!selectedLocation) {
+      try {
+        sessionStorage.setItem(CLIMATE_CACHE_KEY, JSON.stringify({ globalData }));
+      } catch { /* quota exceeded — ignore */ }
+      return;
+    }
     try {
       sessionStorage.setItem(CLIMATE_CACHE_KEY, JSON.stringify({
         selectedLocation, countryData, usStateData, ukRegionData,
@@ -468,8 +482,8 @@ export default function ClimateDashboard() {
     if (!countryData?.yearlyData) return null;
     const regionYearly = (selectedLocation?.type === 'us-state' ? usStateData?.paramData?.tavg?.yearly : null) || (isUkSubRegion ? ukRegionData?.varData?.Tmean?.yearly : null);
     // If we have region data OR global overlay is active, use the multi-line merge
-    if (!regionYearly && !(showGlobalOverlay && globalData?.yearlyData)) return null;
-    return mergeTempData(countryData.yearlyData, regionYearly || [], showGlobalOverlay ? globalData?.yearlyData : undefined);
+    if (!regionYearly && !(showGlobalOverlay && globalData?.landYearlyData)) return null;
+    return mergeTempData(countryData.yearlyData, regionYearly || [], showGlobalOverlay ? globalData?.landYearlyData : undefined);
   }, [countryData, usStateData, ukRegionData, showGlobalOverlay, globalData, selectedLocation, isUkSubRegion]);
 
   const combinedMinMaxData = useMemo(() => {
@@ -633,12 +647,12 @@ export default function ClimateDashboard() {
                   if (combinedAvgTempData && regionLabel) parts.push(regionLabel);
                   if (countryData?.yearlyData && countryLabel) parts.push(countryLabel);
                   else if (regionLabel && !combinedAvgTempData) parts.push(regionLabel);
-                  if (showGlobalOverlay && globalData?.yearlyData) parts.push('Global');
+                  if (showGlobalOverlay && globalData?.landYearlyData) parts.push('Global (Land)');
                   return `${parts.join(' + ')} — Average Temperature`;
                 })()}
               >
                 {/* Global overlay toggle */}
-                {globalData?.yearlyData && (
+                {globalData?.landYearlyData && (
                   <div className="flex items-center gap-3 mb-4">
                     <button
                       onClick={() => setShowGlobalOverlay(v => !v)}
@@ -650,7 +664,7 @@ export default function ClimateDashboard() {
                       type="button"
                     >
                       <Globe className="h-3.5 w-3.5" />
-                      {showGlobalOverlay ? 'Hide' : 'Show'} Global Temperature
+                      {showGlobalOverlay ? 'Hide' : 'Show'} Global Land Temperature
                     </button>
                   </div>
                 )}
@@ -663,7 +677,7 @@ export default function ClimateDashboard() {
                       series={[
                         ...((selectedLocation?.type === 'us-state' && usStateData?.paramData?.tavg?.yearly || isUkSubRegion && ukRegionData?.varData?.Tmean?.yearly) ? [{ dataKey: 'regionTemp', rollingKey: 'regionRolling', label: regionLabel, color: '#fdcc74', rollingColor: '#f59e0b' }] : []),
                         { dataKey: 'countryTemp', rollingKey: 'countryRolling', label: countryLabel, color: '#fca5a5', rollingColor: '#dc2626' },
-                        ...(showGlobalOverlay ? [{ dataKey: 'globalTemp', rollingKey: 'globalRolling', label: 'Global', color: '#6ee7b7', rollingColor: '#10b981' }] : []),
+                        ...(showGlobalOverlay ? [{ dataKey: 'globalTemp', rollingKey: 'globalRolling', label: 'Global (Land)', color: '#6ee7b7', rollingColor: '#10b981' }] : []),
                       ]}
                       thresholds={showGlobalOverlay && globalData ? [
                         { value: globalData.keyThresholds.plus1_5, label: '+1.5°C Paris limit', color: '#f59e0b', labelPosition: 'insideTopLeft' },
@@ -709,9 +723,9 @@ export default function ClimateDashboard() {
                     <ComparisonChart data={noaaNationalTempComparison || countryData.monthlyComparison} recentKey={noaaNationalTempComparison ? "recent" : "recentTemp"} label="Temperature" units="°C" barColor="#ef4444" />
                   </SubSection>
                 )}
-                {showGlobalOverlay && globalData?.monthlyComparison && (
-                  <SubSection title="Global — Last 12 months vs 1961-1990 baseline">
-                    <ComparisonChart data={globalData.monthlyComparison} recentKey="recentTemp" label="Temperature" units="°C" barColor="#10b981" />
+                {showGlobalOverlay && globalData?.landMonthlyComparison && (
+                  <SubSection title="Global (Land) — Last 12 months vs 1961-1990 baseline">
+                    <ComparisonChart data={globalData.landMonthlyComparison} recentKey="recentTemp" label="Temperature" units="°C" barColor="#10b981" />
                   </SubSection>
                 )}
 
@@ -927,19 +941,27 @@ export default function ClimateDashboard() {
             )}
 
             {/* ═══ GLOBAL CONTEXT ═══ */}
-            {globalData?.yearlyData && (
-              <>
-                <Divider icon={<Globe className="h-5 w-5" />} title="Global Context" />
+            {/* (moved outside hasData gate — see below) */}
 
-                <SectionCard icon={<Globe className="h-5 w-5 text-emerald-400" />} title="Global Average Temperature — NOAA">
-                  <SubSection title="Annual global temperature vs Paris Agreement thresholds">
+            {/* ─── Attribution ───────────────────────────────────────── */}
+            {/* (moved outside hasData gate — see below) */}
+          </>
+        )}
+
+        {/* ═══ GLOBAL CONTEXT ═══ */}
+        {globalData?.yearlyData && (
+          <>
+            {hasData && !loading && <Divider icon={<Globe className="h-5 w-5" />} title="Global Context" />}
+
+                <SectionCard icon={<Globe className="h-5 w-5 text-emerald-400" />} title="Global Average Temperature — NOAA (Land + Ocean)">
+                  <SubSection title="Annual global land + ocean temperature vs Paris Agreement thresholds">
                     <YearlyChart
                       data={globalData.yearlyData}
                       dataKey="absoluteTemp"
                       rollingKey="rollingAvg"
                       label="Global Avg Temp"
                       units="°C"
-                      color="#D3C8BB"
+                      color="#6ee7b7"
                       rollingColor="#10b981"
                       thresholds={[
                         { value: globalData.keyThresholds.plus1_5, label: 'Paris +1.5°C limit', color: '#f59e0b' },
@@ -953,12 +975,14 @@ export default function ClimateDashboard() {
                         <BarChart data={globalData.yearlyData} margin={CHART_MARGIN}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} unit="°" domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} />
+                          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="°" domain={[-0.5, 2.5]} ticks={[-0.5, 0, 0.5, 1, 1.5, 2, 2.5]} />
                           <Tooltip content={<DarkTooltip />} cursor={{ fill: '#1F2937' }} />
                           <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                           <ReferenceLine y={0} stroke="#7A6E63" />
-                          <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4"
-                            label={{ position: 'right', value: '+1.5°C', fill: '#f59e0b', fontSize: 11 }} />
+                          <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5}
+                            label={{ position: 'insideTopLeft', value: 'Paris +1.5°C limit', fill: '#f59e0b', fontSize: 11, fontWeight: 600 } as any} />
+                          <ReferenceLine y={2.0} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5}
+                            label={{ position: 'insideTopLeft', value: 'Critical +2.0°C limit', fill: '#ef4444', fontSize: 11, fontWeight: 600 } as any} />
                           <Bar dataKey="anomaly" name="Temperature Anomaly (°C)">
                             {globalData.yearlyData.map((entry: any, index: number) => (
                               <Cell key={index} fill={entry.anomaly >= 0 ? '#ef4444' : '#3b82f6'} />
@@ -970,8 +994,31 @@ export default function ClimateDashboard() {
                     </div>
                   </SubSection>
                 </SectionCard>
-              </>
-            )}
+
+                {globalData?.landVsOceanMonthly && (
+                  <SectionCard icon={<ThermometerSun className="h-5 w-5 text-amber-400" />} title="Global Land vs Land + Ocean — Monthly Comparison">
+                    <p className="text-sm text-gray-400 mb-4">
+                      Land surface temperatures run warmer and swing more with the seasons than the combined land + ocean average.
+                      Country data on this page uses <span className="text-emerald-400">land surface temperature</span> from Copernicus ERA5, while
+                      the global trend chart above uses <span className="text-amber-400">land + ocean</span> from NOAA — the standard measure for climate policy.
+                    </p>
+                    <SubSection title="Last 12 months — absolute temperature (°C)">
+                      <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={globalData.landVsOceanMonthly} margin={CHART_MARGIN}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                            <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                            <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} unit="°" domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} />
+                            <Tooltip content={<DarkTooltip />} cursor={{ fill: '#1F2937' }} />
+                            <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, left: 0, right: 0 }} />
+                            <Bar dataKey="landTemp" name="Global Land (ERA5)" fill="#10b981" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="landOceanTemp" name="Global Land + Ocean (NOAA)" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </SubSection>
+                  </SectionCard>
+                )}
 
             {/* ─── Attribution ───────────────────────────────────────── */}
             <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
@@ -979,20 +1026,10 @@ export default function ClimateDashboard() {
               {countryData && <p>• Country temperatures: <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Copernicus ERA5 reanalysis</a> (CC-BY)</p>}
               {usStateData && <p>• US state data: <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA National Centers for Environmental Information</a> (public domain)</p>}
               {ukRegionData && <p>• UK regional data: Contains <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Met Office</a> data © Crown copyright (Open Government Licence)</p>}
-              {globalData && <p>• Global temperatures: <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Climate at a Glance</a> (public domain)</p>}
+              {globalData && <p>• Global land + ocean temperatures: <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Climate at a Glance</a> (public domain)</p>}
+              {globalData?.landYearlyData && <p>• Global land temperatures: <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Copernicus ERA5</a> (CC-BY)</p>}
             </div>
           </>
-        )}
-
-        {/* ─── Empty State ──────────────────────────────────────────── */}
-        {!hasData && !loading && !error && (
-          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl border border-gray-800 text-center">
-            <Globe className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-400 mb-2">Search for a location to get started</h2>
-            <p className="text-gray-500 text-sm max-w-md mx-auto">
-              Try &quot;United Kingdom&quot;, &quot;London&quot;, &quot;California&quot;, &quot;France&quot;, or any country, US state, or UK city/region.
-            </p>
-          </div>
         )}
       </div>
       </div>

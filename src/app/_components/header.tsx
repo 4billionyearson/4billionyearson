@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 const Header = () => {
@@ -12,6 +12,41 @@ const Header = () => {
       Live
     </span>
   );
+  const MonthlyBadge = () => (
+    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-sky-400">
+      <span className="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block" />
+      Updated Monthly
+    </span>
+  );
+  const AnnualBadge = () => (
+    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-violet-400">
+      <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
+      Updated Annually
+    </span>
+  );
+  const NewArticleBadge = () => (
+    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-amber-300">
+      <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+      New Article
+    </span>
+  );
+  const RecentArticleBadge = () => (
+    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-emerald-400">
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+      Recent Article
+    </span>
+  );
+  const ArticleBadge = ({ cat }: { cat: string }) => {
+    const status = recentCategories[cat];
+    if (status === 'new') return <NewArticleBadge />;
+    if (status === 'recent') return <RecentArticleBadge />;
+    return null;
+  };
+
+  const [recentCategories, setRecentCategories] = useState<Record<string, string>>({});
+  useEffect(() => {
+    fetch('/api/recent-posts').then(r => r.json()).then(setRecentCategories).catch(() => {});
+  }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
@@ -65,7 +100,7 @@ const Header = () => {
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
                 <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD] bg-gray-900' : 'text-gray-300 hover:text-[#89DEFD] hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Blog Articles
+                  Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
                 </div>
               </div>
@@ -81,19 +116,19 @@ const Header = () => {
             </button>
             {isRenewablesOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
-                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[260px]">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[370px]">
                 <Link href="/energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Local & Global Energy Data<LiveBadge />
+                  Local & Global Energy Data<AnnualBadge />
                 </Link>
                 <Link href="/energy-rankings" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Global Energy Rankings<LiveBadge />
+                  Global Energy Rankings<AnnualBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/energy-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300 bg-gray-900' : 'text-gray-300 hover:text-emerald-300 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Energy Explained
                 </Link>
                 <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Blog Articles
+                  Blog{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
                 </Link>
                 </div>
                 </div>
@@ -110,31 +145,31 @@ const Header = () => {
             </button>
             {isClimateChangeOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
-                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[240px]">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[420px]">
                 <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Local & Global Climate Change<LiveBadge />
+                  Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  The Nine Factors<LiveBadge />
+                  The Nine Factors<MonthlyBadge />
                 </Link>
                 <Link href="/greenhouse-gases" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400 bg-gray-900' : 'text-gray-300 hover:text-amber-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Greenhouse Gases<LiveBadge />
+                  Greenhouse Gases<MonthlyBadge />
                 </Link>
                 <Link href="/sea-levels-ice" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400 bg-gray-900' : 'text-gray-300 hover:text-teal-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Sea Levels & Ice<LiveBadge />
+                  Sea Levels & Ice<MonthlyBadge />
                 </Link>
                 <Link href="/extreme-weather" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400 bg-gray-900' : 'text-gray-300 hover:text-orange-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
                 </Link>
                 <Link href="/emissions" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/emissions' ? 'text-rose-400 bg-gray-900' : 'text-gray-300 hover:text-rose-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  CO₂ Emissions<LiveBadge />
+                  CO₂ Emissions<AnnualBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/climate-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-explained' ? 'text-sky-400 bg-gray-900' : 'text-gray-300 hover:text-sky-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Climate Explained
                 </Link>
                 <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Blog Articles
+                  Blog{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
                 </Link>
                 </div>
                 </div>
@@ -153,7 +188,7 @@ const Header = () => {
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
                 <Link href="/category/biotechnology" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742] bg-gray-900' : 'text-gray-300 hover:text-[#D26742] hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Blog Articles
+                  Blog{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
                 </div>
               </div>
@@ -171,16 +206,16 @@ const Header = () => {
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[160px]">
                 <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD] bg-gray-900' : 'text-gray-300 hover:text-[#89DEFD] hover:bg-gray-900'}`} onClick={closeMenu}>
-                  AI
+                  AI{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
                 <Link href="/category/biotechnology" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742] bg-gray-900' : 'text-gray-300 hover:text-[#D26742] hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Biotech
+                  Biotech{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
                 <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Climate
+                  Climate{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
                 </Link>
                 <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Renewables
+                  Renewables{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
                 </Link>
                 </div>
               </div>
@@ -205,16 +240,22 @@ const Header = () => {
 
         {/* Mobile Menu Button */}
         <button 
-          className="xl:hidden text-white text-4xl leading-none mt-1 md:mt-2 mr-2.5 outline-none hover:text-gray-300" 
+          className="xl:hidden text-white w-10 h-10 flex items-center justify-center mt-1 md:mt-2 mr-2.5 outline-none hover:text-gray-300 transition-colors" 
           aria-label="Menu"
           onClick={toggleMenu}
         >
-          {isMenuOpen ? "×" : "≡"}
+          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+            {isMenuOpen ? (
+              <><line x1="6" y1="6" x2="18" y2="18" /><line x1="6" y1="18" x2="18" y2="6" /></>
+            ) : (
+              <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>
+            )}
+          </svg>
         </button>
       </div>
 
       {isMenuOpen && (
-        <div className="xl:hidden absolute top-full left-0 right-0 bg-black/95 min-h-screen z-40 border-t border-gray-800">
+        <div className="xl:hidden fixed inset-0 top-[var(--header-h)] bg-black/95 z-[60] border-t border-gray-800 overflow-y-auto" style={{ '--header-h': '0px' } as React.CSSProperties} ref={(el) => { if (el) { const header = el.closest('header'); if (header) el.style.setProperty('--header-h', header.offsetHeight + 'px'); } }}>
           <nav className="flex flex-col w-full text-left font-mono tracking-widest">
             <Link href="/" className="text-white text-base hover:text-gray-300 px-6 py-4 border-b border-gray-600/50 w-full" onClick={closeMenu}>
               Home
@@ -231,7 +272,7 @@ const Header = () => {
             {mobileAIOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD]' : 'text-gray-400 hover:text-[#89DEFD]'}`} onClick={closeMenu}>
-                  Blog Articles
+                  Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
               </div>
             )}
@@ -247,16 +288,16 @@ const Header = () => {
             {mobileRenewablesOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy' ? 'text-emerald-400' : 'text-gray-400 hover:text-emerald-400'}`} onClick={closeMenu}>
-                  Local & Global Energy Data<LiveBadge />
+                  Local & Global Energy Data<AnnualBadge />
                 </Link>
                 <Link href="/energy-rankings" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400' : 'text-gray-400 hover:text-emerald-400'}`} onClick={closeMenu}>
-                  Global Energy Rankings<LiveBadge />
+                  Global Energy Rankings<AnnualBadge />
                 </Link>
                 <Link href="/energy-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300' : 'text-gray-400 hover:text-emerald-300'}`} onClick={closeMenu}>
                   Energy Explained
                 </Link>
                 <Link href="/category/renewable-energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368]' : 'text-gray-400 hover:text-[#D1E368]'}`} onClick={closeMenu}>
-                  Blog Articles
+                  Blog{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
                 </Link>
               </div>
             )}
@@ -272,28 +313,28 @@ const Header = () => {
             {mobileClimateOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/climate-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={closeMenu}>
-                  Local & Global Climate Change<LiveBadge />
+                  Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`} onClick={closeMenu}>
-                  The Nine Factors<LiveBadge />
+                  The Nine Factors<MonthlyBadge />
                 </Link>
                 <Link href="/greenhouse-gases" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400' : 'text-gray-400 hover:text-amber-400'}`} onClick={closeMenu}>
-                  Greenhouse Gases<LiveBadge />
+                  Greenhouse Gases<MonthlyBadge />
                 </Link>
                 <Link href="/sea-levels-ice" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400' : 'text-gray-400 hover:text-teal-400'}`} onClick={closeMenu}>
-                  Sea Levels & Ice<LiveBadge />
+                  Sea Levels & Ice<MonthlyBadge />
                 </Link>
                 <Link href="/extreme-weather" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400' : 'text-gray-400 hover:text-orange-400'}`} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
                 </Link>
                 <Link href="/emissions" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/emissions' ? 'text-rose-400' : 'text-gray-400 hover:text-rose-400'}`} onClick={closeMenu}>
-                  CO₂ Emissions<LiveBadge />
+                  CO₂ Emissions<AnnualBadge />
                 </Link>
                 <Link href="/climate-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-explained' ? 'text-sky-400' : 'text-gray-400 hover:text-sky-400'}`} onClick={closeMenu}>
                   Climate Explained
                 </Link>
                 <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-400 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
-                  Blog Articles
+                  Blog{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
                 </Link>
               </div>
             )}
@@ -309,7 +350,7 @@ const Header = () => {
             {mobileBiotechOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/category/biotechnology" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742]' : 'text-gray-400 hover:text-[#D26742]'}`} onClick={closeMenu}>
-                  Blog Articles
+                  Blog{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
               </div>
             )}
@@ -325,16 +366,16 @@ const Header = () => {
             {mobileBlogOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD]' : 'text-gray-400 hover:text-[#89DEFD]'}`} onClick={closeMenu}>
-                  AI
+                  AI{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
                 <Link href="/category/biotechnology" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742]' : 'text-gray-400 hover:text-[#D26742]'}`} onClick={closeMenu}>
-                  Biotech
+                  Biotech{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
                 <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-400 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
-                  Climate
+                  Climate{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
                 </Link>
                 <Link href="/category/renewable-energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368]' : 'text-gray-400 hover:text-[#D1E368]'}`} onClick={closeMenu}>
-                  Renewables
+                  Renewables{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
                 </Link>
               </div>
             )}

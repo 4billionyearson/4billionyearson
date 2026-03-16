@@ -3,11 +3,12 @@ import { getCached, setShortTerm } from '@/lib/climate/redis';
 
 const GLOBAL_BASELINE = 13.9; // NOAA 20th century average
 const PRE_INDUSTRIAL_BASELINE = 13.5; // Approximate pre-industrial (1850-1900) absolute temp
+const OWID_WORLD_ENTITY = 355; // OWID entity ID for World
 
 export async function GET() {
   const cacheKey = 'climate:global';
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v2`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v3`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {
@@ -15,13 +16,20 @@ export async function GET() {
   }
 
   try {
-    const res = await fetch(
-      'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026.json',
-      { next: { revalidate: 86400 } }
-    );
+    // Fetch NOAA (land+ocean) and OWID/ERA5 (land) in parallel
+    const [noaaRes, owidRes] = await Promise.all([
+      fetch(
+        'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026.json',
+        { next: { revalidate: 86400 } }
+      ),
+      fetch(
+        'https://api.ourworldindata.org/v1/indicators/1005195.data.json',
+        { next: { revalidate: 86400 } }
+      ),
+    ]);
 
-    if (!res.ok) throw new Error(`NOAA returned ${res.status}`);
-    const json = await res.json();
+    if (!noaaRes.ok) throw new Error(`NOAA returned ${noaaRes.status}`);
+    const json = await noaaRes.json();
 
     const monthlyData: { date: string; year: number; month: number; anomaly: number; absoluteTemp: number }[] = [];
 
@@ -102,9 +110,99 @@ export async function GET() {
       return { monthLabel: `${monthNames[month - 1]} ${year}`, month, year, recentTemp: temp, historicAvg, diff };
     });
 
+    // ─── OWID / ERA5 global land surface temperature ──────────────────
+    let landYearlyData: any[] | null = null;
+    let landMonthlyComparison: any[] | null = null;
+    let landVsOceanMonthly: any[] | null = null;
+
+    if (owidRes.ok) {
+      try {
+        const owidData = await owidRes.json();
+        const epoch = new Date(1950, 0, 1);
+        const landMonthly: { date: string; year: number; month: number; temp: number }[] = [];
+
+        for (let i = 0; i < owidData.years.length; i++) {
+          if (owidData.entities[i] !== OWID_WORLD_ENTITY) continue;
+          const d = new Date(epoch.getTime() + owidData.years[i] * 86400000);
+          const year = d.getFullYear();
+          const month = d.getMonth() + 1;
+          // Skip current month (incomplete) and future
+          if (year > currentYear || (year === currentYear && month >= currentMonth)) continue;
+          landMonthly.push({
+            date: `${year}-${String(month).padStart(2, '0')}`,
+            year, month,
+            temp: Math.round(owidData.values[i] * 100) / 100,
+          });
+        }
+        landMonthly.sort((a, b) => a.date.localeCompare(b.date));
+
+        // Yearly averages
+        const landByYear: Record<number, number[]> = {};
+        for (const p of landMonthly) {
+          if (!landByYear[p.year]) landByYear[p.year] = [];
+          landByYear[p.year].push(p.temp);
+        }
+        landYearlyData = Object.keys(landByYear).map(Number).sort()
+          .filter(y => y < currentYear && landByYear[y].length >= 6)
+          .map(y => {
+            const temps = landByYear[y];
+            const avgTemp = Math.round((temps.reduce((a, b) => a + b, 0) / temps.length) * 100) / 100;
+            return { year: y, avgTemp, rollingAvg: undefined as number | undefined };
+          });
+        for (let i = 0; i < landYearlyData.length; i++) {
+          if (i >= 9) {
+            const slice = landYearlyData.slice(i - 9, i + 1);
+            landYearlyData[i].rollingAvg = Math.round(
+              (slice.reduce((a: number, b: any) => a + b.avgTemp, 0) / slice.length) * 100
+            ) / 100;
+          }
+        }
+
+        // Monthly comparison (land): last 12 months vs 1961-1990 baseline
+        const landHistoricByMonth: Record<number, number[]> = {};
+        for (const p of landMonthly) {
+          if (p.year >= 1961 && p.year <= 1990) {
+            if (!landHistoricByMonth[p.month]) landHistoricByMonth[p.month] = [];
+            landHistoricByMonth[p.month].push(p.temp);
+          }
+        }
+
+        const landRecent12: { month: number; year: number; temp: number | null }[] = [];
+        for (let i = 1; i <= 12; i++) {
+          let m = currentMonth - i;
+          let y = currentYear;
+          if (m <= 0) { m += 12; y--; }
+          const point = landMonthly.find(p => p.year === y && p.month === m);
+          landRecent12.unshift({ month: m, year: y, temp: point ? point.temp : null });
+        }
+
+        landMonthlyComparison = landRecent12.map(({ month, year, temp }) => {
+          const historic = landHistoricByMonth[month];
+          const historicAvg = historic && historic.length > 0
+            ? Math.round((historic.reduce((a, b) => a + b, 0) / historic.length) * 100) / 100
+            : null;
+          const diff = temp !== null && historicAvg !== null ? Math.round((temp - historicAvg) * 100) / 100 : null;
+          return { monthLabel: `${monthNames[month - 1]} ${year}`, month, year, recentTemp: temp, historicAvg, diff };
+        });
+
+        // Land vs Land+Ocean — merged monthly comparison for the last 12 months
+        landVsOceanMonthly = landRecent12.map(({ month, year, temp: landTemp }) => {
+          const noaaPoint = recent12.find(r => r.month === month && r.year === year);
+          return {
+            monthLabel: `${monthNames[month - 1]} ${year}`,
+            landTemp,
+            landOceanTemp: noaaPoint?.temp ?? null,
+          };
+        });
+      } catch { /* OWID parsing failed — continue without land data */ }
+    }
+
     const result = {
       yearlyData,
       monthlyComparison,
+      landYearlyData,
+      landMonthlyComparison,
+      landVsOceanMonthly,
       globalBaseline: GLOBAL_BASELINE,
       preIndustrialBaseline: PRE_INDUSTRIAL_BASELINE,
       keyThresholds: {
