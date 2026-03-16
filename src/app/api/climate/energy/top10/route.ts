@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:energy-top10:v1';
+const CACHE_KEY = 'climate:energy-top10:v2';
 const OWID_URL = 'https://owid-public.owid.io/data/energy/owid-energy-data.json';
 
 // Regions / aggregates to exclude from country rankings
@@ -96,13 +96,13 @@ export async function GET() {
       if (fos && fos.value > 0) fossilShare.push({ name, value: fos.value, year: fos.year });
     }
 
-    const top = (arr: RankEntry[], n = 10) =>
+    const top = (arr: RankEntry[], n = 20) =>
       [...arr].sort((a, b) => b.value - a.value).slice(0, n);
 
-    // For renewable share: top 10 highest share among countries with meaningful electricity
+    // For renewable share: top 20 highest share among countries with meaningful electricity
     const topRenShare = [...renewableShare]
       .sort((a, b) => b.value - a.value)
-      .slice(0, 10);
+      .slice(0, 20);
 
     // Lowest carbon intensity (cleanest grids) — filter out tiny producers
     const cleanestGrids = [...carbonIntensity]
@@ -111,12 +111,12 @@ export async function GET() {
         return elec && elec.value > 10; // At least 10 TWh
       })
       .sort((a, b) => a.value - b.value)
-      .slice(0, 10);
+      .slice(0, 20);
 
     // Most fossil-dependent (highest fossil share)
     const mostFossil = [...fossilShare]
       .sort((a, b) => b.value - a.value)
-      .slice(0, 10);
+      .slice(0, 20);
 
     const result = {
       top10RenewableTWh: top(renewableTWh),

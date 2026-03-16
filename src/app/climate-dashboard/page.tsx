@@ -524,13 +524,10 @@ export default function ClimateDashboard() {
 
         {/* ─── Header & Search ──────────────────────────────────────── */}
         <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-800">
-          <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: 'linear-gradient(to right, #60a5fa, #818cf8, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Climate Change
-          </p>
           <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-            Global & Local{" "}
+            Local & Global{" "}
             <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              Climate Data
+              Climate Change
             </span>
           </h1>
           <p className="text-gray-400 text-sm md:text-base mb-4">
@@ -633,9 +630,9 @@ export default function ClimateDashboard() {
                 icon={<TrendingUp className="h-5 w-5 text-red-400" />}
                 title={(() => {
                   const parts: string[] = [];
+                  if (combinedAvgTempData && regionLabel) parts.push(regionLabel);
                   if (countryData?.yearlyData && countryLabel) parts.push(countryLabel);
-                  else if (regionLabel) parts.push(regionLabel);
-                  if (combinedAvgTempData && regionLabel && countryLabel) parts.push(regionLabel);
+                  else if (regionLabel && !combinedAvgTempData) parts.push(regionLabel);
                   if (showGlobalOverlay && globalData?.yearlyData) parts.push('Global');
                   return `${parts.join(' + ')} — Average Temperature`;
                 })()}
@@ -664,8 +661,8 @@ export default function ClimateDashboard() {
                     <MultiLineChart
                       data={combinedAvgTempData}
                       series={[
-                        { dataKey: 'countryTemp', rollingKey: 'countryRolling', label: countryLabel, color: '#fca5a5', rollingColor: '#dc2626' },
                         ...((selectedLocation?.type === 'us-state' && usStateData?.paramData?.tavg?.yearly || isUkSubRegion && ukRegionData?.varData?.Tmean?.yearly) ? [{ dataKey: 'regionTemp', rollingKey: 'regionRolling', label: regionLabel, color: '#fdcc74', rollingColor: '#f59e0b' }] : []),
+                        { dataKey: 'countryTemp', rollingKey: 'countryRolling', label: countryLabel, color: '#fca5a5', rollingColor: '#dc2626' },
                         ...(showGlobalOverlay ? [{ dataKey: 'globalTemp', rollingKey: 'globalRolling', label: 'Global', color: '#6ee7b7', rollingColor: '#10b981' }] : []),
                       ]}
                       thresholds={showGlobalOverlay && globalData ? [
@@ -697,11 +694,6 @@ export default function ClimateDashboard() {
                 )}
 
                 {/* Monthly comparisons */}
-                {(noaaNationalTempComparison || countryData?.monthlyComparison) && (
-                  <SubSection title={`${countryLabel || 'United States'} — Last 12 months vs 1961-1990 baseline`}>
-                    <ComparisonChart data={noaaNationalTempComparison || countryData.monthlyComparison} recentKey={noaaNationalTempComparison ? "recent" : "recentTemp"} label="Temperature" units="°C" barColor="#ef4444" />
-                  </SubSection>
-                )}
                 {selectedLocation?.type === 'us-state' && usStateData?.paramData?.tavg?.monthlyComparison && (
                   <SubSection title={`${usStateData.state} — Last 12 months vs historic average`}>
                     <ComparisonChart data={usStateData.paramData.tavg.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#ea580c" />
@@ -710,6 +702,11 @@ export default function ClimateDashboard() {
                 {isUkSubRegion && ukRegionData?.varData?.Tmean?.monthlyComparison && (
                   <SubSection title={`${ukRegionData.region} — Last 12 months vs historic average`}>
                     <ComparisonChart data={ukRegionData.varData.Tmean.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#d97706" />
+                  </SubSection>
+                )}
+                {(noaaNationalTempComparison || countryData?.monthlyComparison) && (
+                  <SubSection title={`${countryLabel || 'United States'} — Last 12 months vs 1961-1990 baseline`}>
+                    <ComparisonChart data={noaaNationalTempComparison || countryData.monthlyComparison} recentKey={noaaNationalTempComparison ? "recent" : "recentTemp"} label="Temperature" units="°C" barColor="#ef4444" />
                   </SubSection>
                 )}
                 {showGlobalOverlay && globalData?.monthlyComparison && (

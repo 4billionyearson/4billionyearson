@@ -28,9 +28,42 @@ html {
   display: none !important;
 }
 
-/* Brighten map labels so country/place names stand out */
-.leaflet-labels-bright {
-  filter: brightness(1.0) contrast(0.95);
+/* Strip default Leaflet tooltip chrome (white border / background / arrow) */
+.leaflet-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.leaflet-tooltip-top::before,
+.leaflet-tooltip-bottom::before,
+.leaflet-tooltip-left::before,
+.leaflet-tooltip-right::before {
+  display: none !important;
+}
+
+/* Country labels on the energy choropleth map */
+.country-label,
+.continent-label {
+  background: none !important;
+  border: none !important;
+}
+.country-label span,
+.continent-label span {
+  display: block;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.continent-label span {
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Pulsing LIVE badge */

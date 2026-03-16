@@ -75,15 +75,18 @@ const Header = () => {
           {/* Renewables Dropdown */}
           <div className="relative" onMouseEnter={() => setIsRenewablesOpen(true)} onMouseLeave={() => setIsRenewablesOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/energy' || pathname === '/energy-explained' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/energy' || pathname === '/energy-rankings' || pathname === '/energy-explained' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
-              Renewables ▾
+              Renewable Energy ▾
             </button>
             {isRenewablesOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[260px]">
                 <Link href="/energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Global & Country Energy Data<LiveBadge />
+                  Local & Global Energy Data<LiveBadge />
+                </Link>
+                <Link href="/energy-rankings" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Global Energy Rankings<LiveBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/energy-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300 bg-gray-900' : 'text-gray-300 hover:text-emerald-300 hover:bg-gray-900'}`} onClick={closeMenu}>
@@ -109,7 +112,7 @@ const Header = () => {
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[240px]">
                 <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Global & Local Climate Data<LiveBadge />
+                  Local & Global Climate Change<LiveBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   The Nine Factors<LiveBadge />
@@ -233,18 +236,21 @@ const Header = () => {
               </div>
             )}
 
-            {/* Mobile Renewables Accordion */}
+            {/* Mobile Renewable Energy Accordion */}
             <button
               className="text-base px-6 py-4 border-b border-gray-600/50 w-full text-left text-[#FFF5E7] flex items-center justify-between"
               onClick={() => setMobileRenewablesOpen(!mobileRenewablesOpen)}
             >
-              Renewables
+              Renewable Energy
               <span className={`transition-transform ${mobileRenewablesOpen ? 'rotate-180' : ''}`}>▾</span>
             </button>
             {mobileRenewablesOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy' ? 'text-emerald-400' : 'text-gray-400 hover:text-emerald-400'}`} onClick={closeMenu}>
-                  Global & Country Energy Data<LiveBadge />
+                  Local & Global Energy Data<LiveBadge />
+                </Link>
+                <Link href="/energy-rankings" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400' : 'text-gray-400 hover:text-emerald-400'}`} onClick={closeMenu}>
+                  Global Energy Rankings<LiveBadge />
                 </Link>
                 <Link href="/energy-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300' : 'text-gray-400 hover:text-emerald-300'}`} onClick={closeMenu}>
                   Energy Explained
@@ -266,7 +272,7 @@ const Header = () => {
             {mobileClimateOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/climate-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-400 hover:text-white'}`} onClick={closeMenu}>
-                  Global & Local Climate Data<LiveBadge />
+                  Local & Global Climate Change<LiveBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`} onClick={closeMenu}>
                   The Nine Factors<LiveBadge />
