@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:emissions:v2';
+const CACHE_KEY = 'climate:emissions:v3';
 
 // OWID indicator IDs (Global Carbon Project via OWID)
 const INDICATORS = {
@@ -189,6 +189,19 @@ export async function GET() {
     const latestWorld = worldAnnual[worldAnnual.length - 1];
     const latestCumul = worldCumulative[worldCumulative.length - 1];
 
+    // Country-level map data: { name → { annual, perCapita } }
+    const countryMapData: Record<string, { annual: number; perCapita: number }> = {};
+    for (const c of annualByCountry) {
+      countryMapData[c.name] = { annual: c.latestValue, perCapita: 0 };
+    }
+    for (const c of perCapByCountry) {
+      if (countryMapData[c.name]) {
+        countryMapData[c.name].perCapita = c.latestValue;
+      } else {
+        countryMapData[c.name] = { annual: 0, perCapita: c.latestValue };
+      }
+    }
+
     const result = {
       top10Annual,
       top10PerCapita,
@@ -197,6 +210,7 @@ export async function GET() {
       worldCumulative,
       top5History,
       top5Names,
+      countryMapData,
       stats: {
         latestAnnual: latestWorld?.value ?? 0,
         latestAnnualYear: latestWorld?.year ?? 0,

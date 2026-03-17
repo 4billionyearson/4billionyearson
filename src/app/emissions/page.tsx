@@ -1,11 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import {
   BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, Brush, Cell,
 } from "recharts";
-import { Loader2, Activity, Factory, TrendingUp, Globe, Users, Link2 } from "lucide-react";
+import { Loader2, Activity, Factory, TrendingUp, Globe, Users, Link2, MapPin } from "lucide-react";
+
+const EmissionsChoroplethMap = dynamic(() => import("@/app/_components/emissions-choropleth-map"), {
+  ssr: false,
+  loading: () => <div className="h-[400px] md:h-[500px] w-full rounded-xl bg-gray-900/50 animate-pulse" />,
+});
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -20,6 +26,7 @@ interface EmissionsData {
   worldCumulative: YearlyPoint[];
   top5History: Record<string, number>[];
   top5Names: string[];
+  countryMapData: Record<string, { annual: number; perCapita: number }>;
   stats: {
     latestAnnual: number;
     latestAnnualYear: number;
@@ -250,6 +257,14 @@ export default function EmissionsPage() {
                   />
                 </div>
               </div>
+
+              {/* ═══ EMISSIONS MAP ═══ */}
+              <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="Global CO₂ Emissions Map">
+                <EmissionsChoroplethMap countryMapData={data.countryMapData} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Hover over any country to see its emissions. Toggle between per-capita and total annual views.
+                </p>
+              </SectionCard>
 
               {/* ═══ TOP EMITTERS ═══ */}
               <Divider icon={<Factory className="h-5 w-5" />} title="Top Emitters" />
