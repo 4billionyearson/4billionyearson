@@ -814,7 +814,6 @@ export default function ExtremeWeatherPage() {
                   label={`Disasters (${stats.latest?.year || "–"})`}
                   value={stats.latest?.value?.toLocaleString() || "–"}
                   unit="events"
-                  subtext={`2010–2019 avg: ${stats.decadeAvg}`}
                   color="text-orange-400"
                 />
                 <StatCard
