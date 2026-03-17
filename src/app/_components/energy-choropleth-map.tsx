@@ -484,12 +484,11 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
           maxBounds={[[-60, -180], [85, 180]]}
           maxBoundsViscosity={1.0}
           className="h-[400px] md:h-[500px] w-full rounded-xl z-0"
-          style={{ background: "#9dc3e6" }}
+          style={{ background: "#BEEEF9" }}
         >
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
-            className="map-tiles-saturate"
           />
           <GeoJSON
             ref={geoRef}

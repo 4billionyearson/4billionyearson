@@ -54,7 +54,7 @@ html {
   white-space: nowrap;
   color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   pointer-events: none;
@@ -63,12 +63,12 @@ html {
 .continent-label span {
   font-weight: 700;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-/* Boost saturation on Voyager map tiles for richer land/sea colours */
-.map-tiles-saturate {
-  filter: saturate(1.5);
+/* Richer sea colour on Voyager map tiles */
+.leaflet-tile-pane img {
+  filter: saturate(3);
 }
 
 /* Pulsing LIVE badge */

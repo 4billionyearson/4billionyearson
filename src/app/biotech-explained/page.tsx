@@ -78,12 +78,12 @@ export default function BiotechExplainedPage() {
           {/* Hero */}
           <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
             <div className="flex items-center gap-3 mb-4">
-              <BookOpen className="h-6 w-6 text-fuchsia-400" />
-              <p className="text-sm uppercase tracking-[0.3em] text-fuchsia-400 font-mono">Explainer</p>
+              <BookOpen className="h-6 w-6 text-[#FFF5E7]" />
+              <p className="text-sm uppercase tracking-[0.3em] text-[#FFF5E7] font-mono">Explainer</p>
             </div>
             <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
               Biotechnology{" "}
-              <span className="bg-gradient-to-r from-fuchsia-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">
+              <span className="text-[#FFF5E7]">
                 Explained
               </span>
             </h1>
@@ -144,7 +144,7 @@ export default function BiotechExplainedPage() {
                   { title: "Xenotransplantation", desc: "Genetically modified pig organs have been transplanted into human patients for the first time, offering hope for the severe shortage of donor organs." },
                 ].map(({ title, desc }) => (
                   <div key={title} className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60">
-                    <p className="text-sm font-semibold text-fuchsia-300 mb-1">{title}</p>
+                    <p className="text-sm font-semibold text-[#FFF5E7] mb-1">{title}</p>
                     <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
                   </div>
                 ))}
@@ -198,11 +198,11 @@ export default function BiotechExplainedPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60 hover:border-fuchsia-800/60 transition-colors group"
+                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60 hover:border-[#FFF5E7]/30 transition-colors group"
                 >
-                  <ExternalLink className="h-4 w-4 text-fuchsia-400 flex-shrink-0 mt-0.5" />
+                  <ExternalLink className="h-4 w-4 text-[#FFF5E7] flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-fuchsia-400 group-hover:text-fuchsia-300 transition-colors">{name}</p>
+                    <p className="text-sm font-semibold text-[#FFF5E7] transition-colors">{name}</p>
                     <p className="text-xs text-gray-500">{desc}</p>
                   </div>
                 </a>
