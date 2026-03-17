@@ -3,8 +3,7 @@ import { HeroPost } from "@/app/_components/hero-post";
 import { MoreStories } from "@/app/_components/more-stories";
 import NavigationHub from "@/app/_components/navigation-hub";
 import { getAllPosts, getAllCategories } from "@/lib/api";
-import Link from "next/link";
-import Image from "next/image";
+import { Newspaper } from "lucide-react";
 
 export const revalidate = 60;
 
@@ -25,6 +24,14 @@ export default async function Index() {
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
         {heroPost && (
           <>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-px bg-gray-700 flex-1" />
+              <h2 className="text-lg font-bold font-mono text-gray-200 flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-gray-700 shadow-lg">
+                <Newspaper className="h-4 w-4" />
+                Latest Article
+              </h2>
+              <div className="h-px bg-gray-700 flex-1" />
+            </div>
             <HeroPost
               title={heroPost.title}
               coverImage={heroPost.coverImage}

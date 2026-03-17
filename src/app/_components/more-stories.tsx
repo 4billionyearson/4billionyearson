@@ -8,7 +8,7 @@ type Props = {
   hideTitle?: boolean;
 };
 
-export function MoreStories({ posts, title = "More Posts", hideTitle = false }: Props) {
+export function MoreStories({ posts, title = "More Articles", hideTitle = false }: Props) {
   return (
     <section>
       {!hideTitle && (
