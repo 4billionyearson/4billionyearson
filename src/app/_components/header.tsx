@@ -92,16 +92,21 @@ const Header = () => {
           {/* AI Dropdown */}
           <div className="relative" onMouseEnter={() => setIsAIOpen(true)} onMouseLeave={() => setIsAIOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/category/artificial-intelligence' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/ai-explained' || pathname === '/category/artificial-intelligence' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               AI ▾
             </button>
             {isAIOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
+                <Link href="/ai-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/ai-explained' ? 'text-violet-300 bg-gray-900' : 'text-gray-300 hover:text-violet-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  AI Explained
+                </Link>
+                <div className="border-t border-gray-700/50">
                 <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD] bg-gray-900' : 'text-gray-300 hover:text-[#89DEFD] hover:bg-gray-900'}`} onClick={closeMenu}>
                   Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
+                </div>
                 </div>
               </div>
             )}
@@ -180,16 +185,21 @@ const Header = () => {
           {/* Biotech Dropdown */}
           <div className="relative" onMouseEnter={() => setIsBiotechOpen(true)} onMouseLeave={() => setIsBiotechOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/category/biotechnology' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/biotech-explained' || pathname === '/category/biotechnology' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Biotech ▾
             </button>
             {isBiotechOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
+                <Link href="/biotech-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/biotech-explained' ? 'text-fuchsia-300 bg-gray-900' : 'text-gray-300 hover:text-fuchsia-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Biotech Explained
+                </Link>
+                <div className="border-t border-gray-700/50">
                 <Link href="/category/biotechnology" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742] bg-gray-900' : 'text-gray-300 hover:text-[#D26742] hover:bg-gray-900'}`} onClick={closeMenu}>
                   Blog{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
+                </div>
                 </div>
               </div>
             )}
@@ -271,6 +281,9 @@ const Header = () => {
             </button>
             {mobileAIOpen && (
               <div className="bg-gray-950/50">
+                <Link href="/ai-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/ai-explained' ? 'text-violet-300' : 'text-gray-400 hover:text-violet-300'}`} onClick={closeMenu}>
+                  AI Explained
+                </Link>
                 <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD]' : 'text-gray-400 hover:text-[#89DEFD]'}`} onClick={closeMenu}>
                   Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
@@ -349,6 +362,9 @@ const Header = () => {
             </button>
             {mobileBiotechOpen && (
               <div className="bg-gray-950/50">
+                <Link href="/biotech-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/biotech-explained' ? 'text-fuchsia-300' : 'text-gray-400 hover:text-fuchsia-300'}`} onClick={closeMenu}>
+                  Biotech Explained
+                </Link>
                 <Link href="/category/biotechnology" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742]' : 'text-gray-400 hover:text-[#D26742]'}`} onClick={closeMenu}>
                   Blog{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
