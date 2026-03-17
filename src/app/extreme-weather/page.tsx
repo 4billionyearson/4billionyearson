@@ -475,7 +475,7 @@ const EventsMap = dynamic(
         React.useEffect(() => {
           if (!map.getPane("labels")) {
             const pane = map.createPane("labels");
-            pane.style.zIndex = "350";
+            pane.style.zIndex = "450";
             pane.style.pointerEvents = "none";
           }
           const tooltipPane = map.getPane("tooltipPane");
@@ -765,7 +765,7 @@ export default function ExtremeWeatherPage() {
                 Events
               </span>
             </h1>
-            <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
               Tracking extreme weather events worldwide – from historical trends over the past century to live alerts today.
               Data sourced from{" "}
               <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
