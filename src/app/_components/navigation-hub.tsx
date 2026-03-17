@@ -15,6 +15,7 @@ interface SubLink {
   label: string;
   icon: React.ReactNode;
   badge?: "live" | "monthly" | "annual";
+  blogCategory?: string;   // slug for article-badge lookup
   desc: string;
 }
 
@@ -22,7 +23,7 @@ interface Section {
   id: string;
   title: string;
   tagline: string;
-  color: string;       // hex color e.g. "#D0A65E"
+  color: string;
   icon: React.ReactNode;
   links: SubLink[];
 }
@@ -32,24 +33,24 @@ const SECTIONS: Section[] = [
     id: "ai",
     title: "Artificial Intelligence",
     tagline: "Understanding the AI revolution",
-    color: "#89DEFD",
+    color: "#88DDFC",
     icon: <Brain className="h-6 w-6" />,
     links: [
       { href: "/ai-explained", label: "AI Explained", icon: <Cpu className="h-4 w-4" />, desc: "Plain-English guide to AI" },
-      { href: "/category/artificial-intelligence", label: "Blog", icon: <Newspaper className="h-4 w-4" />, desc: "Latest articles" },
+      { href: "/category/artificial-intelligence", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "artificial-intelligence", desc: "Latest articles" },
     ],
   },
   {
     id: "energy",
     title: "Renewable Energy",
     tagline: "Tracking the global shift to clean power",
-    color: "#D1E368",
+    color: "#D2E369",
     icon: <Zap className="h-6 w-6" />,
     links: [
       { href: "/energy", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
       { href: "/energy-rankings", label: "Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
       { href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
-      { href: "/category/renewable-energy", label: "Blog", icon: <Newspaper className="h-4 w-4" />, desc: "Latest articles" },
+      { href: "/category/renewable-energy", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "renewable-energy", desc: "Latest articles" },
     ],
   },
   {
@@ -66,23 +67,23 @@ const SECTIONS: Section[] = [
       { href: "/extreme-weather", label: "Extreme Weather", icon: <CloudLightning className="h-4 w-4" />, badge: "live", desc: "Active disasters worldwide" },
       { href: "/emissions", label: "CO₂ Emissions", icon: <Factory className="h-4 w-4" />, badge: "annual", desc: "Country rankings & trends" },
       { href: "/climate-explained", label: "Climate Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
-      { href: "/category/climate-change", label: "Blog", icon: <Newspaper className="h-4 w-4" />, desc: "Latest articles" },
+      { href: "/category/climate-change", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "climate-change", desc: "Latest articles" },
     ],
   },
   {
     id: "biotech",
     title: "Biotechnology",
     tagline: "Gene editing, mRNA, and the future of medicine",
-    color: "#D26742",
+    color: "#FFF5E7",
     icon: <Dna className="h-6 w-6" />,
     links: [
       { href: "/biotech-explained", label: "Biotech Explained", icon: <Microscope className="h-4 w-4" />, desc: "Plain-English guide to biotech" },
-      { href: "/category/biotechnology", label: "Blog", icon: <Newspaper className="h-4 w-4" />, desc: "Latest articles" },
+      { href: "/category/biotechnology", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "biotechnology", desc: "Latest articles" },
     ],
   },
 ];
 
-/* ─── Badge component ────────────────────────────────────────────────────── */
+/* ─── Badge components ───────────────────────────────────────────────────── */
 
 function Badge({ type }: { type: "live" | "monthly" | "annual" }) {
   if (type === "live")
@@ -96,20 +97,38 @@ function Badge({ type }: { type: "live" | "monthly" | "annual" }) {
     return (
       <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-sky-400 flex-shrink-0">
         <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-        Monthly
+        Updated Monthly
       </span>
     );
   return (
     <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-violet-400 flex-shrink-0">
       <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
-      Annual
+      Updated Annually
     </span>
   );
 }
 
+function ArticleBadge({ status }: { status: string }) {
+  if (status === "new")
+    return (
+      <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-amber-300 flex-shrink-0">
+        <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-400" />
+        New Article
+      </span>
+    );
+  if (status === "recent")
+    return (
+      <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-emerald-400 flex-shrink-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        Recent Article
+      </span>
+    );
+  return null;
+}
+
 /* ─── Section card ───────────────────────────────────────────────────────── */
 
-function SectionCard({ section, isExpanded, onToggle }: { section: Section; isExpanded: boolean; onToggle: () => void }) {
+function SectionCard({ section, isExpanded, onToggle, recentCategories }: { section: Section; isExpanded: boolean; onToggle: () => void; recentCategories: Record<string, string> }) {
   const c = section.color;
 
   return (
@@ -175,6 +194,9 @@ function SectionCard({ section, isExpanded, onToggle }: { section: Section; isEx
                   </p>
                 </div>
                 {link.badge && <Badge type={link.badge} />}
+                {link.blogCategory && recentCategories[link.blogCategory] && (
+                  <ArticleBadge status={recentCategories[link.blogCategory]} />
+                )}
               </Link>
             ))}
           </div>
@@ -189,8 +211,12 @@ function SectionCard({ section, isExpanded, onToggle }: { section: Section; isEx
 export default function NavigationHub() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
+  const [recentCategories, setRecentCategories] = useState<Record<string, string>>({});
 
-  useEffect(() => { setHasMounted(true); }, []);
+  useEffect(() => {
+    setHasMounted(true);
+    fetch("/api/recent-posts").then(r => r.json()).then(setRecentCategories).catch(() => {});
+  }, []);
 
   const toggle = (id: string) => setExpanded((prev) => (prev === id ? null : id));
 
@@ -218,6 +244,7 @@ export default function NavigationHub() {
               section={section}
               isExpanded={expanded === section.id}
               onToggle={() => toggle(section.id)}
+              recentCategories={recentCategories}
             />
           </div>
         ))}
