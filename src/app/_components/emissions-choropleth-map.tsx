@@ -366,12 +366,11 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
           maxBounds={[[-60, -180], [85, 180]]}
           maxBoundsViscosity={1.0}
           className="h-[400px] md:h-[500px] w-full rounded-xl z-0"
-          style={{ background: "#374151" }}
+          style={{ background: "#9dc3e6" }}
         >
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
-            className="map-tiles-bright"
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
           />
           <GeoJSON
             key={`${mode}-${dataMap.size}`}

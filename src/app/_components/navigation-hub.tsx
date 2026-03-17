@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Brain, Cpu, Zap, Sun, Wind, Thermometer, Globe, Waves,
   CloudLightning, Factory, Dna, Microscope, BookOpen,
-  ChevronRight, Newspaper, BarChart3, MapPin,
+  ChevronRight, Newspaper, BarChart3,
 } from "lucide-react";
 
 /* ─── Section data ───────────────────────────────────────────────────────── */
@@ -88,20 +88,20 @@ const SECTIONS: Section[] = [
 function Badge({ type }: { type: "live" | "monthly" | "annual" }) {
   if (type === "live")
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase text-red-400 flex-shrink-0">
+      <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-red-400 flex-shrink-0">
         <span className="live-dot w-1.5 h-1.5 rounded-full bg-red-500" />
         Live
       </span>
     );
   if (type === "monthly")
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase text-sky-400 flex-shrink-0">
+      <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-sky-400 flex-shrink-0">
         <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
         Updated Monthly
       </span>
     );
   return (
-    <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase text-violet-400 flex-shrink-0">
+    <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-violet-400 flex-shrink-0">
       <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
       Updated Annually
     </span>
@@ -111,14 +111,14 @@ function Badge({ type }: { type: "live" | "monthly" | "annual" }) {
 function ArticleBadge({ status }: { status: string }) {
   if (status === "new")
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase text-amber-300 flex-shrink-0">
+      <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-amber-300 flex-shrink-0">
         <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-400" />
         New Article
       </span>
     );
   if (status === "recent")
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase text-emerald-400 flex-shrink-0">
+      <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-emerald-400 flex-shrink-0">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
         Recent Article
       </span>
@@ -134,19 +134,14 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
   return (
     <div
       className={`
-        relative rounded-2xl border transition-all duration-500 ease-out overflow-hidden
+        relative rounded-2xl border-2 transition-all duration-500 ease-out overflow-hidden
         ${isExpanded
           ? "bg-gray-950/95"
-          : "border-gray-800/60 bg-gray-950/70 hover:border-gray-700/80 hover:bg-gray-950/90"
+          : "bg-gray-950/70 hover:bg-gray-950/90"
         }
       `}
-      style={isExpanded ? { borderColor: `${c}66`, boxShadow: `0 4px 20px ${c}22` } : undefined}
+      style={{ borderColor: c, ...(isExpanded ? { boxShadow: `0 4px 20px ${c}22` } : {}) }}
     >
-      {/* Solid accent bar at top */}
-      <div
-        className="h-1 w-full"
-        style={{ backgroundColor: c }}
-      />
 
       {/* Header – always visible */}
       <button
@@ -186,19 +181,17 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
                   {link.icon}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-200 group-hover/link:text-white transition-colors leading-tight">
-                      {link.label}
-                    </p>
-                    {link.badge && <Badge type={link.badge} />}
-                    {link.blogCategory && recentCategories[link.blogCategory] && (
-                      <ArticleBadge status={recentCategories[link.blogCategory]} />
-                    )}
-                  </div>
+                  <p className="text-sm font-medium text-gray-200 group-hover/link:text-white transition-colors leading-tight">
+                    {link.label}
+                  </p>
                   <p className="text-[11px] text-gray-600 group-hover/link:text-gray-500 transition-colors leading-tight mt-0.5">
                     {link.desc}
                   </p>
                 </div>
+                {link.badge && <Badge type={link.badge} />}
+                {link.blogCategory && recentCategories[link.blogCategory] && (
+                  <ArticleBadge status={recentCategories[link.blogCategory]} />
+                )}
               </Link>
             ))}
           </div>
@@ -224,12 +217,6 @@ export default function NavigationHub() {
 
   return (
     <section className="w-full">
-      {/* Section heading */}
-      <div className="flex items-center gap-3 mb-4">
-        <MapPin className="h-5 w-5 text-gray-500" />
-        <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-gray-500">Explore</h2>
-      </div>
-
       {/* Cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {SECTIONS.map((section, i) => (
