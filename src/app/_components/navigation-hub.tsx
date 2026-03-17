@@ -125,7 +125,7 @@ function SectionCard({ section, isExpanded, onToggle }: { section: Section; isEx
     >
       {/* Solid accent bar at top */}
       <div
-        className={`h-1 w-full transition-opacity duration-500 ${isExpanded ? "opacity-100" : "opacity-40"}`}
+        className="h-1 w-full"
         style={{ backgroundColor: c }}
       />
 
