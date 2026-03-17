@@ -536,11 +536,12 @@ const EventsMap = dynamic(
             maxZoom={8}
             scrollWheelZoom={true}
             className="h-[350px] md:h-[420px] w-full rounded-xl z-0"
-            style={{ background: "#111827" }}
+            style={{ background: "#1e293b" }}
           >
             <TileLayer
               attribution='&copy; <a href="https://carto.com/">CARTO</a>'
               url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+              className="map-tiles-bright"
             />
             <MapLabels />
             {events.map((e, i) => (

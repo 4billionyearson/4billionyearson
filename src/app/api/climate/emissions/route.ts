@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:emissions:v4';
+const CACHE_KEY = 'climate:emissions:v5';
 
 // OWID indicator IDs (Global Carbon Project via OWID)
 const INDICATORS = {
