@@ -112,11 +112,11 @@ function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: 
 function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-4 my-6">
-      <div className="h-px bg-gray-700 flex-1" />
-      <h2 className="text-lg font-bold font-mono text-gray-200 flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-gray-700 shadow-lg">
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg">
         {icon} {title}
       </h2>
-      <div className="h-px bg-gray-700 flex-1" />
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
     </div>
   );
 }
@@ -186,7 +186,7 @@ export default function EmissionsPage() {
           {/* ─── Hero ─────────────────────────────────────────────── */}
           <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#745630' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 CO₂ Emissions
               </h1>
             </div>

@@ -70,10 +70,10 @@ export default function ClimateExplainedPage() {
           {/* Hero */}
           <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E] overflow-hidden">
             <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#D0A65E' }}>
-              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#745630]">Climate Change</h1>
+              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#FFF5E7]">Climate Change</h1>
               <div className="flex items-center gap-2 mt-3">
-                <BookOpen className="h-5 w-5 text-[#745630]/80" />
-                <p className="text-sm uppercase tracking-[0.3em] text-[#745630]/80 font-mono">Explainer</p>
+                <BookOpen className="h-5 w-5 text-[#FFF5E7]/80" />
+                <p className="text-sm uppercase tracking-[0.3em] text-[#FFF5E7]/80 font-mono">Explainer</p>
               </div>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-5 py-4 md:px-6 md:py-5">

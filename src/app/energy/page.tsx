@@ -145,33 +145,41 @@ function SubSection({ title, children }: { title: string; children: React.ReactN
 function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-4 my-6">
-      <div className="h-px bg-gray-700 flex-1" />
-      <h2 className="text-lg font-bold font-mono text-gray-200 flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-gray-700 shadow-lg">
+      <div className="h-px bg-[#D2E369]/30 flex-1" />
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D2E369]/50 shadow-lg">
         {icon} {title}
       </h2>
-      <div className="h-px bg-gray-700 flex-1" />
+      <div className="h-px bg-[#D2E369]/30 flex-1" />
     </div>
   );
 }
 
 function StatCard({ label, value, unit, color, icon, countryValue, countryName, baseLabel = 'Global', subtitle }: { label: string; value: string; unit?: string; color: string; icon: React.ReactNode; countryValue?: string; countryName?: string; baseLabel?: string; subtitle?: string }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md border-2 border-[#D2E369] rounded-xl p-4 flex flex-col items-center text-center shadow-xl">
-      <div className={`mb-2 ${color}`}>{icon}</div>
+    <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
       {countryValue && countryName ? (
         <>
-          <p className={`text-2xl font-bold font-mono ${color}`}>{countryValue}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
-          <p className="text-[10px] text-gray-500 mt-0.5">{countryName}</p>
-          <p className={`text-2xl font-bold font-mono ${color} mt-1`}>{value}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
-          <p className="text-[10px] text-gray-500 mt-0.5">{baseLabel}</p>
-          <p className="text-xs text-gray-400 mt-1">{label}</p>
-          {subtitle && <p className="text-[10px] text-gray-600 mt-0.5">{subtitle}</p>}
+          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+          <div className="flex items-baseline gap-1">
+            <span className={`text-2xl font-bold font-mono ${color}`}>{countryValue}</span>
+            {unit && <span className="text-sm text-gray-400">{unit}</span>}
+          </div>
+          <div className="text-xs text-gray-500 mt-0.5">{countryName}</div>
+          <div className="flex items-baseline gap-1 mt-2">
+            <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
+            {unit && <span className="text-sm text-gray-400">{unit}</span>}
+          </div>
+          <div className="text-xs text-gray-500 mt-0.5">{baseLabel}</div>
+          {subtitle && <div className="text-[10px] text-gray-600 mt-1">{subtitle}</div>}
         </>
       ) : (
         <>
-          <p className={`text-2xl font-bold font-mono ${color}`}>{value}{unit && <span className="text-sm ml-1">{unit}</span>}</p>
-          <p className="text-xs text-gray-400 mt-1">{label}</p>
-          {subtitle && <p className="text-[10px] text-gray-600 mt-0.5">{subtitle}</p>}
+          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+          <div className="flex items-baseline gap-1">
+            <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
+            {unit && <span className="text-sm text-gray-400">{unit}</span>}
+          </div>
+          {subtitle && <div className="text-xs text-gray-500 mt-1">{subtitle}</div>}
         </>
       )}
     </div>

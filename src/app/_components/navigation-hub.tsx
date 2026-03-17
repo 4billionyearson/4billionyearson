@@ -134,7 +134,7 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
   const textMap: Record<string, string> = {
     "#88DDFC": "#FFF5E7",
     "#D2E369": "#2C5263",
-    "#D0A65E": "#745630",
+    "#D0A65E": "#FFF5E7",
     "#FFF5E7": "#D26742",
   };
   const textColor = textMap[c] ?? "#1a1a1a";
@@ -164,11 +164,6 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
             className={`h-4 w-4 flex-shrink-0 transition-transform duration-300 ${isExpanded ? "rotate-90" : "group-hover:translate-x-0.5"}`}
             style={{ color: `${textColor}99` }}
           />
-        </div>
-
-        {/* Dark section – tagline */}
-        <div className={`px-4 py-2.5 md:px-5 md:py-3 ${isExpanded ? "bg-gray-950/95" : "bg-gray-950/70 group-hover:bg-gray-950/90"} transition-colors duration-300`}>
-          <p className="text-xs text-gray-400 leading-relaxed">{section.tagline}</p>
         </div>
       </button>
 
