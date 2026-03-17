@@ -262,7 +262,11 @@ export default function EmissionsPage() {
               <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="Global CO₂ Emissions Map">
                 <EmissionsChoroplethMap countryMapData={data.countryMapData} />
                 <p className="text-xs text-gray-500 mt-4">
-                  Hover over any country to see its emissions. Toggle between per-capita and total annual views.
+                  Hover over any country to see its emissions. Toggle between per-capita and total annual views. Source:{" "}
+                  <a href="https://github.com/owid/co2-data" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
+                    Global Carbon Project
+                  </a>{" "}
+                  via Our World in Data ({data.stats.latestAnnualYear}).
                 </p>
               </SectionCard>
 
