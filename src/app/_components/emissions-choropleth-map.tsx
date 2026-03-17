@@ -373,7 +373,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
             url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
           />
           <GeoJSON
-            key={mode}
+            key={`${mode}-${dataMap.size}`}
             data={geoData}
             style={style}
             onEachFeature={onEachFeature}

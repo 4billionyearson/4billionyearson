@@ -259,6 +259,7 @@ export default function EmissionsPage() {
               </div>
 
               {/* ═══ EMISSIONS MAP ═══ */}
+              {data.countryMapData && Object.keys(data.countryMapData).length > 0 && (
               <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="Global CO₂ Emissions Map">
                 <EmissionsChoroplethMap countryMapData={data.countryMapData} />
                 <p className="text-xs text-gray-500 mt-4">
@@ -269,6 +270,7 @@ export default function EmissionsPage() {
                   via Our World in Data ({data.stats.latestAnnualYear}).
                 </p>
               </SectionCard>
+              )}
 
               {/* ═══ TOP EMITTERS ═══ */}
               <Divider icon={<Factory className="h-5 w-5" />} title="Top Emitters" />
