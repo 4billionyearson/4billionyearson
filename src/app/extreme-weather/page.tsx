@@ -195,7 +195,7 @@ function StackedTypeChart({
             <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
             <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} allowDecimals={false} tickFormatter={formatYAxis} />
             <Tooltip content={<DarkTooltip />} cursor={{ fill: "#1F2937" }} />
-            <Legend wrapperStyle={{ color: "#D3C8BB", fontSize: 11, left: 0, right: 0 }} />
+            <Legend wrapperStyle={{ color: "#D3C8BB", fontSize: 11, left: 0, right: 0, paddingTop: 12 }} />
             {MAIN_TYPES.map((type) => (
               <Bar key={type} dataKey={type} stackId="a" fill={TYPE_COLORS[type] || "#6b7280"} />
             ))}
@@ -316,10 +316,6 @@ function Top10Countries() {
 
   return (
     <SectionCard icon={<AlertTriangle className="h-5 w-5 text-orange-400" />} title="Most-Affected Countries (Last 20 Years)">
-      <p className="text-sm text-gray-400 mb-4">
-        Countries that have experienced the highest total number of reported extreme weather events
-        (floods, storms, droughts, wildfires) over the past two decades according to the EM-DAT international disaster database.
-      </p>
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={ranking} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
@@ -343,16 +339,116 @@ function Top10Countries() {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      <p className="text-xs text-gray-500 mt-4">
+        Top countries by reported extreme weather events over the past two decades. Source:{" "}
+        <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">EM-DAT</a>.
+      </p>
     </SectionCard>
   );
 }
 
 /* ─── Map (SSR-safe dynamic import) ──────────────────────────────────────── */
 
+/* Manual centroid overrides for countries whose auto-centroid lands poorly */
+const LABEL_OVERRIDES: Record<string, [number, number]> = {
+  "United States of America": [40, -98],
+  "Canada": [56, -96],
+  "Russia": [62, 95],
+  "France": [47, 2.5],
+  "Norway": [65, 13],
+  "Indonesia": [-2, 118],
+  "Malaysia": [4, 109],
+  "Chile": [-35, -71],
+  "New Zealand": [-42, 174],
+  "Japan": [36, 138],
+  "Antarctica": [-82, 0],
+};
+
+const CONTINENT_LABELS: { name: string; pos: [number, number] }[] = [
+  { name: "North America", pos: [45, -100] },
+  { name: "South America", pos: [-15, -58] },
+  { name: "Europe", pos: [52, 15] },
+  { name: "Africa", pos: [5, 20] },
+  { name: "Asia", pos: [42, 85] },
+  { name: "Oceania", pos: [-25, 135] },
+];
+
+const MAJOR_COUNTRIES = new Set([
+  "United States of America", "Canada", "Mexico", "Brazil", "Argentina",
+  "Colombia", "Peru", "Chile", "Venezuela",
+  "Russia", "China", "India", "Japan", "Australia",
+  "Indonesia", "Saudi Arabia", "Iran", "Kazakhstan",
+  "United Kingdom", "France", "Germany", "Spain", "Italy",
+  "Turkey", "Ukraine", "Poland", "Sweden", "Norway", "Finland",
+  "Egypt", "South Africa", "Nigeria", "Algeria", "Libya",
+  "Dem. Rep. Congo", "Sudan", "Ethiopia", "Tanzania", "Kenya",
+  "Mongolia", "Pakistan", "Afghanistan", "Thailand", "Myanmar",
+  "Greenland", "Iceland", "New Zealand",
+]);
+
+const MAP_NAME_MAP: Record<string, string> = {
+  "United States of America": "United States",
+  "Dem. Rep. Congo": "Democratic Republic of Congo",
+  "Dominican Rep.": "Dominican Republic",
+  "Central African Rep.": "Central African Republic",
+  "S. Sudan": "South Sudan",
+  "Bosnia and Herz.": "Bosnia and Herzegovina",
+  "Czech Rep.": "Czechia",
+  "W. Sahara": "Western Sahara",
+  "Falkland Is.": "Falkland Islands",
+  "Fr. S. Antarctic Lands": "French Southern Territories",
+  "Eq. Guinea": "Equatorial Guinea",
+  "eSwatini": "Eswatini",
+  "Solomon Is.": "Solomon Islands",
+  "Timor-Leste": "Timor",
+  "N. Cyprus": "North Cyprus",
+  "Somaliland": "Somalia",
+  "Côte d'Ivoire": "Cote d'Ivoire",
+  "Macedonia": "North Macedonia",
+  "Kosovo": "Kosovo",
+  "Taiwan": "Taiwan",
+  "Myanmar": "Myanmar",
+  "Lao PDR": "Laos",
+  "Brunei": "Brunei",
+};
+
+function featureCentroidEW(feature: any): [number, number] | null {
+  const geom = feature.geometry;
+  if (geom.type === "Polygon") {
+    const ring = geom.coordinates[0];
+    let x = 0, y = 0;
+    for (const c of ring) { x += c[0]; y += c[1]; }
+    return [y / ring.length, x / ring.length];
+  }
+  if (geom.type === "MultiPolygon") {
+    let best: number[][] = [];
+    let bestArea = 0;
+    for (const poly of geom.coordinates) {
+      const ring = poly[0];
+      let a = 0;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        a += (ring[j][0] - ring[i][0]) * (ring[j][1] + ring[i][1]);
+      }
+      a = Math.abs(a / 2);
+      if (a > bestArea) { bestArea = a; best = ring; }
+    }
+    if (best.length) {
+      let x = 0, y = 0;
+      for (const c of best) { x += c[0]; y += c[1]; }
+      return [y / best.length, x / best.length];
+    }
+  }
+  return null;
+}
+
 const EventsMap = dynamic(
   () =>
-    import("react-leaflet").then((mod) => {
-      const { MapContainer, TileLayer, CircleMarker, Popup } = mod;
+    Promise.all([
+      import("react-leaflet"),
+      import("leaflet"),
+      fetch("/data/world-countries.json").then((r) => r.json()).catch(() => null),
+    ]).then(([mod, L, geoData]) => {
+      const { MapContainer, TileLayer, CircleMarker, Popup, Marker, useMap, useMapEvents } = mod;
       const ALERT_FILL: Record<string, string> = {
         Red: "#ef4444",
         Orange: "#f97316",
@@ -368,6 +464,69 @@ const EventsMap = dynamic(
         Orange: "#f97316",
         Green: "#10b981",
       };
+
+      function MapLabels() {
+        const map = useMap();
+        const [ready, setReady] = React.useState(false);
+        const [zoom, setZoom] = React.useState(map.getZoom());
+
+        useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+
+        React.useEffect(() => {
+          if (!map.getPane("labels")) {
+            const pane = map.createPane("labels");
+            pane.style.zIndex = "350";
+            pane.style.pointerEvents = "none";
+          }
+          const tooltipPane = map.getPane("tooltipPane");
+          if (tooltipPane) tooltipPane.style.zIndex = "700";
+          setReady(true);
+        }, [map]);
+
+        const countryLabels = React.useMemo(() => {
+          if (!geoData) return [];
+          const result: { name: string; pos: [number, number] }[] = [];
+          for (const f of geoData.features) {
+            const name = f.properties?.name;
+            if (!name) continue;
+            const pos = LABEL_OVERRIDES[name] ?? featureCentroidEW(f);
+            if (pos) result.push({ name, pos });
+          }
+          return result;
+        }, []);
+
+        if (!ready || !geoData) return null;
+
+        const visibleLabels =
+          zoom <= 2
+            ? CONTINENT_LABELS
+            : zoom <= 3
+              ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
+              : countryLabels;
+
+        const fontSize = zoom <= 2 ? 13 : 10;
+        const cls = zoom <= 2 ? "continent-label" : "country-label";
+
+        return (
+          <>
+            {visibleLabels.map(({ name, pos }) => (
+              <Marker
+                key={name}
+                position={pos}
+                pane="labels"
+                interactive={false}
+                icon={L.default.divIcon({
+                  className: cls,
+                  html: `<span style="font-size:${fontSize}px">${MAP_NAME_MAP[name] || name}</span>`,
+                  iconSize: [0, 0],
+                  iconAnchor: [0, 0],
+                })}
+              />
+            ))}
+          </>
+        );
+      }
+
       return function Map({ events }: { events: GDACSEvent[] }) {
         return (
           <MapContainer
@@ -383,10 +542,7 @@ const EventsMap = dynamic(
               attribution='&copy; <a href="https://carto.com/">CARTO</a>'
               url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
             />
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png"
-              className="leaflet-labels-bright"
-            />
+            <MapLabels />
             {events.map((e, i) => (
               <CircleMarker
                 key={i}
@@ -687,45 +843,42 @@ export default function ExtremeWeatherPage() {
 
               {/* ─── Live GDACS Alerts ──────────────────────────────── */}
               {data.gdacsEvents.length > 0 && (
-                <SectionCard icon={<Activity />} title="Live Extreme Weather Alerts (GDACS)">
-                  <p className="text-xs text-gray-500 mb-4">
-                    Real-time extreme weather alerts from the Global Disaster Alert and Coordination System (EU/JRC) – last 12 months.
-                    Click any event for the full{" "}
+                <SectionCard icon={<Activity />} title="Live Extreme Weather Alerts">
+                  <LiveEventsSection events={data.gdacsEvents} />
+                  <p className="text-xs text-gray-500 mt-4">
+                    Real-time alerts from{" "}
                     <a href="https://www.gdacs.org/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                       GDACS <ExternalLink className="inline w-3 h-3" />
                     </a>{" "}
-                    report.
+                    (EU/JRC) – last 12 months.
                   </p>
-                  <LiveEventsSection events={data.gdacsEvents} />
                 </SectionCard>
               )}
 
               {/* ─── Disasters by Type ─────────────────────────────── */}
               <SectionCard icon={<CloudLightning />} title="Extreme Weather by Type">
-                <p className="text-xs text-gray-500 mb-4">
-                  Annual count of recorded extreme weather events by type, from{" "}
+                <StackedTypeChart data={data.disastersByType} title="Recorded Extreme Weather Events per Year" yLabel="Events" />
+                <p className="text-xs text-gray-500 mt-4">
+                  Annual events by type from{" "}
                   <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                     EM-DAT <ExternalLink className="inline w-3 h-3" />
                   </a>{" "}
                   via{" "}
                   <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                     Our World in Data <ExternalLink className="inline w-3 h-3" />
-                  </a>
-                  . EM-DAT records disasters with ≥10 fatalities, ≥100 affected, a declared state of emergency, or a call for international assistance.
+                  </a>.
                 </p>
-                <StackedTypeChart data={data.disastersByType} title="Recorded Extreme Weather Events per Year" yLabel="Events" />
               </SectionCard>
 
               {/* ─── Deaths by Type ────────────────────────────────── */}
               <SectionCard icon={<AlertTriangle />} title="Deaths from Extreme Weather">
-                <p className="text-xs text-gray-500 mb-4">
-                  Annual death toll from extreme weather events, broken down by type. Source:{" "}
+                <StackedTypeChart data={data.deathsByType} title="Deaths from Extreme Weather per Year" yLabel="Deaths" />
+                <p className="text-xs text-gray-500 mt-4">
+                  Annual death toll by type. Source:{" "}
                   <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                     EM-DAT <ExternalLink className="inline w-3 h-3" />
-                  </a>
-                  .
+                  </a>.
                 </p>
-                <StackedTypeChart data={data.deathsByType} title="Deaths from Extreme Weather per Year" yLabel="Deaths" />
               </SectionCard>
 
               {/* ─── Total trends ──────────────────────────────────── */}

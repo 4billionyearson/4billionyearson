@@ -98,7 +98,7 @@ function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingCo
             <ReferenceLine key={i} y={t.value} stroke={t.color} strokeDasharray="4 4" strokeWidth={1.5}
               label={{ position: (t.labelPosition || 'insideTopLeft'), value: t.label, fill: t.color, fontSize: 11, fontWeight: 600 } as any} />
           ))}
-          <Line type="monotone" dataKey={dataKey} name={label} stroke={color} strokeWidth={1} dot={false} />
+          <Line type="monotone" dataKey={dataKey} name={label} stroke={color} strokeWidth={1} dot={false} strokeOpacity={0.35} />
           {rollingKey && <Line type="monotone" dataKey={rollingKey} name="10-Yr Rolling Avg" stroke={rollingColor} strokeWidth={3} dot={false} />}
           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
             <LineChart data={data}>
@@ -167,7 +167,7 @@ function MultiLineChart({ data, series, thresholds }: {
   const lines: React.ReactNode[] = [];
   series.forEach((s, i) => {
     lines.push(
-      <Line key={`data-${i}`} type="monotone" dataKey={s.dataKey} name={s.label} stroke={s.color} strokeWidth={1} dot={false} connectNulls />
+      <Line key={`data-${i}`} type="monotone" dataKey={s.dataKey} name={s.label} stroke={s.color} strokeWidth={1} dot={false} connectNulls strokeOpacity={0.35} />
     );
     if (s.rollingKey) {
       lines.push(
@@ -998,9 +998,7 @@ export default function ClimateDashboard() {
                 {globalData?.landVsOceanMonthly && (
                   <SectionCard icon={<ThermometerSun className="h-5 w-5 text-amber-400" />} title="Global Land vs Land + Ocean – Monthly Comparison">
                     <p className="text-sm text-gray-400 mb-4">
-                      Land surface temperatures run warmer and swing more with the seasons than the combined land + ocean average.
-                      Country data on this page uses <span className="text-emerald-400">land surface temperature</span> from Copernicus ERA5, while
-                      the global trend chart above uses <span className="text-amber-400">land + ocean</span> from NOAA – the standard measure for climate policy.
+                      Country data uses <span className="text-emerald-400">land-only</span> temperature (ERA5); the global trend above uses <span className="text-amber-400">land + ocean</span> (NOAA).
                     </p>
                     <SubSection title="Last 12 months – absolute temperature (°C)">
                       <div className="h-[300px] w-full">

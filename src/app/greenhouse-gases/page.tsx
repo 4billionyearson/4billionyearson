@@ -304,9 +304,6 @@ function OverviewSection({ data }: { data: GHGData }) {
       {/* ── CO₂ vs Temperature ── */}
       {co2TempData && co2TempData.length > 0 && (
         <SectionCard icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="CO₂ & Global Temperature">
-          <p className="text-sm text-gray-400 mb-4">
-            The fundamental cause-and-effect of climate change. As atmospheric CO₂ has risen from <span className="text-white font-medium">~315 ppm</span> in 1958 to over <span className="text-white font-medium">{data.co2?.current.value.toFixed(0)} ppm</span> today, global temperatures have tracked upward in near-lockstep – a correlation that holds across every timescale.
-          </p>
           <SubSection title="CO₂ concentration (left axis) vs temperature anomaly (right axis)">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -336,15 +333,15 @@ function OverviewSection({ data }: { data: GHGData }) {
               </ResponsiveContainer>
             </div>
           </SubSection>
+          <p className="text-sm text-gray-400 mt-3">
+            As CO₂ rises, global temperatures track upward in near-lockstep – a correlation that holds across every timescale.
+          </p>
         </SectionCard>
       )}
 
       {/* ── All Gases Normalised ── */}
       {normalisedGasData.length > 0 && (
         <SectionCard icon={<TrendingUp className="h-5 w-5 text-rose-400" />} title="All Greenhouse Gases – Percentage Rise">
-          <p className="text-sm text-gray-400 mb-4">
-            All three major greenhouse gases plotted on the same scale as <span className="text-white font-medium">percentage increase above pre-industrial levels</span>. This reveals how methane has risen the fastest in relative terms, followed by CO₂ and nitrous oxide – each amplifying the others&apos; warming effect.
-          </p>
           <SubSection title="% above pre-industrial level – drag slider to zoom">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -370,15 +367,15 @@ function OverviewSection({ data }: { data: GHGData }) {
               </ResponsiveContainer>
             </div>
           </SubSection>
+          <p className="text-sm text-gray-400 mt-3">
+            All three gases as percentage increase above pre-industrial levels, showing how each amplifies the others&apos; warming effect.
+          </p>
         </SectionCard>
       )}
 
       {/* ── Temperature + Ocean ── */}
       {tempOceanData && tempOceanData.length > 0 && (
         <SectionCard icon={<Waves className="h-5 w-5 text-blue-400" />} title="Global Warming – Land & Sea">
-          <p className="text-sm text-gray-400 mb-4">
-            The atmosphere and oceans are warming in tandem. While the ocean absorbs over 90% of excess heat, its surface temperature anomaly tracks closely with global land temperatures – confirming that warming is not a local phenomenon but a whole-Earth system shift.
-          </p>
           <SubSection title="Temperature anomaly: land (NASA/NOAA) vs ocean surface (NOAA)">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -405,15 +402,15 @@ function OverviewSection({ data }: { data: GHGData }) {
               </ResponsiveContainer>
             </div>
           </SubSection>
+          <p className="text-sm text-gray-400 mt-3">
+            The atmosphere and oceans are warming in tandem – confirming this is a whole-Earth system shift, not a local phenomenon.
+          </p>
         </SectionCard>
       )}
 
       {/* ── CO₂ vs Arctic Ice ── */}
       {co2IceData && co2IceData.length > 0 && (
         <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Rising Carbon, Vanishing Ice">
-          <p className="text-sm text-gray-400 mb-4">
-            One of the starkest visualisations of climate change. As CO₂ concentrations climb, Arctic sea ice extent drops – a feedback loop where lost ice exposes dark ocean, absorbing more heat, melting more ice, and accelerating warming further.
-          </p>
           <SubSection title="CO₂ concentration (left axis) vs Arctic sea ice extent (right axis)">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -439,6 +436,9 @@ function OverviewSection({ data }: { data: GHGData }) {
               </ResponsiveContainer>
             </div>
           </SubSection>
+          <p className="text-sm text-gray-400 mt-3">
+            As CO₂ climbs, Arctic ice drops – lost ice exposes dark ocean, absorbing more heat and accelerating warming further.
+          </p>
         </SectionCard>
       )}
 
@@ -578,10 +578,6 @@ export default function GreenhouseGasesPage() {
                 <>
                   <Divider icon={<TrendingUp className="h-5 w-5" />} title="Carbon Dioxide (CO₂)" />
                   <SectionCard icon={<TrendingUp className="h-5 w-5 text-red-400" />} title="Atmospheric CO₂ Concentration">
-                    <p className="text-sm text-gray-400 mb-4">
-                      CO₂ is the primary driver of climate change, responsible for about two-thirds of the total warming effect. Continuous measurements from Mauna Loa Observatory date back to <span className="text-white font-medium">1958</span>.
-                      The current level of <span className="text-white font-medium">{data.co2.current.value.toFixed(1)} ppm</span> is {pctAbovePreindustrial(data.co2.current.value, 280)}% above the pre-industrial level of 280 ppm and well beyond the safe planetary boundary of 350 ppm.
-                    </p>
                     <SubSection title="Yearly average CO₂ concentration (ppm) – drag slider to zoom">
                       <GasYearlyChart
                         data={data.co2.yearly}
@@ -593,6 +589,9 @@ export default function GreenhouseGasesPage() {
                         preindustrialLabel="Pre-industrial: 280 ppm"
                       />
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-3">
+                      CO₂ is the primary driver of climate change, responsible for about two-thirds of total warming. Continuous measurements from Mauna Loa date back to 1958.
+                    </p>
                   </SectionCard>
                 </>
               )}
@@ -602,9 +601,6 @@ export default function GreenhouseGasesPage() {
                 <>
                   <Divider icon={<Wind className="h-5 w-5" />} title="Methane (CH₄)" />
                   <SectionCard icon={<Wind className="h-5 w-5 text-amber-400" />} title="Atmospheric Methane Concentration">
-                    <p className="text-sm text-gray-400 mb-4">
-                      Methane is over 80× more potent than CO₂ over a 20-year period. Its concentration has risen from a pre-industrial level of 722 ppb to <span className="text-white font-medium">{data.methane.current.value.toFixed(0)} ppb</span> – a {pctAbovePreindustrial(data.methane.current.value, 722)}% increase. Major sources include agriculture, fossil fuel extraction, and wetlands.
-                    </p>
                     <SubSection title="Yearly average methane concentration (ppb) – drag slider to zoom">
                       <GasYearlyChart
                         data={data.methane.yearly}
@@ -616,6 +612,9 @@ export default function GreenhouseGasesPage() {
                         preindustrialLabel="Pre-industrial: 722 ppb"
                       />
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-3">
+                      Methane is over 80× more potent than CO₂ over 20 years. Major sources include agriculture, fossil fuel extraction, and wetlands.
+                    </p>
                   </SectionCard>
                 </>
               )}
@@ -625,9 +624,6 @@ export default function GreenhouseGasesPage() {
                 <>
                   <Divider icon={<Wind className="h-5 w-5" />} title="Nitrous Oxide (N₂O)" />
                   <SectionCard icon={<Wind className="h-5 w-5 text-purple-400" />} title="Atmospheric Nitrous Oxide Concentration">
-                    <p className="text-sm text-gray-400 mb-4">
-                      Nitrous oxide has nearly 300× the warming potential of CO₂ over 100 years and also depletes the ozone layer. Its concentration has risen from 270 ppb to <span className="text-white font-medium">{data.n2o.current.value.toFixed(1)} ppb</span>. The primary source is agricultural fertiliser use.
-                    </p>
                     <SubSection title="Yearly average N₂O concentration (ppb) – drag slider to zoom">
                       <GasYearlyChart
                         data={data.n2o.yearly}
@@ -639,6 +635,9 @@ export default function GreenhouseGasesPage() {
                         preindustrialLabel="Pre-industrial: 270 ppb"
                       />
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-3">
+                      N₂O has nearly 300× the warming potential of CO₂ over 100 years and also depletes the ozone layer. The primary source is agricultural fertiliser.
+                    </p>
                   </SectionCard>
                 </>
               )}
@@ -648,12 +647,12 @@ export default function GreenhouseGasesPage() {
                 <>
                   <Divider icon={<Thermometer className="h-5 w-5" />} title="Global Temperature" />
                   <SectionCard icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Global Temperature Anomaly">
-                    <p className="text-sm text-gray-400 mb-4">
-                      The cumulative effect of rising greenhouse gases. The planet has warmed approximately <span className="text-white font-medium">+{Math.abs(data.temperature.current.anomaly).toFixed(2)}°C</span> above the 1951-1980 baseline. The Paris Agreement aims to limit warming to 1.5°C, with 2.0°C as an absolute ceiling.
-                    </p>
                     <SubSection title="Annual average temperature anomaly (°C)">
                       <TempAnomalyChart data={data.temperature.yearly} />
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-3">
+                      The cumulative effect of rising greenhouse gases. The Paris Agreement aims to limit warming to 1.5°C, with 2.0°C as an absolute ceiling.
+                    </p>
                   </SectionCard>
                 </>
               )}
@@ -663,9 +662,6 @@ export default function GreenhouseGasesPage() {
                 <>
                   <Divider icon={<Snowflake className="h-5 w-5" />} title="Arctic Sea Ice" />
                   <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Arctic Sea Ice Extent">
-                    <p className="text-sm text-gray-400 mb-4">
-                      Arctic sea ice acts as a giant reflector, bouncing sunlight back into space. As it melts, the darker ocean absorbs more heat, accelerating warming in a feedback loop. Current extent is <span className="text-white font-medium">{data.arcticIce.current.extent.toFixed(1)} million km²</span>.
-                    </p>
                     <SubSection title="Annual average sea ice extent (million km²)">
                       <SimpleYearlyChart
                         data={data.arcticIce.yearly}
@@ -676,6 +672,9 @@ export default function GreenhouseGasesPage() {
                         fillColor="#22d3ee"
                       />
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-3">
+                      Arctic ice reflects sunlight back into space. As it melts, darker ocean absorbs more heat, accelerating warming in a feedback loop.
+                    </p>
                   </SectionCard>
                 </>
               )}
@@ -685,9 +684,6 @@ export default function GreenhouseGasesPage() {
                 <>
                   <Divider icon={<Waves className="h-5 w-5" />} title="Ocean Warming" />
                   <SectionCard icon={<Waves className="h-5 w-5 text-blue-400" />} title="Ocean Surface Temperature Anomaly">
-                    <p className="text-sm text-gray-400 mb-4">
-                      Oceans absorb over 90% of the excess heat trapped by greenhouse gases. Rising ocean temperatures drive coral bleaching, sea-level rise, and more intense storms. The surface anomaly has reached <span className="text-white font-medium">+{data.oceanWarming.current.anomaly.toFixed(2)}°C</span>.
-                    </p>
                     <SubSection title="Annual ocean surface temperature anomaly (°C)">
                       <SimpleYearlyChart
                         data={data.oceanWarming.yearly}
@@ -698,6 +694,9 @@ export default function GreenhouseGasesPage() {
                         fillColor="#3b82f6"
                       />
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-3">
+                      Oceans absorb over 90% of excess heat trapped by greenhouse gases, driving coral bleaching, sea-level rise, and more intense storms.
+                    </p>
                   </SectionCard>
                 </>
               )}

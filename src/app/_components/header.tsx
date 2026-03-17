@@ -7,19 +7,19 @@ import { useRouter, usePathname } from "next/navigation";
 
 const Header = () => {
   const LiveBadge = () => (
-    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-red-400">
+    <span className="flex items-center gap-1 mt-0.5 text-[10px] font-bold tracking-wide uppercase text-red-400">
       <span className="live-dot w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
       Live
     </span>
   );
   const MonthlyBadge = () => (
-    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-sky-400">
+    <span className="flex items-center gap-1 mt-0.5 text-[10px] font-bold tracking-wide uppercase text-sky-400">
       <span className="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block" />
       Updated Monthly
     </span>
   );
   const AnnualBadge = () => (
-    <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-violet-400">
+    <span className="flex items-center gap-1 mt-0.5 text-[10px] font-bold tracking-wide uppercase text-violet-400">
       <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
       Updated Annually
     </span>
@@ -116,7 +116,7 @@ const Header = () => {
             </button>
             {isRenewablesOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
-                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[370px]">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[260px]">
                 <Link href="/energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Local & Global Energy Data<AnnualBadge />
                 </Link>
@@ -145,7 +145,7 @@ const Header = () => {
             </button>
             {isClimateChangeOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
-                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[420px]">
+                <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[280px]">
                 <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>

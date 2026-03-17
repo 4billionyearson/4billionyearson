@@ -313,17 +313,24 @@ export default function SeaLevelsIcePage() {
               </div>
 
               {/* ═══ ICE EXTENT + ANOMALY PANEL ═══ */}
-              <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="September Ice Extent: Arctic & Antarctic 1979 – 2024">
-                <p className="text-sm text-gray-400 mb-4">
-                  Every September the Arctic sea ice reaches its annual minimum while Antarctic ice nears its maximum. Press play to see how both poles have changed over 45 years – the Arctic has <span className="text-white font-medium">dramatically shrunk</span> from 7.2 to 4.3 million km², while Antarctic extent has also declined in recent years. The lighter the colour, the greater the extent. Drag to rotate each globe.
-                </p>
+              <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-xl font-bold font-mono text-white flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+                    <MapPin className="h-5 w-5 text-cyan-400" />
+                    Polar Ice Extent
+                  </h2>
+                  <div className="bg-gray-950/80 backdrop-blur-sm border border-gray-700 rounded-md px-3 py-1 flex items-center gap-2">
+                    <div className="text-[10px] text-gray-400 uppercase tracking-wider">September</div>
+                    <div className="text-lg font-bold font-mono text-cyan-400">{activeIceYear}</div>
+                  </div>
+                </div>
                 <ArcticIceMap onYearChange={handleIceYearChange} />
 
                 {/* Combined anomaly chart for the same years */}
                 {iceYearAnomalies && iceYearAnomalies.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-3">
-                      Temperature &amp; Sea Level for the Same Years
+                      Corresponding Temperatures &amp; Sea Level
                     </h3>
                     <div className="h-[320px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
@@ -358,7 +365,7 @@ export default function SeaLevelsIcePage() {
                 <p className="text-xs text-gray-600 mt-3">
                   Source: <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">NSIDC Sea Ice Index v4.0</a> – September monthly polygon shapefiles · NASA GISS · NOAA
                 </p>
-              </SectionCard>
+              </div>
 
               {/* ═══ HOW IT ALL CONNECTS ═══ */}
               <Divider icon={<Link2 className="h-5 w-5" />} title="How It All Connects" />
@@ -366,9 +373,6 @@ export default function SeaLevelsIcePage() {
               {/* ── Temperature → Sea Level ── */}
               {tempSeaLevelData && tempSeaLevelData.length > 0 && (
                 <SectionCard icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Warming Drives Rising Seas">
-                  <p className="text-sm text-gray-400 mb-4">
-                    Rising global temperatures are the root cause of sea level rise. Warmer air melts ice sheets and glaciers, adding water to the oceans. At the same time, warmer water <span className="text-white font-medium">expands</span> – thermal expansion accounts for roughly a third of observed sea level rise. This chart shows the tight correlation between temperature anomaly and sea level since satellite measurement began.
-                  </p>
                   <SubSection title="Temperature anomaly (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
@@ -392,15 +396,15 @@ export default function SeaLevelsIcePage() {
                       </ResponsiveContainer>
                     </div>
                   </SubSection>
+                  <p className="text-sm text-gray-400 mt-3">
+                    Warmer air melts ice and warmer water expands – both pushing sea levels higher.
+                  </p>
                 </SectionCard>
               )}
 
               {/* ── Ice → Sea Level ── */}
               {iceSeaLevelData && iceSeaLevelData.length > 0 && (
                 <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Melting Ice, Rising Seas">
-                  <p className="text-sm text-gray-400 mb-4">
-                    As Arctic sea ice extent declines, it signals broader ice loss across Greenland, Antarctica, and mountain glaciers – all of which contribute directly to sea level rise. While sea ice itself (floating on water) doesn&apos;t raise levels when it melts, its loss <span className="text-white font-medium">accelerates warming</span> through the ice-albedo feedback, driving further ice sheet melt from land-based glaciers.
-                  </p>
                   <SubSection title="Arctic ice extent in M km² (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
@@ -422,15 +426,15 @@ export default function SeaLevelsIcePage() {
                       </ResponsiveContainer>
                     </div>
                   </SubSection>
+                  <p className="text-sm text-gray-400 mt-3">
+                    Declining sea ice signals broader ice loss – and accelerates warming through the ice-albedo feedback loop.
+                  </p>
                 </SectionCard>
               )}
 
               {/* ── Temperature → Ice ── */}
               {tempIceData && tempIceData.length > 0 && (
                 <SectionCard icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Warming Destroys Ice">
-                  <p className="text-sm text-gray-400 mb-4">
-                    The mechanism is straightforward: higher temperatures melt ice. This chart shows how rising global temperatures have driven a steady decline in Arctic sea ice extent – a trend that feeds on itself as exposed dark ocean absorbs more solar energy, amplifying the warming that caused the melt in the first place.
-                  </p>
                   <SubSection title="Temperature anomaly (left axis) vs Arctic ice extent in M km² (right axis)">
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
@@ -454,15 +458,15 @@ export default function SeaLevelsIcePage() {
                       </ResponsiveContainer>
                     </div>
                   </SubSection>
+                  <p className="text-sm text-gray-400 mt-3">
+                    Higher temperatures melt ice, exposing dark ocean that absorbs more heat – a self-reinforcing cycle.
+                  </p>
                 </SectionCard>
               )}
 
               {/* ── Ocean Warming → Sea Level ── */}
               {oceanSeaLevelData && oceanSeaLevelData.length > 0 && (
                 <SectionCard icon={<Waves className="h-5 w-5 text-blue-400" />} title="Warmer Oceans, Higher Seas">
-                  <p className="text-sm text-gray-400 mb-4">
-                    Oceans absorb over <span className="text-white font-medium">90% of excess heat</span> trapped by greenhouse gases. As ocean water warms, it physically expands – a process called <span className="text-white font-medium">thermal expansion</span> – pushing sea levels up even without any additional meltwater. This is the single largest contributor to observed sea level rise to date.
-                  </p>
                   <SubSection title="Ocean surface anomaly (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
@@ -484,15 +488,15 @@ export default function SeaLevelsIcePage() {
                       </ResponsiveContainer>
                     </div>
                   </SubSection>
+                  <p className="text-sm text-gray-400 mt-3">
+                    Oceans absorb over 90% of excess heat. As water warms it expands – the single largest contributor to sea level rise.
+                  </p>
                 </SectionCard>
               )}
 
               {/* ── CO₂ → Sea Level ── */}
               {co2SeaLevelData && co2SeaLevelData.length > 0 && (
                 <SectionCard icon={<ArrowUp className="h-5 w-5 text-teal-400" />} title="Rising Carbon, Rising Seas">
-                  <p className="text-sm text-gray-400 mb-4">
-                    The chain of cause and effect begins with CO₂. Fossil fuel emissions trap heat, that heat warms oceans and melts ice, and both processes raise sea levels. Since satellite measurements began in 1993, global mean sea level has risen by over <span className="text-white font-medium">{data.seaLevel?.current.value.toFixed(0)} mm</span> – an accelerating trend with profound implications for coastal communities worldwide.
-                  </p>
                   <SubSection title="CO₂ concentration (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
@@ -514,6 +518,9 @@ export default function SeaLevelsIcePage() {
                       </ResponsiveContainer>
                     </div>
                   </SubSection>
+                  <p className="text-sm text-gray-400 mt-3">
+                    CO₂ traps heat, which warms oceans and melts ice – both pushing sea levels higher in an accelerating trend.
+                  </p>
                 </SectionCard>
               )}
 
@@ -524,9 +531,6 @@ export default function SeaLevelsIcePage() {
                 <>
                   <Divider icon={<ArrowUp className="h-5 w-5" />} title="Global Sea Level" />
                   <SectionCard icon={<ArrowUp className="h-5 w-5 text-teal-400" />} title="Global Mean Sea Level">
-                    <p className="text-sm text-gray-400 mb-4">
-                      Satellite altimetry has tracked global mean sea level since 1993, revealing an accelerating rise. The current level is approximately <span className="text-white font-medium">+{data.seaLevel.current.value.toFixed(0)} mm</span> above the 1993 baseline, rising at <span className="text-white font-medium">{data.seaLevel.rate}</span>. At this pace, sea levels could rise by 0.3–1.0 metres by 2100, threatening hundreds of millions of people in low-lying coastal areas.
-                    </p>
                     <SubSection title="Annual average sea level change (mm) – satellite era">
                       <SimpleYearlyChart
                         data={data.seaLevel.yearly}
@@ -537,6 +541,9 @@ export default function SeaLevelsIcePage() {
                         fillColor="#14b8a6"
                       />
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-3">
+                      Satellite altimetry has tracked sea level since 1993, revealing an accelerating rise driven by thermal expansion and ice melt.
+                    </p>
                   </SectionCard>
                 </>
               )}
@@ -547,9 +554,6 @@ export default function SeaLevelsIcePage() {
                   <Divider icon={<Snowflake className="h-5 w-5" />} title="Arctic Sea Ice" />
 
                   <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Arctic Sea Ice Extent">
-                    <p className="text-sm text-gray-400 mb-4">
-                      Arctic sea ice acts as a giant reflector, bouncing sunlight back into space. As it melts, the darker ocean absorbs more heat, accelerating warming in a dangerous feedback loop. Current extent is <span className="text-white font-medium">{data.arcticIce.current.extent.toFixed(1)} million km²</span>. Scientists project ice-free Arctic summers could occur within the next few decades.
-                    </p>
                     <SubSection title="Annual average sea ice extent (million km²)">
                       <SimpleYearlyChart
                         data={data.arcticIce.yearly}
@@ -560,6 +564,9 @@ export default function SeaLevelsIcePage() {
                         fillColor="#22d3ee"
                       />
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-3">
+                      Arctic ice reflects sunlight back into space. As it melts, darker ocean absorbs more heat – accelerating warming in a feedback loop.
+                    </p>
                   </SectionCard>
                 </>
               )}

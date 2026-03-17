@@ -80,13 +80,10 @@ interface PoleGlobeProps {
   landData: FeatureCollection;
   yearIdx: number;
   rotation: [number, number];
-  onPointerDown: (e: React.PointerEvent) => void;
-  onPointerMove: (e: React.PointerEvent) => void;
-  onPointerUp: (e: React.PointerEvent) => void;
   label: string;
 }
 
-function PoleGlobe({ canvasRef, iceData, landData, yearIdx, rotation, onPointerDown, onPointerMove, onPointerUp, label }: PoleGlobeProps) {
+function PoleGlobe({ canvasRef, iceData, landData, yearIdx, rotation, label }: PoleGlobeProps) {
   const currentYear = YEARS[yearIdx];
 
   // Render on canvas
@@ -147,11 +144,11 @@ function PoleGlobe({ canvasRef, iceData, landData, yearIdx, rotation, onPointerD
     if (geo) {
       ctx.beginPath();
       path(geo as any);
-      ctx.fillStyle = YEAR_COLORS[currentYear] || "#22d3ee";
+      ctx.fillStyle = "#e0f2fe";
       ctx.globalAlpha = 0.6;
       ctx.fill();
       ctx.globalAlpha = 1;
-      ctx.strokeStyle = STROKE_COLORS[currentYear] || "#22d3ee";
+      ctx.strokeStyle = "#bae6fd";
       ctx.lineWidth = 0.3;
       ctx.stroke();
     }
@@ -168,20 +165,12 @@ function PoleGlobe({ canvasRef, iceData, landData, yearIdx, rotation, onPointerD
     <div className="relative rounded-xl overflow-hidden bg-[#060d1a] flex-1 min-w-0">
       <canvas
         ref={canvasRef}
-        className="w-full cursor-grab active:cursor-grabbing"
-        style={{ aspectRatio: "1/1", touchAction: "none" }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        className="w-full"
+        style={{ aspectRatio: "1/1" }}
       />
       {/* Label */}
-      <div className="absolute top-2 left-2 z-10 bg-gray-950/70 backdrop-blur-sm border border-gray-700/50 rounded-md px-2.5 py-1">
-        <div className="text-[10px] text-gray-400 uppercase tracking-wider">{label}</div>
-      </div>
-      {/* Drag hint */}
-      <div className="absolute bottom-2 left-2 z-10 text-[9px] text-gray-600">
-        Drag to rotate
+      <div className="absolute top-1.5 left-1.5 z-10 bg-gray-950/70 backdrop-blur-sm border border-gray-700/50 rounded px-1.5 py-0.5">
+        <div className="text-[8px] text-gray-500 uppercase tracking-wider">{label}</div>
       </div>
     </div>
   );
@@ -198,11 +187,9 @@ export default function ArcticIceMap({ onYearChange }: { onYearChange?: (year: s
   const [loading, setLoading] = useState(true);
   const [yearIdx, setYearIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [arcticRot, setArcticRot] = useState<[number, number]>([0, -90]);
-  const [antarcticRot, setAntarcticRot] = useState<[number, number]>([0, 90]);
+  const [arcticRot] = useState<[number, number]>([0, -90]);
+  const [antarcticRot] = useState<[number, number]>([0, 90]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const arcticDragRef = useRef<{ x: number; y: number; rot: [number, number] } | null>(null);
-  const antarcticDragRef = useRef<{ x: number; y: number; rot: [number, number] } | null>(null);
 
   // Load data
   useEffect(() => {
@@ -239,42 +226,6 @@ export default function ArcticIceMap({ onYearChange }: { onYearChange?: (year: s
 
   useEffect(() => { return () => { if (intervalRef.current) clearInterval(intervalRef.current); }; }, []);
 
-  // Drag handlers – Arctic
-  const handleArcticDown = useCallback((e: React.PointerEvent) => {
-    arcticDragRef.current = { x: e.clientX, y: e.clientY, rot: [...arcticRot] as [number, number] };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  }, [arcticRot]);
-
-  const handleArcticMove = useCallback((e: React.PointerEvent) => {
-    if (!arcticDragRef.current) return;
-    const dx = e.clientX - arcticDragRef.current.x;
-    const dy = e.clientY - arcticDragRef.current.y;
-    setArcticRot([
-      arcticDragRef.current.rot[0] - dx * 0.3,
-      Math.max(-90, Math.min(0, arcticDragRef.current.rot[1] + dy * 0.3)),
-    ]);
-  }, []);
-
-  const handleArcticUp = useCallback(() => { arcticDragRef.current = null; }, []);
-
-  // Drag handlers – Antarctic
-  const handleAntarcticDown = useCallback((e: React.PointerEvent) => {
-    antarcticDragRef.current = { x: e.clientX, y: e.clientY, rot: [...antarcticRot] as [number, number] };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  }, [antarcticRot]);
-
-  const handleAntarcticMove = useCallback((e: React.PointerEvent) => {
-    if (!antarcticDragRef.current) return;
-    const dx = e.clientX - antarcticDragRef.current.x;
-    const dy = e.clientY - antarcticDragRef.current.y;
-    setAntarcticRot([
-      antarcticDragRef.current.rot[0] - dx * 0.3,
-      Math.max(0, Math.min(90, antarcticDragRef.current.rot[1] + dy * 0.3)),
-    ]);
-  }, []);
-
-  const handleAntarcticUp = useCallback(() => { antarcticDragRef.current = null; }, []);
-
   const currentYear = YEARS[yearIdx];
 
   if (loading) {
@@ -295,14 +246,6 @@ export default function ArcticIceMap({ onYearChange }: { onYearChange?: (year: s
 
   return (
     <div>
-      {/* Year badge – centred above globes */}
-      <div className="flex justify-center mb-3">
-        <div className="bg-gray-950/80 backdrop-blur-sm border border-gray-700 rounded-lg px-5 py-2 text-center">
-          <div className="text-xs text-gray-400 uppercase tracking-wider">September</div>
-          <div className="text-2xl font-bold font-mono text-cyan-400">{currentYear}</div>
-        </div>
-      </div>
-
       {/* Dual globes */}
       <div className="flex gap-3">
         <PoleGlobe
@@ -311,9 +254,6 @@ export default function ArcticIceMap({ onYearChange }: { onYearChange?: (year: s
           landData={landData}
           yearIdx={yearIdx}
           rotation={arcticRot}
-          onPointerDown={handleArcticDown}
-          onPointerMove={handleArcticMove}
-          onPointerUp={handleArcticUp}
           label="Arctic (North)"
         />
         <PoleGlobe
@@ -322,9 +262,6 @@ export default function ArcticIceMap({ onYearChange }: { onYearChange?: (year: s
           landData={landData}
           yearIdx={yearIdx}
           rotation={antarcticRot}
-          onPointerDown={handleAntarcticDown}
-          onPointerMove={handleAntarcticMove}
-          onPointerUp={handleAntarcticUp}
           label="Antarctic (South)"
         />
       </div>

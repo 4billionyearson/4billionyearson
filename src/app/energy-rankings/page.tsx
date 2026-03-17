@@ -146,9 +146,7 @@ export default function EnergyRankingsPage() {
             {/* Top 20 Renewable Energy (TWh) */}
             <SectionCard icon={<Sun className="h-5 w-5 text-emerald-400" />} title="Top 20 Renewable Energy Producers">
               <p className="text-sm text-gray-400 mb-4">
-                The countries producing the most renewable energy in absolute terms (TWh). Large economies dominate
-                because of their massive energy needs, but their investment signals where the global energy
-                transition is gathering pace.
+                The largest renewable energy producers in absolute terms (TWh). Large economies dominate due to scale, but their investment signals where the transition is gathering pace.
               </p>
               <Top10BarChart data={top10.top10RenewableTWh} label="Renewable Energy" unit="TWh" formatFn={formatTWh} />
             </SectionCard>
@@ -156,9 +154,7 @@ export default function EnergyRankingsPage() {
             {/* Top 20 Renewable Share (%) */}
             <SectionCard icon={<Globe className="h-5 w-5 text-green-400" />} title="Top 20 by Renewable Energy Share">
               <p className="text-sm text-gray-400 mb-4">
-                Countries with the highest share of renewables in their total energy mix. These nations are
-                leading the transition away from fossil fuels – many leveraging abundant hydro, geothermal,
-                or wind resources.
+                Countries with the highest share of renewables in their total energy mix, often leveraging abundant hydro, geothermal, or wind resources.
               </p>
               <Top10BarChart data={top10.top10RenewableShare} label="Renewable Share" unit="%"
                 formatFn={(v) => `${Math.round(v)}%`}
@@ -168,8 +164,7 @@ export default function EnergyRankingsPage() {
             {/* Top 20 Solar */}
             <SectionCard icon={<Sun className="h-5 w-5 text-yellow-400" />} title="Top 20 Solar Energy Producers">
               <p className="text-sm text-gray-400 mb-4">
-                Solar energy has experienced exponential growth over the past decade. China alone now produces
-                more solar energy than the rest of the world combined, followed by the US, India, and Japan.
+                Solar energy has experienced exponential growth over the past decade. These are the leading producers by total output (TWh).
               </p>
               <Top10BarChart data={top10.top10Solar} label="Solar Energy" unit="TWh" formatFn={formatTWh} />
             </SectionCard>
@@ -177,8 +172,7 @@ export default function EnergyRankingsPage() {
             {/* Top 20 Wind */}
             <SectionCard icon={<Wind className="h-5 w-5 text-cyan-400" />} title="Top 20 Wind Energy Producers">
               <p className="text-sm text-gray-400 mb-4">
-                Wind power is the second-largest renewable source globally. China and the US lead by a wide margin,
-                with European nations punching above their weight thanks to offshore wind investment.
+                Wind power is the second-largest renewable source globally. Ranked by total output (TWh).
               </p>
               <Top10BarChart data={top10.top10Wind} label="Wind Energy" unit="TWh" formatFn={formatTWh} />
             </SectionCard>
@@ -186,9 +180,7 @@ export default function EnergyRankingsPage() {
             {/* Cleanest Grids */}
             <SectionCard icon={<Zap className="h-5 w-5 text-green-400" />} title="Cleanest Electricity Grids">
               <p className="text-sm text-gray-400 mb-4">
-                Countries with the lowest carbon intensity of electricity (gCO₂/kWh). These nations have
-                decarbonised their power grids through a combination of hydro, nuclear, wind, and solar –
-                providing a model for the rest of the world.
+                Countries with the lowest carbon intensity of electricity (gCO₂/kWh), typically through a mix of hydro, nuclear, wind, and solar.
               </p>
               <Top10BarChart data={top10.cleanestGrids} label="Carbon Intensity" unit="gCO₂/kWh"
                 formatFn={(v) => `${Math.round(v)}`} />
@@ -197,9 +189,7 @@ export default function EnergyRankingsPage() {
             {/* Most Fossil-Dependent */}
             <SectionCard icon={<Flame className="h-5 w-5 text-red-400" />} title="Most Fossil-Dependent Nations">
               <p className="text-sm text-gray-400 mb-4">
-                Countries with the highest share of fossil fuels in their energy mix. These economies face
-                the biggest challenge in transitioning to clean energy, often due to abundant domestic
-                oil, gas, or coal reserves.
+                Countries most reliant on fossil fuels, often due to abundant domestic oil, gas, or coal reserves.
               </p>
               <Top10BarChart data={top10.mostFossil} label="Fossil Share" unit="%"
                 formatFn={(v) => `${Math.round(v)}%`}

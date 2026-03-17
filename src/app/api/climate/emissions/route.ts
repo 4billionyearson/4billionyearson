@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:emissions:v1';
+const CACHE_KEY = 'climate:emissions:v2';
 
 // OWID indicator IDs (Global Carbon Project via OWID)
 const INDICATORS = {
@@ -60,6 +60,7 @@ const EXCLUDE_NAMES = new Set([
   'International shipping', 'Kuwaiti Oil Fires',
   'Africa (GCP)', 'Asia (GCP)', 'Central America (GCP)', 'Europe (GCP)',
   'Middle East (GCP)', 'North America (GCP)', 'Oceania (GCP)', 'South America (GCP)',
+  'OECD (GCP)', 'Non-OECD (GCP)',
 ]);
 
 interface CountryYearly {
@@ -81,7 +82,8 @@ function buildCountryData(
   const byEntity = new Map<number, { year: number; value: number }[]>();
   for (const r of rows) {
     if (!entityMap[r.entityId]) continue;
-    if (EXCLUDE_NAMES.has(entityMap[r.entityId])) continue;
+    const name = entityMap[r.entityId];
+    if (EXCLUDE_NAMES.has(name) || name.includes('(GCP)') || name.includes('(excl.')) continue;
     if (!byEntity.has(r.entityId)) byEntity.set(r.entityId, []);
     byEntity.get(r.entityId)!.push({ year: r.year, value: r.value });
   }

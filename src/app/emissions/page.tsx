@@ -39,8 +39,8 @@ const CHART_MARGIN = { top: 10, right: 0, left: -15, bottom: 0 };
 const BRUSH_HEIGHT = 30;
 
 const formatYAxis = (v: number) =>
-  v >= 1_000_000_000 ? `${(v / 1_000_000_000).toFixed(1)}B`
-  : v >= 1_000_000 ? `${(v / 1_000_000).toFixed(1)}M`
+  v >= 1_000_000_000 ? `${(v / 1_000_000_000).toFixed(0)}B`
+  : v >= 1_000_000 ? `${(v / 1_000_000).toFixed(0)}M`
   : v >= 1_000 ? `${(v / 1_000).toFixed(0)}K`
   : String(v);
 
@@ -256,32 +256,26 @@ export default function EmissionsPage() {
 
               {/* ── Top 10 Annual ── */}
               <SectionCard icon={<Factory className="h-5 w-5 text-red-400" />} title="Top 10 Annual CO₂ Emitters">
-                <p className="text-sm text-gray-400 mb-4">
-                  The top 10 countries are responsible for over <span className="text-white font-medium">two-thirds</span> of 
-                  global annual CO₂ emissions. China and the United States together account for nearly half of the world&apos;s total 
-                  output, with India rapidly rising as the third-largest emitter.
-                </p>
                 <Top10BarChart data={data.top10Annual} dataKey="annual" tooltip={DarkTooltip} />
+                <p className="text-xs text-gray-500 mt-4">
+                  The top 10 countries produce over two-thirds of global annual CO₂ emissions.
+                </p>
               </SectionCard>
 
               {/* ── Top 10 Per Capita ── */}
               <SectionCard icon={<Users className="h-5 w-5 text-amber-400" />} title="Top 10 Emitters Per Capita">
-                <p className="text-sm text-gray-400 mb-4">
-                  Per-capita emissions reveal a different story. Small, wealthy, fossil-fuel-rich nations often top this list, 
-                  while the biggest absolute emitters may fall lower. This metric reflects individual consumption patterns 
-                  and the carbon intensity of each economy.
-                </p>
                 <Top10BarChart data={data.top10PerCapita} dataKey="perCapita" tooltip={PerCapTooltip} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Per-capita figures highlight small, fossil-fuel-rich nations — the biggest absolute emitters often rank lower here.
+                </p>
               </SectionCard>
 
               {/* ── Top 10 Cumulative ── */}
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-yellow-400" />} title="Top 10 Cumulative CO₂ Emitters">
-                <p className="text-sm text-gray-400 mb-4">
-                  Cumulative emissions show the <span className="text-white font-medium">total historical pollution burden</span> each 
-                  country has contributed to the atmosphere. CO₂ stays in the atmosphere for centuries, so countries that 
-                  industrialised earliest carry a disproportionate share of responsibility for today&apos;s warming.
-                </p>
                 <Top10BarChart data={data.top10Cumulative} dataKey="cumulative" tooltip={DarkTooltip} />
+                <p className="text-xs text-gray-500 mt-4">
+                  CO₂ persists for centuries, so early-industrialised nations carry a disproportionate share of the total warming burden.
+                </p>
               </SectionCard>
 
               {/* ═══ GLOBAL TRENDS ═══ */}
@@ -289,12 +283,6 @@ export default function EmissionsPage() {
 
               {/* ── Global Annual ── */}
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-red-400" />} title="Global Annual CO₂ Emissions">
-                <p className="text-sm text-gray-400 mb-4">
-                  Global CO₂ emissions have risen from under 5 billion tonnes in 1950 to over 37 billion tonnes today. 
-                  Despite international pledges, the upward trajectory has shown no sign of reversing. 
-                  To limit warming to 1.5°C, emissions must roughly <span className="text-white font-medium">halve by 2030</span> and 
-                  reach net zero by 2050.
-                </p>
                 <div className="h-[380px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data.worldAnnual} margin={CHART_MARGIN}>
@@ -319,16 +307,14 @@ export default function EmissionsPage() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  To limit warming to 1.5 °C, global emissions must roughly halve by 2030 and reach net zero by 2050.
+                </p>
               </SectionCard>
 
               {/* ── Top 5 Country Comparison Over Time ── */}
               {data.top5History.length > 0 && (
                 <SectionCard icon={<Factory className="h-5 w-5 text-orange-400" />} title="Top 5 Emitters Over Time">
-                  <p className="text-sm text-gray-400 mb-4">
-                    How the world&apos;s biggest emitters have evolved since 1950. China&apos;s dramatic rise from the 2000s 
-                    and the relative stabilisation of Western emissions tells a story of shifting global economic power 
-                    and industrial development.
-                  </p>
                   <div className="h-[380px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={data.top5History} margin={CHART_MARGIN}>
@@ -365,16 +351,14 @@ export default function EmissionsPage() {
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
+                  <p className="text-xs text-gray-500 mt-4">
+                    How the biggest emitters have evolved since 1950, showing shifting patterns of industrial development.
+                  </p>
                 </SectionCard>
               )}
 
               {/* ── Global Cumulative ── */}
               <SectionCard icon={<Globe className="h-5 w-5 text-yellow-400" />} title="Cumulative Global CO₂ Emissions">
-                <p className="text-sm text-gray-400 mb-4">
-                  Since the industrial revolution, humanity has released over <span className="text-white font-medium">{formatTonnes(data.stats.latestCumulative)}</span> of 
-                  CO₂ into the atmosphere. This cumulative burden determines long-term warming – even if emissions 
-                  stopped today, the CO₂ already released would continue warming the planet for centuries.
-                </p>
                 <div className="h-[380px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data.worldCumulative} margin={CHART_MARGIN}>
@@ -399,9 +383,10 @@ export default function EmissionsPage() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  Cumulative CO₂ determines long-term warming &ndash; even if emissions stopped today, existing CO₂ would warm the planet for centuries.
+                </p>
               </SectionCard>
-
-              {/* ─── Attribution ──────────────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
                 <p>• CO₂ emissions: <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>

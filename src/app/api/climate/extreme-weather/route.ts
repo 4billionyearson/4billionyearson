@@ -59,7 +59,7 @@ async function fetchGDACS() {
     const p = f.properties;
     return {
       type: p.eventtype,
-      name: p.name,
+      name: (p.name || '').replace(/\s*\[GDACS\]\s*/g, ' ').trim(),
       alertLevel: p.alertlevel,
       country: p.country || '',
       fromDate: p.fromdate,
