@@ -23,18 +23,40 @@ interface Section {
   title: string;
   tagline: string;
   color: string;       // hex color e.g. "#D0A65E"
-  colorEnd?: string;   // optional second gradient stop
   icon: React.ReactNode;
   links: SubLink[];
 }
 
 const SECTIONS: Section[] = [
   {
+    id: "ai",
+    title: "Artificial Intelligence",
+    tagline: "Understanding the AI revolution",
+    color: "#89DEFD",
+    icon: <Brain className="h-6 w-6" />,
+    links: [
+      { href: "/ai-explained", label: "AI Explained", icon: <Cpu className="h-4 w-4" />, desc: "Plain-English guide to AI" },
+      { href: "/category/artificial-intelligence", label: "Blog", icon: <Newspaper className="h-4 w-4" />, desc: "Latest articles" },
+    ],
+  },
+  {
+    id: "energy",
+    title: "Renewable Energy",
+    tagline: "Tracking the global shift to clean power",
+    color: "#D1E368",
+    icon: <Zap className="h-6 w-6" />,
+    links: [
+      { href: "/energy", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
+      { href: "/energy-rankings", label: "Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
+      { href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
+      { href: "/category/renewable-energy", label: "Blog", icon: <Newspaper className="h-4 w-4" />, desc: "Latest articles" },
+    ],
+  },
+  {
     id: "climate",
     title: "Climate Change",
     tagline: "Live data on global warming, ice loss, and extreme weather",
     color: "#D0A65E",
-    colorEnd: "#E8C87A",
     icon: <Globe className="h-6 w-6" />,
     links: [
       { href: "/climate-dashboard", label: "Global Climate Data", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Temperature anomalies & CO₂ trends" },
@@ -48,37 +70,10 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    id: "energy",
-    title: "Renewable Energy",
-    tagline: "Tracking the global shift to clean power",
-    color: "#D1E368",
-    colorEnd: "#A8C94F",
-    icon: <Zap className="h-6 w-6" />,
-    links: [
-      { href: "/energy", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
-      { href: "/energy-rankings", label: "Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
-      { href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
-      { href: "/category/renewable-energy", label: "Blog", icon: <Newspaper className="h-4 w-4" />, desc: "Latest articles" },
-    ],
-  },
-  {
-    id: "ai",
-    title: "Artificial Intelligence",
-    tagline: "Understanding the AI revolution",
-    color: "#89DEFD",
-    colorEnd: "#5EC4E8",
-    icon: <Brain className="h-6 w-6" />,
-    links: [
-      { href: "/ai-explained", label: "AI Explained", icon: <Cpu className="h-4 w-4" />, desc: "Plain-English guide to AI" },
-      { href: "/category/artificial-intelligence", label: "Blog", icon: <Newspaper className="h-4 w-4" />, desc: "Latest articles" },
-    ],
-  },
-  {
     id: "biotech",
     title: "Biotechnology",
     tagline: "Gene editing, mRNA, and the future of medicine",
     color: "#D26742",
-    colorEnd: "#E8845F",
     icon: <Dna className="h-6 w-6" />,
     links: [
       { href: "/biotech-explained", label: "Biotech Explained", icon: <Microscope className="h-4 w-4" />, desc: "Plain-English guide to biotech" },
@@ -116,7 +111,6 @@ function Badge({ type }: { type: "live" | "monthly" | "annual" }) {
 
 function SectionCard({ section, isExpanded, onToggle }: { section: Section; isExpanded: boolean; onToggle: () => void }) {
   const c = section.color;
-  const cEnd = section.colorEnd || c;
 
   return (
     <div
@@ -129,10 +123,10 @@ function SectionCard({ section, isExpanded, onToggle }: { section: Section; isEx
       `}
       style={isExpanded ? { borderColor: `${c}66`, boxShadow: `0 4px 20px ${c}22` } : undefined}
     >
-      {/* Gradient accent bar at top */}
+      {/* Solid accent bar at top */}
       <div
         className={`h-1 w-full transition-opacity duration-500 ${isExpanded ? "opacity-100" : "opacity-40"}`}
-        style={{ background: `linear-gradient(to right, ${c}, ${cEnd})` }}
+        style={{ backgroundColor: c }}
       />
 
       {/* Header – always visible */}
