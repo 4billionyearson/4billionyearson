@@ -22,11 +22,8 @@ interface Section {
   id: string;
   title: string;
   tagline: string;
-  accentFrom: string;
-  accentTo: string;
-  accentText: string;
-  accentBorder: string;
-  accentGlow: string;
+  color: string;       // hex color e.g. "#D0A65E"
+  colorEnd?: string;   // optional second gradient stop
   icon: React.ReactNode;
   links: SubLink[];
 }
@@ -36,11 +33,8 @@ const SECTIONS: Section[] = [
     id: "climate",
     title: "Climate Change",
     tagline: "Live data on global warming, ice loss, and extreme weather",
-    accentFrom: "from-sky-400",
-    accentTo: "to-teal-400",
-    accentText: "text-sky-400",
-    accentBorder: "border-sky-500/40",
-    accentGlow: "shadow-sky-500/20",
+    color: "#D0A65E",
+    colorEnd: "#E8C87A",
     icon: <Globe className="h-6 w-6" />,
     links: [
       { href: "/climate-dashboard", label: "Global Climate Data", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Temperature anomalies & CO₂ trends" },
@@ -57,11 +51,8 @@ const SECTIONS: Section[] = [
     id: "energy",
     title: "Renewable Energy",
     tagline: "Tracking the global shift to clean power",
-    accentFrom: "from-emerald-400",
-    accentTo: "to-lime-400",
-    accentText: "text-emerald-400",
-    accentBorder: "border-emerald-500/40",
-    accentGlow: "shadow-emerald-500/20",
+    color: "#D1E368",
+    colorEnd: "#A8C94F",
     icon: <Zap className="h-6 w-6" />,
     links: [
       { href: "/energy", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
@@ -74,11 +65,8 @@ const SECTIONS: Section[] = [
     id: "ai",
     title: "Artificial Intelligence",
     tagline: "Understanding the AI revolution",
-    accentFrom: "from-violet-400",
-    accentTo: "to-fuchsia-400",
-    accentText: "text-violet-400",
-    accentBorder: "border-violet-500/40",
-    accentGlow: "shadow-violet-500/20",
+    color: "#89DEFD",
+    colorEnd: "#5EC4E8",
     icon: <Brain className="h-6 w-6" />,
     links: [
       { href: "/ai-explained", label: "AI Explained", icon: <Cpu className="h-4 w-4" />, desc: "Plain-English guide to AI" },
@@ -89,11 +77,8 @@ const SECTIONS: Section[] = [
     id: "biotech",
     title: "Biotechnology",
     tagline: "Gene editing, mRNA, and the future of medicine",
-    accentFrom: "from-fuchsia-400",
-    accentTo: "to-rose-400",
-    accentText: "text-fuchsia-400",
-    accentBorder: "border-fuchsia-500/40",
-    accentGlow: "shadow-fuchsia-500/20",
+    color: "#D26742",
+    colorEnd: "#E8845F",
     icon: <Dna className="h-6 w-6" />,
     links: [
       { href: "/biotech-explained", label: "Biotech Explained", icon: <Microscope className="h-4 w-4" />, desc: "Plain-English guide to biotech" },
@@ -130,25 +115,35 @@ function Badge({ type }: { type: "live" | "monthly" | "annual" }) {
 /* ─── Section card ───────────────────────────────────────────────────────── */
 
 function SectionCard({ section, isExpanded, onToggle }: { section: Section; isExpanded: boolean; onToggle: () => void }) {
+  const c = section.color;
+  const cEnd = section.colorEnd || c;
+
   return (
     <div
       className={`
         relative rounded-2xl border transition-all duration-500 ease-out overflow-hidden
         ${isExpanded
-          ? `${section.accentBorder} shadow-lg ${section.accentGlow} bg-gray-950/95`
+          ? "bg-gray-950/95"
           : "border-gray-800/60 bg-gray-950/70 hover:border-gray-700/80 hover:bg-gray-950/90"
         }
       `}
+      style={isExpanded ? { borderColor: `${c}66`, boxShadow: `0 4px 20px ${c}22` } : undefined}
     >
       {/* Gradient accent bar at top */}
-      <div className={`h-0.5 w-full bg-gradient-to-r ${section.accentFrom} ${section.accentTo} transition-opacity duration-500 ${isExpanded ? "opacity-100" : "opacity-30 group-hover:opacity-60"}`} />
+      <div
+        className={`h-1 w-full transition-opacity duration-500 ${isExpanded ? "opacity-100" : "opacity-40"}`}
+        style={{ background: `linear-gradient(to right, ${c}, ${cEnd})` }}
+      />
 
       {/* Header – always visible */}
       <button
         onClick={onToggle}
         className="w-full text-left px-4 py-4 md:px-5 md:py-5 flex items-start gap-3 group"
       >
-        <div className={`mt-0.5 ${section.accentText} transition-transform duration-300 ${isExpanded ? "scale-110" : "group-hover:scale-105"}`}>
+        <div
+          className={`mt-0.5 transition-transform duration-300 ${isExpanded ? "scale-110" : "group-hover:scale-105"}`}
+          style={{ color: c }}
+        >
           {section.icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -174,7 +169,7 @@ function SectionCard({ section, isExpanded, onToggle }: { section: Section; isEx
                 href={link.href}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors group/link"
               >
-                <span className={`${section.accentText} opacity-60 group-hover/link:opacity-100 transition-opacity`}>
+                <span className="opacity-60 group-hover/link:opacity-100 transition-opacity" style={{ color: section.color }}>
                   {link.icon}
                 </span>
                 <div className="flex-1 min-w-0">
