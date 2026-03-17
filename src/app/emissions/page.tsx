@@ -99,7 +99,7 @@ const PerCapTooltip = ({ active, payload, label }: any) => {
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
+    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
@@ -184,7 +184,7 @@ export default function EmissionsPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
             <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: "linear-gradient(to right, #ef4444, #f59e0b, #eab308)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               Global Emissions
             </p>
@@ -203,7 +203,7 @@ export default function EmissionsPage() {
 
           {/* ─── Loading / Error ───────────────────────────────────── */}
           {loading && (
-            <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4">
+            <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border-2 border-[#D0A65E] flex flex-col items-center gap-4">
               <Loader2 className="h-10 w-10 animate-spin text-red-400" />
               <p className="text-gray-400">Fetching emissions data from Our World in Data...</p>
             </div>
@@ -218,7 +218,7 @@ export default function EmissionsPage() {
           {data && (
             <>
               {/* ─── Stat Cards ───────────────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-green-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Key Facts ({data.stats.latestAnnualYear})</h2>
@@ -408,7 +408,7 @@ export default function EmissionsPage() {
                   Cumulative CO₂ determines long-term warming &ndash; even if emissions stopped today, existing CO₂ would warm the planet for centuries.
                 </p>
               </SectionCard>
-              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
+              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D0A65E] text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
                 <p>• CO₂ emissions: <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>
                 <p>• Per capita emissions: <a href="https://ourworldindata.org/per-capita-co2" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>

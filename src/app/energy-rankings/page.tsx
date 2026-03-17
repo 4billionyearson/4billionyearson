@@ -40,7 +40,7 @@ const RANK_COLORS = [
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
+    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D2E369]">
       <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
@@ -112,7 +112,7 @@ export default function EnergyRankingsPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D2E369] p-4 md:p-6 shadow-xl">
             <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4 bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
               Global Rankings
             </p>
@@ -129,14 +129,14 @@ export default function EnergyRankingsPage() {
           </div>
 
         {loading && (
-          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4">
+          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border-2 border-[#D2E369] flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
             <p className="text-gray-400 text-sm">Loading global rankings…</p>
           </div>
         )}
 
         {!loading && !top10 && (
-          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 text-center">
+          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border-2 border-[#D2E369] text-center">
             <p className="text-gray-400">Unable to load ranking data. Please try again later.</p>
           </div>
         )}
@@ -197,7 +197,7 @@ export default function EnergyRankingsPage() {
             </SectionCard>
 
             {/* Attribution */}
-            <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
+            <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D2E369] text-sm text-gray-400 space-y-1.5">
               <p className="font-semibold text-gray-300">Data sources & attribution:</p>
               <p>• Energy data: <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Energy Institute Statistical Review</a> (CC-BY)</p>
               <p>• Electricity data: <a href="https://ember-climate.org/data/data-tools/data-explorer/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Ember Global Electricity Review</a> (CC-BY)</p>

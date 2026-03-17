@@ -367,7 +367,7 @@ export default function PlanetaryBoundariesPage() {
       <section>
         <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
-         <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+         <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
           <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: 'linear-gradient(to right, #f87171, #fbbf24, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Climate Change
           </p>
@@ -461,7 +461,7 @@ export default function PlanetaryBoundariesPage() {
 
           {/* ── Temperature Chart (separate card) ── */}
           {liveData?.temperature?.history && liveData.temperature.history.length > 5 && (
-            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <Thermometer className="w-5 h-5 text-orange-400" />
                 <h3 className="text-white font-semibold font-mono">
@@ -707,7 +707,7 @@ export default function PlanetaryBoundariesPage() {
       </div>
 
       {/* ── Framework context ────────────────────────────────────────────── */}
-      <div className="mt-6 bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+      <div className="mt-6 bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
           <div>
             <h2 className="text-2xl font-bold font-mono text-white mb-6">
               About the Planetary Boundaries Framework

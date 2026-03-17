@@ -76,7 +76,7 @@ export default function AIExplainedPage() {
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
             <div className="flex items-center gap-3 mb-4">
               <BookOpen className="h-6 w-6 text-[#88DDFC]" />
               <p className="text-sm uppercase tracking-[0.3em] text-[#88DDFC] font-mono">Explainer</p>
@@ -93,11 +93,11 @@ export default function AIExplainedPage() {
           </div>
 
           {/* Key facts */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
             <div className="grid gap-3">
               {KEY_FACTS.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60">
+                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#88DDFC]/60">
                   {icon}
                   <p className="text-sm text-gray-300 leading-relaxed">{text}</p>
                 </div>
@@ -106,7 +106,7 @@ export default function AIExplainedPage() {
           </section>
 
           {/* How AI works */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">How Modern AI Works</h2>
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
@@ -128,7 +128,7 @@ export default function AIExplainedPage() {
           </section>
 
           {/* The AI landscape */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">The AI Landscape in 2025–26</h2>
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
@@ -143,7 +143,7 @@ export default function AIExplainedPage() {
                   { title: "AI regulation", desc: "The EU AI Act, US executive orders, and UK AI Safety Institute mark the beginning of serious AI governance. Balancing innovation with safety is the central policy challenge." },
                   { title: "Scaling debate", desc: "Whether simply making models bigger continues to improve them ('scaling laws') or whether new architectures are needed is one of the biggest open questions in the field." },
                 ].map(({ title, desc }) => (
-                  <div key={title} className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60">
+                  <div key={title} className="bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#88DDFC]/60">
                     <p className="text-sm font-semibold text-[#88DDFC] mb-1">{title}</p>
                     <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
                   </div>
@@ -153,7 +153,7 @@ export default function AIExplainedPage() {
           </section>
 
           {/* Glossary */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Glossary</h2>
             <div className="divide-y divide-gray-800/60">
               {GLOSSARY.map(({ term, definition }) => (
@@ -166,7 +166,7 @@ export default function AIExplainedPage() {
           </section>
 
           {/* Explore */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Explore AI Content</h2>
             <p className="text-sm text-gray-400 mb-4">Read our latest analysis and reporting on artificial intelligence:</p>
             <div className="grid sm:grid-cols-2 gap-3">
@@ -176,7 +176,7 @@ export default function AIExplainedPage() {
                 <a
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60 hover:border-gray-600 transition-colors group"
+                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#88DDFC]/60 hover:border-gray-600 transition-colors group"
                 >
                   <ArrowUpRight className={`h-4 w-4 ${color} flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
                   <div>
@@ -189,7 +189,7 @@ export default function AIExplainedPage() {
           </section>
 
           {/* Further reading */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Further Reading</h2>
             <div className="grid gap-3">
               {RESOURCES.map(({ name, url, desc }) => (
@@ -198,7 +198,7 @@ export default function AIExplainedPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60 hover:border-[#88DDFC]/30 transition-colors group"
+                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#88DDFC]/60 hover:border-[#88DDFC]/30 transition-colors group"
                 >
                   <ExternalLink className="h-4 w-4 text-[#88DDFC] flex-shrink-0 mt-0.5" />
                   <div>

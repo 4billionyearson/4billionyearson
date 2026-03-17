@@ -257,7 +257,7 @@ function mergeMetricData(regionYearly: any[], countryYearly: any[]): any[] {
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
+    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
@@ -537,7 +537,7 @@ export default function ClimateDashboard() {
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* ─── Header & Search ──────────────────────────────────────── */}
-        <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-800">
+        <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
           <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
             Local & Global{" "}
             <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
@@ -559,7 +559,7 @@ export default function ClimateDashboard() {
                     onChange={(e) => handleInputChange(e.target.value)}
                     onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
                     placeholder="Search..."
-                    className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    className="w-full pl-9 pr-4 py-1.5 rounded-lg border-2 border-[#D0A65E] bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                     autoComplete="off"
                   />
                 </div>
@@ -627,7 +627,7 @@ export default function ClimateDashboard() {
 
         {/* ─── Loading ──────────────────────────────────────────────── */}
         {loading && (
-          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4">
+          <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border-2 border-[#D0A65E] flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-blue-400" />
             <p className="text-gray-400">Loading climate data – this may take a moment for first-time locations...</p>
           </div>
@@ -1019,7 +1019,7 @@ export default function ClimateDashboard() {
                 )}
 
             {/* ─── Attribution ───────────────────────────────────────── */}
-            <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
+            <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D0A65E] text-sm text-gray-400 space-y-1.5">
               <p className="font-semibold text-gray-300">Data sources & attribution:</p>
               {countryData && <p>• Country temperatures: <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Copernicus ERA5 reanalysis</a> (CC-BY)</p>}
               {usStateData && <p>• US state data: <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA National Centers for Environmental Information</a> (public domain)</p>}

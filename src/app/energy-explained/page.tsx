@@ -75,7 +75,7 @@ export default function EnergyExplainedPage() {
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <div className="flex items-center gap-3 mb-4">
               <BookOpen className="h-6 w-6 text-[#D2E369]" />
               <p className="text-sm uppercase tracking-[0.3em] text-[#D2E369] font-mono">Explainer</p>
@@ -92,11 +92,11 @@ export default function EnergyExplainedPage() {
           </div>
 
           {/* Key facts */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
             <div className="grid gap-3">
               {KEY_FACTS.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60">
+                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#D2E369]/60">
                   {icon}
                   <p className="text-sm text-gray-300 leading-relaxed">{text}</p>
                 </div>
@@ -105,7 +105,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* How energy works */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">How Global Energy Works</h2>
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
@@ -127,7 +127,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* Units explained */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Understanding Energy Units</h2>
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
@@ -160,7 +160,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* Glossary */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Glossary</h2>
             <div className="divide-y divide-gray-800/60">
               {GLOSSARY.map(({ term, definition }) => (
@@ -173,7 +173,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* Explore our data pages */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Explore Energy Data</h2>
             <p className="text-sm text-gray-400 mb-4">See these concepts in action with real data on our dashboard pages:</p>
             <div className="grid sm:grid-cols-2 gap-3">
@@ -186,7 +186,7 @@ export default function EnergyExplainedPage() {
                 <a
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60 hover:border-gray-600 transition-colors group"
+                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#D2E369]/60 hover:border-gray-600 transition-colors group"
                 >
                   <ArrowUpRight className={`h-4 w-4 ${color} flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
                   <div>
@@ -199,7 +199,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* Further reading */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-800">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Further Reading</h2>
             <div className="grid gap-3">
               {RESOURCES.map(({ name, url, desc }) => (
@@ -208,7 +208,7 @@ export default function EnergyExplainedPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-800/60 hover:border-[#D2E369]/30 transition-colors group"
+                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#D2E369]/60 hover:border-[#D2E369]/30 transition-colors group"
                 >
                   <ExternalLink className="h-4 w-4 text-[#D2E369] flex-shrink-0 mt-0.5" />
                   <div>

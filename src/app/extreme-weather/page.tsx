@@ -119,7 +119,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
+    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
@@ -742,7 +742,7 @@ export default function ExtremeWeatherPage() {
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* ─── Hero ─────────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
             <p
               className="text-sm uppercase tracking-[0.3em] font-mono mb-4"
               style={{
@@ -801,7 +801,7 @@ export default function ExtremeWeatherPage() {
           {data && stats && (
             <>
               {/* ─── Summary Stats ──────────────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-orange-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Key Facts ({stats.latest?.year || "–"})</h2>
@@ -927,7 +927,7 @@ export default function ExtremeWeatherPage() {
               <Top10Countries />
 
               {/* ─── Data Sources ──────────────────────────────────── */}
-              <div className="bg-gray-950/70 rounded-xl border border-gray-800/50 p-4 text-xs text-gray-500 space-y-1">
+              <div className="bg-gray-950/70 rounded-xl border-2 border-[#D0A65E]/50 p-4 text-xs text-gray-500 space-y-1">
                 <div className="flex items-center gap-1.5 mb-2 text-gray-400 font-semibold">
                   <Link2 className="w-3.5 h-3.5" /> Data Sources
                 </div>

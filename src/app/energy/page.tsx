@@ -123,7 +123,7 @@ const DarkTooltip = ({ active, payload, label }: any) => {
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-800">
+    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D2E369]">
       <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
@@ -156,7 +156,7 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
 
 function StatCard({ label, value, unit, color, icon, countryValue, countryName, baseLabel = 'Global', subtitle }: { label: string; value: string; unit?: string; color: string; icon: React.ReactNode; countryValue?: string; countryName?: string; baseLabel?: string; subtitle?: string }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center shadow-xl">
+    <div className="bg-gray-950/90 backdrop-blur-md border-2 border-[#D2E369] rounded-xl p-4 flex flex-col items-center text-center shadow-xl">
       <div className={`mb-2 ${color}`}>{icon}</div>
       {countryValue && countryName ? (
         <>
@@ -272,7 +272,7 @@ function LocationSearch({ onSelect, loading, error }: {
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
             placeholder="Search..."
-            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-800 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+            className="w-full pl-9 pr-4 py-1.5 rounded-lg border-2 border-[#D2E369] bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
             autoComplete="off"
           />
         </div>
@@ -1246,7 +1246,7 @@ export default function EnergyPage() {
       <main>
         <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 font-sans text-gray-200">
           <div className="max-w-7xl mx-auto">
-            <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border border-gray-800 flex flex-col items-center gap-4 mt-6">
+            <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border-2 border-[#D2E369] flex flex-col items-center gap-4 mt-6">
               <Loader2 className="h-10 w-10 animate-spin text-emerald-400" />
               <p className="text-gray-400">Loading global energy data...</p>
             </div>
@@ -1279,7 +1279,7 @@ export default function EnergyPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ───────────────────────────────────────────────── */}
-          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border border-gray-800">
+          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
               Local & Global{" "}
               <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
@@ -1401,7 +1401,7 @@ export default function EnergyPage() {
           })()}
 
           {/* ─── Attribution ─────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border border-gray-800 text-sm text-gray-400 space-y-1.5">
+          <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D2E369] text-sm text-gray-400 space-y-1.5">
             <p className="font-semibold text-gray-300">Data sources & attribution:</p>
             <p>• Energy data: <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Energy Institute Statistical Review</a> (CC-BY)</p>
             <p>• Electricity data: <a href="https://ember-climate.org/data/data-tools/data-explorer/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Ember Global Electricity Review</a> (CC-BY)</p>
