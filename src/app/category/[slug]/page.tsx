@@ -2,9 +2,17 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Brain, Zap, Globe, Dna } from 'lucide-react'
 import { getCategoryBySlug, getPostsByCategory, getAllCategories } from '@/lib/api'
 import Container from '@/app/_components/container'
 import DateFormatter from '@/app/_components/date-formatter'
+
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  'artificial-intelligence': <Brain className="h-7 w-7 md:h-9 md:w-9" />,
+  'renewable-energy': <Zap className="h-7 w-7 md:h-9 md:w-9" />,
+  'climate-change': <Globe className="h-7 w-7 md:h-9 md:w-9" />,
+  'biotechnology': <Dna className="h-7 w-7 md:h-9 md:w-9" />,
+}
 
 export const revalidate = 60;
 
@@ -31,16 +39,16 @@ export default async function CategoryPage({ params }: Params) {
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
-        <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl shadow-xl border-2 overflow-hidden" style={{ borderColor: accentHex }}>
+        <div className="rounded-2xl shadow-xl border-2 overflow-hidden" style={{ borderColor: accentHex }}>
           <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: accentHex }}>
-              <h1 className={`text-3xl md:text-4xl font-extrabold mb-3 drop-shadow-sm font-mono tracking-tight ${slug === 'biotechnology' ? 'text-[#D26742]' : slug === 'renewable-energy' ? 'text-[#2C5263]' : slug === 'climate-change' ? 'text-[#745630]' : 'text-[#FFF5E7]'}`}>{category.title}</h1>
+              <h1 className={`text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight flex items-center gap-2 ${slug === 'biotechnology' ? 'text-[#D26742]' : slug === 'renewable-energy' ? 'text-[#2C5263]' : slug === 'climate-change' ? 'text-[#745630]' : 'text-[#FFF5E7]'}`}>{CATEGORY_ICONS[slug]}{category.title}</h1>
               {(category.description || fallbackDescriptions[slug]) && (
-                <p className={`text-sm md:text-lg font-medium max-w-3xl drop-shadow-sm ${slug === 'biotechnology' ? 'text-[#D26742]' : slug === 'renewable-energy' ? 'text-[#2C5263]' : slug === 'climate-change' ? 'text-[#745630]' : 'text-[#FFF5E7]'}`}>
+                <p className={`text-sm md:text-lg font-medium max-w-3xl mt-3 ${slug === 'biotechnology' ? 'text-[#D26742]/80' : slug === 'renewable-energy' ? 'text-[#2C5263]/80' : slug === 'climate-change' ? 'text-[#745630]/80' : 'text-[#FFF5E7]/80'}`}>
                   {category.description || fallbackDescriptions[slug]}
                 </p>
               )}
           </div>
-          <div className="px-0 py-3 sm:px-2 sm:py-4 md:px-4 md:py-6 lg:px-5 lg:py-7 xl:px-6 xl:py-8">
+          <div className="bg-gray-950/90 px-0 py-3 sm:px-2 sm:py-4 md:px-4 md:py-6 lg:px-5 lg:py-7 xl:px-6 xl:py-8">
           <Container>
 
             {posts.length === 0 ? (

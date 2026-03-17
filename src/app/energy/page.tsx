@@ -1279,13 +1279,13 @@ export default function EnergyPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ───────────────────────────────────────────────── */}
-          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D2E369]">
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              Local & Global{" "}
-              <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
-                Energy Data
-              </span>
-            </h1>
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369] overflow-hidden">
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#2C5263' }}>
+                Local & Global Energy Data
+              </h1>
+            </div>
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
             <p className="text-gray-400 text-sm md:text-base mb-4">
               Search for any country, or USA state.
             </p>
@@ -1314,6 +1314,7 @@ export default function EnergyPage() {
               </div>
             )}
           </div>
+          </div>
 
           {/* ─── Live Stats ─────────────────────────────────────────── */}
           {latest && (() => {
@@ -1323,7 +1324,11 @@ export default function EnergyPage() {
             // For US states, show USA values as the "main" stat, state as comparison
             const mainLatest = usStateData ? countryData?.latest : latest;
             return (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D2E369] p-4 md:p-6 shadow-xl">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-lg font-bold font-mono text-white">Key Facts ({(mainLatest || latest).year})</h2>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard
                 label={`Fossil – primary energy (${(mainLatest || latest).year})`}
                 subtitle="Coal, oil & gas. Rest is renewables + nuclear."
@@ -1368,6 +1373,7 @@ export default function EnergyPage() {
                 countryName={compName}
                 baseLabel={statBaseLabel}
               />
+            </div>
             </div>
             );
           })()}

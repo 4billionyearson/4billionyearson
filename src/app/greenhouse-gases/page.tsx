@@ -472,19 +472,17 @@ export default function GreenhouseGasesPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
-            <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: 'linear-gradient(to right, #f59e0b, #fb923c, #f87171)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Climate Change
-            </p>
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              Greenhouse{" "}
-              <span className="bg-gradient-to-r from-red-400 via-amber-400 to-emerald-400 bg-clip-text text-transparent">
-                Gases
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Live atmospheric concentrations of the key greenhouse gases driving climate change – carbon dioxide, methane, and nitrous oxide – along with their historical trends and climate impacts.
-            </p>
+          <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#745630' }}>
+                Greenhouse Gases
+              </h1>
+            </div>
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+              <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
+                Live atmospheric concentrations of the key greenhouse gases driving climate change – carbon dioxide, methane, and nitrous oxide – along with their historical trends and climate impacts.
+              </p>
+            </div>
           </div>
 
           {/* ─── Loading / Error ───────────────────────────────────── */}

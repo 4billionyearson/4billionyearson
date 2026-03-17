@@ -76,20 +76,19 @@ export default function BiotechExplainedPage() {
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
-            <div className="flex items-center gap-3 mb-4">
-              <BookOpen className="h-6 w-6 text-[#FFF5E7]" />
-              <p className="text-sm uppercase tracking-[0.3em] text-[#FFF5E7] font-mono">Explainer</p>
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#FFF5E7] overflow-hidden">
+            <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#FFF5E7' }}>
+              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#D26742]">Biotechnology</h1>
+              <div className="flex items-center gap-2 mt-3">
+                <BookOpen className="h-5 w-5 text-[#D26742]/80" />
+                <p className="text-sm uppercase tracking-[0.3em] text-[#D26742]/80 font-mono">Explainer</p>
+              </div>
             </div>
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              Biotechnology{" "}
-              <span className="text-[#FFF5E7]">
-                Explained
-              </span>
-            </h1>
-            <p className="text-gray-400 text-sm md:text-base max-w-2xl">
-              A plain-English guide to biotech – gene editing, mRNA, synthetic biology, and how biological science is transforming medicine, agriculture, and industry.
-            </p>
+            <div className="bg-gray-950/90 backdrop-blur-md px-5 py-4 md:px-6 md:py-5">
+              <p className="text-sm md:text-lg font-medium max-w-3xl text-gray-300">
+                A plain-English guide to biotech – gene editing, mRNA, synthetic biology, and how biological science is transforming medicine, agriculture, and industry.
+              </p>
+            </div>
           </div>
 
           {/* Key facts */}

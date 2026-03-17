@@ -112,20 +112,18 @@ export default function EnergyRankingsPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D2E369] p-4 md:p-6 shadow-xl">
-            <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4 bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
-              Global Rankings
-            </p>
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              Energy{" "}
-              <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
-                Rankings
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Which countries lead the clean energy transition – and which remain most dependent on fossil fuels?
-              Rankings are based on the latest available data from Our World in Data and the Energy Institute.
-            </p>
+          <div className="rounded-2xl border-2 border-[#D2E369] shadow-xl overflow-hidden">
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#2C5263' }}>
+                Energy Rankings
+              </h1>
+            </div>
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+              <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
+                Which countries lead the clean energy transition – and which remain most dependent on fossil fuels?
+                Rankings are based on the latest available data from Our World in Data and the Energy Institute.
+              </p>
+            </div>
           </div>
 
         {loading && (

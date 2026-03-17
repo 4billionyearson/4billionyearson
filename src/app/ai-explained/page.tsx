@@ -76,20 +76,19 @@ export default function AIExplainedPage() {
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
-            <div className="flex items-center gap-3 mb-4">
-              <BookOpen className="h-6 w-6 text-[#88DDFC]" />
-              <p className="text-sm uppercase tracking-[0.3em] text-[#88DDFC] font-mono">Explainer</p>
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#88DDFC] overflow-hidden">
+            <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#88DDFC' }}>
+              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#FFF5E7]">Artificial Intelligence</h1>
+              <div className="flex items-center gap-2 mt-3">
+                <BookOpen className="h-5 w-5 text-[#FFF5E7]/80" />
+                <p className="text-sm uppercase tracking-[0.3em] text-[#FFF5E7]/80 font-mono">Explainer</p>
+              </div>
             </div>
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              Artificial Intelligence{" "}
-              <span className="text-[#88DDFC]">
-                Explained
-              </span>
-            </h1>
-            <p className="text-gray-400 text-sm md:text-base max-w-2xl">
-              A plain-English guide to AI – how it works, what the key concepts mean, and why it matters. No hype, no jargon – just the essentials.
-            </p>
+            <div className="bg-gray-950/90 backdrop-blur-md px-5 py-4 md:px-6 md:py-5">
+              <p className="text-sm md:text-lg font-medium max-w-3xl text-gray-300">
+                A plain-English guide to AI – how it works, what the key concepts mean, and why it matters. No hype, no jargon – just the essentials.
+              </p>
+            </div>
           </div>
 
           {/* Key facts */}

@@ -742,30 +742,14 @@ export default function ExtremeWeatherPage() {
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* ─── Hero ─────────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
-            <p
-              className="text-sm uppercase tracking-[0.3em] font-mono mb-4"
-              style={{
-                background: "linear-gradient(to right, #ef4444, #f97316, #eab308)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Climate Change
-            </p>
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              Extreme Weather{" "}
-              <span
-                style={{
-                  background: "linear-gradient(to right, #ef4444, #f97316, #eab308)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Events
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
+          <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#745630' }}>
+                Extreme Weather Events
+              </h1>
+            </div>
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+            <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
               Tracking extreme weather events worldwide – from historical trends over the past century to live alerts today.
               Data sourced from{" "}
               <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
@@ -781,6 +765,7 @@ export default function ExtremeWeatherPage() {
               </a>{" "}
               (EU/JRC) for live global alerts.
             </p>
+            </div>
           </div>
 
           {/* ─── Loading / Error ───────────────────────────────────── */}

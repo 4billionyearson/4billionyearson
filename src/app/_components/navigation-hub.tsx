@@ -130,39 +130,46 @@ function ArticleBadge({ status }: { status: string }) {
 
 function SectionCard({ section, isExpanded, onToggle, recentCategories }: { section: Section; isExpanded: boolean; onToggle: () => void; recentCategories: Record<string, string> }) {
   const c = section.color;
+  /* Pick a dark text color that contrasts with each category's background */
+  const textMap: Record<string, string> = {
+    "#88DDFC": "#FFF5E7",
+    "#D2E369": "#2C5263",
+    "#D0A65E": "#745630",
+    "#FFF5E7": "#D26742",
+  };
+  const textColor = textMap[c] ?? "#1a1a1a";
 
   return (
     <div
-      className={`
-        relative rounded-2xl border-2 transition-all duration-500 ease-out overflow-hidden
-        ${isExpanded
-          ? "bg-gray-950/95"
-          : "bg-gray-950/70 hover:bg-gray-950/90"
-        }
-      `}
+      className="relative rounded-2xl border-2 transition-all duration-500 ease-out overflow-hidden"
       style={{ borderColor: c, ...(isExpanded ? { boxShadow: `0 4px 20px ${c}22` } : {}) }}
     >
 
-      {/* Header – always visible */}
+      {/* Colored header – title row */}
       <button
         onClick={onToggle}
-        className="w-full text-left px-4 py-4 md:px-5 md:py-5 flex items-start gap-3 group"
+        className="w-full text-left group"
       >
-        <div
-          className={`mt-0.5 transition-transform duration-300 ${isExpanded ? "scale-110" : "group-hover:scale-105"}`}
-          style={{ color: c }}
-        >
-          {section.icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-mono font-bold text-white text-base md:text-lg tracking-wide leading-tight">
+        <div className="px-4 py-3 md:px-5 md:py-4 flex items-center gap-2" style={{ backgroundColor: c }}>
+          <div
+            className={`transition-transform duration-300 flex-shrink-0 ${isExpanded ? "scale-110" : "group-hover:scale-105"}`}
+            style={{ color: textColor }}
+          >
+            {section.icon}
+          </div>
+          <h3 className="flex-1 min-w-0 font-mono font-bold text-base md:text-lg tracking-wide leading-tight" style={{ color: textColor }}>
             {section.title}
           </h3>
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">{section.tagline}</p>
+          <ChevronRight
+            className={`h-4 w-4 flex-shrink-0 transition-transform duration-300 ${isExpanded ? "rotate-90" : "group-hover:translate-x-0.5"}`}
+            style={{ color: `${textColor}99` }}
+          />
         </div>
-        <ChevronRight
-          className={`h-4 w-4 text-gray-500 flex-shrink-0 mt-1 transition-transform duration-300 ${isExpanded ? "rotate-90" : "group-hover:translate-x-0.5"}`}
-        />
+
+        {/* Dark section – tagline */}
+        <div className={`px-4 py-2.5 md:px-5 md:py-3 ${isExpanded ? "bg-gray-950/95" : "bg-gray-950/70 group-hover:bg-gray-950/90"} transition-colors duration-300`}>
+          <p className="text-xs text-gray-400 leading-relaxed">{section.tagline}</p>
+        </div>
       </button>
 
       {/* Expandable links panel */}
@@ -170,7 +177,7 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
         className={`grid transition-all duration-500 ease-out ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
       >
         <div className="overflow-hidden">
-          <div className="px-4 pb-4 md:px-5 md:pb-5 space-y-1">
+          <div className="bg-gray-950/95 px-4 pb-4 md:px-5 md:pb-5 space-y-1">
             {section.links.map((link) => (
               <Link
                 key={link.href}

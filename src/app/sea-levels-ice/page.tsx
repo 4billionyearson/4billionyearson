@@ -232,19 +232,17 @@ export default function SeaLevelsIcePage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
-            <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: 'linear-gradient(to right, #22d3ee, #14b8a6, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Climate Change
-            </p>
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              Sea Levels{" "}
-              <span style={{ background: 'linear-gradient(to right, #22d3ee, #14b8a6, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                &amp; Ice
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Rising temperatures are melting polar ice and driving sea levels higher. As the planet warms, two forces push the oceans upward: thermal expansion of warming water and the vast quantities of meltwater from glaciers and ice sheets. This page tracks both, and shows how they&apos;re connected.
-            </p>
+          <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#745630' }}>
+                Sea Levels &amp; Ice
+              </h1>
+            </div>
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+              <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
+                Rising temperatures are melting polar ice and driving sea levels higher. As the planet warms, two forces push the oceans upward: thermal expansion of warming water and the vast quantities of meltwater from glaciers and ice sheets. This page tracks both, and shows how they&apos;re connected.
+              </p>
+            </div>
           </div>
 
           {/* ─── Loading / Error ───────────────────────────────────── */}

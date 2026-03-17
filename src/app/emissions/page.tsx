@@ -184,21 +184,19 @@ export default function EmissionsPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
-            <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: "linear-gradient(to right, #ef4444, #f59e0b, #eab308)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              Global Emissions
-            </p>
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-              CO₂{" "}
-              <span style={{ background: "linear-gradient(to right, #ef4444, #f59e0b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                Emissions
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Carbon dioxide is the primary driver of human-caused climate change. This page tracks who emits the most, 
-              how emissions have changed over time, and the cumulative pollution burden each country carries. 
-              Understanding emissions is the first step toward reducing them.
-            </p>
+          <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#745630' }}>
+                CO₂ Emissions
+              </h1>
+            </div>
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+              <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
+                Carbon dioxide is the primary driver of human-caused climate change. This page tracks who emits the most, 
+                how emissions have changed over time, and the cumulative pollution burden each country carries. 
+                Understanding emissions is the first step toward reducing them.
+              </p>
+            </div>
           </div>
 
           {/* ─── Loading / Error ───────────────────────────────────── */}

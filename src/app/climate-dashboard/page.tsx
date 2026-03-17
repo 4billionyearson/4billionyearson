@@ -537,13 +537,13 @@ export default function ClimateDashboard() {
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* ─── Header & Search ──────────────────────────────────────── */}
-        <div className="relative z-10 bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-          <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-4">
-            Local & Global{" "}
-            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              Climate Change
-            </span>
-          </h1>
+        <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E] overflow-hidden">
+          <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#745630' }}>
+              Local & Global Climate Change
+            </h1>
+          </div>
+          <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
           <p className="text-gray-400 text-sm md:text-base mb-4">
             Search for any country, US state, or UK city/region.
           </p>
@@ -623,6 +623,7 @@ export default function ClimateDashboard() {
               </button>
             </div>
           )}
+        </div>
         </div>
 
         {/* ─── Loading ──────────────────────────────────────────────── */}

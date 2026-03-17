@@ -367,17 +367,14 @@ export default function PlanetaryBoundariesPage() {
       <section>
         <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
-         <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
-          <p className="text-sm uppercase tracking-[0.3em] font-mono mb-4" style={{ background: 'linear-gradient(to right, #f87171, #fbbf24, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Climate Change
-          </p>
-          <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide text-white leading-tight mb-6">
-            The Nine Planetary{" "}
-            <span className="bg-gradient-to-r from-red-400 via-amber-400 to-emerald-400 bg-clip-text text-transparent">
-              Boundaries
-            </span>
-          </h1>
-          <p className="text-base md:text-xl text-gray-300 leading-relaxed mb-8">
+         <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
+          <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#745630' }}>
+              The Nine Planetary Boundaries
+            </h1>
+          </div>
+          <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+          <p className="text-sm md:text-lg text-gray-300 leading-relaxed mb-8">
             In 2009, a team of Earth system scientists led by{" "}
             <span className="text-white font-medium">Johan Rockström</span>{" "}
             identified nine processes that regulate the stability of the Earth
@@ -457,6 +454,7 @@ export default function PlanetaryBoundariesPage() {
             Source: <a href="https://www.stockholmresilience.org/research/planetary-boundaries.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">Stockholm Resilience Centre</a> &middot; <a href="https://www.planetaryhealthcheck.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">Planetary Health Check
             2025</a> &middot; <a href="https://www.science.org/doi/10.1126/sciadv.adh2458" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">Richardson et al. (2023)</a>
           </p>
+          </div>
          </div>
 
           {/* ── Temperature Chart (separate card) ── */}
