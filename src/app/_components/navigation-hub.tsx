@@ -142,7 +142,7 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
   return (
     <div
       className="relative rounded-2xl border-2 transition-all duration-500 ease-out overflow-hidden"
-      style={{ borderColor: c, ...(isExpanded ? { boxShadow: `0 4px 20px ${c}22` } : {}) }}
+      style={{ borderColor: c, boxShadow: isExpanded ? `0 4px 24px ${c}33` : '0 4px 12px rgba(0,0,0,0.4)' }}
     >
 
       {/* Colored header – title row */}

@@ -256,6 +256,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<MetricMode>("perCapita");
+  const [selectedInfo, setSelectedInfo] = useState<{ name: string; annual: number | null; perCapita: number | null; color: string } | null>(null);
 
   useEffect(() => {
     fetch("/data/world-countries.json")
@@ -295,21 +296,14 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
       const geoName = feature.properties?.name || "";
       const owidName = NAME_MAP[geoName] || geoName;
       const entry = dataMap.get(owidName);
-      const annual = entry?.annual;
-      const perCap = entry?.perCapita;
-      const color = getColor(mode, mode === "perCapita" ? perCap : annual);
-      const html = `
-        <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:160px">
-          <div style="font-weight:700;margin-bottom:4px">${owidName}</div>
-          <div style="color:${color};font-weight:600">
-            ${annual != null ? formatTonnes(annual) + ' / year' : 'No data'}
-          </div>
-          <div style="color:#94a3b8;margin-top:2px">
-            ${perCap != null ? perCap.toFixed(1) + ' t CO₂ per person' : ''}
-          </div>
-        </div>
-      `;
-      layer.bindTooltip(html, { sticky: true, direction: "top", offset: [0, -10] });
+      const annual = entry?.annual ?? null;
+      const perCap = entry?.perCapita ?? null;
+      const color = getColor(mode, mode === "perCapita" ? perCap ?? undefined : annual ?? undefined);
+
+      const showInfo = () => setSelectedInfo({ name: owidName, annual, perCapita: perCap, color });
+      layer.on("mouseover", showInfo);
+      layer.on("click", showInfo);
+      layer.on("mouseout", () => setSelectedInfo(null));
     },
     [dataMap, mode],
   );
@@ -380,6 +374,19 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
           />
           <CountryLabels geo={geoData} />
         </MapContainer>
+
+        {/* Info bar */}
+        {selectedInfo && (
+          <div className="absolute bottom-0 left-0 right-0 z-[500] bg-gray-950/90 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex items-center gap-4 text-sm pointer-events-none">
+            <span className="font-bold text-gray-100">{selectedInfo.name}</span>
+            <span className="font-semibold" style={{ color: selectedInfo.color }}>
+              {selectedInfo.annual != null ? formatTonnes(selectedInfo.annual) + " / year" : "No data"}
+            </span>
+            {selectedInfo.perCapita != null && (
+              <span className="text-gray-400">{selectedInfo.perCapita.toFixed(1)} t CO₂ per person</span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Legend */}

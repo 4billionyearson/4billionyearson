@@ -78,7 +78,7 @@ export default function BiotechExplainedPage() {
           {/* Hero */}
           <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#FFF5E7] overflow-hidden">
             <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#FFF5E7' }}>
-              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#D26742]">Biotechnology</h1>
+              <h1 className="flex items-center gap-2 text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#D26742]"><Dna className="h-8 w-8 md:h-9 md:w-9" />Biotechnology</h1>
               <div className="flex items-center gap-2 mt-3">
                 <BookOpen className="h-5 w-5 text-[#D26742]/80" />
                 <p className="text-sm uppercase tracking-[0.3em] text-[#D26742]/80 font-mono">Explainer</p>

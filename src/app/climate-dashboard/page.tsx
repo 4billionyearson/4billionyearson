@@ -91,7 +91,7 @@ function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingCo
         <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} unit={units === '°C' ? '°' : ''} />
+          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} tickCount={10} domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} unit={units === '°C' ? '°' : ''} />
           <Tooltip content={<DarkTooltip />} />
           <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {thresholds?.map((t, i) => (
@@ -1007,7 +1007,7 @@ export default function ClimateDashboard() {
                           <BarChart data={globalData.landVsOceanMonthly} margin={CHART_MARGIN}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                             <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                            <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} unit="°" domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} />
+                            <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} tickCount={10} unit="°" domain={[(d: number) => Math.floor(d - 1), (d: number) => Math.ceil(d + 1)]} />
                             <Tooltip content={<DarkTooltip />} cursor={{ fill: '#1F2937' }} />
                             <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, left: 0, right: 0 }} />
                             <Bar dataKey="landTemp" name="Global Land (ERA5)" fill="#10b981" radius={[4, 4, 0, 0]} />

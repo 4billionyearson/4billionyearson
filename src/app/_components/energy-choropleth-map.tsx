@@ -223,7 +223,7 @@ function getColor(value: number | undefined) {
 const US_STATES_ZOOM = 4; // show state outlines at zoom ≥ 4
 
 /* Lazily load US states GeoJSON + energy data and show coloured states when zoomed in */
-function USStatesLayer() {
+function USStatesLayer({ onInfo }: { onInfo: (info: { name: string; value: number | null; color: string } | null) => void }) {
   const map = useMap();
   const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
   const [stateEnergy, setStateEnergy] = useState<Record<string, number> | null>(null);
@@ -267,18 +267,14 @@ function USStatesLayer() {
   const onEachState = useCallback(
     (feature: Feature, layer: Layer) => {
       const name = feature.properties?.name || "";
-      const value = stateEnergy?.[name];
-      const html = `
-        <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px">
-          <div style="font-weight:700;margin-bottom:2px">${name}</div>
-          <div style="color:${getColor(value)};font-weight:600">
-            ${value != null ? `${value.toFixed(1)}% renewable` : "No data"}
-          </div>
-        </div>
-      `;
-      layer.bindTooltip(html, { sticky: true, direction: "top", offset: [0, -10] });
+      const value = stateEnergy?.[name] ?? null;
+      const color = getColor(value ?? undefined);
+      const showInfo = () => onInfo({ name, value, color });
+      layer.on("mouseover", showInfo);
+      layer.on("click", showInfo);
+      layer.on("mouseout", () => onInfo(null));
     },
-    [stateEnergy]
+    [stateEnergy, onInfo]
   );
 
   if (!visible || !statesGeo || !stateEnergy) return null;
@@ -387,6 +383,7 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
   const [energyData, setEnergyData] = useState<Map<string, number> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedInfo, setSelectedInfo] = useState<{ name: string; value: number | null; color: string } | null>(null);
   const geoRef = useRef<any>(null);
 
   useEffect(() => {
@@ -442,16 +439,12 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
       if (!energyData) return;
       const geoName = feature.properties?.name || "";
       const owidName = NAME_MAP[geoName] || geoName;
-      const value = energyData.get(owidName);
-      const html = `
-        <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px">
-          <div style="font-weight:700;margin-bottom:2px">${owidName}</div>
-          <div style="color:${getColor(value)};font-weight:600">
-            ${value != null ? `${value.toFixed(1)}% renewable` : "No data"}
-          </div>
-        </div>
-      `;
-      layer.bindTooltip(html, { sticky: true, direction: "top", offset: [0, -10] });
+      const value = energyData.get(owidName) ?? null;
+      const color = getColor(value ?? undefined);
+      const showInfo = () => setSelectedInfo({ name: owidName, value, color });
+      layer.on("mouseover", showInfo);
+      layer.on("click", showInfo);
+      layer.on("mouseout", () => setSelectedInfo(null));
     },
     [energyData]
   );
@@ -497,10 +490,20 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
             style={style}
             onEachFeature={onEachFeature}
           />
-          <USStatesLayer />
+          <USStatesLayer onInfo={setSelectedInfo} />
           <CountryLabels geo={geoData} />
           <FlyToCountry name={selectedCountry} stateName={selectedState} geo={geoData} />
         </MapContainer>
+
+        {/* Info bar */}
+        {selectedInfo && (
+          <div className="absolute bottom-0 left-0 right-0 z-[500] bg-gray-950/90 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex items-center gap-4 text-sm pointer-events-none">
+            <span className="font-bold text-gray-100">{selectedInfo.name}</span>
+            <span className="font-semibold" style={{ color: selectedInfo.color }}>
+              {selectedInfo.value != null ? `${selectedInfo.value.toFixed(1)}% renewable` : "No data"}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Legend */}

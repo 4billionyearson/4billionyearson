@@ -77,7 +77,7 @@ export default function EnergyExplainedPage() {
           {/* Hero */}
           <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369] overflow-hidden">
             <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#D2E369' }}>
-              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">Renewable Energy</h1>
+              <h1 className="flex items-center gap-2 text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]"><Zap className="h-8 w-8 md:h-9 md:w-9" />Renewable Energy</h1>
               <div className="flex items-center gap-2 mt-3">
                 <BookOpen className="h-5 w-5 text-[#2C5263]/80" />
                 <p className="text-sm uppercase tracking-[0.3em] text-[#2C5263]/80 font-mono">Explainer</p>
