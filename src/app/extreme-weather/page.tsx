@@ -801,7 +801,15 @@ export default function ExtremeWeatherPage() {
           {data && stats && (
             <>
               {/* ─── Summary Stats ──────────────────────────────────── */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border border-gray-800 p-4 md:p-6 shadow-xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <Activity className="w-5 h-5 text-orange-400 animate-pulse" />
+                  <h2 className="text-lg font-bold font-mono text-white">Key Facts ({stats.latest?.year || "–"})</h2>
+                  <span className="ml-auto text-xs text-gray-600">
+                    Updated {new Date(data.fetchedAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard
                   label={`Disasters (${stats.latest?.year || "–"})`}
                   value={stats.latest?.value?.toLocaleString() || "–"}
@@ -839,6 +847,7 @@ export default function ExtremeWeatherPage() {
                   unit="USD"
                   color="text-emerald-400"
                 />
+              </div>
               </div>
 
               {/* ─── Live GDACS Alerts ──────────────────────────────── */}
