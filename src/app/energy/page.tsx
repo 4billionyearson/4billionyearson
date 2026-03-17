@@ -1293,7 +1293,7 @@ export default function EnergyPage() {
                 Local & Global Energy Data
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
             <p className="text-gray-400 text-sm md:text-base mb-4">
               Search for any country, or USA state.
             </p>
@@ -1332,7 +1332,7 @@ export default function EnergyPage() {
             // For US states, show USA values as the "main" stat, state as comparison
             const mainLatest = usStateData ? countryData?.latest : latest;
             return (
-            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D2E369] p-4 md:p-6 shadow-xl">
+            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D2E369] p-4 shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <h2 className="text-lg font-bold font-mono text-white">Key Facts ({(mainLatest || latest).year})</h2>
               </div>

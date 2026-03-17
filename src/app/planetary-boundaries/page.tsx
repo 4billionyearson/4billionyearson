@@ -373,7 +373,7 @@ export default function PlanetaryBoundariesPage() {
               The Nine Planetary Boundaries
             </h1>
           </div>
-          <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+          <div className="bg-gray-950/90 backdrop-blur-md p-4">
           <p className="text-sm md:text-lg text-gray-300 leading-relaxed mb-8">
             In 2009, a team of Earth system scientists led by{" "}
             <span className="text-white font-medium">Johan Rockström</span>{" "}
@@ -459,7 +459,7 @@ export default function PlanetaryBoundariesPage() {
 
           {/* ── Temperature Chart (separate card) ── */}
           {liveData?.temperature?.history && liveData.temperature.history.length > 5 && (
-            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
+            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <Thermometer className="w-5 h-5 text-orange-400" />
                 <h3 className="text-white font-semibold font-mono">
@@ -517,7 +517,7 @@ export default function PlanetaryBoundariesPage() {
             return (
               <div
                 key={b.id}
-                className={`group rounded-2xl border ${statusBorder(
+                className={`group rounded-2xl border-2 ${statusBorder(
                   b.status
                 )} bg-gray-950/90 backdrop-blur-md border-gray-800 shadow-lg ${statusGlow(
                   b.status
@@ -705,7 +705,7 @@ export default function PlanetaryBoundariesPage() {
       </div>
 
       {/* ── Framework context ────────────────────────────────────────────── */}
-      <div className="mt-6 bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
+      <div className="mt-6 bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
           <div>
             <h2 className="text-2xl font-bold font-mono text-white mb-6">
               About the Planetary Boundaries Framework

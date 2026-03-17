@@ -190,7 +190,7 @@ export default function EmissionsPage() {
                 CO₂ Emissions
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
                 Carbon dioxide is the primary driver of human-caused climate change. This page tracks who emits the most, 
                 how emissions have changed over time, and the cumulative pollution burden each country carries. 
@@ -216,7 +216,7 @@ export default function EmissionsPage() {
           {data && (
             <>
               {/* ─── Stat Cards ───────────────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
+              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-green-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Key Facts ({data.stats.latestAnnualYear})</h2>

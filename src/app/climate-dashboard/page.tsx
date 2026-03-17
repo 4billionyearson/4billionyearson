@@ -543,7 +543,7 @@ export default function ClimateDashboard() {
               Local & Global Climate Change
             </h1>
           </div>
-          <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+          <div className="bg-gray-950/90 backdrop-blur-md p-4">
           <p className="text-gray-400 text-sm md:text-base mb-4">
             Search for any country, US state, or UK city/region.
           </p>

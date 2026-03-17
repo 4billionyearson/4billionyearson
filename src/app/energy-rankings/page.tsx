@@ -118,7 +118,7 @@ export default function EnergyRankingsPage() {
                 Energy Rankings
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
                 Which countries lead the clean energy transition – and which remain most dependent on fossil fuels?
                 Rankings are based on the latest available data from Our World in Data and the Energy Institute.

@@ -238,7 +238,7 @@ export default function SeaLevelsIcePage() {
                 Sea Levels &amp; Ice
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
                 Rising temperatures are melting polar ice and driving sea levels higher. As the planet warms, two forces push the oceans upward: thermal expansion of warming water and the vast quantities of meltwater from glaciers and ice sheets. This page tracks both, and shows how they&apos;re connected.
               </p>
@@ -262,7 +262,7 @@ export default function SeaLevelsIcePage() {
           {data && (
             <>
               {/* ─── Live Readings ────────────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
+              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-green-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Current Readings</h2>

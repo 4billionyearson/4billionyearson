@@ -748,7 +748,7 @@ export default function ExtremeWeatherPage() {
                 Extreme Weather Events
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
             <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
               Tracking extreme weather events worldwide – from historical trends over the past century to live alerts today.
               Data sourced from{" "}
@@ -786,7 +786,7 @@ export default function ExtremeWeatherPage() {
           {data && stats && (
             <>
               {/* ─── Summary Stats ──────────────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
+              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-orange-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Key Facts ({stats.latest?.year || "–"})</h2>
@@ -835,8 +835,12 @@ export default function ExtremeWeatherPage() {
               </div>
 
               {/* ─── Live GDACS Alerts ──────────────────────────────── */}
-              {data.gdacsEvents.length > 0 && (
-                <SectionCard icon={<Activity />} title="Live Extreme Weather Alerts">
+              {data.gdacsEvents.length > 0 && (() => {
+                const hasRed = data.gdacsEvents.some((e: GDACSEvent) => e.alertLevel === "Red");
+                const hasOrange = data.gdacsEvents.some((e: GDACSEvent) => e.alertLevel === "Orange");
+                const alertColor = hasRed ? "text-red-400" : hasOrange ? "text-orange-400" : "text-emerald-400";
+                return (
+                <SectionCard icon={<Activity className={`${alertColor} animate-pulse`} />} title="Live Extreme Weather Alerts">
                   <LiveEventsSection events={data.gdacsEvents} />
                   <p className="text-xs text-gray-500 mt-4">
                     Real-time alerts from{" "}
@@ -846,7 +850,8 @@ export default function ExtremeWeatherPage() {
                     (EU/JRC) – last 12 months.
                   </p>
                 </SectionCard>
-              )}
+                );
+              })()}
 
               {/* ─── Disasters by Type ─────────────────────────────── */}
               <SectionCard icon={<CloudLightning />} title="Extreme Weather by Type">

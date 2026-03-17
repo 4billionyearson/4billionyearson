@@ -91,7 +91,7 @@ export default function EnergyExplainedPage() {
           </div>
 
           {/* Key facts */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
             <div className="grid gap-3">
               {KEY_FACTS.map(({ icon, text }, i) => (
@@ -104,7 +104,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* How energy works */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">How Global Energy Works</h2>
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
@@ -126,7 +126,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* Units explained */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Understanding Energy Units</h2>
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
@@ -159,7 +159,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* Glossary */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Glossary</h2>
             <div className="divide-y divide-gray-800/60">
               {GLOSSARY.map(({ term, definition }) => (
@@ -172,7 +172,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* Explore our data pages */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Explore Energy Data</h2>
             <p className="text-sm text-gray-400 mb-4">See these concepts in action with real data on our dashboard pages:</p>
             <div className="grid sm:grid-cols-2 gap-3">
@@ -198,7 +198,7 @@ export default function EnergyExplainedPage() {
           </section>
 
           {/* Further reading */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Further Reading</h2>
             <div className="grid gap-3">
               {RESOURCES.map(({ name, url, desc }) => (

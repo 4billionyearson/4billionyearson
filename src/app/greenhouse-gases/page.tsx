@@ -478,7 +478,7 @@ export default function GreenhouseGasesPage() {
                 Greenhouse Gases
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
                 Live atmospheric concentrations of the key greenhouse gases driving climate change – carbon dioxide, methane, and nitrous oxide – along with their historical trends and climate impacts.
               </p>
@@ -502,7 +502,7 @@ export default function GreenhouseGasesPage() {
           {data && (
             <>
               {/* ─── Live Readings ────────────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 md:p-6 shadow-xl">
+              <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-green-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Current Readings</h2>
