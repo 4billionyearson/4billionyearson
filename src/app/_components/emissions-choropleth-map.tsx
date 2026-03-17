@@ -183,7 +183,7 @@ function CountryLabels({ geo }: { geo: FeatureCollection }) {
   useEffect(() => {
     if (!map.getPane("labels")) {
       const pane = map.createPane("labels");
-      pane.style.zIndex = "350";
+      pane.style.zIndex = "450";
       pane.style.pointerEvents = "none";
     }
     const tooltipPane = map.getPane("tooltipPane");
