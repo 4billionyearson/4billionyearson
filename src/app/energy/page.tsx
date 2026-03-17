@@ -280,7 +280,7 @@ function LocationSearch({ onSelect, loading, error }: {
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
             placeholder="Search..."
-            className="w-full pl-9 pr-4 py-1.5 rounded-lg border-2 border-[#D2E369] bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-700 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
             autoComplete="off"
           />
         </div>

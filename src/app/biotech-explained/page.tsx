@@ -78,7 +78,7 @@ export default function BiotechExplainedPage() {
           {/* Hero */}
           <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#FFF5E7] overflow-hidden">
             <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#FFF5E7' }}>
-              <h1 className="flex items-center gap-2 text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#D26742]"><Dna className="h-8 w-8 md:h-9 md:w-9" />Biotechnology</h1>
+              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#D26742]">Biotechnology</h1>
               <div className="flex items-center gap-2 mt-3">
                 <BookOpen className="h-5 w-5 text-[#D26742]/80" />
                 <p className="text-sm uppercase tracking-[0.3em] text-[#D26742]/80 font-mono">Explainer</p>
@@ -92,11 +92,11 @@ export default function BiotechExplainedPage() {
           </div>
 
           {/* Key facts */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
             <div className="grid gap-3">
               {KEY_FACTS.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#FFF5E7]/60">
+                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
                   {icon}
                   <p className="text-sm text-gray-300 leading-relaxed">{text}</p>
                 </div>
@@ -105,7 +105,7 @@ export default function BiotechExplainedPage() {
           </section>
 
           {/* How biotech works */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">How Modern Biotech Works</h2>
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
@@ -127,7 +127,7 @@ export default function BiotechExplainedPage() {
           </section>
 
           {/* Frontiers */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Biotech Frontiers in 2025–26</h2>
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
@@ -142,7 +142,7 @@ export default function BiotechExplainedPage() {
                   { title: "Epigenetic editing", desc: "New tools that modify gene expression without changing the underlying DNA sequence – potentially offering reversible gene therapy and treatments for diseases of ageing." },
                   { title: "Xenotransplantation", desc: "Genetically modified pig organs have been transplanted into human patients for the first time, offering hope for the severe shortage of donor organs." },
                 ].map(({ title, desc }) => (
-                  <div key={title} className="bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#FFF5E7]/60">
+                  <div key={title} className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
                     <p className="text-sm font-semibold text-[#FFF5E7] mb-1">{title}</p>
                     <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
                   </div>
@@ -152,7 +152,7 @@ export default function BiotechExplainedPage() {
           </section>
 
           {/* Glossary */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Glossary</h2>
             <div className="divide-y divide-gray-800/60">
               {GLOSSARY.map(({ term, definition }) => (
@@ -165,7 +165,7 @@ export default function BiotechExplainedPage() {
           </section>
 
           {/* Explore */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Explore Biotech Content</h2>
             <p className="text-sm text-gray-400 mb-4">Read our latest analysis and reporting on biotechnology:</p>
             <div className="grid sm:grid-cols-2 gap-3">
@@ -175,7 +175,7 @@ export default function BiotechExplainedPage() {
                 <a
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#FFF5E7]/60 hover:border-gray-600 transition-colors group"
+                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
                 >
                   <ArrowUpRight className={`h-4 w-4 ${color} flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
                   <div>
@@ -188,7 +188,7 @@ export default function BiotechExplainedPage() {
           </section>
 
           {/* Further reading */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border border-gray-700/50">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Further Reading</h2>
             <div className="grid gap-3">
               {RESOURCES.map(({ name, url, desc }) => (
@@ -197,7 +197,7 @@ export default function BiotechExplainedPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border-2 border-[#FFF5E7]/60 hover:border-[#FFF5E7]/30 transition-colors group"
+                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
                 >
                   <ExternalLink className="h-4 w-4 text-[#FFF5E7] flex-shrink-0 mt-0.5" />
                   <div>

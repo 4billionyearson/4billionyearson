@@ -559,7 +559,7 @@ export default function ClimateDashboard() {
                     onChange={(e) => handleInputChange(e.target.value)}
                     onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
                     placeholder="Search..."
-                    className="w-full pl-9 pr-4 py-1.5 rounded-lg border-2 border-[#D0A65E] bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-700 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                     autoComplete="off"
                   />
                 </div>
