@@ -66,9 +66,9 @@ html {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* Brighten dark map tiles for better sunlight / mobile readability */
-.map-tiles-bright {
-  filter: brightness(1.5);
+/* Boost saturation on Voyager map tiles for richer land/sea colours */
+.map-tiles-saturate {
+  filter: saturate(1.5);
 }
 
 /* Pulsing LIVE badge */

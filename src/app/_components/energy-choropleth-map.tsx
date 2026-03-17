@@ -489,6 +489,7 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
+            className="map-tiles-saturate"
           />
           <GeoJSON
             ref={geoRef}
