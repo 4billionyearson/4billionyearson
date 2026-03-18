@@ -144,7 +144,7 @@ function MultiAreaChart({ data, keys, formatter, stacked, unit }: {
   if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
   return (
     <div className="h-[380px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <AreaChart data={data} margin={CHART_MARGIN}>
           <defs>
             {keys.map((k, i) => (
@@ -190,7 +190,7 @@ function MultiLineChart({ data, keys, formatter, refLine }: {
   if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
   return (
     <div className="h-[380px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
@@ -225,7 +225,7 @@ function StackedBarChart({ data, keys, formatter }: {
   if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
   return (
     <div className="h-[380px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
@@ -252,7 +252,7 @@ function Top10BarChart({ data, dataKey, formatter }: {
   const chartData = data.map(d => ({ name: d.name, [dataKey]: d.value }));
   return (
     <div className="h-[400px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#374151" />
           <XAxis type="number" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
