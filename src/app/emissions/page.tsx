@@ -192,9 +192,7 @@ export default function EmissionsPage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Carbon dioxide is the primary driver of human-caused climate change. This page tracks who emits the most, 
-                how emissions have changed over time, and the cumulative pollution burden each country carries. 
-                Understanding emissions is the first step toward reducing them.
+                Tracking who emits the most CO₂, how emissions have changed over time, and the cumulative burden each country carries.
               </p>
             </div>
           </div>

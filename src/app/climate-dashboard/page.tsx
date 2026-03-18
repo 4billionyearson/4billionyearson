@@ -998,9 +998,6 @@ export default function ClimateDashboard() {
 
                 {globalData?.landVsOceanMonthly && (
                   <SectionCard icon={<ThermometerSun className="h-5 w-5 text-amber-400" />} title="Global Land vs Land + Ocean – Monthly Comparison">
-                    <p className="text-sm text-gray-400 mb-4">
-                      Country data uses <span className="text-emerald-400">land-only</span> temperature (ERA5); the global trend above uses <span className="text-amber-400">land + ocean</span> (NOAA).
-                    </p>
                     <SubSection title="Last 12 months – absolute temperature (°C)">
                       <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -1016,6 +1013,9 @@ export default function ClimateDashboard() {
                         </ResponsiveContainer>
                       </div>
                     </SubSection>
+                    <p className="text-sm text-gray-400 mt-4">
+                      Country data uses <span className="text-emerald-400">land-only</span> temperature (ERA5); the global trend above uses <span className="text-amber-400">land + ocean</span> (NOAA).
+                    </p>
                   </SectionCard>
                 )}
 

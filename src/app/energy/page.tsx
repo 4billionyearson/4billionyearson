@@ -388,10 +388,6 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
       <Divider icon={<Flame className="h-5 w-5" />} title="Energy Mix" />
 
       <SectionCard icon={<BarChart3 className="h-5 w-5 text-orange-400" />} title="Primary Energy Consumption">
-        <p className="text-sm text-gray-400 mb-4">
-          Total primary energy consumption broken down by source. The world remains heavily dependent on
-          fossil fuels, though renewables are the <span className="text-emerald-400 font-medium">fastest-growing</span> segment.
-        </p>
         {/* Country stacked area */}
         {countryMixData && countryMixData.length > 0 && countryData && (
           <SubSection title={`${countryData.name} – primary energy by source (TWh)`}>
@@ -470,13 +466,14 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
             </div>
           </SubSection>
         )}
+        <p className="text-sm text-gray-400 mt-4">
+          Total primary energy consumption broken down by source. The world remains heavily dependent on
+          fossil fuels, though renewables are the <span className="text-emerald-400 font-medium">fastest-growing</span> segment.
+        </p>
       </SectionCard>
 
       {comparisonData && comparisonData.length > 0 && countryData && (
         <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title={`${countryData.name} vs ${baseLabel} – Energy Share`}>
-          <p className="text-sm text-gray-400 mb-4">
-            Comparing <span className="text-white font-medium">{countryData.name}</span>&apos;s fossil and renewable energy share against the global average.
-          </p>
           <SubSection title="Fossil & renewable share of primary energy (%)">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -495,6 +492,9 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
               </ResponsiveContainer>
             </div>
           </SubSection>
+          <p className="text-sm text-gray-400 mt-4">
+            Comparing <span className="text-white font-medium">{countryData.name}</span>&apos;s fossil and renewable energy share against the global average.
+          </p>
         </SectionCard>
       )}
     </>
@@ -573,11 +573,6 @@ function ElectricityMixSection({ data, countryData, baseLabel = 'Global' }: { da
       <Divider icon={<Zap className="h-5 w-5" />} title="Electricity Mix" />
 
       <SectionCard icon={<Zap className="h-5 w-5 text-yellow-400" />} title="Electricity Generation by Source">
-        <p className="text-sm text-gray-400 mb-4">
-          How electricity is generated matters enormously for emissions. The shift from coal and gas
-          to wind, solar, hydro and nuclear is the key to decarbonising the grid.
-        </p>
-
         {/* Show country first when selected */}
         {countryData && <ElecStackedChart data={countryData.yearly} label={countryData.name} />}
 
@@ -605,6 +600,10 @@ function ElectricityMixSection({ data, countryData, baseLabel = 'Global' }: { da
             </div>
           </SubSection>
         )}
+        <p className="text-sm text-gray-400 mt-4">
+          How electricity is generated matters enormously for emissions. The shift from coal and gas
+          to wind, solar, hydro and nuclear is the key to decarbonising the grid.
+        </p>
       </SectionCard>
     </>
   );
@@ -674,11 +673,6 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
       <Divider icon={<Sun className="h-5 w-5" />} title="Renewables Growth" />
 
       <SectionCard icon={<TrendingUp className="h-5 w-5 text-emerald-400" />} title="Renewable Electricity Growth">
-        <p className="text-sm text-gray-400 mb-4">
-          Solar and wind are experiencing <span className="text-yellow-400 font-medium">exponential growth</span>. Solar electricity
-          has grown from near-zero to over 6% of global generation in just 15 years.
-        </p>
-
         {/* Country renewables stacked area */}
         {countryRenewData && countryRenewData.length > 0 && countryData && (
           <SubSection title={`${countryData.name} – share of electricity from renewables (%)`}>
@@ -760,6 +754,10 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
             </div>
           </SubSection>
         )}
+        <p className="text-sm text-gray-400 mt-4">
+          Solar and wind are experiencing <span className="text-yellow-400 font-medium">exponential growth</span>. Solar electricity
+          has grown from near-zero to over 6% of global generation in just 15 years.
+        </p>
       </SectionCard>
     </>
   );
@@ -791,11 +789,6 @@ function CarbonIntensitySection({ data, countryData, baseLabel = 'Global' }: { d
       <Divider icon={<Factory className="h-5 w-5" />} title="Carbon Intensity" />
 
       <SectionCard icon={<Factory className="h-5 w-5 text-gray-400" />} title="Carbon Intensity of Electricity">
-        <p className="text-sm text-gray-400 mb-4">
-          Grams of CO₂ emitted per kilowatt-hour of electricity generated. Lower is better.
-          The global average has been slowly declining as renewables displace coal, but the pace
-          must <span className="text-red-400 font-medium">accelerate dramatically</span> to meet climate goals.
-        </p>
         <SubSection title="gCO₂ per kWh – drag slider to zoom">
           <div className="h-[380px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -814,6 +807,11 @@ function CarbonIntensitySection({ data, countryData, baseLabel = 'Global' }: { d
             </ResponsiveContainer>
           </div>
         </SubSection>
+        <p className="text-sm text-gray-400 mt-4">
+          Grams of CO₂ emitted per kilowatt-hour of electricity generated. Lower is better.
+          The global average has been slowly declining as renewables displace coal, but the pace
+          must <span className="text-red-400 font-medium">accelerate dramatically</span> to meet climate goals.
+        </p>
       </SectionCard>
     </>
   );
@@ -866,12 +864,6 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
       <Divider icon={<Users className="h-5 w-5" />} title="Per Capita" />
 
       <SectionCard icon={<Users className="h-5 w-5 text-blue-400" />} title="Energy Use Per Capita">
-        <p className="text-sm text-gray-400 mb-4">
-          Energy consumption per person reveals vast inequalities between nations.
-          High-income countries use many times more energy per capita than the global average,
-          though efficiency gains are <span className="text-emerald-400 font-medium">narrowing the gap</span>.
-        </p>
-
         {/* Energy per capita */}
         {compData && compData.length > 0 && countryData ? (
           <SubSection title={`${countryData.name} vs ${baseLabel} – primary energy per capita (kWh/person)`}>
@@ -943,6 +935,11 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
             </div>
           </SubSection>
         )}
+        <p className="text-sm text-gray-400 mt-4">
+          Energy consumption per person reveals vast inequalities between nations.
+          High-income countries use many times more energy per capita than the global average,
+          though efficiency gains are <span className="text-emerald-400 font-medium">narrowing the gap</span>.
+        </p>
       </SectionCard>
     </>
   );
@@ -991,11 +988,6 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
       <Divider icon={<Flame className="h-5 w-5" />} title="Emissions" />
 
       <SectionCard icon={<Flame className="h-5 w-5 text-red-400" />} title="Greenhouse Gas Emissions from Energy">
-        <p className="text-sm text-gray-400 mb-4">
-          Total greenhouse gas emissions from energy production and consumption (Mt CO₂ equivalent).
-          Despite renewable growth, global emissions continue to rise as energy demand outpaces the transition.
-        </p>
-
         {/* Country emissions at its own scale */}
         {countryEmData && countryEmData.length > 0 && countryData && (
           <SubSection title={`${countryData.name} – annual GHG emissions (Mt CO₂eq)`}>
@@ -1067,7 +1059,10 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
             </div>
           </SubSection>
         )}
-
+        <p className="text-sm text-gray-400 mt-4">
+          Total greenhouse gas emissions from energy production and consumption (Mt CO₂ equivalent).
+          Despite renewable growth, global emissions continue to rise as energy demand outpaces the transition.
+        </p>
       </SectionCard>
     </>
   );
@@ -1136,11 +1131,6 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'Global' }:
 
   return (
     <SectionCard icon={<Flame className="h-5 w-5 text-orange-400" />} title="Fossil Fuel Breakdown">
-      <p className="text-sm text-gray-400 mb-4">
-        The three fossil fuels – coal, oil, and gas – broken down individually.
-        Coal is the dirtiest, while gas produces roughly half the CO₂ per unit of energy.
-      </p>
-
       {countryFossilData && countryFossilData.length > 0 && countryData && (
         <FossilStackedChart chartData={countryFossilData} title={`${countryData.name} – fossil fuel consumption by type (TWh)`} />
       )}
@@ -1165,6 +1155,10 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'Global' }:
           </div>
         </SubSection>
       )}
+      <p className="text-sm text-gray-400 mt-4">
+        The three fossil fuels – coal, oil, and gas – broken down individually.
+        Coal is the dirtiest, while gas produces roughly half the CO₂ per unit of energy.
+      </p>
     </SectionCard>
   );
 }

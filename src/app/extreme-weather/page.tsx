@@ -770,20 +770,7 @@ export default function ExtremeWeatherPage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
             <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-              Tracking extreme weather events worldwide – from historical trends over the past century to live alerts today.
-              Data sourced from{" "}
-              <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
-                EM-DAT
-              </a>{" "}
-              (via{" "}
-              <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
-                Our World in Data
-              </a>
-              ) for historical records and{" "}
-              <a href="https://www.gdacs.org/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
-                GDACS
-              </a>{" "}
-              (EU/JRC) for live global alerts.
+              Tracking extreme weather events worldwide – from historical trends to live alerts today.
             </p>
             </div>
           </div>
