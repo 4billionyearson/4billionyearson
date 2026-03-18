@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import {
   Loader2, Brain, DollarSign, TrendingUp, Building2, Users,
-  Cpu, Globe, FileText, Scale, BarChart3, Activity,
+  Cpu, Globe, FileText, Scale, BarChart3, Activity, Car,
 } from "lucide-react";
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
@@ -30,12 +30,17 @@ interface AIDashboardData {
   aiBills: Record<string, number>[];
   topBills: { name: string; value: number; year: number }[];
   testScores: Record<string, number>[];
+  frontierMath: { name: string; score: number; date: string }[];
+  selfDrivingMiles: Record<string, any>[];
+  epochModelsByOrg: { name: string; value: number }[];
+  epochModelsByYear: Record<string, number>[];
   stats: {
     latestYear: number;
     globalInvestment: number;
     usInvestment: number;
     topPatentCountry: string;
     topPatentCount: number;
+    totalModels2025: number;
   };
   fetchedAt: string;
 }
@@ -353,7 +358,13 @@ export default function AIDashboardPage() {
                     label="Data Year"
                     value={String(data.stats.latestYear)}
                     color="text-green-400"
-                    subtext="Latest available"
+                    subtext="Investment data"
+                  />
+                  <StatCard
+                    label="2025 Notable Models"
+                    value={String(data.stats.totalModels2025)}
+                    color="text-violet-400"
+                    subtext="Tracked by Epoch AI (live)"
                   />
                 </div>
               </div>
@@ -479,6 +490,48 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
+              {data.frontierMath.length > 0 && (
+              <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark (2025–2026)">
+                <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${v.toFixed(1)}%`} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Updated through 2026. Source:{" "}
+                  <a href="https://ourworldindata.org/grapher/ai-frontier-math-benchmark" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI / Our World in Data
+                  </a>.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.epochModelsByOrg.length > 0 && (
+              <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 Notable AI Models by Organization">
+                <Top10BarChart data={data.epochModelsByOrg} dataKey="models" />
+                <p className="text-xs text-gray-500 mt-4">
+                  Notable AI models released in 2025, broken down by organization. Live data from the{" "}
+                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI Notable Models Database
+                  </a>. Updated continuously.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.epochModelsByYear.length > 0 && (
+              <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="Notable AI Models Per Year">
+                <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Total notable AI models tracked by Epoch AI per year (2010–present). Source: Epoch AI Notable Models Database.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.selfDrivingMiles.length > 0 && (
+              <SectionCard icon={<Car className="h-5 w-5 text-green-400" />} title="Self-Driving Taxi Passenger Miles">
+                <MultiAreaChart data={data.selfDrivingMiles} keys={seriesKeys(data.selfDrivingMiles)} formatter={formatCompact} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Quarterly autonomous vehicle passenger miles in California (Waymo, Cruise). Data through 2025. Source: California PUC / Our World in Data.
+                </p>
+              </SectionCard>
+              )}
+
               {/* ═══ RESEARCH & REGULATION ═══ */}
               <Divider icon={<FileText className="h-5 w-5" />} title="Research &amp; Regulation" />
 
@@ -515,7 +568,10 @@ export default function AIDashboardPage() {
                 <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                   Our World in Data
                 </a>
-                {" "}(Epoch AI, AI Index Report, CSET). Licensed under{" "}
+                {" "}(Epoch AI, AI Index Report, CSET) and the{" "}
+                <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                  Epoch AI Notable Models Database
+                </a>. Licensed under{" "}
                 <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">CC BY 4.0</a>.
               </div>
             </>
