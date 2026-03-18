@@ -532,11 +532,10 @@ const EventsMap = dynamic(
         React.useEffect(() => {
           if (events.length === 0) return;
           const bounds = L.default.latLngBounds(events.map((e) => [e.lat, e.lon]));
-          const isMobile = map.getContainer().clientWidth < 768;
-          map.fitBounds(bounds, {
-            padding: isMobile ? [15, 15] : [40, 40],
-            maxZoom: isMobile ? 3 : 5,
-          });
+          const width = map.getContainer().clientWidth;
+          const maxZoom = width < 500 ? 1 : width < 768 ? 3 : 5;
+          const pad = width < 500 ? [10, 10] : [40, 40];
+          map.fitBounds(bounds, { padding: pad as [number, number], maxZoom });
         }, [events, map]);
         return null;
       }
@@ -546,7 +545,7 @@ const EventsMap = dynamic(
           <MapContainer
             center={[20, 0]}
             zoom={2}
-            minZoom={2}
+            minZoom={1}
             maxZoom={8}
             scrollWheelZoom={true}
             className="h-[350px] md:h-[420px] w-full rounded-xl z-0"
