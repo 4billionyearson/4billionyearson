@@ -63,7 +63,7 @@ const formatBillions = (v: number) => {
 };
 
 const formatCompact = (v: number) => {
-  if (v >= 1e6) return `${(v / 1e6).toFixed(1)}M`;
+  if (v >= 1e6) return `${(v / 1e6).toFixed(0)}M`;
   if (v >= 1e3) return `${(v / 1e3).toFixed(0)}K`;
   return String(Math.round(v));
 };
@@ -372,7 +372,7 @@ export default function AIDashboardPage() {
 
               {data.frontierMath?.length > 0 && (
               <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark (2025–2026)">
-                <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${v.toFixed(1)}%`} />
+                <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${Math.round(v)}%`} />
                 <p className="text-xs text-gray-500 mt-4">
                   Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Updated through 2026. Source:{" "}
                   <a href="https://ourworldindata.org/grapher/ai-frontier-math-benchmark" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
