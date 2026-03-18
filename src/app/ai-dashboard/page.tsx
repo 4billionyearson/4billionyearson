@@ -31,6 +31,7 @@ interface AIDashboardData {
   epochModelsByYear: Record<string, number>[];
   dataCentersByState: { name: string; value: number; sqft: number }[];
   dataCentersByOperator: { name: string; value: number }[];
+  latestModels: { name: string; org: string; date: string; domain: string }[];
   stats: {
     latestYear: number;
     globalInvestment: number;
@@ -303,7 +304,7 @@ export default function AIDashboardPage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Tracking global AI investment, company adoption, research output, compute growth, and regulation.
+                Tracking AI models released, investment, data center infrastructure, company adoption, and workforce trends.
               </p>
             </div>
           </div>
@@ -363,6 +364,39 @@ export default function AIDashboardPage() {
 
               {/* ═══ MODELS & BENCHMARKS ═══ */}
               <Divider icon={<Brain className="h-5 w-5" />} title="Models" />
+
+              {data.latestModels?.length > 0 && (
+              <SectionCard icon={<Brain className="h-5 w-5 text-emerald-400" />} title="Latest AI Models Released">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-700/50 text-left">
+                        <th className="py-2 pr-4 text-gray-400 font-medium">Model</th>
+                        <th className="py-2 pr-4 text-gray-400 font-medium">Organization</th>
+                        <th className="py-2 pr-4 text-gray-400 font-medium hidden sm:table-cell">Domain</th>
+                        <th className="py-2 text-gray-400 font-medium">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.latestModels.map((m, i) => (
+                        <tr key={i} className="border-b border-gray-800/40">
+                          <td className="py-2 pr-4 text-gray-200 font-medium">{m.name}</td>
+                          <td className="py-2 pr-4 text-gray-400">{m.org}</td>
+                          <td className="py-2 pr-4 text-gray-500 hidden sm:table-cell">{m.domain}</td>
+                          <td className="py-2 text-gray-500 whitespace-nowrap">{m.date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  Most recently released AI models. Source:{" "}
+                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI
+                  </a>. Continuously updated.
+                </p>
+              </SectionCard>
+              )}
 
               {data.epochModelsByOrg?.length > 0 && (
               <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 AI Models Released by Organization">

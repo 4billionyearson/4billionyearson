@@ -132,6 +132,7 @@ const EPOCH_CSV_URL = 'https://epoch.ai/data/epochdb/notable_ai_models.csv';
 async function fetchEpochModels(): Promise<{
   modelsByOrg: { name: string; value: number }[];
   modelsByYear: Record<string, number>[];
+  latestModels: { name: string; org: string; date: string; domain: string }[];
   totalModels2025: number;
 }> {
   try {
@@ -142,16 +143,19 @@ async function fetchEpochModels(): Promise<{
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     clearTimeout(id);
-    if (!res.ok) return { modelsByOrg: [], modelsByYear: [], totalModels2025: 0 };
+    if (!res.ok) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
     const text = await res.text();
     const lines = text.split('\n');
     const headers = parseCSVLine(lines[0]);
     const dateIdx = headers.indexOf('Publication date');
     const orgIdx = headers.indexOf('Organization');
-    if (dateIdx < 0) return { modelsByOrg: [], modelsByYear: [], totalModels2025: 0 };
+    const nameIdx = headers.indexOf('Model');
+    const domainIdx = headers.indexOf('Domain');
+    if (dateIdx < 0) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
 
     const orgCounts = new Map<string, number>();
     const yearCounts = new Map<number, number>();
+    const allRecent: { name: string; org: string; date: string; domain: string; sortDate: string }[] = [];
     let total2025 = 0;
 
     for (let i = 1; i < lines.length; i++) {
@@ -167,6 +171,14 @@ async function fetchEpochModels(): Promise<{
         const org = (cols[orgIdx] || 'Unknown').split(',')[0].trim();
         orgCounts.set(org, (orgCounts.get(org) || 0) + 1);
       }
+      if (year >= 2024) {
+        const modelName = nameIdx >= 0 ? (cols[nameIdx] || '').trim() : '';
+        const org = orgIdx >= 0 ? (cols[orgIdx] || '').split(',')[0].trim() : '';
+        const domain = domainIdx >= 0 ? (cols[domainIdx] || '').split(',')[0].trim() : '';
+        if (modelName) {
+          allRecent.push({ name: modelName, org, date: date.substring(0, 10), domain, sortDate: date });
+        }
+      }
     }
 
     const modelsByOrg = Array.from(orgCounts.entries())
@@ -178,9 +190,14 @@ async function fetchEpochModels(): Promise<{
       .map(([year, count]) => ({ year, 'Notable Models': count }))
       .sort((a, b) => a.year - b.year);
 
-    return { modelsByOrg, modelsByYear, totalModels2025: total2025 };
+    const latestModels = allRecent
+      .sort((a, b) => b.sortDate.localeCompare(a.sortDate))
+      .slice(0, 15)
+      .map(({ sortDate, ...rest }) => rest);
+
+    return { modelsByOrg, modelsByYear, latestModels, totalModels2025: total2025 };
   } catch {
-    return { modelsByOrg: [], modelsByYear: [], totalModels2025: 0 };
+    return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
   }
 }
 
@@ -388,6 +405,7 @@ async function fetchAIDashboardData() {
     frontierMath,
     epochModelsByOrg: epochData.modelsByOrg,
     epochModelsByYear: epochData.modelsByYear,
+    latestModels: epochData.latestModels,
     dataCentersByState: dataCenters.byState,
     dataCentersByOperator: dataCenters.byOperator,
     stats: {
