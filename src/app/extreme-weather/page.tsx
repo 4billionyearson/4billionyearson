@@ -534,7 +534,7 @@ const EventsMap = dynamic(
           const width = map.getContainer().clientWidth;
           if (width < 500) {
             // On mobile, always show full world view
-            map.setView([20, 15], 1);
+            map.setView([20, 30], 1);
           } else {
             const bounds = L.default.latLngBounds(events.map((e) => [e.lat, e.lon]));
             map.fitBounds(bounds, {
@@ -554,7 +554,7 @@ const EventsMap = dynamic(
             minZoom={1}
             maxZoom={8}
             scrollWheelZoom={true}
-            className="h-[450px] md:h-[420px] w-full rounded-xl z-0"
+            className="h-[350px] md:h-[420px] w-full rounded-xl z-0"
             style={{ background: "#BEEEF9" }}
           >
             <TileLayer
