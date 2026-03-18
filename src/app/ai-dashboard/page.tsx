@@ -361,7 +361,7 @@ export default function AIDashboardPage() {
                     label="AI Energy Demand"
                     value={`${((data.stats.frontierTotalPowerMW ?? 0) * 8.76 / 1000).toFixed(1)} TWh`}
                     color="text-amber-400"
-                    subtext="Frontier DC annualised"
+                    subtext={`${data.frontierDataCenters?.filter(dc => dc.powerMW > 0).length ?? 0} operational sites annualised`}
                   />
                 </div>
               </div>
@@ -465,54 +465,28 @@ export default function AIDashboardPage() {
                   const opPower = operational.reduce((s, dc) => s + dc.powerMW, 0);
                   const opH100 = operational.reduce((s, dc) => s + dc.h100Equiv, 0);
                   const opCost = operational.reduce((s, dc) => s + dc.costBillions, 0);
-                  const plPower = planned.reduce((s, dc) => s + dc.powerMW, 0);
-                  const plH100 = planned.reduce((s, dc) => s + dc.h100Equiv, 0);
-                  const plCost = planned.reduce((s, dc) => s + dc.costBillions, 0);
                   return (
-                    <div className="space-y-3 mb-5">
-                      <div>
-                        <div className="text-xs text-emerald-400 font-semibold uppercase tracking-wider mb-1.5">Operational ({operational.length} sites)</div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                            <div className="text-2xl font-bold text-emerald-400">{operational.length}</div>
-                            <div className="text-xs text-gray-400 mt-1">Sites</div>
-                          </div>
-                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                            <div className="text-2xl font-bold text-emerald-400">{opPower.toLocaleString()} MW</div>
-                            <div className="text-xs text-gray-400 mt-1">Power</div>
-                          </div>
-                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                            <div className="text-2xl font-bold text-emerald-400">{(opH100 / 1e6).toFixed(1)}M</div>
-                            <div className="text-xs text-gray-400 mt-1">H100 Equiv.</div>
-                          </div>
-                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                            <div className="text-2xl font-bold text-emerald-400">${Math.round(opCost * 10) / 10}B</div>
-                            <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
-                          </div>
+                    <div className="mb-5">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                          <div className="text-2xl font-bold text-cyan-400">{data.stats.frontierCount}</div>
+                          <div className="text-xs text-gray-400 mt-1">Tracked Sites</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">{operational.length} operational · {planned.length} planned</div>
+                        </div>
+                        <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                          <div className="text-2xl font-bold text-emerald-400">{opPower.toLocaleString()} MW</div>
+                          <div className="text-xs text-gray-400 mt-1">Operational Power</div>
+                        </div>
+                        <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                          <div className="text-2xl font-bold text-amber-400">{(opH100 / 1e6).toFixed(1)}M</div>
+                          <div className="text-xs text-gray-400 mt-1">H100 Equivalents</div>
+                        </div>
+                        <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                          <div className="text-2xl font-bold text-violet-400">${Math.round(opCost * 10) / 10}B</div>
+                          <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
                         </div>
                       </div>
-                      <div>
-                        <div className="text-xs text-amber-400 font-semibold uppercase tracking-wider mb-1.5">Planned ({planned.length} sites)</div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                            <div className="text-2xl font-bold text-amber-400">{planned.length}</div>
-                            <div className="text-xs text-gray-400 mt-1">Sites</div>
-                          </div>
-                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                            <div className="text-2xl font-bold text-amber-400">{plPower > 0 ? plPower.toLocaleString() + ' MW' : '—'}</div>
-                            <div className="text-xs text-gray-400 mt-1">Power</div>
-                          </div>
-                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                            <div className="text-2xl font-bold text-amber-400">{plH100 > 0 ? (plH100 / 1e6).toFixed(1) + 'M' : '—'}</div>
-                            <div className="text-xs text-gray-400 mt-1">H100 Equiv.</div>
-                          </div>
-                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                            <div className="text-2xl font-bold text-amber-400">{plCost > 0 ? '$' + (Math.round(plCost * 10) / 10) + 'B' : '—'}</div>
-                            <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500">H100 Equivalents = total GPU compute capacity normalised to NVIDIA H100 chips, allowing comparison across different hardware.</p>
+                      <p className="text-xs text-gray-500 mt-2">H100 Equivalents = total GPU compute capacity normalised to NVIDIA H100 chips, allowing comparison across different hardware.</p>
                     </div>
                   );
                 })()}
