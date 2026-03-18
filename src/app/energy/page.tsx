@@ -402,7 +402,11 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
                   <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <AreaChart data={countryMixData}>
+                      <Area type="monotone" dataKey="Fossil" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
+                  </Brush>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -421,7 +425,11 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
                 <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
                 <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
                 <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
-                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                  <AreaChart data={mixData}>
+                    <Area type="monotone" dataKey="Fossil" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.2} dot={false} strokeWidth={1} />
+                  </AreaChart>
+                </Brush>
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -440,7 +448,11 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
                   <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <AreaChart data={countryShareData}>
+                      <Area type="monotone" dataKey="Fossil" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
+                  </Brush>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -460,7 +472,11 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
                   <Area type="monotone" dataKey="Fossil" stackId="1" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Nuclear" stackId="1" stroke={COLORS.nuclear} fill={COLORS.nuclear} fillOpacity={0.7} />
                   <Area type="monotone" dataKey="Renewables" stackId="1" stroke={COLORS.renewables} fill={COLORS.renewables} fillOpacity={0.7} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <AreaChart data={shareData}>
+                      <Area type="monotone" dataKey="Fossil" stroke={COLORS.fossil} fill={COLORS.fossil} fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
+                  </Brush>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -487,7 +503,11 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
                   <Line type="monotone" dataKey={`${baseLabel} Fossil`} stroke="#fca5a5" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Line type="monotone" dataKey={`${countryData.name} Renewables`} stroke="#10b981" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey={`${baseLabel} Renewables`} stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <LineChart data={comparisonData}>
+                      <Line type="monotone" dataKey={`${countryData.name} Fossil`} stroke="#ef4444" dot={false} strokeWidth={1} />
+                    </LineChart>
+                  </Brush>
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -538,7 +558,11 @@ function ElecStackedChart({ data: yearly, label }: { data: EnergyYearlyPoint[]; 
             <Area type="monotone" dataKey="Solar" stackId="1" stroke={COLORS.solar} fill={COLORS.solar} fillOpacity={0.8} />
             <Area type="monotone" dataKey="Biofuel" stackId="1" stroke={COLORS.biofuel} fill={COLORS.biofuel} fillOpacity={0.8} />
             <Area type="monotone" dataKey="Other" stackId="1" stroke={COLORS.otherRenew} fill={COLORS.otherRenew} fillOpacity={0.8} />
-            <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+            <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+              <AreaChart data={elecShareData}>
+                <Area type="monotone" dataKey="Coal" stroke={COLORS.coal} fill={COLORS.coal} fillOpacity={0.2} dot={false} strokeWidth={1} />
+              </AreaChart>
+            </Brush>
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -594,7 +618,11 @@ function ElectricityMixSection({ data, countryData, baseLabel = 'Global' }: { da
                   <Line type="monotone" dataKey={`${baseLabel} Fossil`} stroke="#fca5a5" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Line type="monotone" dataKey={`${countryData.name} Renewables`} stroke="#10b981" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey={`${baseLabel} Renewables`} stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <LineChart data={comparisonData}>
+                      <Line type="monotone" dataKey={`${countryData.name} Fossil`} stroke="#ef4444" dot={false} strokeWidth={1} />
+                    </LineChart>
+                  </Brush>
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -687,7 +715,11 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
                   <Area type="monotone" dataKey="Hydro" stackId="1" stroke={COLORS.hydro} fill={COLORS.hydro} fillOpacity={0.6} />
                   <Area type="monotone" dataKey="Wind" stackId="1" stroke={COLORS.wind} fill={COLORS.wind} fillOpacity={0.6} />
                   <Area type="monotone" dataKey="Solar" stackId="1" stroke={COLORS.solar} fill={COLORS.solar} fillOpacity={0.6} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <AreaChart data={countryRenewData}>
+                      <Area type="monotone" dataKey="Hydro" stroke={COLORS.hydro} fill={COLORS.hydro} fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
+                  </Brush>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -707,7 +739,11 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
                 <Area type="monotone" dataKey="Hydro" stackId="1" stroke={COLORS.hydro} fill={COLORS.hydro} fillOpacity={0.6} />
                 <Area type="monotone" dataKey="Wind" stackId="1" stroke={COLORS.wind} fill={COLORS.wind} fillOpacity={0.6} />
                 <Area type="monotone" dataKey="Solar" stackId="1" stroke={COLORS.solar} fill={COLORS.solar} fillOpacity={0.6} />
-                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                  <AreaChart data={worldRenewData}>
+                    <Area type="monotone" dataKey="Hydro" stroke={COLORS.hydro} fill={COLORS.hydro} fillOpacity={0.2} dot={false} strokeWidth={1} />
+                  </AreaChart>
+                </Brush>
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -726,7 +762,11 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
                   <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={countryData.name} stroke="#10b981" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey={baseLabel} stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <LineChart data={renewCompData}>
+                      <Line type="monotone" dataKey={countryData.name} stroke="#10b981" dot={false} strokeWidth={1} />
+                    </LineChart>
+                  </Brush>
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -748,7 +788,11 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
                   <Line type="monotone" dataKey={`${baseLabel} Solar`} stroke={COLORS.solar} strokeWidth={2} dot={false} strokeDasharray="6 3" opacity={0.5} />
                   <Line type="monotone" dataKey={`${countryData.name} Wind`} stroke={COLORS.wind} strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey={`${baseLabel} Wind`} stroke={COLORS.wind} strokeWidth={2} dot={false} strokeDasharray="6 3" opacity={0.5} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <LineChart data={solarWindCompData}>
+                      <Line type="monotone" dataKey={`${countryData.name} Solar`} stroke={COLORS.solar} dot={false} strokeWidth={1} />
+                    </LineChart>
+                  </Brush>
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -802,7 +846,11 @@ function CarbonIntensitySection({ data, countryData, baseLabel = 'Global' }: { d
                 {countryData && (
                   <Line type="monotone" dataKey={countryData.name} stroke="#10b981" strokeWidth={2} dot={false} />
                 )}
-                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                  <LineChart data={chartData}>
+                    <Line type="monotone" dataKey={baseLabel} stroke="#6ee7b7" dot={false} strokeWidth={1} />
+                  </LineChart>
+                </Brush>
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -877,7 +925,11 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
                   <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={countryData.name} stroke="#3b82f6" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey={baseLabel} stroke="#93c5fd" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <LineChart data={compData}>
+                      <Line type="monotone" dataKey={countryData.name} stroke="#3b82f6" dot={false} strokeWidth={1} />
+                    </LineChart>
+                  </Brush>
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -893,7 +945,11 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
                   <Tooltip content={<DarkTooltip />} />
                   <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey={baseLabel} stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} strokeWidth={2} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <AreaChart data={worldPerCapita}>
+                      <Area type="monotone" dataKey={baseLabel} stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
+                  </Brush>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -913,7 +969,11 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
                   <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={countryData.name} stroke="#a855f7" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey={baseLabel} stroke="#c4b5fd" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <LineChart data={elecCompData}>
+                      <Line type="monotone" dataKey={countryData.name} stroke="#a855f7" dot={false} strokeWidth={1} />
+                    </LineChart>
+                  </Brush>
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -929,7 +989,11 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
                   <Tooltip content={<DarkTooltip />} />
                   <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey={baseLabel} stroke="#a855f7" fill="#a855f7" fillOpacity={0.3} strokeWidth={2} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <AreaChart data={worldElecPerCapita}>
+                      <Area type="monotone" dataKey={baseLabel} stroke="#a855f7" fill="#a855f7" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
+                  </Brush>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -1000,7 +1064,11 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
                   <Tooltip content={<DarkTooltip />} />
                   <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey="Emissions" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.3} strokeWidth={2} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <AreaChart data={countryEmData}>
+                      <Area type="monotone" dataKey="Emissions" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
+                  </Brush>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -1018,7 +1086,11 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
                 <Tooltip content={<DarkTooltip />} />
                 <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                 <Area type="monotone" dataKey="Emissions" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} />
-                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                  <AreaChart data={worldData}>
+                    <Area type="monotone" dataKey="Emissions" stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                  </AreaChart>
+                </Brush>
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -1037,7 +1109,11 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
                   <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Line type="monotone" dataKey={countryData.name} stroke="#f59e0b" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey={baseLabel} stroke="#ef4444" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <LineChart data={perCapitaComp}>
+                      <Line type="monotone" dataKey={countryData.name} stroke="#f59e0b" dot={false} strokeWidth={1} />
+                    </LineChart>
+                  </Brush>
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1053,7 +1129,11 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
                   <Tooltip content={<DarkTooltip />} />
                   <Legend iconType="square" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                   <Area type="monotone" dataKey={baseLabel} stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} strokeWidth={2} />
-                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                  <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                    <AreaChart data={worldPerCapita}>
+                      <Area type="monotone" dataKey={baseLabel} stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
+                  </Brush>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -1122,7 +1202,11 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'Global' }:
             <Area type="monotone" dataKey="Coal" stackId="1" stroke={COLORS.coal} fill={COLORS.coal} fillOpacity={0.7} />
             <Area type="monotone" dataKey="Oil" stackId="1" stroke={COLORS.oil} fill={COLORS.oil} fillOpacity={0.7} />
             <Area type="monotone" dataKey="Gas" stackId="1" stroke={COLORS.gas} fill={COLORS.gas} fillOpacity={0.7} />
-            <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+            <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+              <AreaChart data={chartData}>
+                <Area type="monotone" dataKey="Coal" stroke={COLORS.coal} fill={COLORS.coal} fillOpacity={0.2} dot={false} strokeWidth={1} />
+              </AreaChart>
+            </Brush>
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -1149,7 +1233,11 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'Global' }:
                 <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                 <Line type="monotone" dataKey={countryData.name} stroke={COLORS.fossil} strokeWidth={2} dot={false} />
                 <Line type="monotone" dataKey={baseLabel} stroke="#f87171" strokeWidth={2} dot={false} strokeDasharray="6 3" />
-                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+                <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                  <LineChart data={fossilShareComp}>
+                    <Line type="monotone" dataKey={countryData.name} stroke={COLORS.fossil} dot={false} strokeWidth={1} />
+                  </LineChart>
+                </Brush>
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -1281,13 +1369,13 @@ export default function EnergyPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ───────────────────────────────────────────────── */}
-          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369] overflow-hidden">
-            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369]">
+            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl" style={{ backgroundColor: '#D2E369' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#2C5263' }}>
                 Local & Global Energy Data
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-b-2xl">
             <p className="text-gray-400 text-sm md:text-base mb-4">
               Search for any country, or USA state.
             </p>

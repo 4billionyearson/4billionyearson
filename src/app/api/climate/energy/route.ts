@@ -150,13 +150,23 @@ function extractLatest(yearly: EnergyYearlyPoint[]): LatestStats | null {
   for (let i = yearly.length - 1; i >= 0; i--) {
     const y = yearly[i];
     if (y.fossilShareEnergy != null || y.renewablesShareEnergy != null) {
+      // Solar/wind share may lag behind fossil/renewables — search backwards
+      let solar = y.solarShareElec;
+      let wind = y.windShareElec;
+      if (solar == null || wind == null) {
+        for (let j = yearly.length - 1; j >= 0; j--) {
+          if (solar == null && yearly[j].solarShareElec != null) solar = yearly[j].solarShareElec;
+          if (wind == null && yearly[j].windShareElec != null) wind = yearly[j].windShareElec;
+          if (solar != null && wind != null) break;
+        }
+      }
       return {
         year: y.year,
         fossilShare: y.fossilShareEnergy,
         renewablesShare: y.renewablesShareEnergy,
         nuclearShare: y.nuclearShareEnergy,
-        solarShareElec: y.solarShareElec,
-        windShareElec: y.windShareElec,
+        solarShareElec: solar,
+        windShareElec: wind,
         carbonIntensity: y.carbonIntensity,
         electricityGeneration: y.electricityGeneration,
         ghgEmissions: y.ghgEmissions,
