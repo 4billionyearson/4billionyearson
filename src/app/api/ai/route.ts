@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v7';
+const CACHE_KEY = 'ai:dashboard:v8';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -145,8 +145,9 @@ async function fetchEpochModels(): Promise<{
     clearTimeout(id);
     if (!res.ok) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
     const text = await res.text();
-    const lines = text.split('\n');
-    const headers = parseCSVLine(lines[0]);
+    const rows = parseCSVRecords(text);
+    if (rows.length < 2) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
+    const headers = rows[0];
     const dateIdx = headers.indexOf('Publication date');
     const orgIdx = headers.indexOf('Organization');
     const nameIdx = headers.indexOf('Model');
@@ -158,9 +159,9 @@ async function fetchEpochModels(): Promise<{
     const allRecent: { name: string; org: string; date: string; domain: string; sortDate: string }[] = [];
     let total2025 = 0;
 
-    for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
-      const cols = parseCSVLine(lines[i]);
+    for (let i = 1; i < rows.length; i++) {
+      const cols = rows[i];
+      if (cols.length <= dateIdx) continue;
       const date = cols[dateIdx] || '';
       const year = parseInt(date.substring(0, 4), 10);
       const currentYear = new Date().getFullYear();
@@ -201,24 +202,52 @@ async function fetchEpochModels(): Promise<{
   }
 }
 
-/** Minimal CSV line parser handling quoted fields */
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
+/** RFC 4180 CSV parser handling quoted fields with embedded newlines, commas, and escaped quotes */
+function parseCSVRecords(text: string): string[][] {
+  const records: string[][] = [];
+  let current: string[] = [];
+  let field = '';
   let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      inQuotes = !inQuotes;
-    } else if (ch === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (i + 1 < text.length && text[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        field += ch;
+      }
     } else {
-      current += ch;
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        current.push(field.trim());
+        field = '';
+      } else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
+        if (ch === '\r') i++;
+        current.push(field.trim());
+        if (current.some(f => f !== '')) records.push(current);
+        current = [];
+        field = '';
+      } else if (ch === '\r') {
+        current.push(field.trim());
+        if (current.some(f => f !== '')) records.push(current);
+        current = [];
+        field = '';
+      } else {
+        field += ch;
+      }
     }
   }
-  result.push(current.trim());
-  return result;
+  if (field || current.length > 0) {
+    current.push(field.trim());
+    if (current.some(f => f !== '')) records.push(current);
+  }
+  return records;
 }
 
 /* ─── IM3 Data Center Atlas — US data center locations ─────────────────────── */
@@ -240,8 +269,9 @@ async function fetchDataCenterLocations(): Promise<{
     clearTimeout(id);
     if (!res.ok) return { byState: [], byOperator: [], totalFacilities: 0 };
     const text = await res.text();
-    const lines = text.split('\n');
-    const headers = parseCSVLine(lines[0]);
+    const rows = parseCSVRecords(text);
+    if (rows.length < 2) return { byState: [], byOperator: [], totalFacilities: 0 };
+    const headers = rows[0];
     const stateIdx = headers.indexOf('state');
     const operatorIdx = headers.indexOf('operator');
     const sqftIdx = headers.indexOf('sqft');
@@ -251,9 +281,9 @@ async function fetchDataCenterLocations(): Promise<{
     const opCounts = new Map<string, number>();
     let totalFacilities = 0;
 
-    for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
-      const cols = parseCSVLine(lines[i]);
+    for (let i = 1; i < rows.length; i++) {
+      const cols = rows[i];
+      if (cols.length <= stateIdx) continue;
       const state = cols[stateIdx] || '';
       if (!state) continue;
       totalFacilities++;
