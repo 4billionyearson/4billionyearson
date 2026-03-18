@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v2';
+const CACHE_KEY = 'ai:dashboard:v3';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -405,6 +405,20 @@ async function fetchAIDashboardData() {
     .filter(r => investMap[r.entityId] === 'United States')
     .sort((a, b) => b.year - a.year)[0];
 
+  // Latest NVIDIA quarter total
+  const lastNvQuarter = nvidiaRevenue.length > 0 ? nvidiaRevenue[nvidiaRevenue.length - 1] : null;
+  let nvidiaLatestTotal = 0;
+  let nvidiaLatestQuarter = '';
+  if (lastNvQuarter) {
+    nvidiaLatestQuarter = String(lastNvQuarter.year || '');
+    nvidiaLatestTotal = Object.entries(lastNvQuarter)
+      .filter(([k]) => k !== 'year')
+      .reduce((sum, [, v]) => sum + (typeof v === 'number' ? v : 0), 0);
+  }
+
+  // FrontierMath top score
+  const fmTop = frontierMath.length > 0 ? frontierMath[0] : null;
+
   const stats = {
     latestYear: latestInvestWorld?.year ?? 0,
     globalInvestment: latestInvestWorld?.value ?? 0,
@@ -412,6 +426,10 @@ async function fetchAIDashboardData() {
     topPatentCountry: topPatents[0]?.name ?? '',
     topPatentCount: topPatents[0]?.value ?? 0,
     totalModels2025: epochData.totalModels2025,
+    nvidiaLatestQuarter,
+    nvidiaLatestTotal,
+    fmTopModel: fmTop?.name ?? '',
+    fmTopScore: fmTop?.score ?? 0,
   };
 
   return {
