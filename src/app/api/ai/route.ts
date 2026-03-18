@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v8';
+const CACHE_KEY = 'ai:dashboard:v9';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -312,6 +312,194 @@ async function fetchDataCenterLocations(): Promise<{
   }
 }
 
+/* ─── Epoch AI Frontier Data Centers ───────────────────────────────────────── */
+
+const EPOCH_DC_CSV = 'https://epoch.ai/data/data_centers/data_centers.csv';
+const EPOCH_DC_TIMELINE_CSV = 'https://epoch.ai/data/data_centers/data_center_timelines.csv';
+
+interface FrontierDC {
+  name: string;
+  owner: string;
+  users: string;
+  powerMW: number;
+  h100Equiv: number;
+  costBillions: number;
+  country: string;
+  lat: number;
+  lon: number;
+}
+
+async function fetchFrontierDataCenters(): Promise<{
+  sites: FrontierDC[];
+  timeline: { date: string; totalPowerMW: number; totalH100e: number; totalCostB: number }[];
+  totalPowerMW: number;
+  totalCostB: number;
+  totalH100e: number;
+}> {
+  const empty = { sites: [], timeline: [], totalPowerMW: 0, totalCostB: 0, totalH100e: 0 };
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 30000);
+    const [dcRes, tlRes] = await Promise.all([
+      fetch(EPOCH_DC_CSV, { signal: controller.signal, headers: { 'User-Agent': 'Mozilla/5.0' } }),
+      fetch(EPOCH_DC_TIMELINE_CSV, { signal: controller.signal, headers: { 'User-Agent': 'Mozilla/5.0' } }),
+    ]);
+    clearTimeout(id);
+
+    if (!dcRes.ok) return empty;
+
+    // Parse main data centers CSV
+    const dcText = await dcRes.text();
+    const dcRows = parseCSVRecords(dcText);
+    if (dcRows.length < 2) return empty;
+    const h = dcRows[0];
+    const idx = (col: string) => h.indexOf(col);
+    const nameI = idx('Name');
+    const ownerI = idx('Owner');
+    const usersI = idx('Users');
+    const powerI = idx('Current power (MW)');
+    const h100I = idx('Current H100 equivalents');
+    const costI = idx('Current total capital cost (2025 USD billions)');
+    const countryI = idx('Country');
+    const latI = idx('Latitude');
+    const lonI = idx('Longitude');
+
+    if (nameI < 0) return empty;
+
+    const sites: FrontierDC[] = [];
+    let totalPowerMW = 0;
+    let totalCostB = 0;
+    let totalH100e = 0;
+
+    for (let i = 1; i < dcRows.length; i++) {
+      const r = dcRows[i];
+      const get = (ci: number) => ci >= 0 && ci < r.length ? r[ci] : '';
+      const cleanTag = (s: string) => s.replace(/#\w+/g, '').trim();
+      const power = parseFloat(get(powerI)) || 0;
+      const h100 = parseFloat(get(h100I)) || 0;
+      const cost = parseFloat(get(costI)) || 0;
+      totalPowerMW += power;
+      totalCostB += cost;
+      totalH100e += h100;
+      sites.push({
+        name: get(nameI),
+        owner: cleanTag(get(ownerI)),
+        users: cleanTag(get(usersI)),
+        powerMW: Math.round(power),
+        h100Equiv: Math.round(h100),
+        costBillions: Math.round(cost * 10) / 10,
+        country: get(countryI),
+        lat: parseFloat(get(latI)) || 0,
+        lon: parseFloat(get(lonI)) || 0,
+      });
+    }
+
+    // Sort by power descending
+    sites.sort((a, b) => b.powerMW - a.powerMW);
+
+    // Parse timeline CSV — aggregate total power/compute over time
+    let timeline: { date: string; totalPowerMW: number; totalH100e: number; totalCostB: number }[] = [];
+    if (tlRes.ok) {
+      const tlText = await tlRes.text();
+      const tlRows = parseCSVRecords(tlText);
+      if (tlRows.length > 1) {
+        const th = tlRows[0];
+        const dateI = th.indexOf('Date');
+        const tPowerI = th.indexOf('Power (MW)');
+        const tH100I = th.indexOf('H100 equivalents');
+        const tCostI = th.indexOf('Total capital cost (2025 USD billions)');
+        const dcNameI = th.indexOf('Data center');
+
+        if (dateI >= 0 && tPowerI >= 0) {
+          // Aggregate by month: sum power across all DCs for each month
+          const monthAgg = new Map<string, { power: number; h100: number; cost: number }>();
+
+          for (let i = 1; i < tlRows.length; i++) {
+            const r = tlRows[i];
+            const date = r[dateI] || '';
+            const month = date.substring(0, 7); // YYYY-MM
+            if (!month || month.length < 7) continue;
+            const power = parseFloat(r[tPowerI] || '0') || 0;
+            const h100 = parseFloat(r[tH100I] || '0') || 0;
+            const cost = parseFloat(r[tCostI] || '0') || 0;
+            const entry = monthAgg.get(month) || { power: 0, h100: 0, cost: 0 };
+            // For each DC that has multiple timeline entries in the same month,
+            // keep the latest (highest) values - so we take max per DC per month
+            // Simple approach: just sum all, then we'll use the latest date's cumulative
+            entry.power += power;
+            entry.h100 += h100;
+            entry.cost += cost;
+            monthAgg.set(month, entry);
+          }
+
+          // Build a cumulative timeline by tracking latest state per DC
+          // Better approach: For each unique date, sum latest power across all DCs
+          const dcLatest = new Map<string, { date: string; power: number; h100: number; cost: number }>();
+          const dateEntries: { date: string; dc: string; power: number; h100: number; cost: number }[] = [];
+
+          for (let i = 1; i < tlRows.length; i++) {
+            const r = tlRows[i];
+            const date = r[dateI] || '';
+            const dc = dcNameI >= 0 ? r[dcNameI] || '' : '';
+            const power = parseFloat(r[tPowerI] || '0') || 0;
+            const h100 = parseFloat(r[tH100I] || '0') || 0;
+            const cost = parseFloat(r[tCostI] || '0') || 0;
+            if (date) dateEntries.push({ date, dc, power, h100, cost });
+          }
+
+          dateEntries.sort((a, b) => a.date.localeCompare(b.date));
+
+          const uniqueDates = [...new Set(dateEntries.map(e => e.date))].sort();
+          const quarterDates: string[] = [];
+
+          // Sample quarterly to keep data manageable
+          for (const date of uniqueDates) {
+            // Update DC states
+            for (const e of dateEntries.filter(x => x.date === date)) {
+              dcLatest.set(e.dc, { date: e.date, power: e.power, h100: e.h100, cost: e.cost });
+            }
+          }
+
+          // Rebuild: step through all dates and snapshot state every quarter
+          const dcState = new Map<string, { power: number; h100: number; cost: number }>();
+          let lastQuarter = '';
+          for (const date of uniqueDates) {
+            for (const e of dateEntries.filter(x => x.date === date)) {
+              dcState.set(e.dc, { power: e.power, h100: e.h100, cost: e.cost });
+            }
+            const q = date.substring(0, 7);
+            if (q !== lastQuarter) {
+              lastQuarter = q;
+              let tPower = 0, tH100 = 0, tCost = 0;
+              for (const v of dcState.values()) {
+                tPower += v.power;
+                tH100 += v.h100;
+                tCost += v.cost;
+              }
+              timeline.push({
+                date: date.substring(0, 7),
+                totalPowerMW: Math.round(tPower),
+                totalH100e: Math.round(tH100),
+                totalCostB: Math.round(tCost * 10) / 10,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      sites,
+      timeline,
+      totalPowerMW: Math.round(totalPowerMW),
+      totalCostB: Math.round(totalCostB * 10) / 10,
+      totalH100e: Math.round(totalH100e),
+    };
+  } catch {
+    return empty;
+  }
+}
+
 /* ─── Main data fetch ─────────────────────────────────────────────────────── */
 
 async function fetchAIDashboardData() {
@@ -401,6 +589,9 @@ async function fetchAIDashboardData() {
   // ─ IM3 data center locations ─
   const dataCenters = await fetchDataCenterLocations();
 
+  // ─ Epoch frontier data centers ─
+  const frontierDC = await fetchFrontierDataCenters();
+
   // ─ Stats ─
   const latestInvestWorld = investRows
     .filter(r => investMap[r.entityId] === 'World')
@@ -438,9 +629,15 @@ async function fetchAIDashboardData() {
     latestModels: epochData.latestModels,
     dataCentersByState: dataCenters.byState,
     dataCentersByOperator: dataCenters.byOperator,
+    frontierDataCenters: frontierDC.sites,
+    frontierDCTimeline: frontierDC.timeline,
     stats: {
       ...stats,
       totalDataCenters: dataCenters.totalFacilities,
+      frontierTotalPowerMW: frontierDC.totalPowerMW,
+      frontierTotalCostB: frontierDC.totalCostB,
+      frontierTotalH100e: frontierDC.totalH100e,
+      frontierCount: frontierDC.sites.length,
     },
     fetchedAt: new Date().toISOString(),
   };

@@ -32,6 +32,18 @@ interface AIDashboardData {
   dataCentersByState: { name: string; value: number; sqft: number }[];
   dataCentersByOperator: { name: string; value: number }[];
   latestModels: { name: string; org: string; date: string; domain: string }[];
+  frontierDataCenters: {
+    name: string;
+    owner: string;
+    users: string;
+    powerMW: number;
+    h100Equiv: number;
+    costBillions: number;
+    country: string;
+    lat: number;
+    lon: number;
+  }[];
+  frontierDCTimeline: { date: string; totalPowerMW: number; totalH100e: number; totalCostB: number }[];
   stats: {
     latestYear: number;
     globalInvestment: number;
@@ -40,6 +52,10 @@ interface AIDashboardData {
     fmTopModel: string;
     fmTopScore: number;
     totalDataCenters: number;
+    frontierTotalPowerMW: number;
+    frontierTotalCostB: number;
+    frontierTotalH100e: number;
+    frontierCount: number;
   };
   fetchedAt: string;
 }
@@ -497,6 +513,83 @@ export default function AIDashboardPage() {
               {/* ═══ INFRASTRUCTURE & WORKFORCE ═══ */}
               <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure &amp; Workforce" />
 
+              {data.frontierDataCenters?.length > 0 && (
+              <SectionCard icon={<Cpu className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Centers">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                  <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-cyan-400">{data.stats.frontierCount}</div>
+                    <div className="text-xs text-gray-400 mt-1">Tracked Sites</div>
+                  </div>
+                  <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-emerald-400">{data.stats.frontierTotalPowerMW?.toLocaleString()} MW</div>
+                    <div className="text-xs text-gray-400 mt-1">Total Power</div>
+                  </div>
+                  <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-amber-400">{(data.stats.frontierTotalH100e / 1e6).toFixed(1)}M</div>
+                    <div className="text-xs text-gray-400 mt-1">H100 Equivalents</div>
+                  </div>
+                  <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                    <div className="text-2xl font-bold text-violet-400">${data.stats.frontierTotalCostB}B</div>
+                    <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-700/50 text-left">
+                        <th className="py-2 pr-3 text-gray-400 font-medium">Data Center</th>
+                        <th className="py-2 pr-3 text-gray-400 font-medium">Owner</th>
+                        <th className="py-2 pr-3 text-gray-400 font-medium hidden sm:table-cell">Users</th>
+                        <th className="py-2 pr-3 text-gray-400 font-medium text-right">Power (MW)</th>
+                        <th className="py-2 pr-3 text-gray-400 font-medium text-right hidden md:table-cell">H100 Equiv.</th>
+                        <th className="py-2 text-gray-400 font-medium text-right">Cost ($B)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.frontierDataCenters.map((dc, i) => (
+                        <tr key={i} className="border-b border-gray-800/40">
+                          <td className="py-2 pr-3 text-gray-200 font-medium">{dc.name}</td>
+                          <td className="py-2 pr-3 text-gray-400">{dc.owner}</td>
+                          <td className="py-2 pr-3 text-gray-500 hidden sm:table-cell">{dc.users || '—'}</td>
+                          <td className="py-2 pr-3 text-gray-300 text-right font-mono">{dc.powerMW > 0 ? dc.powerMW.toLocaleString() : '—'}</td>
+                          <td className="py-2 pr-3 text-gray-400 text-right font-mono hidden md:table-cell">{dc.h100Equiv > 0 ? (dc.h100Equiv / 1000).toFixed(0) + 'K' : '—'}</td>
+                          <td className="py-2 text-gray-300 text-right font-mono">{dc.costBillions > 0 ? `$${dc.costBillions}` : '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  The world&apos;s largest known AI data centers tracked via satellite imagery, construction permits and public disclosures. Source:{" "}
+                  <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI — Frontier Data Centers
+                  </a>{" "}(CC-BY). Updated {new Date(data.fetchedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.frontierDCTimeline?.length > 0 && (
+              <SectionCard icon={<TrendingUp className="h-5 w-5 text-emerald-400" />} title="Frontier Data Center Power Over Time">
+                <div className="h-[380px] w-full">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                    <AreaChart data={data.frontierDCTimeline} margin={CHART_MARGIN}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
+                      <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
+                      <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  Cumulative operational power capacity across all tracked frontier AI data centers. Source:{" "}
+                  <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI
+                  </a>{" "}(CC-BY).
+                </p>
+              </SectionCard>
+              )}
+
               {data.dataCentersByState?.length > 0 && (
               <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="US Data Center Locations">
                 <DataCenterMap data={data.dataCentersByState} />
@@ -566,6 +659,7 @@ export default function AIDashboardPage() {
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#88DDFC] text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
                 <p>• AI models, systems &amp; benchmarks: <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI</a> and <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
+                <p>• Frontier data centers: <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI — Frontier Data Centers</a> (CC-BY)</p>
                 <p>• Investment, adoption &amp; workforce: <a href="https://aiindex.stanford.edu/report/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">AI Index Report</a> via <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
                 <p>• Data center construction: <a href="https://www.census.gov/construction/c30/c30index.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">US Census Bureau</a> via Our World in Data</p>
                 <p>• Data center locations: <a href="https://github.com/shawn15goh/Data-Center-Location-USA-Datasets" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">IM3 Open Source Data Center Atlas</a> (PNNL / OpenStreetMap)</p>
