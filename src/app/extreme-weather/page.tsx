@@ -527,6 +527,16 @@ const EventsMap = dynamic(
         );
       }
 
+      function FitBounds({ events }: { events: GDACSEvent[] }) {
+        const map = useMap();
+        React.useEffect(() => {
+          if (events.length === 0) return;
+          const bounds = L.default.latLngBounds(events.map((e) => [e.lat, e.lon]));
+          map.fitBounds(bounds, { padding: [30, 30], maxZoom: 5 });
+        }, [events, map]);
+        return null;
+      }
+
       return function Map({ events }: { events: GDACSEvent[] }) {
         return (
           <MapContainer
@@ -543,6 +553,7 @@ const EventsMap = dynamic(
               url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
             />
             <MapLabels />
+            <FitBounds events={events} />
             {events.map((e, i) => (
               <CircleMarker
                 key={i}
