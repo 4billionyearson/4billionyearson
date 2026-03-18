@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v9';
+const CACHE_KEY = 'ai:dashboard:v10';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -248,68 +248,6 @@ function parseCSVRecords(text: string): string[][] {
     if (current.some(f => f !== '')) records.push(current);
   }
   return records;
-}
-
-/* ─── IM3 Data Center Atlas — US data center locations ─────────────────────── */
-
-const IM3_CSV_URL = 'https://raw.githubusercontent.com/shawn15goh/Data-Center-Location-USA-Datasets/main/im3_open_source_data_center_atlas/im3_open_source_data_center_atlas.csv';
-
-async function fetchDataCenterLocations(): Promise<{
-  byState: { name: string; value: number; sqft: number }[];
-  byOperator: { name: string; value: number }[];
-  totalFacilities: number;
-}> {
-  try {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 30000);
-    const res = await fetch(IM3_CSV_URL, {
-      signal: controller.signal,
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-    });
-    clearTimeout(id);
-    if (!res.ok) return { byState: [], byOperator: [], totalFacilities: 0 };
-    const text = await res.text();
-    const rows = parseCSVRecords(text);
-    if (rows.length < 2) return { byState: [], byOperator: [], totalFacilities: 0 };
-    const headers = rows[0];
-    const stateIdx = headers.indexOf('state');
-    const operatorIdx = headers.indexOf('operator');
-    const sqftIdx = headers.indexOf('sqft');
-    if (stateIdx < 0) return { byState: [], byOperator: [], totalFacilities: 0 };
-
-    const stateCounts = new Map<string, { count: number; sqft: number }>();
-    const opCounts = new Map<string, number>();
-    let totalFacilities = 0;
-
-    for (let i = 1; i < rows.length; i++) {
-      const cols = rows[i];
-      if (cols.length <= stateIdx) continue;
-      const state = cols[stateIdx] || '';
-      if (!state) continue;
-      totalFacilities++;
-      const entry = stateCounts.get(state) || { count: 0, sqft: 0 };
-      entry.count++;
-      const sqft = parseFloat(cols[sqftIdx] || '0');
-      if (!isNaN(sqft)) entry.sqft += sqft;
-      stateCounts.set(state, entry);
-
-      const op = (cols[operatorIdx] || '').trim();
-      if (op) opCounts.set(op, (opCounts.get(op) || 0) + 1);
-    }
-
-    const byState = Array.from(stateCounts.entries())
-      .map(([name, d]) => ({ name, value: d.count, sqft: Math.round(d.sqft) }))
-      .sort((a, b) => b.value - a.value);
-
-    const byOperator = Array.from(opCounts.entries())
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 12);
-
-    return { byState, byOperator, totalFacilities };
-  } catch {
-    return { byState: [], byOperator: [], totalFacilities: 0 };
-  }
 }
 
 /* ─── Epoch AI Frontier Data Centers ───────────────────────────────────────── */
@@ -586,9 +524,6 @@ async function fetchAIDashboardData() {
   // ─ Epoch AI live model data (2025-2026) ─
   const epochData = await fetchEpochModels();
 
-  // ─ IM3 data center locations ─
-  const dataCenters = await fetchDataCenterLocations();
-
   // ─ Epoch frontier data centers ─
   const frontierDC = await fetchFrontierDataCenters();
 
@@ -627,13 +562,10 @@ async function fetchAIDashboardData() {
     epochModelsByOrg: epochData.modelsByOrg,
     epochModelsByYear: epochData.modelsByYear,
     latestModels: epochData.latestModels,
-    dataCentersByState: dataCenters.byState,
-    dataCentersByOperator: dataCenters.byOperator,
     frontierDataCenters: frontierDC.sites,
     frontierDCTimeline: frontierDC.timeline,
     stats: {
       ...stats,
-      totalDataCenters: dataCenters.totalFacilities,
       frontierTotalPowerMW: frontierDC.totalPowerMW,
       frontierTotalCostB: frontierDC.totalCostB,
       frontierTotalH100e: frontierDC.totalH100e,

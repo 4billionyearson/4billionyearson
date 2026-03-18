@@ -29,8 +29,6 @@ interface AIDashboardData {
   frontierMath: { name: string; score: number; date: string }[];
   epochModelsByOrg: { name: string; value: number }[];
   epochModelsByYear: Record<string, number>[];
-  dataCentersByState: { name: string; value: number; sqft: number }[];
-  dataCentersByOperator: { name: string; value: number }[];
   latestModels: { name: string; org: string; date: string; domain: string }[];
   frontierDataCenters: {
     name: string;
@@ -51,7 +49,6 @@ interface AIDashboardData {
     totalModels2025: number;
     fmTopModel: string;
     fmTopScore: number;
-    totalDataCenters: number;
     frontierTotalPowerMW: number;
     frontierTotalCostB: number;
     frontierTotalH100e: number;
@@ -370,10 +367,10 @@ export default function AIDashboardPage() {
                     subtext={`${data.stats.latestYear} (AI Index Report)`}
                   />
                   <StatCard
-                    label="US Data Centers"
-                    value={(data.stats.totalDataCenters ?? 0).toLocaleString()}
+                    label="Frontier AI Sites"
+                    value={(data.stats.frontierCount ?? 0).toLocaleString()}
                     color="text-sky-400"
-                    subtext="IM3 Atlas (PNNL)"
+                    subtext={`${data.stats.frontierTotalPowerMW?.toLocaleString()} MW total`}
                   />
                 </div>
               </div>
@@ -595,28 +592,14 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.dataCentersByState?.length > 0 && (
-              <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="US Data Center Locations">
-                <DataCenterMap data={data.dataCentersByState} />
+              {data.frontierDataCenters?.length > 0 && (
+              <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Center Locations">
+                <DataCenterMap sites={data.frontierDataCenters} />
                 <p className="text-xs text-gray-500 mt-4">
-                  {data.stats.totalDataCenters?.toLocaleString() ?? '1,242'} data center facilities across {data.dataCentersByState.length} US states. Source:{" "}
-                  <a href="https://github.com/shawn15goh/Data-Center-Location-USA-Datasets" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    IM3 Open Source Data Center Atlas
-                  </a>{" "}(PNNL / OpenStreetMap). Includes all facility types — not limited to AI.
-                  <span className="block mt-1">For worldwide data center locations, see{" "}
-                    <a href="https://www.datacentermap.com/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                      Data Center Map
-                    </a>{" "}(11,000+ facilities across 174 countries).
-                  </span>
-                </p>
-              </SectionCard>
-              )}
-
-              {data.dataCentersByOperator?.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-emerald-400" />} title="Top Data Center Operators (US)">
-                <Top10BarChart data={data.dataCentersByOperator} dataKey="facilities" />
-                <p className="text-xs text-gray-500 mt-4">
-                  Largest data center operators in the US by number of facilities. Source: IM3 Open Source Data Center Atlas.
+                  {data.stats.frontierCount} frontier AI data centers tracked globally ({data.frontierDataCenters.filter(dc => dc.country === 'United States').length} in the US). Pin size indicates power capacity. Source:{" "}
+                  <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI — Frontier Data Centers
+                  </a>{" "}(CC-BY).
                 </p>
               </SectionCard>
               )}
