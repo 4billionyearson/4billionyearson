@@ -1338,7 +1338,7 @@ export default function EnergyPage() {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard
-                label={`Fossil – primary energy (${(mainLatest || latest).year})`}
+                label="Fossil – primary energy"
                 subtitle="Coal, oil & gas. Rest is renewables + nuclear."
                 value={(mainLatest || latest).fossilShare?.toFixed(1) || '–'}
                 unit="%"
@@ -1349,7 +1349,7 @@ export default function EnergyPage() {
                 baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Renewables – primary energy (${(mainLatest || latest).year})`}
+                label="Renewables – primary energy"
                 subtitle="Solar, wind, hydro, biomass & other."
                 value={(mainLatest || latest).renewablesShare?.toFixed(1) || '–'}
                 unit="%"
@@ -1360,7 +1360,7 @@ export default function EnergyPage() {
                 baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Solar – share of electricity (${(mainLatest || latest).year})`}
+                label="Solar – share of electricity"
                 subtitle="% of all electricity generated."
                 value={(mainLatest || latest).solarShareElec?.toFixed(1) || '–'}
                 unit="%"
@@ -1371,7 +1371,7 @@ export default function EnergyPage() {
                 baseLabel={statBaseLabel}
               />
               <StatCard
-                label={`Wind – share of electricity (${(mainLatest || latest).year})`}
+                label="Wind – share of electricity"
                 subtitle="% of all electricity generated."
                 value={(mainLatest || latest).windShareElec?.toFixed(1) || '–'}
                 unit="%"

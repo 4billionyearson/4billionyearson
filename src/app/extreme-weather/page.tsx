@@ -816,19 +816,19 @@ export default function ExtremeWeatherPage() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard
-                  label={`Disasters (${stats.latest?.year || "–"})`}
+                  label="Disasters"
                   value={stats.latest?.value?.toLocaleString() || "–"}
                   unit="events"
                   color="text-orange-400"
                 />
                 <StatCard
-                  label={`Deaths (${stats.latestDeaths?.year || "–"})`}
+                  label="Deaths"
                   value={stats.latestDeaths?.value?.toLocaleString() || "–"}
                   unit="people"
                   color="text-red-400"
                 />
                 <StatCard
-                  label={`Affected (${stats.latestAffected?.year || "–"})`}
+                  label="Affected"
                   value={
                     stats.latestAffected?.value
                       ? stats.latestAffected.value >= 1e9
@@ -842,7 +842,7 @@ export default function ExtremeWeatherPage() {
                   color="text-amber-400"
                 />
                 <StatCard
-                  label={`Damages (${stats.latestDamages?.year || "–"})`}
+                  label="Damages"
                   value={
                     stats.latestDamages?.value
                       ? `$${(stats.latestDamages.value / 1e9).toFixed(0)}B`
