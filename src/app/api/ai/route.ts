@@ -159,7 +159,8 @@ async function fetchEpochModels(): Promise<{
       const cols = parseCSVLine(lines[i]);
       const date = cols[dateIdx] || '';
       const year = parseInt(date.substring(0, 4), 10);
-      if (isNaN(year) || year < 2010) continue;
+      const currentYear = new Date().getFullYear();
+      if (isNaN(year) || year < 2010 || year > currentYear + 1) continue;
       yearCounts.set(year, (yearCounts.get(year) || 0) + 1);
       if (year >= 2025) {
         total2025++;
