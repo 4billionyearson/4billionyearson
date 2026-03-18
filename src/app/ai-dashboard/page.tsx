@@ -69,7 +69,7 @@ const BAR_GRADIENT = [
 function DarkTooltip({ active, payload, label, formatter }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[180px] relative z-50">
+    <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[180px]">
       <p className="font-semibold text-gray-200 mb-1 text-sm">{label}</p>
       {payload.filter((p: any) => p.value != null).map((p: any, i: number) => (
         <p key={i} className="text-sm flex items-center gap-1.5">
@@ -149,7 +149,7 @@ function MultiAreaChart({ data, keys, formatter, stacked, unit }: {
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
-          <Tooltip content={<DarkTooltip formatter={formatter} />} />
+          <Tooltip content={<DarkTooltip formatter={formatter} />} wrapperStyle={{ zIndex: 50 }} />
           <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {keys.map((k, i) => (
             <Area
@@ -187,7 +187,7 @@ function MultiLineChart({ data, keys, formatter, refLine }: {
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
-          <Tooltip content={<DarkTooltip formatter={formatter} />} />
+          <Tooltip content={<DarkTooltip formatter={formatter} />} wrapperStyle={{ zIndex: 50 }} />
           <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {keys.map((k, i) => (
             <Line
@@ -222,7 +222,7 @@ function StackedBarChart({ data, keys, formatter }: {
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
-          <Tooltip content={<DarkTooltip formatter={formatter} />} />
+          <Tooltip content={<DarkTooltip formatter={formatter} />} wrapperStyle={{ zIndex: 50 }} />
           <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {keys.map((k, i) => (
             <Bar key={k} dataKey={k} stackId="1" fill={SERIES_COLORS[i % SERIES_COLORS.length]} />
@@ -249,7 +249,7 @@ function Top10BarChart({ data, dataKey, formatter }: {
           <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#374151" />
           <XAxis type="number" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
           <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11, fill: "#D3C8BB" }} tickLine={false} axisLine={false} />
-          <Tooltip content={<DarkTooltip formatter={formatter} />} />
+          <Tooltip content={<DarkTooltip formatter={formatter} />} wrapperStyle={{ zIndex: 50 }} />
           <Bar dataKey={dataKey} radius={[0, 4, 4, 0]}>
             {chartData.map((_, i) => (
               <Cell key={i} fill={BAR_GRADIENT[i]} />
