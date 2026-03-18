@@ -15,7 +15,7 @@ interface Props {
 }
 
 const COLOR_SCALE = [
-  "#0e2433", // 0
+  "#1a2332", // 0
   "#0f3d5c", // 1-5
   "#115e8a", // 6-15
   "#1a7fb8", // 16-30
@@ -70,13 +70,13 @@ export default function DataCenterMap({ data }: Props) {
     return map;
   }, [data]);
 
-  const projection = useMemo(
-    () => geoAlbersUsa().scale(1000).translate([480, 300]),
-    []
-  );
-  const pathGen = useMemo(() => geoPath().projection(projection), [projection]);
+  const pathGen = useMemo(() => {
+    if (!geo) return null;
+    const projection = geoAlbersUsa().fitSize([960, 600], geo);
+    return geoPath().projection(projection);
+  }, [geo]);
 
-  if (!geo) return <div className="h-[400px] animate-pulse bg-gray-800/50 rounded-xl" />;
+  if (!geo || !pathGen) return <div className="h-[400px] animate-pulse bg-gray-800/50 rounded-xl" />;
 
   const hoveredData = hovered ? dataMap.get(hovered) : null;
 
@@ -87,18 +87,20 @@ export default function DataCenterMap({ data }: Props) {
         className="w-full h-auto"
         style={{ maxHeight: 500 }}
       >
+        <rect width="960" height="600" fill="#0d1520" rx="8" />
         {geo.features.map((feature: Feature) => {
           const name = feature.properties?.name || "";
           const stateData = dataMap.get(name);
           const count = stateData?.value ?? 0;
           const d = pathGen(feature as any) || "";
+          if (!d) return null;
           const isHovered = hovered === name;
           return (
             <path
               key={name}
               d={d}
               fill={getColor(count)}
-              stroke={isHovered ? "#88DDFC" : "#1e3a4f"}
+              stroke={isHovered ? "#88DDFC" : "#2a3f52"}
               strokeWidth={isHovered ? 2 : 0.5}
               className="transition-colors duration-150 cursor-pointer"
               onMouseEnter={() => setHovered(name)}

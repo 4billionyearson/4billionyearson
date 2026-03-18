@@ -342,12 +342,6 @@ export default function AIDashboardPage() {
                     subtext="Epoch AI (continuously updated)"
                   />
                   <StatCard
-                    label="US Data Centers"
-                    value={(data.stats.totalDataCenters ?? 0).toLocaleString()}
-                    color="text-sky-400"
-                    subtext="IM3 Atlas (PNNL)"
-                  />
-                  <StatCard
                     label="Global AI Investment"
                     value={formatBillions(data.stats.globalInvestment)}
                     color="text-cyan-400"
@@ -358,6 +352,12 @@ export default function AIDashboardPage() {
                     value={formatBillions(data.stats.usInvestment)}
                     color="text-green-400"
                     subtext={`${data.stats.latestYear} (AI Index Report)`}
+                  />
+                  <StatCard
+                    label="US Data Centers"
+                    value={(data.stats.totalDataCenters ?? 0).toLocaleString()}
+                    color="text-sky-400"
+                    subtext="IM3 Atlas (PNNL)"
                   />
                 </div>
               </div>
