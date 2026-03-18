@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v10';
+const CACHE_KEY = 'ai:dashboard:v12';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -14,7 +14,7 @@ const INDICATORS = {
   companyAdoption: 1025671,     // Share of companies using AI
   aiJobPostings: 1025677,       // AI job postings share
   devsUsingAi: 1146598,         // Software devs using AI tools
-  dataCenterSpend: 1132529,     // Monthly US data center construction spend
+  dataCenterSpend: 1132529,     // Monthly US data center construction spend (unused, kept for reference)
   aiSystems: 1015499,           // Large-scale AI systems released per year
   aiSystemsByCountry: 1015497,  // Cumulative AI systems by country
   frontierMath: 1144186,        // FrontierMath benchmark scores (2025-2026)
@@ -447,10 +447,7 @@ async function fetchAIDashboardData() {
     genAiData,
     dealsData, dealsMap,
     companiesData, companiesMap,
-    adoptionData, adoptionMap,
-    jobsData, jobsMap,
     devsData,
-    dcSpendData,
     systemsData, systemsMap,
     systemsCountryData, systemsCountryMap,
     frontierMathData, frontierMathMap,
@@ -462,12 +459,7 @@ async function fetchAIDashboardData() {
     fetchEntityMap(INDICATORS.corporateDeals),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.newCompanies}.data.json`),
     fetchEntityMap(INDICATORS.newCompanies),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.companyAdoption}.data.json`),
-    fetchEntityMap(INDICATORS.companyAdoption),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiJobPostings}.data.json`),
-    fetchEntityMap(INDICATORS.aiJobPostings),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.devsUsingAi}.data.json`),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.dataCenterSpend}.data.json`),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiSystems}.data.json`),
     fetchEntityMap(INDICATORS.aiSystems),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiSystemsByCountry}.data.json`),
@@ -493,21 +485,9 @@ async function fetchAIDashboardData() {
   const compRows = parseOWID(companiesData);
   const newCompanies = buildTimeSeries(compRows, companiesMap, ['World', 'United States', 'China', 'Europe']);
 
-  // ─ Adoption ─
-  const adoptRows = parseOWID(adoptionData);
-  const companyAdoption = buildTimeSeries(adoptRows, adoptionMap);
-
-  // ─ AI job postings ─
-  const jobRows = parseOWID(jobsData);
-  const jobPostings = buildTimeSeries(jobRows, jobsMap);
-
   // ─ Developers using AI ─
   const devRows = parseOWID(devsData);
   const devsUsingAi = buildTimeSeries(devRows, investMap, ['World']);
-
-  // ─ Data center spend (sub-annual: yearIsDay, zeroDay=2014-01-01) ─
-  const dcRows = parseOWID(dcSpendData);
-  const dataCenterSpend = buildMonthTimeSeries(dcRows, investMap, '2014-01-01', ['United States']);
 
   // ─ AI systems per year ─
   const sysRows = parseOWID(systemsData);
@@ -552,10 +532,7 @@ async function fetchAIDashboardData() {
     genAiInvestment,
     corporateDeals,
     newCompanies,
-    companyAdoption,
-    jobPostings,
     devsUsingAi,
-    dataCenterSpend,
     aiSystemsPerYear,
     aiSystemsByCountry,
     frontierMath,

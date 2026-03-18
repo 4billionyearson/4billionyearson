@@ -20,10 +20,7 @@ interface AIDashboardData {
   genAiInvestment: Record<string, number>[];
   corporateDeals: Record<string, number>[];
   newCompanies: Record<string, number>[];
-  companyAdoption: Record<string, number>[];
-  jobPostings: Record<string, number>[];
   devsUsingAi: Record<string, number>[];
-  dataCenterSpend: Record<string, number>[];
   aiSystemsPerYear: Record<string, number>[];
   aiSystemsByCountry: Record<string, number>[];
   frontierMath: { name: string; score: number; date: string }[];
@@ -45,7 +42,6 @@ interface AIDashboardData {
   stats: {
     latestYear: number;
     globalInvestment: number;
-    usInvestment: number;
     totalModels2025: number;
     fmTopModel: string;
     fmTopScore: number;
@@ -361,16 +357,16 @@ export default function AIDashboardPage() {
                     subtext={`${data.stats.latestYear} (AI Index Report)`}
                   />
                   <StatCard
-                    label="US AI Investment"
-                    value={formatBillions(data.stats.usInvestment)}
-                    color="text-green-400"
-                    subtext={`${data.stats.latestYear} (AI Index Report)`}
-                  />
-                  <StatCard
                     label="Frontier AI Sites"
                     value={(data.stats.frontierCount ?? 0).toLocaleString()}
                     color="text-sky-400"
                     subtext={`${data.stats.frontierTotalPowerMW?.toLocaleString()} MW total`}
+                  />
+                  <StatCard
+                    label="AI Energy Demand"
+                    value={`${((data.stats.frontierTotalPowerMW ?? 0) * 8.76 / 1000).toFixed(1)} TWh`}
+                    color="text-amber-400"
+                    subtext="Frontier DC annualised"
                   />
                 </div>
               </div>
@@ -604,15 +600,6 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.dataCenterSpend.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-sky-400" />} title="US Data Center Construction Spend">
-                <MultiAreaChart data={data.dataCenterSpend} keys={seriesKeys(data.dataCenterSpend)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Monthly spending on data center construction in the United States. Source: US Census Bureau / Our World in Data. Updated monthly.
-                </p>
-              </SectionCard>
-              )}
-
               {data.devsUsingAi.length > 0 && (
               <SectionCard icon={<Cpu className="h-5 w-5 text-violet-400" />} title="Developers Using AI Tools">
                 <MultiLineChart data={data.devsUsingAi} keys={seriesKeys(data.devsUsingAi)} formatter={formatPct} />
@@ -623,34 +610,13 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.companyAdoption.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-blue-400" />} title="Company AI Adoption by Region">
-                <MultiLineChart data={data.companyAdoption} keys={seriesKeys(data.companyAdoption)} formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Share of companies using AI technology, by region. Source: McKinsey via AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
-                </p>
-              </SectionCard>
-              )}
-
-              {data.jobPostings.length > 0 && (
-              <SectionCard icon={<Users className="h-5 w-5 text-amber-400" />} title="AI Job Postings Share">
-                <MultiLineChart data={data.jobPostings} keys={seriesKeys(data.jobPostings)} formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Share of all job postings that mention artificial intelligence, by country. Source: AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
-                </p>
-              </SectionCard>
-              )}
-
               {/* ─── Footer attribution ───────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#88DDFC] text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
                 <p>• AI models, systems &amp; benchmarks: <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI</a> and <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
                 <p>• Frontier data centers: <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI — Frontier Data Centers</a> (CC-BY)</p>
                 <p>• Investment, adoption &amp; workforce: <a href="https://aiindex.stanford.edu/report/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">AI Index Report</a> via <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
-                <p>• Data center construction: <a href="https://www.census.gov/construction/c30/c30index.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">US Census Bureau</a> via Our World in Data</p>
-                <p>• Data center locations: <a href="https://github.com/shawn15goh/Data-Center-Location-USA-Datasets" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">IM3 Open Source Data Center Atlas</a> (PNNL / OpenStreetMap)</p>
+                <p>• Developers using AI: <a href="https://survey.stackoverflow.co/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Stack Overflow Developer Survey</a> via Our World in Data</p>
               </div>
             </>
           )}
