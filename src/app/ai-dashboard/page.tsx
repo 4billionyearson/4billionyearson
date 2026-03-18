@@ -335,12 +335,6 @@ export default function AIDashboardPage() {
                     subtext="Epoch AI (live)"
                   />
                   <StatCard
-                    label="US AI Investment"
-                    value={formatBillions(data.stats.usInvestment)}
-                    color="text-green-400"
-                    subtext={`${data.stats.latestYear} (AI Index Report)`}
-                  />
-                  <StatCard
                     label="FrontierMath Leader"
                     value={`${(data.stats.fmTopScore ?? 0).toFixed(1)}%`}
                     color="text-rose-400"
@@ -352,20 +346,44 @@ export default function AIDashboardPage() {
                     color="text-cyan-400"
                     subtext={`${data.stats.latestYear} (AI Index Report)`}
                   />
+                  <StatCard
+                    label="US AI Investment"
+                    value={formatBillions(data.stats.usInvestment)}
+                    color="text-green-400"
+                    subtext={`${data.stats.latestYear} (AI Index Report)`}
+                  />
                 </div>
               </div>
 
-              {/* ═══ LIVE & RECENT (2025–2026) ═══ */}
-              <Divider icon={<Activity className="h-5 w-5" />} title="Live &amp; Recent Data" />
+              {/* ═══ MODELS & BENCHMARKS ═══ */}
+              <Divider icon={<Brain className="h-5 w-5" />} title="Models &amp; Benchmarks" />
 
               {data.frontierMath?.length > 0 && (
-              <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark (2025–2026)">
+              <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark">
                 <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${Math.round(v)}%`} />
                 <p className="text-xs text-gray-500 mt-4">
-                  Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Updated through 2026. Source:{" "}
+                  Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Source:{" "}
                   <a href="https://ourworldindata.org/grapher/ai-frontier-math-benchmark" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI / Our World in Data
-                  </a>.
+                  </a>. Updated monthly.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.aiSystemsPerYear.length > 0 && (
+              <SectionCard icon={<Brain className="h-5 w-5 text-violet-400" />} title="AI Systems Released Per Year">
+                <StackedBarChart data={data.aiSystemsPerYear} keys={seriesKeys(data.aiSystemsPerYear)} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Number of large-scale AI systems released per year, by domain (language, vision, multimodal, etc.). Source: Epoch AI / Our World in Data. Updated monthly.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.aiSystemsByCountry.length > 0 && (
+              <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title="Cumulative AI Systems by Country">
+                <MultiAreaChart data={data.aiSystemsByCountry} keys={seriesKeys(data.aiSystemsByCountry)} stacked />
+                <p className="text-xs text-gray-500 mt-4">
+                  Cumulative number of large-scale AI systems by country of origin since 2017. Source: Epoch AI / Our World in Data. Updated monthly.
                 </p>
               </SectionCard>
               )}
@@ -386,19 +404,19 @@ export default function AIDashboardPage() {
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="Notable AI Models Per Year">
                 <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} />
                 <p className="text-xs text-gray-500 mt-4">
-                  Total notable AI models tracked by Epoch AI per year (2010–present). Source: Epoch AI Notable Models Database.
+                  Total notable AI models tracked by Epoch AI per year (2010–present). Source: Epoch AI Notable Models Database. Updated continuously.
                 </p>
               </SectionCard>
               )}
 
-              {/* ═══ INFRASTRUCTURE (through Q3 2025) ═══ */}
-              <Divider icon={<Cpu className="h-5 w-5" />} title="AI Infrastructure (2025)" />
+              {/* ═══ INFRASTRUCTURE & WORKFORCE ═══ */}
+              <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure &amp; Workforce" />
 
               {data.dataCenterSpend.length > 0 && (
               <SectionCard icon={<Building2 className="h-5 w-5 text-sky-400" />} title="US Data Center Construction Spend">
                 <MultiAreaChart data={data.dataCenterSpend} keys={seriesKeys(data.dataCenterSpend)} formatter={formatBillions} />
                 <p className="text-xs text-gray-500 mt-4">
-                  Monthly spending on data center construction in the United States. Data through Aug 2025. Source: US Census Bureau / Our World in Data.
+                  Monthly spending on data center construction in the United States. Source: US Census Bureau / Our World in Data. Updated monthly.
                 </p>
               </SectionCard>
               )}
@@ -408,85 +426,17 @@ export default function AIDashboardPage() {
                 <MultiLineChart data={data.devsUsingAi} keys={seriesKeys(data.devsUsingAi)} formatter={formatPct} />
                 <p className="text-xs text-gray-500 mt-4">
                   Share of professional software developers using AI coding tools. Source: Stack Overflow Developer Survey / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~mid-2026 (annual survey).</span>
                 </p>
               </SectionCard>
               )}
-
-              {/* ═══ MODELS & CAPABILITIES (through 2026) ═══ */}
-              <Divider icon={<Brain className="h-5 w-5" />} title="Models &amp; Capabilities" />
-
-              {data.aiSystemsPerYear.length > 0 && (
-              <SectionCard icon={<Brain className="h-5 w-5 text-violet-400" />} title="AI Systems Released Per Year">
-                <StackedBarChart data={data.aiSystemsPerYear} keys={seriesKeys(data.aiSystemsPerYear)} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Number of large-scale AI systems released per year, by domain (language, vision, multimodal, etc.). Data through 2026. Source: Epoch AI / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.aiSystemsByCountry.length > 0 && (
-              <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title="Cumulative AI Systems by Country">
-                <MultiAreaChart data={data.aiSystemsByCountry} keys={seriesKeys(data.aiSystemsByCountry)} stacked />
-                <p className="text-xs text-gray-500 mt-4">
-                  Cumulative number of large-scale AI systems by country of origin since 2017. Data through 2026. Source: Epoch AI / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {/* ═══ INVESTMENT (2024) ═══ */}
-              <Divider icon={<DollarSign className="h-5 w-5" />} title="AI Investment (2024)" />
-              <p className="text-xs text-amber-400/80 text-center -mt-3 mb-2">
-                Annual data from the AI Index Report. Next update expected ~April 2026.
-              </p>
-
-              <SectionCard icon={<DollarSign className="h-5 w-5 text-cyan-400" />} title="Global AI Investment">
-                <MultiAreaChart data={data.investment} keys={seriesKeys(data.investment)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Total private investment into AI companies raising above $1.5M. Inflation-adjusted (constant 2021 US$). Source:{" "}
-                  <a href="https://ourworldindata.org/grapher/private-investment-in-artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Quid via AI Index Report
-                  </a>{" "}/ Our World in Data.
-                </p>
-              </SectionCard>
-
-              {data.genAiInvestment.length > 0 && (
-              <SectionCard icon={<TrendingUp className="h-5 w-5 text-violet-400" />} title="Generative AI Investment">
-                <MultiAreaChart data={data.genAiInvestment} keys={seriesKeys(data.genAiInvestment)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Investment into privately held generative AI companies specifically. Source: Quid via AI Index Report / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.corporateDeals.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-orange-400" />} title="Corporate AI Deals by Type">
-                <StackedBarChart data={data.corporateDeals} keys={seriesKeys(data.corporateDeals)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Annual corporate finance transactions involving AI companies: mergers &amp; acquisitions, private investment, public offerings, and minority stakes.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.newCompanies.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-emerald-400" />} title="Newly-Funded AI Companies">
-                <MultiLineChart data={data.newCompanies} keys={seriesKeys(data.newCompanies)} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Number of newly-funded AI companies by region per year.
-                </p>
-              </SectionCard>
-              )}
-
-              {/* ═══ ADOPTION & WORKFORCE (2024) ═══ */}
-              <Divider icon={<Users className="h-5 w-5" />} title="Adoption &amp; Workforce (2024)" />
-              <p className="text-xs text-amber-400/80 text-center -mt-3 mb-2">
-                Annual data from the AI Index Report. Next update expected ~April 2026.
-              </p>
 
               {data.companyAdoption.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-blue-400" />} title="Company AI Adoption">
+              <SectionCard icon={<Building2 className="h-5 w-5 text-blue-400" />} title="Company AI Adoption by Region">
                 <MultiAreaChart data={data.companyAdoption} keys={seriesKeys(data.companyAdoption)} formatter={formatPct} stacked />
                 <p className="text-xs text-gray-500 mt-4">
                   Share of companies using AI technology, by region. Source: McKinsey via AI Index Report / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
                 </p>
               </SectionCard>
               )}
@@ -495,7 +445,52 @@ export default function AIDashboardPage() {
               <SectionCard icon={<Users className="h-5 w-5 text-amber-400" />} title="AI Job Postings Share">
                 <MultiLineChart data={data.jobPostings} keys={seriesKeys(data.jobPostings)} formatter={formatPct} />
                 <p className="text-xs text-gray-500 mt-4">
-                  Share of all job postings that mention artificial intelligence, by country.
+                  Share of all job postings that mention artificial intelligence, by country. Source: AI Index Report / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
+                </p>
+              </SectionCard>
+              )}
+
+              {/* ═══ INVESTMENT ═══ */}
+              <Divider icon={<DollarSign className="h-5 w-5" />} title="Investment" />
+
+              <SectionCard icon={<DollarSign className="h-5 w-5 text-cyan-400" />} title="Global AI Investment">
+                <MultiAreaChart data={data.investment} keys={seriesKeys(data.investment)} formatter={formatBillions} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Total private investment into AI companies raising above $1.5M. Inflation-adjusted (constant 2021 US$). Source:{" "}
+                  <a href="https://ourworldindata.org/grapher/private-investment-in-artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Quid via AI Index Report
+                  </a>{" "}/ Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
+                </p>
+              </SectionCard>
+
+              {data.genAiInvestment.length > 0 && (
+              <SectionCard icon={<TrendingUp className="h-5 w-5 text-violet-400" />} title="Generative AI Investment">
+                <MultiAreaChart data={data.genAiInvestment} keys={seriesKeys(data.genAiInvestment)} formatter={formatBillions} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Investment into privately held generative AI companies specifically. Source: Quid via AI Index Report / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
+                </p>
+              </SectionCard>
+              )}
+
+              {data.corporateDeals.length > 0 && (
+              <SectionCard icon={<Building2 className="h-5 w-5 text-orange-400" />} title="Corporate AI Deals by Type">
+                <StackedBarChart data={data.corporateDeals} keys={seriesKeys(data.corporateDeals)} formatter={formatBillions} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Annual corporate finance transactions involving AI companies: mergers &amp; acquisitions, private investment, public offerings, and minority stakes. Source: AI Index Report / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
+                </p>
+              </SectionCard>
+              )}
+
+              {data.newCompanies.length > 0 && (
+              <SectionCard icon={<Building2 className="h-5 w-5 text-emerald-400" />} title="Newly-Funded AI Companies">
+                <MultiLineChart data={data.newCompanies} keys={seriesKeys(data.newCompanies)} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Number of newly-funded AI companies by region per year. Source: AI Index Report / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
                 </p>
               </SectionCard>
               )}
