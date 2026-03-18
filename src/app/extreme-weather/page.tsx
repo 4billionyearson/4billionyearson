@@ -532,7 +532,11 @@ const EventsMap = dynamic(
         React.useEffect(() => {
           if (events.length === 0) return;
           const bounds = L.default.latLngBounds(events.map((e) => [e.lat, e.lon]));
-          map.fitBounds(bounds, { padding: [30, 30], maxZoom: 5 });
+          const isMobile = map.getContainer().clientWidth < 768;
+          map.fitBounds(bounds, {
+            padding: isMobile ? [15, 15] : [40, 40],
+            maxZoom: isMobile ? 3 : 5,
+          });
         }, [events, map]);
         return null;
       }
