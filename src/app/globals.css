@@ -66,6 +66,30 @@ html {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* Dark labels for light-background maps (extreme weather) */
+.country-label-dark,
+.continent-label-dark {
+  background: none !important;
+  border: none !important;
+}
+.country-label-dark span,
+.continent-label-dark span {
+  display: block;
+  white-space: nowrap;
+  color: rgba(30, 41, 59, 0.7);
+  font-weight: 600;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.continent-label-dark span {
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(30, 41, 59, 0.6);
+}
+
 /* Richer sea colour on Voyager map tiles */
 .leaflet-tile-pane img {
   filter: saturate(3);

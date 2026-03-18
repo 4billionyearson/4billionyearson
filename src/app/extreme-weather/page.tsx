@@ -450,9 +450,9 @@ const EventsMap = dynamic(
     ]).then(([mod, L, geoData]) => {
       const { MapContainer, TileLayer, CircleMarker, Popup, Marker, useMap, useMapEvents } = mod;
       const ALERT_FILL: Record<string, string> = {
-        Red: "#ef4444",
-        Orange: "#f97316",
-        Green: "#10b981",
+        Red: "#dc2626",
+        Orange: "#ea580c",
+        Green: "#059669",
       };
       const ALERT_BG: Record<string, string> = {
         Red: "#1a0505",
@@ -505,7 +505,7 @@ const EventsMap = dynamic(
               : countryLabels;
 
         const fontSize = zoom <= 2 ? 13 : 10;
-        const cls = zoom <= 2 ? "continent-label" : "country-label";
+        const cls = zoom <= 2 ? "continent-label-dark" : "country-label-dark";
 
         return (
           <>
@@ -536,23 +536,23 @@ const EventsMap = dynamic(
             maxZoom={8}
             scrollWheelZoom={true}
             className="h-[350px] md:h-[420px] w-full rounded-xl z-0"
-            style={{ background: "#1e293b" }}
+            style={{ background: "#BEEEF9" }}
           >
             <TileLayer
               attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
             />
             <MapLabels />
             {events.map((e, i) => (
               <CircleMarker
                 key={i}
                 center={[e.lat, e.lon]}
-                radius={e.alertLevel === "Red" ? 8 : e.alertLevel === "Orange" ? 6 : 4}
+                radius={e.alertLevel === "Red" ? 14 : e.alertLevel === "Orange" ? 11 : 9}
                 pathOptions={{
-                  color: ALERT_FILL[e.alertLevel] || "#6b7280",
+                  color: "#1e293b",
                   fillColor: ALERT_FILL[e.alertLevel] || "#6b7280",
-                  fillOpacity: 0.6,
-                  weight: 1.5,
+                  fillOpacity: 0.75,
+                  weight: 2,
                 }}
               >
                 <Popup>
