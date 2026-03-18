@@ -292,7 +292,7 @@ export default function AIDashboardPage() {
           <div className="rounded-2xl border-2 border-[#88DDFC] shadow-xl overflow-hidden">
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: "#88DDFC" }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: "#FFF5E7" }}>
-                AI Industry &amp; Research
+                AI Industry Data
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
@@ -356,7 +356,7 @@ export default function AIDashboardPage() {
               </div>
 
               {/* ═══ MODELS & BENCHMARKS ═══ */}
-              <Divider icon={<Brain className="h-5 w-5" />} title="Models &amp; Benchmarks" />
+              <Divider icon={<Brain className="h-5 w-5" />} title="Models" />
 
               {data.epochModelsByOrg?.length > 0 && (
               <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 Notable AI Models by Organization">
@@ -410,48 +410,6 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {/* ═══ INFRASTRUCTURE & WORKFORCE ═══ */}
-              <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure &amp; Workforce" />
-
-              {data.dataCenterSpend.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-sky-400" />} title="US Data Center Construction Spend">
-                <MultiAreaChart data={data.dataCenterSpend} keys={seriesKeys(data.dataCenterSpend)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Monthly spending on data center construction in the United States. Source: US Census Bureau / Our World in Data. Updated monthly.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.devsUsingAi.length > 0 && (
-              <SectionCard icon={<Cpu className="h-5 w-5 text-violet-400" />} title="Developers Using AI Tools">
-                <MultiLineChart data={data.devsUsingAi} keys={seriesKeys(data.devsUsingAi)} formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Share of professional software developers using AI coding tools. Source: Stack Overflow Developer Survey / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~mid-2026 (annual survey).</span>
-                </p>
-              </SectionCard>
-              )}
-
-              {data.companyAdoption.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-blue-400" />} title="Company AI Adoption by Region">
-                <MultiAreaChart data={data.companyAdoption} keys={seriesKeys(data.companyAdoption)} formatter={formatPct} stacked />
-                <p className="text-xs text-gray-500 mt-4">
-                  Share of companies using AI technology, by region. Source: McKinsey via AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
-                </p>
-              </SectionCard>
-              )}
-
-              {data.jobPostings.length > 0 && (
-              <SectionCard icon={<Users className="h-5 w-5 text-amber-400" />} title="AI Job Postings Share">
-                <MultiLineChart data={data.jobPostings} keys={seriesKeys(data.jobPostings)} formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Share of all job postings that mention artificial intelligence, by country. Source: AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
-                </p>
-              </SectionCard>
-              )}
-
               {/* ═══ INVESTMENT ═══ */}
               <Divider icon={<DollarSign className="h-5 w-5" />} title="Investment" />
 
@@ -491,6 +449,48 @@ export default function AIDashboardPage() {
                 <MultiLineChart data={data.newCompanies} keys={seriesKeys(data.newCompanies)} />
                 <p className="text-xs text-gray-500 mt-4">
                   Number of newly-funded AI companies by region per year. Source: AI Index Report / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
+                </p>
+              </SectionCard>
+              )}
+
+              {/* ═══ INFRASTRUCTURE & WORKFORCE ═══ */}
+              <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure &amp; Workforce" />
+
+              {data.dataCenterSpend.length > 0 && (
+              <SectionCard icon={<Building2 className="h-5 w-5 text-sky-400" />} title="US Data Center Construction Spend">
+                <MultiAreaChart data={data.dataCenterSpend} keys={seriesKeys(data.dataCenterSpend)} formatter={formatBillions} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Monthly spending on data center construction in the United States. Source: US Census Bureau / Our World in Data. Updated monthly.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.devsUsingAi.length > 0 && (
+              <SectionCard icon={<Cpu className="h-5 w-5 text-violet-400" />} title="Developers Using AI Tools">
+                <MultiLineChart data={data.devsUsingAi} keys={seriesKeys(data.devsUsingAi)} formatter={formatPct} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Share of professional software developers using AI coding tools. Source: Stack Overflow Developer Survey / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~mid-2026 (annual survey).</span>
+                </p>
+              </SectionCard>
+              )}
+
+              {data.companyAdoption.length > 0 && (
+              <SectionCard icon={<Building2 className="h-5 w-5 text-blue-400" />} title="Company AI Adoption by Region">
+                <MultiLineChart data={data.companyAdoption} keys={seriesKeys(data.companyAdoption)} formatter={formatPct} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Share of companies using AI technology, by region. Source: McKinsey via AI Index Report / Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
+                </p>
+              </SectionCard>
+              )}
+
+              {data.jobPostings.length > 0 && (
+              <SectionCard icon={<Users className="h-5 w-5 text-amber-400" />} title="AI Job Postings Share">
+                <MultiLineChart data={data.jobPostings} keys={seriesKeys(data.jobPostings)} formatter={formatPct} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Share of all job postings that mention artificial intelligence, by country. Source: AI Index Report / Our World in Data.
                   <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
                 </p>
               </SectionCard>
