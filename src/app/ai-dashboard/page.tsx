@@ -497,16 +497,11 @@ export default function AIDashboardPage() {
               )}
 
               {/* ─── Footer attribution ───────────────────────────── */}
-              <div className="text-center text-xs text-gray-600 pt-4">
-                Data from{" "}
-                <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                  Our World in Data
-                </a>
-                {" "}(Epoch AI, AI Index Report) and the{" "}
-                <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                  Epoch AI Notable Models Database
-                </a>. Licensed under{" "}
-                <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">CC BY 4.0</a>.
+              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#88DDFC] text-sm text-gray-400 space-y-1.5">
+                <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
+                <p>• AI models, systems &amp; benchmarks: <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI Notable Models Database</a> and <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
+                <p>• Investment, adoption &amp; workforce: <a href="https://aiindex.stanford.edu/report/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">AI Index Report</a> via <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
+                <p>• Data center construction: <a href="https://www.census.gov/construction/c30/c30index.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">US Census Bureau</a> via Our World in Data</p>
               </div>
             </>
           )}
