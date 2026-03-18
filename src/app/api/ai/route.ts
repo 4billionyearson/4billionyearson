@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v1';
+const CACHE_KEY = 'ai:dashboard:v2';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
