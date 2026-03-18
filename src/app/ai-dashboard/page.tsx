@@ -362,7 +362,7 @@ export default function AIDashboardPage() {
                   />
                   <StatCard
                     label="2025 Notable Models"
-                    value={String(data.stats.totalModels2025)}
+                    value={String(data.stats.totalModels2025 ?? 0)}
                     color="text-violet-400"
                     subtext="Tracked by Epoch AI (live)"
                   />
@@ -490,7 +490,7 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.frontierMath.length > 0 && (
+              {data.frontierMath?.length > 0 && (
               <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark (2025–2026)">
                 <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${v.toFixed(1)}%`} />
                 <p className="text-xs text-gray-500 mt-4">
@@ -502,7 +502,7 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.epochModelsByOrg.length > 0 && (
+              {data.epochModelsByOrg?.length > 0 && (
               <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 Notable AI Models by Organization">
                 <Top10BarChart data={data.epochModelsByOrg} dataKey="models" />
                 <p className="text-xs text-gray-500 mt-4">
@@ -514,7 +514,7 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.epochModelsByYear.length > 0 && (
+              {data.epochModelsByYear?.length > 0 && (
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="Notable AI Models Per Year">
                 <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} />
                 <p className="text-xs text-gray-500 mt-4">
@@ -523,7 +523,7 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.selfDrivingMiles.length > 0 && (
+              {data.selfDrivingMiles?.length > 0 && (
               <SectionCard icon={<Car className="h-5 w-5 text-green-400" />} title="Self-Driving Taxi Passenger Miles">
                 <MultiAreaChart data={data.selfDrivingMiles} keys={seriesKeys(data.selfDrivingMiles)} formatter={formatCompact} />
                 <p className="text-xs text-gray-500 mt-4">
