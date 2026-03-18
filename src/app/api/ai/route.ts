@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v13';
+const CACHE_KEY = 'ai:dashboard:v14';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -444,17 +444,12 @@ async function fetchAIDashboardData() {
   // Fetch all indicators in parallel
   const [
     investData, investMap,
-    companiesData, companiesMap,
-    devsData,
     systemsData, systemsMap,
     systemsCountryData, systemsCountryMap,
     frontierMathData, frontierMathMap,
   ] = await Promise.all([
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.privateInvestment}.data.json`),
     fetchEntityMap(INDICATORS.privateInvestment),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.newCompanies}.data.json`),
-    fetchEntityMap(INDICATORS.newCompanies),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.devsUsingAi}.data.json`),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiSystems}.data.json`),
     fetchEntityMap(INDICATORS.aiSystems),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiSystemsByCountry}.data.json`),
@@ -467,14 +462,6 @@ async function fetchAIDashboardData() {
   // ─ Investment ─
   const investRows = parseOWID(investData);
   const investment = buildTimeSeries(investRows, investMap, ['World', 'United States', 'Europe', 'China']);
-
-  // ─ New companies ─
-  const compRows = parseOWID(companiesData);
-  const newCompanies = buildTimeSeries(compRows, companiesMap, ['World', 'United States', 'China', 'Europe']);
-
-  // ─ Developers using AI ─
-  const devRows = parseOWID(devsData);
-  const devsUsingAi = buildTimeSeries(devRows, investMap, ['World']);
 
   // ─ AI systems per year ─
   const sysRows = parseOWID(systemsData);
@@ -516,8 +503,6 @@ async function fetchAIDashboardData() {
 
   return {
     investment,
-    newCompanies,
-    devsUsingAi,
     aiSystemsPerYear,
     aiSystemsByCountry,
     frontierMath,

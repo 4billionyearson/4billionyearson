@@ -6,7 +6,7 @@ import {
   Tooltip, Legend, ResponsiveContainer, Brush, Cell,
 } from "recharts";
 import {
-  Loader2, Brain, DollarSign, TrendingUp, Building2, Users,
+  Loader2, Brain, DollarSign, TrendingUp,
   Cpu, Globe, BarChart3, Activity, MapPin,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -17,8 +17,6 @@ const DataCenterMap = dynamic(() => import("@/app/_components/data-center-map"),
 
 interface AIDashboardData {
   investment: Record<string, number>[];
-  newCompanies: Record<string, number>[];
-  devsUsingAi: Record<string, number>[];
   aiSystemsPerYear: Record<string, number>[];
   aiSystemsByCountry: Record<string, number>[];
   frontierMath: { name: string; score: number; date: string }[];
@@ -358,7 +356,7 @@ export default function AIDashboardPage() {
                     label="Frontier AI Sites"
                     value={(data.stats.frontierCount ?? 0).toLocaleString()}
                     color="text-sky-400"
-                    subtext={`${data.stats.frontierTotalPowerMW?.toLocaleString()} MW total`}
+                    subtext={`${data.frontierDataCenters?.filter(dc => dc.powerMW > 0).length ?? 0} Operational · ${data.frontierDataCenters?.filter(dc => dc.powerMW <= 0).length ?? 0} Planned`}
                   />
                   <StatCard
                     label="AI Energy Demand"
@@ -471,18 +469,8 @@ export default function AIDashboardPage() {
                 </p>
               </SectionCard>
 
-              {data.newCompanies.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-emerald-400" />} title="Newly-Funded AI Companies">
-                <MultiLineChart data={data.newCompanies} keys={seriesKeys(data.newCompanies)} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Number of newly-funded AI companies by region per year. Source: AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
-                </p>
-              </SectionCard>
-              )}
-
-              {/* ═══ INFRASTRUCTURE & WORKFORCE ═══ */}
-              <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure &amp; Workforce" />
+              {/* ═══ INFRASTRUCTURE ═══ */}
+              <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure" />
 
               {data.frontierDataCenters?.length > 0 && (
               <SectionCard icon={<Cpu className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Centers">
@@ -578,23 +566,12 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.devsUsingAi.length > 0 && (
-              <SectionCard icon={<Cpu className="h-5 w-5 text-violet-400" />} title="Developers Using AI Tools">
-                <MultiLineChart data={data.devsUsingAi} keys={seriesKeys(data.devsUsingAi)} formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Share of professional software developers using AI coding tools. Source: Stack Overflow Developer Survey / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~mid-2026 (annual survey).</span>
-                </p>
-              </SectionCard>
-              )}
-
               {/* ─── Footer attribution ───────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#88DDFC] text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
                 <p>• AI models, systems &amp; benchmarks: <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI</a> and <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
                 <p>• Frontier data centers: <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI — Frontier Data Centers</a> (CC-BY)</p>
-                <p>• Investment, adoption &amp; workforce: <a href="https://aiindex.stanford.edu/report/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">AI Index Report</a> via <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
-                <p>• Developers using AI: <a href="https://survey.stackoverflow.co/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Stack Overflow Developer Survey</a> via Our World in Data</p>
+                <p>• Investment: <a href="https://aiindex.stanford.edu/report/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">AI Index Report</a> via <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
               </div>
             </>
           )}
