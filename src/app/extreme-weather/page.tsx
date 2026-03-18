@@ -534,7 +534,7 @@ const EventsMap = dynamic(
           const bounds = L.default.latLngBounds(events.map((e) => [e.lat, e.lon]));
           const width = map.getContainer().clientWidth;
           const maxZoom = width < 500 ? 1 : width < 768 ? 3 : 5;
-          const pad = width < 500 ? [10, 10] : [40, 40];
+          const pad = width < 500 ? [20, 30] : [40, 40];
           map.fitBounds(bounds, { padding: pad as [number, number], maxZoom });
         }, [events, map]);
         return null;
