@@ -308,7 +308,7 @@ export default function AIDashboardPage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Tracking AI models released, investment, and data center infrastructure.
+                Tracking AI models released, data center infrastructure, and investment.
               </p>
             </div>
           </div>
@@ -458,6 +458,18 @@ export default function AIDashboardPage() {
               <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure" />
 
               {data.frontierDataCenters?.length > 0 && (
+              <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Center Locations">
+                <DataCenterMap sites={data.frontierDataCenters} />
+                <p className="text-xs text-gray-500 mt-4">
+                  {data.stats.frontierCount} frontier AI data centers tracked globally ({data.frontierDataCenters.filter(dc => dc.country === 'United States').length} in the US). Pin size indicates power capacity. Source:{" "}
+                  <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI — Frontier Data Centers
+                  </a>{" "}(CC-BY).
+                </p>
+              </SectionCard>
+              )}
+
+              {data.frontierDataCenters?.length > 0 && (
               <SectionCard icon={<Cpu className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Centers">
                 {(() => {
                   const operational = data.frontierDataCenters.filter(dc => dc.powerMW > 0);
@@ -484,6 +496,7 @@ export default function AIDashboardPage() {
                         <div className="bg-gray-800/60 rounded-lg p-3 text-center">
                           <div className="text-2xl font-bold text-violet-400">${Math.round(opCost * 10) / 10}B</div>
                           <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">2021–2029, {data.stats.frontierCount} sites</div>
                         </div>
                       </div>
                       <p className="text-xs text-gray-500 mt-2">H100 Equivalents = total GPU compute capacity normalised to NVIDIA H100 chips, allowing comparison across different hardware.</p>
@@ -547,18 +560,6 @@ export default function AIDashboardPage() {
                   Cumulative operational power capacity across all tracked frontier AI data centers. Source:{" "}
                   <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI
-                  </a>{" "}(CC-BY).
-                </p>
-              </SectionCard>
-              )}
-
-              {data.frontierDataCenters?.length > 0 && (
-              <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Center Locations">
-                <DataCenterMap sites={data.frontierDataCenters} />
-                <p className="text-xs text-gray-500 mt-4">
-                  {data.stats.frontierCount} frontier AI data centers tracked globally ({data.frontierDataCenters.filter(dc => dc.country === 'United States').length} in the US). Pin size indicates power capacity. Source:{" "}
-                  <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Epoch AI — Frontier Data Centers
                   </a>{" "}(CC-BY).
                 </p>
               </SectionCard>
