@@ -36,6 +36,7 @@ const SECTIONS: Section[] = [
     color: "#88DDFC",
     icon: <Brain className="h-6 w-6" />,
     links: [
+      { href: "/ai-dashboard", label: "AI Industry Data", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Investment, adoption & research" },
       { href: "/ai-explained", label: "AI Explained", icon: <Cpu className="h-4 w-4" />, desc: "Plain-English guide to AI" },
       { href: "/category/artificial-intelligence", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "artificial-intelligence", desc: "Latest articles" },
     ],
@@ -77,6 +78,7 @@ const SECTIONS: Section[] = [
     color: "#FFF5E7",
     icon: <Dna className="h-6 w-6" />,
     links: [
+      { href: "/biotech-dashboard", label: "Biotech & Health Data", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Genomics, trials & global health" },
       { href: "/biotech-explained", label: "Biotech Explained", icon: <Microscope className="h-4 w-4" />, desc: "Plain-English guide to biotech" },
       { href: "/category/biotechnology", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "biotechnology", desc: "Latest articles" },
     ],
