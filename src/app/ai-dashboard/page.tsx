@@ -552,7 +552,11 @@ export default function AIDashboardPage() {
                       <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
                       <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
                       <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
-                      <Brush dataKey="date" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10} />
+                      <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                        <AreaChart data={data.frontierDCTimeline}>
+                          <Area type="monotone" dataKey="totalPowerMW" stroke="#10b981" fill="#10b981" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                        </AreaChart>
+                      </Brush>
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>

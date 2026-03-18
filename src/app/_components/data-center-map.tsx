@@ -198,6 +198,56 @@ const InnerMap = dynamic(
         );
       }
 
+      const US_STATES_ZOOM = 4;
+
+      function USStateLabels() {
+        const map = useMap();
+        const [visible, setVisible] = React.useState(map.getZoom() >= US_STATES_ZOOM);
+        const [statesGeo, setStatesGeo] = React.useState<any>(null);
+        const fetched = React.useRef(false);
+
+        useMapEvents({ zoomend: () => setVisible(map.getZoom() >= US_STATES_ZOOM) });
+
+        React.useEffect(() => {
+          if (visible && !fetched.current) {
+            fetched.current = true;
+            fetch("/data/us-states.json")
+              .then(r => r.json())
+              .then(geo => setStatesGeo(geo))
+              .catch(() => {});
+          }
+        }, [visible]);
+
+        if (!visible || !statesGeo) return null;
+
+        const stateLabels: { name: string; pos: [number, number] }[] = [];
+        for (const f of statesGeo.features) {
+          const name = f.properties?.name;
+          if (!name) continue;
+          const pos = featureCentroid(f);
+          if (pos) stateLabels.push({ name, pos });
+        }
+
+        return (
+          <>
+            {stateLabels.map(({ name, pos }) => (
+              <Marker
+                key={`state-${name}`}
+                position={pos}
+                pane="labels"
+                interactive={false}
+                icon={L.default.divIcon({
+                  className: "country-label-dark",
+                  html: `<span style="font-size:9px">${name}</span>`,
+                  iconSize: [0, 0],
+                  iconAnchor: [0, 0],
+                })}
+              />
+            ))}
+          </>
+        );
+      }
+
       function FitSites({ sites }: { sites: SiteData[] }) {
         const map = useMap();
         React.useEffect(() => {
@@ -234,6 +284,7 @@ const InnerMap = dynamic(
               url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
             />
             <MapLabels />
+            <USStateLabels />
             <FitSites sites={sites} />
             {sites.map((site, i) => {
               if (!site.lat || !site.lon) return null;
