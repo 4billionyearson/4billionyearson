@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v3';
+const CACHE_KEY = 'ai:dashboard:v4';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -14,16 +14,10 @@ const INDICATORS = {
   companyAdoption: 1025671,     // Share of companies using AI
   aiJobPostings: 1025677,       // AI job postings share
   devsUsingAi: 1146598,         // Software devs using AI tools
-  nvidiaRevenue: 1119964,       // NVIDIA quarterly revenue by segment
   dataCenterSpend: 1132529,     // Monthly US data center construction spend
   aiSystems: 1015499,           // Large-scale AI systems released per year
   aiSystemsByCountry: 1015497,  // Cumulative AI systems by country
-  aiPublications: 1119074,      // AI scholarly publications
-  aiPatents: 1119050,           // AI patent applications by country
-  aiBills: 1025672,             // AI bills passed into law
-  aiTestScores: 852592,         // AI test scores vs human performance
   frontierMath: 1144186,        // FrontierMath benchmark scores (2025-2026)
-  selfDrivingMiles: 1129220,    // Self-driving taxi passenger miles (2025)
 };
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -71,27 +65,6 @@ function owidDayToDate(dayOffset: number, zeroDay: string): Date {
   const [y, m, d] = zeroDay.split('-').map(Number);
   const base = new Date(y, m - 1, d);
   return new Date(base.getTime() + dayOffset * 86400000);
-}
-
-/** Build time series for sub-annual (yearIsDay) data, converting day offsets to quarter labels */
-function buildQuarterTimeSeries(
-  rows: OwidRow[],
-  entityMap: Record<number, string>,
-  zeroDay: string,
-): Record<string, any>[] {
-  const byLabel = new Map<string, Record<string, any>>();
-  for (const r of rows) {
-    const name = entityMap[r.entityId];
-    if (!name) continue;
-    const date = owidDayToDate(r.year, zeroDay);
-    const q = Math.floor(date.getMonth() / 3) + 1;
-    const label = `Q${q} ${date.getFullYear()}`;
-    if (!byLabel.has(label)) byLabel.set(label, { year: label, _sort: r.year });
-    byLabel.get(label)![name] = (byLabel.get(label)![name] || 0) + r.value;
-  }
-  return Array.from(byLabel.values())
-    .sort((a, b) => a._sort - b._sort)
-    .map(({ _sort, ...rest }) => rest);
 }
 
 /** Build time series for sub-annual (yearIsDay) data, converting day offsets to month labels */
@@ -150,24 +123,6 @@ function buildTimeSeries(
     byYear.get(r.year)![name] = r.value;
   }
   return Array.from(byYear.values()).sort((a, b) => a["year"] - b["year"]);
-}
-
-function getLatestByEntity(
-  rows: OwidRow[],
-  entityMap: Record<number, string>,
-  excludeNames?: Set<string>,
-): { name: string; value: number; year: number }[] {
-  const latest = new Map<string, { value: number; year: number }>();
-  for (const r of rows) {
-    const name = entityMap[r.entityId];
-    if (!name || excludeNames?.has(name)) continue;
-    const prev = latest.get(name);
-    if (!prev || r.year > prev.year) {
-      latest.set(name, { value: r.value, year: r.year });
-    }
-  }
-  return Array.from(latest.entries())
-    .map(([name, d]) => ({ name, value: d.value, year: d.year }));
 }
 
 /* ─── Epoch AI CSV — live notable model data ──────────────────────────────── */
@@ -248,16 +203,6 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
-/* ─── Regions/aggregates to exclude from country rankings ─────────────────── */
-
-const EXCLUDE_AGGREGATES = new Set([
-  'World', 'Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania',
-  'European Union (27)', 'European Union (28)', 'High-income countries',
-  'Upper-middle-income countries', 'Lower-middle-income countries', 'Low-income countries',
-  'All geographies', 'Developing markets', 'Greater China', 'Asia-Pacific',
-  'All large-scale AI systems',
-]);
-
 /* ─── Main data fetch ─────────────────────────────────────────────────────── */
 
 async function fetchAIDashboardData() {
@@ -270,16 +215,10 @@ async function fetchAIDashboardData() {
     adoptionData, adoptionMap,
     jobsData, jobsMap,
     devsData,
-    nvidiaData, nvidiaMap,
     dcSpendData,
     systemsData, systemsMap,
     systemsCountryData, systemsCountryMap,
-    pubsData, pubsMap,
-    patentsData, patentsMap,
-    billsData, billsMap,
-    testScoresData, testScoresMap,
     frontierMathData, frontierMathMap,
-    selfDrivingData, selfDrivingMap,
   ] = await Promise.all([
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.privateInvestment}.data.json`),
     fetchEntityMap(INDICATORS.privateInvestment),
@@ -293,26 +232,14 @@ async function fetchAIDashboardData() {
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiJobPostings}.data.json`),
     fetchEntityMap(INDICATORS.aiJobPostings),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.devsUsingAi}.data.json`),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.nvidiaRevenue}.data.json`),
-    fetchEntityMap(INDICATORS.nvidiaRevenue),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.dataCenterSpend}.data.json`),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiSystems}.data.json`),
     fetchEntityMap(INDICATORS.aiSystems),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiSystemsByCountry}.data.json`),
     fetchEntityMap(INDICATORS.aiSystemsByCountry),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiPublications}.data.json`),
-    fetchEntityMap(INDICATORS.aiPublications),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiPatents}.data.json`),
-    fetchEntityMap(INDICATORS.aiPatents),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiBills}.data.json`),
-    fetchEntityMap(INDICATORS.aiBills),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.aiTestScores}.data.json`),
-    fetchEntityMap(INDICATORS.aiTestScores),
     // Fresh 2025-2026 indicators
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.frontierMath}.data.json`),
     fetchEntityMap(INDICATORS.frontierMath),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.selfDrivingMiles}.data.json`),
-    fetchEntityMap(INDICATORS.selfDrivingMiles),
   ]);
 
   // ─ Investment ─
@@ -343,10 +270,6 @@ async function fetchAIDashboardData() {
   const devRows = parseOWID(devsData);
   const devsUsingAi = buildTimeSeries(devRows, investMap, ['World']);
 
-  // ─ NVIDIA revenue (sub-annual: yearIsDay, zeroDay=2014-01-01) ─
-  const nvRows = parseOWID(nvidiaData);
-  const nvidiaRevenue = buildQuarterTimeSeries(nvRows, nvidiaMap, '2014-01-01');
-
   // ─ Data center spend (sub-annual: yearIsDay, zeroDay=2014-01-01) ─
   const dcRows = parseOWID(dcSpendData);
   const dataCenterSpend = buildMonthTimeSeries(dcRows, investMap, '2014-01-01', ['United States']);
@@ -359,40 +282,9 @@ async function fetchAIDashboardData() {
   const sysCountryRows = parseOWID(systemsCountryData);
   const aiSystemsByCountry = buildTimeSeries(sysCountryRows, systemsCountryMap);
 
-  // ─ Publications ─
-  const pubRows = parseOWID(pubsData);
-  const publications = buildTimeSeries(pubRows, pubsMap, ['World', 'United States', 'China', 'United Kingdom', 'Germany']);
-
-  // ─ Patents ─
-  const patentRows = parseOWID(patentsData);
-  const topPatents = getLatestByEntity(patentRows, patentsMap, EXCLUDE_AGGREGATES)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-
-  // Patent map data for choropleth
-  const patentMapData: Record<string, number> = {};
-  for (const entry of getLatestByEntity(patentRows, patentsMap, EXCLUDE_AGGREGATES)) {
-    patentMapData[entry.name] = entry.value;
-  }
-
-  // ─ AI regulation ─
-  const billRows = parseOWID(billsData);
-  const aiBills = buildTimeSeries(billRows, billsMap);
-  const topBills = getLatestByEntity(billRows, billsMap, EXCLUDE_AGGREGATES)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-
-  // ─ AI test scores vs human ─
-  const testRows = parseOWID(testScoresData);
-  const testScores = buildTimeSeries(testRows, testScoresMap);
-
   // ─ FrontierMath benchmark (yearIsDay, zeroDay=2024-06-20, data through 2026) ─
   const fmRows = parseOWID(frontierMathData);
   const frontierMath = buildDatePointSeries(fmRows, frontierMathMap, '2024-06-20');
-
-  // ─ Self-driving taxi passenger miles (yearIsDay, zeroDay=2022-03-31) ─
-  const sdRows = parseOWID(selfDrivingData);
-  const selfDrivingMiles = buildMonthTimeSeries(sdRows, selfDrivingMap, '2022-03-31');
 
   // ─ Epoch AI live model data (2025-2026) ─
   const epochData = await fetchEpochModels();
@@ -405,17 +297,6 @@ async function fetchAIDashboardData() {
     .filter(r => investMap[r.entityId] === 'United States')
     .sort((a, b) => b.year - a.year)[0];
 
-  // Latest NVIDIA quarter total
-  const lastNvQuarter = nvidiaRevenue.length > 0 ? nvidiaRevenue[nvidiaRevenue.length - 1] : null;
-  let nvidiaLatestTotal = 0;
-  let nvidiaLatestQuarter = '';
-  if (lastNvQuarter) {
-    nvidiaLatestQuarter = String(lastNvQuarter.year || '');
-    nvidiaLatestTotal = Object.entries(lastNvQuarter)
-      .filter(([k]) => k !== 'year')
-      .reduce((sum, [, v]) => sum + (typeof v === 'number' ? v : 0), 0);
-  }
-
   // FrontierMath top score
   const fmTop = frontierMath.length > 0 ? frontierMath[0] : null;
 
@@ -423,11 +304,7 @@ async function fetchAIDashboardData() {
     latestYear: latestInvestWorld?.year ?? 0,
     globalInvestment: latestInvestWorld?.value ?? 0,
     usInvestment: latestInvestUS?.value ?? 0,
-    topPatentCountry: topPatents[0]?.name ?? '',
-    topPatentCount: topPatents[0]?.value ?? 0,
     totalModels2025: epochData.totalModels2025,
-    nvidiaLatestQuarter,
-    nvidiaLatestTotal,
     fmTopModel: fmTop?.name ?? '',
     fmTopScore: fmTop?.score ?? 0,
   };
@@ -440,18 +317,10 @@ async function fetchAIDashboardData() {
     companyAdoption,
     jobPostings,
     devsUsingAi,
-    nvidiaRevenue,
     dataCenterSpend,
     aiSystemsPerYear,
     aiSystemsByCountry,
-    publications,
-    topPatents,
-    patentMapData,
-    aiBills,
-    topBills,
-    testScores,
     frontierMath,
-    selfDrivingMiles,
     epochModelsByOrg: epochData.modelsByOrg,
     epochModelsByYear: epochData.modelsByYear,
     stats,

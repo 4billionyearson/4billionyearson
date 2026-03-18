@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import {
   Loader2, Brain, DollarSign, TrendingUp, Building2, Users,
-  Cpu, Globe, FileText, Scale, BarChart3, Activity, Car,
+  Cpu, Globe, BarChart3, Activity,
 } from "lucide-react";
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
@@ -20,29 +20,17 @@ interface AIDashboardData {
   companyAdoption: Record<string, number>[];
   jobPostings: Record<string, number>[];
   devsUsingAi: Record<string, number>[];
-  nvidiaRevenue: Record<string, number>[];
   dataCenterSpend: Record<string, number>[];
   aiSystemsPerYear: Record<string, number>[];
   aiSystemsByCountry: Record<string, number>[];
-  publications: Record<string, number>[];
-  topPatents: { name: string; value: number; year: number }[];
-  patentMapData: Record<string, number>;
-  aiBills: Record<string, number>[];
-  topBills: { name: string; value: number; year: number }[];
-  testScores: Record<string, number>[];
   frontierMath: { name: string; score: number; date: string }[];
-  selfDrivingMiles: Record<string, any>[];
   epochModelsByOrg: { name: string; value: number }[];
   epochModelsByYear: Record<string, number>[];
   stats: {
     latestYear: number;
     globalInvestment: number;
     usInvestment: number;
-    topPatentCountry: string;
-    topPatentCount: number;
     totalModels2025: number;
-    nvidiaLatestQuarter: string;
-    nvidiaLatestTotal: number;
     fmTopModel: string;
     fmTopScore: number;
   };
@@ -81,7 +69,7 @@ const BAR_GRADIENT = [
 function DarkTooltip({ active, payload, label, formatter }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[180px]">
+    <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[180px] relative z-50">
       <p className="font-semibold text-gray-200 mb-1 text-sm">{label}</p>
       {payload.filter((p: any) => p.value != null).map((p: any, i: number) => (
         <p key={i} className="text-sm flex items-center gap-1.5">
@@ -347,10 +335,10 @@ export default function AIDashboardPage() {
                     subtext="Epoch AI (live)"
                   />
                   <StatCard
-                    label={`NVIDIA ${data.stats.nvidiaLatestQuarter || 'Latest'}`}
-                    value={formatBillions(data.stats.nvidiaLatestTotal ?? 0)}
+                    label="US AI Investment"
+                    value={formatBillions(data.stats.usInvestment)}
                     color="text-green-400"
-                    subtext="Total quarterly revenue"
+                    subtext={`${data.stats.latestYear} (AI Index Report)`}
                   />
                   <StatCard
                     label="FrontierMath Leader"
@@ -403,26 +391,8 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.selfDrivingMiles?.length > 0 && (
-              <SectionCard icon={<Car className="h-5 w-5 text-green-400" />} title="Self-Driving Taxi Passenger Miles">
-                <MultiAreaChart data={data.selfDrivingMiles} keys={seriesKeys(data.selfDrivingMiles)} formatter={formatCompact} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Quarterly autonomous vehicle passenger miles in California (Waymo, Cruise). Data through 2025. Source: California PUC / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
               {/* ═══ INFRASTRUCTURE (through Q3 2025) ═══ */}
               <Divider icon={<Cpu className="h-5 w-5" />} title="AI Infrastructure (2025)" />
-
-              {data.nvidiaRevenue.length > 0 && (
-              <SectionCard icon={<Cpu className="h-5 w-5 text-green-400" />} title="NVIDIA Quarterly Revenue">
-                <StackedBarChart data={data.nvidiaRevenue} keys={seriesKeys(data.nvidiaRevenue)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  NVIDIA&rsquo;s quarterly revenue by market segment, showing the explosion in data center / AI chip demand. Data through Q3 2025.
-                </p>
-              </SectionCard>
-              )}
 
               {data.dataCenterSpend.length > 0 && (
               <SectionCard icon={<Building2 className="h-5 w-5 text-sky-400" />} title="US Data Center Construction Spend">
@@ -459,16 +429,6 @@ export default function AIDashboardPage() {
                 <MultiAreaChart data={data.aiSystemsByCountry} keys={seriesKeys(data.aiSystemsByCountry)} stacked />
                 <p className="text-xs text-gray-500 mt-4">
                   Cumulative number of large-scale AI systems by country of origin since 2017. Data through 2026. Source: Epoch AI / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.testScores.length > 0 && (
-              <SectionCard icon={<TrendingUp className="h-5 w-5 text-emerald-400" />} title="AI Performance vs Human Baseline">
-                <MultiLineChart data={data.testScores} keys={seriesKeys(data.testScores)} />
-                <p className="text-xs text-gray-500 mt-4">
-                  AI test scores on various capabilities relative to human performance (0 = human level). Source: Kiela et al. / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2023. The AI Index Report typically updates this annually around April.</span>
                 </p>
               </SectionCard>
               )}
@@ -524,7 +484,7 @@ export default function AIDashboardPage() {
 
               {data.companyAdoption.length > 0 && (
               <SectionCard icon={<Building2 className="h-5 w-5 text-blue-400" />} title="Company AI Adoption">
-                <MultiLineChart data={data.companyAdoption} keys={seriesKeys(data.companyAdoption)} formatter={formatPct} />
+                <MultiAreaChart data={data.companyAdoption} keys={seriesKeys(data.companyAdoption)} formatter={formatPct} stacked />
                 <p className="text-xs text-gray-500 mt-4">
                   Share of companies using AI technology, by region. Source: McKinsey via AI Index Report / Our World in Data.
                 </p>
@@ -540,49 +500,13 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {/* ═══ RESEARCH & REGULATION (2020–2023) ═══ */}
-              <Divider icon={<FileText className="h-5 w-5" />} title="Research &amp; Regulation" />
-              <p className="text-xs text-amber-400/80 text-center -mt-3 mb-2">
-                Academic and patent data — last updated 2020–2023. Next update schedule varies by source.
-              </p>
-
-              {data.publications.length > 0 && (
-              <SectionCard icon={<FileText className="h-5 w-5 text-sky-400" />} title="AI Scholarly Publications">
-                <MultiAreaChart data={data.publications} keys={seriesKeys(data.publications)} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Annual scholarly publications on artificial intelligence by country. Source: AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2023.</span>
-                </p>
-              </SectionCard>
-              )}
-
-              {data.topPatents.length > 0 && (
-              <SectionCard icon={<FileText className="h-5 w-5 text-amber-400" />} title="Top 10 Countries by AI Patents">
-                <Top10BarChart data={data.topPatents} dataKey="patents" />
-                <p className="text-xs text-gray-500 mt-4">
-                  AI patent applications filed by country. Source: CSET / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2020. This dataset has not been recently updated by the source.</span>
-                </p>
-              </SectionCard>
-              )}
-
-              {data.topBills.length > 0 && (
-              <SectionCard icon={<Scale className="h-5 w-5 text-rose-400" />} title="Top Countries by AI Laws Passed">
-                <Top10BarChart data={data.topBills} dataKey="bills" />
-                <p className="text-xs text-gray-500 mt-4">
-                  Cumulative number of AI-related bills passed into law by country. Source: OECD via AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2023.</span>
-                </p>
-              </SectionCard>
-              )}
-
               {/* ─── Footer attribution ───────────────────────────── */}
               <div className="text-center text-xs text-gray-600 pt-4">
                 Data from{" "}
                 <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                   Our World in Data
                 </a>
-                {" "}(Epoch AI, AI Index Report, CSET) and the{" "}
+                {" "}(Epoch AI, AI Index Report) and the{" "}
                 <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                   Epoch AI Notable Models Database
                 </a>. Licensed under{" "}
