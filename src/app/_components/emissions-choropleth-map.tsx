@@ -171,6 +171,17 @@ const ANNUAL_LEGEND = [
   { color: "#7f1d1d", label: "5B+" },
 ];
 
+/* ─── Mobile zoom adjustment ────────────────────────────────────────────── */
+
+function SetMobileView() {
+  const map = useMap();
+  React.useEffect(() => {
+    const width = map.getContainer().clientWidth;
+    if (width < 500) map.setView([20, 30], 1);
+  }, [map]);
+  return null;
+}
+
 /* ─── Country labels ────────────────────────────────────────────────────── */
 
 function CountryLabels({ geo }: { geo: FeatureCollection }) {
@@ -354,7 +365,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
         <MapContainer
           center={[20, 0]}
           zoom={2}
-          minZoom={2}
+          minZoom={1}
           maxZoom={10}
           scrollWheelZoom={true}
           maxBounds={[[-60, -180], [85, 180]]}
@@ -362,6 +373,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
           className="h-[400px] md:h-[500px] w-full rounded-xl z-0"
           style={{ background: "#BEEEF9" }}
         >
+          <SetMobileView />
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"

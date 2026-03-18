@@ -77,6 +77,17 @@ const MAJOR_COUNTRIES = new Set([
   "Greenland", "Iceland", "New Zealand",
 ]);
 
+/* ─── Mobile zoom adjustment ────────────────────────────────────────────── */
+
+function SetMobileView() {
+  const map = useMap();
+  React.useEffect(() => {
+    const width = map.getContainer().clientWidth;
+    if (width < 500) map.setView([20, 30], 1);
+  }, [map]);
+  return null;
+}
+
 /* Render English-only country labels on a custom pane above the GeoJSON fill */
 function CountryLabels({ geo }: { geo: FeatureCollection }) {
   const map = useMap();
@@ -471,7 +482,7 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
         <MapContainer
           center={[20, 0]}
           zoom={2}
-          minZoom={2}
+          minZoom={1}
           maxZoom={10}
           scrollWheelZoom={true}
           maxBounds={[[-60, -180], [85, 180]]}
@@ -479,6 +490,7 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
           className="h-[400px] md:h-[500px] w-full rounded-xl z-0"
           style={{ background: "#BEEEF9" }}
         >
+          <SetMobileView />
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
