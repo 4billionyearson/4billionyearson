@@ -7,8 +7,11 @@ import {
 } from "recharts";
 import {
   Loader2, Brain, DollarSign, TrendingUp, Building2, Users,
-  Cpu, Globe, BarChart3, Activity,
+  Cpu, Globe, BarChart3, Activity, MapPin,
 } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const DataCenterMap = dynamic(() => import("@/app/_components/data-center-map"), { ssr: false });
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -26,6 +29,8 @@ interface AIDashboardData {
   frontierMath: { name: string; score: number; date: string }[];
   epochModelsByOrg: { name: string; value: number }[];
   epochModelsByYear: Record<string, number>[];
+  dataCentersByState: { name: string; value: number; sqft: number }[];
+  dataCentersByOperator: { name: string; value: number }[];
   stats: {
     latestYear: number;
     globalInvestment: number;
@@ -33,6 +38,7 @@ interface AIDashboardData {
     totalModels2025: number;
     fmTopModel: string;
     fmTopScore: number;
+    totalDataCenters: number;
   };
   fetchedAt: string;
 }
@@ -457,6 +463,27 @@ export default function AIDashboardPage() {
               {/* ═══ INFRASTRUCTURE & WORKFORCE ═══ */}
               <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure &amp; Workforce" />
 
+              {data.dataCentersByState?.length > 0 && (
+              <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="US Data Center Locations">
+                <DataCenterMap data={data.dataCentersByState} />
+                <p className="text-xs text-gray-500 mt-4">
+                  {data.stats.totalDataCenters?.toLocaleString() ?? '1,242'} data center facilities across {data.dataCentersByState.length} US states. Source:{" "}
+                  <a href="https://github.com/shawn15goh/Data-Center-Location-USA-Datasets" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    IM3 Open Source Data Center Atlas
+                  </a>{" "}(PNNL / OpenStreetMap). Includes all facility types — not limited to AI.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.dataCentersByOperator?.length > 0 && (
+              <SectionCard icon={<Building2 className="h-5 w-5 text-emerald-400" />} title="Top Data Center Operators (US)">
+                <Top10BarChart data={data.dataCentersByOperator} dataKey="facilities" />
+                <p className="text-xs text-gray-500 mt-4">
+                  Largest data center operators in the US by number of facilities. Source: IM3 Open Source Data Center Atlas.
+                </p>
+              </SectionCard>
+              )}
+
               {data.dataCenterSpend.length > 0 && (
               <SectionCard icon={<Building2 className="h-5 w-5 text-sky-400" />} title="US Data Center Construction Spend">
                 <MultiAreaChart data={data.dataCenterSpend} keys={seriesKeys(data.dataCenterSpend)} formatter={formatBillions} />
@@ -502,6 +529,7 @@ export default function AIDashboardPage() {
                 <p>• AI models, systems &amp; benchmarks: <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI Notable Models Database</a> and <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
                 <p>• Investment, adoption &amp; workforce: <a href="https://aiindex.stanford.edu/report/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">AI Index Report</a> via <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
                 <p>• Data center construction: <a href="https://www.census.gov/construction/c30/c30index.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">US Census Bureau</a> via Our World in Data</p>
+                <p>• Data center locations: <a href="https://github.com/shawn15goh/Data-Center-Location-USA-Datasets" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">IM3 Open Source Data Center Atlas</a> (PNNL / OpenStreetMap)</p>
               </div>
             </>
           )}
