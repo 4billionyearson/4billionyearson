@@ -554,7 +554,7 @@ const EventsMap = dynamic(
             minZoom={1}
             maxZoom={8}
             scrollWheelZoom={true}
-            className="h-[350px] md:h-[420px] w-full rounded-xl z-0"
+            className="h-[280px] md:h-[420px] w-full rounded-xl z-0"
             style={{ background: "#BEEEF9" }}
           >
             <TileLayer

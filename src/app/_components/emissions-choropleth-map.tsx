@@ -370,7 +370,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
           scrollWheelZoom={true}
           maxBounds={[[-60, -180], [85, 180]]}
           maxBoundsViscosity={1.0}
-          className="h-[400px] md:h-[500px] w-full rounded-xl z-0"
+          className="h-[280px] md:h-[500px] w-full rounded-xl z-0"
           style={{ background: "#BEEEF9" }}
         >
           <SetMobileView />
