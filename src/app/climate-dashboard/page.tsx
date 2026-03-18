@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
 } from 'recharts';
 import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe } from 'lucide-react';
@@ -101,9 +101,9 @@ function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingCo
           <Line type="monotone" dataKey={dataKey} name={label} stroke={color} strokeWidth={1} dot={false} strokeOpacity={0.35} />
           {rollingKey && <Line type="monotone" dataKey={rollingKey} name="10-Yr Rolling Avg" stroke={rollingColor} strokeWidth={3} dot={false} />}
           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
-            <LineChart data={data}>
-              <Line type="monotone" dataKey={dataKey} stroke={color} dot={false} strokeWidth={1} />
-            </LineChart>
+            <AreaChart data={data}>
+              <Area type="monotone" dataKey={dataKey} stroke={color} fill={color} fillOpacity={0.2} dot={false} strokeWidth={1} />
+            </AreaChart>
           </Brush>
         </LineChart>
       </ResponsiveContainer>
@@ -191,9 +191,9 @@ function MultiLineChart({ data, series, thresholds }: {
           ))}
           {lines}
           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
-            <LineChart data={data}>
-              <Line type="monotone" dataKey={series[0].dataKey} stroke={series[0].color} dot={false} strokeWidth={1} />
-            </LineChart>
+            <AreaChart data={data}>
+              <Area type="monotone" dataKey={series[0].dataKey} stroke={series[0].color} fill={series[0].color} fillOpacity={0.2} dot={false} strokeWidth={1} />
+            </AreaChart>
           </Brush>
         </LineChart>
       </ResponsiveContainer>
@@ -989,7 +989,15 @@ export default function ClimateDashboard() {
                               <Cell key={index} fill={entry.anomaly >= 0 ? '#ef4444' : '#3b82f6'} />
                             ))}
                           </Bar>
-                          <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" />
+                          <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                            <BarChart data={globalData.yearlyData}>
+                              <Bar dataKey="anomaly">
+                                {globalData.yearlyData.map((entry: any, index: number) => (
+                                  <Cell key={index} fill={entry.anomaly >= 0 ? '#ef4444' : '#3b82f6'} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </Brush>
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
