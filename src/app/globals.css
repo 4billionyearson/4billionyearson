@@ -27,6 +27,14 @@ html {
 .leaflet-popup-tip {
   display: none !important;
 }
+.leaflet-popup-close-button {
+  color: #9ca3af !important;
+  font-size: 18px !important;
+  padding: 4px 6px !important;
+  top: 2px !important;
+  right: 2px !important;
+  z-index: 10;
+}
 
 /* Strip default Leaflet tooltip chrome (white border / background / arrow) */
 .leaflet-tooltip {
