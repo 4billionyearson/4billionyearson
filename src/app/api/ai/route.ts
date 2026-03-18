@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v15';
+const CACHE_KEY = 'ai:dashboard:v16';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -267,6 +267,23 @@ interface FrontierDC {
   lon: number;
 }
 
+/** Convert DMS string like `40°04'05"N` or `82°45'00"W` to decimal degrees. */
+function parseDMS(dms: string): number {
+  if (!dms) return 0;
+  const n = parseFloat(dms);
+  // If it's already a plain decimal number (no °), just return it
+  if (!dms.includes('°')) return isNaN(n) ? 0 : n;
+  const m = dms.match(/(\d+)[°]\s*(\d+)[′']\s*(\d+(?:\.\d+)?)[″"]?\s*([NSEW])?/i);
+  if (!m) return isNaN(n) ? 0 : n;
+  const deg = parseInt(m[1], 10);
+  const min = parseInt(m[2], 10);
+  const sec = parseFloat(m[3]);
+  const dir = (m[4] || '').toUpperCase();
+  let dd = deg + min / 60 + sec / 3600;
+  if (dir === 'S' || dir === 'W') dd = -dd;
+  return dd;
+}
+
 async function fetchFrontierDataCenters(): Promise<{
   sites: FrontierDC[];
   timeline: { date: string; totalPowerMW: number; totalH100e: number; totalCostB: number }[];
@@ -327,8 +344,8 @@ async function fetchFrontierDataCenters(): Promise<{
         h100Equiv: Math.round(h100),
         costBillions: Math.round(cost * 10) / 10,
         country: get(countryI),
-        lat: parseFloat(get(latI)) || 0,
-        lon: parseFloat(get(lonI)) || 0,
+        lat: parseDMS(get(latI)),
+        lon: parseDMS(get(lonI)),
       });
     }
 
