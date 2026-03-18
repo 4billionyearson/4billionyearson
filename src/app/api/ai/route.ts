@@ -64,6 +64,57 @@ function parseOWID(data: any): OwidRow[] {
   return result;
 }
 
+/** Convert OWID day offset to a date, given a zeroDay like '2014-01-01' */
+function owidDayToDate(dayOffset: number, zeroDay: string): Date {
+  const [y, m, d] = zeroDay.split('-').map(Number);
+  const base = new Date(y, m - 1, d);
+  return new Date(base.getTime() + dayOffset * 86400000);
+}
+
+/** Build time series for sub-annual (yearIsDay) data, converting day offsets to quarter labels */
+function buildQuarterTimeSeries(
+  rows: OwidRow[],
+  entityMap: Record<number, string>,
+  zeroDay: string,
+): Record<string, any>[] {
+  const byLabel = new Map<string, Record<string, any>>();
+  for (const r of rows) {
+    const name = entityMap[r.entityId];
+    if (!name) continue;
+    const date = owidDayToDate(r.year, zeroDay);
+    const q = Math.floor(date.getMonth() / 3) + 1;
+    const label = `Q${q} ${date.getFullYear()}`;
+    if (!byLabel.has(label)) byLabel.set(label, { year: label, _sort: r.year });
+    byLabel.get(label)![name] = (byLabel.get(label)![name] || 0) + r.value;
+  }
+  return Array.from(byLabel.values())
+    .sort((a, b) => a._sort - b._sort)
+    .map(({ _sort, ...rest }) => rest);
+}
+
+/** Build time series for sub-annual (yearIsDay) data, converting day offsets to month labels */
+function buildMonthTimeSeries(
+  rows: OwidRow[],
+  entityMap: Record<number, string>,
+  zeroDay: string,
+  selectedEntities?: string[],
+): Record<string, any>[] {
+  const byLabel = new Map<string, Record<string, any>>();
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for (const r of rows) {
+    const name = entityMap[r.entityId];
+    if (!name) continue;
+    if (selectedEntities && !selectedEntities.includes(name)) continue;
+    const date = owidDayToDate(r.year, zeroDay);
+    const label = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    if (!byLabel.has(label)) byLabel.set(label, { year: label, _sort: r.year });
+    byLabel.get(label)![name] = r.value;
+  }
+  return Array.from(byLabel.values())
+    .sort((a, b) => a._sort - b._sort)
+    .map(({ _sort, ...rest }) => rest);
+}
+
 function buildTimeSeries(
   rows: OwidRow[],
   entityMap: Record<number, string>,
@@ -187,13 +238,13 @@ async function fetchAIDashboardData() {
   const devRows = parseOWID(devsData);
   const devsUsingAi = buildTimeSeries(devRows, investMap, ['World']);
 
-  // ─ NVIDIA revenue ─
+  // ─ NVIDIA revenue (sub-annual: yearIsDay, zeroDay=2014-01-01) ─
   const nvRows = parseOWID(nvidiaData);
-  const nvidiaRevenue = buildTimeSeries(nvRows, nvidiaMap);
+  const nvidiaRevenue = buildQuarterTimeSeries(nvRows, nvidiaMap, '2014-01-01');
 
-  // ─ Data center spend ─
+  // ─ Data center spend (sub-annual: yearIsDay, zeroDay=2014-01-01) ─
   const dcRows = parseOWID(dcSpendData);
-  const dataCenterSpend = buildTimeSeries(dcRows, investMap, ['United States']);
+  const dataCenterSpend = buildMonthTimeSeries(dcRows, investMap, '2014-01-01', ['United States']);
 
   // ─ AI systems per year ─
   const sysRows = parseOWID(systemsData);

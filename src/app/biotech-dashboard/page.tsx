@@ -148,7 +148,7 @@ function MultiAreaChart({ data, keys, formatter }: {
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
           <Tooltip content={<DarkTooltip formatter={formatter} />} />
-          <Legend wrapperStyle={{ fontSize: 11 }} />
+          <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {keys.map((k, i) => (
             <Area
               key={k}
@@ -184,7 +184,7 @@ function MultiLineChart({ data, keys, formatter }: {
           <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
           <Tooltip content={<DarkTooltip formatter={formatter} />} />
-          <Legend wrapperStyle={{ fontSize: 11 }} />
+          <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
           {keys.map((k, i) => (
             <Line
               key={k}
