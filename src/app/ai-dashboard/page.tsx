@@ -335,16 +335,16 @@ export default function AIDashboardPage() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <StatCard
-                    label="2025 Notable Models"
+                    label="2025 AI Models Released"
                     value={String(data.stats.totalModels2025 ?? 0)}
                     color="text-violet-400"
-                    subtext="Epoch AI (live)"
+                    subtext="Epoch AI (continuously updated)"
                   />
                   <StatCard
-                    label="FrontierMath Leader"
-                    value={`${(data.stats.fmTopScore ?? 0).toFixed(1)}%`}
-                    color="text-rose-400"
-                    subtext={data.stats.fmTopModel || 'N/A'}
+                    label="US Data Centers"
+                    value={(data.stats.totalDataCenters ?? 0).toLocaleString()}
+                    color="text-sky-400"
+                    subtext="IM3 Atlas (PNNL)"
                   />
                   <StatCard
                     label="Global AI Investment"
@@ -365,22 +365,22 @@ export default function AIDashboardPage() {
               <Divider icon={<Brain className="h-5 w-5" />} title="Models" />
 
               {data.epochModelsByOrg?.length > 0 && (
-              <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 Notable AI Models by Organization">
+              <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 AI Models Released by Organization">
                 <Top10BarChart data={data.epochModelsByOrg} dataKey="models" />
                 <p className="text-xs text-gray-500 mt-4">
-                  Notable AI models released in 2025, by organization. Live data from the{" "}
+                  AI models released in 2025, by organization. Source:{" "}
                   <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Epoch AI Notable Models Database
-                  </a>. Updated continuously.
+                    Epoch AI
+                  </a>. Continuously updated.
                 </p>
               </SectionCard>
               )}
 
               {data.epochModelsByYear?.length > 0 && (
-              <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="Notable AI Models Per Year">
+              <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="AI Models Released Per Year">
                 <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} />
                 <p className="text-xs text-gray-500 mt-4">
-                  Total notable AI models tracked by Epoch AI per year (2010–present). Source: Epoch AI Notable Models Database. Updated continuously.
+                  AI models released per year (2010–present). Source: Epoch AI. Continuously updated.
                 </p>
               </SectionCard>
               )}
@@ -471,6 +471,11 @@ export default function AIDashboardPage() {
                   <a href="https://github.com/shawn15goh/Data-Center-Location-USA-Datasets" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     IM3 Open Source Data Center Atlas
                   </a>{" "}(PNNL / OpenStreetMap). Includes all facility types — not limited to AI.
+                  <span className="block mt-1">For worldwide data center locations, see{" "}
+                    <a href="https://www.datacentermap.com/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                      Data Center Map
+                    </a>{" "}(11,000+ facilities across 174 countries).
+                  </span>
                 </p>
               </SectionCard>
               )}
@@ -526,7 +531,7 @@ export default function AIDashboardPage() {
               {/* ─── Footer attribution ───────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#88DDFC] text-sm text-gray-400 space-y-1.5">
                 <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
-                <p>• AI models, systems &amp; benchmarks: <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI Notable Models Database</a> and <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
+                <p>• AI models, systems &amp; benchmarks: <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI</a> and <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
                 <p>• Investment, adoption &amp; workforce: <a href="https://aiindex.stanford.edu/report/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">AI Index Report</a> via <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
                 <p>• Data center construction: <a href="https://www.census.gov/construction/c30/c30index.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">US Census Bureau</a> via Our World in Data</p>
                 <p>• Data center locations: <a href="https://github.com/shawn15goh/Data-Center-Location-USA-Datasets" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">IM3 Open Source Data Center Atlas</a> (PNNL / OpenStreetMap)</p>
