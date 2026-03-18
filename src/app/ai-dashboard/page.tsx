@@ -10,6 +10,7 @@ import {
   Cpu, Globe, BarChart3, Activity, MapPin,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import "leaflet/dist/leaflet.css";
 
 const DataCenterMap = dynamic(() => import("@/app/_components/data-center-map"), { ssr: false });
 
@@ -67,8 +68,6 @@ const formatCompact = (v: number) => {
   if (v >= 1e3) return `${(v / 1e3).toFixed(0)}K`;
   return String(Math.round(v));
 };
-
-const formatPct = (v: number) => `${v.toFixed(0)}%`;
 
 const SERIES_COLORS = ["#ef4444", "#f59e0b", "#3b82f6", "#10b981", "#a855f7", "#06b6d4", "#ec4899", "#84cc16", "#f97316", "#14b8a6", "#8b5cf6"];
 const BAR_GRADIENT = [
@@ -309,7 +308,7 @@ export default function AIDashboardPage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Tracking AI models released, investment, data center infrastructure, company adoption, and workforce trends.
+                Tracking AI models released, investment, and data center infrastructure.
               </p>
             </div>
           </div>
@@ -455,43 +454,68 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {/* ═══ INVESTMENT ═══ */}
-              <Divider icon={<DollarSign className="h-5 w-5" />} title="Investment" />
-
-              <SectionCard icon={<DollarSign className="h-5 w-5 text-cyan-400" />} title="Global AI Investment">
-                <MultiAreaChart data={data.investment} keys={seriesKeys(data.investment)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Total private investment into AI companies raising above $1.5M. Inflation-adjusted (constant 2021 US$). Source:{" "}
-                  <a href="https://ourworldindata.org/grapher/private-investment-in-artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Quid via AI Index Report
-                  </a>{" "}/ Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
-                </p>
-              </SectionCard>
-
               {/* ═══ INFRASTRUCTURE ═══ */}
               <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure" />
 
               {data.frontierDataCenters?.length > 0 && (
               <SectionCard icon={<Cpu className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Centers">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-                  <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-cyan-400">{data.stats.frontierCount}</div>
-                    <div className="text-xs text-gray-400 mt-1">Tracked Sites</div>
-                  </div>
-                  <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-emerald-400">{data.stats.frontierTotalPowerMW?.toLocaleString()} MW</div>
-                    <div className="text-xs text-gray-400 mt-1">Total Power</div>
-                  </div>
-                  <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-amber-400">{(data.stats.frontierTotalH100e / 1e6).toFixed(1)}M</div>
-                    <div className="text-xs text-gray-400 mt-1">H100 Equivalents</div>
-                  </div>
-                  <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-violet-400">${data.stats.frontierTotalCostB}B</div>
-                    <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
-                  </div>
-                </div>
+                {(() => {
+                  const operational = data.frontierDataCenters.filter(dc => dc.powerMW > 0);
+                  const planned = data.frontierDataCenters.filter(dc => dc.powerMW <= 0);
+                  const opPower = operational.reduce((s, dc) => s + dc.powerMW, 0);
+                  const opH100 = operational.reduce((s, dc) => s + dc.h100Equiv, 0);
+                  const opCost = operational.reduce((s, dc) => s + dc.costBillions, 0);
+                  const plPower = planned.reduce((s, dc) => s + dc.powerMW, 0);
+                  const plH100 = planned.reduce((s, dc) => s + dc.h100Equiv, 0);
+                  const plCost = planned.reduce((s, dc) => s + dc.costBillions, 0);
+                  return (
+                    <div className="space-y-3 mb-5">
+                      <div>
+                        <div className="text-xs text-emerald-400 font-semibold uppercase tracking-wider mb-1.5">Operational ({operational.length} sites)</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                            <div className="text-2xl font-bold text-emerald-400">{operational.length}</div>
+                            <div className="text-xs text-gray-400 mt-1">Sites</div>
+                          </div>
+                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                            <div className="text-2xl font-bold text-emerald-400">{opPower.toLocaleString()} MW</div>
+                            <div className="text-xs text-gray-400 mt-1">Power</div>
+                          </div>
+                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                            <div className="text-2xl font-bold text-emerald-400">{(opH100 / 1e6).toFixed(1)}M</div>
+                            <div className="text-xs text-gray-400 mt-1">H100 Equiv.</div>
+                          </div>
+                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                            <div className="text-2xl font-bold text-emerald-400">${Math.round(opCost * 10) / 10}B</div>
+                            <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-amber-400 font-semibold uppercase tracking-wider mb-1.5">Planned ({planned.length} sites)</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                            <div className="text-2xl font-bold text-amber-400">{planned.length}</div>
+                            <div className="text-xs text-gray-400 mt-1">Sites</div>
+                          </div>
+                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                            <div className="text-2xl font-bold text-amber-400">{plPower > 0 ? plPower.toLocaleString() + ' MW' : '—'}</div>
+                            <div className="text-xs text-gray-400 mt-1">Power</div>
+                          </div>
+                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                            <div className="text-2xl font-bold text-amber-400">{plH100 > 0 ? (plH100 / 1e6).toFixed(1) + 'M' : '—'}</div>
+                            <div className="text-xs text-gray-400 mt-1">H100 Equiv.</div>
+                          </div>
+                          <div className="bg-gray-800/60 rounded-lg p-3 text-center">
+                            <div className="text-2xl font-bold text-amber-400">{plCost > 0 ? '$' + (Math.round(plCost * 10) / 10) + 'B' : '—'}</div>
+                            <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500">H100 Equivalents = total GPU compute capacity normalised to NVIDIA H100 chips, allowing comparison across different hardware.</p>
+                    </div>
+                  );
+                })()}
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -565,6 +589,20 @@ export default function AIDashboardPage() {
                 </p>
               </SectionCard>
               )}
+
+              {/* ═══ INVESTMENT ═══ */}
+              <Divider icon={<DollarSign className="h-5 w-5" />} title="Investment" />
+
+              <SectionCard icon={<DollarSign className="h-5 w-5 text-cyan-400" />} title="Global AI Investment">
+                <MultiAreaChart data={data.investment} keys={seriesKeys(data.investment)} formatter={formatBillions} />
+                <p className="text-xs text-gray-500 mt-4">
+                  Total private investment into AI companies raising above $1.5M. Inflation-adjusted (constant 2021 US$). Source:{" "}
+                  <a href="https://ourworldindata.org/grapher/private-investment-in-artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Quid via AI Index Report
+                  </a>{" "}/ Our World in Data.
+                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
+                </p>
+              </SectionCard>
 
               {/* ─── Footer attribution ───────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#88DDFC] text-sm text-gray-400 space-y-1.5">

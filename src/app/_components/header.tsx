@@ -99,14 +99,14 @@ const Header = () => {
             {isAIOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
-                <Link href="/ai-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/ai-dashboard' ? 'text-cyan-400 bg-gray-900' : 'text-gray-300 hover:text-cyan-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/ai-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/ai-dashboard' ? 'text-[#88DDFC] bg-gray-900' : 'text-gray-300 hover:text-[#88DDFC] hover:bg-gray-900'}`} onClick={closeMenu}>
                   AI Industry Data<MonthlyBadge />
                 </Link>
                 <Link href="/ai-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/ai-explained' ? 'text-violet-300 bg-gray-900' : 'text-gray-300 hover:text-violet-300 hover:bg-gray-900'}`} onClick={closeMenu}>
                   AI Explained
                 </Link>
                 <div className="border-t border-gray-700/50">
-                <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD] bg-gray-900' : 'text-gray-300 hover:text-[#89DEFD] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#88DDFC] bg-gray-900' : 'text-gray-300 hover:text-[#88DDFC] hover:bg-gray-900'}`} onClick={closeMenu}>
                   Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
                 </div>
@@ -287,13 +287,13 @@ const Header = () => {
             </button>
             {mobileAIOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/ai-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/ai-dashboard' ? 'text-cyan-400' : 'text-gray-300 hover:text-cyan-400'}`} onClick={closeMenu}>
+                <Link href="/ai-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/ai-dashboard' ? 'text-[#88DDFC]' : 'text-gray-300 hover:text-[#88DDFC]'}`} onClick={closeMenu}>
                   AI Industry Data<MonthlyBadge />
                 </Link>
                 <Link href="/ai-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/ai-explained' ? 'text-violet-300' : 'text-gray-300 hover:text-violet-300'}`} onClick={closeMenu}>
                   AI Explained
                 </Link>
-                <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD]' : 'text-gray-300 hover:text-[#89DEFD]'}`} onClick={closeMenu}>
+                <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#88DDFC]' : 'text-gray-300 hover:text-[#88DDFC]'}`} onClick={closeMenu}>
                   Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
               </div>

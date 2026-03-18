@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 interface SiteData {
   name: string;
@@ -15,16 +17,12 @@ interface Props {
   sites: SiteData[];
 }
 
-// Pre-computed projection coordinates for each site (AlbersUSA fitSize [960,600])
-// Sites outside the US (null projection) are excluded from the map
-const US_PROJECTION: Record<string, [number, number]> = {};
-
 function getPinRadius(powerMW: number): number {
-  if (powerMW <= 0) return 5;
-  if (powerMW <= 100) return 6;
-  if (powerMW <= 300) return 8;
-  if (powerMW <= 500) return 10;
-  return 12;
+  if (powerMW <= 0) return 6;
+  if (powerMW <= 100) return 7;
+  if (powerMW <= 300) return 9;
+  if (powerMW <= 500) return 11;
+  return 14;
 }
 
 function getPinColor(powerMW: number): string {
@@ -34,98 +32,75 @@ function getPinColor(powerMW: number): string {
   return "#a855f7"; // purple — largest
 }
 
-export default function DataCenterMap({ sites }: Props) {
-  const [paths, setPaths] = useState<Record<string, string> | null>(null);
-  const [projCoords, setProjCoords] = useState<Record<string, [number, number]>>(US_PROJECTION);
-  const [hovered, setHovered] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/data/us-state-paths.json")
-      .then((r) => r.json())
-      .then(setPaths)
-      .catch(() => {});
-  }, []);
-
-  // Compute projections client-side using the same projection params as generate_paths.js
-  // fitSize([960,600], geo) → scale ≈ 1054.95, translate ≈ [480, 300]
-  useEffect(() => {
+function FitSites({ sites }: { sites: SiteData[] }) {
+  const map = useMap();
+  React.useEffect(() => {
     if (!sites.length) return;
-    import("d3-geo").then(({ geoAlbersUsa }) => {
-      const proj = geoAlbersUsa().scale(1054.95).translate([480, 300]);
-      const coords: Record<string, [number, number]> = {};
-      for (const s of sites) {
-        if (s.lat && s.lon) {
-          const p = proj([s.lon, s.lat]);
-          if (p) coords[s.name] = [p[0], p[1]];
-        }
-      }
-      setProjCoords(coords);
-    });
-  }, [sites]);
+    const L = require("leaflet");
+    const validSites = sites.filter(s => s.lat && s.lon);
+    if (!validSites.length) return;
+    const bounds = L.latLngBounds(validSites.map(s => [s.lat, s.lon]));
+    map.fitBounds(bounds, { padding: [30, 30], maxZoom: 5 });
+  }, [sites, map]);
+  return null;
+}
 
-  if (!paths) return <div className="h-[400px] animate-pulse bg-gray-800/50 rounded-xl" />;
-
-  const stateNames = Object.keys(paths);
-  const hoveredSite = hovered ? sites.find(s => s.name === hovered) : null;
-
+export default function DataCenterMap({ sites }: Props) {
   return (
     <div className="relative w-full">
-      <svg
-        viewBox="0 0 960 600"
-        className="w-full h-auto"
-        style={{ maxHeight: 500 }}
+      <MapContainer
+        center={[38, -97]}
+        zoom={4}
+        minZoom={2}
+        maxZoom={10}
+        scrollWheelZoom={true}
+        className="h-[320px] md:h-[440px] w-full rounded-xl z-0"
+        style={{ background: "#0d1520" }}
       >
-        <rect width="960" height="600" fill="#0d1520" rx="8" />
-        {stateNames.map((name) => (
-          <path
-            key={name}
-            d={paths[name]}
-            fill="#1a2332"
-            stroke="#2a3f52"
-            strokeWidth={0.5}
-          />
-        ))}
-        {/* Site pins */}
-        {sites.map((site) => {
-          const coord = projCoords[site.name];
-          if (!coord) return null;
-          const r = getPinRadius(site.powerMW);
-          const isHovered = hovered === site.name;
+        <TileLayer
+          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+        />
+        <FitSites sites={sites} />
+        {sites.map((site, i) => {
+          if (!site.lat || !site.lon) return null;
           return (
-            <g key={site.name}>
-              <circle
-                cx={coord[0]}
-                cy={coord[1]}
-                r={isHovered ? r + 3 : r}
-                fill={getPinColor(site.powerMW)}
-                fillOpacity={0.7}
-                stroke={isHovered ? "#fff" : getPinColor(site.powerMW)}
-                strokeWidth={isHovered ? 2 : 1}
-                strokeOpacity={0.9}
-                className="cursor-pointer transition-all duration-150"
-                onMouseEnter={() => setHovered(site.name)}
-                onMouseLeave={() => setHovered(null)}
-              />
-              {isHovered && (
-                <circle cx={coord[0]} cy={coord[1]} r={r + 8} fill="none" stroke="#88DDFC" strokeWidth={1.5} strokeOpacity={0.5} />
-              )}
-            </g>
+            <CircleMarker
+              key={i}
+              center={[site.lat, site.lon]}
+              radius={getPinRadius(site.powerMW)}
+              pathOptions={{
+                color: "#1e293b",
+                fillColor: getPinColor(site.powerMW),
+                fillOpacity: 0.75,
+                weight: 2,
+              }}
+            >
+              <Popup>
+                <div
+                  style={{
+                    background: "#111827",
+                    border: "1px solid #374151",
+                    borderRadius: "8px",
+                    padding: "8px 10px",
+                    color: "#e5e7eb",
+                    minWidth: 160,
+                    fontSize: 12,
+                  }}
+                >
+                  <div style={{ fontWeight: 700, marginBottom: 2 }}>{site.name}</div>
+                  <div style={{ opacity: 0.7 }}>{site.owner}</div>
+                  {site.powerMW > 0 ? (
+                    <div style={{ color: "#22d3ee", marginTop: 4 }}>{site.powerMW.toLocaleString()} MW</div>
+                  ) : (
+                    <div style={{ color: "#f59e0b", marginTop: 4 }}>Planned</div>
+                  )}
+                </div>
+              </Popup>
+            </CircleMarker>
           );
         })}
-      </svg>
-
-      {/* Tooltip */}
-      {hovered && hoveredSite && (
-        <div className="absolute top-3 right-3 bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl text-sm pointer-events-none">
-          <p className="font-semibold text-gray-200">{hoveredSite.name}</p>
-          <p className="text-gray-400">{hoveredSite.owner}</p>
-          {hoveredSite.powerMW > 0 ? (
-            <p className="text-cyan-400">{hoveredSite.powerMW.toLocaleString()} MW</p>
-          ) : (
-            <p className="text-amber-400">Planned</p>
-          )}
-        </div>
-      )}
+      </MapContainer>
 
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-2 text-xs text-gray-400">
