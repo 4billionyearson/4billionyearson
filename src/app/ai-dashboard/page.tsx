@@ -17,8 +17,6 @@ const DataCenterMap = dynamic(() => import("@/app/_components/data-center-map"),
 
 interface AIDashboardData {
   investment: Record<string, number>[];
-  genAiInvestment: Record<string, number>[];
-  corporateDeals: Record<string, number>[];
   newCompanies: Record<string, number>[];
   devsUsingAi: Record<string, number>[];
   aiSystemsPerYear: Record<string, number>[];
@@ -472,26 +470,6 @@ export default function AIDashboardPage() {
                   <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
                 </p>
               </SectionCard>
-
-              {data.genAiInvestment.length > 0 && (
-              <SectionCard icon={<TrendingUp className="h-5 w-5 text-violet-400" />} title="Generative AI Investment">
-                <MultiAreaChart data={data.genAiInvestment} keys={seriesKeys(data.genAiInvestment)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Investment into privately held generative AI companies specifically. Source: Quid via AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
-                </p>
-              </SectionCard>
-              )}
-
-              {data.corporateDeals.length > 0 && (
-              <SectionCard icon={<Building2 className="h-5 w-5 text-orange-400" />} title="Corporate AI Deals by Type">
-                <StackedBarChart data={data.corporateDeals} keys={seriesKeys(data.corporateDeals)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Annual corporate finance transactions involving AI companies: mergers &amp; acquisitions, private investment, public offerings, and minority stakes. Source: AI Index Report / Our World in Data.
-                  <span className="block mt-1 text-amber-400/80">Data through 2024. Next update expected ~April 2026 (AI Index Report).</span>
-                </p>
-              </SectionCard>
-              )}
 
               {data.newCompanies.length > 0 && (
               <SectionCard icon={<Building2 className="h-5 w-5 text-emerald-400" />} title="Newly-Funded AI Companies">

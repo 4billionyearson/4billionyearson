@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v12';
+const CACHE_KEY = 'ai:dashboard:v13';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -444,8 +444,6 @@ async function fetchAIDashboardData() {
   // Fetch all indicators in parallel
   const [
     investData, investMap,
-    genAiData,
-    dealsData, dealsMap,
     companiesData, companiesMap,
     devsData,
     systemsData, systemsMap,
@@ -454,9 +452,6 @@ async function fetchAIDashboardData() {
   ] = await Promise.all([
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.privateInvestment}.data.json`),
     fetchEntityMap(INDICATORS.privateInvestment),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.genAiInvestment}.data.json`),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.corporateDeals}.data.json`),
-    fetchEntityMap(INDICATORS.corporateDeals),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.newCompanies}.data.json`),
     fetchEntityMap(INDICATORS.newCompanies),
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.devsUsingAi}.data.json`),
@@ -472,14 +467,6 @@ async function fetchAIDashboardData() {
   // ─ Investment ─
   const investRows = parseOWID(investData);
   const investment = buildTimeSeries(investRows, investMap, ['World', 'United States', 'Europe', 'China']);
-
-  const genAiRows = parseOWID(genAiData);
-  const genAiMap = investMap; // same entity set
-  const genAiInvestment = buildTimeSeries(genAiRows, genAiMap, ['World']);
-
-  // ─ Corporate deals ─
-  const dealRows = parseOWID(dealsData);
-  const corporateDeals = buildTimeSeries(dealRows, dealsMap);
 
   // ─ New companies ─
   const compRows = parseOWID(companiesData);
@@ -529,8 +516,6 @@ async function fetchAIDashboardData() {
 
   return {
     investment,
-    genAiInvestment,
-    corporateDeals,
     newCompanies,
     devsUsingAi,
     aiSystemsPerYear,
