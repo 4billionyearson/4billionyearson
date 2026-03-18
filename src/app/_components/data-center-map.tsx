@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { geoAlbersUsa, geoPath } from "d3-geo";
-import type { FeatureCollection, Feature } from "geojson";
 
 interface StateData {
   name: string;
@@ -54,13 +52,13 @@ const LEGEND_ITEMS = [
 ];
 
 export default function DataCenterMap({ data }: Props) {
-  const [geo, setGeo] = useState<FeatureCollection | null>(null);
+  const [paths, setPaths] = useState<Record<string, string> | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/data/us-states.json")
+    fetch("/data/us-state-paths.json")
       .then((r) => r.json())
-      .then(setGeo)
+      .then(setPaths)
       .catch(() => {});
   }, []);
 
@@ -70,14 +68,9 @@ export default function DataCenterMap({ data }: Props) {
     return map;
   }, [data]);
 
-  const pathGen = useMemo(() => {
-    if (!geo) return null;
-    const projection = geoAlbersUsa().fitSize([960, 600], geo);
-    return geoPath().projection(projection);
-  }, [geo]);
+  if (!paths) return <div className="h-[400px] animate-pulse bg-gray-800/50 rounded-xl" />;
 
-  if (!geo || !pathGen) return <div className="h-[400px] animate-pulse bg-gray-800/50 rounded-xl" />;
-
+  const stateNames = Object.keys(paths);
   const hoveredData = hovered ? dataMap.get(hovered) : null;
 
   return (
@@ -88,12 +81,10 @@ export default function DataCenterMap({ data }: Props) {
         style={{ maxHeight: 500 }}
       >
         <rect width="960" height="600" fill="#0d1520" rx="8" />
-        {geo.features.map((feature: Feature) => {
-          const name = feature.properties?.name || "";
+        {stateNames.map((name) => {
+          const d = paths[name];
           const stateData = dataMap.get(name);
           const count = stateData?.value ?? 0;
-          const d = pathGen(feature as any) || "";
-          if (!d) return null;
           const isHovered = hovered === name;
           return (
             <path

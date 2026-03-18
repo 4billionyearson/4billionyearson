@@ -1,0 +1,10 @@
+const fs = require("fs");
+const geo = JSON.parse(fs.readFileSync("public/data/us-states.json", "utf-8"));
+const names = geo.features.map(f => (f.properties && f.properties.name) || "MISSING");
+names.sort();
+console.log("Features:", names.length);
+console.log("Names:", JSON.stringify(names));
+const dupes = names.filter((n,i) => names.indexOf(n) !== i);
+console.log("Duplicates:", JSON.stringify(dupes));
+const empty = names.filter(n => n === "MISSING");
+console.log("Empty names:", empty.length);

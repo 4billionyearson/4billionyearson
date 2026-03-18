@@ -110,7 +110,7 @@ function DarkTooltip({ active, payload, label, formatter }: any) {
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#88DDFC]">
+    <div className="relative z-0 bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#88DDFC] [&:hover]:z-10">
       <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
@@ -540,9 +540,11 @@ export default function AIDashboardPage() {
                         <th className="py-2 pr-3 text-gray-400 font-medium">Data Center</th>
                         <th className="py-2 pr-3 text-gray-400 font-medium">Owner</th>
                         <th className="py-2 pr-3 text-gray-400 font-medium hidden sm:table-cell">Users</th>
+                        <th className="py-2 pr-3 text-gray-400 font-medium hidden lg:table-cell">Country</th>
                         <th className="py-2 pr-3 text-gray-400 font-medium text-right">Power (MW)</th>
                         <th className="py-2 pr-3 text-gray-400 font-medium text-right hidden md:table-cell">H100 Equiv.</th>
-                        <th className="py-2 text-gray-400 font-medium text-right">Cost ($B)</th>
+                        <th className="py-2 pr-3 text-gray-400 font-medium text-right">Cost ($B)</th>
+                        <th className="py-2 text-gray-400 font-medium text-center hidden sm:table-cell">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -551,9 +553,11 @@ export default function AIDashboardPage() {
                           <td className="py-2 pr-3 text-gray-200 font-medium">{dc.name}</td>
                           <td className="py-2 pr-3 text-gray-400">{dc.owner}</td>
                           <td className="py-2 pr-3 text-gray-500 hidden sm:table-cell">{dc.users || '—'}</td>
+                          <td className="py-2 pr-3 text-gray-500 hidden lg:table-cell">{dc.country || '—'}</td>
                           <td className="py-2 pr-3 text-gray-300 text-right font-mono">{dc.powerMW > 0 ? dc.powerMW.toLocaleString() : '—'}</td>
                           <td className="py-2 pr-3 text-gray-400 text-right font-mono hidden md:table-cell">{dc.h100Equiv > 0 ? (dc.h100Equiv / 1000).toFixed(0) + 'K' : '—'}</td>
-                          <td className="py-2 text-gray-300 text-right font-mono">{dc.costBillions > 0 ? `$${dc.costBillions}` : '—'}</td>
+                          <td className="py-2 pr-3 text-gray-300 text-right font-mono">{dc.costBillions > 0 ? `$${dc.costBillions}` : '—'}</td>
+                          <td className="py-2 text-center hidden sm:table-cell">{dc.powerMW > 0 ? <span className="text-emerald-400 text-xs">Operational</span> : <span className="text-amber-400 text-xs">Planned</span>}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -578,6 +582,7 @@ export default function AIDashboardPage() {
                       <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
                       <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
                       <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
+                      <Brush dataKey="date" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
