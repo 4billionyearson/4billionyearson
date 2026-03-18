@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:energy:v5';
+const CACHE_KEY = 'climate:energy:v6';
 const CACHE_TTL_HOURS = 24;
 
 const OWID_URL = 'https://owid-public.owid.io/data/energy/owid-energy-data.json';
@@ -253,7 +253,7 @@ export async function GET(request: Request) {
 async function fetchCountryResponse(countryName: string, worldData: EnergyData) {
   // We need to fetch the full OWID dataset again for the country
   // Check country cache first
-  const countryKey = `climate:energy:v5:country:${countryName.toLowerCase().replace(/\s+/g, '-')}`;
+  const countryKey = `${CACHE_KEY}:country:${countryName.toLowerCase().replace(/\s+/g, '-')}`;
   const cached = await getCached<CountryEnergy>(countryKey);
   if (cached) {
     return NextResponse.json({ world: worldData.world, country: cached, fetchedAt: worldData.fetchedAt, source: 'cache' });
