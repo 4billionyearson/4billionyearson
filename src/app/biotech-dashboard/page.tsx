@@ -256,8 +256,9 @@ export default function BiotechDashboardPage() {
                       ))}
                       <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10}>
                         <LineChart data={logData}>
+                          <YAxis hide domain={[2, 9]} yAxisId="brushY" />
                           {keys.map((k, i) => (
-                            <Line key={k} type="monotone" dataKey={k} stroke={SERIES_COLORS[i % SERIES_COLORS.length]} dot={false} strokeWidth={1} />
+                            <Line key={k} type="monotone" dataKey={k} stroke={SERIES_COLORS[i % SERIES_COLORS.length]} dot={false} strokeWidth={1} yAxisId="brushY" />
                           ))}
                         </LineChart>
                       </Brush>
