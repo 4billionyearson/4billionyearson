@@ -196,7 +196,7 @@ const Header = () => {
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
                 <Link href="/biotech-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/biotech-dashboard' ? 'text-pink-400 bg-gray-900' : 'text-gray-300 hover:text-pink-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Biotech & Health Data<AnnualBadge />
+                  Biotech Data<AnnualBadge />
                 </Link>
                 <Link href="/biotech-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/biotech-explained' ? 'text-fuchsia-300 bg-gray-900' : 'text-gray-300 hover:text-fuchsia-300 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Biotech Explained
@@ -372,7 +372,7 @@ const Header = () => {
             {mobileBiotechOpen && (
               <div className="bg-gray-950/50">
                 <Link href="/biotech-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/biotech-dashboard' ? 'text-pink-400' : 'text-gray-300 hover:text-pink-400'}`} onClick={closeMenu}>
-                  Biotech & Health Data<AnnualBadge />
+                  Biotech Data<AnnualBadge />
                 </Link>
                 <Link href="/biotech-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/biotech-explained' ? 'text-fuchsia-300' : 'text-gray-300 hover:text-fuchsia-300'}`} onClick={closeMenu}>
                   Biotech Explained

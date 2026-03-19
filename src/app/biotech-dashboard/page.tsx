@@ -2,35 +2,24 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, Brush, Cell,
 } from "recharts";
 import {
-  Loader2, Dna, Heart, Syringe, Activity, FlaskConical,
-  HeartPulse, FileText, DollarSign, TrendingDown, Globe,
+  Loader2, Dna, Activity, FlaskConical,
+  FileText,
 } from "lucide-react";
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
 interface BiotechDashboardData {
   genomeCost: Record<string, number>[];
-  lifeExpectancy: Record<string, number>[];
-  cancerPrevalence: Record<string, number>[];
-  cancerDeathRate: Record<string, number>[];
-  dtp3Vaccination: Record<string, number>[];
-  healthcareSpending: Record<string, number>[];
-  topHealthSpenders: { name: string; value: number; year: number }[];
-  childMortality: Record<string, number>[];
-  hivPrevalence: Record<string, number>[];
-  malariaDeathRate: Record<string, number>[];
   clinicalTrials: { category: string; count: number }[];
   pubmedCounts: { category: string; count: number }[];
   crisprYearTrend: { year: number; count: number }[];
   stats: {
-    latestYear: number;
     genomeCost: number;
     genomeCostYear: number;
-    globalLifeExpectancy: number;
     totalCrisprTrials: number;
     totalGeneTherapyTrials: number;
   };
@@ -56,7 +45,6 @@ const formatCompact = (v: number) => {
   return String(Math.round(v));
 };
 
-const formatPct = (v: number) => `${v.toFixed(1)}%`;
 
 const SERIES_COLORS = ["#ef4444", "#f59e0b", "#3b82f6", "#10b981", "#a855f7", "#06b6d4", "#ec4899", "#84cc16", "#f97316", "#14b8a6", "#8b5cf6"];
 const BAR_GRADIENT = [
@@ -124,50 +112,6 @@ function StatCard({ label, value, unit, subtext, color }: {
   );
 }
 
-/* ─── Multi-series area chart ─────────────────────────────────────────────── */
-
-function MultiAreaChart({ data, keys, formatter }: {
-  data: Record<string, number>[];
-  keys: string[];
-  formatter?: (v: number) => string;
-}) {
-  if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
-  return (
-    <div className="h-[380px] w-full">
-      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-        <AreaChart data={data} margin={CHART_MARGIN}>
-          <defs>
-            {keys.map((k, i) => (
-              <linearGradient key={k} id={`bio-grad-${k.replace(/\s+/g, '-')}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={SERIES_COLORS[i % SERIES_COLORS.length]} stopOpacity={0.3} />
-                <stop offset="95%" stopColor={SERIES_COLORS[i % SERIES_COLORS.length]} stopOpacity={0} />
-              </linearGradient>
-            ))}
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-          <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
-          <Tooltip content={<DarkTooltip formatter={formatter} />} />
-          <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
-          {keys.map((k, i) => (
-            <Area
-              key={k}
-              type="monotone"
-              dataKey={k}
-              stroke={SERIES_COLORS[i % SERIES_COLORS.length]}
-              fill={`url(#bio-grad-${k.replace(/\s+/g, '-')})`}
-              strokeWidth={2}
-              dot={false}
-              connectNulls
-            />
-          ))}
-          {data.length > 15 && <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10} />}
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-
 /* ─── Multi-series line chart ─────────────────────────────────────────────── */
 
 function MultiLineChart({ data, keys, formatter }: {
@@ -198,33 +142,6 @@ function MultiLineChart({ data, keys, formatter }: {
           ))}
           {data.length > 15 && <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10} />}
         </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-
-/* ─── Horizontal bar chart ────────────────────────────────────────────────── */
-
-function HorizontalBarChart({ data, dataKey, formatter }: {
-  data: { name: string; value: number }[];
-  dataKey: string;
-  formatter?: (v: number) => string;
-}) {
-  const chartData = data.map(d => ({ name: d.name, [dataKey]: d.value }));
-  return (
-    <div className="h-[400px] w-full">
-      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-        <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#374151" />
-          <XAxis type="number" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
-          <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11, fill: "#D3C8BB" }} tickLine={false} axisLine={false} />
-          <Tooltip content={<DarkTooltip formatter={formatter} />} />
-          <Bar dataKey={dataKey} radius={[0, 4, 4, 0]}>
-            {chartData.map((_, i) => (
-              <Cell key={i} fill={BAR_GRADIENT[i]} />
-            ))}
-          </Bar>
-        </BarChart>
       </ResponsiveContainer>
     </div>
   );
@@ -290,12 +207,12 @@ export default function BiotechDashboardPage() {
           <div className="rounded-2xl border-2 border-[#FFF5E7] shadow-xl overflow-hidden">
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: "#FFF5E7" }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: "#D26742" }}>
-                Biotech &amp; Global Health
+                Biotechnology
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Genome sequencing costs, clinical trials, life expectancy, vaccination coverage, disease burden, and healthcare spending worldwide.
+                Genome sequencing costs, clinical trials, CRISPR research, and biotech publication trends.
               </p>
             </div>
           </div>
@@ -304,7 +221,7 @@ export default function BiotechDashboardPage() {
           {loading && (
             <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border-2 border-[#FFF5E7] flex flex-col items-center gap-4">
               <Loader2 className="h-10 w-10 animate-spin text-amber-300" />
-              <p className="text-gray-400">Fetching biotech &amp; health data...</p>
+              <p className="text-gray-400">Fetching biotech data...</p>
             </div>
           )}
 
@@ -325,19 +242,12 @@ export default function BiotechDashboardPage() {
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <StatCard
                     label="Genome Sequencing Cost"
                     value={formatDollars(data.stats.genomeCost)}
                     color="text-green-400"
                     subtext={`As of ${data.stats.genomeCostYear}`}
-                  />
-                  <StatCard
-                    label="Global Life Expectancy"
-                    value={data.stats.globalLifeExpectancy.toFixed(1)}
-                    unit="years"
-                    color="text-cyan-400"
-                    subtext={`${data.stats.latestYear}`}
                   />
                   <StatCard
                     label="CRISPR Clinical Trials"
@@ -403,109 +313,13 @@ export default function BiotechDashboardPage() {
               </SectionCard>
               )}
 
-              {/* ═══ LIFE EXPECTANCY & MORTALITY ═══ */}
-              <Divider icon={<HeartPulse className="h-5 w-5" />} title="Life Expectancy &amp; Mortality" />
-
-              {data.lifeExpectancy.length > 0 && (
-              <SectionCard icon={<Heart className="h-5 w-5 text-rose-400" />} title="Life Expectancy at Birth">
-                <MultiLineChart data={data.lifeExpectancy} keys={seriesKeys(data.lifeExpectancy)} formatter={(v) => `${v.toFixed(1)} yr`} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Life expectancy at birth by country. Source:{" "}
-                  <a href="https://ourworldindata.org/life-expectancy" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
-                    UN World Population Prospects via Our World in Data
-                  </a>.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.childMortality.length > 0 && (
-              <SectionCard icon={<TrendingDown className="h-5 w-5 text-blue-400" />} title="Under-5 Mortality Rate">
-                <MultiLineChart data={data.childMortality} keys={seriesKeys(data.childMortality)} formatter={(v) => `${v.toFixed(1)}`} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Deaths of children under five years old per 1,000 live births. One of the most important indicators of global health progress. Source: UN IGME / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.hivPrevalence.length > 0 && (
-              <SectionCard icon={<Activity className="h-5 w-5 text-red-400" />} title="People Living with HIV">
-                <MultiAreaChart data={data.hivPrevalence} keys={seriesKeys(data.hivPrevalence)} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Estimated number of people living with HIV worldwide. Source: UNAIDS / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.malariaDeathRate.length > 0 && (
-              <SectionCard icon={<TrendingDown className="h-5 w-5 text-teal-400" />} title="Malaria Death Rate">
-                <MultiLineChart data={data.malariaDeathRate} keys={seriesKeys(data.malariaDeathRate)} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Age-standardized death rate from malaria per 100,000 population. Source: IHME / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {/* ═══ CANCER ═══ */}
-              <Divider icon={<Activity className="h-5 w-5" />} title="Cancer" />
-
-              {data.cancerPrevalence.length > 0 && (
-              <SectionCard icon={<Activity className="h-5 w-5 text-orange-400" />} title="Cancer Prevalence">
-                <MultiLineChart data={data.cancerPrevalence} keys={seriesKeys(data.cancerPrevalence)} formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Share of population with cancer (all forms), by country. Source: IHME Global Burden of Disease / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.cancerDeathRate.length > 0 && (
-              <SectionCard icon={<TrendingDown className="h-5 w-5 text-red-400" />} title="Cancer Death Rate">
-                <MultiLineChart data={data.cancerDeathRate} keys={seriesKeys(data.cancerDeathRate)} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Age-standardized death rate from cancer per 100,000 population. Source: IHME / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {/* ═══ VACCINATION & PUBLIC HEALTH ═══ */}
-              <Divider icon={<Syringe className="h-5 w-5" />} title="Vaccination &amp; Public Health" />
-
-              {data.dtp3Vaccination.length > 0 && (
-              <SectionCard icon={<Syringe className="h-5 w-5 text-blue-400" />} title="DTP3 Vaccination Coverage">
-                <MultiLineChart data={data.dtp3Vaccination} keys={seriesKeys(data.dtp3Vaccination)} formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Share of one-year-olds who have received three doses of the combined DTP vaccine (diphtheria, tetanus, pertussis). Source: WHO / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {/* ═══ HEALTHCARE SPENDING ═══ */}
-              <Divider icon={<DollarSign className="h-5 w-5" />} title="Healthcare Spending" />
-
-              {data.healthcareSpending.length > 0 && (
-              <SectionCard icon={<DollarSign className="h-5 w-5 text-green-400" />} title="Healthcare Spending (% of GDP)">
-                <MultiLineChart data={data.healthcareSpending} keys={seriesKeys(data.healthcareSpending)} formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Total healthcare expenditure as a share of GDP. Source: WHO Global Health Expenditure Database / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.topHealthSpenders.length > 0 && (
-              <SectionCard icon={<Globe className="h-5 w-5 text-amber-400" />} title="Top 10 Countries by Healthcare Spending (% GDP)">
-                <HorizontalBarChart data={data.topHealthSpenders} dataKey="spending" formatter={formatPct} />
-                <p className="text-xs text-gray-500 mt-4">
-                  Countries with the highest share of GDP allocated to healthcare. Source: WHO / Our World in Data.
-                </p>
-              </SectionCard>
-              )}
-
               {/* ─── Footer attribution ───────────────────────────── */}
               <div className="text-center text-xs text-gray-600 pt-4">
                 Data from{" "}
                 <a href="https://ourworldindata.org" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                   Our World in Data
                 </a>
-                {" "}(IHME, WHO, UNAIDS, NHGRI),{" "}
+                {" "}(NHGRI),{" "}
                 <a href="https://clinicaltrials.gov" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                   ClinicalTrials.gov
                 </a>

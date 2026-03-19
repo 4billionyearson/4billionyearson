@@ -8,16 +8,6 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 const INDICATORS = {
   genomeCost: 816712,           // Cost of sequencing a full human genome ($)
-  lifeExpectancy: 1118466,      // Life expectancy at birth (UN WPP)
-  cancerPrevalence: 1188335,    // Share of population with cancer (IHME)
-  cancerDeathRate: 1165250,     // Death rate from cancer (IHME)
-  dtp3Vaccination: 1077436,     // DTP3 immunization coverage (WHO)
-  healthcareSpending: 1045260,  // Healthcare spending as % of GDP (WHO)
-  antibioticUse: 772629,        // Antibiotic use in livestock
-  childMortality: 1027772,      // Under-5 mortality rate (UN IGME)
-  hivPrevalence: 1178467,       // People living with HIV (UNAIDS)
-  malariaDeathRate: 1165115,    // Death rate from malaria (IHME)
-  dalys: 1163226,               // DALYs rate (all causes, IHME)
 };
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -76,24 +66,6 @@ function buildTimeSeries(
   return Array.from(byYear.values()).sort((a, b) => a["year"] - b["year"]);
 }
 
-function getLatestByEntity(
-  rows: OwidRow[],
-  entityMap: Record<number, string>,
-  excludeNames?: Set<string>,
-): { name: string; value: number; year: number }[] {
-  const latest = new Map<string, { value: number; year: number }>();
-  for (const r of rows) {
-    const name = entityMap[r.entityId];
-    if (!name || excludeNames?.has(name)) continue;
-    const prev = latest.get(name);
-    if (!prev || r.year > prev.year) {
-      latest.set(name, { value: r.value, year: r.year });
-    }
-  }
-  return Array.from(latest.entries())
-    .map(([name, d]) => ({ name, value: d.value, year: d.year }));
-}
-
 /* ─── ClinicalTrials.gov v2 queries ──────────────────────────────────────── */
 
 interface TrialCount { term: string; count: number }
@@ -138,30 +110,12 @@ async function fetchPubmedYearSeries(term: string, startYear: number, endYear: n
   return results;
 }
 
-/* ─── Regions/aggregates to exclude from country rankings ─────────────────── */
-
-const EXCLUDE_AGGREGATES = new Set([
-  'World', 'Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania',
-  'European Union (27)', 'European Union (28)', 'High-income countries',
-  'Upper-middle-income countries', 'Lower-middle-income countries', 'Low-income countries',
-]);
-
-const KEY_COUNTRIES = ['World', 'United States', 'China', 'United Kingdom', 'Germany', 'Japan', 'India', 'Brazil'];
-
 /* ─── Main data fetch ─────────────────────────────────────────────────────── */
 
 async function fetchBiotechDashboardData() {
   // Fetch all OWID indicators + external APIs in parallel
   const [
     genomeData, genomeMap,
-    lifeExpData, lifeExpMap,
-    cancerPrevData, cancerPrevMap,
-    cancerDeathData, cancerDeathMap,
-    dtp3Data, dtp3Map,
-    healthSpendData, healthSpendMap,
-    childMortData, childMortMap,
-    hivData, hivMap,
-    malariaData, malariaMap,
     // ClinicalTrials.gov counts
     crisprTrials,
     geneTherapyTrials,
@@ -176,22 +130,6 @@ async function fetchBiotechDashboardData() {
   ] = await Promise.all([
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.genomeCost}.data.json`),
     fetchEntityMap(INDICATORS.genomeCost),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.lifeExpectancy}.data.json`),
-    fetchEntityMap(INDICATORS.lifeExpectancy),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.cancerPrevalence}.data.json`),
-    fetchEntityMap(INDICATORS.cancerPrevalence),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.cancerDeathRate}.data.json`),
-    fetchEntityMap(INDICATORS.cancerDeathRate),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.dtp3Vaccination}.data.json`),
-    fetchEntityMap(INDICATORS.dtp3Vaccination),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.healthcareSpending}.data.json`),
-    fetchEntityMap(INDICATORS.healthcareSpending),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.childMortality}.data.json`),
-    fetchEntityMap(INDICATORS.childMortality),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.hivPrevalence}.data.json`),
-    fetchEntityMap(INDICATORS.hivPrevalence),
-    fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.malariaDeathRate}.data.json`),
-    fetchEntityMap(INDICATORS.malariaDeathRate),
     // ClinicalTrials.gov
     fetchTrialCount('CRISPR'),
     fetchTrialCount('"gene therapy"'),
@@ -208,43 +146,6 @@ async function fetchBiotechDashboardData() {
   // ─ Genome sequencing cost ─
   const genomeRows = parseOWID(genomeData);
   const genomeCost = buildTimeSeries(genomeRows, genomeMap);
-
-  // ─ Life expectancy ─
-  const lifeExpRows = parseOWID(lifeExpData);
-  const lifeExpectancy = buildTimeSeries(lifeExpRows, lifeExpMap, KEY_COUNTRIES);
-
-  // ─ Cancer prevalence ─
-  const cancerPrevRows = parseOWID(cancerPrevData);
-  const cancerPrevalence = buildTimeSeries(cancerPrevRows, cancerPrevMap, KEY_COUNTRIES);
-
-  // ─ Cancer death rate ─
-  const cancerDeathRows = parseOWID(cancerDeathData);
-  const cancerDeathRate = buildTimeSeries(cancerDeathRows, cancerDeathMap, KEY_COUNTRIES);
-
-  // ─ DTP3 vaccination ─
-  const dtp3Rows = parseOWID(dtp3Data);
-  const dtp3Vaccination = buildTimeSeries(dtp3Rows, dtp3Map, ['World', 'United States', 'India', 'China', 'Brazil']);
-
-  // ─ Healthcare spending ─
-  const healthRows = parseOWID(healthSpendData);
-  const healthcareSpending = buildTimeSeries(healthRows, healthSpendMap, KEY_COUNTRIES);
-
-  // ─ Top healthcare spenders ─
-  const topHealthSpenders = getLatestByEntity(healthRows, healthSpendMap, EXCLUDE_AGGREGATES)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-
-  // ─ Child mortality ─
-  const childMortRows = parseOWID(childMortData);
-  const childMortality = buildTimeSeries(childMortRows, childMortMap, ['World', 'United States', 'India', 'China', 'Brazil', 'Nigeria']);
-
-  // ─ HIV ─
-  const hivRows = parseOWID(hivData);
-  const hivPrevalence = buildTimeSeries(hivRows, hivMap, ['World']);
-
-  // ─ Malaria death rate ─
-  const malariaRows = parseOWID(malariaData);
-  const malariaDeathRate = buildTimeSeries(malariaRows, malariaMap, ['World', 'India', 'Nigeria']);
 
   // ─ Clinical trials summary ─
   const clinicalTrials = [
@@ -268,30 +169,16 @@ async function fetchBiotechDashboardData() {
 
   // ─ Stats ─
   const latestGenomeCost = genomeRows.sort((a, b) => b.year - a.year)[0];
-  const latestLifeExp = lifeExpRows
-    .filter(r => lifeExpMap[r.entityId] === 'World')
-    .sort((a, b) => b.year - a.year)[0];
 
   const stats = {
-    latestYear: latestLifeExp?.year ?? 0,
     genomeCost: latestGenomeCost?.value ?? 0,
     genomeCostYear: latestGenomeCost?.year ?? 0,
-    globalLifeExpectancy: latestLifeExp?.value ?? 0,
     totalCrisprTrials: crisprTrials.count,
     totalGeneTherapyTrials: geneTherapyTrials.count,
   };
 
   return {
     genomeCost,
-    lifeExpectancy,
-    cancerPrevalence,
-    cancerDeathRate,
-    dtp3Vaccination,
-    healthcareSpending,
-    topHealthSpenders,
-    childMortality,
-    hivPrevalence,
-    malariaDeathRate,
     clinicalTrials,
     pubmedCounts,
     crisprYearTrend,
