@@ -47,7 +47,7 @@ interface AIDashboardData {
     frontierTotalH100e: number;
     frontierCount: number;
     worldElectricityTWh: number | null;
-    countryElectricityTWh: { name: string; twh: number }[];
+    equivalentCountry: string | null;
   };
   fetchedAt: string;
 }
@@ -579,45 +579,25 @@ export default function AIDashboardPage() {
                 {(() => {
                   const aiTWh = (data.stats.frontierTotalPowerMW ?? 0) * 8.76 / 1000;
                   const worldTWh = data.stats.worldElectricityTWh;
-                  const pct = (aiTWh / worldTWh) * 100;
-                  const countries = data.stats.countryElectricityTWh ?? [];
+                  const pct = worldTWh ? (aiTWh / worldTWh) * 100 : 0;
+                  const eqCountry = data.stats.equivalentCountry;
                   return (
                     <div className="space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-3xl font-bold font-mono text-amber-400">{pct.toFixed(2)}%</div>
-                          <div className="text-xs text-gray-400 mt-1">AI Share of World Electricity</div>
+                          <div className="text-xs text-gray-400 mt-1">of World Electricity Generation</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-emerald-400">{aiTWh.toFixed(1)} TWh</div>
                           <div className="text-xs text-gray-400 mt-1">Frontier AI Data Center Demand</div>
                           <div className="text-[10px] text-gray-500 mt-0.5">annualised from {data.stats.frontierTotalPowerMW?.toLocaleString()} MW capacity</div>
                         </div>
-                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
-                          <div className="text-2xl font-bold font-mono text-cyan-400">{(worldTWh / 1000).toFixed(1)}k TWh</div>
-                          <div className="text-xs text-gray-400 mt-1">World Electricity Generation</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">latest available year</div>
-                        </div>
                       </div>
-                      {/* Country comparison */}
-                      {countries.length > 0 && (
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-300 mb-3">AI Energy Demand as % of Country Electricity</h3>
-                          <div className="space-y-2">
-                            {countries.map(c => {
-                              const cPct = (aiTWh / c.twh) * 100;
-                              return (
-                                <div key={c.name} className="flex items-center gap-3">
-                                  <span className="text-xs text-gray-400 w-28 text-right flex-shrink-0">{c.name}</span>
-                                  <div className="flex-1 bg-gray-800 rounded-full h-5 overflow-hidden">
-                                    <div className="h-full bg-amber-500/70 rounded-full" style={{ width: `${Math.min(Math.max(cPct, 0.5), 100)}%` }} />
-                                  </div>
-                                  <span className="text-xs font-mono text-amber-400 w-16 flex-shrink-0">{cPct.toFixed(2)}%</span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
+                      {eqCountry && (
+                        <p className="text-sm text-gray-300 text-center">
+                          Roughly equivalent to the entire electricity generation of <span className="font-semibold text-amber-400">{eqCountry}</span>.
+                        </p>
                       )}
                       <p className="text-xs text-gray-500">
                         Covers only tracked frontier facilities; total AI-related electricity use (including cloud, inference, and smaller facilities) is likely higher. Sources:{" "}

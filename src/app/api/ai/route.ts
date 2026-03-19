@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v18';
+const CACHE_KEY = 'ai:dashboard:v19';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -459,32 +459,36 @@ async function fetchFrontierDataCenters(): Promise<{
 
 interface ElecData {
   worldTWh: number | null;
-  countryTWh: { name: string; twh: number }[];
+  equivalentCountry: string | null;
 }
 
-const ELEC_COUNTRIES = ['World', 'United States', 'China', 'European Union (27)', 'India', 'Japan', 'Germany', 'United Kingdom', 'France', 'South Korea', 'Brazil'];
-
-async function fetchElectricityData(): Promise<ElecData> {
+async function fetchElectricityData(aiTWhEstimate: number): Promise<ElecData> {
   const data = await fetchJSON('https://owid-public.owid.io/data/energy/owid-energy-data.json', 30000);
-  if (!data) return { worldTWh: null, countryTWh: [] };
+  if (!data) return { worldTWh: null, equivalentCountry: null };
 
-  const result: { name: string; twh: number }[] = [];
   let worldTWh: number | null = null;
+  // Find real countries whose electricity generation is closest to aiTWhEstimate
+  const EXCLUDED = new Set(['World', 'High-income countries', 'Low-income countries', 'Lower-middle-income countries', 'Upper-middle-income countries', 'Europe', 'European Union (27)', 'North America', 'South America', 'Asia', 'Africa', 'Oceania', 'OECD', 'Non-OECD']);
+  let bestMatch: { name: string; diff: number } | null = null;
 
-  for (const key of ELEC_COUNTRIES) {
-    const years: { year: number; electricity_generation?: number }[] = data[key]?.data ?? [];
+  for (const [key, entity] of Object.entries(data as Record<string, any>)) {
+    const years: { year: number; electricity_generation?: number }[] = entity?.data ?? [];
     for (let i = years.length - 1; i >= 0; i--) {
       if (years[i].electricity_generation != null) {
         const twh = years[i].electricity_generation!;
-        const label = key === 'European Union (27)' ? 'EU' : key;
-        if (key === 'World') worldTWh = twh;
-        else result.push({ name: label, twh });
+        if (key === 'World') { worldTWh = twh; break; }
+        if (!EXCLUDED.has(key) && twh > 0) {
+          const diff = Math.abs(twh - aiTWhEstimate);
+          if (!bestMatch || diff < bestMatch.diff) {
+            bestMatch = { name: key, diff };
+          }
+        }
         break;
       }
     }
   }
 
-  return { worldTWh, countryTWh: result };
+  return { worldTWh, equivalentCountry: bestMatch?.name ?? null };
 }
 
 async function fetchAIDashboardData() {
@@ -523,11 +527,14 @@ async function fetchAIDashboardData() {
   const frontierMath = buildDatePointSeries(fmRows, frontierMathMap, '2024-06-20');
 
   // ─ Epoch AI live model data (2025-2026) ─
-  const [epochData, frontierDC, elecData] = await Promise.all([
+  const [epochData, frontierDC] = await Promise.all([
     fetchEpochModels(),
     fetchFrontierDataCenters(),
-    fetchElectricityData(),
   ]);
+
+  // Electricity data needs AI TWh estimate from frontierDC
+  const aiTWhEstimate = (frontierDC.totalPowerMW ?? 0) * 8.76 / 1000;
+  const elecData = await fetchElectricityData(aiTWhEstimate);
 
   // ─ Stats ─
   const latestInvestWorld = investRows
@@ -566,7 +573,7 @@ async function fetchAIDashboardData() {
       frontierTotalH100e: frontierDC.totalH100e,
       frontierCount: frontierDC.sites.length,
       worldElectricityTWh: elecData.worldTWh,
-      countryElectricityTWh: elecData.countryTWh,
+      equivalentCountry: elecData.equivalentCountry,
     },
     fetchedAt: new Date().toISOString(),
   };
