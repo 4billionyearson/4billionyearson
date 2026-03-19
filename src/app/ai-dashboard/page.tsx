@@ -610,7 +610,7 @@ export default function AIDashboardPage() {
                                 <div key={r.name} className="flex items-center gap-3">
                                   <span className={`text-xs w-28 text-right flex-shrink-0 ${r.isAI ? 'text-amber-400 font-semibold' : 'text-gray-400'}`}>{r.name}</span>
                                   <div className="flex-1 bg-gray-800 rounded-full h-5 overflow-hidden">
-                                    <div className={`h-full rounded-full ${r.isAI ? 'bg-amber-500/70' : 'bg-cyan-500/60'}`} style={{ width: `${(r.twh / maxTWh) * 100}%` }} />
+                                    <div className={`h-full rounded-full ${r.isAI ? 'bg-amber-500' : 'bg-cyan-600'}`} style={{ width: `${(r.twh / maxTWh) * 100}%` }} />
                                   </div>
                                   <span className={`text-xs font-mono w-20 flex-shrink-0 ${r.isAI ? 'text-amber-400' : 'text-gray-400'}`}>{r.twh.toFixed(1)} TWh</span>
                                 </div>
