@@ -345,7 +345,21 @@ function OverviewSection({ data }: { data: GHGData }) {
           <SubSection title="% above pre-industrial level – drag slider to zoom">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={normalisedGasData} margin={CHART_MARGIN}>
+                <AreaChart data={normalisedGasData} margin={CHART_MARGIN}>
+                  <defs>
+                    <linearGradient id="grad-co2Pct" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="grad-ch4Pct" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="grad-n2oPct" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#a855f7" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} unit="%" />
@@ -355,15 +369,15 @@ function OverviewSection({ data }: { data: GHGData }) {
                     label={{ position: 'insideBottomLeft', value: 'Pre-industrial level', fill: '#7A6E63', fontSize: 10 } as any} />
                   <ReferenceLine y={((350 - 280) / 280) * 100} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5}
                     label={{ position: 'insideTopLeft', value: 'CO₂ safe boundary (350 ppm ≈ 25%)', fill: '#ef4444', fontSize: 10, fontWeight: 600, dy: -17 } as any} />
-                  <Line type="monotone" dataKey="co2Pct" name="CO₂ (% above 280 ppm)" stroke="#ef4444" strokeWidth={2} dot={false} connectNulls />
-                  <Line type="monotone" dataKey="ch4Pct" name="CH₄ (% above 722 ppb)" stroke="#f59e0b" strokeWidth={2} dot={false} connectNulls />
-                  <Line type="monotone" dataKey="n2oPct" name="N₂O (% above 270 ppb)" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls />
+                  <Area type="monotone" dataKey="co2Pct" name="CO₂ (% above 280 ppm)" stroke="#ef4444" strokeWidth={2} dot={false} connectNulls fill="url(#grad-co2Pct)" />
+                  <Area type="monotone" dataKey="ch4Pct" name="CH₄ (% above 722 ppb)" stroke="#f59e0b" strokeWidth={2} dot={false} connectNulls fill="url(#grad-ch4Pct)" />
+                  <Area type="monotone" dataKey="n2oPct" name="N₂O (% above 270 ppb)" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls fill="url(#grad-n2oPct)" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
-                    <LineChart data={normalisedGasData}>
-                      <Line type="monotone" dataKey="co2Pct" stroke="#ef4444" dot={false} strokeWidth={1} />
-                    </LineChart>
+                    <AreaChart data={normalisedGasData}>
+                      <Area type="monotone" dataKey="co2Pct" stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                    </AreaChart>
                   </Brush>
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </SubSection>
