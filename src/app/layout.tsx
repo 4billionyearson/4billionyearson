@@ -4,8 +4,6 @@ import { CMS_NAME, HOME_OG_IMAGE_URL } from "@/lib/constants";
 import type { Metadata } from "next";
 import { Inter, Space_Mono } from "next/font/google";
 import cn from "classnames";
-import { ThemeSwitcher } from "./_components/theme-switcher";
-
 import CookieBanner from "./_components/cookie-banner";
 import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from "@next/third-parties/google";
@@ -53,7 +51,6 @@ export default function RootLayout({
             backgroundRepeat: "no-repeat",
           }}
         />
-        <ThemeSwitcher />
         <div className="relative z-10 flex flex-col min-h-screen">
           <Header />
           <div className="flex-grow">
