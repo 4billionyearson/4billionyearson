@@ -236,10 +236,10 @@ export default function BiotechDashboardPage() {
               <SectionCard icon={<Dna className="h-5 w-5 text-green-400" />} title="Cost to Sequence a Human Genome">
                 <div className="h-[380px] w-full">
                   <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                    <LineChart data={data.genomeCost} margin={{ top: 10, right: 0, left: 5, bottom: 0 }}>
+                    <LineChart data={data.genomeCost} margin={{ top: 10, right: 0, left: 10, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
-                      <YAxis scale="log" domain={['auto', 'auto']} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatDollars} allowDataOverflow>
+                      <YAxis scale="log" domain={['auto', 'auto']} width={60} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatDollars} allowDataOverflow>
                         <Label value="$100M" position="insideTopLeft" offset={10} style={{ fill: '#A99B8D', fontSize: 12, fontWeight: 600 }} />
                       </YAxis>
                       <Tooltip content={<DarkTooltip formatter={formatDollars} />} />
