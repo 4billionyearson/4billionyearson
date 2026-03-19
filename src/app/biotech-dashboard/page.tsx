@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, Brush, Cell, Label,
+  Tooltip, Legend, ResponsiveContainer, Brush, Cell,
 } from "recharts";
 import {
   Loader2, Dna, Activity, FlaskConical,
@@ -239,9 +239,7 @@ export default function BiotechDashboardPage() {
                     <LineChart data={data.genomeCost} margin={{ top: 10, right: 0, left: 10, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
-                      <YAxis scale="log" domain={['auto', 'auto']} width={60} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatDollars} allowDataOverflow>
-                        <Label value="$100M" position="insideTopLeft" offset={10} style={{ fill: '#A99B8D', fontSize: 12, fontWeight: 600 }} />
-                      </YAxis>
+                      <YAxis scale="log" domain={[1000, 100000000]} width={60} ticks={[1000, 10000, 100000, 1000000, 10000000, 100000000]} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatDollars} allowDataOverflow />
                       <Tooltip content={<DarkTooltip formatter={formatDollars} />} />
                       <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                       {seriesKeys(data.genomeCost).map((k, i) => (
