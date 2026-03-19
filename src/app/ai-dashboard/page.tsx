@@ -419,7 +419,7 @@ export default function AIDashboardPage() {
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="AI Models Released Per Year">
                 <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} showBrush={false} />
                 <p className="text-xs text-gray-500 mt-4">
-                  AI models released per year (2010–present). Source: Epoch AI. Continuously updated.
+                  AI models released per year (2010–present). Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>. Continuously updated.
                 </p>
               </SectionCard>
               )}
@@ -428,7 +428,7 @@ export default function AIDashboardPage() {
               <SectionCard icon={<Brain className="h-5 w-5 text-violet-400" />} title="AI Systems Released Per Year">
                 <StackedBarChart data={data.aiSystemsPerYear} keys={seriesKeys(data.aiSystemsPerYear)} />
                 <p className="text-xs text-gray-500 mt-4">
-                  Number of large-scale AI systems released per year, by domain (language, vision, multimodal, etc.). Source: Epoch AI / Our World in Data. Updated monthly.
+                  Number of large-scale AI systems released per year, by domain (language, vision, multimodal, etc.). Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" / "}<a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>. Updated monthly.
                   <span className="block mt-1 text-amber-400/80">2026 figure is year-to-date and will increase throughout the year.</span>
                 </p>
               </SectionCard>
@@ -438,7 +438,7 @@ export default function AIDashboardPage() {
               <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title="Cumulative AI Systems by Country">
                 <MultiAreaChart data={data.aiSystemsByCountry} keys={seriesKeys(data.aiSystemsByCountry)} stacked />
                 <p className="text-xs text-gray-500 mt-4">
-                  Cumulative number of large-scale AI systems by country of origin since 2017. Source: Epoch AI / Our World in Data. Updated monthly.
+                  Cumulative number of large-scale AI systems by country of origin since 2017. Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" / "}<a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>. Updated monthly.
                 </p>
               </SectionCard>
               )}
@@ -448,8 +448,8 @@ export default function AIDashboardPage() {
                 <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${Math.round(v)}%`} />
                 <p className="text-xs text-gray-500 mt-4">
                   Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Source:{" "}
-                  <a href="https://ourworldindata.org/grapher/ai-frontier-math-benchmark" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Epoch AI / Our World in Data
+                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI
                   </a>. Updated monthly.
                 </p>
               </SectionCard>
