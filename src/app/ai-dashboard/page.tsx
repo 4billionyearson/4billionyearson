@@ -47,6 +47,7 @@ interface AIDashboardData {
     frontierTotalH100e: number;
     frontierCount: number;
     worldElectricityTWh: number | null;
+    countryElectricityTWh: { name: string; twh: number }[];
   };
   fetchedAt: string;
 }
@@ -579,6 +580,7 @@ export default function AIDashboardPage() {
                   const aiTWh = (data.stats.frontierTotalPowerMW ?? 0) * 8.76 / 1000;
                   const worldTWh = data.stats.worldElectricityTWh;
                   const pct = (aiTWh / worldTWh) * 100;
+                  const countries = data.stats.countryElectricityTWh ?? [];
                   return (
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -597,25 +599,30 @@ export default function AIDashboardPage() {
                           <div className="text-[10px] text-gray-500 mt-0.5">latest available year</div>
                         </div>
                       </div>
-                      {/* Proportional bar */}
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs text-gray-400">World electricity generation</span>
-                        </div>
-                        <div className="w-full bg-gray-800 rounded-full h-6 overflow-hidden relative">
-                          <div className="h-full bg-amber-500/80 rounded-full flex items-center justify-end pr-2" style={{ width: `${Math.max(pct, 1.5)}%` }}>
-                            <span className="text-[10px] font-bold text-gray-900">AI</span>
+                      {/* Country comparison */}
+                      {countries.length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-semibold text-gray-300 mb-3">AI Energy Demand as % of Country Electricity</h3>
+                          <div className="space-y-2">
+                            {countries.map(c => {
+                              const cPct = (aiTWh / c.twh) * 100;
+                              return (
+                                <div key={c.name} className="flex items-center gap-3">
+                                  <span className="text-xs text-gray-400 w-28 text-right flex-shrink-0">{c.name}</span>
+                                  <div className="flex-1 bg-gray-800 rounded-full h-5 overflow-hidden">
+                                    <div className="h-full bg-amber-500/70 rounded-full" style={{ width: `${Math.min(Math.max(cPct, 0.5), 100)}%` }} />
+                                  </div>
+                                  <span className="text-xs font-mono text-amber-400 w-16 flex-shrink-0">{cPct.toFixed(2)}%</span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
-                        <div className="flex justify-between text-[10px] text-gray-500 mt-1">
-                          <span>0 TWh</span>
-                          <span>{(worldTWh / 1000).toFixed(0)}k TWh</span>
-                        </div>
-                      </div>
+                      )}
                       <p className="text-xs text-gray-500">
-                        Frontier AI data centers account for approximately {pct.toFixed(2)}% of global electricity generation. This covers only tracked frontier facilities; total AI-related electricity use (including cloud, inference, and smaller facilities) is likely higher. Sources:{" "}
+                        Covers only tracked frontier facilities; total AI-related electricity use (including cloud, inference, and smaller facilities) is likely higher. Sources:{" "}
                         <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(data centers),{" "}
-                        <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>{" "}(world electricity).
+                        <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>{" "}(electricity generation).
                       </p>
                     </div>
                   );

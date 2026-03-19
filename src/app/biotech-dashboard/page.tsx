@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, Brush, Cell,
+  Tooltip, Legend, ResponsiveContainer, Brush, Cell, Label,
 } from "recharts";
 import {
   Loader2, Dna, Activity, FlaskConical,
@@ -239,7 +239,9 @@ export default function BiotechDashboardPage() {
                     <LineChart data={data.genomeCost} margin={CHART_MARGIN}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
-                      <YAxis scale="log" domain={['auto', 'auto']} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatDollars} allowDataOverflow />
+                      <YAxis scale="log" domain={['auto', 'auto']} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatDollars} allowDataOverflow>
+                        <Label value="$100M" position="insideTopLeft" offset={10} style={{ fill: '#A99B8D', fontSize: 12, fontWeight: 600 }} />
+                      </YAxis>
                       <Tooltip content={<DarkTooltip formatter={formatDollars} />} />
                       <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
                       {seriesKeys(data.genomeCost).map((k, i) => (
@@ -299,20 +301,11 @@ export default function BiotechDashboardPage() {
               )}
 
               {/* ─── Footer attribution ───────────────────────────── */}
-              <div className="text-center text-xs text-gray-600 pt-4">
-                Data from{" "}
-                <a href="https://ourworldindata.org" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
-                  Our World in Data
-                </a>
-                {" "}(NHGRI),{" "}
-                <a href="https://clinicaltrials.gov" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
-                  ClinicalTrials.gov
-                </a>
-                , and{" "}
-                <a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
-                  PubMed/NCBI
-                </a>
-                . Licensed under CC BY 4.0.
+              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#FFF5E7] text-sm text-gray-400 space-y-1.5">
+                <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
+                <p>• Genome sequencing cost: <a href="https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NHGRI via Our World in Data</a> (CC-BY)</p>
+                <p>• Clinical trials: <a href="https://clinicaltrials.gov" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">ClinicalTrials.gov</a></p>
+                <p>• Publications: <a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">PubMed / NCBI</a></p>
               </div>
             </>
           )}

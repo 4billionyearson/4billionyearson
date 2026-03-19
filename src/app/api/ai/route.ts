@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v17';
+const CACHE_KEY = 'ai:dashboard:v18';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -457,14 +457,34 @@ async function fetchFrontierDataCenters(): Promise<{
 
 /* ─── Main data fetch ─────────────────────────────────────────────────────── */
 
-async function fetchWorldElectricityTWh(): Promise<number | null> {
+interface ElecData {
+  worldTWh: number | null;
+  countryTWh: { name: string; twh: number }[];
+}
+
+const ELEC_COUNTRIES = ['World', 'United States', 'China', 'European Union (27)', 'India', 'Japan', 'Germany', 'United Kingdom', 'France', 'South Korea', 'Brazil'];
+
+async function fetchElectricityData(): Promise<ElecData> {
   const data = await fetchJSON('https://owid-public.owid.io/data/energy/owid-energy-data.json', 30000);
-  if (!data?.World) return null;
-  const worldYears: { year: number; electricity_generation?: number }[] = data.World.data ?? [];
-  for (let i = worldYears.length - 1; i >= 0; i--) {
-    if (worldYears[i].electricity_generation != null) return worldYears[i].electricity_generation!;
+  if (!data) return { worldTWh: null, countryTWh: [] };
+
+  const result: { name: string; twh: number }[] = [];
+  let worldTWh: number | null = null;
+
+  for (const key of ELEC_COUNTRIES) {
+    const years: { year: number; electricity_generation?: number }[] = data[key]?.data ?? [];
+    for (let i = years.length - 1; i >= 0; i--) {
+      if (years[i].electricity_generation != null) {
+        const twh = years[i].electricity_generation!;
+        const label = key === 'European Union (27)' ? 'EU' : key;
+        if (key === 'World') worldTWh = twh;
+        else result.push({ name: label, twh });
+        break;
+      }
+    }
   }
-  return null;
+
+  return { worldTWh, countryTWh: result };
 }
 
 async function fetchAIDashboardData() {
@@ -503,10 +523,10 @@ async function fetchAIDashboardData() {
   const frontierMath = buildDatePointSeries(fmRows, frontierMathMap, '2024-06-20');
 
   // ─ Epoch AI live model data (2025-2026) ─
-  const [epochData, frontierDC, worldElecTWh] = await Promise.all([
+  const [epochData, frontierDC, elecData] = await Promise.all([
     fetchEpochModels(),
     fetchFrontierDataCenters(),
-    fetchWorldElectricityTWh(),
+    fetchElectricityData(),
   ]);
 
   // ─ Stats ─
@@ -545,7 +565,8 @@ async function fetchAIDashboardData() {
       frontierTotalCostB: frontierDC.totalCostB,
       frontierTotalH100e: frontierDC.totalH100e,
       frontierCount: frontierDC.sites.length,
-      worldElectricityTWh: worldElecTWh,
+      worldElectricityTWh: elecData.worldTWh,
+      countryElectricityTWh: elecData.countryTWh,
     },
     fetchedAt: new Date().toISOString(),
   };

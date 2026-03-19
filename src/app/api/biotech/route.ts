@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'biotech:dashboard:v2';
+const CACHE_KEY = 'biotech:dashboard:v3';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -94,18 +94,13 @@ async function fetchPubmedYearSeries(term: string, startYear: number, endYear: n
   const results: { year: number; count: number }[] = [];
   const encoded = encodeURIComponent(term);
   const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
-  for (let b = 0; b < years.length; b += 3) {
-    if (b > 0) await new Promise(r => setTimeout(r, 400));
-    const batch = years.slice(b, b + 3);
-    const counts = await Promise.all(
-      batch.map(async yr => {
-        const data = await fetchJSON(
-          `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encoded}&mindate=${yr}/01/01&maxdate=${yr}/12/31&datetype=pdat&rettype=count&retmode=json`
-        );
-        return { year: yr, count: Number(data?.esearchresult?.count ?? 0) };
-      })
+  // Fully sequential — one request at a time with 400ms gap to stay under NCBI 3 req/sec
+  for (const yr of years) {
+    await new Promise(r => setTimeout(r, 400));
+    const data = await fetchJSON(
+      `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encoded}&mindate=${yr}/01/01&maxdate=${yr}/12/31&datetype=pdat&rettype=count&retmode=json`
     );
-    results.push(...counts);
+    results.push({ year: yr, count: Number(data?.esearchresult?.count ?? 0) });
   }
   return results;
 }
@@ -133,11 +128,15 @@ async function fetchBiotechDashboardData() {
     fetchTrialCount('immunotherapy'),
   ]);
 
-  // PubMed total counts — sequential to respect NCBI rate limit (3 req/sec without API key)
+  // PubMed total counts — sequential with delays to respect NCBI 3 req/sec limit
   const crisprPubs = await fetchPubmedCount('CRISPR');
+  await new Promise(r => setTimeout(r, 400));
   const geneTherapyPubs = await fetchPubmedCount('"gene therapy"');
+  await new Promise(r => setTimeout(r, 400));
   const mrnaPubs = await fetchPubmedCount('"mRNA vaccine"');
+  await new Promise(r => setTimeout(r, 400));
   const genomicsPubs = await fetchPubmedCount('genomics');
+  await new Promise(r => setTimeout(r, 400));
 
   // ─ Genome sequencing cost ─
   const genomeRows = parseOWID(genomeData);
