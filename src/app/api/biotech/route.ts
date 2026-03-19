@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'biotech:dashboard:v1';
+const CACHE_KEY = 'biotech:dashboard:v2';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -93,14 +93,14 @@ async function fetchPubmedCount(term: string): Promise<{ term: string; count: nu
 async function fetchPubmedYearSeries(term: string, startYear: number, endYear: number): Promise<{ year: number; count: number }[]> {
   const results: { year: number; count: number }[] = [];
   const encoded = encodeURIComponent(term);
-  // Fetch counts for each year in parallel (batches of 5)
   const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
-  for (let b = 0; b < years.length; b += 5) {
-    const batch = years.slice(b, b + 5);
+  for (let b = 0; b < years.length; b += 3) {
+    if (b > 0) await new Promise(r => setTimeout(r, 400));
+    const batch = years.slice(b, b + 3);
     const counts = await Promise.all(
       batch.map(async yr => {
         const data = await fetchJSON(
-          `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encoded}&mindate=${yr}&maxdate=${yr}&datetype=pdat&rettype=count&retmode=json`
+          `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encoded}&mindate=${yr}/01/01&maxdate=${yr}/12/31&datetype=pdat&rettype=count&retmode=json`
         );
         return { year: yr, count: Number(data?.esearchresult?.count ?? 0) };
       })
@@ -122,11 +122,6 @@ async function fetchBiotechDashboardData() {
     mrnaTrials,
     carTTrials,
     immunotherapyTrials,
-    // PubMed total counts
-    crisprPubs,
-    geneTherapyPubs,
-    mrnaPubs,
-    genomicsPubs,
   ] = await Promise.all([
     fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.genomeCost}.data.json`),
     fetchEntityMap(INDICATORS.genomeCost),
@@ -136,12 +131,13 @@ async function fetchBiotechDashboardData() {
     fetchTrialCount('mRNA'),
     fetchTrialCount('"CAR-T"'),
     fetchTrialCount('immunotherapy'),
-    // PubMed
-    fetchPubmedCount('CRISPR'),
-    fetchPubmedCount('"gene therapy"'),
-    fetchPubmedCount('"mRNA vaccine"'),
-    fetchPubmedCount('genomics'),
   ]);
+
+  // PubMed total counts — sequential to respect NCBI rate limit (3 req/sec without API key)
+  const crisprPubs = await fetchPubmedCount('CRISPR');
+  const geneTherapyPubs = await fetchPubmedCount('"gene therapy"');
+  const mrnaPubs = await fetchPubmedCount('"mRNA vaccine"');
+  const genomicsPubs = await fetchPubmedCount('genomics');
 
   // ─ Genome sequencing cost ─
   const genomeRows = parseOWID(genomeData);

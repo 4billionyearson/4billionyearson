@@ -112,41 +112,6 @@ function StatCard({ label, value, unit, subtext, color }: {
   );
 }
 
-/* ─── Multi-series line chart ─────────────────────────────────────────────── */
-
-function MultiLineChart({ data, keys, formatter }: {
-  data: Record<string, number>[];
-  keys: string[];
-  formatter?: (v: number) => string;
-}) {
-  if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
-  return (
-    <div className="h-[380px] w-full">
-      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-        <LineChart data={data} margin={CHART_MARGIN}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-          <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatter || formatCompact} />
-          <Tooltip content={<DarkTooltip formatter={formatter} />} />
-          <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
-          {keys.map((k, i) => (
-            <Line
-              key={k}
-              type="monotone"
-              dataKey={k}
-              stroke={SERIES_COLORS[i % SERIES_COLORS.length]}
-              strokeWidth={2}
-              dot={false}
-              connectNulls
-            />
-          ))}
-          {data.length > 15 && <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10} />}
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-
 /* ─── Simple vertical bar chart ───────────────────────────────────────────── */
 
 function SimpleBarChart({ data, categoryKey, valueKey, formatter, barColor }: {
@@ -269,9 +234,29 @@ export default function BiotechDashboardPage() {
 
               {data.genomeCost.length > 0 && (
               <SectionCard icon={<Dna className="h-5 w-5 text-green-400" />} title="Cost to Sequence a Human Genome">
-                <MultiLineChart data={data.genomeCost} keys={seriesKeys(data.genomeCost)} formatter={formatDollars} />
+                <div className="h-[380px] w-full">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                    <LineChart data={data.genomeCost} margin={CHART_MARGIN}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
+                      <YAxis scale="log" domain={['auto', 'auto']} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatDollars} allowDataOverflow />
+                      <Tooltip content={<DarkTooltip formatter={formatDollars} />} />
+                      <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
+                      {seriesKeys(data.genomeCost).map((k, i) => (
+                        <Line key={k} type="monotone" dataKey={k} stroke={SERIES_COLORS[i % SERIES_COLORS.length]} strokeWidth={2} dot={false} connectNulls />
+                      ))}
+                      <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10}>
+                        <LineChart data={data.genomeCost}>
+                          {seriesKeys(data.genomeCost).map((k, i) => (
+                            <Line key={k} type="monotone" dataKey={k} stroke={SERIES_COLORS[i % SERIES_COLORS.length]} dot={false} strokeWidth={1} />
+                          ))}
+                        </LineChart>
+                      </Brush>
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
                 <p className="text-xs text-gray-500 mt-4">
-                  Cost of sequencing a complete human genome, from $100M in 2001 to under $1,000 today — outpacing Moore&rsquo;s Law. Source:{" "}
+                  Cost of sequencing a complete human genome, from $100M in 2001 to under $1,000 today — outpacing Moore&rsquo;s Law. Logarithmic scale. Source:{" "}
                   <a href="https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     NHGRI via Our World in Data
                   </a>.
