@@ -596,33 +596,29 @@ export default function AIDashboardPage() {
                           <div className="text-[10px] text-gray-500 mt-0.5">annualised from {data.stats.frontierTotalPowerMW?.toLocaleString()} MW capacity</div>
                         </div>
                       </div>
-                      {comparisons.length > 0 && (
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-300 mb-3">For comparison — country electricity generation (TWh)</h3>
-                          <div className="space-y-2">
-                            {comparisons.map(c => {
-                              const maxTWh = Math.max(...comparisons.map(x => x.twh), aiTWh);
-                              return (
-                                <div key={c.name} className="flex items-center gap-3">
-                                  <span className="text-xs text-gray-400 w-28 text-right flex-shrink-0">{c.name}</span>
+                      {comparisons.length > 0 && (() => {
+                        const allRows = [
+                          ...comparisons.map(c => ({ name: c.name, twh: c.twh, isAI: false })),
+                          { name: '⚡ AI Frontier', twh: aiTWh, isAI: true },
+                        ].sort((a, b) => b.twh - a.twh);
+                        const maxTWh = Math.max(...allRows.map(r => r.twh));
+                        return (
+                          <div>
+                            <h3 className="text-sm font-semibold text-gray-300 mb-3">For comparison — country electricity generation (TWh)</h3>
+                            <div className="space-y-2">
+                              {allRows.map(r => (
+                                <div key={r.name} className="flex items-center gap-3">
+                                  <span className={`text-xs w-28 text-right flex-shrink-0 ${r.isAI ? 'text-amber-400 font-semibold' : 'text-gray-400'}`}>{r.name}</span>
                                   <div className="flex-1 bg-gray-800 rounded-full h-5 overflow-hidden">
-                                    <div className="h-full bg-cyan-600/60 rounded-full" style={{ width: `${(c.twh / maxTWh) * 100}%` }} />
+                                    <div className={`h-full rounded-full ${r.isAI ? 'bg-amber-500/70' : 'bg-cyan-500/60'}`} style={{ width: `${(r.twh / maxTWh) * 100}%` }} />
                                   </div>
-                                  <span className="text-xs font-mono text-gray-400 w-20 flex-shrink-0">{c.twh.toFixed(1)} TWh</span>
+                                  <span className={`text-xs font-mono w-20 flex-shrink-0 ${r.isAI ? 'text-amber-400' : 'text-gray-400'}`}>{r.twh.toFixed(1)} TWh</span>
                                 </div>
-                              );
-                            })}
-                            {/* AI demand row */}
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs text-amber-400 font-semibold w-28 text-right flex-shrink-0">⚡ AI Frontier</span>
-                              <div className="flex-1 bg-gray-800 rounded-full h-5 overflow-hidden">
-                                <div className="h-full bg-amber-500/70 rounded-full" style={{ width: `${(aiTWh / Math.max(...comparisons.map(x => x.twh), aiTWh)) * 100}%` }} />
-                              </div>
-                              <span className="text-xs font-mono text-amber-400 w-20 flex-shrink-0">{aiTWh.toFixed(1)} TWh</span>
+                              ))}
                             </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                       <p className="text-xs text-gray-500">
                         Covers only tracked frontier facilities; total AI-related electricity use (including cloud, inference, and smaller facilities) is likely higher. Sources:{" "}
                         <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(data centers),{" "}
