@@ -249,6 +249,7 @@ export default function BiotechDashboardPage() {
                       ))}
                       <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10}>
                         <LineChart data={data.genomeCost}>
+                          <YAxis scale="log" domain={['auto', 'auto']} hide />
                           {seriesKeys(data.genomeCost).map((k, i) => (
                             <Line key={k} type="monotone" dataKey={k} stroke={SERIES_COLORS[i % SERIES_COLORS.length]} dot={false} strokeWidth={1} />
                           ))}
