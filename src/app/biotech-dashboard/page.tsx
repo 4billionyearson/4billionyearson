@@ -232,9 +232,18 @@ export default function BiotechDashboardPage() {
               {/* ═══ GENOMICS & BIOTECHNOLOGY ═══ */}
               <Divider icon={<Dna className="h-5 w-5" />} title="Genomics &amp; Biotechnology" />
 
-              {data.genomeCost.length > 0 && (
+              {data.genomeCost.length > 0 && (() => {
+                // Pre-transform data to log10 for Brush child (avoids YAxis conflict)
+                const keys = seriesKeys(data.genomeCost);
+                const logData = data.genomeCost.map(row => {
+                  const out: Record<string, number> = { year: row.year };
+                  for (const k of keys) if (row[k] != null && row[k] > 0) out[k] = Math.log10(row[k]);
+                  return out;
+                });
+                return (
               <SectionCard icon={<Dna className="h-5 w-5 text-green-400" />} title="Cost to Sequence a Human Genome">
-                <div className="h-[380px] w-full">
+                <div className="h-[380px] w-full relative">
+                  <div className="absolute top-0 left-0 text-[11px] font-semibold" style={{ color: '#A99B8D' }}>$100M</div>
                   <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <LineChart data={data.genomeCost} margin={CHART_MARGIN}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -242,12 +251,12 @@ export default function BiotechDashboardPage() {
                       <YAxis scale="log" domain={['auto', 'auto']} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={formatDollars} allowDataOverflow />
                       <Tooltip content={<DarkTooltip formatter={formatDollars} />} />
                       <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
-                      {seriesKeys(data.genomeCost).map((k, i) => (
+                      {keys.map((k, i) => (
                         <Line key={k} type="monotone" dataKey={k} stroke={SERIES_COLORS[i % SERIES_COLORS.length]} strokeWidth={2} dot={false} connectNulls />
                       ))}
                       <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10}>
-                        <LineChart data={data.genomeCost}>
-                          {seriesKeys(data.genomeCost).map((k, i) => (
+                        <LineChart data={logData}>
+                          {keys.map((k, i) => (
                             <Line key={k} type="monotone" dataKey={k} stroke={SERIES_COLORS[i % SERIES_COLORS.length]} dot={false} strokeWidth={1} />
                           ))}
                         </LineChart>
@@ -262,7 +271,8 @@ export default function BiotechDashboardPage() {
                   </a>.
                 </p>
               </SectionCard>
-              )}
+              );
+              })()}
 
               {data.clinicalTrials.length > 0 && (
               <SectionCard icon={<FlaskConical className="h-5 w-5 text-violet-400" />} title="Clinical Trials by Therapy Type">
