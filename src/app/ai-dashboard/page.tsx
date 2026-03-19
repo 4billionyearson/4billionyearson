@@ -220,10 +220,11 @@ function MultiLineChart({ data, keys, formatter, refLine }: {
 
 /* ─── Stacked bar chart ───────────────────────────────────────────────────── */
 
-function StackedBarChart({ data, keys, formatter }: {
+function StackedBarChart({ data, keys, formatter, showBrush = true }: {
   data: Record<string, number>[];
   keys: string[];
   formatter?: (v: number) => string;
+  showBrush?: boolean;
 }) {
   if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
   return (
@@ -238,7 +239,7 @@ function StackedBarChart({ data, keys, formatter }: {
           {keys.map((k, i) => (
             <Bar key={k} dataKey={k} stackId="1" fill={SERIES_COLORS[i % SERIES_COLORS.length]} />
           ))}
-          {data.length > 15 && <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10} />}
+          {showBrush && data.length > 15 && <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10} />}
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -416,7 +417,7 @@ export default function AIDashboardPage() {
 
               {data.epochModelsByYear?.length > 0 && (
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="AI Models Released Per Year">
-                <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} />
+                <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} showBrush={false} />
                 <p className="text-xs text-gray-500 mt-4">
                   AI models released per year (2010–present). Source: Epoch AI. Continuously updated.
                 </p>

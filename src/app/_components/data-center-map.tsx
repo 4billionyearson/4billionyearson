@@ -286,7 +286,21 @@ const InnerMap = dynamic(
             <MapLabels />
             <USStateLabels />
             <FitSites sites={sites} />
-            {sites.map((site, i) => {
+            {(() => {
+              // Offset overlapping pins using a spiral pattern
+              const posMap = new Map<string, number>();
+              const OFFSET = 0.35; // degrees offset
+              const offsetSites = sites.map(site => {
+                if (!site.lat || !site.lon) return site;
+                const key = `${site.lat.toFixed(2)},${site.lon.toFixed(2)}`;
+                const count = posMap.get(key) || 0;
+                posMap.set(key, count + 1);
+                if (count === 0) return site;
+                const angle = (count * 2 * Math.PI) / 6;
+                const r = OFFSET * Math.ceil(count / 6);
+                return { ...site, lat: site.lat + r * Math.sin(angle), lon: site.lon + r * Math.cos(angle) };
+              });
+              return offsetSites.map((site, i) => {
               if (!site.lat || !site.lon) return null;
               return (
                 <CircleMarker
@@ -325,7 +339,8 @@ const InnerMap = dynamic(
                   </Popup>
                 </CircleMarker>
               );
-            })}
+            });
+            })()}
           </MapContainer>
         );
       };
