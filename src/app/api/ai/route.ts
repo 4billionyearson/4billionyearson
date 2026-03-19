@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v19';
+const CACHE_KEY = 'ai:dashboard:v20';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -460,35 +460,49 @@ async function fetchFrontierDataCenters(): Promise<{
 interface ElecData {
   worldTWh: number | null;
   equivalentCountry: string | null;
+  comparisonCountries: { name: string; twh: number }[];
 }
 
 async function fetchElectricityData(aiTWhEstimate: number): Promise<ElecData> {
   const data = await fetchJSON('https://owid-public.owid.io/data/energy/owid-energy-data.json', 30000);
-  if (!data) return { worldTWh: null, equivalentCountry: null };
+  if (!data) return { worldTWh: null, equivalentCountry: null, comparisonCountries: [] };
 
   let worldTWh: number | null = null;
-  // Find real countries whose electricity generation is closest to aiTWhEstimate
   const EXCLUDED = new Set(['World', 'High-income countries', 'Low-income countries', 'Lower-middle-income countries', 'Upper-middle-income countries', 'Europe', 'European Union (27)', 'North America', 'South America', 'Asia', 'Africa', 'Oceania', 'OECD', 'Non-OECD']);
-  let bestMatch: { name: string; diff: number } | null = null;
+  const allCountries: { name: string; twh: number }[] = [];
 
   for (const [key, entity] of Object.entries(data as Record<string, any>)) {
     const years: { year: number; electricity_generation?: number }[] = entity?.data ?? [];
     for (let i = years.length - 1; i >= 0; i--) {
       if (years[i].electricity_generation != null) {
         const twh = years[i].electricity_generation!;
-        if (key === 'World') { worldTWh = twh; break; }
-        if (!EXCLUDED.has(key) && twh > 0) {
-          const diff = Math.abs(twh - aiTWhEstimate);
-          if (!bestMatch || diff < bestMatch.diff) {
-            bestMatch = { name: key, diff };
-          }
+        if (key === 'World') { worldTWh = twh; }
+        else if (!EXCLUDED.has(key) && twh > 0) {
+          allCountries.push({ name: key, twh });
         }
         break;
       }
     }
   }
 
-  return { worldTWh, equivalentCountry: bestMatch?.name ?? null };
+  // Sort by TWh ascending
+  allCountries.sort((a, b) => a.twh - b.twh);
+
+  // Find the closest match
+  let closestIdx = 0;
+  let closestDiff = Infinity;
+  for (let i = 0; i < allCountries.length; i++) {
+    const diff = Math.abs(allCountries[i].twh - aiTWhEstimate);
+    if (diff < closestDiff) { closestDiff = diff; closestIdx = i; }
+  }
+  const equivalentCountry = allCountries[closestIdx]?.name ?? null;
+
+  // Pick 2 countries below and 2 above AI demand for context
+  const below = allCountries.filter(c => c.twh < aiTWhEstimate).slice(-2);
+  const above = allCountries.filter(c => c.twh >= aiTWhEstimate).slice(0, 2);
+  const comparison = [...below, ...above];
+
+  return { worldTWh, equivalentCountry, comparisonCountries: comparison };
 }
 
 async function fetchAIDashboardData() {
@@ -574,6 +588,7 @@ async function fetchAIDashboardData() {
       frontierCount: frontierDC.sites.length,
       worldElectricityTWh: elecData.worldTWh,
       equivalentCountry: elecData.equivalentCountry,
+      comparisonCountries: elecData.comparisonCountries,
     },
     fetchedAt: new Date().toISOString(),
   };
