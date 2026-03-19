@@ -505,7 +505,7 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
                   <Line type="monotone" dataKey={`${baseLabel} Renewables`} stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
                     <LineChart data={comparisonData}>
-                      <Line type="monotone" dataKey={`${countryData.name} Fossil`} stroke="#ef4444" dot={false} strokeWidth={1} />
+                      <Line type="monotone" dataKey={`${baseLabel} Fossil`} stroke="#fca5a5" dot={false} strokeWidth={1} />
                     </LineChart>
                   </Brush>
                 </LineChart>
@@ -620,7 +620,7 @@ function ElectricityMixSection({ data, countryData, baseLabel = 'Global' }: { da
                   <Line type="monotone" dataKey={`${baseLabel} Renewables`} stroke="#6ee7b7" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
                     <LineChart data={comparisonData}>
-                      <Line type="monotone" dataKey={`${countryData.name} Fossil`} stroke="#ef4444" dot={false} strokeWidth={1} />
+                      <Line type="monotone" dataKey={`${baseLabel} Fossil`} stroke="#fca5a5" dot={false} strokeWidth={1} />
                     </LineChart>
                   </Brush>
                 </LineChart>
@@ -1235,7 +1235,7 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'Global' }:
                 <Line type="monotone" dataKey={baseLabel} stroke="#f87171" strokeWidth={2} dot={false} strokeDasharray="6 3" />
                 <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
                   <LineChart data={fossilShareComp}>
-                    <Line type="monotone" dataKey={countryData.name} stroke={COLORS.fossil} dot={false} strokeWidth={1} />
+                    <Line type="monotone" dataKey={baseLabel} stroke="#f87171" dot={false} strokeWidth={1} />
                   </LineChart>
                 </Brush>
               </LineChart>
