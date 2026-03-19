@@ -108,6 +108,13 @@ export const postType = defineType({
       ],
     }),
     defineField({
+      name: 'htmlBody',
+      title: 'HTML Body',
+      type: 'text',
+      rows: 20,
+      description: 'Optional: paste raw HTML here to use instead of the rich text Body field above.',
+    }),
+    defineField({
       name: 'seoTitle',
       title: 'SEO Title',
       type: 'string',

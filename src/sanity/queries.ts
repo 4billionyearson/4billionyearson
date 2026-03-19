@@ -38,6 +38,7 @@ export const postBySlugQuery = groq`
       accentColor
     },
     body,
+    htmlBody,
     seoTitle,
     seoDescription
   }

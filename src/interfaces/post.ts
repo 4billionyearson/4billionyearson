@@ -16,6 +16,7 @@ export type Post = {
     url: string;
   };
   body: any;
+  htmlBody?: string;
   preview?: boolean;
   seoTitle?: string;
   seoDescription?: string;

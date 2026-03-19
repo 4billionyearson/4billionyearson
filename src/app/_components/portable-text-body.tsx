@@ -77,9 +77,19 @@ const components = {
 
 type Props = {
   content: any
+  htmlBody?: string
 }
 
-export function PostBody({ content }: Props) {
+export function PostBody({ content, htmlBody }: Props) {
+  if (htmlBody) {
+    return (
+      <div
+        className="prose prose-lg prose-invert max-w-none text-gray-300"
+        dangerouslySetInnerHTML={{ __html: htmlBody }}
+      />
+    )
+  }
+
   return (
     <div className="prose prose-lg prose-invert max-w-none text-gray-300">
       <PortableText value={content} components={components} />

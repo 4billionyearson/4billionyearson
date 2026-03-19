@@ -31,7 +31,7 @@ export default async function Post(props: Params) {
                 author={post.author}
                 category={post.category}
               />
-              <PostBody content={post.body} />
+              <PostBody content={post.body} htmlBody={post.htmlBody} />
               <SocialShare title={post.title} />
             </article>
           </div>
