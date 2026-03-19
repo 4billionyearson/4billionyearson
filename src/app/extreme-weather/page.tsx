@@ -199,7 +199,11 @@ function StackedTypeChart({
             {MAIN_TYPES.map((type) => (
               <Bar key={type} dataKey={type} stackId="a" fill={TYPE_COLORS[type] || "#6b7280"} />
             ))}
-            <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+            <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+              <BarChart data={filtered}>
+                <Bar dataKey={MAIN_TYPES[0]} stackId="a" fill={TYPE_COLORS[MAIN_TYPES[0]] || "#6b7280"} />
+              </BarChart>
+            </Brush>
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -247,7 +251,11 @@ function TotalTrendChart({
               fill={`url(#grad-ew-${title.replace(/\s/g, "")})`}
               strokeWidth={2}
             />
-            <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10} />
+            <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+              <AreaChart data={filtered}>
+                <Area type="monotone" dataKey="value" stroke={color} fill={fillColor} fillOpacity={0.2} dot={false} strokeWidth={1} />
+              </AreaChart>
+            </Brush>
           </AreaChart>
         </ResponsiveContainer>
       </div>
