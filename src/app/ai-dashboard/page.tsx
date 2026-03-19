@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import {
   Loader2, Brain, DollarSign, TrendingUp,
-  Cpu, Globe, BarChart3, Activity, MapPin,
+  Cpu, Globe, BarChart3, Activity, MapPin, Zap,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
@@ -46,6 +46,7 @@ interface AIDashboardData {
     frontierTotalCostB: number;
     frontierTotalH100e: number;
     frontierCount: number;
+    worldElectricityTWh: number | null;
   };
   fetchedAt: string;
 }
@@ -362,13 +363,15 @@ export default function AIDashboardPage() {
                     label="AI Energy Demand"
                     value={`${((data.stats.frontierTotalPowerMW ?? 0) * 8.76 / 1000).toFixed(1)} TWh`}
                     color="text-amber-400"
-                    subtext={`${data.frontierDataCenters?.filter(dc => dc.powerMW > 0).length ?? 0} operational sites annualised`}
+                    subtext={data.stats.worldElectricityTWh
+                      ? `${(((data.stats.frontierTotalPowerMW ?? 0) * 8.76 / 1000) / data.stats.worldElectricityTWh * 100).toFixed(2)}% of world electricity`
+                      : `${data.frontierDataCenters?.filter(dc => dc.powerMW > 0).length ?? 0} operational sites annualised`}
                   />
                 </div>
               </div>
 
-              {/* ═══ MODELS & BENCHMARKS ═══ */}
-              <Divider icon={<Brain className="h-5 w-5" />} title="Models" />
+              {/* ═══ AI MODELS & BENCHMARKS ═══ */}
+              <Divider icon={<Brain className="h-5 w-5" />} title="AI Models" />
 
               {data.latestModels?.length > 0 && (
               <SectionCard icon={<Brain className="h-5 w-5 text-emerald-400" />} title="Latest AI Models Released">
@@ -567,6 +570,56 @@ export default function AIDashboardPage() {
                     Epoch AI
                   </a>{" "}(CC-BY).
                 </p>
+              </SectionCard>
+              )}
+
+              {data.stats.worldElectricityTWh && (
+              <SectionCard icon={<Zap className="h-5 w-5 text-amber-400" />} title="AI Share of World Electricity">
+                {(() => {
+                  const aiTWh = (data.stats.frontierTotalPowerMW ?? 0) * 8.76 / 1000;
+                  const worldTWh = data.stats.worldElectricityTWh;
+                  const pct = (aiTWh / worldTWh) * 100;
+                  return (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
+                          <div className="text-3xl font-bold font-mono text-amber-400">{pct.toFixed(2)}%</div>
+                          <div className="text-xs text-gray-400 mt-1">AI Share of World Electricity</div>
+                        </div>
+                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold font-mono text-emerald-400">{aiTWh.toFixed(1)} TWh</div>
+                          <div className="text-xs text-gray-400 mt-1">Frontier AI Data Center Demand</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">annualised from {data.stats.frontierTotalPowerMW?.toLocaleString()} MW capacity</div>
+                        </div>
+                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold font-mono text-cyan-400">{(worldTWh / 1000).toFixed(1)}k TWh</div>
+                          <div className="text-xs text-gray-400 mt-1">World Electricity Generation</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">latest available year</div>
+                        </div>
+                      </div>
+                      {/* Proportional bar */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs text-gray-400">World electricity generation</span>
+                        </div>
+                        <div className="w-full bg-gray-800 rounded-full h-6 overflow-hidden relative">
+                          <div className="h-full bg-amber-500/80 rounded-full flex items-center justify-end pr-2" style={{ width: `${Math.max(pct, 1.5)}%` }}>
+                            <span className="text-[10px] font-bold text-gray-900">AI</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-[10px] text-gray-500 mt-1">
+                          <span>0 TWh</span>
+                          <span>{(worldTWh / 1000).toFixed(0)}k TWh</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Frontier AI data centers account for approximately {pct.toFixed(2)}% of global electricity generation. This covers only tracked frontier facilities; total AI-related electricity use (including cloud, inference, and smaller facilities) is likely higher. Sources:{" "}
+                        <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(data centers),{" "}
+                        <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>{" "}(world electricity).
+                      </p>
+                    </div>
+                  );
+                })()}
               </SectionCard>
               )}
 

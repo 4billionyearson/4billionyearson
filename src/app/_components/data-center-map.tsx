@@ -289,7 +289,7 @@ const InnerMap = dynamic(
             {(() => {
               // Offset overlapping pins using a spiral pattern
               const posMap = new Map<string, number>();
-              const OFFSET = 0.5; // degrees offset per ring
+              const OFFSET = 1.0; // degrees offset per ring
               const offsetSites = sites.map(site => {
                 if (!site.lat || !site.lon) return site;
                 // Round to 1 decimal (~11km grid) to catch nearby pins

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v16';
+const CACHE_KEY = 'ai:dashboard:v17';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -457,6 +457,16 @@ async function fetchFrontierDataCenters(): Promise<{
 
 /* ─── Main data fetch ─────────────────────────────────────────────────────── */
 
+async function fetchWorldElectricityTWh(): Promise<number | null> {
+  const data = await fetchJSON('https://owid-public.owid.io/data/energy/owid-energy-data.json', 30000);
+  if (!data?.World) return null;
+  const worldYears: { year: number; electricity_generation?: number }[] = data.World.data ?? [];
+  for (let i = worldYears.length - 1; i >= 0; i--) {
+    if (worldYears[i].electricity_generation != null) return worldYears[i].electricity_generation!;
+  }
+  return null;
+}
+
 async function fetchAIDashboardData() {
   // Fetch all indicators in parallel
   const [
@@ -493,10 +503,11 @@ async function fetchAIDashboardData() {
   const frontierMath = buildDatePointSeries(fmRows, frontierMathMap, '2024-06-20');
 
   // ─ Epoch AI live model data (2025-2026) ─
-  const epochData = await fetchEpochModels();
-
-  // ─ Epoch frontier data centers ─
-  const frontierDC = await fetchFrontierDataCenters();
+  const [epochData, frontierDC, worldElecTWh] = await Promise.all([
+    fetchEpochModels(),
+    fetchFrontierDataCenters(),
+    fetchWorldElectricityTWh(),
+  ]);
 
   // ─ Stats ─
   const latestInvestWorld = investRows
@@ -534,6 +545,7 @@ async function fetchAIDashboardData() {
       frontierTotalCostB: frontierDC.totalCostB,
       frontierTotalH100e: frontierDC.totalH100e,
       frontierCount: frontierDC.sites.length,
+      worldElectricityTWh: worldElecTWh,
     },
     fetchedAt: new Date().toISOString(),
   };
