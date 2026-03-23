@@ -118,7 +118,7 @@ const Header = () => {
           {/* Renewables Dropdown */}
           <div className="relative" onMouseEnter={() => setIsRenewablesOpen(true)} onMouseLeave={() => setIsRenewablesOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/energy' || pathname === '/energy-rankings' || pathname === '/energy-explained' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/energy' || pathname === '/energy-rankings' || pathname === '/energy-models' || pathname === '/energy-explained' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Renewable Energy ▾
             </button>
@@ -130,6 +130,9 @@ const Header = () => {
                 </Link>
                 <Link href="/energy-rankings" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Global Energy Rankings<AnnualBadge />
+                </Link>
+                <Link href="/energy-models" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-models' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Energy Models
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/energy-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300 bg-gray-900' : 'text-gray-300 hover:text-emerald-300 hover:bg-gray-900'}`} onClick={closeMenu}>
@@ -314,6 +317,9 @@ const Header = () => {
                 </Link>
                 <Link href="/energy-rankings" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'}`} onClick={closeMenu}>
                   Global Energy Rankings<AnnualBadge />
+                </Link>
+                <Link href="/energy-models" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-models' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'}`} onClick={closeMenu}>
+                  Energy Models
                 </Link>
                 <Link href="/energy-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300' : 'text-gray-300 hover:text-emerald-300'}`} onClick={closeMenu}>
                   Energy Explained
