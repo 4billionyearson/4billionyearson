@@ -475,131 +475,6 @@ export default function AIDashboardPage() {
               </SectionCard>
               )}
 
-              {data.stats.frontierTotalH100e > 0 && (
-              <SectionCard icon={<Smartphone className="h-5 w-5 text-violet-400" />} title="AI Processing Power – In Human Terms">
-                {(() => {
-                  const TFLOPS_PER_H100 = 989;   // H100 SXM FP16 dense
-                  const TFLOPS_PER_PHONE = 2;     // Modern smartphone (iPhone 16 / Pixel 9 class)
-                  const WORLD_POP = 8.2e9;        // ~8.2 billion (2025)
-                  const WORLD_PHONES = 4.9e9;     // ~4.9 billion smartphones globally (GSMA 2025)
-
-                  const totalH100e = data.stats.frontierTotalH100e;
-                  const totalTFLOPS = totalH100e * TFLOPS_PER_H100;
-                  const totalExaFLOPS = totalTFLOPS / 1e6; // 1 ExaFLOPS = 10^6 TFLOPS
-                  const perPersonTFLOPS = totalTFLOPS / WORLD_POP;
-                  const phoneEquivPerPerson = perPersonTFLOPS / TFLOPS_PER_PHONE;
-                  const worldPhoneTFLOPS = WORLD_PHONES * TFLOPS_PER_PHONE;
-                  const aiVsPhonesPct = (totalTFLOPS / worldPhoneTFLOPS) * 100;
-
-                  // Compute growth from timeline
-                  const computeTimeline = (data.frontierDCTimeline ?? []).map(d => ({
-                    date: d.date,
-                    exaflops: Math.round((d.totalH100e * TFLOPS_PER_H100) / 1e6),
-                    phonesPerPerson: Math.round(((d.totalH100e * TFLOPS_PER_H100) / WORLD_POP / TFLOPS_PER_PHONE) * 1000) / 1000,
-                  })).filter(d => d.exaflops > 0);
-
-                  // Growth multiplier
-                  const earliest = computeTimeline.length > 1 ? computeTimeline[0] : null;
-                  const latest = computeTimeline.length > 1 ? computeTimeline[computeTimeline.length - 1] : null;
-                  const growthX = earliest && earliest.exaflops > 0 ? Math.round(latest!.exaflops / earliest.exaflops) : null;
-
-                  // Device comparison (sorted by TFLOPS ascending)
-                  const devices = [
-                    { name: 'Smartwatch', tflops: 0.1, isAI: false },
-                    { name: 'Budget phone', tflops: 0.5, isAI: false },
-                    { name: '\u26A1 AI per person', tflops: perPersonTFLOPS, isAI: true },
-                    { name: 'Flagship phone', tflops: 2, isAI: false },
-                    { name: 'Laptop (M3 Pro)', tflops: 7, isAI: false },
-                  ].sort((a, b) => a.tflops - b.tflops);
-                  const maxTFLOPS = Math.max(...devices.map(d => d.tflops));
-
-                  return (
-                    <div className="space-y-5">
-                      {/* ─ Stat cards ─ */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
-                          <div className="text-2xl font-bold font-mono text-violet-400">{totalExaFLOPS < 100 ? totalExaFLOPS.toFixed(1) : Math.round(totalExaFLOPS).toLocaleString()}</div>
-                          <div className="text-xs text-gray-400 mt-1">ExaFLOPS (FP16)</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">operational + planned</div>
-                        </div>
-                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
-                          <div className="text-2xl font-bold font-mono text-cyan-400">{perPersonTFLOPS < 0.01 ? perPersonTFLOPS.toFixed(3) : perPersonTFLOPS.toFixed(2)}</div>
-                          <div className="text-xs text-gray-400 mt-1">TFLOPS per person</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">if shared among 8.2B people</div>
-                        </div>
-                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
-                          <div className="text-2xl font-bold font-mono text-amber-400">{phoneEquivPerPerson < 1 ? phoneEquivPerPerson.toFixed(2) : phoneEquivPerPerson.toFixed(1)}</div>
-                          <div className="text-xs text-gray-400 mt-1">{"\uD83D\uDCF1"} Phones per person</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">equivalent processing power</div>
-                        </div>
-                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
-                          <div className="text-2xl font-bold font-mono text-emerald-400">{aiVsPhonesPct < 1 ? aiVsPhonesPct.toFixed(2) : aiVsPhonesPct.toFixed(1)}%</div>
-                          <div className="text-xs text-gray-400 mt-1">of All Phone Compute</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">vs ~4.9B smartphones combined</div>
-                        </div>
-                      </div>
-
-                      {/* ─ Headline insight ─ */}
-                      <div className="bg-violet-900/20 border border-violet-700/40 rounded-lg p-3">
-                        <p className="text-sm text-gray-300">
-                          {phoneEquivPerPerson < 1
-                            ? <>Despite billions of dollars in data centers, frontier AI processing provides the equivalent of <span className="text-amber-400 font-semibold">{(phoneEquivPerPerson * 100).toFixed(0)}%</span> of a single smartphone&apos;s power for every person on Earth.</>
-                            : <>Frontier AI now provides the equivalent of <span className="text-amber-400 font-semibold">{phoneEquivPerPerson.toFixed(1)} smartphones</span> of processing power for every person on Earth.</>}
-                          {growthX && growthX > 1 && <> Compute has grown <span className="text-violet-400 font-semibold">{growthX}{"\u00D7"}</span> since {earliest!.date}.{' '}  </> }
-                        </p>
-                      </div>
-
-                      {/* ─ Compute growth chart ─ */}
-                      {computeTimeline.length > 1 && (
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-300 mb-3">Total frontier AI compute over time (ExaFLOPS, FP16)</h3>
-                          <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                              <AreaChart data={computeTimeline} margin={CHART_MARGIN}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
-                                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={(v: number) => v.toLocaleString()} />
-                                <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} ExaFLOPS`} />} wrapperStyle={{ zIndex: 50 }} />
-                                <Area type="monotone" dataKey="exaflops" name="ExaFLOPS" stroke="#a855f7" fill="#a855f7" fillOpacity={0.15} strokeWidth={2} />
-                                {computeTimeline.length > 15 && (
-                                  <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
-                                    <AreaChart data={computeTimeline}>
-                                      <Area type="monotone" dataKey="exaflops" stroke="#a855f7" fill="#a855f7" fillOpacity={0.2} dot={false} strokeWidth={1} />
-                                    </AreaChart>
-                                  </Brush>
-                                )}
-                              </AreaChart>
-                            </ResponsiveContainer>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* ─ Device comparison bars ─ */}
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-300 mb-3">AI per person vs everyday devices (TFLOPS, FP16)</h3>
-                        <div className="space-y-2">
-                          {devices.map(d => (
-                            <div key={d.name} className="flex items-center gap-3">
-                              <span className={`text-xs w-36 text-right flex-shrink-0 ${d.isAI ? 'text-amber-400 font-semibold' : 'text-gray-400'}`}>{d.name}</span>
-                              <div className="flex-1 bg-gray-800 rounded-full h-5 overflow-hidden">
-                                <div className="h-full rounded-full" style={{ width: `${Math.max((d.tflops / maxTFLOPS) * 100, 1.5)}%`, backgroundColor: d.isAI ? '#f59e0b' : '#8b5cf6' }} />
-                              </div>
-                              <span className={`text-xs font-mono w-20 flex-shrink-0 ${d.isAI ? 'text-amber-400' : 'text-gray-400'}`}>{d.tflops < 1 ? d.tflops.toFixed(2) : d.tflops.toFixed(1)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <p className="text-xs text-gray-500">
-                        TFLOPS = trillion floating-point operations per second (FP16 precision). H100 SXM at 989 TFLOPS (dense FP16). Includes both operational and planned frontier data centers. Smartphone estimate based on modern flagship GPU (Apple A18/Snapdragon 8 Gen 3 class). World population ~8.2B (UN 2025); smartphone count ~4.9B (GSMA Intelligence 2025). Source:{" "}
-                        <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(CC-BY).
-                      </p>
-                    </div>
-                  );
-                })()}
-              </SectionCard>
-              )}
-
               {data.frontierDataCenters?.length > 0 && (
               <SectionCard icon={<Cpu className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Centers">
                 {(() => {
@@ -670,28 +545,116 @@ export default function AIDashboardPage() {
                     Epoch AI — Frontier Data Centers
                   </a>{" "}(CC-BY). Updated {new Date(data.fetchedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}.
                 </p>
-                {data.frontierDCTimeline?.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-3">Power Over Time</h3>
-                  <div className="h-[340px] w-full">
-                    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                      <AreaChart data={data.frontierDCTimeline} margin={CHART_MARGIN}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
-                        <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
-                        <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
-                        <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
-                          <AreaChart data={data.frontierDCTimeline}>
-                            <Area type="monotone" dataKey="totalPowerMW" stroke="#10b981" fill="#10b981" fillOpacity={0.2} dot={false} strokeWidth={1} />
-                          </AreaChart>
-                        </Brush>
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">Cumulative operational power capacity across all tracked frontier data centers.</p>
-                </div>
-                )}
+              </SectionCard>
+              )}
+
+              {data.stats.frontierTotalH100e > 0 && (
+              <SectionCard icon={<Smartphone className="h-5 w-5 text-violet-400" />} title="Frontier Data Center Processing – In Human Terms">
+                {(() => {
+                  const TFLOPS_PER_H100 = 989;   // H100 SXM FP16 dense
+                  const TFLOPS_PER_PHONE = 2;     // Modern smartphone (iPhone 16 / Pixel 9 class)
+                  const WORLD_POP = 8.2e9;        // ~8.2 billion (2025)
+                  const WORLD_PHONES = 4.9e9;     // ~4.9 billion smartphones globally (GSMA 2025)
+
+                  const totalH100e = data.stats.frontierTotalH100e;
+                  const totalTFLOPS = totalH100e * TFLOPS_PER_H100;
+                  const totalExaFLOPS = totalTFLOPS / 1e6; // 1 ExaFLOPS = 10^6 TFLOPS
+                  const perPersonTFLOPS = totalTFLOPS / WORLD_POP;
+                  const phoneEquivPerPerson = perPersonTFLOPS / TFLOPS_PER_PHONE;
+                  const worldPhoneTFLOPS = WORLD_PHONES * TFLOPS_PER_PHONE;
+                  const aiVsPhonesPct = (totalTFLOPS / worldPhoneTFLOPS) * 100;
+
+                  // Compute growth from timeline
+                  const computeTimeline = (data.frontierDCTimeline ?? []).map(d => ({
+                    date: d.date,
+                    exaflops: Math.round((d.totalH100e * TFLOPS_PER_H100) / 1e6),
+                    phonesPerPerson: Math.round(((d.totalH100e * TFLOPS_PER_H100) / WORLD_POP / TFLOPS_PER_PHONE) * 1000) / 1000,
+                  })).filter(d => d.exaflops > 0);
+
+                  // Device comparison (sorted by TFLOPS ascending)
+                  const devices = [
+                    { name: 'Smartwatch', tflops: 0.1, isAI: false },
+                    { name: 'Budget phone', tflops: 0.5, isAI: false },
+                    { name: '\u26A1 AI per human', tflops: perPersonTFLOPS, isAI: true },
+                    { name: 'Flagship phone', tflops: 2, isAI: false },
+                    { name: 'Laptop (M3 Pro)', tflops: 7, isAI: false },
+                  ].sort((a, b) => a.tflops - b.tflops);
+                  const maxTFLOPS = Math.max(...devices.map(d => d.tflops));
+
+                  return (
+                    <div className="space-y-5">
+                      {/* ─ Stat cards ─ */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold font-mono text-violet-400">{totalExaFLOPS < 100 ? totalExaFLOPS.toFixed(1) : Math.round(totalExaFLOPS).toLocaleString()}</div>
+                          <div className="text-xs text-gray-400 mt-1">ExaFLOPS (FP16)</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">operational + planned</div>
+                        </div>
+                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold font-mono text-cyan-400">{perPersonTFLOPS < 0.01 ? perPersonTFLOPS.toFixed(3) : perPersonTFLOPS.toFixed(2)}</div>
+                          <div className="text-xs text-gray-400 mt-1">TFLOPS per human</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">if shared among 8.2B people</div>
+                        </div>
+                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold font-mono text-amber-400">{phoneEquivPerPerson < 1 ? phoneEquivPerPerson.toFixed(2) : phoneEquivPerPerson.toFixed(1)}</div>
+                          <div className="text-xs text-gray-400 mt-1">{"\uD83D\uDCF1"} Phones per human</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">AI DC compute \u00F7 smartphone power</div>
+                        </div>
+                        <div className="bg-gray-800/60 rounded-lg p-4 text-center">
+                          <div className="text-2xl font-bold font-mono text-emerald-400">{aiVsPhonesPct < 1 ? aiVsPhonesPct.toFixed(2) : aiVsPhonesPct.toFixed(1)}%</div>
+                          <div className="text-xs text-gray-400 mt-1">of Total Global Phone Compute</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">AI DCs vs ~4.9B smartphones combined</div>
+                        </div>
+                      </div>
+
+                      {/* ─ Compute growth chart ─ */}
+                      {computeTimeline.length > 1 && (
+                        <div>
+                          <h3 className="text-sm font-semibold text-gray-300 mb-3">Total frontier data center compute over time (ExaFLOPS, FP16)</h3>
+                          <div className="h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                              <AreaChart data={computeTimeline} margin={CHART_MARGIN}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                                <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={(v: number) => v.toLocaleString()} />
+                                <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} ExaFLOPS`} />} wrapperStyle={{ zIndex: 50 }} />
+                                <Area type="monotone" dataKey="exaflops" name="ExaFLOPS" stroke="#a855f7" fill="#a855f7" fillOpacity={0.15} strokeWidth={2} />
+                                {computeTimeline.length > 15 && (
+                                  <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                                    <AreaChart data={computeTimeline}>
+                                      <Area type="monotone" dataKey="exaflops" stroke="#a855f7" fill="#a855f7" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                                    </AreaChart>
+                                  </Brush>
+                                )}
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* ─ Device comparison bars ─ */}
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-300 mb-3">Frontier AI per human vs everyday devices (TFLOPS, FP16)</h3>
+                        <div className="space-y-2">
+                          {devices.map(d => (
+                            <div key={d.name} className="flex items-center gap-3">
+                              <span className={`text-xs w-36 text-right flex-shrink-0 ${d.isAI ? 'text-amber-400 font-semibold' : 'text-gray-400'}`}>{d.name}</span>
+                              <div className="flex-1 bg-gray-800 rounded-full h-5 overflow-hidden">
+                                <div className="h-full rounded-full" style={{ width: `${Math.max((d.tflops / maxTFLOPS) * 100, 1.5)}%`, backgroundColor: d.isAI ? '#f59e0b' : '#8b5cf6' }} />
+                              </div>
+                              <span className={`text-xs font-mono w-20 flex-shrink-0 ${d.isAI ? 'text-amber-400' : 'text-gray-400'}`}>{d.tflops < 1 ? d.tflops.toFixed(2) : d.tflops.toFixed(1)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-gray-500">
+                        Frontier data center compute only (not general AI in phones/laptops). TFLOPS = trillion floating-point operations per second (FP16). H100 SXM at 989 TFLOPS (dense FP16). Includes operational + planned facilities. Smartphone estimate: modern flagship GPU (Apple A18/Snapdragon 8 Gen 3 class). World population ~8.2B (UN 2025); smartphone count ~4.9B (GSMA Intelligence 2025). Source:{" "}
+                        <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(CC-BY).
+                      </p>
+                    </div>
+                  );
+                })()}
               </SectionCard>
               )}
 
@@ -744,6 +707,28 @@ export default function AIDashboardPage() {
                         <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(data centers),{" "}
                         <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>{" "}(electricity generation).
                       </p>
+                      {data.frontierDCTimeline?.length > 0 && (
+                      <div className="mt-2">
+                        <h3 className="text-sm font-semibold text-gray-300 mb-3">Power Over Time</h3>
+                        <div className="h-[340px] w-full">
+                          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                            <AreaChart data={data.frontierDCTimeline} margin={CHART_MARGIN}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
+                              <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
+                              <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
+                              <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
+                              <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                                <AreaChart data={data.frontierDCTimeline}>
+                                  <Area type="monotone" dataKey="totalPowerMW" stroke="#10b981" fill="#10b981" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                                </AreaChart>
+                              </Brush>
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Cumulative operational power capacity across all tracked frontier data centers.</p>
+                      </div>
+                      )}
                     </div>
                   );
                 })()}
