@@ -572,13 +572,14 @@ export default function AIDashboardPage() {
                   })).filter(d => d.exaflops > 0);
 
                   // Device comparison (sorted by TFLOPS ascending)
-                  const devices = [
+                  const devices: { name: string; icon?: React.ReactNode; tflops: number; isAI: boolean }[] = [
                     { name: 'Smartwatch', tflops: 0.1, isAI: false },
                     { name: 'Budget phone', tflops: 0.5, isAI: false },
-                    { name: '\u25A3 AI per human', tflops: perPersonTFLOPS, isAI: true },
+                    { name: 'AI per human', icon: <Cpu className="h-3 w-3 inline-block mr-1" />, tflops: perPersonTFLOPS, isAI: true },
                     { name: 'Flagship phone', tflops: 2, isAI: false },
                     { name: 'Laptop (M3 Pro)', tflops: 7, isAI: false },
-                  ].sort((a, b) => a.tflops - b.tflops);
+                  ];
+                  devices.sort((a, b) => a.tflops - b.tflops);
                   const maxTFLOPS = Math.max(...devices.map(d => d.tflops));
 
                   return (
@@ -638,7 +639,7 @@ export default function AIDashboardPage() {
                         <div className="space-y-2">
                           {devices.map(d => (
                             <div key={d.name} className="flex items-center gap-3">
-                              <span className={`text-xs w-36 text-right flex-shrink-0 ${d.isAI ? 'text-amber-400 font-semibold' : 'text-gray-400'}`}>{d.name}</span>
+                              <span className={`text-xs w-36 text-right flex-shrink-0 ${d.isAI ? 'text-amber-400 font-semibold' : 'text-gray-400'}`}>{d.icon}{d.name}</span>
                               <div className="flex-1 bg-gray-800 rounded-full h-5 overflow-hidden">
                                 <div className="h-full rounded-full" style={{ width: `${Math.max((d.tflops / maxTFLOPS) * 100, 1.5)}%`, backgroundColor: d.isAI ? '#f59e0b' : '#8b5cf6' }} />
                               </div>
