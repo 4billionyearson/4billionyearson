@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import {
   Loader2, Brain, DollarSign, TrendingUp,
-  Cpu, Globe, BarChart3, Activity, MapPin, Zap, Smartphone,
+  Cpu, Globe, BarChart3, Activity, MapPin, Zap,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
@@ -545,11 +545,33 @@ export default function AIDashboardPage() {
                     Epoch AI — Frontier Data Centers
                   </a>{" "}(CC-BY). Updated {new Date(data.fetchedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}.
                 </p>
+                {data.frontierDCTimeline?.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-sm font-semibold text-gray-300 mb-3">Power Over Time</h3>
+                  <div className="h-[340px] w-full">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                      <AreaChart data={data.frontierDCTimeline} margin={CHART_MARGIN}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
+                        <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
+                        <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
+                        <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                          <AreaChart data={data.frontierDCTimeline}>
+                            <Area type="monotone" dataKey="totalPowerMW" stroke="#10b981" fill="#10b981" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                          </AreaChart>
+                        </Brush>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Cumulative operational power capacity across all tracked frontier data centers.</p>
+                </div>
+                )}
               </SectionCard>
               )}
 
               {data.stats.frontierTotalH100e > 0 && (
-              <SectionCard icon={<Smartphone className="h-5 w-5 text-violet-400" />} title="Frontier Data Center Processing – In Human Terms">
+              <SectionCard icon={<Cpu className="h-5 w-5 text-violet-400" />} title="AI Frontier Data Center Processing Power">
                 {(() => {
                   const TFLOPS_PER_H100 = 989;   // H100 SXM FP16 dense
                   const TFLOPS_PER_PHONE = 2;     // Modern smartphone (iPhone 16 / Pixel 9 class)
@@ -575,7 +597,7 @@ export default function AIDashboardPage() {
                   const devices = [
                     { name: 'Smartwatch', tflops: 0.1, isAI: false },
                     { name: 'Budget phone', tflops: 0.5, isAI: false },
-                    { name: '\u26A1 AI per human', tflops: perPersonTFLOPS, isAI: true },
+                    { name: '\uD83D\uDDA5\uFE0F AI per human', tflops: perPersonTFLOPS, isAI: true },
                     { name: 'Flagship phone', tflops: 2, isAI: false },
                     { name: 'Laptop (M3 Pro)', tflops: 7, isAI: false },
                   ].sort((a, b) => a.tflops - b.tflops);
@@ -610,7 +632,7 @@ export default function AIDashboardPage() {
                       {/* ─ Compute growth chart ─ */}
                       {computeTimeline.length > 1 && (
                         <div>
-                          <h3 className="text-sm font-semibold text-gray-300 mb-3">Total frontier data center compute over time (ExaFLOPS, FP16)</h3>
+                          <h3 className="text-sm font-semibold text-gray-300 mb-3">Total AI frontier data center compute over time (ExaFLOPS, FP16)</h3>
                           <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                               <AreaChart data={computeTimeline} margin={CHART_MARGIN}>
@@ -634,7 +656,7 @@ export default function AIDashboardPage() {
 
                       {/* ─ Device comparison bars ─ */}
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-300 mb-3">Frontier AI per human vs everyday devices (TFLOPS, FP16)</h3>
+                        <h3 className="text-sm font-semibold text-gray-300 mb-3">Frontier AI data center processing per human vs everyday devices (TFLOPS, FP16)</h3>
                         <div className="space-y-2">
                           {devices.map(d => (
                             <div key={d.name} className="flex items-center gap-3">
@@ -707,28 +729,6 @@ export default function AIDashboardPage() {
                         <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(data centers),{" "}
                         <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>{" "}(electricity generation).
                       </p>
-                      {data.frontierDCTimeline?.length > 0 && (
-                      <div className="mt-2">
-                        <h3 className="text-sm font-semibold text-gray-300 mb-3">Power Over Time</h3>
-                        <div className="h-[340px] w-full">
-                          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                            <AreaChart data={data.frontierDCTimeline} margin={CHART_MARGIN}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
-                              <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
-                              <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
-                              <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
-                              <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
-                                <AreaChart data={data.frontierDCTimeline}>
-                                  <Area type="monotone" dataKey="totalPowerMW" stroke="#10b981" fill="#10b981" fillOpacity={0.2} dot={false} strokeWidth={1} />
-                                </AreaChart>
-                              </Brush>
-                            </AreaChart>
-                          </ResponsiveContainer>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">Cumulative operational power capacity across all tracked frontier data centers.</p>
-                      </div>
-                      )}
                     </div>
                   );
                 })()}
