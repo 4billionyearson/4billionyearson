@@ -12,7 +12,7 @@ export const allPostsQuery = groq`
       name,
       "picture": picture.asset->url
     },
-    "category": category-> {
+    "categories": categories[]-> {
       title,
       "slug": slug.current,
       accentColor
@@ -32,7 +32,7 @@ export const postBySlugQuery = groq`
       name,
       "picture": picture.asset->url
     },
-    "category": category-> {
+    "categories": categories[]-> {
       title,
       "slug": slug.current,
       accentColor
@@ -60,7 +60,7 @@ export const allCategoriesQuery = groq`
 `
 
 export const postsByCategoryQuery = groq`
-  *[_type == "post" && category->slug.current == $slug] | order(date desc) {
+  *[_type == "post" && $slug in categories[]->slug.current] | order(date desc) {
     _id,
     title,
     "slug": slug.current,
@@ -97,7 +97,7 @@ export const searchPostsQuery = groq`
       name,
       "picture": picture.asset->url
     },
-    "category": category-> {
+    "categories": categories[]-> {
       title,
       "slug": slug.current,
       accentColor

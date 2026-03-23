@@ -10,11 +10,11 @@ type Props = {
   excerpt: string;
   author: Author;
   slug: string;
-  category?: {
+  categories?: {
     title: string;
     slug: string;
     accentColor?: string;
-  };
+  }[];
 };
 
 export function HeroPost({
@@ -24,9 +24,8 @@ export function HeroPost({
   excerpt,
   author,
   slug,
-  category,
+  categories,
 }: Props) {
-  const accentHex = (category?.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#7ec8e3';
 
   return (
     <section className="mb-6 md:mb-10">
@@ -50,10 +49,18 @@ export function HeroPost({
             <div>
               <div className="text-[#FFF5E7]/80 uppercase tracking-widest text-xs md:text-sm font-bold mb-3 flex flex-row items-center gap-3 drop-shadow-md">
                 <DateFormatter dateString={date} />
-                {category && (
+                {categories && categories.length > 0 && (
                   <>
                     <span className="text-[#FFF5E7]/40">|</span>
-                    <span style={{ color: accentHex }}>{category.title}</span>
+                    {categories.map((cat, i) => {
+                      const hex = (cat.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#7ec8e3';
+                      return (
+                        <span key={cat.slug} className="flex items-center gap-2">
+                          {i > 0 && <span className="text-[#FFF5E7]/40">·</span>}
+                          <span style={{ color: hex }}>{cat.title}</span>
+                        </span>
+                      );
+                    })}
                   </>
                 )}
               </div>

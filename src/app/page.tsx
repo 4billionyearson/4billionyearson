@@ -39,7 +39,7 @@ export default async function Index() {
               author={heroPost.author}
               slug={heroPost.slug}
               excerpt={heroPost.excerpt}
-              category={heroPost.category}
+              categories={heroPost.categories}
             />
           </>
         )}

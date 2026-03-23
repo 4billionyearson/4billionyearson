@@ -31,7 +31,7 @@ export function MoreStories({ posts, title = "More Articles", hideTitle = false 
             author={post.author}
             slug={post.slug}
             excerpt={post.excerpt}
-            category={post.category}
+            categories={post.categories}
           />
         ))}
       </div>

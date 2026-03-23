@@ -16,7 +16,7 @@ export default async function Post(props: Params) {
     return notFound();
   }
 
-  const accentHex = (post.category?.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#374151';
+  const accentHex = (post.categories?.[0]?.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#374151';
 
   return (
     <main>
@@ -29,7 +29,7 @@ export default async function Post(props: Params) {
                 coverImage={post.coverImage}
                 date={post.date}
                 author={post.author}
-                category={post.category}
+                categories={post.categories}
               />
               <PostBody content={post.body} htmlBody={post.htmlBody} />
               <SocialShare title={post.title} />

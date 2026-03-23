@@ -4,7 +4,7 @@ import { groq } from 'next-sanity';
 
 const query = groq`
   *[_type == "post" && date >= $since] | order(date desc) {
-    "category": category->slug.current,
+    "categories": categories[]->slug.current,
     date
   }
 `;
@@ -20,11 +20,13 @@ export async function GET() {
 
   const categories: Record<string, string> = {};
   for (const p of posts) {
-    if (!p.category) continue;
+    if (!p.categories || p.categories.length === 0) continue;
     const postDate = new Date(p.date);
     const isNew = postDate >= sevenDaysAgo;
-    if (!categories[p.category] || isNew) {
-      categories[p.category] = isNew ? 'new' : 'recent';
+    for (const slug of p.categories) {
+      if (!categories[slug] || isNew) {
+        categories[slug] = isNew ? 'new' : 'recent';
+      }
     }
   }
 

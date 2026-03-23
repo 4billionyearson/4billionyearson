@@ -10,11 +10,11 @@ type Props = {
   excerpt: string;
   author: Author;
   slug: string;
-  category?: {
+  categories?: {
     title: string;
     slug: string;
     accentColor?: string;
-  };
+  }[];
 };
 
 export function PostPreview({
@@ -24,9 +24,8 @@ export function PostPreview({
   excerpt,
   author,
   slug,
-  category,
+  categories,
 }: Props) {
-  const accentHex = (category?.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#7ec8e3';
 
   return (
     <Link href={`/posts/${slug}`} className="group block transition-transform duration-500 hover:scale-[1.02] h-full">
@@ -49,10 +48,18 @@ export function PostPreview({
           <div>
             <div className="text-[#FFF5E7]/80 uppercase tracking-widest text-xs font-bold mb-2 flex flex-row items-center gap-2 drop-shadow-md">
               <DateFormatter dateString={date} />
-              {category && (
+              {categories && categories.length > 0 && (
                 <>
                   <span className="text-[#FFF5E7]/40">|</span>
-                  <span style={{ color: accentHex }}>{category.title}</span>
+                  {categories.map((cat, i) => {
+                    const hex = (cat.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#7ec8e3';
+                    return (
+                      <span key={cat.slug} className="flex items-center gap-1">
+                        {i > 0 && <span className="text-[#FFF5E7]/40">·</span>}
+                        <span style={{ color: hex }}>{cat.title}</span>
+                      </span>
+                    );
+                  })}
                 </>
               )}
             </div>
