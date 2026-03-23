@@ -500,7 +500,7 @@ export default function AIDashboardPage() {
                           <div className="text-xs text-gray-400 mt-1">H100 Equivalents</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                          <div className="text-2xl font-bold text-violet-400">${Math.round(opCost * 10) / 10}B</div>
+                          <div className="text-2xl font-bold text-rose-400">${Math.round(opCost * 10) / 10}B</div>
                           <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
                           <div className="text-[10px] text-gray-500 mt-0.5">2021–2029, {data.stats.frontierCount} sites</div>
                         </div>
@@ -575,7 +575,7 @@ export default function AIDashboardPage() {
                   const devices = [
                     { name: 'Smartwatch', tflops: 0.1, isAI: false },
                     { name: 'Budget phone', tflops: 0.5, isAI: false },
-                    { name: '\uD83D\uDDA5\uFE0F AI per human', tflops: perPersonTFLOPS, isAI: true },
+                    { name: '\u2699\uFE0F AI per human', tflops: perPersonTFLOPS, isAI: true },
                     { name: 'Flagship phone', tflops: 2, isAI: false },
                     { name: 'Laptop (M3 Pro)', tflops: 7, isAI: false },
                   ].sort((a, b) => a.tflops - b.tflops);
@@ -597,8 +597,8 @@ export default function AIDashboardPage() {
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-amber-400">{phoneEquivPerPerson < 1 ? phoneEquivPerPerson.toFixed(2) : phoneEquivPerPerson.toFixed(1)}</div>
-                          <div className="text-xs text-gray-400 mt-1">{"\uD83D\uDCF1"} Phones per human</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">AI DC compute {"÷"} smartphone power</div>
+                          <div className="text-xs text-gray-400 mt-1">Equivalent smartphones per human</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">AI DC compute per person = this many phones</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-emerald-400">{aiVsPhonesPct < 1 ? aiVsPhonesPct.toFixed(2) : aiVsPhonesPct.toFixed(1)}%</div>
@@ -679,6 +679,28 @@ export default function AIDashboardPage() {
                           <div className="text-[10px] text-gray-500 mt-0.5">annualised from {data.stats.frontierTotalPowerMW?.toLocaleString()} MW capacity</div>
                         </div>
                       </div>
+                      {data.frontierDCTimeline?.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-300 mb-3">Power Over Time</h3>
+                        <div className="h-[340px] w-full">
+                          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                            <AreaChart data={data.frontierDCTimeline} margin={CHART_MARGIN}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
+                              <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
+                              <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
+                              <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
+                              <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
+                                <AreaChart data={data.frontierDCTimeline}>
+                                  <Area type="monotone" dataKey="totalPowerMW" stroke="#10b981" fill="#10b981" fillOpacity={0.2} dot={false} strokeWidth={1} />
+                                </AreaChart>
+                              </Brush>
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Cumulative operational power capacity across all tracked frontier data centers.</p>
+                      </div>
+                      )}
                       {comparisons.length > 0 && (() => {
                         const allRows = [
                           ...comparisons.map(c => ({ name: c.name, twh: c.twh, isAI: false })),
@@ -707,28 +729,6 @@ export default function AIDashboardPage() {
                         <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(data centers),{" "}
                         <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>{" "}(electricity generation).
                       </p>
-                      {data.frontierDCTimeline?.length > 0 && (
-                      <div className="mt-2">
-                        <h3 className="text-sm font-semibold text-gray-300 mb-3">Power Over Time</h3>
-                        <div className="h-[340px] w-full">
-                          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-                            <AreaChart data={data.frontierDCTimeline} margin={CHART_MARGIN}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                              <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
-                              <YAxis tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v.toLocaleString()} MW`} />
-                              <Tooltip content={<DarkTooltip formatter={(v: number) => `${v.toLocaleString()} MW`} />} wrapperStyle={{ zIndex: 50 }} />
-                              <Area type="monotone" dataKey="totalPowerMW" name="Total Power (MW)" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
-                              <Brush dataKey="date" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
-                                <AreaChart data={data.frontierDCTimeline}>
-                                  <Area type="monotone" dataKey="totalPowerMW" stroke="#10b981" fill="#10b981" fillOpacity={0.2} dot={false} strokeWidth={1} />
-                                </AreaChart>
-                              </Brush>
-                            </AreaChart>
-                          </ResponsiveContainer>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">Cumulative operational power capacity across all tracked frontier data centers.</p>
-                      </div>
-                      )}
                     </div>
                   );
                 })()}
