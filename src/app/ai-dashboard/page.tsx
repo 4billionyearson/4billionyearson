@@ -520,7 +520,7 @@ export default function AIDashboardPage() {
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-violet-400">{totalExaFLOPS < 100 ? totalExaFLOPS.toFixed(1) : Math.round(totalExaFLOPS).toLocaleString()}</div>
                           <div className="text-xs text-gray-400 mt-1">ExaFLOPS (FP16)</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">total frontier AI compute</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">operational + planned</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-cyan-400">{perPersonTFLOPS < 0.01 ? perPersonTFLOPS.toFixed(3) : perPersonTFLOPS.toFixed(2)}</div>
@@ -591,7 +591,7 @@ export default function AIDashboardPage() {
                       </div>
 
                       <p className="text-xs text-gray-500">
-                        TFLOPS = trillion floating-point operations per second (FP16 precision). H100 SXM at 989 TFLOPS (dense FP16). Smartphone estimate based on modern flagship GPU (Apple A18/Snapdragon 8 Gen 3 class). World population ~8.2B (UN 2025); smartphone count ~4.9B (GSMA Intelligence 2025). Covers tracked frontier facilities only — total AI-related compute including cloud inference is higher. Source:{" "}
+                        TFLOPS = trillion floating-point operations per second (FP16 precision). H100 SXM at 989 TFLOPS (dense FP16). Includes both operational and planned frontier data centers. Smartphone estimate based on modern flagship GPU (Apple A18/Snapdragon 8 Gen 3 class). World population ~8.2B (UN 2025); smartphone count ~4.9B (GSMA Intelligence 2025). Source:{" "}
                         <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(CC-BY).
                       </p>
                     </div>
