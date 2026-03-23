@@ -4,7 +4,10 @@ import { groq } from 'next-sanity';
 
 const query = groq`
   *[_type == "post" && date >= $since] | order(date desc) {
-    "categories": categories[]->slug.current,
+    "categories": coalesce(
+      categories[]->slug.current,
+      select(defined(category) => [category->slug.current])
+    ),
     date
   }
 `;

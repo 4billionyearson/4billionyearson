@@ -12,11 +12,10 @@ export const allPostsQuery = groq`
       name,
       "picture": picture.asset->url
     },
-    "categories": categories[]-> {
-      title,
-      "slug": slug.current,
-      accentColor
-    }
+    "categories": coalesce(
+      categories[]-> { title, "slug": slug.current, accentColor },
+      select(defined(category) => [category-> { title, "slug": slug.current, accentColor }])
+    )
   }
 `
 
@@ -32,11 +31,10 @@ export const postBySlugQuery = groq`
       name,
       "picture": picture.asset->url
     },
-    "categories": categories[]-> {
-      title,
-      "slug": slug.current,
-      accentColor
-    },
+    "categories": coalesce(
+      categories[]-> { title, "slug": slug.current, accentColor },
+      select(defined(category) => [category-> { title, "slug": slug.current, accentColor }])
+    ),
     body,
     htmlBody,
     seoTitle,
@@ -60,7 +58,7 @@ export const allCategoriesQuery = groq`
 `
 
 export const postsByCategoryQuery = groq`
-  *[_type == "post" && $slug in categories[]->slug.current] | order(date desc) {
+  *[_type == "post" && ($slug in categories[]->slug.current || category->slug.current == $slug)] | order(date desc) {
     _id,
     title,
     "slug": slug.current,
@@ -97,10 +95,9 @@ export const searchPostsQuery = groq`
       name,
       "picture": picture.asset->url
     },
-    "categories": categories[]-> {
-      title,
-      "slug": slug.current,
-      accentColor
-    }
+    "categories": coalesce(
+      categories[]-> { title, "slug": slug.current, accentColor },
+      select(defined(category) => [category-> { title, "slug": slug.current, accentColor }])
+    )
   }
 `

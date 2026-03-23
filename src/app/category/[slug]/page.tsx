@@ -7,14 +7,14 @@ import { getCategoryBySlug, getPostsByCategory, getAllCategories } from '@/lib/a
 import Container from '@/app/_components/container'
 import DateFormatter from '@/app/_components/date-formatter'
 
+export const revalidate = 60;
+
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'artificial-intelligence': <Brain className="h-7 w-7 md:h-9 md:w-9" />,
   'renewable-energy': <Zap className="h-7 w-7 md:h-9 md:w-9" />,
   'climate-change': <Globe className="h-7 w-7 md:h-9 md:w-9" />,
   'biotechnology': <Dna className="h-7 w-7 md:h-9 md:w-9" />,
 }
-
-export const revalidate = 60;
 
 type Params = { params: Promise<{ slug: string }> }
 

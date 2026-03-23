@@ -46,26 +46,24 @@ export function PostPreview({
 
         <div className="relative z-10 p-5 md:p-8 flex flex-col justify-between h-full text-outline">
           <div>
-            <div className="text-[#FFF5E7]/80 uppercase tracking-widest text-xs font-bold mb-2 flex flex-row items-center gap-2 drop-shadow-md">
+            <div className="text-[#FFF5E7]/80 uppercase tracking-widest text-xs font-bold mb-2 drop-shadow-md">
               <DateFormatter dateString={date} />
-              {categories && categories.length > 0 && (
-                <>
-                  <span className="text-[#FFF5E7]/40">|</span>
-                  {categories.map((cat, i) => {
-                    const hex = (cat.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#7ec8e3';
-                    return (
-                      <span key={cat.slug} className="flex items-center gap-1">
-                        {i > 0 && <span className="text-[#FFF5E7]/40">·</span>}
-                        <span style={{ color: hex }}>{cat.title}</span>
-                      </span>
-                    );
-                  })}
-                </>
-              )}
             </div>
-            <h3 className="text-[#FFF5E7] text-2xl md:text-3xl font-bold font-mono tracking-tight leading-snug mb-3 drop-shadow-md">
+            <h3 className="text-[#FFF5E7] text-2xl md:text-3xl font-bold font-mono tracking-tight leading-snug mb-2 drop-shadow-md">
               {title}
             </h3>
+            {categories && categories.length > 0 && (
+              <div className="flex flex-row items-center gap-2 mb-3 flex-wrap">
+                {categories.map((cat, i) => {
+                  const hex = (cat.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#7ec8e3';
+                  return (
+                    <span key={cat.slug} className="text-[0.65rem] font-bold uppercase tracking-wider drop-shadow-md" style={{ color: hex }}>
+                      {cat.title}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
           
           <p className="text-[#FFF5E7]/90 text-sm md:text-base leading-relaxed line-clamp-3 mt-auto drop-shadow-md">
