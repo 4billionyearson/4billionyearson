@@ -87,7 +87,9 @@ function calcHome(p: { cost: number; takeup_pct: number; eff: number; battSize: 
   const annCapex = capex / 10;
   const co2_Mt = (cap_GW * 1e6 * p.eff * 8760 * 0.15 * G.fossilEmissions_gCO2_kWh) / 1e15;
   const cpt = co2_Mt > 0.001 ? (annCapex * 1e9) / (co2_Mt * 1e6) : 0;
-  return { homes, cap_GW, peakSmooth, consumerSaving, peakerSaved, infraSaved, gridSaving: peakerSaved + infraSaved, capex, annCapex, net: consumerSaving + peakerSaved + infraSaved - annCapex, co2_Mt, cpt };
+  const capexPerHome = p.battSize * p.cost;
+  const paybackYears = savingPerHome > 0 ? capexPerHome / savingPerHome : 99;
+  return { homes, cap_GW, peakSmooth, consumerSaving, peakerSaved, infraSaved, gridSaving: peakerSaved + infraSaved, capex, annCapex, net: consumerSaving + peakerSaved + infraSaved - annCapex, co2_Mt, cpt, savingPerHome, capexPerHome, paybackYears };
 }
 
 function calcGrid(p: { cap: number; eff: number; cpg: number }, G: GeoConstants) {
@@ -555,6 +557,20 @@ export default function EnergyModelsPage() {
                 </div>
 
                 <Tag label="Financial Impact" accent="#a78bfa" />
+                {/* Per-household breakdown */}
+                <div className="bg-gray-950 border border-gray-800 rounded-lg p-3.5 mb-3">
+                  <div className="text-[0.58rem] text-sky-400 uppercase tracking-wider mb-3 font-bold" style={{ fontFamily: M }}>◈ Per Household · Home Battery</div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
+                    <InfoCard label="Battery cost" value={`${C}${hm.capexPerHome.toLocaleString()}`} sub={`${bSize} kWh × ${C}${bCost}/kWh`} accent="#38bdf8" />
+                    <InfoCard label="Annual saving" value={`${C}${Math.round(hm.savingPerHome)}/yr`} sub="ToU arbitrage" accent="#34d399" />
+                    <InfoCard label="Payback" value={hm.paybackYears < 50 ? `${hm.paybackYears.toFixed(1)} yrs` : "—"} sub={hm.paybackYears < 10 ? "strong return" : hm.paybackYears < 20 ? "long payback" : "not economic"} accent={hm.paybackYears < 10 ? "#34d399" : hm.paybackYears < 20 ? "#f59e0b" : "#f87171"} />
+                    <InfoCard label="10yr net return" value={`${hm.savingPerHome * 10 - hm.capexPerHome > 0 ? "+" : ""}${C}${Math.round(hm.savingPerHome * 10 - hm.capexPerHome).toLocaleString()}`} sub="saving − cost" accent={hm.savingPerHome * 10 - hm.capexPerHome > 0 ? "#34d399" : "#f87171"} />
+                  </div>
+                  <div className="text-[0.57rem] text-gray-600 leading-relaxed" style={{ fontFamily: M }}>
+                    Based on {bSize} kWh battery cycling {G.avgDailyCycles}×/day at {G.avgRetailPriceSpread_p}{geo === "UK" ? "p" : "¢"}/kWh spread with {bEff}% coordination efficiency.
+                  </div>
+                </div>
+                {/* Fleet-wide */}
                 <div className="grid grid-cols-2 gap-2 mb-3">
                   <InfoCard label="Consumer Saving (home)" value={fv(hm.consumerSaving)} sub="Annual ToU arbitrage" accent="#38bdf8" />
                   <InfoCard label="Consumer Benefit (grid)" value={fv(gr.consumer)} sub="Wholesale pass-through" accent="#f59e0b" />
@@ -568,6 +584,30 @@ export default function EnergyModelsPage() {
                   <CBBox title="Home Batteries" accent="#38bdf8" C={C} rows={[["Capex (÷10yr)", hm.annCapex, false], ["Consumer saving", hm.consumerSaving, true], ["Grid saving", hm.gridSaving, true]]} net={hm.net} life={10} />
                   <CBBox title="Grid Batteries" accent="#f59e0b" C={C} rows={[["Capex (÷20yr)", gr.annCapex, false], ["Consumer benefit", gr.consumer, true], ["Grid saving", gr.gridSaving, true]]} net={gr.net} life={20} />
                 </div>
+
+                {/* ROI summary */}
+                {(() => {
+                  const hmBen = hm.consumerSaving + hm.gridSaving;
+                  const hmROI = hm.capex > 0 ? ((hmBen * 10 - hm.capex) / hm.capex) * 100 : 0;
+                  const hmPay = hmBen > 0 ? hm.capex / hmBen : 99;
+                  const grBen = gr.consumer + gr.gridSaving;
+                  const grROI = gr.capex > 0 ? ((grBen * 20 - gr.capex) / gr.capex) * 100 : 0;
+                  const grPay = grBen > 0 ? gr.capex / grBen : 99;
+                  const fPct = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(0)}%`;
+                  const fYr = (v: number) => v >= 99 ? "—" : `${v.toFixed(1)}yr`;
+                  return (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                      {([["Home ROI (10yr)", hmROI, "#38bdf8"], ["Payback", hmPay, "#38bdf8"], ["Grid ROI (20yr)", grROI, "#f59e0b"], ["Payback", grPay, "#f59e0b"]] as const).map(([l, v, col], i) => (
+                        <div key={i} className="bg-gray-950 border border-gray-800 rounded-md p-2.5 text-center">
+                          <div className="text-[0.55rem] text-gray-500 uppercase tracking-wider mb-1" style={{ fontFamily: M }}>{l}</div>
+                          <div className="text-sm font-bold" style={{ fontFamily: M, color: i % 2 === 0 ? (v > 0 ? "#34d399" : "#f87171") : col }}>
+                            {i % 2 === 0 ? fPct(v as number) : fYr(v as number)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
 
                 <div className="bg-gray-950 border border-gray-800 rounded-md p-3 flex gap-6 flex-wrap">
                   {([["Home fleet", hm.cap_GW, "#38bdf8"], ["Grid fleet", gr.effCap, "#f59e0b"]] as const).map(([l, gw, col]) => (
