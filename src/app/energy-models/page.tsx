@@ -185,13 +185,17 @@ function ModelSlider({ label, min, max, step, value, onChange, fmt, hint, accent
 }) {
   const pct = ((value - min) / (max - min)) * 100;
   return (
-    <div className="mb-5">
-      <div className="flex justify-between mb-1">
+    <div className="mb-5 group">
+      <div className="flex justify-between mb-1.5">
         <span className="text-[0.7rem] uppercase tracking-wider text-gray-400" style={{ fontFamily: M }}>{label}</span>
         <span className="text-sm font-semibold text-gray-200" style={{ fontFamily: M }}>{fmt(value)}</span>
       </div>
-      <div className="relative h-[5px] bg-gray-800 rounded">
-        <div className="absolute left-0 top-0 h-full rounded opacity-80 transition-[width] duration-75" style={{ width: `${pct}%`, background: accent }} />
+      <div className="relative h-2 bg-gray-800 rounded-full">
+        <div className="absolute left-0 top-0 h-full rounded-full transition-[width] duration-75" style={{ width: `${pct}%`, background: accent }} />
+        <div
+          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 shadow-lg transition-transform group-hover:scale-110 pointer-events-none"
+          style={{ left: `calc(${pct}% - 8px)`, background: accent, borderColor: "#030a15", boxShadow: `0 0 8px ${accent}66` }}
+        />
         <input type="range" min={min} max={max} step={step} value={value}
           onChange={e => onChange(Number(e.target.value))}
           className="absolute inset-0 w-full opacity-0 cursor-pointer h-full m-0" />
@@ -237,17 +241,48 @@ function InfoCard({ label, value, sub, accent = "#cbd5e1" }: { label: string; va
   );
 }
 
-function Gauge({ pct, color, label }: { pct: number; color: string; label: string }) {
-  const r = 46, cx = 58, cy = 58, circ = Math.PI * r;
+function PeakDemandBar({ homePct, gridPct, peakGW, totalGW, homeGW, gridGW, fGW }: {
+  homePct: number; gridPct: number; peakGW: number; totalGW: number;
+  homeGW: number; gridGW: number; fGW: (v: number) => string;
+}) {
+  const combinedPct = Math.min(homePct + gridPct, 100);
+  const hP = Math.min(homePct, 100);
+  const gP = Math.min(gridPct, 100 - hP);
   return (
-    <div className="flex flex-col items-center">
-      <svg width="116" height="68" viewBox="0 0 116 68">
-        <path d={`M ${cx - r},${cy} A ${r},${r} 0 0,1 ${cx + r},${cy}`} fill="none" stroke="#1e293b" strokeWidth="8" strokeLinecap="round" />
-        <path d={`M ${cx - r},${cy} A ${r},${r} 0 0,1 ${cx + r},${cy}`} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round"
-          strokeDasharray={circ} strokeDashoffset={circ * (1 - Math.min(pct, 100) / 100)} style={{ transition: "stroke-dashoffset 0.35s ease" }} />
-        <text x={cx} y={cx - 4} textAnchor="middle" fill="#e2e8f0" fontSize="15" fontFamily={M} fontWeight="700">{Math.min(pct, 100).toFixed(0)}%</text>
-      </svg>
-      <div className="text-[0.58rem] text-gray-500 uppercase tracking-wider text-center -mt-1" style={{ fontFamily: M }}>{label}</div>
+    <div>
+      <div className="flex items-baseline justify-between mb-2">
+        <div>
+          <div className="text-[0.58rem] text-gray-500 uppercase tracking-wider" style={{ fontFamily: M }}>How much residential peak demand can batteries cover?</div>
+          <div className="text-[0.55rem] text-gray-600 mt-0.5" style={{ fontFamily: M }}>
+            Adjust <span className="text-sky-400">Household Take-up</span> and <span className="text-amber-400">Grid Capacity</span> sliders to see the effect
+          </div>
+        </div>
+        <div className="text-right flex-shrink-0 ml-4">
+          <div className="text-lg font-bold" style={{ fontFamily: M, color: combinedPct >= 80 ? "#34d399" : combinedPct >= 40 ? "#f59e0b" : "#f87171" }}>{combinedPct.toFixed(0)}%</div>
+          <div className="text-[0.55rem] text-gray-600" style={{ fontFamily: M }}>covered</div>
+        </div>
+      </div>
+      {/* Bar */}
+      <div className="relative h-6 bg-gray-800 rounded-full overflow-hidden mb-2">
+        <div className="absolute left-0 top-0 h-full rounded-l-full transition-[width] duration-300" style={{ width: `${hP}%`, background: "#38bdf8" }} />
+        <div className="absolute top-0 h-full transition-[width,left] duration-300" style={{ left: `${hP}%`, width: `${gP}%`, background: "#f59e0b", borderRadius: gP + hP >= 99.5 ? "0 9999px 9999px 0" : "0" }} />
+        {/* Peak demand marker */}
+        <div className="absolute top-0 right-0 h-full flex items-center pr-2">
+          <span className="text-[0.55rem] text-gray-400 font-semibold" style={{ fontFamily: M }}>{fGW(peakGW)}</span>
+        </div>
+      </div>
+      {/* Legend */}
+      <div className="flex gap-4 flex-wrap">
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded-sm bg-sky-400" />
+          <span className="text-[0.6rem] text-gray-400" style={{ fontFamily: M }}>Home batteries: {fGW(homeGW)} ({hP.toFixed(0)}%)</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded-sm bg-amber-400" />
+          <span className="text-[0.6rem] text-gray-400" style={{ fontFamily: M }}>Grid batteries: {fGW(gridGW)} ({gP.toFixed(0)}%)</span>
+        </div>
+        <span className="text-[0.6rem] text-gray-600" style={{ fontFamily: M }}>of {totalGW} GW total peak ({fGW(peakGW)} residential)</span>
+      </div>
     </div>
   );
 }
@@ -502,15 +537,16 @@ export default function EnergyModelsPage() {
 
               {/* Output */}
               <div>
-                <Tag label="Peak Demand Smoothing" accent="#64748b" />
-                <div className="bg-gray-950 border border-gray-800 rounded-lg p-4 flex justify-around items-center mb-3 flex-wrap gap-3">
-                  <Gauge pct={hm.peakSmooth} color="#38bdf8" label="Home Batteries" />
-                  <div className="text-center">
-                    <div className="text-[0.57rem] text-gray-700 uppercase" style={{ fontFamily: M }}>Residential Peak</div>
-                    <div className="text-lg font-bold text-gray-500" style={{ fontFamily: M }}>{fGW(G.peakDemand_GW * G.residentialShareOfPeak)}</div>
-                    <div className="text-[0.57rem] text-gray-700" style={{ fontFamily: M }}>of {G.peakDemand_GW} GW total</div>
-                  </div>
-                  <Gauge pct={gr.peakSmooth} color="#f59e0b" label="Grid Batteries" />
+                <div className="bg-gray-950 border border-gray-800 rounded-lg p-4 mb-3">
+                  <PeakDemandBar
+                    homePct={hm.peakSmooth}
+                    gridPct={gr.peakSmooth}
+                    peakGW={G.peakDemand_GW * G.residentialShareOfPeak}
+                    totalGW={G.peakDemand_GW}
+                    homeGW={hm.cap_GW}
+                    gridGW={gr.effCap}
+                    fGW={fGW}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-3">
