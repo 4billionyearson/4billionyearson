@@ -496,7 +496,7 @@ export default function AIDashboardPage() {
                           <div className="text-xs text-gray-400 mt-1">Operational Power</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-3 text-center">
-                          <div className="text-2xl font-bold text-amber-400">{(opH100 / 1e6).toFixed(1)}M</div>
+                          <div className="text-2xl font-bold text-violet-400">{(opH100 / 1e6).toFixed(1)}M</div>
                           <div className="text-xs text-gray-400 mt-1">H100 Equivalents</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-3 text-center">
@@ -575,7 +575,7 @@ export default function AIDashboardPage() {
                   const devices = [
                     { name: 'Smartwatch', tflops: 0.1, isAI: false },
                     { name: 'Budget phone', tflops: 0.5, isAI: false },
-                    { name: '\u2699\uFE0F AI per human', tflops: perPersonTFLOPS, isAI: true },
+                    { name: '\u25A3 AI per human', tflops: perPersonTFLOPS, isAI: true },
                     { name: 'Flagship phone', tflops: 2, isAI: false },
                     { name: 'Laptop (M3 Pro)', tflops: 7, isAI: false },
                   ].sort((a, b) => a.tflops - b.tflops);
@@ -597,8 +597,8 @@ export default function AIDashboardPage() {
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-amber-400">{phoneEquivPerPerson < 1 ? phoneEquivPerPerson.toFixed(2) : phoneEquivPerPerson.toFixed(1)}</div>
-                          <div className="text-xs text-gray-400 mt-1">Equivalent smartphones per human</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">AI DC compute per person = this many phones</div>
+                          <div className="text-xs text-gray-400 mt-1">Smartphones per human</div>
+                          <div className="text-[10px] text-gray-500 mt-0.5">(equivalent of)</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-emerald-400">{aiVsPhonesPct < 1 ? aiVsPhonesPct.toFixed(2) : aiVsPhonesPct.toFixed(1)}%</div>
