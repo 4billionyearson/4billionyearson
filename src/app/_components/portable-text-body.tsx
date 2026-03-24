@@ -4,6 +4,7 @@ import { PortableText } from '@portabletext/react'
 import imageUrlBuilder from '@sanity/image-url'
 import { createClient } from 'next-sanity'
 import Image from 'next/image'
+import { useEffect, useRef } from 'react'
 
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
@@ -81,9 +82,26 @@ type Props = {
 }
 
 export function PostBody({ content, htmlBody }: Props) {
+  const htmlRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!htmlBody || !htmlRef.current) return
+    const container = htmlRef.current
+    const scripts = container.querySelectorAll('script')
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement('script')
+      Array.from(oldScript.attributes).forEach((attr) =>
+        newScript.setAttribute(attr.name, attr.value)
+      )
+      newScript.textContent = oldScript.textContent
+      oldScript.parentNode?.replaceChild(newScript, oldScript)
+    })
+  }, [htmlBody])
+
   if (htmlBody) {
     return (
       <div
+        ref={htmlRef}
         className="prose prose-lg prose-invert max-w-none text-gray-300"
         dangerouslySetInnerHTML={{ __html: htmlBody }}
       />
