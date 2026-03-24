@@ -19,10 +19,49 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://4billionyearson.org"),
-  title: "4 Billion Years On",
-  description: "Exploring science, technology and the story of life on Earth.",
+  title: {
+    default: "4 Billion Years On — Climate, Energy, AI & Biotech Data",
+    template: "%s | 4 Billion Years On",
+  },
+  description:
+    "Interactive dashboards, data visualisations and in-depth articles on climate change, renewable energy, AI and biotechnology. Built for students, researchers, journalists, educators and policymakers who need clear, sourced data on the biggest challenges facing humanity.",
+  keywords: [
+    "climate change data",
+    "renewable energy dashboard",
+    "global emissions tracker",
+    "AI explained",
+    "biotechnology news",
+    "greenhouse gas data",
+    "sea level rise",
+    "arctic ice extent",
+    "energy transition",
+    "planetary boundaries",
+    "extreme weather data",
+    "climate science",
+    "decarbonisation models",
+  ],
+  authors: [{ name: "4 Billion Years On" }],
+  creator: "4 Billion Years On",
+  publisher: "4 Billion Years On",
   openGraph: {
+    type: "website",
+    siteName: "4 Billion Years On",
+    title: "4 Billion Years On — Climate, Energy, AI & Biotech Data",
+    description:
+      "Interactive dashboards and data-driven articles covering climate change, renewable energy, artificial intelligence and biotechnology.",
     images: [HOME_OG_IMAGE_URL],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "4 Billion Years On",
+    description:
+      "Interactive climate, energy, AI and biotech dashboards with sourced data visualisations.",
+  },
+  category: "Science & Technology",
+  other: {
+    "audience": "students, researchers, journalists, educators, policymakers, general public",
+    "coverage": "global",
+    "topic": "Climate Change, Renewable Energy, Artificial Intelligence, Biotechnology, Emissions, Sea Levels, Arctic Ice, Extreme Weather, Planetary Boundaries",
   },
 };
 
@@ -39,6 +78,66 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/logo.png" />
         <meta name="theme-color" content="#000" />
         <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": "https://4billionyearson.org/#website",
+                  url: "https://4billionyearson.org",
+                  name: "4 Billion Years On",
+                  description:
+                    "Interactive dashboards, data visualisations and in-depth articles on climate change, renewable energy, artificial intelligence and biotechnology.",
+                  publisher: { "@id": "https://4billionyearson.org/#organization" },
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: "https://4billionyearson.org/search?q={search_term_string}",
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+                {
+                  "@type": "Organization",
+                  "@id": "https://4billionyearson.org/#organization",
+                  name: "4 Billion Years On",
+                  url: "https://4billionyearson.org",
+                  logo: "https://4billionyearson.org/logo.png",
+                  description:
+                    "A science and technology platform providing interactive data dashboards and articles on climate change, renewable energy, AI and biotechnology. Useful for students, researchers, journalists, educators and policymakers seeking clear, sourced data on humanity's biggest challenges.",
+                  sameAs: [],
+                  knowsAbout: [
+                    "Climate Change",
+                    "Global Warming",
+                    "Greenhouse Gas Emissions",
+                    "Renewable Energy",
+                    "Solar Energy",
+                    "Wind Energy",
+                    "Battery Storage",
+                    "Energy Transition",
+                    "Decarbonisation",
+                    "Sea Level Rise",
+                    "Arctic Sea Ice",
+                    "Extreme Weather Events",
+                    "Planetary Boundaries",
+                    "Artificial Intelligence",
+                    "Machine Learning",
+                    "Large Language Models",
+                    "Biotechnology",
+                    "Gene Editing",
+                    "CRISPR",
+                  ],
+                  audience: {
+                    "@type": "Audience",
+                    audienceType:
+                      "Students, Researchers, Journalists, Educators, Policymakers, Environmental Analysts, Data Scientists, General Public",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body className={cn(inter.variable, spaceMono.variable, inter.className, "bg-black")}>
         <div 

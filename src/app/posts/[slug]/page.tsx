@@ -18,8 +18,36 @@ export default async function Post(props: Params) {
 
   const accentHex = (post.categories?.[0]?.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#374151';
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.seoDescription || post.excerpt,
+    image: post.coverImage || undefined,
+    datePublished: post.date,
+    author: {
+      "@type": "Person",
+      name: post.author?.name || "4 Billion Years On",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "4 Billion Years On",
+      url: "https://4billionyearson.org",
+      logo: "https://4billionyearson.org/logo.png",
+    },
+    mainEntityOfPage: `https://4billionyearson.org/posts/${params.slug}`,
+    ...(post.categories && post.categories.length > 0
+      ? { articleSection: post.categories.map((c: any) => c.title) }
+      : {}),
+    keywords: post.categories?.map((c: any) => c.title)?.join(", "),
+  };
+
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
         <div className="bg-gray-950/100 backdrop-blur-md rounded-2xl shadow-xl border-2 p-3 sm:p-5 md:p-7 lg:p-8 xl:p-10" style={{ borderColor: accentHex }}>
           <div>

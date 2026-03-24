@@ -1,0 +1,59 @@
+# 4 Billion Years On
+
+> Interactive data dashboards, visualisations and in-depth articles on climate change, renewable energy, artificial intelligence and biotechnology.
+
+## About
+
+4 Billion Years On is a science and technology platform that presents complex data in clear, interactive formats. The site is designed for students, researchers, journalists, educators, policymakers and anyone seeking sourced, visual data on the biggest challenges facing humanity.
+
+## What the site covers
+
+- **Climate Change**: Global temperature trends, CO₂ concentrations, greenhouse gas emissions by country, climate projections and historical data
+- **Emissions**: Country-by-country emissions data, per-capita comparisons, sector breakdowns and trend analysis
+- **Renewable Energy**: Energy mix by country, renewable capacity, generation data, cost trends and energy transition progress
+- **Sea Levels & Ice**: Sea level rise data, Arctic and Antarctic ice extent, glacier retreat and ocean warming
+- **Extreme Weather**: Wildfire, hurricane, flood and heatwave data with historical comparisons
+- **Planetary Boundaries**: Status of the nine planetary boundaries including biodiversity, nitrogen cycle, ocean acidification
+- **Artificial Intelligence**: AI industry data, compute trends, model capabilities, energy use and societal impact
+- **Biotechnology**: Gene editing, CRISPR developments, synthetic biology and medical breakthroughs
+- **Energy Models**: Interactive decarbonisation models comparing batteries, heat pumps, EVs and renewables
+
+## Who finds this site useful
+
+- Students researching climate, energy or technology topics
+- Researchers seeking sourced datasets and visualisations
+- Journalists looking for data to support science/technology reporting
+- Educators teaching about climate change, energy or AI
+- Policymakers comparing country-level data on emissions and energy
+- Environmental analysts tracking trends in emissions, ice cover and extreme weather
+- Data scientists interested in climate and energy datasets
+- General public wanting clear explanations of complex science topics
+
+## Interactive dashboards
+
+- Climate Dashboard: https://4billionyearson.org/climate-dashboard
+- Emissions: https://4billionyearson.org/emissions
+- Energy: https://4billionyearson.org/energy
+- Energy Rankings: https://4billionyearson.org/energy-rankings
+- Greenhouse Gases: https://4billionyearson.org/greenhouse-gases
+- Sea Levels & Ice: https://4billionyearson.org/sea-levels-ice
+- Extreme Weather: https://4billionyearson.org/extreme-weather
+- Planetary Boundaries: https://4billionyearson.org/planetary-boundaries
+- AI Dashboard: https://4billionyearson.org/ai-dashboard
+- Biotech Dashboard: https://4billionyearson.org/biotech-dashboard
+- Energy Models: https://4billionyearson.org/energy-models
+
+## Explainer pages
+
+- Climate Explained: https://4billionyearson.org/climate-explained
+- Energy Explained: https://4billionyearson.org/energy-explained
+- AI Explained: https://4billionyearson.org/ai-explained
+- Biotech Explained: https://4billionyearson.org/biotech-explained
+
+## Blog
+
+Latest articles on climate, energy, AI and biotech: https://4billionyearson.org
+
+## Contact
+
+Website: https://4billionyearson.org
