@@ -87,24 +87,43 @@ export function PostBody({ content, htmlBody }: Props) {
   useEffect(() => {
     if (!htmlBody || !htmlRef.current) return
     const container = htmlRef.current
-    // Check if scripts already ran (full page load) by looking for rendered canvas/svg
-    const alreadyRan = container.querySelector('canvas, svg.chart, [data-chart]')
-    if (alreadyRan) return
+    const scripts = Array.from(container.querySelectorAll('script'))
+    if (scripts.length === 0) return
 
-    const scripts = container.querySelectorAll('script')
-    scripts.forEach((oldScript) => {
-      const newScript = document.createElement('script')
-      Array.from(oldScript.attributes).forEach((attr) =>
-        newScript.setAttribute(attr.name, attr.value)
-      )
-      // Wrap inline scripts in IIFE to avoid redeclaring const/let in global scope
-      if (oldScript.textContent && !oldScript.src) {
-        newScript.textContent = `(function(){${oldScript.textContent}})();`
-      } else {
-        newScript.textContent = oldScript.textContent
-      }
-      oldScript.parentNode?.replaceChild(newScript, oldScript)
-    })
+    // Separate external (src) and inline scripts
+    const externals = scripts.filter((s) => s.src)
+    const inlines = scripts.filter((s) => !s.src && s.textContent)
+
+    const loadExternal = (script: HTMLScriptElement): Promise<void> => {
+      // Skip if this src is already loaded elsewhere in the document
+      const existing = document.querySelector(
+        `script[src="${script.src}"]`
+      ) as HTMLScriptElement | null
+      if (existing && existing !== script) return Promise.resolve()
+      return new Promise((resolve) => {
+        const el = document.createElement('script')
+        Array.from(script.attributes).forEach((a) =>
+          el.setAttribute(a.name, a.value)
+        )
+        el.onload = () => resolve()
+        el.onerror = () => resolve()
+        script.parentNode?.replaceChild(el, script)
+      })
+    }
+
+    const runInlines = () => {
+      inlines.forEach((oldScript) => {
+        const el = document.createElement('script')
+        Array.from(oldScript.attributes).forEach((a) =>
+          el.setAttribute(a.name, a.value)
+        )
+        el.textContent = `(function(){try{${oldScript.textContent}}catch(e){}})();`
+        oldScript.parentNode?.replaceChild(el, oldScript)
+      })
+    }
+
+    // Load external scripts first, then execute inline scripts
+    Promise.all(externals.map(loadExternal)).then(runInlines)
   }, [htmlBody])
 
   if (htmlBody) {
