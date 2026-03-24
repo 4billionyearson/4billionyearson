@@ -87,13 +87,22 @@ export function PostBody({ content, htmlBody }: Props) {
   useEffect(() => {
     if (!htmlBody || !htmlRef.current) return
     const container = htmlRef.current
+    // Check if scripts already ran (full page load) by looking for rendered canvas/svg
+    const alreadyRan = container.querySelector('canvas, svg.chart, [data-chart]')
+    if (alreadyRan) return
+
     const scripts = container.querySelectorAll('script')
     scripts.forEach((oldScript) => {
       const newScript = document.createElement('script')
       Array.from(oldScript.attributes).forEach((attr) =>
         newScript.setAttribute(attr.name, attr.value)
       )
-      newScript.textContent = oldScript.textContent
+      // Wrap inline scripts in IIFE to avoid redeclaring const/let in global scope
+      if (oldScript.textContent && !oldScript.src) {
+        newScript.textContent = `(function(){${oldScript.textContent}})();`
+      } else {
+        newScript.textContent = oldScript.textContent
+      }
       oldScript.parentNode?.replaceChild(newScript, oldScript)
     })
   }, [htmlBody])
