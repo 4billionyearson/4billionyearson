@@ -304,18 +304,15 @@ export default function BiotechDashboardPage() {
               <SectionCard icon={<FileText className="h-5 w-5 text-sky-400" />} title="Biotech Research Publications (All Time)">
                 <SimpleBarChart data={data.pubmedCounts} categoryKey="category" valueKey="count" barColor="#0ea5e9" />
                 <p className="text-xs text-gray-500 mt-4">
-                  Total publications indexed in PubMed for key biotechnology research areas: gene therapy, CRISPR, genomics, and mRNA vaccines.
+                  Total publications indexed in PubMed for key biotechnology research areas: gene therapy, CRISPR, genomics, and mRNA vaccines. Source:{" "}
+                  <a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
+                    PubMed / NCBI
+                  </a>.
                 </p>
               </SectionCard>
               )}
 
-              {/* ─── Footer attribution ───────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#FFF5E7] text-sm text-gray-400 space-y-1.5">
-                <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
-                <p>• Genome sequencing cost: <a href="https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NHGRI via Our World in Data</a> (CC-BY)</p>
-                <p>• Clinical trials: <a href="https://clinicaltrials.gov" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">ClinicalTrials.gov</a></p>
-                <p>• Publications: <a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">PubMed / NCBI</a></p>
-              </div>
+
             </>
           )}
         </div>

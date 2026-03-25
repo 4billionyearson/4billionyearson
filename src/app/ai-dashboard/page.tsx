@@ -750,13 +750,7 @@ export default function AIDashboardPage() {
                 </p>
               </SectionCard>
 
-              {/* ─── Footer attribution ───────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#88DDFC] text-sm text-gray-400 space-y-1.5">
-                <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
-                <p>• AI models, systems &amp; benchmarks: <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI</a> and <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
-                <p>• Frontier data centers: <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Epoch AI — Frontier Data Centers</a> (CC-BY)</p>
-                <p>• Investment: <a href="https://aiindex.stanford.edu/report/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">AI Index Report</a> via <a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> (CC-BY)</p>
-              </div>
+
             </>
           )}
         </div>

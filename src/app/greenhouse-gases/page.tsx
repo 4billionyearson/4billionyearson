@@ -334,7 +334,9 @@ function OverviewSection({ data }: { data: GHGData }) {
             </div>
           </SubSection>
           <p className="text-sm text-gray-400 mt-3">
-            As CO₂ rises, global temperatures track upward in near-lockstep – a correlation that holds across every timescale.
+            As CO₂ rises, global temperatures track upward in near-lockstep – a correlation that holds across every timescale. Sources:{" "}
+            <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA GML</a>{" "}(CO₂) ·{" "}
+            <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NASA GISS</a>{" "}/ NOAA (temperature).
           </p>
         </SectionCard>
       )}
@@ -382,7 +384,9 @@ function OverviewSection({ data }: { data: GHGData }) {
             </div>
           </SubSection>
           <p className="text-sm text-gray-400 mt-3">
-            All three gases as percentage increase above pre-industrial levels, showing how each amplifies the others&apos; warming effect.
+            All three gases as percentage increase above pre-industrial levels, showing how each amplifies the others&apos; warming effect. Sources:{" "}
+            <a href="https://gml.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA Global Monitoring Laboratory</a>{" "}via{" "}
+            <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
           </p>
         </SectionCard>
       )}
@@ -417,7 +421,9 @@ function OverviewSection({ data }: { data: GHGData }) {
             </div>
           </SubSection>
           <p className="text-sm text-gray-400 mt-3">
-            The atmosphere and oceans are warming in tandem – confirming this is a whole-Earth system shift, not a local phenomenon.
+            The atmosphere and oceans are warming in tandem – confirming this is a whole-Earth system shift, not a local phenomenon. Sources:{" "}
+            <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NASA GISS</a>{" "}/ <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA</a>{" "}via{" "}
+            <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
           </p>
         </SectionCard>
       )}
@@ -451,7 +457,10 @@ function OverviewSection({ data }: { data: GHGData }) {
             </div>
           </SubSection>
           <p className="text-sm text-gray-400 mt-3">
-            As CO₂ climbs, Arctic ice drops – lost ice exposes dark ocean, absorbing more heat and accelerating warming further.
+            As CO₂ climbs, Arctic ice drops – lost ice exposes dark ocean, absorbing more heat and accelerating warming further. Sources:{" "}
+            <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA GML</a>{" "}(CO₂) ·{" "}
+            <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NSIDC</a>{" "}via{" "}
+            <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
           </p>
         </SectionCard>
       )}
@@ -602,7 +611,8 @@ export default function GreenhouseGasesPage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      CO₂ is the primary driver of climate change, responsible for about two-thirds of total warming. Continuous measurements from Mauna Loa date back to 1958.
+                      CO₂ is the primary driver of climate change, responsible for about two-thirds of total warming. Continuous measurements from Mauna Loa date back to 1958. Source:{" "}
+                      <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA Global Monitoring Laboratory</a>{" "}(Mauna Loa Observatory).
                     </p>
                   </SectionCard>
                 </>
@@ -625,7 +635,9 @@ export default function GreenhouseGasesPage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      Methane is over 80× more potent than CO₂ over 20 years. Major sources include agriculture, fossil fuel extraction, and wetlands.
+                      Methane is over 80× more potent than CO₂ over 20 years. Major sources include agriculture, fossil fuel extraction, and wetlands. Source:{" "}
+                      <a href="https://gml.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA GML</a>{" "}via{" "}
+                      <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
                     </p>
                   </SectionCard>
                 </>
@@ -648,7 +660,9 @@ export default function GreenhouseGasesPage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      N₂O has nearly 300× the warming potential of CO₂ over 100 years and also depletes the ozone layer. The primary source is agricultural fertiliser.
+                      N₂O has nearly 300× the warming potential of CO₂ over 100 years and also depletes the ozone layer. The primary source is agricultural fertiliser. Source:{" "}
+                      <a href="https://gml.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA GML</a>{" "}via{" "}
+                      <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
                     </p>
                   </SectionCard>
                 </>
@@ -663,7 +677,9 @@ export default function GreenhouseGasesPage() {
                       <TempAnomalyChart data={data.temperature.yearly} />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      The cumulative effect of rising greenhouse gases. The Paris Agreement aims to limit warming to 1.5°C, with 2.0°C as an absolute ceiling.
+                      The cumulative effect of rising greenhouse gases. The Paris Agreement aims to limit warming to 1.5°C, with 2.0°C as an absolute ceiling. Source:{" "}
+                      <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NASA GISS</a>{" "}/ <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA</a>{" "}via{" "}
+                      <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
                     </p>
                   </SectionCard>
                 </>
@@ -685,7 +701,9 @@ export default function GreenhouseGasesPage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      Arctic ice reflects sunlight back into space. As it melts, darker ocean absorbs more heat, accelerating warming in a feedback loop.
+                      Arctic ice reflects sunlight back into space. As it melts, darker ocean absorbs more heat, accelerating warming in a feedback loop. Source:{" "}
+                      <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NSIDC</a>{" "}/ NOAA via{" "}
+                      <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
                     </p>
                   </SectionCard>
                 </>
@@ -707,24 +725,13 @@ export default function GreenhouseGasesPage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      Oceans absorb over 90% of excess heat trapped by greenhouse gases, driving coral bleaching, sea-level rise, and more intense storms.
+                      Oceans absorb over 90% of excess heat trapped by greenhouse gases, driving coral bleaching, sea-level rise, and more intense storms. Source:{" "}
+                      <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA</a>{" "}via{" "}
+                      <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
                     </p>
                   </SectionCard>
                 </>
               )}
-
-              {/* ─── Attribution ──────────────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D0A65E] text-sm text-gray-400 space-y-1.5">
-                <p className="font-semibold text-gray-300">Data sources & attribution:</p>
-                <p>• CO₂: <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> – Mauna Loa Observatory (1958-present)</p>
-                <p>• Methane, N₂O: <a href="https://gml.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p>• Temperature anomaly: <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NASA GISS</a> / <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p>• Arctic sea ice: <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC</a> / NOAA via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p>• Ocean warming: <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p className="text-xs text-gray-600 pt-2">
-                  Data refreshed automatically every 12 hours. Last updated: {new Date(data.fetchedAt).toLocaleString()}
-                </p>
-              </div>
             </>
           )}
         </div>

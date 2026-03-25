@@ -742,6 +742,11 @@ export default function ClimateDashboard() {
                     />
                   </SubSection>
                 )}
+                <p className="text-xs text-gray-500 mt-4">
+                  {countryData?.yearlyData && <>Country temperature:{" "}<a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}/ <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Copernicus ERA5</a> (CC-BY).{" "}</>}
+                  {usStateData?.paramData?.tavg && <>US state data:{" "}<a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA NCEI</a>.{" "}</>}
+                  {ukRegionData?.varData?.Tmean && <>UK data: contains{" "}<a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}data © Crown copyright (Open Government Licence).</>}
+                </p>
               </SectionCard>
             )}
 
@@ -780,6 +785,11 @@ export default function ClimateDashboard() {
                       <ComparisonChart data={ukCountryData.varData.Sunshine.monthlyComparison} recentKey="recent" label="Sunshine" units="hours" barColor="#ea580c" />
                     </SubSection>
                   )}
+                  <p className="text-xs text-gray-500 mt-4">
+                    Source: Contains{" "}
+                    <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}
+                    data © Crown copyright (Open Government Licence).
+                  </p>
                 </SectionCard>
               </>
             )}
@@ -797,6 +807,11 @@ export default function ClimateDashboard() {
                     <SubSection title="Annual total precipitation (mm)">
                       <YearlyChart data={countryData.precipYearly} dataKey="value" rollingKey="rollingAvg" label="Precipitation" units="mm" color="#60a5fa" rollingColor="#2563eb" />
                     </SubSection>
+                    <p className="text-xs text-gray-500 mt-4">
+                      Source:{" "}
+                      <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}
+                      / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Copernicus ERA5</a> (CC-BY).
+                    </p>
                   </SectionCard>
                 )}
 
@@ -829,6 +844,11 @@ export default function ClimateDashboard() {
                         <ComparisonChart data={usNationalData.paramData.pcp.monthlyComparison} recentKey="recent" label="Precipitation" units="mm" barColor="#7c3aed" />
                       </SubSection>
                     )}
+                    <p className="text-xs text-gray-500 mt-4">
+                      Source:{" "}
+                      <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA National Centers for Environmental Information</a>{" "}
+                      (public domain).
+                    </p>
                   </SectionCard>
                 )}
 
@@ -863,6 +883,11 @@ export default function ClimateDashboard() {
                         <ComparisonChart data={ukCountryData.varData.Rainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#7c3aed" />
                       </SubSection>
                     )}
+                    <p className="text-xs text-gray-500 mt-4">
+                      Source: Contains{" "}
+                      <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}
+                      data © Crown copyright (Open Government Licence).
+                    </p>
                   </SectionCard>
                 )}
 
@@ -897,6 +922,11 @@ export default function ClimateDashboard() {
                         <ComparisonChart data={ukCountryData.varData.Raindays1mm.monthlyComparison} recentKey="recent" label="Rain Days" units="days" barColor="#8b5cf6" />
                       </SubSection>
                     )}
+                    <p className="text-xs text-gray-500 mt-4">
+                      Source: Contains{" "}
+                      <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}
+                      data © Crown copyright (Open Government Licence).
+                    </p>
                   </SectionCard>
                 )}
               </>
@@ -937,6 +967,11 @@ export default function ClimateDashboard() {
                       <ComparisonChart data={ukCountryData.varData.AirFrost.monthlyComparison} recentKey="recent" label="Frost Days" units="days" barColor="#a855f7" />
                     </SubSection>
                   )}
+                  <p className="text-xs text-gray-500 mt-4">
+                    Source: Contains{" "}
+                    <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}
+                    data © Crown copyright (Open Government Licence).
+                  </p>
                 </SectionCard>
               </>
             )}
@@ -1002,6 +1037,11 @@ export default function ClimateDashboard() {
                       </ResponsiveContainer>
                     </div>
                   </SubSection>
+                  <p className="text-xs text-gray-500 mt-4">
+                    Source:{" "}
+                    <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA Climate at a Glance</a>{" "}
+                    (public domain).
+                  </p>
                 </SectionCard>
 
                 {globalData?.landVsOceanMonthly && (
@@ -1022,20 +1062,17 @@ export default function ClimateDashboard() {
                       </div>
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-4">
-                      Country data uses <span className="text-emerald-400">land-only</span> temperature (ERA5); the global trend above uses <span className="text-amber-400">land + ocean</span> (NOAA).
+                      Country data uses <span className="text-emerald-400">land-only</span> temperature (ERA5); the global trend above uses <span className="text-amber-400">land + ocean</span> (NOAA).{" "}
+                      Sources:{" "}
+                      <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}
+                      / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Copernicus ERA5</a> (CC-BY) (land) ·{" "}
+                      <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA Climate at a Glance</a>{" "}
+                      (land + ocean).
                     </p>
                   </SectionCard>
                 )}
 
-            {/* ─── Attribution ───────────────────────────────────────── */}
-            <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D0A65E] text-sm text-gray-400 space-y-1.5">
-              <p className="font-semibold text-gray-300">Data sources & attribution:</p>
-              {countryData && <p>• Country temperatures: <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Copernicus ERA5 reanalysis</a> (CC-BY)</p>}
-              {usStateData && <p>• US state data: <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA National Centers for Environmental Information</a> (public domain)</p>}
-              {ukRegionData && <p>• UK regional data: Contains <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Met Office</a> data © Crown copyright (Open Government Licence)</p>}
-              {globalData && <p>• Global land + ocean temperatures: <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Climate at a Glance</a> (public domain)</p>}
-              {globalData?.landYearlyData && <p>• Global land temperatures: <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Copernicus ERA5</a> (CC-BY)</p>}
-            </div>
+
           </>
         )}
       </div>

@@ -42,7 +42,7 @@ export function PostPreview({
           />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/55 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/65 to-black/70 pointer-events-none" />
 
         <div className="relative z-10 p-5 md:p-8 flex flex-col justify-between h-full text-outline">
           <div>

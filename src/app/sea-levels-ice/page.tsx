@@ -395,7 +395,9 @@ export default function SeaLevelsIcePage() {
                     </div>
                   </SubSection>
                   <p className="text-sm text-gray-400 mt-3">
-                    Warmer air melts ice and warmer water expands – both pushing sea levels higher.
+                    Warmer air melts ice and warmer water expands – both pushing sea levels higher. Sources:{" "}
+                    <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NASA GISS</a>{" "}/ NOAA (temperature) ·{" "}
+                    <a href="https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NOAA Satellite Altimetry</a>{" "}(sea level).
                   </p>
                 </SectionCard>
               )}
@@ -425,7 +427,9 @@ export default function SeaLevelsIcePage() {
                     </div>
                   </SubSection>
                   <p className="text-sm text-gray-400 mt-3">
-                    Declining sea ice signals broader ice loss – and accelerates warming through the ice-albedo feedback loop.
+                    Declining sea ice signals broader ice loss – and accelerates warming through the ice-albedo feedback loop. Sources:{" "}
+                    <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NSIDC</a>{" "}/ NOAA (ice) ·{" "}
+                    <a href="https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NOAA Satellite Altimetry</a>{" "}(sea level).
                   </p>
                 </SectionCard>
               )}
@@ -457,7 +461,9 @@ export default function SeaLevelsIcePage() {
                     </div>
                   </SubSection>
                   <p className="text-sm text-gray-400 mt-3">
-                    Higher temperatures melt ice, exposing dark ocean that absorbs more heat – a self-reinforcing cycle.
+                    Higher temperatures melt ice, exposing dark ocean that absorbs more heat – a self-reinforcing cycle. Sources:{" "}
+                    <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NASA GISS</a>{" "}/ NOAA (temperature) ·{" "}
+                    <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NSIDC</a>{" "}(ice).
                   </p>
                 </SectionCard>
               )}
@@ -487,7 +493,9 @@ export default function SeaLevelsIcePage() {
                     </div>
                   </SubSection>
                   <p className="text-sm text-gray-400 mt-3">
-                    Oceans absorb over 90% of excess heat. As water warms it expands – the single largest contributor to sea level rise.
+                    Oceans absorb over 90% of excess heat. As water warms it expands – the single largest contributor to sea level rise. Sources:{" "}
+                    <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NOAA</a>{" "}(ocean) ·{" "}
+                    <a href="https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NOAA Satellite Altimetry</a>{" "}(sea level).
                   </p>
                 </SectionCard>
               )}
@@ -517,7 +525,9 @@ export default function SeaLevelsIcePage() {
                     </div>
                   </SubSection>
                   <p className="text-sm text-gray-400 mt-3">
-                    CO₂ traps heat, which warms oceans and melts ice – both pushing sea levels higher in an accelerating trend.
+                    CO₂ traps heat, which warms oceans and melts ice – both pushing sea levels higher in an accelerating trend. Sources:{" "}
+                    <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NOAA GML</a>{" "}(CO₂) ·{" "}
+                    <a href="https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NOAA Satellite Altimetry</a>{" "}(sea level).
                   </p>
                 </SectionCard>
               )}
@@ -540,7 +550,8 @@ export default function SeaLevelsIcePage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      Satellite altimetry has tracked sea level since 1993, revealing an accelerating rise driven by thermal expansion and ice melt.
+                      Satellite altimetry has tracked sea level since 1993, revealing an accelerating rise driven by thermal expansion and ice melt. Source:{" "}
+                      <a href="https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NOAA Laboratory for Satellite Altimetry</a>{" "}(1993–present).
                     </p>
                   </SectionCard>
                 </>
@@ -563,25 +574,15 @@ export default function SeaLevelsIcePage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      Arctic ice reflects sunlight back into space. As it melts, darker ocean absorbs more heat – accelerating warming in a feedback loop.
+                      Arctic ice reflects sunlight back into space. As it melts, darker ocean absorbs more heat – accelerating warming in a feedback loop. Source:{" "}
+                      <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NSIDC</a>{" "}/ NOAA via{" "}
+                      <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">global-warming.org</a>.
                     </p>
                   </SectionCard>
                 </>
               )}
 
-              {/* ─── Attribution ──────────────────────────────────── */}
-              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D0A65E] text-sm text-gray-400 space-y-1.5">
-                <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
-                <p>• Sea level: <a href="https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Laboratory for Satellite Altimetry</a> (1993-present)</p>
-                <p>• Arctic sea ice: <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC</a> / NOAA via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p>• Arctic ice extent map: <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NSIDC Sea Ice Index v4.0</a> – September monthly shapefiles (1979-2024)</p>
-                <p>• Temperature anomaly: <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NASA GISS</a> / <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p>• Ocean warming: <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA</a> via <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">global-warming.org</a></p>
-                <p>• CO₂: <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">NOAA Global Monitoring Laboratory</a> – Mauna Loa Observatory</p>
-                <p className="text-xs text-gray-600 pt-2">
-                  Data refreshed automatically every 12 hours. Last updated: {new Date(data.fetchedAt).toLocaleString()}
-                </p>
-              </div>
+
             </>
           )}
         </div>

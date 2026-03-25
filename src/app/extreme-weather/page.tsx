@@ -928,29 +928,16 @@ export default function ExtremeWeatherPage() {
                     fillColor="#10b981"
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  Annual totals for disasters, deaths, people affected, and economic damage. Source:{" "}
+                  <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">EM-DAT</a>{" "}
+                  via{" "}
+                  <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>.
+                </p>
               </SectionCard>
 
               {/* ─── Top 10 Most-Hit Countries ──────────────────── */}
               <Top10Countries />
-
-              {/* ─── Data Sources ──────────────────────────────────── */}
-              <div className="bg-gray-950/70 rounded-xl border-2 border-[#D0A65E]/50 p-4 text-xs text-gray-500 space-y-1">
-                <div className="flex items-center gap-1.5 mb-2 text-gray-400 font-semibold">
-                  <Link2 className="w-3.5 h-3.5" /> Data Sources
-                </div>
-                <p>
-                  <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">EM-DAT</a>{" "}
-                  – The International Disaster Database, Centre for Research on the Epidemiology of Disasters (CRED), UCLouvain, Brussels.
-                </p>
-                <p>
-                  <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}
-                  – Extreme Weather dataset, based on EM-DAT data.
-                </p>
-                <p>
-                  <a href="https://www.gdacs.org/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">GDACS</a>{" "}
-                  – Global Disaster Alert and Coordination System, European Commission Joint Research Centre (JRC).
-                </p>
-              </div>
             </>
           )}
         </div>

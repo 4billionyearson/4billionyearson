@@ -275,7 +275,8 @@ export default function EmissionsPage() {
               <SectionCard icon={<Factory className="h-5 w-5 text-red-400" />} title="Top 10 Annual CO₂ Emitters">
                 <Top10BarChart data={data.top10Annual} dataKey="annual" tooltip={DarkTooltip} />
                 <p className="text-xs text-gray-500 mt-4">
-                  The top 10 countries produce over two-thirds of global annual CO₂ emissions.
+                  The top 10 countries produce over two-thirds of global annual CO₂ emissions. Source:{" "}
+                  <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
               </SectionCard>
 
@@ -283,7 +284,8 @@ export default function EmissionsPage() {
               <SectionCard icon={<Users className="h-5 w-5 text-amber-400" />} title="Top 10 Emitters Per Capita">
                 <Top10BarChart data={data.top10PerCapita} dataKey="perCapita" tooltip={PerCapTooltip} />
                 <p className="text-xs text-gray-500 mt-4">
-                  Per-capita figures highlight small, fossil-fuel-rich nations — the biggest absolute emitters often rank lower here.
+                  Per-capita figures highlight small, fossil-fuel-rich nations — the biggest absolute emitters often rank lower here. Source:{" "}
+                  <a href="https://ourworldindata.org/per-capita-co2" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
               </SectionCard>
 
@@ -291,7 +293,8 @@ export default function EmissionsPage() {
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-yellow-400" />} title="Top 10 Cumulative CO₂ Emitters">
                 <Top10BarChart data={data.top10Cumulative} dataKey="cumulative" tooltip={DarkTooltip} />
                 <p className="text-xs text-gray-500 mt-4">
-                  CO₂ persists for centuries, so early-industrialised nations carry a disproportionate share of the total warming burden.
+                  CO₂ persists for centuries, so early-industrialised nations carry a disproportionate share of the total warming burden. Source:{" "}
+                  <a href="https://ourworldindata.org/contributed-most-global-co2" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
               </SectionCard>
 
@@ -325,7 +328,8 @@ export default function EmissionsPage() {
                   </ResponsiveContainer>
                 </div>
                 <p className="text-xs text-gray-500 mt-4">
-                  To limit warming to 1.5 °C, global emissions must roughly halve by 2030 and reach net zero by 2050.
+                  To limit warming to 1.5 °C, global emissions must roughly halve by 2030 and reach net zero by 2050. Source:{" "}
+                  <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
               </SectionCard>
 
@@ -369,7 +373,8 @@ export default function EmissionsPage() {
                     </ResponsiveContainer>
                   </div>
                   <p className="text-xs text-gray-500 mt-4">
-                    How the biggest emitters have evolved since 1950, showing shifting patterns of industrial development.
+                    How the biggest emitters have evolved since 1950, showing shifting patterns of industrial development. Source:{" "}
+                    <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                   </p>
                 </SectionCard>
               )}
@@ -401,18 +406,11 @@ export default function EmissionsPage() {
                   </ResponsiveContainer>
                 </div>
                 <p className="text-xs text-gray-500 mt-4">
-                  Cumulative CO₂ determines long-term warming &ndash; even if emissions stopped today, existing CO₂ would warm the planet for centuries.
+                  Cumulative CO₂ determines long-term warming &ndash; even if emissions stopped today, existing CO₂ would warm the planet for centuries. Source:{" "}
+                  <a href="https://ourworldindata.org/contributed-most-global-co2" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
               </SectionCard>
-              <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D0A65E] text-sm text-gray-400 space-y-1.5">
-                <p className="font-semibold text-gray-300">Data sources &amp; attribution:</p>
-                <p>• CO₂ emissions: <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>
-                <p>• Per capita emissions: <a href="https://ourworldindata.org/per-capita-co2" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>
-                <p>• Cumulative emissions: <a href="https://ourworldindata.org/contributed-most-global-co2" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> – Global Carbon Project</p>
-                <p className="text-xs text-gray-600 pt-2">
-                  Data refreshed automatically every 30 days. Last updated: {new Date(data.fetchedAt).toLocaleString()}
-                </p>
-              </div>
+              
             </>
           )}
         </div>

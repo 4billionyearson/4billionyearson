@@ -484,7 +484,10 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
         )}
         <p className="text-sm text-gray-400 mt-4">
           Total primary energy consumption broken down by source. The world remains heavily dependent on
-          fossil fuels, though renewables are the <span className="text-emerald-400 font-medium">fastest-growing</span> segment.
+          fossil fuels, though renewables are the <span className="text-emerald-400 font-medium">fastest-growing</span> segment.{" "}
+          Source:{" "}
+          <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Our World in Data</a>{" "}
+          / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Energy Institute Statistical Review</a> (CC-BY).
         </p>
       </SectionCard>
 
@@ -514,7 +517,10 @@ function EnergyMixSection({ data, countryData, baseLabel = 'Global' }: { data: C
             </div>
           </SubSection>
           <p className="text-sm text-gray-400 mt-4">
-            Comparing <span className="text-white font-medium">{countryData.name}</span>&apos;s fossil and renewable energy share against the global average.
+            Comparing <span className="text-white font-medium">{countryData.name}</span>&apos;s fossil and renewable energy share against the global average.{" "}
+            Source:{" "}
+            <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Our World in Data</a>{" "}
+            / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Energy Institute Statistical Review</a> (CC-BY).
           </p>
         </SectionCard>
       )}
@@ -631,7 +637,9 @@ function ElectricityMixSection({ data, countryData, baseLabel = 'Global' }: { da
         )}
         <p className="text-sm text-gray-400 mt-4">
           How electricity is generated matters enormously for emissions. The shift from coal and gas
-          to wind, solar, hydro and nuclear is the key to decarbonising the grid.
+          to wind, solar, hydro and nuclear is the key to decarbonising the grid.{" "}
+          Source:{" "}
+          <a href="https://ember-climate.org/data/data-tools/data-explorer/" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Ember Global Electricity Review</a> (CC-BY).
         </p>
       </SectionCard>
     </>
@@ -801,7 +809,9 @@ function RenewablesGrowthSection({ data, countryData, baseLabel = 'Global' }: { 
         )}
         <p className="text-sm text-gray-400 mt-4">
           Solar and wind are experiencing <span className="text-yellow-400 font-medium">exponential growth</span>. Solar electricity
-          has grown from near-zero to over 6% of global generation in just 15 years.
+          has grown from near-zero to over 6% of global generation in just 15 years.{" "}
+          Source:{" "}
+          <a href="https://ember-climate.org/data/data-tools/data-explorer/" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Ember Global Electricity Review</a> (CC-BY).
         </p>
       </SectionCard>
     </>
@@ -859,7 +869,9 @@ function CarbonIntensitySection({ data, countryData, baseLabel = 'Global' }: { d
         <p className="text-sm text-gray-400 mt-4">
           Grams of CO₂ emitted per kilowatt-hour of electricity generated. Lower is better.
           The global average has been slowly declining as renewables displace coal, but the pace
-          must <span className="text-red-400 font-medium">accelerate dramatically</span> to meet climate goals.
+          must <span className="text-red-400 font-medium">accelerate dramatically</span> to meet climate goals.{" "}
+          Source:{" "}
+          <a href="https://ember-climate.org/data/data-tools/data-explorer/" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Ember Global Electricity Review</a> (CC-BY).
         </p>
       </SectionCard>
     </>
@@ -1003,7 +1015,10 @@ function EnergyPerCapitaSection({ data, countryData, baseLabel = 'Global' }: { d
         <p className="text-sm text-gray-400 mt-4">
           Energy consumption per person reveals vast inequalities between nations.
           High-income countries use many times more energy per capita than the global average,
-          though efficiency gains are <span className="text-emerald-400 font-medium">narrowing the gap</span>.
+          though efficiency gains are <span className="text-emerald-400 font-medium">narrowing the gap</span>.{" "}
+          Source:{" "}
+          <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Our World in Data</a>{" "}
+          / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Energy Institute Statistical Review</a> (CC-BY).
         </p>
       </SectionCard>
     </>
@@ -1142,7 +1157,10 @@ function EmissionsSection({ data, countryData, baseLabel = 'Global' }: { data: C
         )}
         <p className="text-sm text-gray-400 mt-4">
           Total greenhouse gas emissions from energy production and consumption (Mt CO₂ equivalent).
-          Despite renewable growth, global emissions continue to rise as energy demand outpaces the transition.
+          Despite renewable growth, global emissions continue to rise as energy demand outpaces the transition.{" "}
+          Source:{" "}
+          <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Our World in Data</a>{" "}
+          / <a href="https://www.climatewatchdata.org" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Climate Analysis Indicators Tool (CAIT)</a>.
         </p>
       </SectionCard>
     </>
@@ -1247,7 +1265,10 @@ function FossilFuelBreakdownSection({ data, countryData, baseLabel = 'Global' }:
       )}
       <p className="text-sm text-gray-400 mt-4">
         The three fossil fuels – coal, oil, and gas – broken down individually.
-        Coal is the dirtiest, while gas produces roughly half the CO₂ per unit of energy.
+        Coal is the dirtiest, while gas produces roughly half the CO₂ per unit of energy.{" "}
+        Source:{" "}
+        <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Our World in Data</a>{" "}
+        / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Energy Institute Statistical Review</a> (CC-BY).
       </p>
     </SectionCard>
   );
@@ -1483,7 +1504,10 @@ export default function EnergyPage() {
                 <SectionCard icon={<Globe className="h-5 w-5 text-emerald-400" />} title="Renewable Energy Share by Country">
                   <EnergyChoroplethMap selectedCountry={usStateData ? 'United States' : countryData?.name} selectedState={usStateData?.name} />
                   <p className="text-gray-400 text-sm mt-3 text-center">
-                    Percentage of primary energy from renewable sources. Hover over a country to see its renewable share. Zoom in to the USA to see state-level data.
+                    Percentage of primary energy from renewable sources. Hover over a country to see its renewable share. Zoom in to the USA to see state-level data.{" "}
+                    Source:{" "}
+                    <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Our World in Data</a>{" "}
+                    / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Energy Institute Statistical Review</a> (CC-BY).
                   </p>
                 </SectionCard>
 
@@ -1498,16 +1522,7 @@ export default function EnergyPage() {
             );
           })()}
 
-          {/* ─── Attribution ─────────────────────────────────────────── */}
-          <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-xl border-2 border-[#D2E369] text-sm text-gray-400 space-y-1.5">
-            <p className="font-semibold text-gray-300">Data sources & attribution:</p>
-            <p>• Energy data: <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Our World in Data</a> / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Energy Institute Statistical Review</a> (CC-BY)</p>
-            <p>• Electricity data: <a href="https://ember-climate.org/data/data-tools/data-explorer/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Ember Global Electricity Review</a> (CC-BY)</p>
-            <p>• Emissions: <a href="https://www.climatewatchdata.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">Climate Analysis Indicators Tool (CAIT)</a></p>
-            {locationType === 'us-state' && (
-              <p>• US state energy data: <a href="https://www.eia.gov/state/seds/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-200">U.S. Energy Information Administration (EIA)</a> State Energy Data System</p>
-            )}
-          </div>
+
         </div>
       </div>
     </main>
