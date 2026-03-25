@@ -32,7 +32,7 @@ const BOOKS: Book[] = [
     author: "Ethan Mollick",
     year: 2024,
     asin: "0593716868",
-    cover: "",
+    cover: "r13gEAAAQBAJ",
     rating: "4.5",
     description:
       "Wharton professor Ethan Mollick draws on his research and hands-on experience to offer a practical guide to living and working with AI. He explores how large language models are already transforming education, creativity, and business.",
@@ -42,7 +42,7 @@ const BOOKS: Book[] = [
     author: "Yuval Noah Harari",
     year: 2024,
     asin: "1911717081",
-    cover: "",
+    cover: "BCB60AEACAAJ",
     rating: "4.4",
     description:
       "The bestselling historian examines how information networks – from ancient myths to modern AI – have shaped civilisation. Harari warns that artificial intelligence represents a fundamentally new kind of information agent that could reshape society.",
@@ -52,7 +52,7 @@ const BOOKS: Book[] = [
     author: "Mustafa Suleyman",
     year: 2023,
     asin: "1847927483",
-    cover: "",
+    cover: "nNafzwEACAAJ",
     rating: "4.4",
     description:
       "DeepMind co-founder Mustafa Suleyman warns that AI and synthetic biology represent a wave of technology that will be impossible to contain. He outlines the dilemma of unstoppable technology and the urgent need for containment strategies.",
@@ -62,7 +62,7 @@ const BOOKS: Book[] = [
     author: "Kai-Fu Lee & Chen Qiufan",
     year: 2021,
     asin: "0593238532",
-    cover: "",
+    cover: "5ksqEAAAQBAJ",
     rating: "4.4",
     description:
       "A unique blend of science fiction and expert analysis. Former Google China president Kai-Fu Lee teams with sci-fi writer Chen Qiufan to imagine ten visions of how AI will transform the world over the next twenty years.",
@@ -72,7 +72,7 @@ const BOOKS: Book[] = [
     author: "Kate Crawford",
     year: 2021,
     asin: "0300264631",
-    cover: "",
+    cover: "G2iUzgEACAAJ",
     rating: "4.4",
     description:
       "Kate Crawford reveals AI as a technology of extraction – from the minerals mined to build hardware to the labour exploited to train models. A powerful investigation into the environmental and social costs of artificial intelligence.",
@@ -82,7 +82,7 @@ const BOOKS: Book[] = [
     author: "Cade Metz",
     year: 2021,
     asin: "1524742678",
-    cover: "",
+    cover: "p-UlEAAAQBAJ",
     rating: "4.5",
     description:
       "New York Times reporter Cade Metz tells the story of the brilliant, eccentric researchers behind the deep learning revolution. From Geoffrey Hinton to Demis Hassabis, this is the definitive account of how modern AI was built.",
@@ -92,7 +92,7 @@ const BOOKS: Book[] = [
     author: "Brian Christian",
     year: 2020,
     asin: "0393868338",
-    cover: "",
+    cover: "9GSNEAAAQBAJ",
     rating: "4.5",
     description:
       "A masterful exploration of the fundamental challenge in AI: how do we ensure machine learning systems do what we actually want? Christian weaves together computer science, philosophy, and psychology in this essential read on AI safety.",
@@ -102,7 +102,7 @@ const BOOKS: Book[] = [
     author: "Stuart Russell",
     year: 2019,
     asin: "0525558632",
-    cover: "",
+    cover: "vuqNEAAAQBAJ",
     rating: "4.4",
     description:
       "Leading AI researcher Stuart Russell argues that the standard model of AI – optimising a fixed objective – is fundamentally flawed. He proposes a new framework for creating beneficial AI that defers to human preferences.",
@@ -112,7 +112,7 @@ const BOOKS: Book[] = [
     author: "Max Tegmark",
     year: 2017,
     asin: "0141981806",
-    cover: "",
+    cover: "UPNtswEACAAJ",
     rating: "4.5",
     description:
       "MIT physicist Max Tegmark explores what it means to be human in the age of artificial intelligence. From near-term job automation to far-future superintelligence, he examines the choices we must make to ensure AI benefits humanity.",
@@ -122,7 +122,7 @@ const BOOKS: Book[] = [
     author: "Nick Bostrom",
     year: 2014,
     asin: "0198739834",
-    cover: "",
+    cover: "i0QdjgEACAAJ",
     rating: "4.2",
     description:
       "The book that sparked global conversation about existential risk from AI. Oxford philosopher Nick Bostrom lays out the scenarios in which superhuman machine intelligence could emerge and the existential challenge of controlling it.",
@@ -133,8 +133,8 @@ function amazonUrl(asin: string) {
   return `https://www.amazon.co.uk/dp/${asin}?tag=${AFFILIATE_TAG}`;
 }
 
-function coverUrl(asin: string) {
-  return `https://covers.openlibrary.org/b/isbn/${asin}-L.jpg`;
+function coverUrl(gbid: string) {
+  return `https://books.google.com/books/content?id=${gbid}&printsec=frontcover&img=1&zoom=1`;
 }
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
@@ -174,7 +174,7 @@ export default function AIBooksPage() {
                   className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#88DDFC]/60 transition-colors group"
                 >
                   <img
-                    src={coverUrl(book.asin)}
+                    src={coverUrl(book.cover)}
                     alt={`${book.title} by ${book.author}`}
                     className="w-20 md:w-28 h-auto object-contain rounded-lg shadow-lg flex-shrink-0 group-hover:scale-[1.02] transition-transform"
                     loading="lazy"

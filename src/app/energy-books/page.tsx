@@ -32,7 +32,7 @@ const BOOKS: Book[] = [
     author: "Brett Christophers",
     year: 2024,
     asin: "1804290785",
-    cover: "",
+    cover: "ETPBEAAAQBAJ",
     rating: "4.5",
     description:
       "Why has renewable energy not displaced fossil fuels faster? Christophers argues the answer lies in economics \u2013 green energy is not as cheap as headlines suggest, and markets alone won\u2019t deliver the transition without bold policy intervention.",
@@ -42,7 +42,7 @@ const BOOKS: Book[] = [
     author: "Henry Sanderson",
     year: 2023,
     asin: "0861544692",
-    cover: "",
+    cover: "j9DezgEACAAJ",
     rating: "4.4",
     description:
       "The electrification of everything requires vast quantities of lithium, cobalt, nickel, and rare earths. Financial Times journalist Sanderson investigates the geopolitics and human cost of the battery supply chain powering the clean energy revolution.",
@@ -52,7 +52,7 @@ const BOOKS: Book[] = [
     author: "Vaclav Smil",
     year: 2022,
     asin: "0241454409",
-    cover: "",
+    cover: "G3EszgEACAAJ",
     rating: "4.5",
     description:
       "Bill Gates\u2019s favourite author explains the fundamental realities of energy, food production, materials, and the environment. Smil cuts through the noise with hard data, showing what it will truly take to transition away from fossil fuels.",
@@ -62,7 +62,7 @@ const BOOKS: Book[] = [
     author: "Saul Griffith",
     year: 2021,
     asin: "0262046237",
-    cover: "",
+    cover: "ALVCEAAAQBAJ",
     rating: "4.5",
     description:
       "Engineer and inventor Saul Griffith presents an optimistic, detailed plan for decarbonising everything through electrification. From heat pumps to EVs, he shows how existing technology can solve climate change \u2013 if deployed at scale.",
@@ -72,7 +72,7 @@ const BOOKS: Book[] = [
     author: "Daniel Yergin",
     year: 2020,
     asin: "0141994886",
-    cover: "",
+    cover: "5G_XDwAAQBAJ",
     rating: "4.5",
     description:
       "Pulitzer Prize winner Daniel Yergin charts how the energy revolution, climate politics, and geopolitical rivalries are reshaping the world map. Essential reading for understanding the intersection of energy, power, and global politics.",
@@ -82,7 +82,7 @@ const BOOKS: Book[] = [
     author: "Ross Garnaut",
     year: 2019,
     asin: "1760875651",
-    cover: "",
+    cover: "KPiPDwAAQBAJ",
     rating: "4.4",
     description:
       "Garnaut argues that countries rich in sun, wind, and land could become the energy superpowers of the 21st century. A compelling case for how the renewable energy transition creates enormous economic opportunity.",
@@ -92,7 +92,7 @@ const BOOKS: Book[] = [
     author: "Paul Hawken",
     year: 2017,
     asin: "0143130447",
-    cover: "",
+    cover: "uvtlDgAAQBAJ",
     rating: "4.6",
     description:
       "The most comprehensive plan ever proposed to reverse global warming. Hawken and a team of researchers rank the top 100 solutions by impact \u2013 from wind turbines and solar farms to educating girls and reducing food waste.",
@@ -102,7 +102,7 @@ const BOOKS: Book[] = [
     author: "Vaclav Smil",
     year: 2017,
     asin: "0262536161",
-    cover: "",
+    cover: "Br74DwAAQBAJ",
     rating: "4.4",
     description:
       "A sweeping history of how energy has shaped human civilisation, from biomass and muscle power to fossil fuels and renewables. Smil provides the deep context needed to understand today\u2019s energy transition in historical perspective.",
@@ -112,7 +112,7 @@ const BOOKS: Book[] = [
     author: "Gretchen Bakke",
     year: 2016,
     asin: "1632863324",
-    cover: "",
+    cover: "lxdfCgAAQBAJ",
     rating: "4.3",
     description:
       "Named one of Bill Gates\u2019s favourite reads. Bakke tells the fascinating story of the electrical grid \u2013 the most complex machine ever built \u2013 and explains why modernising it is essential for the renewable energy transition.",
@@ -122,7 +122,7 @@ const BOOKS: Book[] = [
     author: "Chris Goodall",
     year: 2016,
     asin: "1781255245",
-    cover: "",
+    cover: "QWz4CgAAQBAJ",
     rating: "4.3",
     description:
       "Goodall makes the case that solar photovoltaics will become the world\u2019s dominant energy source. He explains how plummeting costs, improving storage, and clever grid management are making a solar-powered civilisation inevitable.",
@@ -132,7 +132,7 @@ const BOOKS: Book[] = [
     author: "McKenzie Funk",
     year: 2014,
     asin: "0143126598",
-    cover: "",
+    cover: "X-dvDwAAQBAJ",
     rating: "4.2",
     description:
       "A global investigation into who stands to profit from climate change. Funk travels from Greenland to Israel to explore how entrepreneurs, nations, and militaries are turning rising seas, melting ice, and drought into business opportunities.",
@@ -142,7 +142,7 @@ const BOOKS: Book[] = [
     author: "David JC MacKay",
     year: 2009,
     asin: "0954452933",
-    cover: "",
+    cover: "Ps7JEAAAQBAJ",
     rating: "4.6",
     description:
       "A cult classic among energy wonks. Professor MacKay uses back-of-the-envelope calculations to show exactly how much energy Britain uses and how renewables could (or couldn\u2019t) replace fossil fuels. Rigorous, witty, and endlessly cited.",
@@ -153,8 +153,8 @@ function amazonUrl(asin: string) {
   return `https://www.amazon.co.uk/dp/${asin}?tag=${AFFILIATE_TAG}`;
 }
 
-function coverUrl(asin: string) {
-  return `https://covers.openlibrary.org/b/isbn/${asin}-L.jpg`;
+function coverUrl(gbid: string) {
+  return `https://books.google.com/books/content?id=${gbid}&printsec=frontcover&img=1&zoom=1`;
 }
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
@@ -194,7 +194,7 @@ export default function EnergyBooksPage() {
                   className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#D2E369]/60 transition-colors group"
                 >
                   <img
-                    src={coverUrl(book.asin)}
+                    src={coverUrl(book.cover)}
                     alt={`${book.title} by ${book.author}`}
                     className="w-20 md:w-28 h-auto object-contain rounded-lg shadow-lg flex-shrink-0 group-hover:scale-[1.02] transition-transform"
                     loading="lazy"

@@ -32,7 +32,7 @@ const BOOKS: Book[] = [
     author: "David Quammen",
     year: 2024,
     asin: "1982172975",
-    cover: "",
+    cover: "Hn-HEAAAQBAJ",
     rating: "4.4",
     description:
       "National Geographic writer David Quammen delivers the definitive account of how COVID-19 emerged and spread. Combining virology, genomics, and investigative journalism, he traces the origins of SARS-CoV-2 and what it reveals about future pandemics.",
@@ -42,7 +42,7 @@ const BOOKS: Book[] = [
     author: "Siddhartha Mukherjee",
     year: 2022,
     asin: "1982117354",
-    cover: "",
+    cover: "zkqMEAAAQBAJ",
     rating: "4.5",
     description:
       "From the author of The Gene and The Emperor of All Maladies. Mukherjee tells the story of the cell \u2013 the basic unit of life \u2013 and how cell therapy is revolutionising medicine, from cancer treatment to organ regeneration.",
@@ -52,7 +52,7 @@ const BOOKS: Book[] = [
     author: "Joe Miller, U\u011fur \u015eahin & \u00d6zlem T\u00fcreci",
     year: 2022,
     asin: "1250280397",
-    cover: "",
+    cover: "OMKiEAAAQBAJ",
     rating: "4.5",
     description:
       "The inside story of how BioNTech created the first mRNA COVID-19 vaccine in record time. A gripping account of scientific ingenuity, personal sacrifice, and the decades of research that made the impossible possible.",
@@ -62,7 +62,7 @@ const BOOKS: Book[] = [
     author: "Walter Isaacson",
     year: 2021,
     asin: "1982115866",
-    cover: "",
+    cover: "GUSFEAAAQBAJ",
     rating: "4.6",
     description:
       "The riveting story of Nobel Prize winner Jennifer Doudna and the invention of CRISPR gene editing. Walter Isaacson follows the race to harness the most significant biological tool since the double helix \u2013 from lab bench to pandemic response.",
@@ -72,7 +72,7 @@ const BOOKS: Book[] = [
     author: "Jennifer A. Doudna & Samuel H. Sternberg",
     year: 2017,
     asin: "1328915360",
-    cover: "",
+    cover: "VXPXvQEACAAJ",
     rating: "4.5",
     description:
       "Written by the co-inventor of CRISPR herself, this is the definitive account of how gene editing works, the ethical dilemmas it raises, and why it will change medicine, agriculture, and the fabric of life itself.",
@@ -82,7 +82,7 @@ const BOOKS: Book[] = [
     author: "Siddhartha Mukherjee",
     year: 2016,
     asin: "0099584573",
-    cover: "",
+    cover: "bhLUwAEACAAJ",
     rating: "4.6",
     description:
       "Pulitzer Prize\u2013winning author Mukherjee tells the epic story of the gene \u2013 from Mendel\u2019s garden to CRISPR. Part history, part science, part personal narrative, it explores how genetics has shaped identity, disease, and destiny.",
@@ -92,7 +92,7 @@ const BOOKS: Book[] = [
     author: "George Church & Ed Regis",
     year: 2014,
     asin: "0465075703",
-    cover: "",
+    cover: "4JhYtAEACAAJ",
     rating: "4.3",
     description:
       "Harvard geneticist George Church envisions a future where synthetic biology rewrites the living world. From resurrecting the woolly mammoth to engineering virus-resistant humans, this is a mind-expanding tour of what\u2019s possible.",
@@ -102,7 +102,7 @@ const BOOKS: Book[] = [
     author: "J. Craig Venter",
     year: 2013,
     asin: "0143125907",
-    cover: "",
+    cover: "zkECDAAAQBAJ",
     rating: "4.2",
     description:
       "The scientist who sequenced the human genome describes the dawn of synthetic biology \u2013 creating life from digital code. Venter explores what it means to design organisms from scratch and the implications for medicine, energy, and food.",
@@ -112,7 +112,7 @@ const BOOKS: Book[] = [
     author: "Matt Ridley",
     year: 1999,
     asin: "0060894083",
-    cover: "",
+    cover: "h2zcDWshkEkC",
     rating: "4.4",
     description:
       "Ridley takes readers on a tour of the human genome, one chromosome at a time. Each chapter reveals a different gene that illuminates a new aspect of humanity \u2013 from disease and intelligence to personality and free will.",
@@ -123,8 +123,8 @@ function amazonUrl(asin: string) {
   return `https://www.amazon.co.uk/dp/${asin}?tag=${AFFILIATE_TAG}`;
 }
 
-function coverUrl(asin: string) {
-  return `https://covers.openlibrary.org/b/isbn/${asin}-L.jpg`;
+function coverUrl(gbid: string) {
+  return `https://books.google.com/books/content?id=${gbid}&printsec=frontcover&img=1&zoom=1`;
 }
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
@@ -164,7 +164,7 @@ export default function BiotechBooksPage() {
                   className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#D26742]/60 transition-colors group"
                 >
                   <img
-                    src={coverUrl(book.asin)}
+                    src={coverUrl(book.cover)}
                     alt={`${book.title} by ${book.author}`}
                     className="w-20 md:w-28 h-auto object-contain rounded-lg shadow-lg flex-shrink-0 group-hover:scale-[1.02] transition-transform"
                     loading="lazy"
