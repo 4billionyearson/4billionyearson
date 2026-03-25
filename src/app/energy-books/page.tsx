@@ -63,7 +63,7 @@ const BOOKS: Book[] = [
     author: "Saul Griffith",
     year: 2021,
     asin: "0262046237",
-    cover: "ALVCEAAAQBAJ",
+      cover: "https://covers.openlibrary.org/b/id/12516365-L.jpg",
     rating: "4.5",
     description:
       "Engineer and inventor Saul Griffith presents an optimistic, detailed plan for decarbonising everything through electrification. From heat pumps to EVs, he shows how existing technology can solve climate change \u2013 if deployed at scale.",
@@ -150,8 +150,12 @@ const BOOKS: Book[] = [
   },
 ];
 
-function coverUrl(gbid: string) {
-  return `https://books.google.com/books/content?id=${gbid}&printsec=frontcover&img=1&zoom=1`;
+function coverUrl(cover: string) {
+  if (cover.startsWith("http://") || cover.startsWith("https://")) {
+    return cover;
+  }
+
+  return `https://books.google.com/books/content?id=${cover}&printsec=frontcover&img=1&zoom=1`;
 }
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
