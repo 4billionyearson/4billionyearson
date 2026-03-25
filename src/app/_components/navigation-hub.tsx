@@ -38,6 +38,7 @@ const SECTIONS: Section[] = [
     links: [
       { href: "/ai-dashboard", label: "AI Industry Data", icon: <BarChart3 className="h-4 w-4" />, badge: "monthly", desc: "Investment, adoption & research" },
       { href: "/ai-explained", label: "AI Explained", icon: <Cpu className="h-4 w-4" />, desc: "Plain-English guide to AI" },
+      { href: "/ai-books", label: "AI Books", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on AI" },
       { href: "/category/artificial-intelligence", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "artificial-intelligence", desc: "Latest articles" },
     ],
   },
@@ -51,6 +52,7 @@ const SECTIONS: Section[] = [
       { href: "/energy", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
       { href: "/energy-rankings", label: "Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
       { href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
+      { href: "/energy-books", label: "Energy Books", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on energy" },
       { href: "/category/renewable-energy", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "renewable-energy", desc: "Latest articles" },
     ],
   },
@@ -68,6 +70,7 @@ const SECTIONS: Section[] = [
       { href: "/extreme-weather", label: "Extreme Weather", icon: <CloudLightning className="h-4 w-4" />, badge: "live", desc: "Active disasters worldwide" },
       { href: "/emissions", label: "CO₂ Emissions", icon: <Factory className="h-4 w-4" />, badge: "annual", desc: "Country rankings & trends" },
       { href: "/climate-explained", label: "Climate Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
+      { href: "/climate-books", label: "Climate Books", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on climate" },
       { href: "/category/climate-change", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "climate-change", desc: "Latest articles" },
     ],
   },
@@ -80,6 +83,7 @@ const SECTIONS: Section[] = [
     links: [
       { href: "/biotech-dashboard", label: "Biotech Data", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Genomics, trials & research" },
       { href: "/biotech-explained", label: "Biotech Explained", icon: <Microscope className="h-4 w-4" />, desc: "Plain-English guide to biotech" },
+      { href: "/biotech-books", label: "Biotech Books", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on biotech" },
       { href: "/category/biotechnology", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "biotechnology", desc: "Latest articles" },
     ],
   },
