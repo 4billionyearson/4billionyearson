@@ -15,8 +15,6 @@ export const metadata: Metadata = {
   },
 };
 
-/* ─── Data ────────────────────────────────────────────────────────────────── */
-
 interface Book {
   title: string;
   author: string;
@@ -36,7 +34,7 @@ const BOOKS: Book[] = [
     cover: "ETPBEAAAQBAJ",
     rating: "4.5",
     description:
-      "Why has renewable energy not displaced fossil fuels faster? Christophers argues the answer lies in economics \u2013 green energy is not as cheap as headlines suggest, and markets alone won\u2019t deliver the transition without bold policy intervention.",
+      "Why has renewable energy not displaced fossil fuels faster? Christophers argues the answer lies in economics – green energy is not as cheap as headlines suggest, and markets alone won’t deliver the transition without bold policy intervention.",
   },
   {
     title: "Volt Rush",
@@ -56,17 +54,17 @@ const BOOKS: Book[] = [
     cover: "G3EszgEACAAJ",
     rating: "4.5",
     description:
-      "Bill Gates\u2019s favourite author explains the fundamental realities of energy, food production, materials, and the environment. Smil cuts through the noise with hard data, showing what it will truly take to transition away from fossil fuels.",
+      "Bill Gates’s favourite author explains the fundamental realities of energy, food production, materials, and the environment. Smil cuts through the noise with hard data, showing what it will truly take to transition away from fossil fuels.",
   },
   {
     title: "Electrify",
     author: "Saul Griffith",
     year: 2021,
     asin: "0262046237",
-      cover: "https://covers.openlibrary.org/b/id/12516365-L.jpg",
+    cover: "ALVCEAAAQBAJ",
     rating: "4.5",
     description:
-      "Engineer and inventor Saul Griffith presents an optimistic, detailed plan for decarbonising everything through electrification. From heat pumps to EVs, he shows how existing technology can solve climate change \u2013 if deployed at scale.",
+      "Engineer and inventor Saul Griffith presents an optimistic, detailed plan for decarbonising everything through electrification. From heat pumps to EVs, he shows how existing technology can solve climate change – if deployed at scale.",
   },
   {
     title: "The New Map",
@@ -96,7 +94,7 @@ const BOOKS: Book[] = [
     cover: "uvtlDgAAQBAJ",
     rating: "4.6",
     description:
-      "The most comprehensive plan ever proposed to reverse global warming. Hawken and a team of researchers rank the top 100 solutions by impact \u2013 from wind turbines and solar farms to educating girls and reducing food waste.",
+      "The most comprehensive plan ever proposed to reverse global warming. Hawken and a team of researchers rank the top 100 solutions by impact – from wind turbines and solar farms to educating girls and reducing food waste.",
   },
   {
     title: "Energy and Civilization",
@@ -106,17 +104,17 @@ const BOOKS: Book[] = [
     cover: "Br74DwAAQBAJ",
     rating: "4.4",
     description:
-      "A sweeping history of how energy has shaped human civilisation, from biomass and muscle power to fossil fuels and renewables. Smil provides the deep context needed to understand today\u2019s energy transition in historical perspective.",
+      "A sweeping history of how energy has shaped human civilisation, from biomass and muscle power to fossil fuels and renewables. Smil provides the deep context needed to understand today’s energy transition in historical perspective.",
   },
   {
     title: "The Grid",
     author: "Gretchen Bakke",
     year: 2016,
     asin: "1632863324",
-    cover: "lxdfCgAAQBAJ",
+    cover: "https://books.google.com/books/content?id=dTbbCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
     rating: "4.3",
     description:
-      "Named one of Bill Gates\u2019s favourite reads. Bakke tells the fascinating story of the electrical grid \u2013 the most complex machine ever built \u2013 and explains why modernising it is essential for the renewable energy transition.",
+      "Named one of Bill Gates’s favourite reads. Bakke tells the fascinating story of the electrical grid – the most complex machine ever built – and explains why modernising it is essential for the renewable energy transition.",
   },
   {
     title: "The Switch",
@@ -126,7 +124,7 @@ const BOOKS: Book[] = [
     cover: "QWz4CgAAQBAJ",
     rating: "4.3",
     description:
-      "Goodall makes the case that solar photovoltaics will become the world\u2019s dominant energy source. He explains how plummeting costs, improving storage, and clever grid management are making a solar-powered civilisation inevitable.",
+      "Goodall makes the case that solar photovoltaics will become the world’s dominant energy source. He explains how plummeting costs, improving storage, and clever grid management are making a solar-powered civilisation inevitable.",
   },
   {
     title: "Windfall",
@@ -139,14 +137,14 @@ const BOOKS: Book[] = [
       "A global investigation into who stands to profit from climate change. Funk travels from Greenland to Israel to explore how entrepreneurs, nations, and militaries are turning rising seas, melting ice, and drought into business opportunities.",
   },
   {
-    title: "Sustainable Energy \u2013 Without the Hot Air",
+    title: "Sustainable Energy – Without the Hot Air",
     author: "David JC MacKay",
     year: 2009,
     asin: "0954452933",
     cover: "Ps7JEAAAQBAJ",
     rating: "4.6",
     description:
-      "A cult classic among energy wonks. Professor MacKay uses back-of-the-envelope calculations to show exactly how much energy Britain uses and how renewables could (or couldn\u2019t) replace fossil fuels. Rigorous, witty, and endlessly cited.",
+      "A cult classic among energy wonks. Professor MacKay uses back-of-the-envelope calculations to show exactly how much energy Britain uses and how renewables could (or couldn’t) replace fossil fuels. Rigorous, witty, and endlessly cited.",
   },
 ];
 
@@ -158,18 +156,15 @@ function coverUrl(cover: string) {
   return `https://books.google.com/books/content?id=${cover}&printsec=frontcover&img=1&zoom=1`;
 }
 
-/* ─── Page ────────────────────────────────────────────────────────────────── */
-
 export default async function EnergyBooksPage() {
   const countryCode = await getCountryCode();
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-4xl mx-auto space-y-6">
-
-          {/* Hero */}
           <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369] overflow-hidden">
-            <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#D2E369' }}>
+            <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: "#D2E369" }}>
               <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">Renewable Energy Books</h1>
               <div className="flex items-center gap-2 mt-3">
                 <BookOpen className="h-5 w-5 text-[#2C5263]/80" />
@@ -183,7 +178,6 @@ export default async function EnergyBooksPage() {
             </div>
           </div>
 
-          {/* Books grid */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-6">Recommended Books</h2>
             <div className="grid gap-5">
@@ -224,7 +218,6 @@ export default async function EnergyBooksPage() {
             </p>
           </section>
 
-          {/* Explore data */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-4">Explore Our Energy Data</h2>
             <p className="text-sm text-gray-400 mb-4">See the data behind the books with our interactive dashboards:</p>
@@ -249,7 +242,6 @@ export default async function EnergyBooksPage() {
               ))}
             </div>
           </section>
-
         </div>
       </div>
     </main>
