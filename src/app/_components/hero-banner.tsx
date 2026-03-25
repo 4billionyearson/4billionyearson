@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const TOPICS = [
   { fullLabel: "Artificial Intelligence", color: "#88DDFC" },
@@ -29,62 +30,61 @@ export default function HeroBanner() {
         transition: "opacity 0.7s ease, transform 0.7s ease",
       }}
     >
-      {/* Dark backdrop card so text reads over the header stripes */}
+      {/* Dark backdrop card */}
       <div className="relative rounded-2xl bg-black/55 backdrop-blur-sm border border-white/8 px-5 py-7 md:px-10 md:py-10 max-w-4xl mx-auto">
 
-      {/* 4-colour accent bar */}
-      <div className="flex h-[4px] rounded-full overflow-hidden mx-auto mb-6 md:mb-8 w-40 md:w-64">
-        {TOPICS.map((t) => (
-          <div key={t.fullLabel} className="flex-1" style={{ backgroundColor: t.color }} />
-        ))}
-      </div>
+        {/* Site logo centred at top */}
+        <div className="flex justify-center mb-5 md:mb-6">
+          <Image
+            src="/logo.png"
+            alt="4 Billion Years On"
+            width={64}
+            height={64}
+            className="opacity-90"
+            priority
+          />
+        </div>
 
-      {/* Headline */}
-      <h1 className="font-mono font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] text-[#FFF5E7] leading-tight mb-4 md:mb-5 max-w-3xl mx-auto">
-        A living dashboard for the forces reshaping the world.
-      </h1>
+        {/* Headline */}
+        <h1 className="font-mono font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] text-[#FFF5E7] leading-tight mb-4 md:mb-5 max-w-3xl mx-auto">
+          A living dashboard for the forces reshaping the world.
+        </h1>
 
-      {/* Coloured topic description */}
-      <p className="text-sm md:text-base text-[#FFF5E7]/80 font-mono max-w-2xl mx-auto mb-6 md:mb-8 leading-relaxed">
-        Tracking{" "}
-        <span className="font-semibold" style={{ color: "#88DDFC" }}>Artificial Intelligence</span>
-        {", "}
-        <span className="font-semibold" style={{ color: "#D0A65E" }}>Climate Change</span>
-        {", "}
-        <span className="font-semibold" style={{ color: "#D2E369" }}>Renewable Energy</span>
-        {" & "}
-        <span className="font-semibold" style={{ color: "#FFF5E7" }}>Biotechnology</span>
-        {" — interactive data, plain-English explainers & sourced articles."}
-      </p>
+        {/* Coloured topic description */}
+        <p className="text-sm md:text-base text-[#FFF5E7]/80 font-mono max-w-2xl mx-auto mb-6 md:mb-8 leading-relaxed">
+          Tracking{" "}
+          <span className="font-semibold" style={{ color: "#88DDFC" }}>Artificial Intelligence</span>
+          {", "}
+          <span className="font-semibold" style={{ color: "#D0A65E" }}>Climate Change</span>
+          {", "}
+          <span className="font-semibold" style={{ color: "#D2E369" }}>Renewable Energy</span>
+          {" & "}
+          <span className="font-semibold" style={{ color: "#FFF5E7" }}>Biotechnology</span>
+          {" — interactive data, plain-English explainers & sourced articles."}
+        </p>
 
-      {/* Stat pills */}
-      <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-6 md:mb-8">
-        {STATS.map((s) => (
-          <div
-            key={s.label}
-            className="flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg bg-gray-950/90 border border-gray-700"
-          >
-            <span
-              className="font-mono font-bold text-sm md:text-base leading-none"
-              style={{ color: s.color }}
+        {/* Stat pills */}
+        <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+          {STATS.map((s) => (
+            <div
+              key={s.label}
+              className="flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg bg-gray-950/90 border border-gray-700"
             >
-              {s.value}
-            </span>
-            <span className="text-[10px] md:text-xs text-[#FFF5E7]/65 font-mono tracking-wide uppercase leading-none">
-              {s.label}
-            </span>
-          </div>
-        ))}
-      </div>
+              <span
+                className="font-mono font-bold text-sm md:text-base leading-none"
+                style={{ color: s.color }}
+              >
+                {s.value}
+              </span>
+              <span className="text-[10px] md:text-xs text-[#FFF5E7]/65 font-mono tracking-wide uppercase leading-none">
+                {s.label}
+              </span>
+            </div>
+          ))}
+        </div>
 
-      {/* Bottom divider — 4 brand colours */}
-      <div className="flex h-[3px] rounded-full overflow-hidden opacity-40 max-w-xs mx-auto">
-        {TOPICS.map((t) => (
-          <div key={t.fullLabel} className="flex-1" style={{ backgroundColor: t.color }} />
-        ))}
       </div>
-
-      </div>{/* end backdrop card */}
     </section>
   );
 }
+
