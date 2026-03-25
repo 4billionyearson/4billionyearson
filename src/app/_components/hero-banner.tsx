@@ -29,20 +29,23 @@ export default function HeroBanner() {
         transition: "opacity 0.7s ease, transform 0.7s ease",
       }}
     >
+      {/* Dark backdrop card so text reads over the header stripes */}
+      <div className="relative rounded-2xl bg-black/55 backdrop-blur-sm border border-white/8 px-5 py-7 md:px-10 md:py-10 max-w-4xl mx-auto">
+
       {/* 4-colour accent bar */}
-      <div className="flex h-[3px] rounded-full overflow-hidden mx-auto mb-6 md:mb-8 w-32 md:w-48">
+      <div className="flex h-[4px] rounded-full overflow-hidden mx-auto mb-6 md:mb-8 w-40 md:w-64">
         {TOPICS.map((t) => (
           <div key={t.fullLabel} className="flex-1" style={{ backgroundColor: t.color }} />
         ))}
       </div>
 
       {/* Headline */}
-      <h1 className="font-mono font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] text-[#FFF5E7] leading-tight text-outline mb-4 md:mb-5 max-w-3xl mx-auto">
+      <h1 className="font-mono font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] text-[#FFF5E7] leading-tight mb-4 md:mb-5 max-w-3xl mx-auto">
         A living dashboard for the forces reshaping the world.
       </h1>
 
       {/* Coloured topic description */}
-      <p className="text-sm md:text-base text-[#FFF5E7]/55 font-mono max-w-2xl mx-auto mb-6 md:mb-8 leading-relaxed">
+      <p className="text-sm md:text-base text-[#FFF5E7]/80 font-mono max-w-2xl mx-auto mb-6 md:mb-8 leading-relaxed">
         Tracking{" "}
         <span className="font-semibold" style={{ color: "#88DDFC" }}>Artificial Intelligence</span>
         {", "}
@@ -59,7 +62,7 @@ export default function HeroBanner() {
         {STATS.map((s) => (
           <div
             key={s.label}
-            className="flex items-center gap-2 px-3 md:px-4 py-1.5 rounded-lg bg-gray-950/80 border border-gray-800"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg bg-gray-950/90 border border-gray-700"
           >
             <span
               className="font-mono font-bold text-sm md:text-base leading-none"
@@ -67,7 +70,7 @@ export default function HeroBanner() {
             >
               {s.value}
             </span>
-            <span className="text-[10px] md:text-xs text-[#FFF5E7]/40 font-mono tracking-wide uppercase leading-none">
+            <span className="text-[10px] md:text-xs text-[#FFF5E7]/65 font-mono tracking-wide uppercase leading-none">
               {s.label}
             </span>
           </div>
@@ -75,11 +78,13 @@ export default function HeroBanner() {
       </div>
 
       {/* Bottom divider — 4 brand colours */}
-      <div className="flex h-px opacity-20 max-w-lg mx-auto">
+      <div className="flex h-[3px] rounded-full overflow-hidden opacity-40 max-w-xs mx-auto">
         {TOPICS.map((t) => (
           <div key={t.fullLabel} className="flex-1" style={{ backgroundColor: t.color }} />
         ))}
       </div>
+
+      </div>{/* end backdrop card */}
     </section>
   );
 }
