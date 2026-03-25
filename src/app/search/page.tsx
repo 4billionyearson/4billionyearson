@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Container from "@/app/_components/container";
 import { MoreStories } from "@/app/_components/more-stories";
 import { searchPosts } from "@/lib/api";
+
+export const metadata: Metadata = {
+  title: "Search",
+  robots: { index: false, follow: true },
+};
 
 type Props = {
   searchParams: Promise<{ q?: string }>;

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
     description:
       "Live global rankings for renewable energy production, solar, wind, cleanest electricity grids, and fossil-fuel dependency – updated monthly.",
     type: "website",
+    images: [{ url: "https://4billionyearson.org/graphic-renewables.png", width: 1200, height: 630, alt: "Global energy rankings" }],
   },
 };
 

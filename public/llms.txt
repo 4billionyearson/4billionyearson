@@ -1,21 +1,24 @@
 # 4 Billion Years On
 
-> Interactive data dashboards, visualisations and in-depth articles on climate change, renewable energy, artificial intelligence and biotechnology.
+> A living dashboard for the forces reshaping the world — tracking climate change, renewable energy, artificial intelligence and biotechnology with interactive data visualisations, plain-English explainers, and sourced articles, updated monthly.
 
 ## About
 
-4 Billion Years On is a science and technology platform that presents complex data in clear, interactive formats. The site is designed for students, researchers, journalists, educators, policymakers and anyone seeking sourced, visual data on the biggest challenges facing humanity.
+4 Billion Years On is a data journalism platform covering four civilisation-scale shifts: climate change, renewable energy, artificial intelligence and biotechnology. It presents complex data in clear, interactive formats for students, researchers, journalists, educators, policymakers and anyone seeking sourced, visual data on the biggest challenges facing humanity.
+
+The site's four topic hubs each combine a live data dashboard (updated monthly or annually), a plain-English explainer, curated book recommendations, and a blog category — all in one place.
 
 ## What the site covers
 
-- **Climate Change**: Global temperature trends, CO₂ concentrations, greenhouse gas emissions by country, climate projections and historical data
-- **Emissions**: Country-by-country emissions data, per-capita comparisons, sector breakdowns and trend analysis
-- **Renewable Energy**: Energy mix by country, renewable capacity, generation data, cost trends and energy transition progress
-- **Sea Levels & Ice**: Sea level rise data, Arctic and Antarctic ice extent, glacier retreat and ocean warming
-- **Extreme Weather**: Wildfire, hurricane, flood and heatwave data with historical comparisons
-- **Planetary Boundaries**: Status of the nine planetary boundaries including biodiversity, nitrogen cycle, ocean acidification
-- **Artificial Intelligence**: AI industry data, compute trends, model capabilities, energy use and societal impact
-- **Biotechnology**: Gene editing, CRISPR developments, synthetic biology and medical breakthroughs
+- **Climate Change** (monthly): Global temperature trends, CO₂ concentrations, greenhouse gas emissions by country, climate projections and historical data
+- **CO₂ Emissions** (annual): Country-by-country emissions data, per-capita comparisons, sector breakdowns and trend analysis
+- **Renewable Energy** (annual): Energy mix by country, renewable capacity, generation data, cost trends and energy transition progress
+- **Sea Levels & Ice** (monthly): Sea level rise data, Arctic and Antarctic ice extent, glacier retreat and ocean warming
+- **Extreme Weather** (live + historical): Wildfire, hurricane, flood and heatwave data with historical comparisons from 1960
+- **Planetary Boundaries** (monthly): Status of the nine planetary boundaries including biodiversity, nitrogen cycle, ocean acidification
+- **Greenhouse Gases** (monthly): Atmospheric CO₂, methane and N₂O levels with 800,000-year ice core records
+- **Artificial Intelligence** (monthly): AI industry data, compute trends, model capabilities, energy use and societal impact
+- **Biotechnology** (annual): Gene editing, CRISPR developments, synthetic biology and medical breakthroughs
 
 ## Who finds this site useful
 
