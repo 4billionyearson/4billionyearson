@@ -50,7 +50,6 @@ const SECTIONS: Section[] = [
     links: [
       { href: "/energy", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
       { href: "/energy-rankings", label: "Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
-      { href: "/energy-models", label: "Energy Models", icon: <Zap className="h-4 w-4" />, desc: "Interactive decarbonisation models" },
       { href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
       { href: "/category/renewable-energy", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "renewable-energy", desc: "Latest articles" },
     ],

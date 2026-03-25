@@ -16,7 +16,6 @@
 - **Planetary Boundaries**: Status of the nine planetary boundaries including biodiversity, nitrogen cycle, ocean acidification
 - **Artificial Intelligence**: AI industry data, compute trends, model capabilities, energy use and societal impact
 - **Biotechnology**: Gene editing, CRISPR developments, synthetic biology and medical breakthroughs
-- **Energy Models**: Interactive decarbonisation models comparing batteries, heat pumps, EVs and renewables
 
 ## Who finds this site useful
 
@@ -41,7 +40,6 @@
 - Planetary Boundaries: https://4billionyearson.org/planetary-boundaries
 - AI Dashboard: https://4billionyearson.org/ai-dashboard
 - Biotech Dashboard: https://4billionyearson.org/biotech-dashboard
-- Energy Models: https://4billionyearson.org/energy-models
 
 ## Explainer pages
 
