@@ -28,21 +28,51 @@ interface Book {
 
 const BOOKS: Book[] = [
   {
+    title: "Breathless",
+    author: "David Quammen",
+    year: 2024,
+    asin: "1982172975",
+    cover: "",
+    rating: "4.4",
+    description:
+      "National Geographic writer David Quammen delivers the definitive account of how COVID-19 emerged and spread. Combining virology, genomics, and investigative journalism, he traces the origins of SARS-CoV-2 and what it reveals about future pandemics.",
+  },
+  {
+    title: "The Song of the Cell",
+    author: "Siddhartha Mukherjee",
+    year: 2022,
+    asin: "1982117354",
+    cover: "",
+    rating: "4.5",
+    description:
+      "From the author of The Gene and The Emperor of All Maladies. Mukherjee tells the story of the cell \u2013 the basic unit of life \u2013 and how cell therapy is revolutionising medicine, from cancer treatment to organ regeneration.",
+  },
+  {
+    title: "The Vaccine",
+    author: "Joe Miller, U\u011fur \u015eahin & \u00d6zlem T\u00fcreci",
+    year: 2022,
+    asin: "1250280397",
+    cover: "",
+    rating: "4.5",
+    description:
+      "The inside story of how BioNTech created the first mRNA COVID-19 vaccine in record time. A gripping account of scientific ingenuity, personal sacrifice, and the decades of research that made the impossible possible.",
+  },
+  {
     title: "The Code Breaker",
     author: "Walter Isaacson",
     year: 2021,
     asin: "1982115866",
-    cover: "https://m.media-amazon.com/images/I/91LIbzl6uvL._SY522_.jpg",
+    cover: "",
     rating: "4.6",
     description:
-      "The riveting story of Nobel Prize winner Jennifer Doudna and the invention of CRISPR gene editing. Walter Isaacson follows the race to harness the most significant biological tool since the double helix – from lab bench to pandemic response.",
+      "The riveting story of Nobel Prize winner Jennifer Doudna and the invention of CRISPR gene editing. Walter Isaacson follows the race to harness the most significant biological tool since the double helix \u2013 from lab bench to pandemic response.",
   },
   {
     title: "A Crack in Creation",
     author: "Jennifer A. Doudna & Samuel H. Sternberg",
     year: 2017,
     asin: "1328915360",
-    cover: "https://m.media-amazon.com/images/I/81a5EVIR3AL._SY522_.jpg",
+    cover: "",
     rating: "4.5",
     description:
       "Written by the co-inventor of CRISPR herself, this is the definitive account of how gene editing works, the ethical dilemmas it raises, and why it will change medicine, agriculture, and the fabric of life itself.",
@@ -52,60 +82,40 @@ const BOOKS: Book[] = [
     author: "Siddhartha Mukherjee",
     year: 2016,
     asin: "0099584573",
-    cover: "https://m.media-amazon.com/images/I/91RRnkz+a0L._SY522_.jpg",
+    cover: "",
     rating: "4.6",
     description:
-      "Pulitzer Prize–winning author Mukherjee tells the epic story of the gene – from Mendel's garden to CRISPR. Part history, part science, part personal narrative, it explores how genetics has shaped identity, disease, and destiny.",
+      "Pulitzer Prize\u2013winning author Mukherjee tells the epic story of the gene \u2013 from Mendel\u2019s garden to CRISPR. Part history, part science, part personal narrative, it explores how genetics has shaped identity, disease, and destiny.",
   },
   {
     title: "Regenesis",
     author: "George Church & Ed Regis",
     year: 2014,
     asin: "0465075703",
-    cover: "https://m.media-amazon.com/images/I/71qOOMx9DhL._SY522_.jpg",
+    cover: "",
     rating: "4.3",
     description:
-      "Harvard geneticist George Church envisions a future where synthetic biology rewrites the living world. From resurrecting the woolly mammoth to engineering virus-resistant humans, this is a mind-expanding tour of what's possible.",
-  },
-  {
-    title: "The Vaccine",
-    author: "Joe Miller, Uğur Şahin & Özlem Türeci",
-    year: 2022,
-    asin: "1250280397",
-    cover: "https://m.media-amazon.com/images/I/81hYmv2PnTL._SY522_.jpg",
-    rating: "4.5",
-    description:
-      "The inside story of how BioNTech created the first mRNA COVID-19 vaccine in record time. A gripping account of scientific ingenuity, personal sacrifice, and the decades of research that made the impossible possible.",
-  },
-  {
-    title: "Genome",
-    author: "Matt Ridley",
-    year: 1999,
-    asin: "0060894083",
-    cover: "https://m.media-amazon.com/images/I/71zy+uZPuTL._SY522_.jpg",
-    rating: "4.4",
-    description:
-      "Ridley takes readers on a tour of the human genome, one chromosome at a time. Each chapter reveals a different gene that illuminates a new aspect of humanity – from disease and intelligence to personality and free will.",
+      "Harvard geneticist George Church envisions a future where synthetic biology rewrites the living world. From resurrecting the woolly mammoth to engineering virus-resistant humans, this is a mind-expanding tour of what\u2019s possible.",
   },
   {
     title: "Life at the Speed of Light",
     author: "J. Craig Venter",
     year: 2013,
     asin: "0143125907",
-    cover: "https://m.media-amazon.com/images/I/81p-B8VtR2L._SY522_.jpg",
+    cover: "",
     rating: "4.2",
     description:
-      "The scientist who sequenced the human genome describes the dawn of synthetic biology – creating life from digital code. Venter explores what it means to design organisms from scratch and the implications for medicine, energy, and food.",
+      "The scientist who sequenced the human genome describes the dawn of synthetic biology \u2013 creating life from digital code. Venter explores what it means to design organisms from scratch and the implications for medicine, energy, and food.",
   },
   {
-    title: "The Song of the Cell",
-    author: "Siddhartha Mukherjee",
-    year: 2022,
-    asin: "1982117354",
-    cover: "https://m.media-amazon.com/images/I/81OqjFD5gJL._SY522_.jpg",
-    rating: "4.5",
+    title: "Genome",
+    author: "Matt Ridley",
+    year: 1999,
+    asin: "0060894083",
+    cover: "",
+    rating: "4.4",
     description:
-      "From the author of The Gene and The Emperor of All Maladies. Mukherjee tells the story of the cell – the basic unit of life – and how cell therapy is revolutionising medicine, from cancer treatment to organ regeneration.",
+      "Ridley takes readers on a tour of the human genome, one chromosome at a time. Each chapter reveals a different gene that illuminates a new aspect of humanity \u2013 from disease and intelligence to personality and free will.",
   },
 ];
 

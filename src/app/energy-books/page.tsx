@@ -28,21 +28,51 @@ interface Book {
 
 const BOOKS: Book[] = [
   {
+    title: "The Price Is Wrong",
+    author: "Brett Christophers",
+    year: 2024,
+    asin: "1804290785",
+    cover: "",
+    rating: "4.5",
+    description:
+      "Why has renewable energy not displaced fossil fuels faster? Christophers argues the answer lies in economics \u2013 green energy is not as cheap as headlines suggest, and markets alone won\u2019t deliver the transition without bold policy intervention.",
+  },
+  {
+    title: "Volt Rush",
+    author: "Henry Sanderson",
+    year: 2023,
+    asin: "0861544692",
+    cover: "",
+    rating: "4.4",
+    description:
+      "The electrification of everything requires vast quantities of lithium, cobalt, nickel, and rare earths. Financial Times journalist Sanderson investigates the geopolitics and human cost of the battery supply chain powering the clean energy revolution.",
+  },
+  {
     title: "How the World Really Works",
     author: "Vaclav Smil",
     year: 2022,
     asin: "0241454409",
-    cover: "https://m.media-amazon.com/images/I/71rBMXCZBBL._SY522_.jpg",
+    cover: "",
     rating: "4.5",
     description:
-      "Bill Gates's favourite author explains the fundamental realities of energy, food production, materials, and the environment. Smil cuts through the noise with hard data, showing what it will truly take to transition away from fossil fuels.",
+      "Bill Gates\u2019s favourite author explains the fundamental realities of energy, food production, materials, and the environment. Smil cuts through the noise with hard data, showing what it will truly take to transition away from fossil fuels.",
+  },
+  {
+    title: "Electrify",
+    author: "Saul Griffith",
+    year: 2021,
+    asin: "0262046237",
+    cover: "",
+    rating: "4.5",
+    description:
+      "Engineer and inventor Saul Griffith presents an optimistic, detailed plan for decarbonising everything through electrification. From heat pumps to EVs, he shows how existing technology can solve climate change \u2013 if deployed at scale.",
   },
   {
     title: "The New Map",
     author: "Daniel Yergin",
     year: 2020,
     asin: "0141994886",
-    cover: "https://m.media-amazon.com/images/I/81-h9CzaI+L._SY522_.jpg",
+    cover: "",
     rating: "4.5",
     description:
       "Pulitzer Prize winner Daniel Yergin charts how the energy revolution, climate politics, and geopolitical rivalries are reshaping the world map. Essential reading for understanding the intersection of energy, power, and global politics.",
@@ -52,40 +82,10 @@ const BOOKS: Book[] = [
     author: "Ross Garnaut",
     year: 2019,
     asin: "1760875651",
-    cover: "https://m.media-amazon.com/images/I/714q1JHxQhL._SY522_.jpg",
+    cover: "",
     rating: "4.4",
     description:
       "Garnaut argues that countries rich in sun, wind, and land could become the energy superpowers of the 21st century. A compelling case for how the renewable energy transition creates enormous economic opportunity.",
-  },
-  {
-    title: "Electrify",
-    author: "Saul Griffith",
-    year: 2021,
-    asin: "0262046237",
-    cover: "https://m.media-amazon.com/images/I/71EfrEQa+JL._SY522_.jpg",
-    rating: "4.5",
-    description:
-      "Engineer and inventor Saul Griffith presents an optimistic, detailed plan for decarbonising everything through electrification. From heat pumps to EVs, he shows how existing technology can solve climate change – if deployed at scale.",
-  },
-  {
-    title: "Sustainable Energy – Without the Hot Air",
-    author: "David JC MacKay",
-    year: 2009,
-    asin: "0954452933",
-    cover: "https://m.media-amazon.com/images/I/71q+rMWLzjL._SY522_.jpg",
-    rating: "4.6",
-    description:
-      "A cult classic among energy wonks. Professor MacKay uses back-of-the-envelope calculations to show exactly how much energy Britain uses and how renewables could (or couldn't) replace fossil fuels. Rigorous, witty, and endlessly cited.",
-  },
-  {
-    title: "The Grid",
-    author: "Gretchen Bakke",
-    year: 2016,
-    asin: "1632863324",
-    cover: "https://m.media-amazon.com/images/I/81bk6uf+WlL._SY522_.jpg",
-    rating: "4.3",
-    description:
-      "Named one of Bill Gates's favourite reads. Bakke tells the fascinating story of the electrical grid – the most complex machine ever built – and explains why modernising it is essential for the renewable energy transition.",
   },
   {
     title: "Drawdown",
@@ -102,10 +102,50 @@ const BOOKS: Book[] = [
     author: "Vaclav Smil",
     year: 2017,
     asin: "0262536161",
-    cover: "https://m.media-amazon.com/images/I/81fFqBzBjCL._SY522_.jpg",
+    cover: "",
     rating: "4.4",
     description:
-      "A sweeping history of how energy has shaped human civilisation, from biomass and muscle power to fossil fuels and renewables. Smil provides the deep context needed to understand today's energy transition in historical perspective.",
+      "A sweeping history of how energy has shaped human civilisation, from biomass and muscle power to fossil fuels and renewables. Smil provides the deep context needed to understand today\u2019s energy transition in historical perspective.",
+  },
+  {
+    title: "The Grid",
+    author: "Gretchen Bakke",
+    year: 2016,
+    asin: "1632863324",
+    cover: "",
+    rating: "4.3",
+    description:
+      "Named one of Bill Gates\u2019s favourite reads. Bakke tells the fascinating story of the electrical grid \u2013 the most complex machine ever built \u2013 and explains why modernising it is essential for the renewable energy transition.",
+  },
+  {
+    title: "The Switch",
+    author: "Chris Goodall",
+    year: 2016,
+    asin: "1781255245",
+    cover: "",
+    rating: "4.3",
+    description:
+      "Goodall makes the case that solar photovoltaics will become the world\u2019s dominant energy source. He explains how plummeting costs, improving storage, and clever grid management are making a solar-powered civilisation inevitable.",
+  },
+  {
+    title: "Windfall",
+    author: "McKenzie Funk",
+    year: 2014,
+    asin: "0143126598",
+    cover: "",
+    rating: "4.2",
+    description:
+      "A global investigation into who stands to profit from climate change. Funk travels from Greenland to Israel to explore how entrepreneurs, nations, and militaries are turning rising seas, melting ice, and drought into business opportunities.",
+  },
+  {
+    title: "Sustainable Energy \u2013 Without the Hot Air",
+    author: "David JC MacKay",
+    year: 2009,
+    asin: "0954452933",
+    cover: "",
+    rating: "4.6",
+    description:
+      "A cult classic among energy wonks. Professor MacKay uses back-of-the-envelope calculations to show exactly how much energy Britain uses and how renewables could (or couldn\u2019t) replace fossil fuels. Rigorous, witty, and endlessly cited.",
   },
 ];
 

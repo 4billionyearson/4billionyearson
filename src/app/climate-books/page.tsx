@@ -28,21 +28,31 @@ interface Book {
 
 const BOOKS: Book[] = [
   {
-    title: "The Uninhabitable Earth",
-    author: "David Wallace-Wells",
-    year: 2019,
-    asin: "0525576711",
-    cover: "https://m.media-amazon.com/images/I/81d+VbfTXEL._SY522_.jpg",
+    title: "Not the End of the World",
+    author: "Hannah Ritchie",
+    year: 2024,
+    asin: "0593492544",
+    cover: "",
     rating: "4.5",
     description:
-      "A vivid, terrifying account of what life on Earth could look like if we fail to act on climate change. Wallace-Wells explores cascading consequences from heat death to economic collapse, drawing on the latest research to paint a picture that is both a warning and a call to action.",
+      "Our World in Data lead researcher Hannah Ritchie makes a data-driven case for optimism. She shows that on many environmental measures – deforestation, air pollution, ozone – things are getting better, while laying out what still needs to change on climate.",
+  },
+  {
+    title: "The Parrot and the Igloo",
+    author: "David Lipsky",
+    year: 2023,
+    asin: "0393866742",
+    cover: "",
+    rating: "4.6",
+    description:
+      "A sweeping, darkly funny history of climate denial in America. Lipsky traces how the science of global warming was understood for over a century – and how industries, politicians, and media conspired to make the public doubt what scientists knew.",
   },
   {
     title: "How to Avoid a Climate Disaster",
     author: "Bill Gates",
     year: 2021,
     asin: "0593215776",
-    cover: "https://m.media-amazon.com/images/I/71HOSsR-e5L._SY522_.jpg",
+    cover: "",
     rating: "4.5",
     description:
       "Bill Gates outlines a practical plan for reaching zero greenhouse gas emissions. Covering energy production, manufacturing, agriculture, and transport, he explains the technology breakthroughs we need and the steps governments, businesses, and individuals can take.",
@@ -52,7 +62,7 @@ const BOOKS: Book[] = [
     author: "Michael E. Mann",
     year: 2021,
     asin: "1541758234",
-    cover: "https://m.media-amazon.com/images/I/81IhCcLdkKL._SY522_.jpg",
+    cover: "",
     rating: "4.5",
     description:
       "Leading climate scientist Michael Mann exposes how fossil fuel interests have shifted from outright denial to more insidious tactics – deflection, division, and delay. He charts a path forward for collective action against the climate crisis.",
@@ -62,50 +72,60 @@ const BOOKS: Book[] = [
     author: "Elizabeth Kolbert",
     year: 2021,
     asin: "0593136276",
-    cover: "https://m.media-amazon.com/images/I/81j0TtAGjEL._SY522_.jpg",
+    cover: "",
     rating: "4.3",
     description:
       "The Pulitzer Prize–winning author of The Sixth Extinction investigates whether humanity can solve the environmental problems it has created. Kolbert travels the world examining radical interventions – gene drives, carbon capture, and solar geoengineering.",
-  },
-  {
-    title: "The Sixth Extinction",
-    author: "Elizabeth Kolbert",
-    year: 2014,
-    asin: "1250062187",
-    cover: "https://m.media-amazon.com/images/I/91xaE+ThATL._SY522_.jpg",
-    rating: "4.5",
-    description:
-      "Winner of the Pulitzer Prize. Kolbert draws on the work of geologists, marine biologists, and botanists to tell the story of Earth's five previous mass extinctions – and makes the case that human activity is driving a sixth one right now.",
-  },
-  {
-    title: "This Changes Everything",
-    author: "Naomi Klein",
-    year: 2014,
-    asin: "1451697392",
-    cover: "https://m.media-amazon.com/images/I/71VRCb+MdHL._SY522_.jpg",
-    rating: "4.4",
-    description:
-      "Klein argues that climate change is not just another issue – it is a civilisational wake-up call that demands we overhaul our economic system. A landmark work connecting environmentalism with social justice and economic reform.",
   },
   {
     title: "The Ministry for the Future",
     author: "Kim Stanley Robinson",
     year: 2020,
     asin: "0316300136",
-    cover: "https://m.media-amazon.com/images/I/81s-cGi+P1L._SY522_.jpg",
+    cover: "",
     rating: "4.1",
     description:
       "A gripping near-future novel set in a world ravaged by climate change. Robinson imagines a UN body tasked with advocating for future generations, weaving together politics, science, economics, and human drama into a visionary blueprint for survival.",
+  },
+  {
+    title: "The Uninhabitable Earth",
+    author: "David Wallace-Wells",
+    year: 2019,
+    asin: "0525576711",
+    cover: "",
+    rating: "4.5",
+    description:
+      "A vivid, terrifying account of what life on Earth could look like if we fail to act on climate change. Wallace-Wells explores cascading consequences from heat death to economic collapse, drawing on the latest research to paint a picture that is both a warning and a call to action.",
   },
   {
     title: "Losing Earth",
     author: "Nathaniel Rich",
     year: 2019,
     asin: "1250234271",
-    cover: "https://m.media-amazon.com/images/I/71+7GfpxRqL._SY522_.jpg",
+    cover: "",
     rating: "4.3",
     description:
       "The devastating story of the decade (1979–1989) when humanity had the chance to solve climate change – and failed. Rich reveals how close we came to a solution, and how political and industrial forces derailed the effort.",
+  },
+  {
+    title: "The Sixth Extinction",
+    author: "Elizabeth Kolbert",
+    year: 2014,
+    asin: "1250062187",
+    cover: "",
+    rating: "4.5",
+    description:
+      "Winner of the Pulitzer Prize. Kolbert draws on the work of geologists, marine biologists, and botanists to tell the story of Earth\u2019s five previous mass extinctions \u2013 and makes the case that human activity is driving a sixth one right now.",
+  },
+  {
+    title: "This Changes Everything",
+    author: "Naomi Klein",
+    year: 2014,
+    asin: "1451697392",
+    cover: "",
+    rating: "4.4",
+    description:
+      "Klein argues that climate change is not just another issue \u2013 it is a civilisational wake-up call that demands we overhaul our economic system. A landmark work connecting environmentalism with social justice and economic reform.",
   },
 ];
 

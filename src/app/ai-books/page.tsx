@@ -28,71 +28,51 @@ interface Book {
 
 const BOOKS: Book[] = [
   {
-    title: "Life 3.0",
-    author: "Max Tegmark",
-    year: 2017,
-    asin: "0141981806",
-    cover: "https://m.media-amazon.com/images/I/71cAPgsizBL._SY522_.jpg",
+    title: "Co-Intelligence",
+    author: "Ethan Mollick",
+    year: 2024,
+    asin: "0593716868",
+    cover: "",
     rating: "4.5",
     description:
-      "MIT physicist Max Tegmark explores what it means to be human in the age of artificial intelligence. From near-term job automation to far-future superintelligence, he examines the choices we must make to ensure AI benefits humanity.",
+      "Wharton professor Ethan Mollick draws on his research and hands-on experience to offer a practical guide to living and working with AI. He explores how large language models are already transforming education, creativity, and business.",
   },
   {
-    title: "The Alignment Problem",
-    author: "Brian Christian",
-    year: 2020,
-    asin: "0393868338",
-    cover: "https://m.media-amazon.com/images/I/81eTfRxv+2L._SY522_.jpg",
-    rating: "4.5",
-    description:
-      "A masterful exploration of the fundamental challenge in AI: how do we ensure machine learning systems do what we actually want? Christian weaves together computer science, philosophy, and psychology in this essential read on AI safety.",
-  },
-  {
-    title: "AI 2041",
-    author: "Kai-Fu Lee & Chen Qiufan",
-    year: 2021,
-    asin: "0593238532",
-    cover: "https://m.media-amazon.com/images/I/81fOHLFP4KL._SY522_.jpg",
+    title: "Nexus",
+    author: "Yuval Noah Harari",
+    year: 2024,
+    asin: "1911717081",
+    cover: "",
     rating: "4.4",
     description:
-      "A unique blend of science fiction and expert analysis. Former Google China president Kai-Fu Lee teams with sci-fi writer Chen Qiufan to imagine ten visions of how AI will transform the world over the next twenty years.",
-  },
-  {
-    title: "Superintelligence",
-    author: "Nick Bostrom",
-    year: 2014,
-    asin: "0198739834",
-    cover: "https://m.media-amazon.com/images/I/71skQXPfbkL._SY522_.jpg",
-    rating: "4.2",
-    description:
-      "The book that sparked global conversation about existential risk from AI. Oxford philosopher Nick Bostrom lays out the scenarios in which superhuman machine intelligence could emerge and the existential challenge of controlling it.",
-  },
-  {
-    title: "Human Compatible",
-    author: "Stuart Russell",
-    year: 2019,
-    asin: "0525558632",
-    cover: "https://m.media-amazon.com/images/I/71aTDWYb+1L._SY522_.jpg",
-    rating: "4.4",
-    description:
-      "Leading AI researcher Stuart Russell argues that the standard model of AI – optimising a fixed objective – is fundamentally flawed. He proposes a new framework for creating beneficial AI that defers to human preferences.",
+      "The bestselling historian examines how information networks – from ancient myths to modern AI – have shaped civilisation. Harari warns that artificial intelligence represents a fundamentally new kind of information agent that could reshape society.",
   },
   {
     title: "The Coming Wave",
     author: "Mustafa Suleyman",
     year: 2023,
     asin: "1847927483",
-    cover: "https://m.media-amazon.com/images/I/71MWG-QxPUL._SY522_.jpg",
+    cover: "",
     rating: "4.4",
     description:
       "DeepMind co-founder Mustafa Suleyman warns that AI and synthetic biology represent a wave of technology that will be impossible to contain. He outlines the dilemma of unstoppable technology and the urgent need for containment strategies.",
+  },
+  {
+    title: "AI 2041",
+    author: "Kai-Fu Lee & Chen Qiufan",
+    year: 2021,
+    asin: "0593238532",
+    cover: "",
+    rating: "4.4",
+    description:
+      "A unique blend of science fiction and expert analysis. Former Google China president Kai-Fu Lee teams with sci-fi writer Chen Qiufan to imagine ten visions of how AI will transform the world over the next twenty years.",
   },
   {
     title: "Atlas of AI",
     author: "Kate Crawford",
     year: 2021,
     asin: "0300264631",
-    cover: "https://m.media-amazon.com/images/I/71sLCX5I+KL._SY522_.jpg",
+    cover: "",
     rating: "4.4",
     description:
       "Kate Crawford reveals AI as a technology of extraction – from the minerals mined to build hardware to the labour exploited to train models. A powerful investigation into the environmental and social costs of artificial intelligence.",
@@ -102,10 +82,50 @@ const BOOKS: Book[] = [
     author: "Cade Metz",
     year: 2021,
     asin: "1524742678",
-    cover: "https://m.media-amazon.com/images/I/81x2gOXvVAL._SY522_.jpg",
+    cover: "",
     rating: "4.5",
     description:
       "New York Times reporter Cade Metz tells the story of the brilliant, eccentric researchers behind the deep learning revolution. From Geoffrey Hinton to Demis Hassabis, this is the definitive account of how modern AI was built.",
+  },
+  {
+    title: "The Alignment Problem",
+    author: "Brian Christian",
+    year: 2020,
+    asin: "0393868338",
+    cover: "",
+    rating: "4.5",
+    description:
+      "A masterful exploration of the fundamental challenge in AI: how do we ensure machine learning systems do what we actually want? Christian weaves together computer science, philosophy, and psychology in this essential read on AI safety.",
+  },
+  {
+    title: "Human Compatible",
+    author: "Stuart Russell",
+    year: 2019,
+    asin: "0525558632",
+    cover: "",
+    rating: "4.4",
+    description:
+      "Leading AI researcher Stuart Russell argues that the standard model of AI – optimising a fixed objective – is fundamentally flawed. He proposes a new framework for creating beneficial AI that defers to human preferences.",
+  },
+  {
+    title: "Life 3.0",
+    author: "Max Tegmark",
+    year: 2017,
+    asin: "0141981806",
+    cover: "",
+    rating: "4.5",
+    description:
+      "MIT physicist Max Tegmark explores what it means to be human in the age of artificial intelligence. From near-term job automation to far-future superintelligence, he examines the choices we must make to ensure AI benefits humanity.",
+  },
+  {
+    title: "Superintelligence",
+    author: "Nick Bostrom",
+    year: 2014,
+    asin: "0198739834",
+    cover: "",
+    rating: "4.2",
+    description:
+      "The book that sparked global conversation about existential risk from AI. Oxford philosopher Nick Bostrom lays out the scenarios in which superhuman machine intelligence could emerge and the existential challenge of controlling it.",
   },
 ];
 
