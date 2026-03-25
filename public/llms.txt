@@ -35,7 +35,7 @@ The site's four topic hubs each combine a live data dashboard (updated monthly o
 
 - Climate Dashboard: https://4billionyearson.org/climate-dashboard
 - Emissions: https://4billionyearson.org/emissions
-- Energy: https://4billionyearson.org/energy
+- Energy: https://4billionyearson.org/energy-dashboard
 - Energy Rankings: https://4billionyearson.org/energy-rankings
 - Greenhouse Gases: https://4billionyearson.org/greenhouse-gases
 - Sea Levels & Ice: https://4billionyearson.org/sea-levels-ice

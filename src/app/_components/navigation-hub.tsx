@@ -49,7 +49,7 @@ const SECTIONS: Section[] = [
     color: "#D2E369",
     icon: <Zap className="h-6 w-6" />,
     links: [
-      { href: "/energy", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
+      { href: "/energy-dashboard", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
       { href: "/energy-rankings", label: "Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
       { href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
       { href: "/energy-books", label: "Books on Energy", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on energy" },
@@ -192,7 +192,7 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
                   <p className="text-sm font-medium text-gray-200 group-hover/link:text-white transition-colors leading-tight">
                     {link.label}
                   </p>
-                  <p className="text-[11px] text-gray-600 group-hover/link:text-gray-500 transition-colors leading-tight mt-0.5">
+                  <p className="text-[11px] text-gray-400 group-hover/link:text-gray-300 transition-colors leading-tight mt-0.5">
                     {link.desc}
                   </p>
                 </div>

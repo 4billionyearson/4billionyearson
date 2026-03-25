@@ -177,7 +177,7 @@ export default function EnergyExplainedPage() {
             <p className="text-sm text-gray-400 mb-4">See these concepts in action with real data on our dashboard pages:</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {[
-                { href: "/energy", label: "Global & Country Energy", color: "text-emerald-400", desc: "Energy mix, renewables, electricity generation" },
+                { href: "/energy-dashboard", label: "Global & Country Energy", color: "text-emerald-400", desc: "Energy mix, renewables, electricity generation" },
                 { href: "/emissions", label: "CO₂ Emissions", color: "text-rose-400", desc: "Country rankings & global trends" },
                 { href: "/climate-dashboard", label: "Climate Dashboard", color: "text-white", desc: "Temperature, CO₂ & weather data" },
                 { href: "/greenhouse-gases", label: "Greenhouse Gases", color: "text-amber-400", desc: "CO₂, methane & N₂O concentrations" },

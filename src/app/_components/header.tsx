@@ -128,7 +128,7 @@ const Header = () => {
             {isRenewablesOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[260px]">
-                <Link href="/energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/energy-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-dashboard' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   Local & Global Energy Data<AnnualBadge />
                 </Link>
                 <Link href="/energy-rankings" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
@@ -324,7 +324,7 @@ const Header = () => {
             </button>
             {mobileRenewablesOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'}`} onClick={closeMenu}>
+                <Link href="/energy-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-dashboard' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'}`} onClick={closeMenu}>
                   Local & Global Energy Data<AnnualBadge />
                 </Link>
                 <Link href="/energy-rankings" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'}`} onClick={closeMenu}>

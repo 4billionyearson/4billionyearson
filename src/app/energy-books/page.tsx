@@ -223,7 +223,7 @@ export default async function EnergyBooksPage() {
             <p className="text-sm text-gray-400 mb-4">See the data behind the books with our interactive dashboards:</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {[
-                { href: "/energy", label: "Global Energy Data", desc: "Energy mix by country & source" },
+                { href: "/energy-dashboard", label: "Global Energy Data", desc: "Energy mix by country & source" },
                 { href: "/energy-rankings", label: "Energy Rankings", desc: "Top producers & consumers" },
                 { href: "/energy-explained", label: "Energy Explained", desc: "Plain-English guide" },
                 { href: "/emissions", label: "CO₂ Emissions", desc: "Country rankings & trends" },

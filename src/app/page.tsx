@@ -1,6 +1,7 @@
 import Container from "@/app/_components/container";
 import { HeroPost } from "@/app/_components/hero-post";
 import { MoreStories } from "@/app/_components/more-stories";
+import HeroBanner from "@/app/_components/hero-banner";
 import NavigationHub from "@/app/_components/navigation-hub";
 import { getAllPosts, getAllCategories } from "@/lib/api";
 import { Newspaper } from "lucide-react";
@@ -15,6 +16,11 @@ export default async function Index() {
 
   return (
     <main>
+      {/* MVP hero banner */}
+      <section className="container mx-auto px-3 md:px-4">
+        <HeroBanner />
+      </section>
+
       {/* Interactive navigation hub */}
       <section className="container mx-auto px-3 md:px-4 pt-2 pb-4 md:pt-4 md:pb-6">
         <NavigationHub />
