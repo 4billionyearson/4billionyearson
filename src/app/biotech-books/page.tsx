@@ -53,7 +53,7 @@ const BOOKS: Book[] = [
     author: "Joe Miller, U\u011fur \u015eahin & \u00d6zlem T\u00fcreci",
     year: 2022,
     asin: "1250280397",
-    cover: "OMKiEAAAQBAJ",
+    cover: "auPgEAAAQBAJ",
     rating: "4.5",
     description:
       "The inside story of how BioNTech created the first mRNA COVID-19 vaccine in record time. A gripping account of scientific ingenuity, personal sacrifice, and the decades of research that made the impossible possible.",
