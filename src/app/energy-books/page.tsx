@@ -149,8 +149,9 @@ const BOOKS: Book[] = [
   },
 ];
 
-function amazonUrl(asin: string) {
-  return `https://www.amazon.co.uk/dp/${asin}?tag=${AFFILIATE_TAG}`;
+function amazonUrl(title: string, author: string) {
+  const q = encodeURIComponent(`${title} ${author}`);
+  return `https://www.amazon.co.uk/s?k=${q}&i=stripbooks&tag=${AFFILIATE_TAG}`;
 }
 
 function coverUrl(gbid: string) {
@@ -188,7 +189,7 @@ export default function EnergyBooksPage() {
               {BOOKS.map((book) => (
                 <a
                   key={book.asin}
-                  href={amazonUrl(book.asin)}
+                  href={amazonUrl(book.title, book.author)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#D2E369]/60 transition-colors group"
