@@ -544,7 +544,7 @@ export default function ClimateDashboard() {
             </h1>
           </div>
           <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-b-2xl">
-          <p className="text-gray-400 text-sm md:text-base mb-4">
+          <p className="text-sm md:text-base mb-4 font-medium" style={{ color: '#D0A65E' }}>
             Search for any country, US state, or UK city/region.
           </p>
 
@@ -552,19 +552,19 @@ export default function ClimateDashboard() {
             <div className="relative w-full">
               <form onSubmit={handleSearch} className="flex gap-2">
                 <div className="relative flex-1">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#D0A65E' }} />
                   <input
                     type="text"
                     value={searchInput}
                     onChange={(e) => handleInputChange(e.target.value)}
                     onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
-                    placeholder="Search..."
-                    className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-700 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    placeholder="Country, US state or UK region…"
+                    className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-[#D0A65E]/50 bg-gray-900/60 text-sm text-white placeholder-[#D0A65E]/60 focus:ring-2 focus:ring-[#D0A65E] focus:border-[#D0A65E] outline-none transition-all"
                     autoComplete="off"
                   />
                 </div>
                 <button type="submit" disabled={loading}
-                  className="bg-blue-600 hover:bg-blue-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center justify-center min-w-[100px] transition-colors">
+                  className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85" style={{ backgroundColor: '#D0A65E', color: '#FFF5E7' }}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
                 </button>
               </form>

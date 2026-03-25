@@ -273,19 +273,19 @@ function LocationSearch({ onSelect, loading, error }: {
     <div className="relative w-full">
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: '#D2E369' }} />
           <input
             type="text"
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
-            placeholder="Search..."
-            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-gray-700 bg-gray-900/50 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+            placeholder="Country or USA state…"
+            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-[#D2E369]/50 bg-gray-900/60 text-sm text-white placeholder-[#D2E369]/60 focus:ring-2 focus:ring-[#D2E369] focus:border-[#D2E369] outline-none transition-all"
             autoComplete="off"
           />
         </div>
         <button type="submit" disabled={loading}
-          className="bg-emerald-600 hover:bg-emerald-700 text-sm text-white px-4 py-1.5 rounded-lg font-medium flex items-center justify-center min-w-[100px] transition-colors">
+          className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85" style={{ backgroundColor: '#D2E369', color: '#2C5263' }}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
         </button>
       </form>
@@ -1399,7 +1399,7 @@ export default function EnergyPage() {
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-b-2xl">
-            <p className="text-gray-400 text-sm md:text-base mb-4">
+            <p className="text-sm md:text-base mb-4 font-medium" style={{ color: '#D2E369' }}>
               Search for any country, or USA state.
             </p>
 
