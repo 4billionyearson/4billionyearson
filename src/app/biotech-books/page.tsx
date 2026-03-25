@@ -1,5 +1,8 @@
 import { Metadata } from "next";
 import { BookOpen, Star, ExternalLink } from "lucide-react";
+import { getCountryCode, amazonUrl } from "@/lib/amazon";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Best Biotechnology Books | 4 Billion Years On",
@@ -13,8 +16,6 @@ export const metadata: Metadata = {
 };
 
 /* ─── Data ────────────────────────────────────────────────────────────────── */
-
-const AFFILIATE_TAG = "idcrnoimamanu-21";
 
 interface Book {
   title: string;
@@ -119,18 +120,14 @@ const BOOKS: Book[] = [
   },
 ];
 
-function amazonUrl(title: string, author: string) {
-  const q = encodeURIComponent(`${title} ${author}`);
-  return `https://www.amazon.co.uk/s?k=${q}&i=stripbooks&tag=${AFFILIATE_TAG}`;
-}
-
 function coverUrl(gbid: string) {
   return `https://books.google.com/books/content?id=${gbid}&printsec=frontcover&img=1&zoom=1`;
 }
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 
-export default function BiotechBooksPage() {
+export default async function BiotechBooksPage() {
+  const countryCode = await getCountryCode();
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -159,7 +156,7 @@ export default function BiotechBooksPage() {
               {BOOKS.map((book) => (
                 <a
                   key={book.asin}
-                  href={amazonUrl(book.title, book.author)}
+                  href={amazonUrl(book.title, book.author, countryCode)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#D26742]/60 transition-colors group"
