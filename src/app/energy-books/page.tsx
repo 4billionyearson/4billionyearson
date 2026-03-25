@@ -218,7 +218,7 @@ export default async function EnergyBooksPage() {
             <p className="text-xs text-gray-500 text-center mt-6 pt-4 border-t border-gray-800/40">
               As an Amazon Associate, I earn from qualifying purchases.
             </p>
-          </section>
+                cover: "dTbbCwAAQBAJ",
 
           {/* Explore data */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
