@@ -43,7 +43,7 @@ export function HeroPost({
             />
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/55 pointer-events-none" />
 
           <div className="relative z-10 p-6 md:p-10 flex flex-col justify-between min-h-[400px] md:min-h-[500px] text-outline">
             <div>
