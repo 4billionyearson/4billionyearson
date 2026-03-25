@@ -24,7 +24,7 @@ export default function HeroBanner() {
       }}
     >
       {/* Dark backdrop card */}
-      <div className="relative rounded-2xl bg-black/55 backdrop-blur-sm border border-white/8 px-5 py-5 md:px-10 md:py-7 max-w-4xl mx-auto">
+      <div className="relative rounded-2xl bg-black/55 backdrop-blur-sm border border-white/8 px-5 py-5 md:px-10 md:py-7">
 
         {/* Site logo centred at top */}
         <div className="flex justify-center mb-4 md:mb-5">
