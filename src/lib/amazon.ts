@@ -1,6 +1,9 @@
 import { headers } from "next/headers";
 
-const AFFILIATE_TAG = "idcrnoimamanu-21";
+const AFFILIATE_TAGS: Record<string, string> = {
+  UK: "idcrnoimamanu-21",
+  US: "4billionyears-20",
+};
 
 /* Map country codes to Amazon domains */
 const AMAZON_DOMAINS: Record<string, string> = {
@@ -26,8 +29,12 @@ const AMAZON_DOMAINS: Record<string, string> = {
   IE: "www.amazon.co.uk", // Ireland → UK store
 };
 
-/* Countries where the UK affiliate tag earns commission */
-const UK_TAG_COUNTRIES = new Set(["GB", "IE"]);
+/* Map country codes to affiliate program */
+const COUNTRY_AFFILIATE: Record<string, string> = {
+  GB: "UK",
+  IE: "UK",
+  US: "US",
+};
 
 /**
  * Detect the visitor's country from Vercel geo headers.
@@ -40,7 +47,7 @@ export async function getCountryCode(): Promise<string> {
 
 /**
  * Build an Amazon search URL for the visitor's local store.
- * Affiliate tag is only appended for UK visitors.
+ * Affiliate tag is appended for UK/IE and US visitors.
  */
 export function amazonUrl(
   title: string,
@@ -49,8 +56,7 @@ export function amazonUrl(
 ): string {
   const domain = AMAZON_DOMAINS[countryCode] ?? "www.amazon.co.uk";
   const q = encodeURIComponent(`${title} ${author}`);
-  const tag = UK_TAG_COUNTRIES.has(countryCode)
-    ? `&tag=${AFFILIATE_TAG}`
-    : "";
+  const program = COUNTRY_AFFILIATE[countryCode];
+  const tag = program ? `&tag=${AFFILIATE_TAGS[program]}` : "";
   return `https://${domain}/s?k=${q}&i=stripbooks${tag}`;
 }
