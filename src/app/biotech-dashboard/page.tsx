@@ -227,6 +227,13 @@ export default function BiotechDashboardPage() {
                     subtext="Registered on ClinicalTrials.gov"
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  Sources:{" "}
+                  <a href="https://www.genome.gov/about-genomics/fact-sheets/Sequencing-Human-Genome-cost" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">NIH NHGRI</a>{" "}
+                  (sequencing cost) ·{" "}
+                  <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">ClinicalTrials.gov</a>{" "}
+                  (CRISPR &amp; gene therapy trials).
+                </p>
               </div>
 
               {/* ═══ GENOMICS & BIOTECHNOLOGY ═══ */}

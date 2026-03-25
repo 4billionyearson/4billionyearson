@@ -252,6 +252,11 @@ export default function EmissionsPage() {
                     color="text-yellow-400"
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  Source:{" "}
+                  <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}
+                  / <a href="https://globalcarbonproject.org/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Global Carbon Project</a>.
+                </p>
               </div>
 
               {/* ═══ EMISSIONS MAP ═══ */}

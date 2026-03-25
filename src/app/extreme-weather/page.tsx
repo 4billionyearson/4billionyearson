@@ -849,6 +849,12 @@ export default function ExtremeWeatherPage() {
                   color="text-emerald-400"
                 />
               </div>
+              <p className="text-xs text-gray-500 mt-3">
+                Source:{" "}
+                <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}
+                / <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EM-DAT</a>{" "}
+                (CRED International Disaster Database).
+              </p>
               </div>
 
               {/* ─── Live GDACS Alerts ──────────────────────────────── */}

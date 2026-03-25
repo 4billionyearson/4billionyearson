@@ -1487,6 +1487,14 @@ export default function EnergyPage() {
                 baseLabel={statBaseLabel}
               />
             </div>
+            <p className="text-xs text-gray-500 mt-3">
+              Sources:{" "}
+              <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Our World in Data</a>{" "}
+              / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Energy Institute Statistical Review</a>{" "}
+              (CC-BY) ·{" "}
+              <a href="https://ember-climate.org/data/data-tools/data-explorer/" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Ember</a>{" "}
+              (electricity shares).
+            </p>
             </div>
             );
           })()}

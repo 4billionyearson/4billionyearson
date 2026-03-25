@@ -370,6 +370,13 @@ export default function AIDashboardPage() {
                       : `${data.frontierDataCenters?.filter(dc => dc.powerMW > 0).length ?? 0} operational sites annualised`}
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  Sources:{" "}
+                  <a href="https://epochai.org/" target="_blank" rel="noopener noreferrer" className="text-[#88DDFC] hover:underline">Epoch AI</a>{" "}
+                  (models &amp; energy) ·{" "}
+                  <a href="https://aiindex.stanford.edu/" target="_blank" rel="noopener noreferrer" className="text-[#88DDFC] hover:underline">Stanford AI Index</a>{" "}
+                  (investment).
+                </p>
               </div>
 
               {/* ═══ AI MODELS & BENCHMARKS ═══ */}
