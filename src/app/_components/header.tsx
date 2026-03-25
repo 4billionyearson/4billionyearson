@@ -106,7 +106,7 @@ const Header = () => {
                   AI Explained
                 </Link>
                 <Link href="/ai-books" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/ai-books' ? 'text-violet-300 bg-gray-900' : 'text-gray-300 hover:text-violet-300 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  AI Books
+                  Books on AI
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#88DDFC] bg-gray-900' : 'text-gray-300 hover:text-[#88DDFC] hover:bg-gray-900'}`} onClick={closeMenu}>
@@ -139,7 +139,7 @@ const Header = () => {
                   Energy Explained
                 </Link>
                 <Link href="/energy-books" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-books' ? 'text-emerald-300 bg-gray-900' : 'text-gray-300 hover:text-emerald-300 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Energy Books
+                  Books on Energy
                 </Link>
                 <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
                   Blog{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
@@ -183,7 +183,7 @@ const Header = () => {
                   Climate Explained
                 </Link>
                 <Link href="/climate-books" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-books' ? 'text-sky-400 bg-gray-900' : 'text-gray-300 hover:text-sky-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Climate Books
+                  Books on Climate
                 </Link>
                 <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
                   Blog{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
@@ -211,7 +211,7 @@ const Header = () => {
                   Biotech Explained
                 </Link>
                 <Link href="/biotech-books" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/biotech-books' ? 'text-fuchsia-300 bg-gray-900' : 'text-gray-300 hover:text-fuchsia-300 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Biotech Books
+                  Books on Biotech
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/category/biotechnology" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742] bg-gray-900' : 'text-gray-300 hover:text-[#D26742] hover:bg-gray-900'}`} onClick={closeMenu}>
@@ -306,7 +306,7 @@ const Header = () => {
                   AI Explained
                 </Link>
                 <Link href="/ai-books" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/ai-books' ? 'text-violet-300' : 'text-gray-300 hover:text-violet-300'}`} onClick={closeMenu}>
-                  AI Books
+                  Books on AI
                 </Link>
                 <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#88DDFC]' : 'text-gray-300 hover:text-[#88DDFC]'}`} onClick={closeMenu}>
                   Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
@@ -334,7 +334,7 @@ const Header = () => {
                   Energy Explained
                 </Link>
                 <Link href="/energy-books" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-books' ? 'text-emerald-300' : 'text-gray-300 hover:text-emerald-300'}`} onClick={closeMenu}>
-                  Energy Books
+                  Books on Energy
                 </Link>
                 <Link href="/category/renewable-energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368]' : 'text-gray-300 hover:text-[#D1E368]'}`} onClick={closeMenu}>
                   Blog{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
@@ -374,7 +374,7 @@ const Header = () => {
                   Climate Explained
                 </Link>
                 <Link href="/climate-books" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-books' ? 'text-sky-400' : 'text-gray-300 hover:text-sky-400'}`} onClick={closeMenu}>
-                  Climate Books
+                  Books on Climate
                 </Link>
                 <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-300 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
                   Blog{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
@@ -399,7 +399,7 @@ const Header = () => {
                   Biotech Explained
                 </Link>
                 <Link href="/biotech-books" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/biotech-books' ? 'text-fuchsia-300' : 'text-gray-300 hover:text-fuchsia-300'}`} onClick={closeMenu}>
-                  Biotech Books
+                  Books on Biotech
                 </Link>
                 <Link href="/category/biotechnology" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742]' : 'text-gray-300 hover:text-[#D26742]'}`} onClick={closeMenu}>
                   Blog{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}

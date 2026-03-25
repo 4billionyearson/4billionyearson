@@ -113,6 +113,10 @@ function amazonUrl(asin: string) {
   return `https://www.amazon.co.uk/dp/${asin}?tag=${AFFILIATE_TAG}`;
 }
 
+function coverUrl(asin: string) {
+  return `https://covers.openlibrary.org/b/isbn/${asin}-L.jpg`;
+}
+
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 
 export default function ClimateBooksPage() {
@@ -150,7 +154,7 @@ export default function ClimateBooksPage() {
                   className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#D0A65E]/60 transition-colors group"
                 >
                   <img
-                    src={book.cover}
+                    src={coverUrl(book.asin)}
                     alt={`${book.title} by ${book.author}`}
                     className="w-20 md:w-28 h-auto object-contain rounded-lg shadow-lg flex-shrink-0 group-hover:scale-[1.02] transition-transform"
                     loading="lazy"
@@ -173,6 +177,9 @@ export default function ClimateBooksPage() {
                 </a>
               ))}
             </div>
+            <p className="text-xs text-gray-500 text-center mt-6 pt-4 border-t border-gray-800/40">
+              As an Amazon Associate, I earn from qualifying purchases.
+            </p>
           </section>
 
           {/* Explore data */}
@@ -200,11 +207,6 @@ export default function ClimateBooksPage() {
               ))}
             </div>
           </section>
-
-          {/* Amazon disclaimer */}
-          <p className="text-xs text-gray-600 text-center px-4">
-            As an Amazon Associate, I earn from qualifying purchases. Book cover images are provided by Amazon.
-          </p>
 
         </div>
       </div>

@@ -88,14 +88,14 @@ const BOOKS: Book[] = [
       "Named one of Bill Gates's favourite reads. Bakke tells the fascinating story of the electrical grid – the most complex machine ever built – and explains why modernising it is essential for the renewable energy transition.",
   },
   {
-    title: "Shorting the Grid",
-    author: "Meredith Angwin",
-    year: 2020,
-    asin: "B08JF4LKXS",
-    cover: "https://m.media-amazon.com/images/I/71bG8lF-aGL._SY522_.jpg",
-    rating: "4.5",
+    title: "Drawdown",
+    author: "Paul Hawken",
+    year: 2017,
+    asin: "0143130447",
+    cover: "",
+    rating: "4.6",
     description:
-      "A clear-eyed look at how deregulation and market design are undermining grid reliability. Angwin, a nuclear and grid expert, explains the hidden dangers of our current electricity system and what must change for a clean energy future.",
+      "The most comprehensive plan ever proposed to reverse global warming. Hawken and a team of researchers rank the top 100 solutions by impact \u2013 from wind turbines and solar farms to educating girls and reducing food waste.",
   },
   {
     title: "Energy and Civilization",
@@ -111,6 +111,10 @@ const BOOKS: Book[] = [
 
 function amazonUrl(asin: string) {
   return `https://www.amazon.co.uk/dp/${asin}?tag=${AFFILIATE_TAG}`;
+}
+
+function coverUrl(asin: string) {
+  return `https://covers.openlibrary.org/b/isbn/${asin}-L.jpg`;
 }
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
@@ -150,7 +154,7 @@ export default function EnergyBooksPage() {
                   className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#D2E369]/60 transition-colors group"
                 >
                   <img
-                    src={book.cover}
+                    src={coverUrl(book.asin)}
                     alt={`${book.title} by ${book.author}`}
                     className="w-20 md:w-28 h-auto object-contain rounded-lg shadow-lg flex-shrink-0 group-hover:scale-[1.02] transition-transform"
                     loading="lazy"
@@ -173,6 +177,9 @@ export default function EnergyBooksPage() {
                 </a>
               ))}
             </div>
+            <p className="text-xs text-gray-500 text-center mt-6 pt-4 border-t border-gray-800/40">
+              As an Amazon Associate, I earn from qualifying purchases.
+            </p>
           </section>
 
           {/* Explore data */}
@@ -200,11 +207,6 @@ export default function EnergyBooksPage() {
               ))}
             </div>
           </section>
-
-          {/* Amazon disclaimer */}
-          <p className="text-xs text-gray-600 text-center px-4">
-            As an Amazon Associate, I earn from qualifying purchases. Book cover images are provided by Amazon.
-          </p>
 
         </div>
       </div>
