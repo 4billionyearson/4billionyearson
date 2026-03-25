@@ -134,8 +134,8 @@ function ComparisonChart({ data, recentKey, label, units, barColor }: {
     const baseline = height >= 0 ? y + height : y;
     return (
       <g>
-        <rect x={x} y={baseline - minH} width={width} height={minH} fill="none" stroke="#6b7280" strokeWidth={1.5} strokeDasharray="4 3" rx={4} ry={4} />
-        <text x={x + width / 2} y={baseline - minH / 2 + 3} textAnchor="middle" fontSize={9} fill="#6b7280" fontStyle="italic">N/A</text>
+        <rect x={x} y={baseline - minH} width={width} height={minH} fill="none" stroke="#9ca3af" strokeWidth={1.5} strokeDasharray="4 3" rx={4} ry={4} />
+        <text x={x + width / 2} y={baseline - minH / 2 + 3} textAnchor="middle" fontSize={9} fill="#9ca3af" fontStyle="italic">N/A</text>
       </g>
     );
   };
@@ -552,7 +552,7 @@ export default function ClimateDashboard() {
             <div className="relative w-full">
               <form onSubmit={handleSearch} className="flex gap-2">
                 <div className="relative flex-1">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
                     value={searchInput}
@@ -585,7 +585,7 @@ export default function ClimateDashboard() {
                       </span>
                       <div>
                         <span className="font-medium text-gray-200">{result.name}</span>
-                        <span className="text-xs text-gray-500 ml-2">
+                        <span className="text-xs text-gray-400 ml-2">
                           {result.type === 'country' ? 'Country' : result.type === 'us-state' ? 'US State' : 'UK Region'}
                         </span>
                       </div>
@@ -742,7 +742,7 @@ export default function ClimateDashboard() {
                     />
                   </SubSection>
                 )}
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   {countryData?.yearlyData && <>Country temperature:{" "}<a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}/ <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Copernicus ERA5</a> (CC-BY).{" "}</>}
                   {usStateData?.paramData?.tavg && <>US state data:{" "}<a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA NCEI</a>.{" "}</>}
                   {ukRegionData?.varData?.Tmean && <>UK data: contains{" "}<a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}data © Crown copyright (Open Government Licence).</>}
@@ -785,7 +785,7 @@ export default function ClimateDashboard() {
                       <ComparisonChart data={ukCountryData.varData.Sunshine.monthlyComparison} recentKey="recent" label="Sunshine" units="hours" barColor="#ea580c" />
                     </SubSection>
                   )}
-                  <p className="text-xs text-gray-500 mt-4">
+                  <p className="text-xs text-gray-400 mt-4">
                     Source: Contains{" "}
                     <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}
                     data © Crown copyright (Open Government Licence).
@@ -807,7 +807,7 @@ export default function ClimateDashboard() {
                     <SubSection title="Annual total precipitation (mm)">
                       <YearlyChart data={countryData.precipYearly} dataKey="value" rollingKey="rollingAvg" label="Precipitation" units="mm" color="#60a5fa" rollingColor="#2563eb" />
                     </SubSection>
-                    <p className="text-xs text-gray-500 mt-4">
+                    <p className="text-xs text-gray-400 mt-4">
                       Source:{" "}
                       <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}
                       / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Copernicus ERA5</a> (CC-BY).
@@ -844,7 +844,7 @@ export default function ClimateDashboard() {
                         <ComparisonChart data={usNationalData.paramData.pcp.monthlyComparison} recentKey="recent" label="Precipitation" units="mm" barColor="#7c3aed" />
                       </SubSection>
                     )}
-                    <p className="text-xs text-gray-500 mt-4">
+                    <p className="text-xs text-gray-400 mt-4">
                       Source:{" "}
                       <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA National Centers for Environmental Information</a>{" "}
                       (public domain).
@@ -883,7 +883,7 @@ export default function ClimateDashboard() {
                         <ComparisonChart data={ukCountryData.varData.Rainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#7c3aed" />
                       </SubSection>
                     )}
-                    <p className="text-xs text-gray-500 mt-4">
+                    <p className="text-xs text-gray-400 mt-4">
                       Source: Contains{" "}
                       <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}
                       data © Crown copyright (Open Government Licence).
@@ -922,7 +922,7 @@ export default function ClimateDashboard() {
                         <ComparisonChart data={ukCountryData.varData.Raindays1mm.monthlyComparison} recentKey="recent" label="Rain Days" units="days" barColor="#8b5cf6" />
                       </SubSection>
                     )}
-                    <p className="text-xs text-gray-500 mt-4">
+                    <p className="text-xs text-gray-400 mt-4">
                       Source: Contains{" "}
                       <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}
                       data © Crown copyright (Open Government Licence).
@@ -967,7 +967,7 @@ export default function ClimateDashboard() {
                       <ComparisonChart data={ukCountryData.varData.AirFrost.monthlyComparison} recentKey="recent" label="Frost Days" units="days" barColor="#a855f7" />
                     </SubSection>
                   )}
-                  <p className="text-xs text-gray-500 mt-4">
+                  <p className="text-xs text-gray-400 mt-4">
                     Source: Contains{" "}
                     <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office</a>{" "}
                     data © Crown copyright (Open Government Licence).
@@ -1037,7 +1037,7 @@ export default function ClimateDashboard() {
                       </ResponsiveContainer>
                     </div>
                   </SubSection>
-                  <p className="text-xs text-gray-500 mt-4">
+                  <p className="text-xs text-gray-400 mt-4">
                     Source:{" "}
                     <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA Climate at a Glance</a>{" "}
                     (public domain).

@@ -96,12 +96,12 @@ function StatCard({ label, value, unit, subtext, color }: {
 }) {
   return (
     <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
-      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className="flex items-baseline gap-1">
         <span className={`text-2xl font-bold ${color}`}>{value}</span>
         <span className="text-sm text-gray-400">{unit}</span>
       </div>
-      {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+      {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>
   );
 }
@@ -529,7 +529,7 @@ export default function GreenhouseGasesPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-green-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Current Readings</h2>
-                  <span className="ml-auto text-xs text-gray-600">
+                  <span className="ml-auto text-xs text-gray-400">
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>

@@ -102,12 +102,12 @@ function StatCard({ label, value, unit, subtext, color }: {
 }) {
   return (
     <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
-      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className="flex items-baseline gap-1">
         <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
         {unit && <span className="text-sm text-gray-400">{unit}</span>}
       </div>
-      {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+      {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>
   );
 }
@@ -121,7 +121,7 @@ function SimpleBarChart({ data, categoryKey, valueKey, formatter, barColor }: {
   formatter?: (v: number) => string;
   barColor?: string;
 }) {
-  if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
+  if (!data.length) return <p className="text-gray-400 text-sm">No data available.</p>;
   return (
     <div className="h-[380px] w-full">
       <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
@@ -203,7 +203,7 @@ export default function BiotechDashboardPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-amber-300 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Key Facts</h2>
-                  <span className="ml-auto text-xs text-gray-600">
+                  <span className="ml-auto text-xs text-gray-400">
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -227,7 +227,7 @@ export default function BiotechDashboardPage() {
                     subtext="Registered on ClinicalTrials.gov"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-xs text-gray-400 mt-3">
                   Sources:{" "}
                   <a href="https://www.genome.gov/about-genomics/fact-sheets/Sequencing-Human-Genome-cost" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">NIH NHGRI</a>{" "}
                   (sequencing cost) ·{" "}
@@ -272,7 +272,7 @@ export default function BiotechDashboardPage() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Cost of sequencing a complete human genome, from $100M in 2001 to under $1,000 today — outpacing Moore&rsquo;s Law. Logarithmic scale. Source:{" "}
                   <a href="https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     NHGRI via Our World in Data
@@ -285,7 +285,7 @@ export default function BiotechDashboardPage() {
               {data.clinicalTrials.length > 0 && (
               <SectionCard icon={<FlaskConical className="h-5 w-5 text-violet-400" />} title="Clinical Trials by Therapy Type">
                 <SimpleBarChart data={data.clinicalTrials} categoryKey="category" valueKey="count" barColor="#a855f7" />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Total number of registered clinical trials on{" "}
                   <a href="https://clinicaltrials.gov" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     ClinicalTrials.gov
@@ -298,7 +298,7 @@ export default function BiotechDashboardPage() {
               {data.crisprYearTrend.length > 0 && (
               <SectionCard icon={<Dna className="h-5 w-5 text-emerald-400" />} title="CRISPR Publications Per Year">
                 <SimpleBarChart data={data.crisprYearTrend} categoryKey="year" valueKey="count" barColor="#10b981" />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Annual CRISPR-related publications indexed in PubMed, showing the explosion of research since the 2012 breakthrough. Source:{" "}
                   <a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     PubMed / NCBI
@@ -310,7 +310,7 @@ export default function BiotechDashboardPage() {
               {data.pubmedCounts.length > 0 && (
               <SectionCard icon={<FileText className="h-5 w-5 text-sky-400" />} title="Biotech Research Publications (All Time)">
                 <SimpleBarChart data={data.pubmedCounts} categoryKey="category" valueKey="count" barColor="#0ea5e9" />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Total publications indexed in PubMed for key biotechnology research areas: gene therapy, CRISPR, genomics, and mRNA vaccines. Source:{" "}
                   <a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     PubMed / NCBI

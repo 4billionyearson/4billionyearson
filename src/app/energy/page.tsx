@@ -159,27 +159,27 @@ function StatCard({ label, value, unit, color, icon, countryValue, countryName, 
     <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
       {countryValue && countryName ? (
         <>
-          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+          <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
           <div className="flex items-baseline gap-1">
             <span className={`text-2xl font-bold font-mono ${color}`}>{countryValue}</span>
             {unit && <span className="text-sm text-gray-400">{unit}</span>}
           </div>
-          <div className="text-xs text-gray-500 mt-0.5">{countryName}</div>
+          <div className="text-xs text-gray-400 mt-0.5">{countryName}</div>
           <div className="flex items-baseline gap-1 mt-2">
             <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
             {unit && <span className="text-sm text-gray-400">{unit}</span>}
           </div>
-          <div className="text-xs text-gray-500 mt-0.5">{baseLabel}</div>
-          {subtitle && <div className="text-[10px] text-gray-600 mt-1">{subtitle}</div>}
+          <div className="text-xs text-gray-400 mt-0.5">{baseLabel}</div>
+          {subtitle && <div className="text-xs text-gray-400 mt-1">{subtitle}</div>}
         </>
       ) : (
         <>
-          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+          <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
           <div className="flex items-baseline gap-1">
             <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
             {unit && <span className="text-sm text-gray-400">{unit}</span>}
           </div>
-          {subtitle && <div className="text-xs text-gray-500 mt-1">{subtitle}</div>}
+          {subtitle && <div className="text-xs text-gray-400 mt-1">{subtitle}</div>}
         </>
       )}
     </div>
@@ -273,7 +273,7 @@ function LocationSearch({ onSelect, loading, error }: {
     <div className="relative w-full">
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
             value={query}
@@ -299,7 +299,7 @@ function LocationSearch({ onSelect, loading, error }: {
               type="button"
             >
               <span>{s.label}</span>
-              <span className="text-xs text-gray-500 ml-auto">
+              <span className="text-xs text-gray-400 ml-auto">
                 {s.type === 'us-state' ? 'US State' : 'Country'}
               </span>
             </button>
@@ -1487,7 +1487,7 @@ export default function EnergyPage() {
                 baseLabel={statBaseLabel}
               />
             </div>
-            <p className="text-xs text-gray-500 mt-3">
+            <p className="text-xs text-gray-400 mt-3">
               Sources:{" "}
               <a href="https://ourworldindata.org/energy" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Our World in Data</a>{" "}
               / <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener noreferrer" className="text-[#D2E369] hover:underline">Energy Institute Statistical Review</a>{" "}

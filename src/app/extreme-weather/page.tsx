@@ -153,12 +153,12 @@ function StatCard({
 }) {
   return (
     <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
-      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className="flex items-baseline gap-1">
         <span className={`text-2xl font-bold ${color}`}>{value}</span>
         <span className="text-sm text-gray-400">{unit}</span>
       </div>
-      {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+      {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>
   );
 }
@@ -347,7 +347,7 @@ function Top10Countries() {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-xs text-gray-500 mt-4">
+      <p className="text-xs text-gray-400 mt-4">
         Top countries by reported extreme weather events over the past two decades. Source:{" "}
         <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">EM-DAT</a>.
       </p>
@@ -807,7 +807,7 @@ export default function ExtremeWeatherPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-orange-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Key Facts ({stats.latest?.year || "–"})</h2>
-                  <span className="ml-auto text-xs text-gray-600">
+                  <span className="ml-auto text-xs text-gray-400">
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -849,7 +849,7 @@ export default function ExtremeWeatherPage() {
                   color="text-emerald-400"
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-3">
+              <p className="text-xs text-gray-400 mt-3">
                 Source:{" "}
                 <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}
                 / <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EM-DAT</a>{" "}
@@ -865,7 +865,7 @@ export default function ExtremeWeatherPage() {
                 return (
                 <SectionCard icon={<Activity className={`${alertColor} animate-pulse`} />} title="Live Extreme Weather Alerts">
                   <LiveEventsSection events={data.gdacsEvents} />
-                  <p className="text-xs text-gray-500 mt-4">
+                  <p className="text-xs text-gray-400 mt-4">
                     Real-time alerts from{" "}
                     <a href="https://www.gdacs.org/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                       GDACS <ExternalLink className="inline w-3 h-3" />
@@ -879,7 +879,7 @@ export default function ExtremeWeatherPage() {
               {/* ─── Disasters by Type ─────────────────────────────── */}
               <SectionCard icon={<CloudLightning />} title="Extreme Weather by Type">
                 <StackedTypeChart data={data.disastersByType} title="Recorded Extreme Weather Events per Year" yLabel="Events" />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Annual events by type from{" "}
                   <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                     EM-DAT <ExternalLink className="inline w-3 h-3" />
@@ -894,7 +894,7 @@ export default function ExtremeWeatherPage() {
               {/* ─── Deaths by Type ────────────────────────────────── */}
               <SectionCard icon={<AlertTriangle />} title="Deaths from Extreme Weather">
                 <StackedTypeChart data={data.deathsByType} title="Deaths from Extreme Weather per Year" yLabel="Deaths" />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Annual death toll by type. Source:{" "}
                   <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                     EM-DAT <ExternalLink className="inline w-3 h-3" />
@@ -934,7 +934,7 @@ export default function ExtremeWeatherPage() {
                     fillColor="#10b981"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Annual totals for disasters, deaths, people affected, and economic damage. Source:{" "}
                   <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">EM-DAT</a>{" "}
                   via{" "}

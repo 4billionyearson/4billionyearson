@@ -128,12 +128,12 @@ function StatCard({ label, value, unit, subtext, color }: {
 }) {
   return (
     <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
-      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className="flex items-baseline gap-1">
         <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
         {unit && <span className="text-sm text-gray-400">{unit}</span>}
       </div>
-      {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+      {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>
   );
 }
@@ -147,7 +147,7 @@ function MultiAreaChart({ data, keys, formatter, stacked, unit }: {
   stacked?: boolean;
   unit?: string;
 }) {
-  if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
+  if (!data.length) return <p className="text-gray-400 text-sm">No data available.</p>;
   return (
     <div className="h-[380px] w-full">
       <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
@@ -193,7 +193,7 @@ function MultiLineChart({ data, keys, formatter, refLine }: {
   formatter?: (v: number) => string;
   refLine?: number;
 }) {
-  if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
+  if (!data.length) return <p className="text-gray-400 text-sm">No data available.</p>;
   return (
     <div className="h-[380px] w-full">
       <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
@@ -229,7 +229,7 @@ function StackedBarChart({ data, keys, formatter, showBrush = true }: {
   formatter?: (v: number) => string;
   showBrush?: boolean;
 }) {
-  if (!data.length) return <p className="text-gray-500 text-sm">No data available.</p>;
+  if (!data.length) return <p className="text-gray-400 text-sm">No data available.</p>;
   return (
     <div className="h-[380px] w-full">
       <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
@@ -338,7 +338,7 @@ export default function AIDashboardPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-cyan-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Key Facts</h2>
-                  <span className="ml-auto text-xs text-gray-600">
+                  <span className="ml-auto text-xs text-gray-400">
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -370,7 +370,7 @@ export default function AIDashboardPage() {
                       : `${data.frontierDataCenters?.filter(dc => dc.powerMW > 0).length ?? 0} operational sites annualised`}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-xs text-gray-400 mt-3">
                   Sources:{" "}
                   <a href="https://epochai.org/" target="_blank" rel="noopener noreferrer" className="text-[#88DDFC] hover:underline">Epoch AI</a>{" "}
                   (models &amp; energy) ·{" "}
@@ -399,14 +399,14 @@ export default function AIDashboardPage() {
                         <tr key={i} className="border-b border-gray-800/40">
                           <td className="py-2 pr-4 text-gray-200 font-medium">{m.name}</td>
                           <td className="py-2 pr-4 text-gray-400">{m.org}</td>
-                          <td className="py-2 pr-4 text-gray-500 hidden sm:table-cell">{m.domain}</td>
-                          <td className="py-2 text-gray-500 whitespace-nowrap">{m.date}</td>
+                          <td className="py-2 pr-4 text-gray-400 hidden sm:table-cell">{m.domain}</td>
+                          <td className="py-2 text-gray-400 whitespace-nowrap">{m.date}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Most recently released AI models. Source:{" "}
                   <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI
@@ -418,7 +418,7 @@ export default function AIDashboardPage() {
               {data.epochModelsByOrg?.length > 0 && (
               <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 AI Models Released by Organization">
                 <Top10BarChart data={data.epochModelsByOrg} dataKey="models" />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   AI models released in 2025, by organization. Source:{" "}
                   <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI
@@ -430,7 +430,7 @@ export default function AIDashboardPage() {
               {data.epochModelsByYear?.length > 0 && (
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="AI Models Released Per Year">
                 <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} showBrush={false} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   AI models released per year (2010–present). Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>. Continuously updated.
                 </p>
               </SectionCard>
@@ -439,7 +439,7 @@ export default function AIDashboardPage() {
               {data.aiSystemsPerYear.length > 0 && (
               <SectionCard icon={<Brain className="h-5 w-5 text-violet-400" />} title="AI Systems Released Per Year">
                 <StackedBarChart data={data.aiSystemsPerYear} keys={seriesKeys(data.aiSystemsPerYear)} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Number of large-scale AI systems released per year, by domain (language, vision, multimodal, etc.). Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" / "}<a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>. Updated monthly.
                   <span className="block mt-1 text-amber-400/80">2026 figure is year-to-date and will increase throughout the year.</span>
                 </p>
@@ -449,7 +449,7 @@ export default function AIDashboardPage() {
               {data.aiSystemsByCountry.length > 0 && (
               <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title="Cumulative AI Systems by Country">
                 <MultiAreaChart data={data.aiSystemsByCountry} keys={seriesKeys(data.aiSystemsByCountry)} stacked />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Cumulative number of large-scale AI systems by country of origin since 2017. Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" / "}<a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>. Updated monthly.
                 </p>
               </SectionCard>
@@ -458,7 +458,7 @@ export default function AIDashboardPage() {
               {data.frontierMath?.length > 0 && (
               <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark">
                 <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${Math.round(v)}%`} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Source:{" "}
                   <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI
@@ -473,7 +473,7 @@ export default function AIDashboardPage() {
               {data.frontierDataCenters?.length > 0 && (
               <SectionCard icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="Frontier AI Data Center Locations">
                 <DataCenterMap sites={data.frontierDataCenters} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   {data.stats.frontierCount} frontier AI data centers tracked globally ({data.frontierDataCenters.filter(dc => dc.country === 'United States').length} in the US). Pin size indicates power capacity. Source:{" "}
                   <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI — Frontier Data Centers
@@ -496,7 +496,7 @@ export default function AIDashboardPage() {
                         <div className="bg-gray-800/60 rounded-lg p-3 text-center">
                           <div className="text-2xl font-bold text-cyan-400">{data.stats.frontierCount}</div>
                           <div className="text-xs text-gray-400 mt-1">Tracked Sites</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">{operational.length} operational · {planned.length} planned</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">{operational.length} operational · {planned.length} planned</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-3 text-center">
                           <div className="text-2xl font-bold text-emerald-400">{opPower.toLocaleString()} MW</div>
@@ -509,10 +509,10 @@ export default function AIDashboardPage() {
                         <div className="bg-gray-800/60 rounded-lg p-3 text-center">
                           <div className="text-2xl font-bold text-rose-400">${Math.round(opCost * 10) / 10}B</div>
                           <div className="text-xs text-gray-400 mt-1">Capital Cost</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">2021–2029, {data.stats.frontierCount} sites</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">2021–2029, {data.stats.frontierCount} sites</div>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">H100 Equivalents = total GPU compute capacity normalised to NVIDIA H100 chips, allowing comparison across different hardware.</p>
+                      <p className="text-xs text-gray-400 mt-2">H100 Equivalents = total GPU compute capacity normalised to NVIDIA H100 chips, allowing comparison across different hardware.</p>
                     </div>
                   );
                 })()}
@@ -535,8 +535,8 @@ export default function AIDashboardPage() {
                         <tr key={i} className="border-b border-gray-800/40">
                           <td className="py-2 pr-3 text-gray-200 font-medium">{dc.name}</td>
                           <td className="py-2 pr-3 text-gray-400">{dc.owner}</td>
-                          <td className="py-2 pr-3 text-gray-500 hidden sm:table-cell">{dc.users || '—'}</td>
-                          <td className="py-2 pr-3 text-gray-500 hidden lg:table-cell">{dc.country || '—'}</td>
+                          <td className="py-2 pr-3 text-gray-400 hidden sm:table-cell">{dc.users || '—'}</td>
+                          <td className="py-2 pr-3 text-gray-400 hidden lg:table-cell">{dc.country || '—'}</td>
                           <td className="py-2 pr-3 text-gray-300 text-right font-mono">{dc.powerMW > 0 ? dc.powerMW.toLocaleString() : '—'}</td>
                           <td className="py-2 pr-3 text-gray-400 text-right font-mono hidden md:table-cell">{dc.h100Equiv > 0 ? (dc.h100Equiv / 1000).toFixed(0) + 'K' : '—'}</td>
                           <td className="py-2 pr-3 text-gray-300 text-right font-mono">{dc.costBillions > 0 ? `$${dc.costBillions}` : '—'}</td>
@@ -546,7 +546,7 @@ export default function AIDashboardPage() {
                     </tbody>
                   </table>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   The world&apos;s largest known AI data centers tracked via satellite imagery, construction permits and public disclosures. Source:{" "}
                   <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI — Frontier Data Centers
@@ -596,22 +596,22 @@ export default function AIDashboardPage() {
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-violet-400">{totalExaFLOPS < 100 ? totalExaFLOPS.toFixed(1) : Math.round(totalExaFLOPS).toLocaleString()}</div>
                           <div className="text-xs text-gray-400 mt-1">ExaFLOPS (FP16)</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">operational + planned</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">operational + planned</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-cyan-400">{perPersonTFLOPS < 0.01 ? perPersonTFLOPS.toFixed(3) : perPersonTFLOPS.toFixed(2)}</div>
                           <div className="text-xs text-gray-400 mt-1">TFLOPS per human</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">if shared among 8.2B people</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">if shared among 8.2B people</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-amber-400">{phoneEquivPerPerson < 1 ? phoneEquivPerPerson.toFixed(2) : phoneEquivPerPerson.toFixed(1)}</div>
                           <div className="text-xs text-gray-400 mt-1">Smartphones per human</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">(equivalent of)</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">(equivalent of)</div>
                         </div>
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-emerald-400">{aiVsPhonesPct < 1 ? aiVsPhonesPct.toFixed(2) : aiVsPhonesPct.toFixed(1)}%</div>
                           <div className="text-xs text-gray-400 mt-1">of Total Global Phone Compute</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">AI DCs vs ~4.9B smartphones combined</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">AI DCs vs ~4.9B smartphones combined</div>
                         </div>
                       </div>
 
@@ -656,7 +656,7 @@ export default function AIDashboardPage() {
                         </div>
                       </div>
 
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400">
                         Frontier data center compute only (not general AI in phones/laptops). TFLOPS = trillion floating-point operations per second (FP16). H100 SXM at 989 TFLOPS (dense FP16). Includes operational + planned facilities. Smartphone estimate: modern flagship GPU (Apple A18/Snapdragon 8 Gen 3 class). World population ~8.2B (UN 2025); smartphone count ~4.9B (GSMA Intelligence 2025). Source:{" "}
                         <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(CC-BY).
                       </p>
@@ -684,7 +684,7 @@ export default function AIDashboardPage() {
                         <div className="bg-gray-800/60 rounded-lg p-4 text-center">
                           <div className="text-2xl font-bold font-mono text-emerald-400">{aiTWh.toFixed(1)} TWh</div>
                           <div className="text-xs text-gray-400 mt-1">Frontier AI Data Center Demand</div>
-                          <div className="text-[10px] text-gray-500 mt-0.5">annualised from {data.stats.frontierTotalPowerMW?.toLocaleString()} MW capacity</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">annualised from {data.stats.frontierTotalPowerMW?.toLocaleString()} MW capacity</div>
                         </div>
                       </div>
                       {data.frontierDCTimeline?.length > 0 && (
@@ -706,7 +706,7 @@ export default function AIDashboardPage() {
                             </AreaChart>
                           </ResponsiveContainer>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">Cumulative operational power capacity across all tracked frontier data centers.</p>
+                        <p className="text-xs text-gray-400 mt-2">Cumulative operational power capacity across all tracked frontier data centers.</p>
                       </div>
                       )}
                       {comparisons.length > 0 && (() => {
@@ -732,7 +732,7 @@ export default function AIDashboardPage() {
                           </div>
                         );
                       })()}
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400">
                         Covers only tracked frontier facilities; total AI-related electricity use (including cloud, inference, and smaller facilities) is likely higher. Sources:{" "}
                         <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" "}(data centers),{" "}
                         <a href="https://ourworldindata.org/electricity-mix" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>{" "}(electricity generation).
@@ -748,7 +748,7 @@ export default function AIDashboardPage() {
 
               <SectionCard icon={<DollarSign className="h-5 w-5 text-cyan-400" />} title="Global AI Investment">
                 <MultiAreaChart data={data.investment} keys={seriesKeys(data.investment)} formatter={formatBillions} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Total private investment into AI companies raising above $1.5M. Inflation-adjusted (constant 2021 US$). Source:{" "}
                   <a href="https://ourworldindata.org/grapher/private-investment-in-artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Quid via AI Index Report

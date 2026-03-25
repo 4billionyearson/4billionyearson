@@ -126,12 +126,12 @@ function StatCard({ label, value, unit, subtext, color }: {
 }) {
   return (
     <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
-      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className="flex items-baseline gap-1">
         <span className={`text-2xl font-bold ${color}`}>{value}</span>
         <span className="text-sm text-gray-400">{unit}</span>
       </div>
-      {subtext && <div className="text-xs text-gray-500 mt-1">{subtext}</div>}
+      {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>
   );
 }
@@ -218,7 +218,7 @@ export default function EmissionsPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <Activity className="w-5 h-5 text-green-400 animate-pulse" />
                   <h2 className="text-lg font-bold font-mono text-white">Key Facts ({data.stats.latestAnnualYear})</h2>
-                  <span className="ml-auto text-xs text-gray-600">
+                  <span className="ml-auto text-xs text-gray-400">
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -252,7 +252,7 @@ export default function EmissionsPage() {
                     color="text-yellow-400"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-xs text-gray-400 mt-3">
                   Source:{" "}
                   <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}
                   / <a href="https://globalcarbonproject.org/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Global Carbon Project</a>.
@@ -263,7 +263,7 @@ export default function EmissionsPage() {
               {data.countryMapData && Object.keys(data.countryMapData).length > 0 && (
               <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="Global CO₂ Emissions Map">
                 <EmissionsChoroplethMap countryMapData={data.countryMapData} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Hover over any country to see its emissions. Toggle between per-capita and total annual views. Source:{" "}
                   <a href="https://github.com/owid/co2-data" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
                     Global Carbon Project
@@ -279,7 +279,7 @@ export default function EmissionsPage() {
               {/* ── Top 10 Annual ── */}
               <SectionCard icon={<Factory className="h-5 w-5 text-red-400" />} title="Top 10 Annual CO₂ Emitters">
                 <Top10BarChart data={data.top10Annual} dataKey="annual" tooltip={DarkTooltip} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   The top 10 countries produce over two-thirds of global annual CO₂ emissions. Source:{" "}
                   <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
@@ -288,7 +288,7 @@ export default function EmissionsPage() {
               {/* ── Top 10 Per Capita ── */}
               <SectionCard icon={<Users className="h-5 w-5 text-amber-400" />} title="Top 10 Emitters Per Capita">
                 <Top10BarChart data={data.top10PerCapita} dataKey="perCapita" tooltip={PerCapTooltip} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Per-capita figures highlight small, fossil-fuel-rich nations — the biggest absolute emitters often rank lower here. Source:{" "}
                   <a href="https://ourworldindata.org/per-capita-co2" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
@@ -297,7 +297,7 @@ export default function EmissionsPage() {
               {/* ── Top 10 Cumulative ── */}
               <SectionCard icon={<TrendingUp className="h-5 w-5 text-yellow-400" />} title="Top 10 Cumulative CO₂ Emitters">
                 <Top10BarChart data={data.top10Cumulative} dataKey="cumulative" tooltip={DarkTooltip} />
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   CO₂ persists for centuries, so early-industrialised nations carry a disproportionate share of the total warming burden. Source:{" "}
                   <a href="https://ourworldindata.org/contributed-most-global-co2" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
@@ -332,7 +332,7 @@ export default function EmissionsPage() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   To limit warming to 1.5 °C, global emissions must roughly halve by 2030 and reach net zero by 2050. Source:{" "}
                   <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
@@ -377,7 +377,7 @@ export default function EmissionsPage() {
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
-                  <p className="text-xs text-gray-500 mt-4">
+                  <p className="text-xs text-gray-400 mt-4">
                     How the biggest emitters have evolved since 1950, showing shifting patterns of industrial development. Source:{" "}
                     <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                   </p>
@@ -410,7 +410,7 @@ export default function EmissionsPage() {
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
+                <p className="text-xs text-gray-400 mt-4">
                   Cumulative CO₂ determines long-term warming &ndash; even if emissions stopped today, existing CO₂ would warm the planet for centuries. Source:{" "}
                   <a href="https://ourworldindata.org/contributed-most-global-co2" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
