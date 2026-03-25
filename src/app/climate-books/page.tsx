@@ -33,7 +33,7 @@ const BOOKS: Book[] = [
     author: "Hannah Ritchie",
     year: 2024,
     asin: "0593492544",
-    cover: "Xd9YEAAAQBAJ",
+    cover: "xua8EAAAQBAJ",
     rating: "4.5",
     description:
       "Our World in Data lead researcher Hannah Ritchie makes a data-driven case for optimism. She shows that on many environmental measures – deforestation, air pollution, ozone – things are getting better, while laying out what still needs to change on climate.",
@@ -43,7 +43,7 @@ const BOOKS: Book[] = [
     author: "David Lipsky",
     year: 2023,
     asin: "0393866742",
-    cover: "eGSNEAAAQBAJ",
+    cover: "1yFG0AEACAAJ",
     rating: "4.6",
     description:
       "A sweeping, darkly funny history of climate denial in America. Lipsky traces how the science of global warming was understood for over a century – and how industries, politicians, and media conspired to make the public doubt what scientists knew.",

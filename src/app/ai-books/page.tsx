@@ -63,7 +63,7 @@ const BOOKS: Book[] = [
     author: "Kai-Fu Lee & Chen Qiufan",
     year: 2021,
     asin: "0593238532",
-    cover: "5ksqEAAAQBAJ",
+    cover: "tUASEAAAQBAJ",
     rating: "4.4",
     description:
       "A unique blend of science fiction and expert analysis. Former Google China president Kai-Fu Lee teams with sci-fi writer Chen Qiufan to imagine ten visions of how AI will transform the world over the next twenty years.",

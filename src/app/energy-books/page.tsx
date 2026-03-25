@@ -43,7 +43,7 @@ const BOOKS: Book[] = [
     author: "Henry Sanderson",
     year: 2023,
     asin: "0861544692",
-    cover: "j9DezgEACAAJ",
+    cover: "aZlZEAAAQBAJ",
     rating: "4.4",
     description:
       "The electrification of everything requires vast quantities of lithium, cobalt, nickel, and rare earths. Financial Times journalist Sanderson investigates the geopolitics and human cost of the battery supply chain powering the clean energy revolution.",
