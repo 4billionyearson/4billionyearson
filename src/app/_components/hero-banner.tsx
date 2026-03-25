@@ -16,7 +16,7 @@ export default function HeroBanner() {
 
   return (
     <section
-      className="text-center px-4 pt-3 pb-2 md:pt-4 md:pb-4"
+      className="text-center pt-3 pb-2 md:pt-4 md:pb-4"
       style={{
         opacity: mounted ? 1 : 0,
         transform: mounted ? "translateY(0)" : "translateY(-8px)",
