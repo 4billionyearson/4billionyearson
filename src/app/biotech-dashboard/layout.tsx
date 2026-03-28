@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     title: "Biotech Data",
     description:
       "Genome sequencing costs, clinical trials, CRISPR research, and biotech publication trends — interactive charts.",
-    images: [{ url: "https://4billionyearson.org/graphic-biotech.png", width: 1200, height: 630, alt: "Biotechnology data dashboard" }],
+    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 

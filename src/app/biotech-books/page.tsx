@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: "Best Biotechnology Books | 4 Billion Years On",
     description:
       "Recommended books on biotechnology, gene editing, CRISPR, and the future of medicine – from pioneering scientists and bestselling authors.",
+    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 

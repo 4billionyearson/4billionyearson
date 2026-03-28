@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: "AI Explained | 4 Billion Years On",
     description:
       "A plain-English guide to artificial intelligence: machine learning, large language models, neural networks, AI safety, and what the technology really means.",
+    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: "Climate Change Explained | 4 Billion Years On",
     description:
       "A plain-English guide to climate change: greenhouse gases, global warming, feedback loops, tipping points, and what the science really says.",
+    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 

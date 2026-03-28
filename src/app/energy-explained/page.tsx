@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: "Energy Explained | 4 Billion Years On",
     description:
       "A plain-English guide to global energy: fossil fuels vs renewables, how electricity grids work, energy units explained, and the transition to clean power.",
+    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: "Biotechnology Explained | 4 Billion Years On",
     description:
       "A plain-English guide to biotechnology: gene editing, CRISPR, mRNA, synthetic biology, and how biotech is reshaping medicine, agriculture, and industry.",
+    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 

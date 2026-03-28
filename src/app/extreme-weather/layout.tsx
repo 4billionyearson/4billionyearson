@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     title: "Live Extreme Weather Tracker – Floods, Wildfires, Droughts & Storms",
     description:
       "Live extreme weather alerts and historical data. Track floods, wildfires, droughts, cyclones, deaths, and economic damage worldwide.",
-    images: [{ url: "https://4billionyearson.org/graphic-climate.png", width: 1200, height: 630, alt: "Extreme weather tracker" }],
+    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 

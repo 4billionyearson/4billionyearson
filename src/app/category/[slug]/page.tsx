@@ -107,6 +107,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: `${category.title} | 4 Billion Years On`,
     description: category.description,
+    openGraph: {
+      title: `${category.title} | 4 Billion Years On`,
+      description: category.description,
+      images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
+    },
   }
 }
 

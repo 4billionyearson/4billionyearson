@@ -3,6 +3,11 @@ import Container from "@/app/_components/container";
 export const metadata = {
   title: "About Us | 4 Billion Years On",
   description: "Learn more about 4 Billion Years On.",
+  openGraph: {
+    title: "About Us | 4 Billion Years On",
+    description: "Learn more about 4 Billion Years On.",
+    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
+  },
 };
 
 export default function AboutPage() {
