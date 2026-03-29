@@ -18,28 +18,45 @@ export default async function Post(props: Params) {
 
   const accentHex = (post.categories?.[0]?.accentColor || '').match(/#[0-9a-fA-F]{3,8}/)?.[0] || '#374151';
 
+  const firstCategory = post.categories?.[0];
+  const breadcrumbItems: { "@type": string; position: number; name: string; item: string }[] = [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://4billionyearson.org" },
+    ...(firstCategory
+      ? [{ "@type": "ListItem", position: 2, name: firstCategory.title, item: `https://4billionyearson.org/category/${firstCategory.slug}` }]
+      : []),
+    { "@type": "ListItem", position: firstCategory ? 3 : 2, name: post.title, item: `https://4billionyearson.org/posts/${params.slug}` },
+  ];
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.seoDescription || post.excerpt,
-    image: post.coverImage || undefined,
-    datePublished: post.date,
-    author: {
-      "@type": "Person",
-      name: post.author?.name || "4 Billion Years On",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "4 Billion Years On",
-      url: "https://4billionyearson.org",
-      logo: "https://4billionyearson.org/logo.png",
-    },
-    mainEntityOfPage: `https://4billionyearson.org/posts/${params.slug}`,
-    ...(post.categories && post.categories.length > 0
-      ? { articleSection: post.categories.map((c: any) => c.title) }
-      : {}),
-    keywords: post.categories?.map((c: any) => c.title)?.join(", "),
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: post.title,
+        description: post.seoDescription || post.excerpt,
+        image: post.coverImage || undefined,
+        datePublished: post.date,
+        author: {
+          "@type": "Person",
+          name: post.author?.name || "4 Billion Years On",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "4 Billion Years On",
+          url: "https://4billionyearson.org",
+          logo: "https://4billionyearson.org/logo.png",
+        },
+        mainEntityOfPage: `https://4billionyearson.org/posts/${params.slug}`,
+        ...(post.categories && post.categories.length > 0
+          ? { articleSection: post.categories.map((c: any) => c.title) }
+          : {}),
+        keywords: post.categories?.map((c: any) => c.title)?.join(", "),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: breadcrumbItems,
+      },
+    ],
   };
 
   return (
@@ -91,6 +108,14 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
     description,
     openGraph: {
       title,
+      description,
+      type: 'article',
+      publishedTime: post.date,
+      images: post.coverImage ? [{ url: post.coverImage, width: 1200, height: 630, alt: title }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | 4 Billion Years On`,
       description,
       images: post.coverImage ? [post.coverImage] : [],
     },

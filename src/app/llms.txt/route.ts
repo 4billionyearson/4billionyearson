@@ -1,4 +1,25 @@
-# 4 Billion Years On
+import { getAllPosts, getAllCategories } from '@/lib/api';
+import { NextResponse } from 'next/server';
+
+export const revalidate = 3600;
+
+export async function GET() {
+  const [posts, categories] = await Promise.all([getAllPosts(), getAllCategories()]);
+
+  const baseUrl = 'https://4billionyearson.org';
+
+  const postLines = posts
+    .map((p) => {
+      const cat = p.categories?.[0]?.title ?? 'General';
+      return `- [${p.title}](${baseUrl}/posts/${p.slug}) (${cat}, ${p.date?.slice(0, 10) ?? ''})`;
+    })
+    .join('\n');
+
+  const categoryLines = categories
+    .map((c: any) => `- [${c.title} Articles](${baseUrl}/category/${c.slug})`)
+    .join('\n');
+
+  const body = `# 4 Billion Years On
 
 > A living dashboard for the forces reshaping the world — tracking climate change, renewable energy, artificial intelligence and biotechnology with interactive data visualisations, plain-English explainers, and sourced articles, updated monthly.
 
@@ -6,7 +27,7 @@
 
 4 Billion Years On is a data journalism platform covering four civilisation-scale shifts: climate change, renewable energy, artificial intelligence and biotechnology. It presents complex data in clear, interactive formats for students, researchers, journalists, educators, policymakers and anyone seeking sourced, visual data on the biggest challenges facing humanity.
 
-The site's four topic hubs each combine a live data dashboard (updated monthly or annually), a plain-English explainer, curated book recommendations, and a blog category — all in one place.
+Core value proposition: Real-time and regularly updated data dashboards, plain-English explainers, curated book recommendations, and editorial articles across all four domains, designed for curious non-experts who want context, not just headlines.
 
 ## What the site covers
 
@@ -33,35 +54,53 @@ The site's four topic hubs each combine a live data dashboard (updated monthly o
 
 ## Interactive dashboards
 
-- Climate Dashboard: https://4billionyearson.org/climate-dashboard
-- Emissions: https://4billionyearson.org/emissions
-- Energy: https://4billionyearson.org/energy-dashboard
-- Energy Rankings: https://4billionyearson.org/energy-rankings
-- Greenhouse Gases: https://4billionyearson.org/greenhouse-gases
-- Sea Levels & Ice: https://4billionyearson.org/sea-levels-ice
-- Extreme Weather: https://4billionyearson.org/extreme-weather
-- Planetary Boundaries: https://4billionyearson.org/planetary-boundaries
-- AI Dashboard: https://4billionyearson.org/ai-dashboard
-- Biotech Dashboard: https://4billionyearson.org/biotech-dashboard
+- Climate Dashboard: ${baseUrl}/climate-dashboard
+- Emissions: ${baseUrl}/emissions
+- Energy: ${baseUrl}/energy-dashboard
+- Energy Rankings: ${baseUrl}/energy-rankings
+- Greenhouse Gases: ${baseUrl}/greenhouse-gases
+- Sea Levels & Ice: ${baseUrl}/sea-levels-ice
+- Extreme Weather: ${baseUrl}/extreme-weather
+- Planetary Boundaries: ${baseUrl}/planetary-boundaries
+- AI Dashboard: ${baseUrl}/ai-dashboard
+- Biotech Dashboard: ${baseUrl}/biotech-dashboard
 
 ## Explainer pages
 
-- Climate Explained: https://4billionyearson.org/climate-explained
-- Energy Explained: https://4billionyearson.org/energy-explained
-- AI Explained: https://4billionyearson.org/ai-explained
-- Biotech Explained: https://4billionyearson.org/biotech-explained
+- Climate Explained: ${baseUrl}/climate-explained
+- Energy Explained: ${baseUrl}/energy-explained
+- AI Explained: ${baseUrl}/ai-explained
+- Biotech Explained: ${baseUrl}/biotech-explained
 
 ## Recommended books
 
-- Climate Books: https://4billionyearson.org/climate-books
-- Energy Books: https://4billionyearson.org/energy-books
-- AI Books: https://4billionyearson.org/ai-books
-- Biotech Books: https://4billionyearson.org/biotech-books
+- Climate Books: ${baseUrl}/climate-books
+- Energy Books: ${baseUrl}/energy-books
+- AI Books: ${baseUrl}/ai-books
+- Biotech Books: ${baseUrl}/biotech-books
 
-## Blog
+## Blog categories
 
-Latest articles on climate, energy, AI and biotech: https://4billionyearson.org
+${categoryLines}
+
+## Recent articles
+
+${postLines}
+
+## Full content
+
+For full article text and structured content, see: ${baseUrl}/llms-full.txt
 
 ## Contact
 
-Website: https://4billionyearson.org
+Website: ${baseUrl}
+Email: chris.4billionyears@gmail.com
+`;
+
+  return new NextResponse(body, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+    },
+  });
+}
