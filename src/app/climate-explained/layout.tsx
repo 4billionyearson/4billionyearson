@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Climate Change Explained | 4 Billion Years On",
+  description: "A plain-English guide to climate change: greenhouse gases, global warming, feedback loops, tipping points, and what the science really says.",
+  alternates: { canonical: 'https://4billionyearson.org/climate-explained' },
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",

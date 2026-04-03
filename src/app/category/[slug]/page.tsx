@@ -107,6 +107,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: `${category.title} | 4 Billion Years On`,
     description: category.description,
+    alternates: { canonical: `https://4billionyearson.org/category/${slug}` },
     openGraph: {
       title: `${category.title} | 4 Billion Years On`,
       description: category.description,

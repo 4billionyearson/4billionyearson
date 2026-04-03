@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Local & Global Climate Change | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/climate-dashboard' },
   description:
     "Live climate data updated monthly. Compare global and local temperatures, track anomalies, and explore historical trends with interactive charts.",
   openGraph: {

@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Live Extreme Weather Tracker – Floods, Wildfires, Droughts & Storms | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/extreme-weather' },
   description:
     "Live extreme weather data with real-time GDACS alerts and historical trends from 1960. Track floods, wildfires, droughts, cyclones, and their human impact worldwide.",
   openGraph: {

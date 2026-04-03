@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "CO₂ Emissions by Country — Rankings & Trends | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/emissions' },
   description:
     "Country-by-country CO₂ emissions data updated annually. Compare total and per-capita emissions, track historical trends, and explore sector breakdowns.",
   openGraph: {

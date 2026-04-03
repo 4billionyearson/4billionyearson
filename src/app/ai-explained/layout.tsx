@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AI Explained | 4 Billion Years On",
+  description: "A plain-English guide to artificial intelligence: machine learning, large language models, neural networks, AI safety, and what the technology really means.",
+  alternates: { canonical: 'https://4billionyearson.org/ai-explained' },
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",

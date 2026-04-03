@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Energy Explained | 4 Billion Years On",
+  description: "A plain-English guide to global energy: fossil fuels vs renewables, how electricity grids work, energy units explained, and the transition to clean power.",
+  alternates: { canonical: 'https://4billionyearson.org/energy-explained' },
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",

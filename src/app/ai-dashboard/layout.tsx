@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "AI Industry Data | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/ai-dashboard' },
   description:
     "Track global AI investment, adoption, research output, compute trends, and regulation with interactive charts and data.",
   openGraph: {

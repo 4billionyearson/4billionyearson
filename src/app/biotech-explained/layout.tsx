@@ -1,3 +1,11 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Biotechnology Explained | 4 Billion Years On",
+  description: "A plain-English guide to biotechnology: gene editing, CRISPR, mRNA, synthetic biology, and how biotech is reshaping medicine, agriculture, and industry.",
+  alternates: { canonical: 'https://4billionyearson.org/biotech-explained' },
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",

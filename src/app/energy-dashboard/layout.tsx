@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Local & Global Energy Data | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/energy-dashboard' },
   description:
     "Live energy data updated monthly. Track global and country-level renewable energy generation, compare sources, and explore the clean energy transition.",
   openGraph: {

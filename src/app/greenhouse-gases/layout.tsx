@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Live Greenhouse Gas Tracker – CO₂, Methane & Temperature | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/greenhouse-gases' },
   description:
     "Live greenhouse gas data updated monthly. Track atmospheric CO₂, methane levels, temperature anomalies, and 800,000-year ice core records.",
   openGraph: {

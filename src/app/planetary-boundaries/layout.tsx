@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Live Planetary Boundaries – The Nine Factors Threatening Earth | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/planetary-boundaries' },
   description:
     "Live planetary boundary data updated regularly. Explore the nine critical Earth-system processes – from climate change and biodiversity loss to ocean acidification.",
   openGraph: {

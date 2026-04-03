@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Live Sea Level & Ice Data – Arctic, Antarctic & Global Trends | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/sea-levels-ice' },
   description:
     "Live sea level and ice sheet data updated monthly. Track global sea level rise, Arctic and Antarctic ice extent, and Greenland ice mass loss.",
   openGraph: {

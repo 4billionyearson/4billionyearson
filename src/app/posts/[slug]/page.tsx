@@ -106,6 +106,7 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
   return {
     title: `${title} | 4 Billion Years On`,
     description,
+    alternates: { canonical: `https://4billionyearson.org/posts/${params.slug}` },
     openGraph: {
       title,
       description,

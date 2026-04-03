@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { getAllPosts, getAllCategories } from '@/lib/api';
 
+export const revalidate = 86400; // 24h fallback — primary invalidation via /api/revalidate webhook
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://4billionyearson.org';
 
@@ -95,6 +97,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date('2025-06-01'),
       changeFrequency: 'monthly' as const,
       priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/ai-dashboard`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/biotech-dashboard`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/biotech-explained`,

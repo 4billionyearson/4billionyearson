@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Global Energy Rankings | 4 Billion Years On",
+  alternates: { canonical: 'https://4billionyearson.org/energy-rankings' },
   description:
     "Live global rankings for renewable energy production, solar, wind, cleanest electricity grids, and fossil-fuel dependency – updated monthly.",
   openGraph: {
