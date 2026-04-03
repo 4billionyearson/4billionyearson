@@ -105,6 +105,20 @@ html {
   filter: saturate(3);
 }
 
+/* Restore ordered list numbering in post HTML bodies
+   (Tailwind preflight strips list-style; @tailwindcss/typography is not installed) */
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+}
+.prose ol li {
+  padding-left: 0.25rem;
+}
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
 /* Pulsing LIVE badge */
 @keyframes live-pulse {
   0%, 100% { opacity: 1; }
