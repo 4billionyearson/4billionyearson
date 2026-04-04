@@ -45,3 +45,15 @@ export async function setShortTerm(key: string, value: unknown): Promise<void> {
     console.warn('Redis set failed:', e);
   }
 }
+
+const DAILY_TTL = 24 * 60 * 60; // 1 day in seconds
+
+export async function setDailyTerm(key: string, value: unknown): Promise<void> {
+  const r = getRedis();
+  if (!r) return;
+  try {
+    await r.set(key, value, { ex: DAILY_TTL });
+  } catch (e) {
+    console.warn('Redis set failed:', e);
+  }
+}

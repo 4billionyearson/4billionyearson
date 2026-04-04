@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getCached, setShortTerm } from '@/lib/climate/redis';
+import { getCached, setShortTerm, setDailyTerm } from '@/lib/climate/redis';
 
 interface NoaaDataPoint {
   value: string;
@@ -132,13 +132,26 @@ function buildMonthlyComparison(monthlyData: Record<string, number>, param: stri
   return comparison;
 }
 
+function getPrevMonthKey(): string {
+  const d = new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function getLatestDataMonth(data: Record<string, number>): string {
+  const keys = Object.keys(data).sort();
+  if (keys.length === 0) return '';
+  const latest = keys[keys.length - 1];
+  return `${latest.substring(0, 4)}-${latest.substring(4, 6)}`;
+}
+
 export async function GET() {
-  const cacheKey = 'climate:us-national';
-  const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v2`;
+  const cacheKey = 'climate:us-national-v3';
+  const prevMonthKey = getPrevMonthKey();
 
   const cached = await getCached<any>(cacheKey);
-  if (cached && cached.lastUpdated === currentMonthKey) {
+  if (cached && cached.lastUpdated >= prevMonthKey) {
     return NextResponse.json({ ...cached, source: 'cache' });
   }
 
@@ -161,14 +174,21 @@ export async function GET() {
       };
     }
 
+    const tavgData = results[0]?.data ?? {};
+    const latestDataMonth = getLatestDataMonth(tavgData);
+
     const response = {
       state: 'United States',
       id: 'us-national',
       paramData,
-      lastUpdated: currentMonthKey,
+      lastUpdated: latestDataMonth,
     };
 
-    await setShortTerm(cacheKey, response);
+    if (latestDataMonth >= prevMonthKey) {
+      await setShortTerm(cacheKey, response);
+    } else {
+      await setDailyTerm(cacheKey, response);
+    }
     return NextResponse.json({ ...response, source: 'fresh' });
   } catch (err: any) {
     if (cached) {
