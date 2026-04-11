@@ -56,6 +56,7 @@ export const metadata: Metadata = {
     title: "4 Billion Years On",
     description:
       "Interactive climate, energy, AI and biotech dashboards with sourced data visualisations.",
+    images: [HOME_OG_IMAGE_URL],
   },
   category: "Science & Technology",
   other: {

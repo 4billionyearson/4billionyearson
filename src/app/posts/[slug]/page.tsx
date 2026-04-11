@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/api";
+import { HOME_OG_IMAGE_URL } from "@/lib/constants";
 import Container from "@/app/_components/container";
 import { PostHeader } from "@/app/_components/post-header";
 import { PostBody } from "@/app/_components/portable-text-body";
@@ -112,13 +113,13 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
       description,
       type: 'article',
       publishedTime: post.date,
-      images: post.coverImage ? [{ url: post.coverImage, width: 1200, height: 630, alt: title }] : [],
+      images: [{ url: post.coverImage || HOME_OG_IMAGE_URL, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${title} | 4 Billion Years On`,
       description,
-      images: post.coverImage ? [post.coverImage] : [],
+      images: [post.coverImage || HOME_OG_IMAGE_URL],
     },
   };
 }
