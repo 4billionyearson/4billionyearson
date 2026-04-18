@@ -379,94 +379,6 @@ export default function AIDashboardPage() {
                 </p>
               </div>
 
-              {/* ═══ AI MODELS & BENCHMARKS ═══ */}
-              <Divider icon={<Brain className="h-5 w-5" />} title="AI Models" />
-
-              {data.latestModels?.length > 0 && (
-              <SectionCard icon={<Brain className="h-5 w-5 text-emerald-400" />} title="Latest AI Models Released">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-700/50 text-left">
-                        <th className="py-2 pr-4 text-gray-400 font-medium">Model</th>
-                        <th className="py-2 pr-4 text-gray-400 font-medium">Organization</th>
-                        <th className="py-2 pr-4 text-gray-400 font-medium hidden sm:table-cell">Domain</th>
-                        <th className="py-2 text-gray-400 font-medium">Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.latestModels.map((m, i) => (
-                        <tr key={i} className="border-b border-gray-800/40">
-                          <td className="py-2 pr-4 text-gray-200 font-medium">{m.name}</td>
-                          <td className="py-2 pr-4 text-gray-400">{m.org}</td>
-                          <td className="py-2 pr-4 text-gray-400 hidden sm:table-cell">{m.domain}</td>
-                          <td className="py-2 text-gray-400 whitespace-nowrap">{m.date}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <p className="text-xs text-gray-400 mt-4">
-                  Most recently released AI models. Source:{" "}
-                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Epoch AI
-                  </a>. Continuously updated.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.epochModelsByOrg?.length > 0 && (
-              <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 AI Models Released by Organization">
-                <Top10BarChart data={data.epochModelsByOrg} dataKey="models" />
-                <p className="text-xs text-gray-400 mt-4">
-                  AI models released in 2025, by organization. Source:{" "}
-                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Epoch AI
-                  </a>. Continuously updated.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.epochModelsByYear?.length > 0 && (
-              <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="AI Models Released Per Year">
-                <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} showBrush={false} />
-                <p className="text-xs text-gray-400 mt-4">
-                  AI models released per year (2010–present). Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>. Continuously updated.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.aiSystemsPerYear.length > 0 && (
-              <SectionCard icon={<Brain className="h-5 w-5 text-violet-400" />} title="AI Systems Released Per Year">
-                <StackedBarChart data={data.aiSystemsPerYear} keys={seriesKeys(data.aiSystemsPerYear)} />
-                <p className="text-xs text-gray-400 mt-4">
-                  Number of large-scale AI systems released per year, by domain (language, vision, multimodal, etc.). Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" / "}<a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>. Updated monthly.
-                  <span className="block mt-1 text-amber-400/80">2026 figure is year-to-date and will increase throughout the year.</span>
-                </p>
-              </SectionCard>
-              )}
-
-              {data.aiSystemsByCountry.length > 0 && (
-              <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title="Cumulative AI Systems by Country">
-                <MultiAreaChart data={data.aiSystemsByCountry} keys={seriesKeys(data.aiSystemsByCountry)} stacked />
-                <p className="text-xs text-gray-400 mt-4">
-                  Cumulative number of large-scale AI systems by country of origin since 2017. Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" / "}<a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>. Updated monthly.
-                </p>
-              </SectionCard>
-              )}
-
-              {data.frontierMath?.length > 0 && (
-              <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark">
-                <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${Math.round(v)}%`} />
-                <p className="text-xs text-gray-400 mt-4">
-                  Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Source:{" "}
-                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Epoch AI
-                  </a>. Updated monthly.
-                </p>
-              </SectionCard>
-              )}
-
               {/* ═══ INFRASTRUCTURE ═══ */}
               <Divider icon={<Cpu className="h-5 w-5" />} title="Infrastructure" />
 
@@ -740,6 +652,94 @@ export default function AIDashboardPage() {
                     </div>
                   );
                 })()}
+              </SectionCard>
+              )}
+
+              {/* ═══ AI MODELS & BENCHMARKS ═══ */}
+              <Divider icon={<Brain className="h-5 w-5" />} title="AI Models" />
+
+              {data.latestModels?.length > 0 && (
+              <SectionCard icon={<Brain className="h-5 w-5 text-emerald-400" />} title="Latest AI Models Released">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-700/50 text-left">
+                        <th className="py-2 pr-4 text-gray-400 font-medium">Model</th>
+                        <th className="py-2 pr-4 text-gray-400 font-medium">Organization</th>
+                        <th className="py-2 pr-4 text-gray-400 font-medium hidden sm:table-cell">Domain</th>
+                        <th className="py-2 text-gray-400 font-medium">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.latestModels.map((m, i) => (
+                        <tr key={i} className="border-b border-gray-800/40">
+                          <td className="py-2 pr-4 text-gray-200 font-medium">{m.name}</td>
+                          <td className="py-2 pr-4 text-gray-400">{m.org}</td>
+                          <td className="py-2 pr-4 text-gray-400 hidden sm:table-cell">{m.domain}</td>
+                          <td className="py-2 text-gray-400 whitespace-nowrap">{m.date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-gray-400 mt-4">
+                  Most recently released AI models. Source:{" "}
+                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI
+                  </a>. Continuously updated.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.epochModelsByOrg?.length > 0 && (
+              <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 AI Models Released by Organization">
+                <Top10BarChart data={data.epochModelsByOrg} dataKey="models" />
+                <p className="text-xs text-gray-400 mt-4">
+                  AI models released in 2025, by organization. Source:{" "}
+                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI
+                  </a>. Continuously updated.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.epochModelsByYear?.length > 0 && (
+              <SectionCard icon={<TrendingUp className="h-5 w-5 text-amber-400" />} title="AI Models Released Per Year">
+                <StackedBarChart data={data.epochModelsByYear} keys={seriesKeys(data.epochModelsByYear)} showBrush={false} />
+                <p className="text-xs text-gray-400 mt-4">
+                  AI models released per year (2010–present). Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>. Continuously updated.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.aiSystemsPerYear.length > 0 && (
+              <SectionCard icon={<Brain className="h-5 w-5 text-violet-400" />} title="AI Systems Released Per Year">
+                <StackedBarChart data={data.aiSystemsPerYear} keys={seriesKeys(data.aiSystemsPerYear)} />
+                <p className="text-xs text-gray-400 mt-4">
+                  Number of large-scale AI systems released per year, by domain (language, vision, multimodal, etc.). Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" / "}<a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>. Updated monthly.
+                  <span className="block mt-1 text-amber-400/80">2026 figure is year-to-date and will increase throughout the year.</span>
+                </p>
+              </SectionCard>
+              )}
+
+              {data.aiSystemsByCountry.length > 0 && (
+              <SectionCard icon={<Globe className="h-5 w-5 text-blue-400" />} title="Cumulative AI Systems by Country">
+                <MultiAreaChart data={data.aiSystemsByCountry} keys={seriesKeys(data.aiSystemsByCountry)} stacked />
+                <p className="text-xs text-gray-400 mt-4">
+                  Cumulative number of large-scale AI systems by country of origin since 2017. Source:{" "}<a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Epoch AI</a>{" / "}<a href="https://ourworldindata.org/artificial-intelligence" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Our World in Data</a>. Updated monthly.
+                </p>
+              </SectionCard>
+              )}
+
+              {data.frontierMath?.length > 0 && (
+              <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark">
+                <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${Math.round(v)}%`} />
+                <p className="text-xs text-gray-400 mt-4">
+                  Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Source:{" "}
+                  <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                    Epoch AI
+                  </a>. Updated monthly.
+                </p>
               </SectionCard>
               )}
 

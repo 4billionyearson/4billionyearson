@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Marker } from "
 import type { FeatureCollection, Feature } from "geojson";
 import type { Layer, PathOptions } from "leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 /* ─── Geometry helpers ──────────────────────────────────────────────────── */
 
