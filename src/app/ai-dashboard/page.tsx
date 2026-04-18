@@ -305,7 +305,7 @@ export default function AIDashboardPage() {
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
           <div className="rounded-2xl border-2 border-[#88DDFC] shadow-xl overflow-hidden">
-            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: "#88DDFC" }}>
+            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-[14px]" style={{ backgroundColor: "#88DDFC" }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: "#FFF5E7" }}>
                 AI Industry Data
               </h1>

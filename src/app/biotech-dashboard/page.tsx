@@ -170,7 +170,7 @@ export default function BiotechDashboardPage() {
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
           <div className="rounded-2xl border-2 border-[#FFF5E7] shadow-xl overflow-hidden">
-            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: "#FFF5E7" }}>
+            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-[14px]" style={{ backgroundColor: "#FFF5E7" }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: "#D26742" }}>
                 Biotechnology
               </h1>

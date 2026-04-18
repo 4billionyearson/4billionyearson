@@ -156,7 +156,7 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
         onClick={onToggle}
         className="w-full text-left group"
       >
-        <div className="px-4 py-3 md:px-5 md:py-4 flex items-center gap-2" style={{ backgroundColor: c }}>
+        <div className="px-4 py-3 md:px-5 md:py-4 flex items-center gap-2 rounded-t-[14px]" style={{ backgroundColor: c }}>
           <div
             className={`transition-transform duration-300 flex-shrink-0 ${isExpanded ? "scale-110" : "group-hover:scale-105"}`}
             style={{ color: textColor }}

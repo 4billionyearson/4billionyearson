@@ -773,7 +773,7 @@ export default function ExtremeWeatherPage() {
         <div className="max-w-7xl mx-auto space-y-6">
           {/* ─── Hero ─────────────────────────────────────────────── */}
           <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
-            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-[14px]" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 Extreme Weather Events
               </h1>

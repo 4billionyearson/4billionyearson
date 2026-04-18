@@ -564,7 +564,7 @@ export default function ClimateDashboard() {
                   />
                 </div>
                 <button type="submit" disabled={loading}
-                  className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85" style={{ backgroundColor: '#D0A65E', color: '#FFF5E7' }}>
+                  className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85 rounded-t-[14px]" style={{ backgroundColor: '#D0A65E', color: '#FFF5E7' }}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
                 </button>
               </form>

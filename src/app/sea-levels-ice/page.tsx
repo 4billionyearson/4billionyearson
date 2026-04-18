@@ -233,7 +233,7 @@ export default function SeaLevelsIcePage() {
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
           <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
-            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-[14px]" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 Sea Levels &amp; Ice
               </h1>
