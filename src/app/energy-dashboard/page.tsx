@@ -1392,13 +1392,13 @@ export default function EnergyPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ───────────────────────────────────────────────── */}
-          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369]">
-            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl ring-2 ring-inset ring-[#D2E369]" style={{ backgroundColor: '#D2E369' }}>
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369] overflow-hidden" style={{ background: "linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)" }}>
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#2C5263' }}>
                 Local & Global Energy Data
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-b-2xl">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
             <p className="text-sm md:text-base mb-4 font-medium" style={{ color: '#D2E369' }}>
               Search for any country, or USA state.
             </p>

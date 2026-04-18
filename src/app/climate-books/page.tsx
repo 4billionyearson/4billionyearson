@@ -252,8 +252,8 @@ export default async function ClimateBooksPage() {
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E] overflow-hidden">
-            <div className="px-5 py-4 md:px-6 md:py-5 ring-2 ring-inset ring-[#D0A65E]" style={{ backgroundColor: '#D0A65E' }}>
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E] overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
+            <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#FFF5E7]">Climate Change Books</h1>
               <div className="flex items-center gap-2 mt-3">
                 <BookOpen className="h-5 w-5 text-[#FFF5E7]/80" />

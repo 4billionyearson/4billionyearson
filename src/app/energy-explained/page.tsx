@@ -76,8 +76,8 @@ export default function EnergyExplainedPage() {
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369] overflow-hidden">
-            <div className="px-5 py-4 md:px-6 md:py-5 ring-2 ring-inset ring-[#D2E369]" style={{ backgroundColor: '#D2E369' }}>
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369] overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)' }}>
+            <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#D2E369' }}>
               <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">Renewable Energy</h1>
               <div className="flex items-center gap-2 mt-3">
                 <BookOpen className="h-5 w-5 text-[#2C5263]/80" />

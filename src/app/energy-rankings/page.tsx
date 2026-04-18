@@ -112,8 +112,8 @@ export default function EnergyRankingsPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="rounded-2xl border-2 border-[#D2E369] shadow-xl overflow-hidden">
-            <div className="px-4 py-3 md:px-6 md:py-4 ring-2 ring-inset ring-[#D2E369]" style={{ backgroundColor: '#D2E369' }}>
+          <div className="rounded-2xl border-2 border-[#D2E369] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)' }}>
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#2C5263' }}>
                 Energy Rankings
               </h1>

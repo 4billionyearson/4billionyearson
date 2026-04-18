@@ -538,7 +538,7 @@ export default function ClimateDashboard() {
 
         {/* ─── Header & Search ──────────────────────────────────────── */}
         <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-          <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl ring-2 ring-inset ring-[#D0A65E]" style={{ backgroundColor: '#D0A65E' }}>
+          <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl" style={{ backgroundColor: '#D0A65E' }}>
             <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
               Local & Global Climate Change
             </h1>

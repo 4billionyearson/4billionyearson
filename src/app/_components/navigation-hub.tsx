@@ -148,7 +148,7 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
   return (
     <div
       className="relative rounded-2xl border-2 transition-all duration-500 ease-out overflow-hidden"
-      style={{ borderColor: c, boxShadow: isExpanded ? `0 4px 24px ${c}33` : '0 4px 12px rgba(0,0,0,0.4)' }}
+      style={{ borderColor: c, background: `linear-gradient(to bottom, ${c} 0%, ${c} 20px, transparent 20px)`, boxShadow: isExpanded ? `0 4px 24px ${c}33` : '0 4px 12px rgba(0,0,0,0.4)' }}
     >
 
       {/* Colored header – title row */}
@@ -156,7 +156,7 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
         onClick={onToggle}
         className="w-full text-left group"
       >
-        <div className="px-4 py-3 md:px-5 md:py-4 flex items-center gap-2" style={{ backgroundColor: c, boxShadow: 'inset 0 0 0 2px ' + c }}>
+        <div className="px-4 py-3 md:px-5 md:py-4 flex items-center gap-2" style={{ backgroundColor: c }}>
           <div
             className={`transition-transform duration-300 flex-shrink-0 ${isExpanded ? "scale-110" : "group-hover:scale-105"}`}
             style={{ color: textColor }}

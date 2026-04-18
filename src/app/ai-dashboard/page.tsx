@@ -304,8 +304,8 @@ export default function AIDashboardPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ─────────────────────────────────────────────── */}
-          <div className="rounded-2xl border-2 border-[#88DDFC] shadow-xl overflow-hidden">
-            <div className="px-4 py-3 md:px-6 md:py-4 ring-2 ring-inset ring-[#88DDFC]" style={{ backgroundColor: "#88DDFC" }}>
+          <div className="rounded-2xl border-2 border-[#88DDFC] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #88DDFC 0%, #88DDFC 20px, transparent 20px)' }}>
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: "#88DDFC" }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: "#FFF5E7" }}>
                 AI Industry Data
               </h1>

@@ -234,8 +234,8 @@ export default async function BiotechBooksPage() {
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Hero */}
-          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#FFF5E7] overflow-hidden">
-            <div className="px-5 py-4 md:px-6 md:py-5 ring-2 ring-inset ring-[#FFF5E7]" style={{ backgroundColor: '#FFF5E7' }}>
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#FFF5E7] overflow-hidden" style={{ background: 'linear-gradient(to bottom, #FFF5E7 0%, #FFF5E7 20px, transparent 20px)' }}>
+            <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#FFF5E7' }}>
               <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#D26742]">Biotechnology Books</h1>
               <div className="flex items-center gap-2 mt-3">
                 <BookOpen className="h-5 w-5 text-[#D26742]/80" />
