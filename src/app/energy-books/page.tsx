@@ -23,7 +23,13 @@ interface Book {
   asin: string;
   cover: string;
   rating: string;
-  description: string;
+  curatorNote: string;
+  reviewHighlights: string[];
+  bestFor: string[];
+  dataConnection: {
+    text: string;
+    link: string;
+  };
 }
 
 const BOOKS: Book[] = [
@@ -34,8 +40,16 @@ const BOOKS: Book[] = [
     asin: "1804290785",
     cover: "ETPBEAAAQBAJ",
     rating: "4.5",
-    description:
-      "Why has renewable energy not displaced fossil fuels faster? Christophers argues the answer lies in economics – green energy is not as cheap as headlines suggest, and markets alone won’t deliver the transition without bold policy intervention.",
+    curatorNote: "Brett Christophers tackles the economic barriers hindering the rapid deployment of renewables. Understanding that capital, not just technology, limits the clean energy transition is a core lesson in our data models.",
+    reviewHighlights: [
+      "Praised for puncturing the myth that 'cheap renewables' will automatically solve the climate crisis via free markets.",
+      "Considered a sobering but essential read about electricity pricing and utilities."
+    ],
+    bestFor: ["Economists", "Policy makers", "Energy analysts"],
+    dataConnection: {
+      text: "Compare these economic headwinds against actual renewable deployment charts.",
+      link: "/energy-dashboard"
+    }
   },
   {
     title: "Volt Rush",
@@ -44,8 +58,16 @@ const BOOKS: Book[] = [
     asin: "0861544692",
     cover: "aZlZEAAAQBAJ",
     rating: "4.4",
-    description:
-      "The electrification of everything requires vast quantities of lithium, cobalt, nickel, and rare earths. Financial Times journalist Sanderson investigates the geopolitics and human cost of the battery supply chain powering the clean energy revolution.",
+    curatorNote: "Sanderson investigates the geopolitical scramble for battery metals. This highlights the physical limitations of scaling our energy storage infrastructure to meet global demand.",
+    reviewHighlights: [
+      "Appreciated for moving beyond vague 'green' promises to the gritty reality of mining.",
+      "Noted for its exceptional, on-the-ground investigative journalism."
+    ],
+    bestFor: ["Supply chain analysts", "Geopolitics students", "EV enthusiasts"],
+    dataConnection: {
+      text: "Track the growth in electric vehicles versus the expansion of global grids.",
+      link: "/energy-dashboard"
+    }
   },
   {
     title: "How the World Really Works",
@@ -54,8 +76,16 @@ const BOOKS: Book[] = [
     asin: "0241454409",
     cover: "G3EszgEACAAJ",
     rating: "4.5",
-    description:
-      "Bill Gates’s favourite author explains the fundamental realities of energy, food production, materials, and the environment. Smil cuts through the noise with hard data, showing what it will truly take to transition away from fossil fuels.",
+    curatorNote: "Smil cuts through the hype to map the physical realities of energy density. His insistence on grounded, data-driven analysis makes this book effectively a manual for our dashboard methodology.",
+    reviewHighlights: [
+      "Universally loved for its unflinching, hyper-rational breakdown of energy usage.",
+      "Readers praise the detailed chapters on modern dependence on cement, steel, plastics, and ammonia."
+    ],
+    bestFor: ["Engineers", "Realists", "Data scientists"],
+    dataConnection: {
+      text: "View the raw numbers behind global power production.",
+      link: "/energy-dashboard"
+    }
   },
   {
     title: "Electrify",
@@ -64,8 +94,16 @@ const BOOKS: Book[] = [
     asin: "0262046237",
     cover: "ALVCEAAAQBAJ",
     rating: "4.5",
-    description:
-      "Engineer and inventor Saul Griffith presents an optimistic, detailed plan for decarbonising everything through electrification. From heat pumps to EVs, he shows how existing technology can solve climate change – if deployed at scale.",
+    curatorNote: "Saul Griffith outlines a massive, optimistic engineering sprint to decarbonize using existing tech. It represents exactly the kind of planetary-scale pivot required in the next epoch of history.",
+    reviewHighlights: [
+      "Commended for its incredibly optimistic, action-oriented tone.",
+      "Valued as a practical blueprint full of detailed schematics for upgrading infrastructure."
+    ],
+    bestFor: ["Optimists", "Engineers", "City planners"],
+    dataConnection: {
+      text: "Track the transition progress toward 100% renewable generation.",
+      link: "/energy-dashboard"
+    }
   },
   {
     title: "The New Map",
@@ -74,8 +112,16 @@ const BOOKS: Book[] = [
     asin: "0141994886",
     cover: "5G_XDwAAQBAJ",
     rating: "4.5",
-    description:
-      "Pulitzer Prize winner Daniel Yergin charts how the energy revolution, climate politics, and geopolitical rivalries are reshaping the world map. Essential reading for understanding the intersection of energy, power, and global politics.",
+    curatorNote: "Yergin maps out how energy reshapes global geopolitics. Understanding the shift from a fossil-fuel map to a renewable map is key to interpreting international relations going forward.",
+    reviewHighlights: [
+      "Called the definitive guide to modern energy geopolitics post-shale revolution.",
+      "Praised for balancing the rise of China, US independence, and the climate transition."
+    ],
+    bestFor: ["Political scientists", "Historians", "Investors"],
+    dataConnection: {
+      text: "Explore how energy production breaks down across global superpowers.",
+      link: "/energy-rankings"
+    }
   },
   {
     title: "Superpower",
@@ -84,8 +130,16 @@ const BOOKS: Book[] = [
     asin: "1760875651",
     cover: "KPiPDwAAQBAJ",
     rating: "4.4",
-    description:
-      "Garnaut argues that countries rich in sun, wind, and land could become the energy superpowers of the 21st century. A compelling case for how the renewable energy transition creates enormous economic opportunity.",
+    curatorNote: "Garnaut charts how vast landscapes of sun and wind alter natural economic advantages. It demonstrates how geographical anomalies we track translate directly into economic power.",
+    reviewHighlights: [
+      "Highly regarded as a brilliant economic case study on leveraging natural resources.",
+      "Though Australia-focused, readers note the principles apply globally to sunny nations."
+    ],
+    bestFor: ["Economists", "Regional planners", "Solar advocates"],
+    dataConnection: {
+      text: "Compare relative solar and wind outputs across leading nations.",
+      link: "/energy-rankings"
+    }
   },
   {
     title: "Drawdown",
@@ -94,8 +148,16 @@ const BOOKS: Book[] = [
     asin: "0143130447",
     cover: "uvtlDgAAQBAJ",
     rating: "4.6",
-    description:
-      "The most comprehensive plan ever proposed to reverse global warming. Hawken and a team of researchers rank the top 100 solutions by impact – from wind turbines and solar farms to educating girls and reducing food waste.",
+    curatorNote: "Drawdown ranks the numerical impact of 100 different climate solutions. This exact kind of multi-variable quantification underscores why data visualization is critical to climate action.",
+    reviewHighlights: [
+      "Loved for turning climate advocacy into an incredibly well-organized, ranked list.",
+      "Readers appreciate the inclusion of unexpected models like family planning or regenerative agriculture."
+    ],
+    bestFor: ["Activists", "General audiences", "Sustainability officers"],
+    dataConnection: {
+      text: "Track the overarching metrics these localized solutions are meant to improve.",
+      link: "/climate-dashboard"
+    }
   },
   {
     title: "Energy and Civilization",
@@ -104,8 +166,16 @@ const BOOKS: Book[] = [
     asin: "0262536161",
     cover: "Br74DwAAQBAJ",
     rating: "4.4",
-    description:
-      "A sweeping history of how energy has shaped human civilisation, from biomass and muscle power to fossil fuels and renewables. Smil provides the deep context needed to understand today’s energy transition in historical perspective.",
+    curatorNote: "Smil tracks human progress entirely through the lens of energy capture—from muscle to coal to solar. This sweeping historical view is foundational to the concept of deep time evolution.",
+    reviewHighlights: [
+      "Considered the ultimate encyclopedic history of prime movers and horsepower.",
+      "Found extremely dense but mathematically rigorous and unparalleled in scope."
+    ],
+    bestFor: ["Anthropologists", "History teachers", "Engineers"],
+    dataConnection: {
+      text: "Trace modern energy generation back to its diverse root sources.",
+      link: "/energy-dashboard"
+    }
   },
   {
     title: "The Grid",
@@ -114,8 +184,16 @@ const BOOKS: Book[] = [
     asin: "1632863324",
     cover: "https://books.google.com/books/content?id=dTbbCwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
     rating: "4.3",
-    description:
-      "Named one of Bill Gates’s favourite reads. Bakke tells the fascinating story of the electrical grid – the most complex machine ever built – and explains why modernising it is essential for the renewable energy transition.",
+    curatorNote: "Bakke clarifies how transforming our power grids is the prerequisite for a renewable era. We view the grid not just as infrastructure, but as humanity’s largest physical machine.",
+    reviewHighlights: [
+      "Praised for making utility management and alternating current history genuinely entertaining.",
+      "Cited as the perfect clarifier for why simply 'building more solar panels' isn't enough."
+    ],
+    bestFor: ["Urban planners", "Tech historians", "Policy advocates"],
+    dataConnection: {
+      text: "Compare modern grid output to historical baseload demand curves.",
+      link: "/energy-dashboard"
+    }
   },
   {
     title: "The Switch",
@@ -124,8 +202,16 @@ const BOOKS: Book[] = [
     asin: "1781255245",
     cover: "QWz4CgAAQBAJ",
     rating: "4.3",
-    description:
-      "Goodall makes the case that solar photovoltaics will become the world’s dominant energy source. He explains how plummeting costs, improving storage, and clever grid management are making a solar-powered civilisation inevitable.",
+    curatorNote: "Goodall tracks the economics making solar power an inevitability. Anticipating these exponential cost drops is critical to projecting our energy transition timelines.",
+    reviewHighlights: [
+      "Appreciated for predicting the massive solar price drops that defined later years.",
+      "Noted for clear explanations on the necessity of diverse storage technologies."
+    ],
+    bestFor: ["Investors", "Solar enthusiasts", "Optimists"],
+    dataConnection: {
+      text: "Look at the exponential rise in solar PV deployment over the last decade.",
+      link: "/energy-dashboard"
+    }
   },
   {
     title: "Windfall",
@@ -134,8 +220,16 @@ const BOOKS: Book[] = [
     asin: "0143126598",
     cover: "X-dvDwAAQBAJ",
     rating: "4.2",
-    description:
-      "A global investigation into who stands to profit from climate change. Funk travels from Greenland to Israel to explore how entrepreneurs, nations, and militaries are turning rising seas, melting ice, and drought into business opportunities.",
+    curatorNote: "By exploring how investors intend to profit off a warming world, Funk reveals the darker side of energy transitions. Watching where capital flows clarifies future development.",
+    reviewHighlights: [
+      "Valued for its unique, unsentimental angle examining the 'climate capitalism' industry.",
+      "Described as deeply engaging travelogue journalism mixed with financial investigation."
+    ],
+    bestFor: ["Finance professionals", "Journalism nerds", "Realists"],
+    dataConnection: {
+      text: "See the shifting dynamics of sea levels and extreme temperatures.",
+      link: "/extreme-weather"
+    }
   },
   {
     title: "Sustainable Energy – Without the Hot Air",
@@ -144,24 +238,51 @@ const BOOKS: Book[] = [
     asin: "0954452933",
     cover: "Ps7JEAAAQBAJ",
     rating: "4.6",
-    description:
-      "A cult classic among energy wonks. Professor MacKay uses back-of-the-envelope calculations to show exactly how much energy Britain uses and how renewables could (or couldn’t) replace fossil fuels. Rigorous, witty, and endlessly cited.",
-  },
+    curatorNote: "MacKay's insistence on basic arithmetic cuts out political rhetoric in favor of pure feasibility. Building models on strict math is the cornerstone of our visualization ethos.",
+    reviewHighlights: [
+      "Hailed as the gold standard for back-of-the-envelope energy physics.",
+      "Revered for its completely neutral, relentlessly logical dismantling of energy myths."
+    ],
+    bestFor: ["Physicists", "Mathematicians", "Logical thinkers"],
+    dataConnection: {
+      text: "Apply MacKay’s logic to our interactive energy mix dashboards.",
+      link: "/energy-dashboard"
+    }
+  }
 ];
 
 function coverUrl(cover: string) {
   if (cover.startsWith("http://") || cover.startsWith("https://")) {
     return cover;
   }
-
-  return `https://books.google.com/books/content?id=${cover}&printsec=frontcover&img=1&zoom=1`;
+  return \`https://books.google.com/books/content?id=\${cover}&printsec=frontcover&img=1&zoom=1\`;
 }
 
 export default async function EnergyBooksPage() {
   const countryCode = await getCountryCode();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": BOOKS.map((book, index) => ({
+      "@type": "Product",
+      "position": index + 1,
+      "name": book.title,
+      "author": { "@type": "Person", "name": book.author },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": book.rating,
+        "bestRating": "5"
+      }
+    }))
+  };
+
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369] overflow-hidden">
@@ -179,70 +300,92 @@ export default async function EnergyBooksPage() {
             </div>
           </div>
 
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
-            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-6">Recommended Books</h2>
-            <div className="grid gap-5">
-              {BOOKS.map((book) => (
-                <a
-                  key={book.asin}
-                  href={amazonUrl(book.title, book.author, countryCode)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#D2E369]/60 transition-colors group"
-                >
-                  <img
-                    src={coverUrl(book.cover)}
-                    alt={`${book.title} by ${book.author}`}
-                    className="w-20 md:w-28 h-auto object-contain rounded-lg shadow-lg flex-shrink-0 group-hover:scale-[1.02] transition-transform"
-                    loading="lazy"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h3 className="text-base md:text-lg font-bold text-white group-hover:text-[#D2E369] transition-colors leading-tight">{book.title}</h3>
-                        <p className="text-sm text-gray-400 mt-0.5">{book.author} · {book.year}</p>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-gray-600 group-hover:text-[#D2E369] flex-shrink-0 mt-1 transition-colors" />
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                      <span className="text-xs text-amber-400 font-semibold">{book.rating}</span>
-                      <span className="text-xs text-gray-500 ml-1">on Amazon</span>
-                    </div>
-                    <p className="text-sm text-gray-400 leading-relaxed mt-2 line-clamp-3 md:line-clamp-none">{book.description}</p>
+          {/* Books list */}
+          <div className="space-y-8">
+            {BOOKS.map((book) => (
+              <section
+                key={book.asin}
+                className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]/40 hover:border-[#D2E369] transition-colors"
+              >
+                <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+                  {/* Book Cover and Amazon CTA */}
+                  <div className="flex flex-col items-center gap-4 md:w-1/3 flex-shrink-0">
+                    <img
+                      src={coverUrl(book.cover)}
+                      alt={\`\${book.title} by \${book.author}\`}
+                      className="w-32 md:w-48 h-auto object-contain rounded-lg shadow-xl"
+                      loading="lazy"
+                    />
+                    <a
+                      href={amazonUrl(book.title, book.author, countryCode)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full text-center bg-[#D2E369] text-[#2C5263] font-bold py-2 px-4 rounded-xl hover:bg-[#C2D35A] transition-colors flex items-center justify-center gap-2"
+                    >
+                      Buy on Amazon <ExternalLink className="h-4 w-4" />
+                    </a>
                   </div>
-                </a>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 text-center mt-6 pt-4 border-t border-gray-800/40">
-              As an Amazon Associate, I earn from qualifying purchases.
-            </p>
-          </section>
 
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]">
-            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-4">Explore Our Energy Data</h2>
-            <p className="text-sm text-gray-400 mb-4">See the data behind the books with our interactive dashboards:</p>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {[
-                { href: "/energy-dashboard", label: "Global Energy Data", desc: "Energy mix by country & source" },
-                { href: "/energy-rankings", label: "Energy Rankings", desc: "Top producers & consumers" },
-                { href: "/energy-explained", label: "Energy Explained", desc: "Plain-English guide" },
-                { href: "/emissions", label: "CO₂ Emissions", desc: "Country rankings & trends" },
-              ].map(({ href, label, desc }) => (
-                <a
-                  key={href}
-                  href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
-                >
-                  <ExternalLink className="h-4 w-4 text-[#D2E369] flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  <div>
-                    <p className="text-sm font-semibold text-[#D2E369]">{label}</p>
-                    <p className="text-xs text-gray-500">{desc}</p>
+                  {/* Content */}
+                  <div className="flex-1 space-y-4">
+                    <div>
+                      <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">{book.title}</h2>
+                      <p className="text-lg text-gray-400 font-medium">{book.author} · {book.year}</p>
+                      
+                      <div className="flex items-center gap-1 mt-2">
+                        <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+                        <span className="text-sm text-amber-400 font-semibold">{book.rating}</span>
+                        <span className="text-sm text-gray-500 ml-1">Rating</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-sm tracking-widest uppercase text-gray-500 font-bold mb-2">Curator&apos;s Note</h3>
+                        <p className="text-gray-300 leading-relaxed">{book.curatorNote}</p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm tracking-widest uppercase text-gray-500 font-bold mb-2">Review Highlights</h3>
+                        <ul className="list-disc list-outside ml-4 text-gray-300 space-y-1">
+                          {book.reviewHighlights.map((highlight, i) => (
+                            <li key={i}>{highlight}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        <span className="text-sm tracking-widest uppercase text-gray-500 font-bold mr-2 self-center">Best For:</span>
+                        {book.bestFor.map((tag, i) => (
+                          <span key={i} className="bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-full border border-gray-700">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="mt-6 p-4 rounded-xl bg-gray-900 border border-gray-800">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                          <div>
+                            <p className="text-[#D2E369] font-bold text-sm uppercase tracking-wide">Why this matters</p>
+                            <p className="text-gray-300 text-sm mt-1">{book.dataConnection.text}</p>
+                          </div>
+                          <a href={book.dataConnection.link} className="text-sm text-white bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-center transition-colors border border-gray-600 whitespace-nowrap">
+                            View Data &rarr;
+                          </a>
+                        </div>
+                      </div>
+
+                    </div>
                   </div>
-                </a>
-              ))}
-            </div>
-          </section>
+                </div>
+              </section>
+            ))}
+          </div>
+
+          <p className="text-xs text-gray-500 text-center pt-8">
+            As an Amazon Associate, I earn from qualifying purchases.
+          </p>
+
         </div>
       </div>
     </main>

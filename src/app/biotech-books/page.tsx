@@ -25,7 +25,13 @@ interface Book {
   asin: string;
   cover: string;
   rating: string;
-  description: string;
+  curatorNote: string;
+  reviewHighlights: string[];
+  bestFor: string[];
+  dataConnection: {
+    text: string;
+    link: string;
+  };
 }
 
 const BOOKS: Book[] = [
@@ -36,8 +42,16 @@ const BOOKS: Book[] = [
     asin: "1982172975",
     cover: "Hn-HEAAAQBAJ",
     rating: "4.4",
-    description:
-      "National Geographic writer David Quammen delivers the definitive account of how COVID-19 emerged and spread. Combining virology, genomics, and investigative journalism, he traces the origins of SARS-CoV-2 and what it reveals about future pandemics.",
+    curatorNote: "David Quammen masterfully dissects the origin and spread of COVID-19. Understanding pandemics is vital to our biotechnology tracking, as viruses represent one of the most immediate existential vectors for humanity.",
+    reviewHighlights: [
+      "Praised for reading like a fast-paced scientific detective story.",
+      "Readers value the clear breakdown of genomic tracing and virology."
+    ],
+    bestFor: ["Public health officials", "Science history buffs", "Biomedical students"],
+    dataConnection: {
+      text: "See our latest data on viral outbreaks and public health.",
+      link: "/biotech-dashboard"
+    }
   },
   {
     title: "The Song of the Cell",
@@ -46,18 +60,34 @@ const BOOKS: Book[] = [
     asin: "1982117354",
     cover: "zkqMEAAAQBAJ",
     rating: "4.5",
-    description:
-      "From the author of The Gene and The Emperor of All Maladies. Mukherjee tells the story of the cell \u2013 the basic unit of life \u2013 and how cell therapy is revolutionising medicine, from cancer treatment to organ regeneration.",
+    curatorNote: "Siddhartha Mukherjee turns the microscopic world into an epic narrative. Understanding the basic building blocks of biological life maps directly to manipulating our own evolutionary trajectory.",
+    reviewHighlights: [
+      "Hailed as a sweeping, poetic biography of the human body's core units.",
+      "Noted for taking highly dense microbiology and making it intensely personal."
+    ],
+    bestFor: ["Medical professionals", "Biology enthusiasts", "General readers"],
+    dataConnection: {
+      text: "Explore how cellular therapies map against life expectancy trends.",
+      link: "/biotech-dashboard"
+    }
   },
   {
     title: "The Vaccine",
-    author: "Joe Miller, U\u011fur \u015eahin & \u00d6zlem T\u00fcreci",
+    author: "Joe Miller, Uğur Şahin & Özlem Türeci",
     year: 2022,
     asin: "1250280397",
     cover: "auPgEAAAQBAJ",
     rating: "4.5",
-    description:
-      "The inside story of how BioNTech created the first mRNA COVID-19 vaccine in record time. A gripping account of scientific ingenuity, personal sacrifice, and the decades of research that made the impossible possible.",
+    curatorNote: "The sheer speed of the mRNA COVID-19 vaccine's development is one of modern history's greatest feats. This inside story vividly captures the acceleration of biotechnology we emphasize in our models.",
+    reviewHighlights: [
+      "Commended for detailing the decades of obscure mRNA research before the pandemic hit.",
+      "Loved by readers for the inspiring portrait of the founding couple behind BioNTech."
+    ],
+    bestFor: ["Biotech founders", "Medical historians", "Entrepreneurs"],
+    dataConnection: {
+      text: "Review the development timelines for modern vaccines and therapies.",
+      link: "/biotech-dashboard"
+    }
   },
   {
     title: "The Code Breaker",
@@ -66,8 +96,16 @@ const BOOKS: Book[] = [
     asin: "1982115866",
     cover: "GUSFEAAAQBAJ",
     rating: "4.6",
-    description:
-      "The riveting story of Nobel Prize winner Jennifer Doudna and the invention of CRISPR gene editing. Walter Isaacson follows the race to harness the most significant biological tool since the double helix \u2013 from lab bench to pandemic response.",
+    curatorNote: "Walter Isaacson’s biography of Jennifer Doudna captures the cutthroat race to commercialize CRISPR. Gene editing is arguably the most powerful biological lever discovered since the agricultural revolution.",
+    reviewHighlights: [
+      "Universally acclaimed for tackling the deep ethical issues of altering human DNA.",
+      "Appreciated for translating complex genetic mechanics into an accessible thriller."
+    ],
+    bestFor: ["Ethics scholars", "Genetics students", "Innovators"],
+    dataConnection: {
+      text: "See our timeline of major breakthroughs in gene editing.",
+      link: "/biotech-dashboard"
+    }
   },
   {
     title: "A Crack in Creation",
@@ -76,8 +114,16 @@ const BOOKS: Book[] = [
     asin: "1328915360",
     cover: "VXPXvQEACAAJ",
     rating: "4.5",
-    description:
-      "Written by the co-inventor of CRISPR herself, this is the definitive account of how gene editing works, the ethical dilemmas it raises, and why it will change medicine, agriculture, and the fabric of life itself.",
+    curatorNote: "Hearing directly from the co-inventor of CRISPR offers an unmatched perspective. Doudna’s blend of scientific pride and profound moral caution is essential for anyone tracking biotechnology's future.",
+    reviewHighlights: [
+      "Readers find the firsthand autobiographical perspective completely gripping.",
+      "Noted for offering hope regarding agricultural resilience and inherited disease."
+    ],
+    bestFor: ["Bioengineers", "Ethicists", "Science advocates"],
+    dataConnection: {
+      text: "Track the growth in CRISPR patent applications and clinical trials.",
+      link: "/biotech-dashboard"
+    }
   },
   {
     title: "The Gene",
@@ -86,8 +132,16 @@ const BOOKS: Book[] = [
     asin: "0099584573",
     cover: "bhLUwAEACAAJ",
     rating: "4.6",
-    description:
-      "Pulitzer Prize\u2013winning author Mukherjee tells the epic story of the gene \u2013 from Mendel\u2019s garden to CRISPR. Part history, part science, part personal narrative, it explores how genetics has shaped identity, disease, and destiny.",
+    curatorNote: "Framing the history of genetics from Mendel’s peas to modern manipulation highlights how recently we truly cracked biology's source code. Mukherjee shows exactly why this era marks a distinct break in the 4 billion year timeline.",
+    reviewHighlights: [
+      "Called the definitive foundational text for the layman on genetic history.",
+      "Loved for its deeply personal interludes regarding the author's own family medical history."
+    ],
+    bestFor: ["History lovers", "Medical professionals", "Biology students"],
+    dataConnection: {
+      text: "Compare historical genetic milestones with modern biotech outputs.",
+      link: "/biotech-dashboard"
+    }
   },
   {
     title: "Regenesis",
@@ -96,8 +150,16 @@ const BOOKS: Book[] = [
     asin: "0465075703",
     cover: "4JhYtAEACAAJ",
     rating: "4.3",
-    description:
-      "Harvard geneticist George Church envisions a future where synthetic biology rewrites the living world. From resurrecting the woolly mammoth to engineering virus-resistant humans, this is a mind-expanding tour of what\u2019s possible.",
+    curatorNote: "George Church effectively argues that synthetic biology is the ultimate creative tool. Building life from the molecular level up is a key driver for overcoming planetary scale constraints like climate and energy.",
+    reviewHighlights: [
+      "Praised for its radical, wildly imaginative (yet scientifically grounded) future scenarios.",
+      "Acknowledged as occasionally dense but incredibly rewarding for science-literate readers."
+    ],
+    bestFor: ["Futurists", "Synthetic biologists", "Transhumanists"],
+    dataConnection: {
+      text: "Explore synthetic biology adoption and engineering trends.",
+      link: "/biotech-dashboard"
+    }
   },
   {
     title: "Life at the Speed of Light",
@@ -106,8 +168,16 @@ const BOOKS: Book[] = [
     asin: "0143125907",
     cover: "zkECDAAAQBAJ",
     rating: "4.2",
-    description:
-      "The scientist who sequenced the human genome describes the dawn of synthetic biology \u2013 creating life from digital code. Venter explores what it means to design organisms from scratch and the implications for medicine, energy, and food.",
+    curatorNote: "Craig Venter recounts the transition of biology into the digital realm. The ability to design organisms purely on computers before 'printing' them physically represents a monumental leap in evolutionary capability.",
+    reviewHighlights: [
+      "Commended for clearly explaining the mechanics of sending genetic information digitally.",
+      "Valued as a provocative look at 'telebiological' capabilities."
+    ],
+    bestFor: ["Bioinformatics specialists", "Tech enthusiasts", "Researchers"],
+    dataConnection: {
+      text: "Look at the intersection of AI and bioinformatics timelines.",
+      link: "/ai-dashboard"
+    }
   },
   {
     title: "Genome",
@@ -116,21 +186,50 @@ const BOOKS: Book[] = [
     asin: "0060894083",
     cover: "h2zcDWshkEkC",
     rating: "4.4",
-    description:
-      "Ridley takes readers on a tour of the human genome, one chromosome at a time. Each chapter reveals a different gene that illuminates a new aspect of humanity \u2013 from disease and intelligence to personality and free will.",
-  },
+    curatorNote: "Though older, Ridley’s chapter-by-chromosome tour of the human genome is a phenomenal primer. Examining how ancient evolutionary echoes reside inside us grounds our understanding of where humanity maps in Deep Time.",
+    reviewHighlights: [
+      "Hailed as a brilliant organizing structure (one chromosome per chapter).",
+      "Celebrated for making complex mapping data both amusing and profound."
+    ],
+    bestFor: ["Educators", "Anthropologists", "Beginners"],
+    dataConnection: {
+      text: "View long-term demographic data drawn from historical DNA maps.",
+      link: "/biotech-dashboard"
+    }
+  }
 ];
 
 function coverUrl(gbid: string) {
-  return `https://books.google.com/books/content?id=${gbid}&printsec=frontcover&img=1&zoom=1`;
+  return \`https://books.google.com/books/content?id=\${gbid}&printsec=frontcover&img=1&zoom=1\`;
 }
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 
 export default async function BiotechBooksPage() {
   const countryCode = await getCountryCode();
+  
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": BOOKS.map((book, index) => ({
+      "@type": "Product",
+      "position": index + 1,
+      "name": book.title,
+      "author": { "@type": "Person", "name": book.author },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": book.rating,
+        "bestRating": "5"
+      }
+    }))
+  };
+
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-4xl mx-auto space-y-6">
 
@@ -150,70 +249,103 @@ export default async function BiotechBooksPage() {
             </div>
           </div>
 
-          {/* Books grid */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
-            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-6">Recommended Books</h2>
-            <div className="grid gap-5">
-              {BOOKS.map((book) => (
-                <a
-                  key={book.asin}
-                  href={amazonUrl(book.title, book.author, countryCode)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex gap-4 md:gap-6 bg-gray-900/60 rounded-xl p-4 md:p-5 border border-gray-700/40 hover:border-[#D26742]/60 transition-colors group"
-                >
-                  <img
-                    src={coverUrl(book.cover)}
-                    alt={`${book.title} by ${book.author}`}
-                    className="w-20 md:w-28 h-auto object-contain rounded-lg shadow-lg flex-shrink-0 group-hover:scale-[1.02] transition-transform"
-                    loading="lazy"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h3 className="text-base md:text-lg font-bold text-white group-hover:text-[#D26742] transition-colors leading-tight">{book.title}</h3>
-                        <p className="text-sm text-gray-400 mt-0.5">{book.author} · {book.year}</p>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-gray-600 group-hover:text-[#D26742] flex-shrink-0 mt-1 transition-colors" />
-                    </div>
-                    <div className="flex items-center gap-1 mt-2">
-                      <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                      <span className="text-xs text-amber-400 font-semibold">{book.rating}</span>
-                      <span className="text-xs text-gray-500 ml-1">on Amazon</span>
-                    </div>
-                    <p className="text-sm text-gray-400 leading-relaxed mt-2 line-clamp-3 md:line-clamp-none">{book.description}</p>
+          {/* Books list */}
+          <div className="space-y-8">
+            {BOOKS.map((book) => (
+              <section
+                key={book.asin}
+                className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]/40 hover:border-[#FFF5E7] transition-colors"
+              >
+                <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+                  {/* Book Cover and Amazon CTA */}
+                  <div className="flex flex-col items-center gap-4 md:w-1/3 flex-shrink-0">
+                    <img
+                      src={coverUrl(book.cover)}
+                      alt={\`\${book.title} by \${book.author}\`}
+                      className="w-32 md:w-48 h-auto object-contain rounded-lg shadow-xl"
+                      loading="lazy"
+                    />
+                    <a
+                      href={amazonUrl(book.title, book.author, countryCode)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full text-center bg-[#D26742] text-white font-bold py-2 px-4 rounded-xl hover:bg-[#C25835] transition-colors flex items-center justify-center gap-2"
+                    >
+                      Buy on Amazon <ExternalLink className="h-4 w-4" />
+                    </a>
                   </div>
-                </a>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 text-center mt-6 pt-4 border-t border-gray-800/40">
-              As an Amazon Associate, I earn from qualifying purchases.
-            </p>
-          </section>
+
+                  {/* Content */}
+                  <div className="flex-1 space-y-4">
+                    <div>
+                      <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">{book.title}</h2>
+                      <p className="text-lg text-gray-400 font-medium">{book.author} · {book.year}</p>
+                      
+                      <div className="flex items-center gap-1 mt-2">
+                        <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+                        <span className="text-sm text-amber-400 font-semibold">{book.rating}</span>
+                        <span className="text-sm text-gray-500 ml-1">Rating</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-sm tracking-widest uppercase text-gray-500 font-bold mb-2">Curator&apos;s Note</h3>
+                        <p className="text-gray-300 leading-relaxed">{book.curatorNote}</p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm tracking-widest uppercase text-gray-500 font-bold mb-2">Review Highlights</h3>
+                        <ul className="list-disc list-outside ml-4 text-gray-300 space-y-1">
+                          {book.reviewHighlights.map((highlight, i) => (
+                            <li key={i}>{highlight}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        <span className="text-sm tracking-widest uppercase text-gray-500 font-bold mr-2 self-center">Best For:</span>
+                        {book.bestFor.map((tag, i) => (
+                          <span key={i} className="bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-full border border-gray-700">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="mt-6 p-4 rounded-xl bg-gray-900 border border-gray-800">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                          <div>
+                            <p className="text-[#D26742] font-bold text-sm uppercase tracking-wide">Why this matters</p>
+                            <p className="text-gray-300 text-sm mt-1">{book.dataConnection.text}</p>
+                          </div>
+                          <a href={book.dataConnection.link} className="text-sm text-white bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-center transition-colors border border-gray-600 whitespace-nowrap">
+                            View Data &rarr;
+                          </a>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </section>
+            ))}
+          </div>
 
           {/* Explore data */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#FFF5E7] mt-8">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-4">Explore Our Biotech Data</h2>
             <p className="text-sm text-gray-400 mb-4">See the science behind the books with our interactive dashboards:</p>
             <div className="grid sm:grid-cols-2 gap-3">
-              {[
-                { href: "/biotech-dashboard", label: "Biotech Data", desc: "Genomics, trials & research trends" },
-                { href: "/biotech-explained", label: "Biotech Explained", desc: "Plain-English guide to biotech" },
-              ].map(({ href, label, desc }) => (
-                <a
-                  key={href}
-                  href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
-                >
-                  <ExternalLink className="h-4 w-4 text-[#D26742] flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  <div>
-                    <p className="text-sm font-semibold text-[#D26742]">{label}</p>
-                    <p className="text-xs text-gray-500">{desc}</p>
-                  </div>
-                </a>
-              ))}
+              <a href="/biotech-dashboard" className="block p-4 rounded-xl border border-gray-800 bg-gray-900 hover:border-[#D26742] transition-colors group">
+                <div className="font-bold text-[#D26742] group-hover:text-[#C25835]">Biotech Data</div>
+                <div className="text-xs text-gray-400 mt-1">Genomics, trials & research trends</div>
+              </a>
             </div>
           </section>
+
+          <p className="text-xs text-gray-500 text-center pt-8">
+            As an Amazon Associate, I earn from qualifying purchases.
+          </p>
 
         </div>
       </div>
