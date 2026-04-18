@@ -176,8 +176,15 @@ const ANNUAL_LEGEND = [
 function SetMobileView() {
   const map = useMap();
   React.useEffect(() => {
-    const width = map.getContainer().clientWidth;
-    if (width < 500) map.setView([20, 30], 1);
+    const container = map.getContainer();
+    if (container.clientWidth < 500) map.setView([20, 30], 1);
+    
+    // Explicitly tell Leaflet to remeasure its container after the DOM settles.
+    // Fixes the "stale cache / delayed render" issue where tiles only half-load.
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+    return () => clearTimeout(timer);
   }, [map]);
   return null;
 }

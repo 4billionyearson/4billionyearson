@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
@@ -127,6 +128,10 @@ export async function GET() {
       fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.cumulative}.data.json`),
       fetchEntityMap(INDICATORS.annual),
     ]);
+
+    if (!annualData || !perCapData || !cumulData || !entityMap || Object.keys(entityMap).length === 0) {
+      throw new Error('Our World in Data API requests failed or timed out');
+    }
 
     const annualRows = parseOWID(annualData);
     const perCapRows = parseOWID(perCapData);
