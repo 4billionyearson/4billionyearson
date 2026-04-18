@@ -1,7 +1,8 @@
+import { AI_DC_LOCATIONS } from "./locations";
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v20';
+const CACHE_KEY = 'ai:dashboard:v21';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -344,8 +345,8 @@ async function fetchFrontierDataCenters(): Promise<{
         h100Equiv: Math.round(h100),
         costBillions: Math.round(cost * 10) / 10,
         country: get(countryI),
-        lat: parseDMS(get(latI)),
-        lon: parseDMS(get(lonI)),
+        lat: parseDMS(get(latI)) || AI_DC_LOCATIONS[get(nameI)]?.lat || 0,
+        lon: parseDMS(get(lonI)) || AI_DC_LOCATIONS[get(nameI)]?.lon || 0,
       });
     }
 
