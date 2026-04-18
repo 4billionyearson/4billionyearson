@@ -255,7 +255,7 @@ function coverUrl(cover: string) {
   if (cover.startsWith("http://") || cover.startsWith("https://")) {
     return cover;
   }
-  return \`https://books.google.com/books/content?id=\${cover}&printsec=frontcover&img=1&zoom=1\`;
+  return `https://books.google.com/books/content?id=${cover}&printsec=frontcover&img=1&zoom=1`;
 }
 
 export default async function EnergyBooksPage() {
@@ -312,7 +312,7 @@ export default async function EnergyBooksPage() {
                   <div className="flex flex-col items-center gap-4 md:w-1/3 flex-shrink-0">
                     <img
                       src={coverUrl(book.cover)}
-                      alt={\`\${book.title} by \${book.author}\`}
+                      alt={`${book.title} by ${book.author}`}
                       className="w-32 md:w-48 h-auto object-contain rounded-lg shadow-xl"
                       loading="lazy"
                     />
