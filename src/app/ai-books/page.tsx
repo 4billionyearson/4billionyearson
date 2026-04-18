@@ -253,7 +253,7 @@ export default async function AIBooksPage() {
 
           {/* Hero */}
           <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#88DDFC] overflow-hidden">
-            <div className="px-5 py-4 md:px-6 md:py-5 rounded-t-[14px]" style={{ backgroundColor: '#88DDFC' }}>
+            <div className="px-5 py-4 md:px-6 md:py-5 ring-2 ring-inset ring-[#88DDFC]" style={{ backgroundColor: '#88DDFC' }}>
               <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#FFF5E7]">Artificial Intelligence Books</h1>
               <div className="flex items-center gap-2 mt-3">
                 <BookOpen className="h-5 w-5 text-[#FFF5E7]/80" />

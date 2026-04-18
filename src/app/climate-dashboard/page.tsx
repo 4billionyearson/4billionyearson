@@ -538,7 +538,7 @@ export default function ClimateDashboard() {
 
         {/* ─── Header & Search ──────────────────────────────────────── */}
         <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-          <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl" style={{ backgroundColor: '#D0A65E' }}>
+          <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl ring-2 ring-inset ring-[#D0A65E]" style={{ backgroundColor: '#D0A65E' }}>
             <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
               Local & Global Climate Change
             </h1>
@@ -564,7 +564,7 @@ export default function ClimateDashboard() {
                   />
                 </div>
                 <button type="submit" disabled={loading}
-                  className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85 rounded-t-[14px]" style={{ backgroundColor: '#D0A65E', color: '#FFF5E7' }}>
+                  className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85" style={{ backgroundColor: '#D0A65E', color: '#FFF5E7' }}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
                 </button>
               </form>

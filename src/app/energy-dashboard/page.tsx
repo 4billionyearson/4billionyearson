@@ -285,7 +285,7 @@ function LocationSearch({ onSelect, loading, error }: {
           />
         </div>
         <button type="submit" disabled={loading}
-          className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85 rounded-t-[14px]" style={{ backgroundColor: '#D2E369', color: '#2C5263' }}>
+          className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85" style={{ backgroundColor: '#D2E369', color: '#2C5263' }}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
         </button>
       </form>
@@ -1393,7 +1393,7 @@ export default function EnergyPage() {
 
           {/* ─── Hero ───────────────────────────────────────────────── */}
           <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D2E369]">
-            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl" style={{ backgroundColor: '#D2E369' }}>
+            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl ring-2 ring-inset ring-[#D2E369]" style={{ backgroundColor: '#D2E369' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#2C5263' }}>
                 Local & Global Energy Data
               </h1>
