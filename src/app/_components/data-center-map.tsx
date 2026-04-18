@@ -7,7 +7,10 @@ import "leaflet/dist/leaflet.css";
 interface SiteData {
   name: string;
   owner: string;
+  users?: string;
   powerMW: number;
+  h100Equiv?: number;
+  costBillions?: number;
   country: string;
   lat: number;
   lon: number;
@@ -324,17 +327,22 @@ const InnerMap = dynamic(
                         padding: "10px 12px",
                         paddingRight: "24px",
                         color: "#e5e7eb",
-                        minWidth: 170,
+                        minWidth: 200,
                         fontSize: 12,
                       }}
                     >
-                      <div style={{ fontWeight: 700, marginBottom: 2 }}>{site.name}</div>
-                      <div style={{ opacity: 0.7 }}>{site.owner}</div>
-                      {site.powerMW > 0 ? (
-                        <div style={{ color: "#06b6d4", marginTop: 4 }}>{site.powerMW.toLocaleString()} MW</div>
-                      ) : (
-                        <div style={{ color: "#f59e0b", marginTop: 4 }}>Planned</div>
-                      )}
+                      <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13, borderBottom: "1px solid #334155", paddingBottom: 4 }}>{site.name}</div>
+                      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "2px 8px", opacity: 0.8, marginTop: 4 }}>
+                        <span style={{ color: "#94a3b8" }}>Owner:</span><span>{site.owner || "—"}</span>
+                        {site.users && <><span style={{ color: "#94a3b8" }}>Users:</span><span>{site.users}</span></>}
+                        <span style={{ color: "#94a3b8" }}>Status:</span>
+                        <span style={{ color: site.powerMW > 0 ? "#10b981" : "#f59e0b" }}>
+                          {site.powerMW > 0 ? "Operational" : "Planned"}
+                        </span>
+                        {site.powerMW > 0 && <><span style={{ color: "#94a3b8" }}>Power:</span><span style={{ color: "#06b6d4", fontFamily: "monospace", fontSize: 11 }}>{site.powerMW.toLocaleString()} MW</span></>}
+                        {site.h100Equiv && site.h100Equiv > 0 ? <><span style={{ color: "#94a3b8" }}>H100 Eq:</span><span style={{ fontFamily: "monospace", fontSize: 11 }}>{(site.h100Equiv / 1000).toFixed(0)}K</span></> : null}
+                        {site.costBillions && site.costBillions > 0 ? <><span style={{ color: "#94a3b8" }}>Cost:</span><span style={{ fontFamily: "monospace", fontSize: 11 }}>${site.costBillions}B</span></> : null}
+                      </div>
                     </div>
                   </Popup>
                 </CircleMarker>
