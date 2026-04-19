@@ -181,18 +181,137 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
-function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
-  return (
-    <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
-      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
-      <span className={`text-2xl font-bold ${color}`}>{value}</span>
-    </div>
-  );
-}
-
 function formatSignedValue(value: number, units = '°C', digits = 1): string {
   const sign = value > 0 ? '+' : '';
   return `${sign}${value.toFixed(digits)}${units}`;
+}
+
+function formatValue(value: number, units = '', digits = 1): string {
+  return `${value.toFixed(digits)}${units}`;
+}
+
+function ordinal(value: number): string {
+  const remainder = value % 100;
+  if (remainder >= 11 && remainder <= 13) return `${value}th`;
+  switch (value % 10) {
+    case 1:
+      return `${value}st`;
+    case 2:
+      return `${value}nd`;
+    case 3:
+      return `${value}rd`;
+    default:
+      return `${value}th`;
+  }
+}
+
+function getPointValue(point: YearlyPoint | PrecipPoint): number | null {
+  if (typeof (point as YearlyPoint).value === 'number') return (point as YearlyPoint).value as number;
+  if (typeof (point as YearlyPoint).avgTemp === 'number') return (point as YearlyPoint).avgTemp as number;
+  return null;
+}
+
+function getLatestYearlyPoint(points: Array<YearlyPoint | PrecipPoint> | undefined) {
+  if (!points?.length) return null;
+  return [...points].reverse().find((point) => typeof getPointValue(point) === 'number') ?? null;
+}
+
+type OverviewRow = {
+  label: string;
+  latest: string;
+  anomaly: string;
+  rank: string;
+  record: string;
+};
+
+type OverviewSection = {
+  title?: string;
+  rows: OverviewRow[];
+};
+
+type OverviewPanel = {
+  title: string;
+  accentClass: string;
+  sections: OverviewSection[];
+};
+
+function buildOverviewRow(
+  label: string,
+  yearly: Array<YearlyPoint | PrecipPoint> | undefined,
+  units: string,
+  digits: number,
+): OverviewRow | null {
+  if (!yearly?.length) return null;
+
+  const values = yearly
+    .map((point) => ({ year: point.year, value: getPointValue(point) }))
+    .filter((point): point is { year: number; value: number } => typeof point.value === 'number');
+
+  if (!values.length) return null;
+
+  const latest = values[values.length - 1];
+  const baseline = values.filter((point) => point.year >= 1961 && point.year <= 1990);
+  const baselineAvg = baseline.length
+    ? baseline.reduce((sum, point) => sum + point.value, 0) / baseline.length
+    : null;
+  const sorted = [...values].sort((a, b) => b.value - a.value);
+  const rank = sorted.findIndex((point) => point.year === latest.year && point.value === latest.value) + 1;
+  const record = sorted[0];
+
+  return {
+    label,
+    latest: `${formatValue(latest.value, units, digits)} (${latest.year})`,
+    anomaly: baselineAvg == null ? 'n/a' : `${formatSignedValue(latest.value - baselineAvg, units, digits)} vs 1961–1990`,
+    rank: `${ordinal(rank)} of ${sorted.length}`,
+    record: `${record.year} (${formatValue(record.value, units, digits)})`,
+  };
+}
+
+function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-8">
+      {panels.map((panel) => (
+        <div key={panel.title} className="bg-gray-900/75 rounded-2xl border border-gray-800 p-4 shadow-xl">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h2 className="text-lg font-bold text-white">{panel.title}</h2>
+            <div className={`h-2 w-20 rounded-full ${panel.accentClass}`} />
+          </div>
+          <div className="space-y-4">
+            {panel.sections.map((section, index) => (
+              <div key={`${panel.title}-${section.title || index}`}>
+                {section.title && <div className="text-xs uppercase tracking-wider text-gray-500 mb-2">{section.title}</div>}
+                <div className="space-y-2">
+                  {section.rows.map((row) => (
+                    <div key={`${panel.title}-${row.label}`} className="rounded-xl border border-gray-800/80 bg-gray-950/60 p-3">
+                      <div className="text-sm font-semibold text-[#FFF5E7] mb-2">{row.label}</div>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Latest</div>
+                          <div className="text-gray-200 font-medium">{row.latest}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Vs Baseline</div>
+                          <div className="text-gray-200 font-medium">{row.anomaly}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Rank</div>
+                          <div className="text-gray-200 font-medium">{row.rank}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Record Year</div>
+                          <div className="text-gray-200 font-medium">{row.record}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function findMonthlyPoint(data: MonthlyComparison[] | undefined, monthLabel: string | undefined): MonthlyComparison | null {
@@ -246,91 +365,91 @@ function mergeTemperatureAnomalyData(
   });
 }
 
-function buildHeroMetrics(data: ProfileData, nationalLabel: string) {
-  const metrics: Array<{ label: string; value: string; color: string; note?: string }> = [];
-  const { region, national, global } = getTemperatureMonthlySeries(data);
-  const latestRegion = getLatestMonthlyPoint(region);
-  const latestNational = findMonthlyPoint(national, latestRegion?.monthLabel) ?? getLatestMonthlyPoint(national);
-  const latestGlobal = findMonthlyPoint(global, latestRegion?.monthLabel) ?? getLatestMonthlyPoint(global);
-  const rollingAnomaly = averageMonthlyDiff(region, 12);
+function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLabel: string): OverviewPanel[] {
+  const panels: OverviewPanel[] = [];
 
-  if (data.keyStats.latestTemp) {
-    metrics.push({
-      label: 'Latest Annual Average',
-      value: data.keyStats.latestTemp,
-      color: 'text-red-400',
-      note: 'Latest full year',
+  const temperatureRows = [
+    buildOverviewRow(
+      regionLabel,
+      data.ukRegionData?.varData?.Tmean?.yearly || data.usStateData?.paramData?.tavg?.yearly || data.countryData?.yearlyData,
+      '°C',
+      2,
+    ),
+    buildOverviewRow(
+      nationalLabel || 'National',
+      data.nationalData?.varData?.Tmean?.yearly || data.nationalData?.paramData?.tavg?.yearly,
+      '°C',
+      2,
+    ),
+    buildOverviewRow('Global Land', data.globalData?.landYearlyData, '°C', 2),
+  ].filter((row): row is OverviewRow => Boolean(row));
+
+  if (temperatureRows.length) {
+    panels.push({
+      title: 'Temperature Overview',
+      accentClass: 'bg-gradient-to-r from-red-400 to-amber-300',
+      sections: [{ rows: temperatureRows }],
     });
   }
 
-  if (latestRegion?.diff != null) {
-    metrics.push({
-      label: 'Latest Monthly Anomaly',
-      value: formatSignedValue(latestRegion.diff),
-      color: latestRegion.diff >= 0 ? 'text-amber-300' : 'text-sky-300',
-      note: `${latestRegion.monthLabel} vs 1961–1990`,
-    });
-  } else if (data.keyStats.tempTrend) {
-    metrics.push({
-      label: 'Decadal Temperature Shift',
-      value: data.keyStats.tempTrend,
-      color: 'text-amber-400',
+  const sunshineRows = [
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Sunshine?.yearly, ' hrs', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, ' hrs', 0),
+  ].filter((row): row is OverviewRow => Boolean(row));
+
+  if (sunshineRows.length) {
+    panels.push({
+      title: 'Sunshine Overview',
+      accentClass: 'bg-gradient-to-r from-yellow-300 to-orange-400',
+      sections: [{ rows: sunshineRows }],
     });
   }
 
-  if (latestRegion?.diff != null && latestNational?.diff != null) {
-    const gap = latestRegion.diff - latestNational.diff;
-    metrics.push({
-      label: `Vs ${nationalLabel}`,
-      value: formatSignedValue(gap),
-      color: gap >= 0 ? 'text-orange-400' : 'text-sky-400',
-      note: `${gap >= 0 ? 'warmer' : 'cooler'} in ${latestRegion.monthLabel}`,
-    });
-  } else if (rollingAnomaly != null) {
-    metrics.push({
-      label: '12-Month Mean Anomaly',
-      value: formatSignedValue(rollingAnomaly),
-      color: rollingAnomaly >= 0 ? 'text-orange-400' : 'text-sky-400',
-      note: 'Average of latest 12 months',
+  const rainfallRows = [
+    buildOverviewRow(
+      regionLabel,
+      data.ukRegionData?.varData?.Rainfall?.yearly || data.usStateData?.paramData?.pcp?.yearly || data.countryData?.precipYearly,
+      ' mm',
+      0,
+    ),
+    buildOverviewRow(
+      nationalLabel || 'National',
+      data.nationalData?.varData?.Rainfall?.yearly || data.nationalData?.paramData?.pcp?.yearly,
+      ' mm',
+      0,
+    ),
+  ].filter((row): row is OverviewRow => Boolean(row));
+
+  const rainDaysRows = [
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Raindays1mm?.yearly, ' days', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, ' days', 0),
+  ].filter((row): row is OverviewRow => Boolean(row));
+
+  if (rainfallRows.length || rainDaysRows.length) {
+    panels.push({
+      title: 'Rainfall & Rain Days',
+      accentClass: 'bg-gradient-to-r from-sky-400 to-indigo-400',
+      sections: [
+        ...(rainfallRows.length ? [{ title: 'Rainfall / Precipitation', rows: rainfallRows }] : []),
+        ...(rainDaysRows.length ? [{ title: 'Rain Days (≥1mm)', rows: rainDaysRows }] : []),
+      ],
     });
   }
 
-  if (latestRegion?.diff != null && latestGlobal?.diff != null) {
-    const gap = latestRegion.diff - latestGlobal.diff;
-    metrics.push({
-      label: 'Vs Global Land',
-      value: formatSignedValue(gap),
-      color: gap >= 0 ? 'text-emerald-400' : 'text-cyan-400',
-      note: `${gap >= 0 ? 'warmer' : 'cooler'} in ${latestRegion.monthLabel}`,
-    });
-  } else if (data.keyStats.warmestYear) {
-    metrics.push({
-      label: 'Warmest Year',
-      value: data.keyStats.warmestYear,
-      color: 'text-orange-400',
-      note: 'Highest annual mean',
+  const frostRows = [
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, ' days', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, ' days', 0),
+  ].filter((row): row is OverviewRow => Boolean(row));
+
+  if (frostRows.length) {
+    panels.push({
+      title: 'Frost Overview',
+      accentClass: 'bg-gradient-to-r from-cyan-300 to-violet-400',
+      sections: [{ rows: frostRows }],
     });
   }
 
-  if (metrics.length < 4 && data.keyStats.warmestYear) {
-    metrics.push({
-      label: 'Warmest Year',
-      value: data.keyStats.warmestYear,
-      color: 'text-orange-400',
-      note: 'Highest annual mean',
-    });
-  }
-
-  if (metrics.length < 4 && data.keyStats.dataRange) {
-    metrics.push({
-      label: 'Data Coverage',
-      value: data.keyStats.dataRange,
-      color: 'text-sky-400',
-      note: 'Historical record span',
-    });
-  }
-
-  return metrics.slice(0, 4);
+  return panels;
 }
 
 // ─── Comparison Bar Chart (dashboard-style, side-by-side) ───────────────────
@@ -644,13 +763,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
   const regionLabel = data?.ukRegionData?.region || data?.usStateData?.state || data?.name || region.name;
   const nationalLabel = data?.nationalData?.region || (region.type === 'us-state' ? 'United States' : region.type === 'uk-region' ? 'United Kingdom' : '');
   const isSubNational = region.type === 'uk-region' || region.type === 'us-state';
-  const heroMetrics = data ? buildHeroMetrics(data, nationalLabel || 'National Average') : [];
-  const heroMetadata = data
-    ? [
-        data.keyStats.warmestYear ? `Warmest year ${data.keyStats.warmestYear}` : null,
-        data.keyStats.dataRange ? `Coverage ${data.keyStats.dataRange}` : null,
-      ].filter((value): value is string => Boolean(value))
-    : [];
+  const overviewPanels = data ? buildOverviewPanels(data, regionLabel, nationalLabel) : [];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-100">
@@ -691,27 +804,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
         {data && !loading && (
           <>
-            {/* Key Stats */}
-            {heroMetrics.length > 0 && (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-3">
-                  {heroMetrics.map((metric) => (
-                    <div key={`${metric.label}-${metric.value}`} className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
-                      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{metric.label}</div>
-                      <div className={`text-2xl font-bold ${metric.color}`}>{metric.value}</div>
-                      {metric.note && <div className="text-xs text-gray-500 mt-2">{metric.note}</div>}
-                    </div>
-                  ))}
-                </div>
-                {heroMetadata.length > 0 && (
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mb-8">
-                    {heroMetadata.map((item) => (
-                      <span key={item}>{item}</span>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
+            {overviewPanels.length > 0 && <OverviewGrid panels={overviewPanels} />}
 
             {/* AI-generated narrative */}
             {summary && (
