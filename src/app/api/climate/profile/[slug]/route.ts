@@ -1,4 +1,5 @@
 export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { getRegionBySlug } from '@/lib/climate/regions';
@@ -45,7 +46,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v4`;
+  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v5`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
