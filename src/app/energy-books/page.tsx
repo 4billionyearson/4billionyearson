@@ -307,13 +307,13 @@ export default async function EnergyBooksPage() {
                 key={book.asin}
                 className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D2E369]/40 hover:border-[#D2E369] transition-colors"
               >
-                <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+                <div className="flex flex-col sm:flex-row gap-5 sm:gap-6">
                   {/* Book Cover and Amazon CTA */}
-                  <div className="flex flex-col items-center gap-4 md:w-1/3 flex-shrink-0">
+                  <div className="flex flex-col items-center gap-3 w-full sm:w-auto sm:min-w-[160px] sm:max-w-[180px] flex-shrink-0">
                     <img
                       src={coverUrl(book.cover)}
                       alt={`${book.title} by ${book.author}`}
-                      className="w-32 md:w-48 h-auto object-contain rounded-lg shadow-xl"
+                      className="w-28 sm:w-36 md:w-44 h-auto object-contain rounded-lg shadow-xl"
                       loading="lazy"
                     />
                     <a
@@ -354,13 +354,15 @@ export default async function EnergyBooksPage() {
                         </ul>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <span className="text-sm tracking-widest uppercase text-gray-500 font-bold mr-2 self-center">Best For:</span>
-                        {book.bestFor.map((tag, i) => (
-                          <span key={i} className="bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-full border border-gray-700">
-                            {tag}
-                          </span>
-                        ))}
+                      <div className="pt-2">
+                        <h3 className="text-sm tracking-widest uppercase text-gray-500 font-bold mb-2">Best For</h3>
+                        <div className="flex flex-wrap gap-1.5">
+                          {book.bestFor.map((tag, i) => (
+                            <span key={i} className="bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-full border border-gray-700">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
 
                       <div className="mt-6 p-4 rounded-xl bg-gray-900 border border-gray-800">

@@ -207,7 +207,7 @@ export default function BiotechDashboardPage() {
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <StatCard
                     label="Genome Sequencing Cost"
                     value={formatDollars(data.stats.genomeCost)}
