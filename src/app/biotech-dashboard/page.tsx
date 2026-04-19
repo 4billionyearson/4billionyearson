@@ -238,16 +238,22 @@ export default function BiotechDashboardPage() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <StatCard
+                    label="DTP3 Vaccination Coverage"
+                    value={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.DTP3 ?? '—'}%` : '—'}
+                    color="text-teal-400"
+                    subtext={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.year} · Diphtheria, Tetanus, Pertussis` : 'Loading…'}
+                  />
+                  <StatCard
                     label="WHO Outbreak Alerts"
                     value={outbreakData ? outbreakData.stats.totalRecentOutbreaks.toLocaleString() : "—"}
                     color="text-red-400"
                     subtext={outbreakData ? `Across ${outbreakData.stats.countriesAffected} countries (past year)` : "Loading…"}
                   />
                   <StatCard
-                    label="DTP3 Vaccination Coverage"
-                    value={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.DTP3 ?? '—'}%` : '—'}
-                    color="text-teal-400"
-                    subtext={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.year} · Diphtheria, Tetanus, Pertussis` : 'Loading…'}
+                    label="Diseases Tracked (WHO)"
+                    value={outbreakData ? outbreakData.stats.diseasesTracked.toLocaleString() : "—"}
+                    color="text-orange-400"
+                    subtext="Distinct diseases in outbreak alerts"
                   />
                   <StatCard
                     label="Genome Sequencing Cost"
@@ -256,22 +262,16 @@ export default function BiotechDashboardPage() {
                     subtext={`As of ${data.stats.genomeCostYear}`}
                   />
                   <StatCard
-                    label="CRISPR Clinical Trials"
-                    value={data.stats.totalCrisprTrials.toLocaleString()}
-                    color="text-violet-400"
-                    subtext="Registered on ClinicalTrials.gov"
-                  />
-                  <StatCard
                     label="Gene Therapy Trials"
                     value={data.stats.totalGeneTherapyTrials.toLocaleString()}
                     color="text-amber-400"
                     subtext="Registered on ClinicalTrials.gov"
                   />
                   <StatCard
-                    label="Diseases Tracked (WHO)"
-                    value={outbreakData ? outbreakData.stats.diseasesTracked.toLocaleString() : "—"}
-                    color="text-orange-400"
-                    subtext="Distinct diseases in outbreak alerts"
+                    label="CRISPR Clinical Trials"
+                    value={data.stats.totalCrisprTrials.toLocaleString()}
+                    color="text-violet-400"
+                    subtext="Registered on ClinicalTrials.gov"
                   />
                 </div>
                 <p className="text-xs text-gray-400 mt-3">
