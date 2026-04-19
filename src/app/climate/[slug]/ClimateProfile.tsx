@@ -235,6 +235,60 @@ function ComparisonChart({ data, recentKey, label, units, barColor }: {
   );
 }
 
+
+
+// ─── Multi Comparison Bar Chart ──────────────────────────────────────────────
+
+function MultiComparisonChart({ data, series, units }: {
+  data: any[];
+  series: { dataKey: string; avgKey?: string; label: string; color: string; isPendingKey?: string }[];
+  units: string;
+}) {
+  const bars: React.ReactNode[] = [];
+  
+  series.forEach((s, i) => {
+    const PendingBarShape = (props: any) => {
+      const { x, y, width, height, payload } = props;
+      if (!payload[s.isPendingKey as string]) {
+        return <rect x={x} y={y} width={width} height={height} fill={s.color} rx={4} ry={4} />;
+      }
+      const minH = 36;
+      const baseline = height >= 0 ? y + height : y;
+      return (
+        <g>
+          <rect x={x} y={baseline - minH} width={width} height={minH} fill="none" stroke="#9ca3af" strokeWidth={1} strokeDasharray="2 2" rx={4} ry={4} />
+          <text x={x + width / 2} y={baseline - minH / 2 + 3} textAnchor="middle" fontSize={8} fill="#9ca3af" fontStyle="italic">N/A</text>
+        </g>
+      );
+    };
+
+    bars.push(
+      <Bar key={`recent-${i}`} dataKey={s.dataKey} name={`${s.label} (Recent)`} fill={s.color} radius={[4, 4, 0, 0]} shape={<PendingBarShape />} />
+    );
+    if (s.avgKey) {
+      bars.push(
+        <Bar key={`avg-${i}`} dataKey={s.avgKey} name={`${s.label} (1961-1990 Avg)`} fill={s.color} fillOpacity={0.3} radius={[4, 4, 0, 0]} />
+      );
+    }
+  });
+
+  return (
+    <div className="h-[380px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={CHART_MARGIN}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+          <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} allowDecimals={false} domain={[(d: number) => { const v = Math.floor(d - 1); return units === '°C' ? v : Math.max(0, v); }, (d: number) => Math.ceil(d + 1)]} unit={units === '°C' ? '°' : ''} />
+          <Tooltip content={<ComparisonTooltip />} cursor={{ fill: '#1F2937' }} />
+          <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, left: 0, right: 0 }} />
+          {bars}
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+
 // ─── Yearly trend chart ──────────────────────────────────────────────────────
 
 function YearlyChart({ data, dataKey, rollingKey, label, units, color, rollingColor }: {
@@ -307,6 +361,29 @@ function MultiLineChart({ data, series }: {
 }
 
 // ─── Merge helpers ───────────────────────────────────────────────────────────
+
+function mergeMonthlyData(regData: any[], natData: any[], globData?: any[]): any[] {
+  if (!regData) return [];
+  return regData.map((r, i) => {
+    const n = natData?.[i] || {};
+    const g = globData?.[i] || {};
+    return {
+      monthLabel: r.monthLabel,
+      regRecent: r.recent ?? r.recentTemp ?? null,
+      regAvg: r.historicAvg ?? null,
+      regPending: (r.recent ?? r.recentTemp) == null,
+      
+      natRecent: n.recent ?? n.recentTemp ?? null,
+      natAvg: n.historicAvg ?? null,
+      natPending: (n.recent ?? n.recentTemp) == null,
+      
+      globRecent: g.recent ?? g.recentTemp ?? null,
+      globAvg: g.historicAvg ?? null,
+      globPending: (g.recent ?? g.recentTemp) == null,
+    };
+  });
+}
+
 
 function mergeMetricData(regionYearly: any[], countryYearly: any[]): any[] {
   const map = new Map<number, any>();
@@ -594,42 +671,32 @@ function TemperatureSection({ data, regionLabel, nationalLabel, isSubNational, r
       <Divider icon={<Thermometer className="h-5 w-5" />} title="Temperature" />
 
       <SectionCard icon={<TrendingUp className="h-5 w-5 text-red-400" />} title={sectionTitle}>
-        {/* Monthly comparison bars FIRST */}
-        {ukVar?.monthlyComparison && (
-          <SubSection title={`${regionLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={ukVar.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#d97706" />
-          </SubSection>
-        )}
-        {natUkVar?.monthlyComparison && (
-          <SubSection title={`${nationalLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={natUkVar.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#ef4444" />
-          </SubSection>
-        )}
 
-        {usVar?.monthlyComparison && (
-          <SubSection title={`${regionLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={usVar.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#ea580c" />
-          </SubSection>
-        )}
-        {natUsVar?.monthlyComparison && (
-          <SubSection title={`${nationalLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={natUsVar.monthlyComparison} recentKey="recent" label="Temperature" units="°C" barColor="#ef4444" />
-          </SubSection>
-        )}
+        {/* NEW UNIFIED MONTHLY COMPARISONS */}
+        {(() => {
+          const rData = ukVar?.monthlyComparison || usVar?.monthlyComparison || data.countryData?.monthlyComparison;
+          const nData = natUkVar?.monthlyComparison || natUsVar?.monthlyComparison;
+          const gData = regionType === 'country' ? null : data.globalData?.landMonthlyComparison;
+          if (!rData) return null;
+          
+          const merged = mergeMonthlyData(rData, nData || [], gData || []);
+          const series = [
+            { dataKey: 'regRecent', avgKey: 'regAvg', isPendingKey: 'regPending', label: regionLabel, color: '#d97706' },
+          ];
+          if (nData) {
+            series.push({ dataKey: 'natRecent', avgKey: 'natAvg', isPendingKey: 'natPending', label: nationalLabel, color: '#ef4444' });
+          }
+          if (gData) {
+            series.push({ dataKey: 'globRecent', avgKey: 'globAvg', isPendingKey: 'globPending', label: 'Global Land', color: '#10b981' });
+          }
 
-        {/* Country-level monthly comparison (for country profiles) */}
-        {regionType === 'country' && data.countryData?.monthlyComparison && (
-          <SubSection title={`${regionLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={data.countryData.monthlyComparison} recentKey="recentTemp" label="Temperature" units="°C" barColor="#ef4444" />
-          </SubSection>
-        )}
+          return (
+            <SubSection title="Last 12 months vs Historic Baseline (1961-1990)">
+               <MultiComparisonChart data={merged} series={series} units="°C" />
+            </SubSection>
+          );
+        })()}
 
-        {/* Global comparison */}
-        {data.globalData?.landMonthlyComparison && (
-          <SubSection title="Global (Land) – Last 12 months vs 1961–1990 baseline">
-            <ComparisonChart data={data.globalData.landMonthlyComparison} recentKey="recentTemp" label="Temperature" units="°C" barColor="#10b981" />
-          </SubSection>
-        )}
 
         {/* Yearly annual trend */}
         {combinedYearly ? (
@@ -697,15 +764,17 @@ function UKVariableSection({ varName, regionData, nationalData, regionLabel, nat
       <Divider icon={dividerIcon} title={dividerTitle} />
 
       <SectionCard icon={icon} title={sectionTitle}>
-        {/* Monthly comparison bars FIRST */}
+                {/* Unified Monthly Comparison FIRST */}
         {variable.monthlyComparison && (
-          <SubSection title={`${regionLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={variable.monthlyComparison} recentKey="recent" label={variable.label} units={variable.units} barColor={barColor} />
-          </SubSection>
-        )}
-        {nationalVar?.monthlyComparison && (
-          <SubSection title={`${nationalLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={nationalVar.monthlyComparison} recentKey="recent" label={variable.label} units={variable.units} barColor={nationalBarColor} />
+          <SubSection title="Last 12 months vs Historic Baseline (1961-1990)">
+            <MultiComparisonChart
+              units={variable.units}
+              data={mergeMonthlyData(variable.monthlyComparison, nationalVar?.monthlyComparison || [])}
+              series={[
+                { dataKey: 'regRecent', avgKey: 'regAvg', isPendingKey: 'regPending', color: barColor, label: regionLabel },
+                ...(nationalVar?.monthlyComparison ? [{ dataKey: 'natRecent', avgKey: 'natAvg', isPendingKey: 'natPending', color: nationalBarColor, label: nationalLabel }] : [])
+              ]}
+            />
           </SubSection>
         )}
 
@@ -772,28 +841,28 @@ function RainfallSection({ data, regionLabel, nationalLabel, isSubNational, regi
       <Divider icon={<Droplets className="h-5 w-5" />} title="Rainfall & Precipitation" />
 
       <SectionCard icon={<Droplets className="h-5 w-5 text-blue-400" />} title={sectionTitle}>
-        {/* Monthly comparison bars FIRST */}
-        {ukRainfall?.monthlyComparison && (
-          <SubSection title={`${regionLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={ukRainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#3b82f6" />
-          </SubSection>
-        )}
-        {natUkRainfall?.monthlyComparison && (
-          <SubSection title={`${nationalLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={natUkRainfall.monthlyComparison} recentKey="recent" label="Rainfall" units="mm" barColor="#7c3aed" />
-          </SubSection>
-        )}
 
-        {usPrecip?.monthlyComparison && (
-          <SubSection title={`${regionLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={usPrecip.monthlyComparison} recentKey="recent" label="Precipitation" units="mm" barColor="#3b82f6" />
-          </SubSection>
-        )}
-        {natUsPrecip?.monthlyComparison && (
-          <SubSection title={`${nationalLabel} – Last 12 months vs 1961–1990 baseline`}>
-            <ComparisonChart data={natUsPrecip.monthlyComparison} recentKey="recent" label="Precipitation" units="mm" barColor="#7c3aed" />
-          </SubSection>
-        )}
+        {/* NEW UNIFIED MONTHLY COMPARISONS */}
+        {(() => {
+          const rData = ukRainfall?.monthlyComparison || usPrecip?.monthlyComparison;
+          const nData = natUkRainfall?.monthlyComparison || natUsPrecip?.monthlyComparison;
+          if (!rData) return null;
+          
+          const merged = mergeMonthlyData(rData, nData || []);
+          const series = [
+            { dataKey: 'regRecent', avgKey: 'regAvg', isPendingKey: 'regPending', label: regionLabel, color: '#3b82f6' },
+          ];
+          if (nData) {
+            series.push({ dataKey: 'natRecent', avgKey: 'natAvg', isPendingKey: 'natPending', label: nationalLabel, color: '#7c3aed' });
+          }
+
+          return (
+            <SubSection title="Last 12 months vs Historic Baseline (1961-1990)">
+               <MultiComparisonChart data={merged} series={series} units="mm" />
+            </SubSection>
+          );
+        })()}
+
 
         {/* Yearly trend */}
         {combinedRainfallYearly ? (

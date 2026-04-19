@@ -223,6 +223,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any)
   lines.push('- Be specific with numbers but weave them into natural prose.');
   lines.push('- Do NOT invent data. Only reference what is provided below.');
   lines.push('- No policy recommendations or speculation about future trends.');
+  lines.push('- CRITICAL: Ensure you complete your final sentence. Do not abruptly truncate the text.');
   lines.push('');
 
   // Region data
@@ -282,7 +283,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v7`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v8`;
 
   // Check cache
   const cached = await getCached<{ summary: string }>(cacheKey);
