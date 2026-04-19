@@ -49,7 +49,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Public health officials", "Science history buffs", "Biomedical students"],
     dataConnection: {
-      text: "See our latest data on viral outbreaks and public health.",
+      text: "See how genome sequencing costs have plummeted from $100M to under $1,000.",
       link: "/biotech-dashboard"
     }
   },
@@ -67,7 +67,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Medical professionals", "Biology enthusiasts", "General readers"],
     dataConnection: {
-      text: "Explore how cellular therapies map against life expectancy trends.",
+      text: "Explore clinical trials by therapy type, from CRISPR to gene therapy.",
       link: "/biotech-dashboard"
     }
   },
@@ -85,7 +85,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Biotech founders", "Medical historians", "Entrepreneurs"],
     dataConnection: {
-      text: "Review the development timelines for modern vaccines and therapies.",
+      text: "See the explosion in CRISPR research publications since 2012.",
       link: "/biotech-dashboard"
     }
   },
@@ -103,7 +103,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Ethics scholars", "Genetics students", "Innovators"],
     dataConnection: {
-      text: "See our timeline of major breakthroughs in gene editing.",
+      text: "Track the growth in CRISPR clinical trials and research output.",
       link: "/biotech-dashboard"
     }
   },
@@ -121,7 +121,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Bioengineers", "Ethicists", "Science advocates"],
     dataConnection: {
-      text: "Track the growth in CRISPR patent applications and clinical trials.",
+      text: "See the number of active CRISPR and gene therapy clinical trials.",
       link: "/biotech-dashboard"
     }
   },
@@ -139,7 +139,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["History lovers", "Medical professionals", "Biology students"],
     dataConnection: {
-      text: "Compare historical genetic milestones with modern biotech outputs.",
+      text: "View total research publications across genomics, CRISPR, and mRNA.",
       link: "/biotech-dashboard"
     }
   },
@@ -157,7 +157,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Futurists", "Synthetic biologists", "Transhumanists"],
     dataConnection: {
-      text: "Explore synthetic biology adoption and engineering trends.",
+      text: "See how genome sequencing costs have dropped exponentially.",
       link: "/biotech-dashboard"
     }
   },
@@ -175,7 +175,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Bioinformatics specialists", "Tech enthusiasts", "Researchers"],
     dataConnection: {
-      text: "Look at the intersection of AI and bioinformatics timelines.",
+      text: "Explore the AI models and infrastructure powering computational biology.",
       link: "/ai-dashboard"
     }
   },
@@ -193,7 +193,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Educators", "Anthropologists", "Beginners"],
     dataConnection: {
-      text: "View long-term demographic data drawn from historical DNA maps.",
+      text: "Track all-time biotech research output across gene therapy and genomics.",
       link: "/biotech-dashboard"
     }
   }

@@ -121,8 +121,8 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Climate activists", "Ethicists", "Sociologists"],
     dataConnection: {
-      text: "View the real-world energy consumption of these systems.",
-      link: "/energy-dashboard"
+      text: "See how AI data centers consume as much electricity as entire countries.",
+      link: "/ai-dashboard"
     }
   },
   {
@@ -157,7 +157,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["AI safety researchers", "Psychologists", "Programmers"],
     dataConnection: {
-      text: "Review the data on AI safety and alignment progress.",
+      text: "See how frontier AI models are ranked by benchmark performance.",
       link: "/ai-dashboard"
     }
   },
@@ -175,7 +175,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Engineers", "Philosophers", "Risk analysts"],
     dataConnection: {
-      text: "Check our timeline of breakthroughs in AI alignment.",
+      text: "Explore global AI investment trends and frontier model releases.",
       link: "/ai-dashboard"
     }
   },
@@ -193,7 +193,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Cosmologists", "Transhumanists", "Big-picture thinkers"],
     dataConnection: {
-      text: "Compare human evolution with the evolution of AI models.",
+      text: "Track the rapid growth in AI model releases and infrastructure.",
       link: "/ai-dashboard"
     }
   },

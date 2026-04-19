@@ -103,8 +103,8 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Political advocates", "Scientists", "Environmentalists"],
     dataConnection: {
-      text: "Explore the systemic emissions data by country and corporation.",
-      link: "/climate-dashboard"
+      text: "Explore CO₂ emissions by country, per capita, and over time.",
+      link: "/emissions"
     }
   },
   {
@@ -211,7 +211,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Activists", "Sociologists", "Anti-capitalism advocates"],
     dataConnection: {
-      text: "Examine the correlation between global GDP and carbon output.",
+      text: "Track temperature anomalies and precipitation trends by region.",
       link: "/climate-dashboard"
     }
   }

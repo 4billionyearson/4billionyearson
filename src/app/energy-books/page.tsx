@@ -65,7 +65,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Supply chain analysts", "Geopolitics students", "EV enthusiasts"],
     dataConnection: {
-      text: "Track the growth in electric vehicles versus the expansion of global grids.",
+      text: "See how electricity generation is shifting from fossil fuels to renewables.",
       link: "/energy-dashboard"
     }
   },
@@ -191,7 +191,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Urban planners", "Tech historians", "Policy advocates"],
     dataConnection: {
-      text: "Compare modern grid output to historical baseload demand curves.",
+      text: "Compare electricity generation mix and carbon intensity across countries.",
       link: "/energy-dashboard"
     }
   },
@@ -227,7 +227,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Finance professionals", "Journalism nerds", "Realists"],
     dataConnection: {
-      text: "See the shifting dynamics of sea levels and extreme temperatures.",
+      text: "Track the rise in floods, droughts, wildfires, and their economic cost.",
       link: "/extreme-weather"
     }
   },
