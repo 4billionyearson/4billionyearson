@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
@@ -294,12 +295,22 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
 
 const CLIMATE_CACHE_KEY = 'climate-dashboard-cache-v3';
 
-export default function ClimateDashboard() {
+export default function ClimateDashboardPage() {
+  return (
+    <Suspense>
+      <ClimateDashboard />
+    </Suspense>
+  );
+}
+
+function ClimateDashboard() {
+  const searchParams = useSearchParams();
   const [searchInput, setSearchInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<LocationResult[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const didAutoSearch = useRef(false);
 
   const [selectedLocation, setSelectedLocation] = useState<LocationResult | null>(null);
   const [countryData, setCountryData] = useState<any>(null);
@@ -461,6 +472,22 @@ export default function ClimateDashboard() {
       setLoading(false);
     }
   }, []);
+
+  // Auto-search from ?q= URL param
+  useEffect(() => {
+    if (didAutoSearch.current) return;
+    const q = searchParams.get('q');
+    if (!q?.trim()) return;
+    didAutoSearch.current = true;
+    setSearchInput(q);
+    (async () => {
+      const res = await fetch(`/api/climate/search?q=${encodeURIComponent(q.trim())}`);
+      const data = await res.json();
+      if (data.results?.length > 0) {
+        handleSelectLocation(data.results[0]);
+      }
+    })();
+  }, [searchParams, handleSelectLocation]);
 
   const getLocationLabel = () => {
     if (!selectedLocation) return '';
