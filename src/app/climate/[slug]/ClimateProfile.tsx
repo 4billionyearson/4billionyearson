@@ -310,7 +310,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
             {/* AI-generated narrative or fallback crawlable summary */}
             <div className="bg-gray-900/80 rounded-xl border border-gray-800 p-5 mb-8">
               <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                {summary ? 'Monthly Climate Summary' : 'Data Summary'}
+                {summary ? 'Monthly Climate Update' : 'Data Summary'}
               </h2>
               {summary ? (
                 <div className="text-gray-400 text-sm leading-relaxed space-y-3">
