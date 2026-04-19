@@ -205,80 +205,84 @@ function buildOverviewRow(
 
 function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
   const periods = ['latestMonth', 'latestQuarter', 'annual'] as const;
+  // Short labels for period column
+  const periodShortLabel = (label: string, period: typeof periods[number]) => {
+    if (period === 'annual') return label; // e.g. "2025"
+    // "Mar 2026" → "Mar", "Jan–Mar 2026" → "Jan–Mar"
+    return label.replace(/\s+\d{4}$/, '');
+  };
 
   return (
-    <div className="rounded-2xl border-2 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md shadow-xl p-4">
+    <div className="rounded-2xl border-2 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md shadow-xl p-3 md:p-4">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {panels.map((panel) => (
-          <div key={panel.title} className="rounded-xl border border-gray-700/50 bg-gray-900/40 overflow-hidden">
+          <div key={panel.title} className="rounded-xl border border-gray-700/50 bg-gray-800/30 overflow-hidden">
             <div className={`px-4 py-2.5 ${panel.accentClass}`}>
               <h2 className="text-sm font-bold uppercase tracking-wider text-white">{panel.title}</h2>
             </div>
 
             {panel.sections.map((section, sIdx) => (
-              <div key={sIdx} className={`${sIdx > 0 ? 'border-t border-gray-800/40' : ''}`}>
+              <div key={sIdx} className={`${sIdx > 0 ? 'border-t border-gray-700/40' : ''}`}>
                 {section.title && (
                   <div className="px-3 pt-3 pb-1 text-xs uppercase tracking-wider text-gray-500">{section.title}</div>
                 )}
-                <div className="p-3 pt-1 overflow-x-auto">
-                  <table className="w-full text-sm border-collapse">
-                    <thead>
-                      <tr>
-                        <th className="text-left py-1.5 px-2 w-[88px]" />
-                        {section.rows.map((row) => (
-                          <th
-                            key={row.label}
-                            className={`text-left py-1.5 px-2 text-xs font-bold whitespace-nowrap ${
-                              row.isPrimary ? 'text-[#D0A65E]' : 'text-gray-500'
-                            }`}
-                          >
-                            {row.label}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {periods.map((period) => {
-                        const periodLabel = section.rows[0]?.[period]?.title ?? '';
-                        return (
-                          <tr key={period} className="border-t border-gray-800/30">
-                            <td className="py-2.5 px-2 text-[10px] uppercase tracking-wider text-gray-500 whitespace-nowrap align-top pt-3">
-                              {periodLabel}
-                            </td>
-                            {section.rows.map((row) => {
-                              const metric = row[period];
-                              const recordPrefix = row.lowerIsBetter ? 'Fewest: ' : 'Record: ';
-                              return (
-                                <td
-                                  key={`${row.label}-${period}`}
-                                  className={`py-2.5 px-2 align-top ${
-                                    row.isPrimary ? `${panel.accentBg} rounded-lg` : ''
-                                  }`}
-                                >
-                                  <div className={row.isPrimary ? 'text-white text-lg font-bold' : 'text-gray-300 text-sm'}>
-                                    {metric.value}
-                                  </div>
-                                  <div className={row.isPrimary ? 'text-white text-lg font-bold' : 'text-gray-400 text-sm'}>
-                                    {metric.rank}
-                                    {row.lowerIsBetter && (
-                                      <span className="text-[10px] font-normal text-gray-400"> (fewest)</span>
-                                    )}
-                                  </div>
-                                  <div className="text-gray-500 text-[11px]">{metric.anomaly}</div>
-                                  <div className="text-gray-600 text-[11px]">{recordPrefix}{metric.record}</div>
-                                </td>
-                              );
-                            })}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                <div className="p-2 md:p-3 pt-1">
+                  {/* Column headers */}
+                  <div className="flex gap-1 mb-1">
+                    <div className="w-14 md:w-20 shrink-0" />
+                    {section.rows.map((row) => (
+                      <div
+                        key={row.label}
+                        className={`flex-1 min-w-0 px-1.5 py-1 text-[11px] md:text-xs font-bold truncate ${
+                          row.isPrimary ? 'text-[#D0A65E]' : 'text-gray-500'
+                        }`}
+                      >
+                        {row.label}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Data rows */}
+                  {periods.map((period) => {
+                    const periodLabel = section.rows[0]?.[period]?.title ?? '';
+                    return (
+                      <div key={period} className="flex gap-1 border-t border-gray-700/30">
+                        <div className="w-14 md:w-20 shrink-0 py-2 px-1 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-500 leading-tight flex items-start pt-2.5">
+                          <span className="md:hidden">{periodShortLabel(periodLabel, period)}</span>
+                          <span className="hidden md:inline">{periodLabel}</span>
+                        </div>
+                        {section.rows.map((row) => {
+                          const metric = row[period];
+                          const recordPrefix = row.lowerIsBetter ? 'Fewest: ' : 'Record: ';
+                          return (
+                            <div
+                              key={`${row.label}-${period}`}
+                              className={`flex-1 min-w-0 py-2 px-1.5 md:px-2 rounded-lg ${
+                                row.isPrimary ? panel.accentBg : ''
+                              }`}
+                            >
+                              <div className={`text-sm ${row.isPrimary ? 'text-white font-bold' : 'text-gray-300'}`}>
+                                {metric.value}
+                              </div>
+                              <div className={`text-sm ${row.isPrimary ? 'text-white font-bold' : 'text-gray-400'}`}>
+                                {metric.rank}
+                                {row.lowerIsBetter && (
+                                  <span className="text-[10px] font-normal text-gray-500"> (fewest)</span>
+                                )}
+                              </div>
+                              <div className="text-gray-500 text-[10px] md:text-[11px]">{metric.anomaly}</div>
+                              <div className="text-gray-600 text-[10px] md:text-[11px] truncate">{recordPrefix}{metric.record}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
 
-            <div className="px-4 pb-2 text-[10px] text-gray-600 text-right">Baseline: 1961–1990 average</div>
+            <div className="px-3 pb-2 text-[10px] text-gray-600 text-right">Baseline: 1961–1990 average</div>
           </div>
         ))}
       </div>
@@ -315,7 +319,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     panels.push({
       title: 'Temperature — Average',
       accentClass: 'bg-red-500/80',
-      accentBg: 'bg-red-950/40',
+      accentBg: 'bg-red-900/50',
       sections: [{ rows: temperatureRows }],
     });
   }
@@ -329,7 +333,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     panels.push({
       title: 'Sunshine — Total Hours',
       accentClass: 'bg-amber-500/80',
-      accentBg: 'bg-amber-950/40',
+      accentBg: 'bg-amber-900/50',
       sections: [{ rows: sunshineRows }],
     });
   }
@@ -364,7 +368,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     panels.push({
       title: 'Rainfall & Rain Days — Totals',
       accentClass: 'bg-blue-500/80',
-      accentBg: 'bg-blue-950/40',
+      accentBg: 'bg-blue-900/50',
       sections: [
         ...(rainfallRows.length ? [{ title: 'Rainfall / Precipitation', rows: rainfallRows }] : []),
         ...(rainDaysRows.length ? [{ title: 'Rain Days (≥1mm)', rows: rainDaysRows }] : []),
@@ -381,7 +385,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     panels.push({
       title: 'Frost Days — Total',
       accentClass: 'bg-sky-300/90',
-      accentBg: 'bg-sky-950/40',
+      accentBg: 'bg-sky-900/50',
       sections: [{ rows: frostRows }],
     });
   }
