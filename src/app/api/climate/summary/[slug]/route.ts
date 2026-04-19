@@ -1,7 +1,7 @@
 export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
-import { getRegionBySlug, type ClimateRegion } from '@/lib/climate/regions';
+import { getRegionBySlug, CLIMATE_REGIONS, type ClimateRegion } from '@/lib/climate/regions';
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -23,214 +23,171 @@ async function fetchJSON(url: string, timeout = 30000): Promise<any | null> {
   }
 }
 
-// ─── Ranking helpers ─────────────────────────────────────────────────────────
-
 function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-interface MonthEntry { month: number; year: number; value: number }
+// ─── Cross-variable monthly table for UK regions ────────────────────────────
 
-/** Rank the latest month against all same-months in the yearly data. Returns e.g. "2nd warmest March" */
-function rankMonth(
-  monthlyComparison: any[],
-  yearlyOrMonthlyHistory: any[],
-  valueKey: string,
-  label: string,
-  units: string,
-  direction: 'highest' | 'lowest' = 'highest',
-): string | null {
-  if (!monthlyComparison?.length) return null;
-  const latest = monthlyComparison[monthlyComparison.length - 1];
-  const latestVal = latest.recent ?? latest.recentTemp ?? null;
-  if (latestVal === null || latestVal === undefined) return null;
+function buildUKRegionTable(varData: Record<string, any>): string {
+  const vars = ['Tmean', 'Tmax', 'Tmin', 'Rainfall', 'Sunshine', 'AirFrost', 'Raindays1mm'];
+  const labels: Record<string, string> = {
+    Tmean: 'Mean Temp (°C)', Tmax: 'Max Temp (°C)', Tmin: 'Min Temp (°C)',
+    Rainfall: 'Rainfall (mm)', Sunshine: 'Sunshine (hrs)', AirFrost: 'Frost Days', Raindays1mm: 'Rain Days (≥1mm)',
+  };
 
-  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const monthName = monthNames[(latest.month - 1)] || `Month ${latest.month}`;
-  const diff = latest.diff;
-  const diffStr = diff !== null ? `${diff > 0 ? '+' : ''}${diff.toFixed(1)}${units}` : '';
-
-  return `${monthName} ${latest.year}: ${latestVal}${units} (${diffStr} vs historical average of ${latest.historicAvg}${units})`;
-}
-
-/** Extract recent monthly trend (last 3 months) */
-function recentMonthlyTrend(monthlyComparison: any[], units: string): string {
-  if (!monthlyComparison?.length) return '';
-  const recent = monthlyComparison.slice(-3);
-  return recent.map(m => {
-    const val = m.recent ?? m.recentTemp ?? '?';
-    const diff = m.diff;
-    const diffStr = diff !== null ? `${diff > 0 ? '+' : ''}${diff.toFixed(1)}` : '?';
-    return `${m.monthLabel}: ${val}${units} (${diffStr})`;
-  }).join('; ');
-}
-
-/** Extract decade averages for context */
-function decadeContext(yearly: any[], valueKey: string): string {
-  if (!yearly?.length) return '';
-  const vals = yearly.map((y: any) => ({ year: y.year, value: y[valueKey] ?? y.value })).filter((y: any) => y.value != null);
-  if (vals.length < 20) return '';
-
-  const lastDecade = vals.filter((y: any) => y.year >= vals[vals.length - 1].year - 9);
-  const prevDecade = vals.filter((y: any) => y.year >= vals[vals.length - 1].year - 19 && y.year < vals[vals.length - 1].year - 9);
-  const baseline = vals.filter((y: any) => y.year >= 1961 && y.year <= 1990);
-
-  const avg = (arr: any[]) => arr.length ? (arr.reduce((s: number, v: any) => s + v.value, 0) / arr.length).toFixed(2) : '?';
-
-  const parts: string[] = [];
-  if (lastDecade.length >= 5) parts.push(`Last 10 years avg: ${avg(lastDecade)}`);
-  if (prevDecade.length >= 5) parts.push(`Previous decade avg: ${avg(prevDecade)}`);
-  if (baseline.length >= 10) parts.push(`1961–1990 baseline avg: ${avg(baseline)}`);
-
-  return parts.join('; ');
-}
-
-// ─── Data extraction per region type ────────────────────────────────────────
-
-function extractCountryData(profileData: any): string {
-  const cd = profileData.countryData;
-  if (!cd) return 'No country data available.';
+  // Get the months from Tmean (they should all be the same)
+  const tmeanMC = varData.Tmean?.monthlyComparison || [];
+  const months = tmeanMC.slice(-6);
+  if (!months.length) return 'No monthly data available.';
 
   const lines: string[] = [];
-  const mc = cd.monthlyComparison || [];
-  const yd = cd.yearlyData || [];
-  const py = cd.precipYearly || [];
+  lines.push('MONTHLY DATA TABLE (last 6 months — value / historic avg / anomaly):');
+  lines.push('');
 
-  // Latest month
-  const latestMonth = rankMonth(mc, yd, 'avgTemp', 'temperature', '°C');
-  if (latestMonth) lines.push(`LATEST MONTH — Temperature: ${latestMonth}`);
+  for (const m of months) {
+    lines.push(`── ${m.monthLabel} ──`);
+    for (const v of vars) {
+      const mc = varData[v]?.monthlyComparison || [];
+      const entry = mc.find((e: any) => e.monthLabel === m.monthLabel);
+      if (!entry) continue;
+      const val = entry.recent ?? '?';
+      const avg = entry.historicAvg ?? '?';
+      const diff = entry.diff;
+      const diffStr = diff != null ? `${diff > 0 ? '+' : ''}${typeof diff === 'number' ? diff.toFixed(1) : diff}` : '?';
+      lines.push(`  ${labels[v] || v}: ${val} (avg: ${avg}, ${diffStr})`);
+    }
+    lines.push('');
+  }
 
-  // Recent 3 months temperature trend
-  const tempTrend = recentMonthlyTrend(mc, '°C');
-  if (tempTrend) lines.push(`RECENT MONTHS — Temperature (value, diff vs avg): ${tempTrend}`);
+  // Add yearly ranking for Tmean
+  const tmeanYearly = varData.Tmean?.yearly || [];
+  if (tmeanYearly.length > 10) {
+    const sorted = [...tmeanYearly].filter((y: any) => y.value != null).sort((a: any, b: any) => b.value - a.value);
+    const latest = tmeanYearly[tmeanYearly.length - 1];
+    const rank = sorted.findIndex((y: any) => y.year === latest.year) + 1;
+    lines.push(`ANNUAL: ${latest.year} mean temp ${latest.value}°C — ${ordinal(rank)} warmest of ${sorted.length} years`);
+    lines.push(`Top 5 warmest: ${sorted.slice(0, 5).map((y: any) => `${y.year} (${y.value}°C)`).join(', ')}`);
+  }
 
-  // Decade context
-  const decCtx = decadeContext(yd, 'avgTemp');
-  if (decCtx) lines.push(`DECADE CONTEXT — Temperature: ${decCtx}`);
+  return lines.join('\n');
+}
 
-  // Annual record holders
-  if (yd.length > 0) {
+// ─── Cross-variable table for US states ─────────────────────────────────────
+
+function buildUSStateTable(paramData: Record<string, any>): string {
+  const params = ['tavg', 'tmax', 'tmin', 'pcp'];
+  const labels: Record<string, string> = {
+    tavg: 'Avg Temp (°C)', tmax: 'Max Temp (°C)', tmin: 'Min Temp (°C)', pcp: 'Precipitation (mm)',
+  };
+
+  const tavgMC = paramData.tavg?.monthlyComparison || [];
+  const months = tavgMC.slice(-6);
+  if (!months.length) return 'No monthly data available.';
+
+  const lines: string[] = [];
+  lines.push('MONTHLY DATA TABLE (last 6 months — value / historic avg / anomaly):');
+  lines.push('');
+
+  for (const m of months) {
+    lines.push(`── ${m.monthLabel} ──`);
+    for (const p of params) {
+      const mc = paramData[p]?.monthlyComparison || [];
+      const entry = mc.find((e: any) => e.monthLabel === m.monthLabel);
+      if (!entry) continue;
+      const val = entry.recent ?? '?';
+      const avg = entry.historicAvg ?? '?';
+      const diff = entry.diff;
+      const diffStr = diff != null ? `${diff > 0 ? '+' : ''}${typeof diff === 'number' ? diff.toFixed(1) : diff}` : '?';
+      lines.push(`  ${labels[p] || p}: ${val} (avg: ${avg}, ${diffStr})`);
+    }
+    lines.push('');
+  }
+
+  // Yearly ranking
+  const tavgYearly = paramData.tavg?.yearly || [];
+  if (tavgYearly.length > 10) {
+    const sorted = [...tavgYearly].filter((y: any) => y.value != null).sort((a: any, b: any) => b.value - a.value);
+    const latest = tavgYearly[tavgYearly.length - 1];
+    const rank = sorted.findIndex((y: any) => y.year === latest.year) + 1;
+    lines.push(`ANNUAL: ${latest.year} avg temp ${latest.value}°C — ${ordinal(rank)} warmest of ${sorted.length} years`);
+    lines.push(`Top 5 warmest: ${sorted.slice(0, 5).map((y: any) => `${y.year} (${y.value}°C)`).join(', ')}`);
+  }
+
+  return lines.join('\n');
+}
+
+// ─── Country monthly data ───────────────────────────────────────────────────
+
+function buildCountryTable(countryData: any): string {
+  const mc = countryData.monthlyComparison || [];
+  const months = mc.slice(-6);
+  if (!months.length) return 'No monthly data available.';
+
+  const lines: string[] = [];
+  lines.push('MONTHLY TEMPERATURE (last 6 months — value / historic avg / anomaly):');
+  for (const m of months) {
+    const val = m.recentTemp ?? m.recent ?? '?';
+    const avg = m.historicAvg ?? '?';
+    const diff = m.diff;
+    const diffStr = diff != null ? `${diff > 0 ? '+' : ''}${typeof diff === 'number' ? diff.toFixed(1) : diff}` : '?';
+    lines.push(`  ${m.monthLabel}: ${val}°C (avg: ${avg}°C, ${diffStr}°C)`);
+  }
+
+  const yd = countryData.yearlyData || [];
+  if (yd.length > 10) {
     const sorted = [...yd].filter((y: any) => y.avgTemp != null).sort((a: any, b: any) => b.avgTemp - a.avgTemp);
     const latest = yd[yd.length - 1];
     const rank = sorted.findIndex((y: any) => y.year === latest.year) + 1;
-    lines.push(`ANNUAL RANKING — ${latest.year} (${latest.avgTemp}°C) ranks ${ordinal(rank)} warmest out of ${sorted.length} years on record`);
-    lines.push(`TOP 5 WARMEST YEARS: ${sorted.slice(0, 5).map((y: any) => `${y.year} (${y.avgTemp}°C)`).join(', ')}`);
+    lines.push(`\nANNUAL: ${latest.year} avg ${latest.avgTemp}°C — ${ordinal(rank)} warmest of ${sorted.length} years`);
+    lines.push(`Top 5 warmest: ${sorted.slice(0, 5).map((y: any) => `${y.year} (${y.avgTemp}°C)`).join(', ')}`);
   }
 
-  // Precipitation
+  const py = countryData.precipYearly || [];
   if (py.length > 0) {
     const latest = py[py.length - 1];
-    lines.push(`LATEST PRECIPITATION — ${latest.year}: ${latest.value}mm`);
-    const sorted = [...py].filter((y: any) => y.value != null).sort((a: any, b: any) => b.value - a.value);
-    const rank = sorted.findIndex((y: any) => y.year === latest.year) + 1;
-    lines.push(`Precipitation ranks ${ordinal(rank)} wettest out of ${sorted.length} years`);
+    lines.push(`\nLatest annual precipitation: ${latest.value}mm (${latest.year})`);
   }
 
   return lines.join('\n');
 }
 
-function extractUSStateData(profileData: any): string {
-  const us = profileData.usStateData;
-  if (!us?.paramData) return 'No US state data available.';
+// ─── National comparison data ───────────────────────────────────────────────
 
+function buildNationalComparison(nationalData: any, nationalName: string): string {
+  if (!nationalData) return '';
   const lines: string[] = [];
-  const params = us.paramData;
+  lines.push(`\n═══ NATIONAL COMPARISON: ${nationalName} ═══`);
 
-  // Temperature
-  if (params.tavg) {
-    const mc = params.tavg.monthlyComparison || [];
-    const yd = params.tavg.yearly || [];
-
-    const latestMonth = rankMonth(mc, yd, 'value', 'avg temperature', '°C');
-    if (latestMonth) lines.push(`LATEST MONTH — Avg Temperature: ${latestMonth}`);
-
-    const tempTrend = recentMonthlyTrend(mc, '°C');
-    if (tempTrend) lines.push(`RECENT MONTHS — Avg Temperature: ${tempTrend}`);
-
-    const decCtx = decadeContext(yd, 'value');
-    if (decCtx) lines.push(`DECADE CONTEXT — Temperature: ${decCtx}`);
-
-    if (yd.length > 0) {
-      const sorted = [...yd].filter((y: any) => y.value != null).sort((a: any, b: any) => b.value - a.value);
-      const latest = yd[yd.length - 1];
-      const rank = sorted.findIndex((y: any) => y.year === latest.year) + 1;
-      lines.push(`ANNUAL RANKING — ${latest.year} (${latest.value}°C) ranks ${ordinal(rank)} warmest of ${sorted.length} years`);
-      lines.push(`TOP 5 WARMEST YEARS: ${sorted.slice(0, 5).map((y: any) => `${y.year} (${y.value}°C)`).join(', ')}`);
+  if (nationalData.countryData) {
+    const mc = nationalData.countryData.monthlyComparison || [];
+    const months = mc.slice(-6);
+    lines.push('Monthly temperature (last 6 months):');
+    for (const m of months) {
+      const val = m.recentTemp ?? m.recent ?? '?';
+      const diff = m.diff;
+      const diffStr = diff != null ? `${diff > 0 ? '+' : ''}${typeof diff === 'number' ? diff.toFixed(1) : diff}` : '?';
+      lines.push(`  ${m.monthLabel}: ${val}°C (${diffStr}°C vs avg)`);
     }
   }
 
-  // Max temp
-  if (params.tmax) {
-    const mc = params.tmax.monthlyComparison || [];
-    const latestMonth = rankMonth(mc, [], 'value', 'max temperature', '°C');
-    if (latestMonth) lines.push(`LATEST MONTH — Max Temperature: ${latestMonth}`);
-  }
-
-  // Precipitation
-  if (params.pcp) {
-    const mc = params.pcp.monthlyComparison || [];
-    const yd = params.pcp.yearly || [];
-    const latestMonth = rankMonth(mc, yd, 'value', 'precipitation', 'mm');
-    if (latestMonth) lines.push(`LATEST MONTH — Precipitation: ${latestMonth}`);
-    const precipTrend = recentMonthlyTrend(mc, 'mm');
-    if (precipTrend) lines.push(`RECENT MONTHS — Precipitation: ${precipTrend}`);
-  }
-
-  return lines.join('\n');
-}
-
-function extractUKRegionData(profileData: any): string {
-  const uk = profileData.ukRegionData;
-  if (!uk?.varData) return 'No UK region data available.';
-
-  const lines: string[] = [];
-  const vars = uk.varData;
-
-  const varConfig: Record<string, { label: string; units: string; direction: 'highest' | 'lowest' }> = {
-    Tmean: { label: 'Mean Temperature', units: '°C', direction: 'highest' },
-    Tmax: { label: 'Max Temperature', units: '°C', direction: 'highest' },
-    Tmin: { label: 'Min Temperature', units: '°C', direction: 'highest' },
-    Rainfall: { label: 'Rainfall', units: 'mm', direction: 'highest' },
-    Sunshine: { label: 'Sunshine Hours', units: 'hrs', direction: 'highest' },
-    AirFrost: { label: 'Air Frost Days', units: ' days', direction: 'lowest' },
-    Raindays1mm: { label: 'Rain Days (≥1mm)', units: ' days', direction: 'highest' },
-  };
-
-  for (const [varKey, config] of Object.entries(varConfig)) {
-    if (!vars[varKey]) continue;
-    const mc = vars[varKey].monthlyComparison || [];
-    const yd = vars[varKey].yearly || [];
-
-    const latestMonth = rankMonth(mc, yd, 'value', config.label, config.units);
-    if (latestMonth) lines.push(`LATEST MONTH — ${config.label}: ${latestMonth}`);
-
-    // Yearly ranking for temperature
-    if (varKey === 'Tmean' && yd.length > 0) {
-      const sorted = [...yd].filter((y: any) => y.value != null).sort((a: any, b: any) => b.value - a.value);
-      const latest = yd[yd.length - 1];
-      const rank = sorted.findIndex((y: any) => y.year === latest.year) + 1;
-      lines.push(`ANNUAL RANKING — ${latest.year} (${latest.value}°C) ranks ${ordinal(rank)} warmest of ${sorted.length} years`);
-      lines.push(`TOP 5 WARMEST YEARS: ${sorted.slice(0, 5).map((y: any) => `${y.year} (${y.value}°C)`).join(', ')}`);
-
-      const decCtx = decadeContext(yd, 'value');
-      if (decCtx) lines.push(`DECADE CONTEXT — Temperature: ${decCtx}`);
+  if (nationalData.ukRegionData?.varData) {
+    const vd = nationalData.ukRegionData.varData;
+    for (const v of ['Tmean', 'AirFrost', 'Rainfall']) {
+      const mc = vd[v]?.monthlyComparison || [];
+      if (!mc.length) continue;
+      const months = mc.slice(-6);
+      const label = v === 'Tmean' ? 'Mean Temp' : v === 'AirFrost' ? 'Frost Days' : 'Rainfall';
+      lines.push(`${label} (last 6 months):`);
+      for (const m of months) {
+        const val = m.recent ?? '?';
+        const diff = m.diff;
+        const diffStr = diff != null ? `${diff > 0 ? '+' : ''}${typeof diff === 'number' ? diff.toFixed(1) : diff}` : '?';
+        lines.push(`  ${m.monthLabel}: ${val} (${diffStr} vs avg)`);
+      }
     }
-  }
-
-  // Recent 3-month trend for key variables
-  if (vars.Tmean) {
-    const trend = recentMonthlyTrend(vars.Tmean.monthlyComparison, '°C');
-    if (trend) lines.push(`RECENT 3-MONTH TREND — Mean Temperature: ${trend}`);
-  }
-  if (vars.Rainfall) {
-    const trend = recentMonthlyTrend(vars.Rainfall.monthlyComparison, 'mm');
-    if (trend) lines.push(`RECENT 3-MONTH TREND — Rainfall: ${trend}`);
-  }
-  if (vars.AirFrost) {
-    const trend = recentMonthlyTrend(vars.AirFrost.monthlyComparison, ' days');
-    if (trend) lines.push(`RECENT 3-MONTH TREND — Air Frost Days: ${trend}`);
   }
 
   return lines.join('\n');
@@ -238,54 +195,59 @@ function extractUKRegionData(profileData: any): string {
 
 // ─── Prompt builder ─────────────────────────────────────────────────────────
 
-function buildPrompt(region: ClimateRegion, profileData: any): string {
+function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any): string {
   const lines: string[] = [];
 
-  // Instructions
-  lines.push(`You are writing a monthly climate data update for ${region.name}.`);
+  lines.push(`You are a climate data analyst writing a monthly update for ${region.name}.`);
   lines.push('');
-  lines.push('TASK: Write a concise 2–3 paragraph monthly climate update (about 150–180 words).');
+  lines.push('TASK: Write a 2–3 paragraph update (180–220 words) that tells a STORY from the data.');
+  lines.push('');
+  lines.push('KEY PRINCIPLES:');
+  lines.push('1. CROSS-VARIABLE: Show how different variables interact. If temperatures are up and frost days are down, connect them. If March was dry but sunny after a wet January/February, say so.');
+  lines.push('2. MOST STRIKING PATTERN FIRST: Lead with the single most notable finding — the thing that would make someone say "wow, really?" For example, frost days consistently well below average across the entire winter might be the standout pattern.');
+  lines.push('3. MONTHLY CONTEXT: How does the latest month compare to the previous 2–3 months? Has there been a shift (e.g. wet → suddenly dry)?');
+  lines.push('4. TRENDS: Place in the context of the decade and long-term record. Is this winter\'s warmth part of an accelerating trend?');
+  if (region.type === 'uk-region') {
+    lines.push('5. NATIONAL CONTEXT: Compare to UK-wide data provided. Is this region\'s pattern more or less extreme than the national picture?');
+  } else if (region.type === 'us-state') {
+    lines.push('5. NATIONAL CONTEXT: Compare to US-wide data provided. Is this state experiencing the same trends as nationally?');
+  } else {
+    lines.push('5. GLOBAL CONTEXT: How does this country\'s warming trend compare to the global average?');
+  }
+  lines.push('6. MAKE IT RELATABLE: Use everyday language where helpful — "fewer frosty mornings", "a notably dry spring" — alongside the data.');
   lines.push('');
   lines.push('RULES:');
-  lines.push('- Focus on the LATEST MONTH\'s data and how it compares historically.');
-  lines.push('- Mention any notable rankings (e.g. "the 3rd warmest March on record", "4th lowest frost days for February").');
-  lines.push('- Place the month in context: how does it fit into trends over the last few months, the last year, and the last decade?');
-  if (region.type === 'us-state') {
-    lines.push('- Reference how this state\'s figures compare to national (US) context where meaningful.');
-  } else if (region.type === 'uk-region') {
-    lines.push('- Reference how this region\'s figures compare to national (UK) context where meaningful.');
-  } else {
-    lines.push('- Reference how this country\'s figures compare to the global trend where meaningful.');
-  }
-  lines.push('- Use British English spelling throughout (e.g. "recognise", "colour", "organisation").');
-  lines.push('- Do NOT use markdown, bullet points, or headings — return flowing plain text paragraphs only.');
-  lines.push('- Be specific with numbers. Do not invent data — only use what is provided below.');
-  lines.push('- Write in an authoritative but accessible tone for a general audience.');
-  lines.push('- Do not add speculative predictions or policy recommendations.');
+  lines.push('- British English spelling throughout.');
+  lines.push('- Plain text only — no markdown, bullet points, or headings.');
+  lines.push('- Be specific with numbers but weave them into natural prose.');
+  lines.push('- Do NOT invent data. Only reference what is provided below.');
+  lines.push('- No policy recommendations or speculation about future trends.');
   lines.push('');
 
-  // Data section
-  lines.push('═══ DATA ═══');
-  lines.push(`Region: ${region.name} (${region.type})`);
-  lines.push(`Data sources: ${region.dataSources.join(', ')}`);
-  lines.push('');
+  // Region data
+  lines.push(`═══ ${region.name.toUpperCase()} DATA ═══`);
+  lines.push(`Region type: ${region.type}`);
 
-  // Key stats
   const ks = profileData.keyStats || {};
-  if (ks.latestTemp) lines.push(`Latest full-year avg temperature: ${ks.latestTemp}`);
-  if (ks.tempTrend) lines.push(`Temperature trend: ${ks.tempTrend}`);
+  if (ks.latestTemp) lines.push(`Latest full-year avg temp: ${ks.latestTemp}`);
+  if (ks.tempTrend) lines.push(`Long-term trend: ${ks.tempTrend}`);
   if (ks.warmestYear) lines.push(`Warmest year on record: ${ks.warmestYear}`);
-  if (ks.dataRange) lines.push(`Data coverage: ${ks.dataRange}`);
-  if (ks.latestPrecip) lines.push(`Latest full-year precipitation: ${ks.latestPrecip}`);
+  if (ks.dataRange) lines.push(`Records since: ${ks.dataRange}`);
   lines.push('');
 
-  // Detailed monthly data
-  if (region.type === 'country') {
-    lines.push(extractCountryData(profileData));
-  } else if (region.type === 'us-state') {
-    lines.push(extractUSStateData(profileData));
-  } else if (region.type === 'uk-region') {
-    lines.push(extractUKRegionData(profileData));
+  // Detailed monthly table
+  if (region.type === 'uk-region' && profileData.ukRegionData?.varData) {
+    lines.push(buildUKRegionTable(profileData.ukRegionData.varData));
+  } else if (region.type === 'us-state' && profileData.usStateData?.paramData) {
+    lines.push(buildUSStateTable(profileData.usStateData.paramData));
+  } else if (region.type === 'country' && profileData.countryData) {
+    lines.push(buildCountryTable(profileData.countryData));
+  }
+
+  // National comparison
+  if (nationalData) {
+    const nationalName = region.type === 'uk-region' ? 'United Kingdom' : 'United States';
+    lines.push(buildNationalComparison(nationalData, nationalName));
   }
 
   return lines.join('\n');
@@ -319,7 +281,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v4`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v5`;
 
   // Check cache
   const cached = await getCached<{ summary: string }>(cacheKey);
@@ -334,7 +296,15 @@ export async function GET(
     return NextResponse.json({ error: 'No profile data available' }, { status: 404 });
   }
 
-  const prompt = buildPrompt(region, profileData);
+  // Fetch national comparison data for sub-national regions
+  let nationalData = null;
+  if (region.type === 'uk-region') {
+    nationalData = await fetchJSON(`${base}/api/climate/profile/uk`);
+  } else if (region.type === 'us-state') {
+    nationalData = await fetchJSON(`${base}/api/climate/profile/usa`);
+  }
+
+  const prompt = buildPrompt(region, profileData, nationalData);
 
   try {
     const geminiRes = await fetch(
@@ -345,8 +315,8 @@ export async function GET(
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 500,
+            temperature: 0.5,
+            maxOutputTokens: 600,
           },
         }),
       }
