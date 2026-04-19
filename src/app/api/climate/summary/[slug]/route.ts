@@ -2,7 +2,7 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
-import { getRegionBySlug, CLIMATE_REGIONS, type ClimateRegion } from '@/lib/climate/regions';
+import { getRegionBySlug, type ClimateRegion } from '@/lib/climate/regions';
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -194,6 +194,83 @@ function buildNationalComparison(nationalData: any, nationalName: string): strin
   return lines.join('\n');
 }
 
+function getLatestMonthlyPoint(data: any[] | undefined): any | null {
+  if (!data?.length) return null;
+  return [...data].reverse().find((entry) => typeof entry?.diff === 'number') ?? null;
+}
+
+function findMonthlyPoint(data: any[] | undefined, monthLabel: string | undefined): any | null {
+  if (!data?.length || !monthLabel) return null;
+  return data.find((entry) => entry.monthLabel === monthLabel) ?? null;
+}
+
+function averageMonthlyDiff(data: any[] | undefined, count = 12): number | null {
+  if (!data?.length) return null;
+  const values = data
+    .slice(-count)
+    .map((entry) => entry.diff)
+    .filter((value): value is number => typeof value === 'number');
+  if (!values.length) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function formatSignedValue(value: number, units = '°C', digits = 1): string {
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${value.toFixed(digits)}${units}`;
+}
+
+function buildDeterministicSummary(region: ClimateRegion, profileData: any): string {
+  const regionMonthly = profileData.ukRegionData?.varData?.Tmean?.monthlyComparison
+    || profileData.usStateData?.paramData?.tavg?.monthlyComparison
+    || profileData.countryData?.monthlyComparison
+    || [];
+  const nationalMonthly = profileData.nationalData?.varData?.Tmean?.monthlyComparison
+    || profileData.nationalData?.paramData?.tavg?.monthlyComparison
+    || [];
+  const globalMonthly = profileData.globalData?.landMonthlyComparison || [];
+
+  const latestRegion = getLatestMonthlyPoint(regionMonthly);
+  const latestNational = findMonthlyPoint(nationalMonthly, latestRegion?.monthLabel) ?? getLatestMonthlyPoint(nationalMonthly);
+  const latestGlobal = findMonthlyPoint(globalMonthly, latestRegion?.monthLabel) ?? getLatestMonthlyPoint(globalMonthly);
+  const recentMean = averageMonthlyDiff(regionMonthly, 12);
+
+  const sentence1Parts: string[] = [];
+  if (latestRegion?.diff != null) {
+    sentence1Parts.push(`${region.name} was running ${formatSignedValue(latestRegion.diff)} against the 1961–1990 temperature average in ${latestRegion.monthLabel}`);
+  }
+  if (recentMean != null) {
+    sentence1Parts.push(`the latest 12 months averaged ${formatSignedValue(recentMean)} above that baseline`);
+  }
+  const sentence1 = sentence1Parts.length
+    ? `${sentence1Parts.join(', and ')}.`
+    : `${region.name} remains warmer than its late-20th-century baseline in the latest available climate record.`;
+
+  const comparisons: string[] = [];
+  if (latestRegion?.diff != null && latestNational?.diff != null) {
+    const gap = latestRegion.diff - latestNational.diff;
+    comparisons.push(`The regional anomaly was ${formatSignedValue(Math.abs(gap))} ${gap >= 0 ? 'higher' : 'lower'} than the national reading in the same month.`);
+  }
+  if (latestRegion?.diff != null && latestGlobal?.diff != null) {
+    const gap = latestRegion.diff - latestGlobal.diff;
+    comparisons.push(`Against global land temperatures, the local anomaly sat ${formatSignedValue(Math.abs(gap))} ${gap >= 0 ? 'above' : 'below'} the worldwide signal.`);
+  }
+
+  const keyStats = profileData.keyStats || {};
+  const longTermParts: string[] = [];
+  if (keyStats.latestTemp) longTermParts.push(`The latest full year averaged ${keyStats.latestTemp}`);
+  if (keyStats.warmestYear) longTermParts.push(`the warmest year on record remains ${keyStats.warmestYear}`);
+  if (keyStats.dataRange) longTermParts.push(`the dataset spans ${keyStats.dataRange}`);
+  const sentence2 = longTermParts.length ? `${longTermParts.join(', and ')}.` : '';
+
+  const firstParagraph = [sentence1, ...comparisons].join(' ');
+  const secondParagraph = sentence2 || 'This profile combines regional observations with national and global baselines so the latest anomaly can be read in context.';
+  return `${firstParagraph}\n\n${secondParagraph}`.trim();
+}
+
+function summaryLooksIncomplete(summary: string): boolean {
+  return !/[.!?]["')\]]?\s*$/.test(summary.trim());
+}
+
 // ─── Prompt builder ─────────────────────────────────────────────────────────
 
 function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any): string {
@@ -201,7 +278,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any)
 
   lines.push(`You are a climate data analyst writing a monthly update for ${region.name}.`);
   lines.push('');
-  lines.push('TASK: Write a 2–3 paragraph update (180–220 words) that tells a STORY from the data.');
+  lines.push('TASK: Write exactly 2 short paragraphs (120–160 words total) that tell a STORY from the data.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
   lines.push('1. CROSS-VARIABLE: Show how different variables interact. If temperatures are up and frost days are down, connect them. If March was dry but sunny after a wet January/February, say so.');
@@ -268,11 +345,6 @@ export async function GET(
     return NextResponse.json({ error: 'Region not found' }, { status: 404 });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ error: 'Gemini API key not configured' }, { status: 500 });
-  }
-
   // Date-aware cache key
   const now = new Date();
   const dayOfMonth = now.getDate();
@@ -283,7 +355,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v8`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v9`;
 
   // Check cache
   const cached = await getCached<{ summary: string }>(cacheKey);
@@ -296,6 +368,17 @@ export async function GET(
   const profileData = await fetchJSON(`${base}/api/climate/profile/${slug}`);
   if (!profileData) {
     return NextResponse.json({ error: 'No profile data available' }, { status: 404 });
+  }
+
+  const fallbackResult = {
+    summary: buildDeterministicSummary(region, profileData),
+    generatedAt: new Date().toISOString(),
+  };
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    await setShortTerm(cacheKey, fallbackResult);
+    return NextResponse.json({ ...fallbackResult, source: 'fallback' });
   }
 
   // Fetch national comparison data for sub-national regions
@@ -317,8 +400,8 @@ export async function GET(
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.5,
-            maxOutputTokens: 1200,
+            temperature: 0.3,
+            maxOutputTokens: 900,
           },
         }),
       }
@@ -327,22 +410,24 @@ export async function GET(
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error('Gemini API error:', errText);
-      return NextResponse.json({ error: 'Failed to generate summary' }, { status: 502 });
+      await setShortTerm(cacheKey, fallbackResult);
+      return NextResponse.json({ ...fallbackResult, source: 'fallback' });
     }
 
     const geminiData = await geminiRes.json();
     const summary = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
-    if (!summary) {
-      return NextResponse.json({ error: 'Empty response from Gemini' }, { status: 502 });
-    }
+    const finalSummary = !summary || summaryLooksIncomplete(summary)
+      ? fallbackResult.summary
+      : summary;
 
-    const result = { summary, generatedAt: new Date().toISOString() };
+    const result = { summary: finalSummary, generatedAt: new Date().toISOString() };
     await setShortTerm(cacheKey, result);
 
-    return NextResponse.json({ ...result, source: 'fresh' });
+    return NextResponse.json({ ...result, source: finalSummary === fallbackResult.summary ? 'fallback' : 'fresh' });
   } catch (err: any) {
     console.error('Gemini summary error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    await setShortTerm(cacheKey, fallbackResult);
+    return NextResponse.json({ ...fallbackResult, source: 'fallback' });
   }
 }

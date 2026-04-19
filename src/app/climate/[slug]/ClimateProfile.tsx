@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, Brush,
+  Tooltip, Legend, ResponsiveContainer, Brush, ReferenceLine,
 } from 'recharts';
 import {
   Loader2, Thermometer, Droplets, Sun, Snowflake,
@@ -190,6 +190,149 @@ function StatCard({ label, value, color }: { label: string; value: string; color
   );
 }
 
+function formatSignedValue(value: number, units = '°C', digits = 1): string {
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${value.toFixed(digits)}${units}`;
+}
+
+function findMonthlyPoint(data: MonthlyComparison[] | undefined, monthLabel: string | undefined): MonthlyComparison | null {
+  if (!data?.length || !monthLabel) return null;
+  return data.find((entry) => entry.monthLabel === monthLabel) ?? null;
+}
+
+function getLatestMonthlyPoint(data: MonthlyComparison[] | undefined): MonthlyComparison | null {
+  if (!data?.length) return null;
+  return [...data].reverse().find((entry) => typeof entry.diff === 'number') ?? null;
+}
+
+function averageMonthlyDiff(data: MonthlyComparison[] | undefined, count = 12): number | null {
+  if (!data?.length) return null;
+  const values = data
+    .slice(-count)
+    .map((entry) => entry.diff)
+    .filter((value): value is number => typeof value === 'number');
+  if (!values.length) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function getTemperatureMonthlySeries(data: ProfileData) {
+  return {
+    region: data.ukRegionData?.varData?.Tmean?.monthlyComparison
+      || data.usStateData?.paramData?.tavg?.monthlyComparison
+      || data.countryData?.monthlyComparison
+      || [],
+    national: data.nationalData?.varData?.Tmean?.monthlyComparison
+      || data.nationalData?.paramData?.tavg?.monthlyComparison
+      || [],
+    global: data.globalData?.landMonthlyComparison || [],
+  };
+}
+
+function mergeTemperatureAnomalyData(
+  regionData: MonthlyComparison[],
+  nationalData: MonthlyComparison[],
+  globalData: MonthlyComparison[],
+) {
+  const base = regionData.length ? regionData : nationalData.length ? nationalData : globalData;
+  return base.map((entry) => {
+    const nationalEntry = findMonthlyPoint(nationalData, entry.monthLabel);
+    const globalEntry = findMonthlyPoint(globalData, entry.monthLabel);
+    return {
+      monthLabel: entry.monthLabel,
+      regionAnomaly: entry.diff,
+      nationalAnomaly: nationalEntry?.diff ?? null,
+      globalAnomaly: globalEntry?.diff ?? null,
+    };
+  });
+}
+
+function buildHeroMetrics(data: ProfileData, nationalLabel: string) {
+  const metrics: Array<{ label: string; value: string; color: string; note?: string }> = [];
+  const { region, national, global } = getTemperatureMonthlySeries(data);
+  const latestRegion = getLatestMonthlyPoint(region);
+  const latestNational = findMonthlyPoint(national, latestRegion?.monthLabel) ?? getLatestMonthlyPoint(national);
+  const latestGlobal = findMonthlyPoint(global, latestRegion?.monthLabel) ?? getLatestMonthlyPoint(global);
+  const rollingAnomaly = averageMonthlyDiff(region, 12);
+
+  if (data.keyStats.latestTemp) {
+    metrics.push({
+      label: 'Latest Annual Average',
+      value: data.keyStats.latestTemp,
+      color: 'text-red-400',
+      note: 'Latest full year',
+    });
+  }
+
+  if (latestRegion?.diff != null) {
+    metrics.push({
+      label: 'Latest Monthly Anomaly',
+      value: formatSignedValue(latestRegion.diff),
+      color: latestRegion.diff >= 0 ? 'text-amber-300' : 'text-sky-300',
+      note: `${latestRegion.monthLabel} vs 1961–1990`,
+    });
+  } else if (data.keyStats.tempTrend) {
+    metrics.push({
+      label: 'Decadal Temperature Shift',
+      value: data.keyStats.tempTrend,
+      color: 'text-amber-400',
+    });
+  }
+
+  if (latestRegion?.diff != null && latestNational?.diff != null) {
+    const gap = latestRegion.diff - latestNational.diff;
+    metrics.push({
+      label: `Vs ${nationalLabel}`,
+      value: formatSignedValue(gap),
+      color: gap >= 0 ? 'text-orange-400' : 'text-sky-400',
+      note: `${gap >= 0 ? 'warmer' : 'cooler'} in ${latestRegion.monthLabel}`,
+    });
+  } else if (rollingAnomaly != null) {
+    metrics.push({
+      label: '12-Month Mean Anomaly',
+      value: formatSignedValue(rollingAnomaly),
+      color: rollingAnomaly >= 0 ? 'text-orange-400' : 'text-sky-400',
+      note: 'Average of latest 12 months',
+    });
+  }
+
+  if (latestRegion?.diff != null && latestGlobal?.diff != null) {
+    const gap = latestRegion.diff - latestGlobal.diff;
+    metrics.push({
+      label: 'Vs Global Land',
+      value: formatSignedValue(gap),
+      color: gap >= 0 ? 'text-emerald-400' : 'text-cyan-400',
+      note: `${gap >= 0 ? 'warmer' : 'cooler'} in ${latestRegion.monthLabel}`,
+    });
+  } else if (data.keyStats.warmestYear) {
+    metrics.push({
+      label: 'Warmest Year',
+      value: data.keyStats.warmestYear,
+      color: 'text-orange-400',
+      note: 'Highest annual mean',
+    });
+  }
+
+  if (metrics.length < 4 && data.keyStats.warmestYear) {
+    metrics.push({
+      label: 'Warmest Year',
+      value: data.keyStats.warmestYear,
+      color: 'text-orange-400',
+      note: 'Highest annual mean',
+    });
+  }
+
+  if (metrics.length < 4 && data.keyStats.dataRange) {
+    metrics.push({
+      label: 'Data Coverage',
+      value: data.keyStats.dataRange,
+      color: 'text-sky-400',
+      note: 'Historical record span',
+    });
+  }
+
+  return metrics.slice(0, 4);
+}
+
 // ─── Comparison Bar Chart (dashboard-style, side-by-side) ───────────────────
 
 function ComparisonChart({ data, recentKey, label, units, barColor }: {
@@ -282,6 +425,60 @@ function MultiComparisonChart({ data, series, units }: {
           <Tooltip content={<ComparisonTooltip />} cursor={{ fill: '#1F2937' }} />
           <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, left: 0, right: 0 }} />
           {bars}
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function AnomalyTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-gray-900 border border-gray-700 rounded-lg p-3 shadow-xl min-w-[210px]">
+      <p className="font-semibold text-gray-200 mb-2 text-sm">{label}</p>
+      {payload
+        .filter((item: any) => typeof item.value === 'number')
+        .map((item: any, index: number) => (
+          <p key={index} style={{ color: item.color }} className="text-sm">
+            {item.name}: {formatSignedValue(item.value)}
+          </p>
+        ))}
+    </div>
+  );
+}
+
+function TemperatureAnomalyChart({ data, series }: {
+  data: Array<Record<string, number | string | null>>;
+  series: Array<{ dataKey: string; label: string; color: string }>;
+}) {
+  const values = data.flatMap((row) =>
+    series
+      .map((item) => row[item.dataKey])
+      .filter((value): value is number => typeof value === 'number')
+  );
+  const maxAbs = values.length ? Math.max(...values.map((value) => Math.abs(value))) : 1;
+  const bound = Math.max(1.5, Math.ceil(maxAbs + 0.5));
+
+  return (
+    <div className="h-[330px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={CHART_MARGIN} barGap={6}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+          <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="4 4" />
+          <XAxis dataKey="monthLabel" tick={{ fontSize: 10, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+          <YAxis
+            tick={{ fontSize: 11, fill: '#A99B8D' }}
+            tickLine={false}
+            axisLine={false}
+            domain={[-bound, bound]}
+            tickFormatter={(value) => `${value > 0 ? '+' : ''}${value}`}
+            unit="°"
+          />
+          <Tooltip content={<AnomalyTooltip />} cursor={{ fill: '#1F2937' }} />
+          <Legend iconType="circle" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, left: 0, right: 0 }} />
+          {series.map((item) => (
+            <Bar key={item.dataKey} dataKey={item.dataKey} name={item.label} fill={item.color} radius={[4, 4, 0, 0]} maxBarSize={24} />
+          ))}
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -447,6 +644,13 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
   const regionLabel = data?.ukRegionData?.region || data?.usStateData?.state || data?.name || region.name;
   const nationalLabel = data?.nationalData?.region || (region.type === 'us-state' ? 'United States' : region.type === 'uk-region' ? 'United Kingdom' : '');
   const isSubNational = region.type === 'uk-region' || region.type === 'us-state';
+  const heroMetrics = data ? buildHeroMetrics(data, nationalLabel || 'National Average') : [];
+  const heroMetadata = data
+    ? [
+        data.keyStats.warmestYear ? `Warmest year ${data.keyStats.warmestYear}` : null,
+        data.keyStats.dataRange ? `Coverage ${data.keyStats.dataRange}` : null,
+      ].filter((value): value is string => Boolean(value))
+    : [];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-100">
@@ -488,21 +692,25 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
         {data && !loading && (
           <>
             {/* Key Stats */}
-            {data.keyStats && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                {data.keyStats.latestTemp && (
-                  <StatCard label="Latest Avg. Temp" value={data.keyStats.latestTemp} color="text-red-400" />
+            {heroMetrics.length > 0 && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-3">
+                  {heroMetrics.map((metric) => (
+                    <div key={`${metric.label}-${metric.value}`} className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
+                      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{metric.label}</div>
+                      <div className={`text-2xl font-bold ${metric.color}`}>{metric.value}</div>
+                      {metric.note && <div className="text-xs text-gray-500 mt-2">{metric.note}</div>}
+                    </div>
+                  ))}
+                </div>
+                {heroMetadata.length > 0 && (
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mb-8">
+                    {heroMetadata.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
                 )}
-                {data.keyStats.tempTrend && (
-                  <StatCard label="Temperature Trend" value={data.keyStats.tempTrend} color="text-amber-400" />
-                )}
-                {data.keyStats.warmestYear && (
-                  <StatCard label="Warmest Year" value={data.keyStats.warmestYear} color="text-orange-400" />
-                )}
-                {data.keyStats.dataRange && (
-                  <StatCard label="Data Coverage" value={data.keyStats.dataRange} color="text-sky-400" />
-                )}
-              </div>
+              </>
             )}
 
             {/* AI-generated narrative */}
@@ -648,6 +856,13 @@ function TemperatureSection({ data, regionLabel, nationalLabel, isSubNational, r
   const usVar = data.usStateData?.paramData?.tavg;
   const natUkVar = data.nationalData?.varData?.Tmean;
   const natUsVar = data.nationalData?.paramData?.tavg;
+  const monthlySeries = getTemperatureMonthlySeries(data);
+  const anomalyData = mergeTemperatureAnomalyData(monthlySeries.region, monthlySeries.national, monthlySeries.global);
+  const anomalySeries = [
+    { dataKey: 'regionAnomaly', label: regionLabel, color: '#f59e0b' },
+    ...(monthlySeries.national.length ? [{ dataKey: 'nationalAnomaly', label: nationalLabel || 'National Average', color: '#ef4444' }] : []),
+    ...(monthlySeries.global.length ? [{ dataKey: 'globalAnomaly', label: 'Global Land', color: '#10b981' }] : []),
+  ];
 
   // Build combined yearly data for overlay chart
   const combinedYearly = (() => {
@@ -671,31 +886,11 @@ function TemperatureSection({ data, regionLabel, nationalLabel, isSubNational, r
       <Divider icon={<Thermometer className="h-5 w-5" />} title="Temperature" />
 
       <SectionCard icon={<TrendingUp className="h-5 w-5 text-red-400" />} title={sectionTitle}>
-
-        {/* NEW UNIFIED MONTHLY COMPARISONS */}
-        {(() => {
-          const rData = ukVar?.monthlyComparison || usVar?.monthlyComparison || data.countryData?.monthlyComparison;
-          const nData = natUkVar?.monthlyComparison || natUsVar?.monthlyComparison;
-          const gData = regionType === 'country' ? null : data.globalData?.landMonthlyComparison;
-          if (!rData) return null;
-          
-          const merged = mergeMonthlyData(rData, nData || [], gData || []);
-          const series = [
-            { dataKey: 'regRecent', avgKey: 'regAvg', isPendingKey: 'regPending', label: regionLabel, color: '#d97706' },
-          ];
-          if (nData) {
-            series.push({ dataKey: 'natRecent', avgKey: 'natAvg', isPendingKey: 'natPending', label: nationalLabel, color: '#ef4444' });
-          }
-          if (gData) {
-            series.push({ dataKey: 'globRecent', avgKey: 'globAvg', isPendingKey: 'globPending', label: 'Global Land', color: '#10b981' });
-          }
-
-          return (
-            <SubSection title="Last 12 months vs Historic Baseline (1961-1990)">
-               <MultiComparisonChart data={merged} series={series} units="°C" />
-            </SubSection>
-          );
-        })()}
+        {anomalyData.length > 0 && (
+          <SubSection title="Degrees above or below the 1961–1990 average">
+            <TemperatureAnomalyChart data={anomalyData} series={anomalySeries} />
+          </SubSection>
+        )}
 
 
         {/* Yearly annual trend */}
