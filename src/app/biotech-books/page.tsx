@@ -49,7 +49,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Public health officials", "Science history buffs", "Biomedical students"],
     dataConnection: {
-      text: "See how genome sequencing costs have plummeted from $100M to under $1,000.",
+      text: "Track live WHO disease outbreak alerts on our interactive global map.",
       link: "/biotech-dashboard"
     }
   },

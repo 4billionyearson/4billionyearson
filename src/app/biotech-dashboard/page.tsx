@@ -7,8 +7,9 @@ import {
 } from "recharts";
 import {
   Loader2, Dna, Activity, FlaskConical,
-  FileText,
+  FileText, MapPin,
 } from "lucide-react";
+import DiseaseOutbreakMap, { type DiseaseOutbreak } from "../_components/disease-outbreak-map";
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -51,6 +52,20 @@ const BAR_GRADIENT = [
   "#ef4444", "#f87171", "#fb923c", "#fbbf24", "#facc15",
   "#a3e635", "#4ade80", "#34d399", "#2dd4bf", "#22d3ee",
 ];
+
+const DISEASE_COLOR_MAP: [string, string][] = [
+  ["influenza", "#dc2626"], ["ebola", "#f97316"], ["marburg", "#ea580c"],
+  ["mers", "#ef4444"], ["sars", "#ef4444"], ["covid", "#ef4444"],
+  ["mpox", "#a855f7"], ["nipah", "#eab308"], ["cholera", "#3b82f6"],
+  ["measles", "#06b6d4"], ["polio", "#14b8a6"], ["zika", "#84cc16"],
+  ["dengue", "#facc15"], ["plague", "#78716c"], ["yellow fever", "#eab308"],
+  ["meningococcal", "#8b5cf6"], ["lassa", "#fb923c"], ["hepatitis", "#f59e0b"],
+];
+function getDiseaseColor(disease: string) {
+  const l = disease.toLowerCase();
+  for (const [k, c] of DISEASE_COLOR_MAP) if (l.includes(k)) return c;
+  return "#6b7280";
+}
 
 /* ─── Tooltip ─────────────────────────────────────────────────────────────── */
 
@@ -150,15 +165,28 @@ function seriesKeys(data: Record<string, number>[]): string[] {
 
 /* ─── Main Page ───────────────────────────────────────────────────────────── */
 
+interface OutbreakData {
+  outbreaks: DiseaseOutbreak[];
+  stats: { totalRecentOutbreaks: number; countriesAffected: number; diseasesTracked: number };
+  fetchedAt: string;
+}
+
 export default function BiotechDashboardPage() {
   const [data, setData] = useState<BiotechDashboardData | null>(null);
+  const [outbreakData, setOutbreakData] = useState<OutbreakData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/biotech")
-      .then(r => r.json())
-      .then(d => { if (d.error) throw new Error(d.error); setData(d); })
+    Promise.all([
+      fetch("/api/biotech").then(r => r.json()),
+      fetch("/api/disease-outbreaks").then(r => r.json()).catch(() => null),
+    ])
+      .then(([biotech, outbreaks]) => {
+        if (biotech.error) throw new Error(biotech.error);
+        setData(biotech);
+        if (outbreaks && !outbreaks.error) setOutbreakData(outbreaks);
+      })
       .catch(e => setError(e.message || "Failed to load data"))
       .finally(() => setLoading(false));
   }, []);
@@ -207,7 +235,7 @@ export default function BiotechDashboardPage() {
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <StatCard
                     label="Genome Sequencing Cost"
                     value={formatDollars(data.stats.genomeCost)}
@@ -226,13 +254,21 @@ export default function BiotechDashboardPage() {
                     color="text-amber-400"
                     subtext="Registered on ClinicalTrials.gov"
                   />
+                  <StatCard
+                    label="WHO Outbreak Alerts"
+                    value={outbreakData ? outbreakData.stats.totalRecentOutbreaks.toLocaleString() : "—"}
+                    color="text-red-400"
+                    subtext={outbreakData ? `Across ${outbreakData.stats.countriesAffected} countries (past year)` : "Loading…"}
+                  />
                 </div>
                 <p className="text-xs text-gray-400 mt-3">
                   Sources:{" "}
                   <a href="https://www.genome.gov/about-genomics/fact-sheets/Sequencing-Human-Genome-cost" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">NIH NHGRI</a>{" "}
                   (sequencing cost) ·{" "}
                   <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">ClinicalTrials.gov</a>{" "}
-                  (CRISPR &amp; gene therapy trials).
+                  (CRISPR &amp; gene therapy trials) ·{" "}
+                  <a href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">WHO DON</a>{" "}
+                  (outbreak alerts).
                 </p>
               </div>
 
@@ -314,6 +350,37 @@ export default function BiotechDashboardPage() {
                   Total publications indexed in PubMed for key biotechnology research areas: gene therapy, CRISPR, genomics, and mRNA vaccines. Source:{" "}
                   <a href="https://pubmed.ncbi.nlm.nih.gov" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     PubMed / NCBI
+                  </a>.
+                </p>
+              </SectionCard>
+              )}
+
+              <Divider icon={<MapPin className="h-4 w-4 text-red-400" />} title="Disease Outbreaks" />
+
+              {outbreakData && outbreakData.outbreaks.length > 0 && (
+              <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="WHO Disease Outbreak Map">
+                <DiseaseOutbreakMap outbreaks={outbreakData.outbreaks} />
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
+                  {outbreakData.outbreaks.map((o, i) => (
+                    <a
+                      key={i}
+                      href={o.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-start gap-2 p-2 bg-gray-800/60 rounded-lg hover:bg-gray-700/60 transition-colors group"
+                    >
+                      <span className="shrink-0 mt-0.5 h-2.5 w-2.5 rounded-full" style={{ background: getDiseaseColor(o.disease) }} />
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-gray-200 truncate group-hover:text-[#FFF5E7]">{o.disease}</p>
+                        <p className="text-[10px] text-gray-400 truncate">{o.country} · {new Date(o.date).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-400 mt-4">
+                  Recent disease outbreak alerts worldwide (past 12 months), deduplicated by disease and country. Source:{" "}
+                  <a href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
+                    WHO Disease Outbreak News
                   </a>.
                 </p>
               </SectionCard>
