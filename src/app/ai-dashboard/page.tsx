@@ -343,18 +343,12 @@ export default function AIDashboardPage() {
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <StatCard
-                    label="2025 AI Models Released"
-                    value={String(data.stats.totalModels2025 ?? 0)}
+                    label="Notable AI Models"
+                    value={String((data.stats.totalModels2025 ?? 0) + (data.stats.totalModels2026 ?? 0))}
                     color="text-violet-400"
-                    subtext="Epoch AI (continuously updated)"
-                  />
-                  <StatCard
-                    label="2026 AI Models (YTD)"
-                    value={String(data.stats.totalModels2026 ?? 0)}
-                    color="text-emerald-400"
-                    subtext="Epoch AI (year to date)"
+                    subtext={`${data.stats.totalModels2025 ?? 0} in 2025 · ${data.stats.totalModels2026 ?? 0} in 2026 (Epoch AI)`}
                   />
                   <StatCard
                     label="Global AI Investment"
@@ -435,31 +429,31 @@ export default function AIDashboardPage() {
                     </div>
                   );
                 })()}
-                <div className="overflow-x-auto max-h-[420px] overflow-y-auto rounded-lg border border-gray-800/50">
-                  <table className="w-full text-sm">
+                <div className="max-h-[420px] overflow-auto rounded-lg border border-gray-800/50">
+                  <table className="w-full text-sm min-w-[700px]">
                     <thead className="sticky top-0 bg-gray-950/95 backdrop-blur-sm z-10">
                       <tr className="border-b border-gray-700/50 text-left">
-                        <th className="py-2 pr-3 text-gray-400 font-medium">Data Center</th>
-                        <th className="py-2 pr-3 text-gray-400 font-medium">Owner</th>
-                        <th className="py-2 pr-3 text-gray-400 font-medium hidden sm:table-cell">Users</th>
-                        <th className="py-2 pr-3 text-gray-400 font-medium hidden lg:table-cell">Country</th>
-                        <th className="py-2 pr-3 text-gray-400 font-medium text-right">Power (MW)</th>
-                        <th className="py-2 pr-3 text-gray-400 font-medium text-right hidden md:table-cell">H100 Equiv.</th>
-                        <th className="py-2 pr-3 text-gray-400 font-medium text-right">Cost ($B)</th>
-                        <th className="py-2 text-gray-400 font-medium text-center hidden sm:table-cell">Status</th>
+                        <th className="py-2 px-3 text-gray-400 font-medium">Data Center</th>
+                        <th className="py-2 px-3 text-gray-400 font-medium">Owner</th>
+                        <th className="py-2 px-3 text-gray-400 font-medium hidden sm:table-cell">Users</th>
+                        <th className="py-2 px-3 text-gray-400 font-medium hidden lg:table-cell">Country</th>
+                        <th className="py-2 px-3 text-gray-400 font-medium text-right">Power (MW)</th>
+                        <th className="py-2 px-3 text-gray-400 font-medium text-right hidden md:table-cell">H100 Equiv.</th>
+                        <th className="py-2 px-3 text-gray-400 font-medium text-right">Cost ($B)</th>
+                        <th className="py-2 px-3 text-gray-400 font-medium text-center hidden sm:table-cell">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {data.frontierDataCenters.map((dc, i) => (
                         <tr key={i} className="border-b border-gray-800/40">
-                          <td className="py-2 pr-3 text-gray-200 font-medium">{dc.name}</td>
-                          <td className="py-2 pr-3 text-gray-400">{dc.owner}</td>
-                          <td className="py-2 pr-3 text-gray-400 hidden sm:table-cell">{dc.users || '—'}</td>
-                          <td className="py-2 pr-3 text-gray-400 hidden lg:table-cell">{dc.country || '—'}</td>
-                          <td className="py-2 pr-3 text-gray-300 text-right font-mono">{dc.powerMW > 0 ? dc.powerMW.toLocaleString() : '—'}</td>
-                          <td className="py-2 pr-3 text-gray-400 text-right font-mono hidden md:table-cell">{dc.h100Equiv > 0 ? (dc.h100Equiv / 1000).toFixed(0) + 'K' : '—'}</td>
-                          <td className="py-2 pr-3 text-gray-300 text-right font-mono">{dc.costBillions > 0 ? `$${dc.costBillions}` : '—'}</td>
-                          <td className="py-2 text-center hidden sm:table-cell">{dc.powerMW > 0 ? <span className="text-emerald-400 text-xs">Operational</span> : <span className="text-amber-400 text-xs">Planned</span>}</td>
+                          <td className="py-2 px-3 text-gray-200 font-medium">{dc.name}</td>
+                          <td className="py-2 px-3 text-gray-400">{dc.owner}</td>
+                          <td className="py-2 px-3 text-gray-400 hidden sm:table-cell">{dc.users || '—'}</td>
+                          <td className="py-2 px-3 text-gray-400 hidden lg:table-cell">{dc.country || '—'}</td>
+                          <td className="py-2 px-3 text-gray-300 text-right font-mono">{dc.powerMW > 0 ? dc.powerMW.toLocaleString() : '—'}</td>
+                          <td className="py-2 px-3 text-gray-400 text-right font-mono hidden md:table-cell">{dc.h100Equiv > 0 ? (dc.h100Equiv / 1000).toFixed(0) + 'K' : '—'}</td>
+                          <td className="py-2 px-3 text-gray-300 text-right font-mono">{dc.costBillions > 0 ? `$${dc.costBillions}` : '—'}</td>
+                          <td className="py-2 px-3 text-center hidden sm:table-cell">{dc.powerMW > 0 ? <span className="text-emerald-400 text-xs">Operational</span> : <span className="text-amber-400 text-xs">Planned</span>}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -699,10 +693,10 @@ export default function AIDashboardPage() {
               )}
 
               {data.epochModelsByOrg?.length > 0 && (
-              <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="2025 AI Models Released by Organization">
+              <SectionCard icon={<Brain className="h-5 w-5 text-cyan-400" />} title="AI Models by Organisation (2025–2026)">
                 <Top10BarChart data={data.epochModelsByOrg} dataKey="models" />
                 <p className="text-xs text-gray-400 mt-4">
-                  AI models released in 2025, by organization. Source:{" "}
+                  Notable AI models released in 2025–2026, by organisation. Source:{" "}
                   <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI
                   </a>. Continuously updated.

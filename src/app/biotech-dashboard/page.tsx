@@ -206,7 +206,7 @@ export default function BiotechDashboardPage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Disease outbreaks, global immunization coverage, genome sequencing costs, clinical trials, and CRISPR research trends.
+                Disease outbreaks, global immunisation coverage, genome sequencing costs, clinical trials, and biotech research trends.
               </p>
             </div>
           </div>
@@ -283,7 +283,7 @@ export default function BiotechDashboardPage() {
                   <a href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">WHO DON</a>{" "}
                   (outbreak alerts) ·{" "}
                   <a href="https://www.who.int/data/gho" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">WHO GHO</a>{" "}
-                  (immunization).
+                  (immunisation).
                 </p>
               </div>
 
@@ -355,7 +355,7 @@ export default function BiotechDashboardPage() {
                   Rotavirus: 'Rotavirus (final dose)',
                 };
                 return (
-              <SectionCard icon={<Syringe className="h-5 w-5 text-teal-400" />} title="Global Immunization Coverage">
+              <SectionCard icon={<Syringe className="h-5 w-5 text-teal-400" />} title="Global Immunisation Coverage">
                 <div className="h-[380px] w-full">
                   <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <LineChart data={data.immunizationCoverage} margin={CHART_MARGIN}>
@@ -378,7 +378,7 @@ export default function BiotechDashboardPage() {
                   </ResponsiveContainer>
                 </div>
                 <p className="text-xs text-gray-400 mt-4">
-                  Global coverage (%) for key childhood vaccines from 2000 to present. DTP3 (diphtheria, tetanus, pertussis – 3rd dose) is the standard WHO benchmark for immunisation programme strength. MCV = measles-containing vaccine, HepB = hepatitis B, PCV = pneumococcal conjugate. Source:{" "}
+                  Global coverage (%) for key childhood vaccines from 2000 to present. DTP3 (diphtheria, tetanus, pertussis – 3rd dose) is the standard WHO benchmark for immunisation programme strength. MCV = measles-containing vaccine, HepB = hepatitis B, PCV = pneumococcal conjugate. Source:{" "}
                   <a href="https://www.who.int/data/gho/data/indicators" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     WHO Global Health Observatory
                   </a>.

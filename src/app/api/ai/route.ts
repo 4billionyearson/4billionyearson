@@ -2,7 +2,7 @@ import { AI_DC_LOCATIONS } from "./locations";
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'ai:dashboard:v21';
+const CACHE_KEY = 'ai:dashboard:v22';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /* ─── OWID indicator IDs ──────────────────────────────────────────────────── */
@@ -135,6 +135,7 @@ async function fetchEpochModels(): Promise<{
   modelsByYear: Record<string, number>[];
   latestModels: { name: string; org: string; date: string; domain: string }[];
   totalModels2025: number;
+  totalModels2026: number;
 }> {
   try {
     const controller = new AbortController();
@@ -144,21 +145,22 @@ async function fetchEpochModels(): Promise<{
       headers: { 'User-Agent': 'Mozilla/5.0' },
     });
     clearTimeout(id);
-    if (!res.ok) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
+    if (!res.ok) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0, totalModels2026: 0 };
     const text = await res.text();
     const rows = parseCSVRecords(text);
-    if (rows.length < 2) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
+    if (rows.length < 2) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0, totalModels2026: 0 };
     const headers = rows[0];
     const dateIdx = headers.indexOf('Publication date');
     const orgIdx = headers.indexOf('Organization');
     const nameIdx = headers.indexOf('Model');
     const domainIdx = headers.indexOf('Domain');
-    if (dateIdx < 0) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
+    if (dateIdx < 0) return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0, totalModels2026: 0 };
 
     const orgCounts = new Map<string, number>();
     const yearCounts = new Map<number, number>();
     const allRecent: { name: string; org: string; date: string; domain: string; sortDate: string }[] = [];
     let total2025 = 0;
+    let total2026 = 0;
 
     for (let i = 1; i < rows.length; i++) {
       const cols = rows[i];
@@ -168,8 +170,9 @@ async function fetchEpochModels(): Promise<{
       const currentYear = new Date().getFullYear();
       if (isNaN(year) || year < 2010 || year > currentYear + 1) continue;
       yearCounts.set(year, (yearCounts.get(year) || 0) + 1);
+      if (year === 2025) total2025++;
+      if (year === 2026) total2026++;
       if (year >= 2025) {
-        total2025++;
         const org = (cols[orgIdx] || 'Unknown').split(',')[0].trim();
         orgCounts.set(org, (orgCounts.get(org) || 0) + 1);
       }
@@ -197,9 +200,9 @@ async function fetchEpochModels(): Promise<{
       .slice(0, 15)
       .map(({ sortDate, ...rest }) => rest);
 
-    return { modelsByOrg, modelsByYear, latestModels, totalModels2025: total2025 };
+    return { modelsByOrg, modelsByYear, latestModels, totalModels2025: total2025, totalModels2026: total2026 };
   } catch {
-    return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0 };
+    return { modelsByOrg: [], modelsByYear: [], latestModels: [], totalModels2025: 0, totalModels2026: 0 };
   }
 }
 
@@ -567,6 +570,7 @@ async function fetchAIDashboardData() {
     globalInvestment: latestInvestWorld?.value ?? 0,
     usInvestment: latestInvestUS?.value ?? 0,
     totalModels2025: epochData.totalModels2025,
+    totalModels2026: epochData.totalModels2026,
     fmTopModel: fmTop?.name ?? '',
     fmTopScore: fmTop?.score ?? 0,
   };

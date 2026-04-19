@@ -85,7 +85,7 @@ const BOOKS: Book[] = [
     ],
     bestFor: ["Biotech founders", "Medical historians", "Entrepreneurs"],
     dataConnection: {
-      text: "See the explosion in CRISPR research publications since 2012.",
+      text: "See global immunisation coverage trends for key childhood vaccines.",
       link: "/biotech-dashboard"
     }
   },
