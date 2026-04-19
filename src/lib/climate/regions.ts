@@ -158,3 +158,12 @@ export function getRegionBySlug(slug: string): ClimateRegion | undefined {
 export function getAllSlugs(): string[] {
   return CLIMATE_REGIONS.map(r => r.slug);
 }
+
+/** Map a location ID (e.g. 'us-fl', 'c-gbr', 'uk-sco') or OWID code (e.g. 'GBR') to a profile slug, or null if no profile exists */
+export function getProfileSlugForLocation(locationId: string, owidCode?: string): string | null {
+  const region = CLIMATE_REGIONS.find(r =>
+    r.apiCode === locationId ||
+    (owidCode && r.apiCode === owidCode)
+  );
+  return region ? region.slug : null;
+}

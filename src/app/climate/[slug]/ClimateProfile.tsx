@@ -82,7 +82,7 @@ const DarkTooltip = ({ active, payload, label }: any) => {
 
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-sky-500/40">
+    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
         {title}
@@ -95,11 +95,11 @@ function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: 
 function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-4 my-6">
-      <div className="h-px bg-sky-500/30 flex-1" />
-      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-sky-500/50 shadow-lg">
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg">
         {icon} {title}
       </h2>
-      <div className="h-px bg-sky-500/30 flex-1" />
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
     </div>
   );
 }
@@ -449,7 +449,7 @@ function RelatedLink({ href, label, desc }: { href: string; label: string; desc:
   return (
     <Link
       href={href}
-      className="block rounded-xl border border-gray-800 bg-gray-900/60 p-4 hover:border-sky-500/40 hover:bg-gray-900 transition-all"
+      className="block rounded-xl border border-gray-800 bg-gray-900/60 p-4 hover:border-[#D0A65E]/40 hover:bg-gray-900 transition-all"
     >
       <div className="font-semibold text-gray-200 text-sm">{label}</div>
       <div className="text-xs text-gray-500 mt-1">{desc}</div>

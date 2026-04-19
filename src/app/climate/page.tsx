@@ -46,7 +46,7 @@ export default function ClimateProfilesIndex() {
       <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-sky-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-[#D0A65E] via-[#E8C97A] to-[#D0A65E] bg-clip-text text-transparent">
             Climate Profiles
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -96,9 +96,9 @@ export default function ClimateProfilesIndex() {
           <div className="text-sm text-gray-500 space-y-3 max-w-3xl">
             <p>
               Each climate profile provides a data-driven snapshot of how climate change is affecting a specific region. Data is sourced from{' '}
-              <a href="https://ourworldindata.org" className="text-sky-400 hover:text-sky-300" target="_blank" rel="noopener noreferrer">Our World in Data</a>,{' '}
-              <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" className="text-sky-400 hover:text-sky-300" target="_blank" rel="noopener noreferrer">NOAA Climate at a Glance</a>, and the{' '}
-              <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data" className="text-sky-400 hover:text-sky-300" target="_blank" rel="noopener noreferrer">Met Office HadUK-Grid</a>.
+              <a href="https://ourworldindata.org" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Our World in Data</a>,{' '}
+              <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">NOAA Climate at a Glance</a>, and the{' '}
+              <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Met Office HadUK-Grid</a>.
             </p>
             <p>
               Profiles include annual temperature trends, monthly comparisons against historic baselines (1961–1990), precipitation data, and where available, CO₂ emissions trajectories. Data is refreshed monthly after source agencies publish their updates.
@@ -114,7 +114,7 @@ function RegionCard({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
   return (
     <Link
       href={`/climate/${region.slug}`}
-      className="group block rounded-xl border border-gray-800 bg-gray-900/60 p-5 hover:border-gray-600 hover:bg-gray-900 transition-all duration-200"
+      className="group block rounded-xl border border-gray-800 bg-gray-900/60 p-5 hover:border-[#D0A65E]/50 hover:bg-gray-900 transition-all duration-200"
     >
       <div className="flex items-start gap-3">
         <span className="text-2xl">{region.emoji}</span>

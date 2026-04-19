@@ -5,8 +5,10 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
 } from 'recharts';
-import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe } from 'lucide-react';
+import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe, ExternalLink } from 'lucide-react';
 import { countryFlag } from '@/lib/climate/locations';
+import { getProfileSlugForLocation } from '@/lib/climate/regions';
+import Link from 'next/link';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -607,6 +609,14 @@ export default function ClimateDashboard() {
               <div className="flex items-center gap-1.5 flex-1 text-green-400 bg-green-950/40 py-1.5 px-4 rounded-lg border border-green-800/50">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
                 <span className="font-medium text-sm">{getLocationLabel()}</span>
+                {selectedLocation && getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode) && (
+                  <Link
+                    href={`/climate/${getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode)}`}
+                    className="ml-auto flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap"
+                  >
+                    View Profile <ExternalLink className="h-3 w-3" />
+                  </Link>
+                )}
               </div>
               <button
                 onClick={() => {
