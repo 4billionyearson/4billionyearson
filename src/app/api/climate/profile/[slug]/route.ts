@@ -5,7 +5,7 @@ import { getRegionBySlug } from '@/lib/climate/regions';
 
 // Internal base URL for calling our own API routes
 function getBaseUrl(): string {
-  // On Vercel, use the deployment URL
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return 'http://localhost:3000';
 }
@@ -45,7 +45,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v1`;
+  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v2`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);

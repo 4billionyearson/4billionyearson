@@ -4,6 +4,7 @@ import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { getRegionBySlug } from '@/lib/climate/regions';
 
 function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return 'http://localhost:3000';
 }
@@ -69,7 +70,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v1`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v2`;
 
   // Check cache first
   const cached = await getCached<{ summary: string }>(cacheKey);
