@@ -219,6 +219,8 @@ function getLatestYearlyPoint(points: Array<YearlyPoint | PrecipPoint> | undefin
 type OverviewRow = {
   label: string;
   latest: string;
+  latestMonth: string;
+  latestQuarter: string;
   anomaly: string;
   rank: string;
   record: string;
@@ -238,6 +240,7 @@ type OverviewPanel = {
 function buildOverviewRow(
   label: string,
   yearly: Array<YearlyPoint | PrecipPoint> | undefined,
+  monthly: MonthlyComparison[] | undefined,
   units: string,
   digits: number,
 ): OverviewRow | null {
@@ -257,10 +260,26 @@ function buildOverviewRow(
   const sorted = [...values].sort((a, b) => b.value - a.value);
   const rank = sorted.findIndex((point) => point.year === latest.year && point.value === latest.value) + 1;
   const record = sorted[0];
+  const latestMonthly = getLatestMonthlyPoint(monthly);
+  const recentMonthly = monthly
+    ?.filter((entry) => typeof (entry.recent ?? entry.recentTemp) === 'number')
+    .slice(-3);
+  const quarterlyRecentAvg = recentMonthly?.length
+    ? recentMonthly.reduce((sum, entry) => sum + ((entry.recent ?? entry.recentTemp) as number), 0) / recentMonthly.length
+    : null;
+  const quarterlyDiffAvg = recentMonthly?.length
+    ? recentMonthly.reduce((sum, entry) => sum + (entry.diff ?? 0), 0) / recentMonthly.length
+    : null;
 
   return {
     label,
     latest: `${formatValue(latest.value, units, digits)} (${latest.year})`,
+    latestMonth: latestMonthly && typeof (latestMonthly.recent ?? latestMonthly.recentTemp) === 'number'
+      ? `${latestMonthly.monthLabel}: ${formatValue((latestMonthly.recent ?? latestMonthly.recentTemp) as number, units, digits)}${typeof latestMonthly.diff === 'number' ? ` (${formatSignedValue(latestMonthly.diff, units, digits)})` : ''}`
+      : 'n/a',
+    latestQuarter: quarterlyRecentAvg != null
+      ? `${formatValue(quarterlyRecentAvg, units, digits)}${quarterlyDiffAvg != null ? ` (${formatSignedValue(quarterlyDiffAvg, units, digits)})` : ''}`
+      : 'n/a',
     anomaly: baselineAvg == null ? 'n/a' : `${formatSignedValue(latest.value - baselineAvg, units, digits)} vs 1961–1990`,
     rank: `${ordinal(rank)} of ${sorted.length}`,
     record: `${record.year} (${formatValue(record.value, units, digits)})`,
@@ -288,6 +307,14 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                         <div>
                           <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Latest</div>
                           <div className="text-gray-200 font-medium">{row.latest}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Latest Month</div>
+                          <div className="text-gray-200 font-medium">{row.latestMonth}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">3-Month Avg</div>
+                          <div className="text-gray-200 font-medium">{row.latestQuarter}</div>
                         </div>
                         <div>
                           <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Vs Baseline</div>
@@ -372,16 +399,18 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     buildOverviewRow(
       regionLabel,
       data.ukRegionData?.varData?.Tmean?.yearly || data.usStateData?.paramData?.tavg?.yearly || data.countryData?.yearlyData,
+      data.ukRegionData?.varData?.Tmean?.monthlyComparison || data.usStateData?.paramData?.tavg?.monthlyComparison || data.countryData?.monthlyComparison,
       '°C',
       2,
     ),
     buildOverviewRow(
       nationalLabel || 'National',
       data.nationalData?.varData?.Tmean?.yearly || data.nationalData?.paramData?.tavg?.yearly,
+      data.nationalData?.varData?.Tmean?.monthlyComparison || data.nationalData?.paramData?.tavg?.monthlyComparison,
       '°C',
       2,
     ),
-    buildOverviewRow('Global Land', data.globalData?.landYearlyData, '°C', 2),
+    buildOverviewRow('Global Land', data.globalData?.landYearlyData, data.globalData?.landMonthlyComparison, '°C', 2),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (temperatureRows.length) {
@@ -393,8 +422,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   }
 
   const sunshineRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Sunshine?.yearly, ' hrs', 0),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, ' hrs', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Sunshine?.yearly, data.ukRegionData?.varData?.Sunshine?.monthlyComparison, ' hrs', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, data.nationalData?.varData?.Sunshine?.monthlyComparison, ' hrs', 0),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (sunshineRows.length) {
@@ -409,20 +438,22 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     buildOverviewRow(
       regionLabel,
       data.ukRegionData?.varData?.Rainfall?.yearly || data.usStateData?.paramData?.pcp?.yearly || data.countryData?.precipYearly,
+      data.ukRegionData?.varData?.Rainfall?.monthlyComparison || data.usStateData?.paramData?.pcp?.monthlyComparison,
       ' mm',
       0,
     ),
     buildOverviewRow(
       nationalLabel || 'National',
       data.nationalData?.varData?.Rainfall?.yearly || data.nationalData?.paramData?.pcp?.yearly,
+      data.nationalData?.varData?.Rainfall?.monthlyComparison || data.nationalData?.paramData?.pcp?.monthlyComparison,
       ' mm',
       0,
     ),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   const rainDaysRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Raindays1mm?.yearly, ' days', 0),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, ' days', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Raindays1mm?.yearly, data.ukRegionData?.varData?.Raindays1mm?.monthlyComparison, ' days', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, data.nationalData?.varData?.Raindays1mm?.monthlyComparison, ' days', 0),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (rainfallRows.length || rainDaysRows.length) {
@@ -437,8 +468,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   }
 
   const frostRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, ' days', 0),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, ' days', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, data.ukRegionData?.varData?.AirFrost?.monthlyComparison, ' days', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.monthlyComparison, ' days', 0),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (frostRows.length) {
