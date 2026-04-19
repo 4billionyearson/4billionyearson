@@ -45,7 +45,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v3`;
+  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v4`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
@@ -59,15 +59,42 @@ export async function GET(
     let countryData = null;
     let usStateData = null;
     let ukRegionData = null;
+    let nationalData = null; // UK-wide or US-national for sub-national regions
+    let owidCountryData = null; // OWID country data (for sub-national comparison)
+    let globalData = null;
 
-    // Fetch data from the appropriate existing API based on region type
+    // Always fetch global context
+    const globalPromise = fetchJSON(`${base}/api/climate/global`);
+
     if (region.type === 'country') {
       countryData = await fetchJSON(`${base}/api/climate/country/${region.apiCode}`);
+      // For UK/USA countries, also fetch national Met Office / NOAA data
+      if (region.apiCode === 'GBR') {
+        nationalData = await fetchJSON(`${base}/api/climate/uk-region/uk-uk`);
+      } else if (region.apiCode === 'USA') {
+        nationalData = await fetchJSON(`${base}/api/climate/us-national`);
+      }
     } else if (region.type === 'us-state') {
-      usStateData = await fetchJSON(`${base}/api/climate/us-state/${region.apiCode}`);
+      const [stateRes, countryRes, nationalRes] = await Promise.all([
+        fetchJSON(`${base}/api/climate/us-state/${region.apiCode}`),
+        fetchJSON(`${base}/api/climate/country/USA`),
+        fetchJSON(`${base}/api/climate/us-national`),
+      ]);
+      usStateData = stateRes;
+      owidCountryData = countryRes;
+      nationalData = nationalRes;
     } else if (region.type === 'uk-region') {
-      ukRegionData = await fetchJSON(`${base}/api/climate/uk-region/${region.apiCode}`);
+      const [regionRes, countryRes, ukNationalRes] = await Promise.all([
+        fetchJSON(`${base}/api/climate/uk-region/${region.apiCode}`),
+        fetchJSON(`${base}/api/climate/country/GBR`),
+        fetchJSON(`${base}/api/climate/uk-region/uk-uk`),
+      ]);
+      ukRegionData = regionRes;
+      owidCountryData = countryRes;
+      nationalData = ukNationalRes;
     }
+
+    globalData = await globalPromise;
 
     // Build key stats for the crawlable summary
     const keyStats = buildKeyStats(region.type, countryData, usStateData, ukRegionData);
@@ -82,6 +109,9 @@ export async function GET(
       countryData,
       usStateData,
       ukRegionData,
+      nationalData,
+      owidCountryData,
+      globalData,
       keyStats,
       lastUpdated: cacheMonth,
     };

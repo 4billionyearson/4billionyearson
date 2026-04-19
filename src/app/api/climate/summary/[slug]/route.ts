@@ -281,7 +281,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v5`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v6`;
 
   // Check cache
   const cached = await getCached<{ summary: string }>(cacheKey);
@@ -316,7 +316,7 @@ export async function GET(
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.5,
-            maxOutputTokens: 600,
+            maxOutputTokens: 1200,
           },
         }),
       }

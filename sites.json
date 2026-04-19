@@ -1,0 +1,206 @@
+[
+  {
+    "name": "Anthropic-Amazon New Carlisle",
+    "power": 1092,
+    "address": "55001 Larrison Blvd, New Carlisle, IN 46552",
+    "country": "United States"
+  },
+  {
+    "name": "Microsoft Fairwater Wisconsin",
+    "power": 555,
+    "address": "4800 90th St, Mount Pleasant, WI 53403",
+    "country": "United States"
+  },
+  {
+    "name": "OpenAI Stargate Abilene",
+    "power": 590,
+    "address": "5502 Spinks Rd, Abilene, TX 79601",
+    "country": "United States"
+  },
+  {
+    "name": "Meta Prometheus",
+    "power": 531,
+    "address": "1 Community Cir, New Albany, OH 43054",
+    "country": "United States"
+  },
+  {
+    "name": "QTS Richmond",
+    "power": 854,
+    "address": "6000 Technology Blvd, Sandston, VA 23150",
+    "country": "United States"
+  },
+  {
+    "name": "Microsoft Fairwater Atlanta",
+    "power": 433,
+    "address": "1435 Hwy 54 W, Fayetteville, GA 30214",
+    "country": "United States"
+  },
+  {
+    "name": "xAI Colossus 1",
+    "power": 425,
+    "address": "3231 Riverport Rd, Memphis, TN 38109",
+    "country": "United States"
+  },
+  {
+    "name": "Amazon Madison Mega Site",
+    "power": 341,
+    "address": "Amazon Data Services Inc, Madison Mega Site Nissan Parkway and Highway 22 Canton, Mississippi Madison County",
+    "country": "United States"
+  },
+  {
+    "name": "Google New Albany",
+    "power": 407,
+    "address": "1101 Beech Rd SW, New Albany, OH 43054",
+    "country": "United States"
+  },
+  {
+    "name": "Microsoft Goodyear",
+    "power": 263,
+    "address": "14250 W Broadway Rd, Goodyear, AZ 85338",
+    "country": "United States"
+  },
+  {
+    "name": "Meta Temple",
+    "power": 198,
+    "address": "2310 Eberhardt Rd, Temple, TX 76504",
+    "country": "United States"
+  },
+  {
+    "name": "Alibaba Zhangbei",
+    "power": 203,
+    "address": "Alibaba Zhangbei Yun Calculation Data Center, Zhangbei County, Zhangjiakou, Hebei, China, 076471",
+    "country": "China"
+  },
+  {
+    "name": "Google Council Bluffs (East)",
+    "power": 190,
+    "address": "10410 Bunge Ave, Council Bluffs, IA 51503",
+    "country": "United States"
+  },
+  {
+    "name": "Fluidstack Lake Mariner",
+    "power": 68,
+    "address": "7725 Lake Rd, Barker, NY 14012",
+    "country": "United States"
+  },
+  {
+    "name": "Google Cedar Rapids",
+    "power": 105,
+    "address": "5800 EDGEWOOD RD SW CEDAR RAPIDS, IA 52404",
+    "country": "United States"
+  },
+  {
+    "name": "Google Omaha",
+    "power": 189,
+    "address": "11110 State St, Omaha, NE 68142",
+    "country": "United States"
+  },
+  {
+    "name": "STACK Infrastructure NVA02",
+    "power": 118,
+    "address": "9590 Hornbaker Rd, Manassas, VA 20109",
+    "country": "United States"
+  },
+  {
+    "name": "Vantage TX1",
+    "power": 44.8,
+    "address": "Goodyear, Arizona 85338",
+    "country": "United States"
+  },
+  {
+    "name": "Google Pryor (North)",
+    "power": 65,
+    "address": "4581 Webb St, Pryor, OK 74361",
+    "country": "United States"
+  },
+  {
+    "name": "Meta Hyperion",
+    "power": 0,
+    "address": "Holly Ridge, LA 71269",
+    "country": "United States"
+  },
+  {
+    "name": "Goodnight",
+    "power": 0,
+    "address": "10001 Lima Rd, Claude, TX 79019",
+    "country": "United States"
+  },
+  {
+    "name": "Amazon Ridgeland",
+    "power": 0,
+    "address": "1626 County Line Road Ridgeland, Mississippi",
+    "country": "United States"
+  },
+  {
+    "name": "OpenAI Stargate UAE",
+    "power": 0,
+    "address": "Nexus L&T Project Office, Al Bihouth, Al Dhafrah, Abu Dhabi, United Arab Emirates",
+    "country": "United Arab Emirates"
+  },
+  {
+    "name": "Coreweave Helios",
+    "power": 0,
+    "address": "984 County Road 112, Afton, TX 79920",
+    "country": "United States"
+  },
+  {
+    "name": "QTS Cedar Rapids",
+    "power": 0,
+    "address": "6200 76th Ave SW, Fairfax, IA 52228",
+    "country": "United States"
+  },
+  {
+    "name": "OpenAI Stargate Shackelford",
+    "power": 0,
+    "address": "175 Private Road 1604, Abilene, TX 79601, Shackelford County",
+    "country": "United States"
+  },
+  {
+    "name": "Crusoe Abilene Expansion",
+    "power": 0,
+    "address": "5502 Spinks Rd, Abilene, TX 79601",
+    "country": "United States"
+  },
+  {
+    "name": "OpenAI Stargate Lordstown",
+    "power": 0,
+    "address": "2300 Hallock Young Rd, Warren, OH 44481",
+    "country": "United States"
+  },
+  {
+    "name": "OpenAI Stargate New Mexico",
+    "power": 0,
+    "address": "",
+    "country": "United States"
+  },
+  {
+    "name": "OpenAI Stargate Wisconsin",
+    "power": 0,
+    "address": "",
+    "country": "United States"
+  },
+  {
+    "name": "OpenAI Stargate Michigan",
+    "power": 0,
+    "address": "",
+    "country": "United States"
+  },
+  {
+    "name": "OpenAI Stargate Milam",
+    "power": 0,
+    "address": "",
+    "country": "United States"
+  },
+  {
+    "name": "Stream Phoenix",
+    "power": 0,
+    "address": "2950 S. Litchfield Road",
+    "country": "United States"
+  },
+  {
+    "name": "xAI Colossus 2",
+    "power": 0,
+    "address": "5420 Tulane Rd, Memphis, TN 38109",
+    "country": "United States"
+  }
+]
