@@ -42,69 +42,76 @@ export default function ClimateProfilesIndex() {
   const ukRegions = CLIMATE_REGIONS.filter(r => r.type === 'uk-region');
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-100">
-      <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
-        {/* Hero */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-[#D0A65E] via-[#E8C97A] to-[#D0A65E] bg-clip-text text-transparent">
-            Climate Profiles
-          </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Temperature trends, precipitation data, and emissions tracking for countries, US states, and UK regions — updated monthly from OWID, NOAA, and the Met Office.
-          </p>
+    <main>
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
+        <div className="max-w-7xl mx-auto space-y-6">
+
+          {/* Hero */}
+          <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+                Climate Profiles
+              </h1>
+            </div>
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
+              <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
+                Temperature trends, precipitation data, and emissions tracking for countries, US states, and UK regions — updated monthly from OWID, NOAA, and the Met Office.
+              </p>
+            </div>
+          </div>
+
+          {/* Countries */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
+              <span>🌍</span> Countries
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {countries.map(region => (
+                <RegionCard key={region.slug} region={region} />
+              ))}
+            </div>
+          </section>
+
+          {/* US States */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
+              <span>🇺🇸</span> US States
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {usStates.map(region => (
+                <RegionCard key={region.slug} region={region} />
+              ))}
+            </div>
+          </section>
+
+          {/* UK Regions */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
+              <span>🇬🇧</span> UK Regions
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {ukRegions.map(region => (
+                <RegionCard key={region.slug} region={region} />
+              ))}
+            </div>
+          </section>
+
+          {/* SEO content block */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+            <h2 className="text-lg font-bold font-mono text-white mb-3">About Climate Profiles</h2>
+            <div className="text-sm text-gray-400 space-y-3 max-w-3xl">
+              <p>
+                Each climate profile provides a data-driven snapshot of how climate change is affecting a specific region. Data is sourced from{' '}
+                <a href="https://ourworldindata.org" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Our World in Data</a>,{' '}
+                <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">NOAA Climate at a Glance</a>, and the{' '}
+                <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Met Office HadUK-Grid</a>.
+              </p>
+              <p>
+                Profiles include annual temperature trends, monthly comparisons against historic baselines (1961–1990), precipitation data, and where available, CO₂ emissions trajectories. Data is refreshed monthly after source agencies publish their updates.
+              </p>
+            </div>
+          </section>
         </div>
-
-        {/* Countries */}
-        <section className="mb-12">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span className="text-sky-400">🌍</span> Countries
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {countries.map(region => (
-              <RegionCard key={region.slug} region={region} />
-            ))}
-          </div>
-        </section>
-
-        {/* US States */}
-        <section className="mb-12">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span className="text-amber-400">🇺🇸</span> US States
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {usStates.map(region => (
-              <RegionCard key={region.slug} region={region} />
-            ))}
-          </div>
-        </section>
-
-        {/* UK Regions */}
-        <section className="mb-12">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span className="text-emerald-400">🇬🇧</span> UK Regions
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {ukRegions.map(region => (
-              <RegionCard key={region.slug} region={region} />
-            ))}
-          </div>
-        </section>
-
-        {/* SEO content block */}
-        <section className="mt-16 border-t border-gray-800 pt-8">
-          <h2 className="text-lg font-semibold mb-3 text-gray-300">About Climate Profiles</h2>
-          <div className="text-sm text-gray-500 space-y-3 max-w-3xl">
-            <p>
-              Each climate profile provides a data-driven snapshot of how climate change is affecting a specific region. Data is sourced from{' '}
-              <a href="https://ourworldindata.org" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Our World in Data</a>,{' '}
-              <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">NOAA Climate at a Glance</a>, and the{' '}
-              <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Met Office HadUK-Grid</a>.
-            </p>
-            <p>
-              Profiles include annual temperature trends, monthly comparisons against historic baselines (1961–1990), precipitation data, and where available, CO₂ emissions trajectories. Data is refreshed monthly after source agencies publish their updates.
-            </p>
-          </div>
-        </section>
       </div>
     </main>
   );
@@ -114,7 +121,7 @@ function RegionCard({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
   return (
     <Link
       href={`/climate/${region.slug}`}
-      className="group block rounded-xl border border-gray-800 bg-gray-900/60 p-5 hover:border-[#D0A65E]/50 hover:bg-gray-900 transition-all duration-200"
+      className="group block rounded-xl border border-gray-700/50 bg-gray-900/60 p-4 hover:border-[#D0A65E]/50 hover:bg-gray-900 transition-all duration-200"
     >
       <div className="flex items-start gap-3">
         <span className="text-2xl">{region.emoji}</span>
