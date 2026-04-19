@@ -153,7 +153,7 @@ const Header = () => {
           {/* Climate Change Dropdown */}
           <div className="relative" onMouseEnter={() => setIsClimateChangeOpen(true)} onMouseLeave={() => setIsClimateChangeOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/climate-dashboard' || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/extreme-weather' || pathname === '/emissions' || pathname === '/climate-explained' || pathname === '/climate-books' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/climate-dashboard' || pathname === '/climate' || pathname?.startsWith('/climate/') || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/extreme-weather' || pathname === '/emissions' || pathname === '/climate-explained' || pathname === '/climate-books' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Climate Change ▾
             </button>
@@ -162,6 +162,9 @@ const Header = () => {
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[280px]">
                 <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
+                </Link>
+                <Link href="/climate" className={`block px-4 py-2.5 text-sm transition-colors ${pathname?.startsWith('/climate/') || pathname === '/climate' ? 'text-cyan-400 bg-gray-900' : 'text-gray-300 hover:text-cyan-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                  Climate Profiles<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
@@ -354,6 +357,9 @@ const Header = () => {
               <div className="bg-gray-950/50">
                 <Link href="/climate-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-300 hover:text-white'}`} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
+                </Link>
+                <Link href="/climate" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname?.startsWith('/climate/') || pathname === '/climate' ? 'text-cyan-400' : 'text-gray-300 hover:text-cyan-400'}`} onClick={closeMenu}>
+                  Climate Profiles<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-300 hover:text-red-400'}`} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />

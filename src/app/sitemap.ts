@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getAllPosts, getAllCategories } from '@/lib/api';
+import { getAllSlugs } from '@/lib/climate/regions';
 
 export const revalidate = 86400; // 24h fallback — primary invalidation via /api/revalidate webhook
 
@@ -142,6 +143,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Climate profile routes
+  const climateProfileRoutes = [
+    {
+      url: `${baseUrl}/climate`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    ...getAllSlugs().map(slug => ({
+      url: `${baseUrl}/climate/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    })),
+  ];
+
   // Category routes
   const categoryRoutes = categories.map((category: any) => ({
     url: `${baseUrl}/category/${category.slug}`,
@@ -158,5 +175,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...routes, ...categoryRoutes, ...postRoutes];
+  return [...routes, ...climateProfileRoutes, ...categoryRoutes, ...postRoutes];
 }
