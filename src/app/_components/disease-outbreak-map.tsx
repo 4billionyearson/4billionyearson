@@ -276,7 +276,6 @@ const InnerMap = dynamic(
                         border: `1px solid ${fill}40`,
                         borderRadius: 8,
                         padding: "10px 12px",
-                        paddingTop: 18,
                         paddingRight: 24,
                         color: "#e5e7eb",
                         minWidth: 200,

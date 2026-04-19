@@ -361,7 +361,23 @@ export default function BiotechDashboardPage() {
 
               <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="WHO Disease Outbreak Map">
                 <DiseaseOutbreakMap outbreaks={outbreakData.outbreaks} />
-                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-gray-400">
+                  <span className="text-gray-500 font-medium uppercase tracking-wide">Colour by disease:</span>
+                  {[
+                    ["Influenza", "#dc2626"], ["Ebola / Marburg", "#f97316"], ["Mpox", "#a855f7"],
+                    ["Nipah", "#eab308"], ["Cholera", "#3b82f6"], ["Measles", "#06b6d4"],
+                    ["Polio", "#14b8a6"], ["Meningococcal", "#8b5cf6"], ["Other", "#6b7280"],
+                  ].map(([label, color]) => (
+                    <span key={label} className="flex items-center gap-1">
+                      <span className="inline-block h-2 w-2 rounded-full" style={{ background: color as string }} />
+                      {label}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-xs text-gray-500">Most recent first</p>
+                </div>
+                <div className="mt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
                   {outbreakData.outbreaks.map((o, i) => (
                     <a
                       key={i}
@@ -373,7 +389,8 @@ export default function BiotechDashboardPage() {
                       <span className="shrink-0 mt-0.5 h-2.5 w-2.5 rounded-full" style={{ background: getDiseaseColor(o.disease) }} />
                       <div className="min-w-0">
                         <p className="text-xs font-medium text-gray-200 truncate group-hover:text-[#FFF5E7]">{o.disease}</p>
-                        <p className="text-[10px] text-gray-400 truncate">{o.country} · {new Date(o.date).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}</p>
+                        <p className="text-[10px] text-gray-400">{o.country}</p>
+                        <p className="text-[10px] text-gray-500">{new Date(o.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
                       </div>
                     </a>
                   ))}
