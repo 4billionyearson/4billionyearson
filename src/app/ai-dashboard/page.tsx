@@ -351,7 +351,7 @@ export default function AIDashboardPage() {
                     subtext={`${data.stats.totalModels2025 ?? 0} in 2025 · ${data.stats.totalModels2026 ?? 0} in 2026 (Epoch AI)`}
                   />
                   <StatCard
-                    label="Global AI Investment"
+                    label="AI Investment"
                     value={formatBillions(data.stats.globalInvestment)}
                     color="text-cyan-400"
                     subtext={`${data.stats.latestYear} (AI Index Report)`}
