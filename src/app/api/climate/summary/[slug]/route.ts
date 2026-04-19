@@ -13,7 +13,7 @@ async function fetchJSON(url: string, timeout = 30000): Promise<any | null> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   try {
-    const res = await fetch(url, { signal: controller.signal });
+    const res = await fetch(url, { signal: controller.signal, redirect: 'follow' });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -70,7 +70,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v2`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v3`;
 
   // Check cache first
   const cached = await getCached<{ summary: string }>(cacheKey);
