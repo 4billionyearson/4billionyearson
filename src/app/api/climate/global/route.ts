@@ -4,11 +4,74 @@ import { getCached, setShortTerm } from '@/lib/climate/redis';
 const GLOBAL_BASELINE = 13.9; // NOAA 20th century average
 const PRE_INDUSTRIAL_BASELINE = 13.5; // Approximate pre-industrial (1850-1900) absolute temp
 const OWID_WORLD_ENTITY = 355; // OWID entity ID for World
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function buildLatestMonthStats(points: Array<{ year: number; month: number; temp: number }>) {
+  if (!points.length) return null;
+  const latest = points[points.length - 1];
+  const comparable = points.filter((point) => point.month === latest.month);
+  const baseline = comparable.filter((point) => point.year >= 1961 && point.year <= 1990);
+  const baselineAvg = baseline.length ? round2(baseline.reduce((sum, point) => sum + point.temp, 0) / baseline.length) : null;
+  const ranked = [...comparable].sort((a, b) => b.temp - a.temp);
+  const rank = ranked.findIndex((point) => point.year === latest.year && point.month === latest.month) + 1;
+  const record = ranked[0];
+
+  return {
+    label: `${MONTH_NAMES[latest.month - 1]} ${latest.year}`,
+    value: latest.temp,
+    diff: baselineAvg === null ? null : round2(latest.temp - baselineAvg),
+    rank,
+    total: ranked.length,
+    recordLabel: `${MONTH_NAMES[record.month - 1]} ${record.year}`,
+    recordValue: record.temp,
+  };
+}
+
+function buildLatestThreeMonthStats(points: Array<{ year: number; month: number; temp: number }>) {
+  if (points.length < 3) return null;
+  const windows: Array<{ endMonth: number; endYear: number; label: string; value: number }> = [];
+  for (let index = 2; index < points.length; index++) {
+    const a = points[index - 2];
+    const b = points[index - 1];
+    const c = points[index];
+    const isContiguous = (a.year * 12 + a.month + 1 === b.year * 12 + b.month)
+      && (b.year * 12 + b.month + 1 === c.year * 12 + c.month);
+    if (!isContiguous) continue;
+    windows.push({
+      endMonth: c.month,
+      endYear: c.year,
+      label: `${MONTH_NAMES[a.month - 1]}–${MONTH_NAMES[c.month - 1]} ${c.year}`,
+      value: round2((a.temp + b.temp + c.temp) / 3),
+    });
+  }
+  if (!windows.length) return null;
+  const latest = windows[windows.length - 1];
+  const comparable = windows.filter((window) => window.endMonth === latest.endMonth);
+  const baseline = comparable.filter((window) => window.endYear >= 1961 && window.endYear <= 1990);
+  const baselineAvg = baseline.length ? round2(baseline.reduce((sum, window) => sum + window.value, 0) / baseline.length) : null;
+  const ranked = [...comparable].sort((a, b) => b.value - a.value);
+  const rank = ranked.findIndex((window) => window.label === latest.label) + 1;
+  const record = ranked[0];
+
+  return {
+    label: latest.label,
+    value: latest.value,
+    diff: baselineAvg === null ? null : round2(latest.value - baselineAvg),
+    rank,
+    total: ranked.length,
+    recordLabel: record.label,
+    recordValue: record.value,
+  };
+}
 
 export async function GET() {
   const cacheKey = 'climate:global';
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v3`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v4`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {
@@ -91,7 +154,6 @@ export async function GET() {
 
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const recent12: { month: number; year: number; temp: number | null }[] = [];
     for (let i = 1; i <= 12; i++) {
       let m = currentMonth - i;
@@ -107,13 +169,14 @@ export async function GET() {
         ? Math.round((historic.reduce((a, b) => a + b, 0) / historic.length) * 100) / 100
         : null;
       const diff = temp !== null && historicAvg !== null ? Math.round((temp - historicAvg) * 100) / 100 : null;
-      return { monthLabel: `${monthNames[month - 1]} ${year}`, month, year, recentTemp: temp, historicAvg, diff };
+      return { monthLabel: `${MONTH_NAMES[month - 1]} ${year}`, month, year, recentTemp: temp, historicAvg, diff };
     });
 
     // ─── OWID / ERA5 global land surface temperature ──────────────────
     let landYearlyData: any[] | null = null;
     let landMonthlyComparison: any[] | null = null;
     let landVsOceanMonthly: any[] | null = null;
+    let landMonthlyData: { year: number; month: number; temp: number }[] = [];
 
     if (owidRes.ok) {
       try {
@@ -135,6 +198,7 @@ export async function GET() {
           });
         }
         landMonthly.sort((a, b) => a.date.localeCompare(b.date));
+        landMonthlyData = landMonthly.map((point) => ({ year: point.year, month: point.month, temp: point.temp }));
 
         // Yearly averages
         const landByYear: Record<number, number[]> = {};
@@ -182,14 +246,14 @@ export async function GET() {
             ? Math.round((historic.reduce((a, b) => a + b, 0) / historic.length) * 100) / 100
             : null;
           const diff = temp !== null && historicAvg !== null ? Math.round((temp - historicAvg) * 100) / 100 : null;
-          return { monthLabel: `${monthNames[month - 1]} ${year}`, month, year, recentTemp: temp, historicAvg, diff };
+          return { monthLabel: `${MONTH_NAMES[month - 1]} ${year}`, month, year, recentTemp: temp, historicAvg, diff };
         });
 
         // Land vs Land+Ocean – merged monthly comparison for the last 12 months
         landVsOceanMonthly = landRecent12.map(({ month, year, temp: landTemp }) => {
           const noaaPoint = recent12.find(r => r.month === month && r.year === year);
           return {
-            monthLabel: `${monthNames[month - 1]} ${year}`,
+            monthLabel: `${MONTH_NAMES[month - 1]} ${year}`,
             landTemp,
             landOceanTemp: noaaPoint?.temp ?? null,
           };
@@ -202,6 +266,8 @@ export async function GET() {
       monthlyComparison,
       landYearlyData,
       landMonthlyComparison,
+      landLatestMonthStats: landMonthlyData.length ? buildLatestMonthStats(landMonthlyData) : null,
+      landLatestThreeMonthStats: landMonthlyData.length ? buildLatestThreeMonthStats(landMonthlyData) : null,
       landVsOceanMonthly,
       globalBaseline: GLOBAL_BASELINE,
       preIndustrialBaseline: PRE_INDUSTRIAL_BASELINE,

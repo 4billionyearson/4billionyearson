@@ -21,6 +21,23 @@ interface MonthlyComparison {
   historicAvg: number | null; diff: number | null;
 }
 interface PrecipPoint { year: number; value?: number; rollingAvg?: number }
+interface RankedPeriodStat {
+  label: string;
+  value: number;
+  diff: number | null;
+  rank: number;
+  total: number;
+  recordLabel: string;
+  recordValue: number;
+}
+interface MetricSeries {
+  label: string;
+  units: string;
+  yearly: YearlyPoint[];
+  monthlyComparison: MonthlyComparison[];
+  latestMonthStats?: RankedPeriodStat;
+  latestThreeMonthStats?: RankedPeriodStat;
+}
 
 interface ProfileData {
   slug: string;
@@ -36,43 +53,25 @@ interface ProfileData {
   countryData?: {
     yearlyData: YearlyPoint[];
     monthlyComparison: MonthlyComparison[];
+    latestMonthStats?: RankedPeriodStat;
+    latestThreeMonthStats?: RankedPeriodStat;
     precipYearly?: PrecipPoint[];
     dateRange: string;
   };
   usStateData?: {
     state: string;
-    paramData: Record<string, {
-      label: string;
-      units: string;
-      yearly: YearlyPoint[];
-      monthlyComparison: MonthlyComparison[];
-    }>;
+    paramData: Record<string, MetricSeries>;
   };
   ukRegionData?: {
     region: string;
-    varData: Record<string, {
-      label: string;
-      units: string;
-      yearly: YearlyPoint[];
-      monthlyComparison: MonthlyComparison[];
-    }>;
+    varData: Record<string, MetricSeries>;
     attribution: string;
   };
   nationalData?: {
     region?: string;
     state?: string;
-    varData?: Record<string, {
-      label: string;
-      units: string;
-      yearly: YearlyPoint[];
-      monthlyComparison: MonthlyComparison[];
-    }>;
-    paramData?: Record<string, {
-      label: string;
-      units: string;
-      yearly: YearlyPoint[];
-      monthlyComparison: MonthlyComparison[];
-    }>;
+    varData?: Record<string, MetricSeries>;
+    paramData?: Record<string, MetricSeries>;
   };
   owidCountryData?: {
     yearlyData: YearlyPoint[];
@@ -83,6 +82,8 @@ interface ProfileData {
   globalData?: {
     landYearlyData: YearlyPoint[];
     landMonthlyComparison: MonthlyComparison[];
+    landLatestMonthStats?: RankedPeriodStat;
+    landLatestThreeMonthStats?: RankedPeriodStat;
     keyThresholds: { plus1_5: number; plus2_0: number };
   };
   lastUpdated: string;
@@ -216,14 +217,19 @@ function getLatestYearlyPoint(points: Array<YearlyPoint | PrecipPoint> | undefin
   return [...points].reverse().find((point) => typeof getPointValue(point) === 'number') ?? null;
 }
 
-type OverviewRow = {
-  label: string;
-  latest: string;
-  latestMonth: string;
-  latestQuarter: string;
+type OverviewMetricBlock = {
+  title: string;
+  value: string;
   anomaly: string;
   rank: string;
   record: string;
+};
+
+type OverviewRow = {
+  label: string;
+  annual: OverviewMetricBlock;
+  latestMonth: OverviewMetricBlock;
+  latestQuarter: OverviewMetricBlock;
 };
 
 type OverviewSection = {
@@ -240,7 +246,8 @@ type OverviewPanel = {
 function buildOverviewRow(
   label: string,
   yearly: Array<YearlyPoint | PrecipPoint> | undefined,
-  monthly: MonthlyComparison[] | undefined,
+  latestMonthStats: RankedPeriodStat | undefined,
+  latestThreeMonthStats: RankedPeriodStat | undefined,
   units: string,
   digits: number,
 ): OverviewRow | null {
@@ -260,29 +267,26 @@ function buildOverviewRow(
   const sorted = [...values].sort((a, b) => b.value - a.value);
   const rank = sorted.findIndex((point) => point.year === latest.year && point.value === latest.value) + 1;
   const record = sorted[0];
-  const latestMonthly = getLatestMonthlyPoint(monthly);
-  const recentMonthly = monthly
-    ?.filter((entry) => typeof (entry.recent ?? entry.recentTemp) === 'number')
-    .slice(-3);
-  const quarterlyRecentAvg = recentMonthly?.length
-    ? recentMonthly.reduce((sum, entry) => sum + ((entry.recent ?? entry.recentTemp) as number), 0) / recentMonthly.length
-    : null;
-  const quarterlyDiffAvg = recentMonthly?.length
-    ? recentMonthly.reduce((sum, entry) => sum + (entry.diff ?? 0), 0) / recentMonthly.length
-    : null;
+
+  const buildPeriodBlock = (title: string, stats?: RankedPeriodStat): OverviewMetricBlock => ({
+    title,
+    value: stats ? `${formatValue(stats.value, units, digits)} (${stats.label})` : 'n/a',
+    anomaly: stats && stats.diff != null ? `${formatSignedValue(stats.diff, units, digits)} vs baseline` : 'n/a',
+    rank: stats ? `${ordinal(stats.rank)} of ${stats.total}` : 'n/a',
+    record: stats ? `${stats.recordLabel} (${formatValue(stats.recordValue, units, digits)})` : 'n/a',
+  });
 
   return {
     label,
-    latest: `${formatValue(latest.value, units, digits)} (${latest.year})`,
-    latestMonth: latestMonthly && typeof (latestMonthly.recent ?? latestMonthly.recentTemp) === 'number'
-      ? `${latestMonthly.monthLabel}: ${formatValue((latestMonthly.recent ?? latestMonthly.recentTemp) as number, units, digits)}${typeof latestMonthly.diff === 'number' ? ` (${formatSignedValue(latestMonthly.diff, units, digits)})` : ''}`
-      : 'n/a',
-    latestQuarter: quarterlyRecentAvg != null
-      ? `${formatValue(quarterlyRecentAvg, units, digits)}${quarterlyDiffAvg != null ? ` (${formatSignedValue(quarterlyDiffAvg, units, digits)})` : ''}`
-      : 'n/a',
-    anomaly: baselineAvg == null ? 'n/a' : `${formatSignedValue(latest.value - baselineAvg, units, digits)} vs 1961–1990`,
-    rank: `${ordinal(rank)} of ${sorted.length}`,
-    record: `${record.year} (${formatValue(record.value, units, digits)})`,
+    annual: {
+      title: 'Annual',
+      value: `${formatValue(latest.value, units, digits)} (${latest.year})`,
+      anomaly: baselineAvg == null ? 'n/a' : `${formatSignedValue(latest.value - baselineAvg, units, digits)} vs 1961–1990`,
+      rank: `${ordinal(rank)} of ${sorted.length}`,
+      record: `${record.year} (${formatValue(record.value, units, digits)})`,
+    },
+    latestMonth: buildPeriodBlock('Latest Month', latestMonthStats),
+    latestQuarter: buildPeriodBlock('Latest 3 Months', latestThreeMonthStats),
   };
 }
 
@@ -303,31 +307,18 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                   {section.rows.map((row) => (
                     <div key={`${panel.title}-${row.label}`} className="rounded-xl border border-gray-800/80 bg-gray-950/60 p-3">
                       <div className="text-sm font-semibold text-[#FFF5E7] mb-2">{row.label}</div>
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                        <div>
-                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Latest</div>
-                          <div className="text-gray-200 font-medium">{row.latest}</div>
-                        </div>
-                        <div>
-                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Latest Month</div>
-                          <div className="text-gray-200 font-medium">{row.latestMonth}</div>
-                        </div>
-                        <div>
-                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">3-Month Avg</div>
-                          <div className="text-gray-200 font-medium">{row.latestQuarter}</div>
-                        </div>
-                        <div>
-                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Vs Baseline</div>
-                          <div className="text-gray-200 font-medium">{row.anomaly}</div>
-                        </div>
-                        <div>
-                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Rank</div>
-                          <div className="text-gray-200 font-medium">{row.rank}</div>
-                        </div>
-                        <div>
-                          <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Record Year</div>
-                          <div className="text-gray-200 font-medium">{row.record}</div>
-                        </div>
+                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 text-sm">
+                        {[row.annual, row.latestMonth, row.latestQuarter].map((metric) => (
+                          <div key={`${row.label}-${metric.title}`} className="rounded-lg border border-gray-800/80 bg-gray-900/50 p-3">
+                            <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">{metric.title}</div>
+                            <div className="space-y-1">
+                              <div className="text-gray-200 font-medium">{metric.value}</div>
+                              <div className="text-gray-400">{metric.anomaly}</div>
+                              <div className="text-gray-400">Rank: {metric.rank}</div>
+                              <div className="text-gray-500">Record: {metric.record}</div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
@@ -399,18 +390,20 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     buildOverviewRow(
       regionLabel,
       data.ukRegionData?.varData?.Tmean?.yearly || data.usStateData?.paramData?.tavg?.yearly || data.countryData?.yearlyData,
-      data.ukRegionData?.varData?.Tmean?.monthlyComparison || data.usStateData?.paramData?.tavg?.monthlyComparison || data.countryData?.monthlyComparison,
+      data.ukRegionData?.varData?.Tmean?.latestMonthStats || data.usStateData?.paramData?.tavg?.latestMonthStats || data.countryData?.latestMonthStats,
+      data.ukRegionData?.varData?.Tmean?.latestThreeMonthStats || data.usStateData?.paramData?.tavg?.latestThreeMonthStats || data.countryData?.latestThreeMonthStats,
       '°C',
       2,
     ),
     buildOverviewRow(
       nationalLabel || 'National',
       data.nationalData?.varData?.Tmean?.yearly || data.nationalData?.paramData?.tavg?.yearly,
-      data.nationalData?.varData?.Tmean?.monthlyComparison || data.nationalData?.paramData?.tavg?.monthlyComparison,
+      data.nationalData?.varData?.Tmean?.latestMonthStats || data.nationalData?.paramData?.tavg?.latestMonthStats,
+      data.nationalData?.varData?.Tmean?.latestThreeMonthStats || data.nationalData?.paramData?.tavg?.latestThreeMonthStats,
       '°C',
       2,
     ),
-    buildOverviewRow('Global Land', data.globalData?.landYearlyData, data.globalData?.landMonthlyComparison, '°C', 2),
+    buildOverviewRow('Global Land', data.globalData?.landYearlyData, data.globalData?.landLatestMonthStats, data.globalData?.landLatestThreeMonthStats, '°C', 2),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (temperatureRows.length) {
@@ -422,8 +415,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   }
 
   const sunshineRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Sunshine?.yearly, data.ukRegionData?.varData?.Sunshine?.monthlyComparison, ' hrs', 0),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, data.nationalData?.varData?.Sunshine?.monthlyComparison, ' hrs', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Sunshine?.yearly, data.ukRegionData?.varData?.Sunshine?.latestMonthStats, data.ukRegionData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, data.nationalData?.varData?.Sunshine?.latestMonthStats, data.nationalData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (sunshineRows.length) {
@@ -438,22 +431,24 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     buildOverviewRow(
       regionLabel,
       data.ukRegionData?.varData?.Rainfall?.yearly || data.usStateData?.paramData?.pcp?.yearly || data.countryData?.precipYearly,
-      data.ukRegionData?.varData?.Rainfall?.monthlyComparison || data.usStateData?.paramData?.pcp?.monthlyComparison,
+      data.ukRegionData?.varData?.Rainfall?.latestMonthStats || data.usStateData?.paramData?.pcp?.latestMonthStats,
+      data.ukRegionData?.varData?.Rainfall?.latestThreeMonthStats || data.usStateData?.paramData?.pcp?.latestThreeMonthStats,
       ' mm',
       0,
     ),
     buildOverviewRow(
       nationalLabel || 'National',
       data.nationalData?.varData?.Rainfall?.yearly || data.nationalData?.paramData?.pcp?.yearly,
-      data.nationalData?.varData?.Rainfall?.monthlyComparison || data.nationalData?.paramData?.pcp?.monthlyComparison,
+      data.nationalData?.varData?.Rainfall?.latestMonthStats || data.nationalData?.paramData?.pcp?.latestMonthStats,
+      data.nationalData?.varData?.Rainfall?.latestThreeMonthStats || data.nationalData?.paramData?.pcp?.latestThreeMonthStats,
       ' mm',
       0,
     ),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   const rainDaysRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Raindays1mm?.yearly, data.ukRegionData?.varData?.Raindays1mm?.monthlyComparison, ' days', 0),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, data.nationalData?.varData?.Raindays1mm?.monthlyComparison, ' days', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Raindays1mm?.yearly, data.ukRegionData?.varData?.Raindays1mm?.latestMonthStats, data.ukRegionData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, data.nationalData?.varData?.Raindays1mm?.latestMonthStats, data.nationalData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (rainfallRows.length || rainDaysRows.length) {
@@ -468,8 +463,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   }
 
   const frostRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, data.ukRegionData?.varData?.AirFrost?.monthlyComparison, ' days', 0),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.monthlyComparison, ' days', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, data.ukRegionData?.varData?.AirFrost?.latestMonthStats, data.ukRegionData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.latestMonthStats, data.nationalData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (frostRows.length) {

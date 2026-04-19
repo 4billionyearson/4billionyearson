@@ -15,6 +15,70 @@ interface MonthlyPoint {
   temp: number;
 }
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function buildLatestMonthStats(monthly: MonthlyPoint[]) {
+  if (!monthly.length) return null;
+  const latest = monthly[monthly.length - 1];
+  const comparable = monthly.filter((point) => point.month === latest.month);
+  const baseline = comparable.filter((point) => point.year >= 1961 && point.year <= 1990);
+  const baselineAvg = baseline.length ? round2(baseline.reduce((sum, point) => sum + point.temp, 0) / baseline.length) : null;
+  const ranked = [...comparable].sort((a, b) => b.temp - a.temp);
+  const rank = ranked.findIndex((point) => point.date === latest.date) + 1;
+  const record = ranked[0];
+
+  return {
+    label: `${MONTH_NAMES[latest.month - 1]} ${latest.year}`,
+    value: latest.temp,
+    diff: baselineAvg === null ? null : round2(latest.temp - baselineAvg),
+    rank,
+    total: ranked.length,
+    recordLabel: `${MONTH_NAMES[record.month - 1]} ${record.year}`,
+    recordValue: record.temp,
+  };
+}
+
+function buildLatestThreeMonthStats(monthly: MonthlyPoint[]) {
+  if (monthly.length < 3) return null;
+  const windows: Array<{ endMonth: number; endYear: number; label: string; value: number }> = [];
+  for (let index = 2; index < monthly.length; index++) {
+    const a = monthly[index - 2];
+    const b = monthly[index - 1];
+    const c = monthly[index];
+    const isContiguous = (a.year * 12 + a.month + 1 === b.year * 12 + b.month)
+      && (b.year * 12 + b.month + 1 === c.year * 12 + c.month);
+    if (!isContiguous) continue;
+    windows.push({
+      endMonth: c.month,
+      endYear: c.year,
+      label: `${MONTH_NAMES[a.month - 1]}–${MONTH_NAMES[c.month - 1]} ${c.year}`,
+      value: round2((a.temp + b.temp + c.temp) / 3),
+    });
+  }
+  if (!windows.length) return null;
+  const latest = windows[windows.length - 1];
+  const comparable = windows.filter((window) => window.endMonth === latest.endMonth);
+  const baseline = comparable.filter((window) => window.endYear >= 1961 && window.endYear <= 1990);
+  const baselineAvg = baseline.length ? round2(baseline.reduce((sum, window) => sum + window.value, 0) / baseline.length) : null;
+  const ranked = [...comparable].sort((a, b) => b.value - a.value);
+  const rank = ranked.findIndex((window) => window.label === latest.label) + 1;
+  const record = ranked[0];
+
+  return {
+    label: latest.label,
+    value: latest.value,
+    diff: baselineAvg === null ? null : round2(latest.value - baselineAvg),
+    rank,
+    total: ranked.length,
+    recordLabel: record.label,
+    recordValue: record.value,
+  };
+}
+
 function parseOwidData(data: OwidDataResponse, entityId: number): MonthlyPoint[] {
   const epoch = new Date(1950, 0, 1);
   const points: MonthlyPoint[] = [];
@@ -111,8 +175,6 @@ function buildMonthlyComparison(monthly: MonthlyPoint[]) {
     recent12.unshift({ point, month: m, year: y });
   }
 
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
   return recent12.map(({ point, month, year }) => {
     const historic = historicByMonth[month];
     const historicAvg = historic && historic.length > 0
@@ -122,7 +184,7 @@ function buildMonthlyComparison(monthly: MonthlyPoint[]) {
     const diff = recentTemp !== null && historicAvg !== null ? Math.round((recentTemp - historicAvg) * 100) / 100 : null;
 
     return {
-      monthLabel: `${monthNames[month - 1]} ${year}`,
+      monthLabel: `${MONTH_NAMES[month - 1]} ${year}`,
       month,
       year,
       recentTemp,
@@ -147,7 +209,7 @@ export async function GET(
 
   const cacheKey = `climate:country:${upperCode}`;
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v4`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v5`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
@@ -204,6 +266,8 @@ export async function GET(
       code: upperCode,
       yearlyData,
       monthlyComparison,
+      latestMonthStats: buildLatestMonthStats(monthly),
+      latestThreeMonthStats: buildLatestThreeMonthStats(monthly),
       precipYearly,
       dataPoints: monthly.length,
       dateRange: `${monthly[0].date} to ${monthly[monthly.length - 1].date}`,

@@ -20,6 +20,79 @@ const PARAM_LABELS: Record<string, string> = {
   pcp: 'Precipitation',
 };
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function monthlyEntries(monthlyData: Record<string, number>) {
+  return Object.entries(monthlyData)
+    .map(([key, value]) => ({ year: parseInt(key.substring(0, 4)), month: parseInt(key.substring(4, 6)), value }))
+    .filter((point) => !Number.isNaN(point.year) && !Number.isNaN(point.month))
+    .sort((a, b) => (a.year - b.year) || (a.month - b.month));
+}
+
+function buildLatestMonthStats(monthlyData: Record<string, number>) {
+  const points = monthlyEntries(monthlyData);
+  if (!points.length) return null;
+  const latest = points[points.length - 1];
+  const comparable = points.filter((point) => point.month === latest.month);
+  const baseline = comparable.filter((point) => point.year >= 1961 && point.year <= 1990);
+  const baselineAvg = baseline.length ? round2(baseline.reduce((sum, point) => sum + point.value, 0) / baseline.length) : null;
+  const ranked = [...comparable].sort((a, b) => b.value - a.value);
+  const rank = ranked.findIndex((point) => point.year === latest.year && point.month === latest.month) + 1;
+  const record = ranked[0];
+
+  return {
+    label: `${MONTH_NAMES[latest.month - 1]} ${latest.year}`,
+    value: latest.value,
+    diff: baselineAvg === null ? null : round2(latest.value - baselineAvg),
+    rank,
+    total: ranked.length,
+    recordLabel: `${MONTH_NAMES[record.month - 1]} ${record.year}`,
+    recordValue: record.value,
+  };
+}
+
+function buildLatestThreeMonthStats(monthlyData: Record<string, number>) {
+  const points = monthlyEntries(monthlyData);
+  if (points.length < 3) return null;
+  const windows: Array<{ endMonth: number; endYear: number; label: string; value: number }> = [];
+  for (let index = 2; index < points.length; index++) {
+    const a = points[index - 2];
+    const b = points[index - 1];
+    const c = points[index];
+    const isContiguous = (a.year * 12 + a.month + 1 === b.year * 12 + b.month)
+      && (b.year * 12 + b.month + 1 === c.year * 12 + c.month);
+    if (!isContiguous) continue;
+    windows.push({
+      endMonth: c.month,
+      endYear: c.year,
+      label: `${MONTH_NAMES[a.month - 1]}–${MONTH_NAMES[c.month - 1]} ${c.year}`,
+      value: round2((a.value + b.value + c.value) / 3),
+    });
+  }
+  if (!windows.length) return null;
+  const latest = windows[windows.length - 1];
+  const comparable = windows.filter((window) => window.endMonth === latest.endMonth);
+  const baseline = comparable.filter((window) => window.endYear >= 1961 && window.endYear <= 1990);
+  const baselineAvg = baseline.length ? round2(baseline.reduce((sum, window) => sum + window.value, 0) / baseline.length) : null;
+  const ranked = [...comparable].sort((a, b) => b.value - a.value);
+  const rank = ranked.findIndex((window) => window.label === latest.label) + 1;
+  const record = ranked[0];
+
+  return {
+    label: latest.label,
+    value: latest.value,
+    diff: baselineAvg === null ? null : round2(latest.value - baselineAvg),
+    rank,
+    total: ranked.length,
+    recordLabel: record.label,
+    recordValue: record.value,
+  };
+}
+
 function fahrenheitToCelsius(f: number): number {
   return Math.round(((f - 32) * 5 / 9) * 100) / 100;
 }
@@ -95,8 +168,6 @@ function buildMonthlyComparison(monthlyData: Record<string, number>, param: stri
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
   const historicByMonth: Record<number, number[]> = {};
   for (const [key, val] of Object.entries(monthlyData)) {
     const year = parseInt(key.substring(0, 4));
@@ -120,7 +191,7 @@ function buildMonthlyComparison(monthlyData: Record<string, number>, param: stri
       : null;
 
     comparison.push({
-      monthLabel: `${monthNames[m - 1]} ${y}`,
+      monthLabel: `${MONTH_NAMES[m - 1]} ${y}`,
       month: m,
       year: y,
       recent: recent !== undefined ? recent : null,
@@ -147,7 +218,7 @@ function getLatestDataMonth(data: Record<string, number>): string {
 }
 
 export async function GET() {
-  const cacheKey = 'climate:us-national-v3';
+  const cacheKey = 'climate:us-national-v4';
   const prevMonthKey = getPrevMonthKey();
 
   const cached = await getCached<any>(cacheKey);
@@ -171,6 +242,8 @@ export async function GET() {
         units: result.units,
         yearly: buildYearlyFromMonthly(result.data, param),
         monthlyComparison: buildMonthlyComparison(result.data, param),
+        latestMonthStats: buildLatestMonthStats(result.data),
+        latestThreeMonthStats: buildLatestThreeMonthStats(result.data),
       };
     }
 
