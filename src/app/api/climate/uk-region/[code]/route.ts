@@ -32,7 +32,13 @@ function round2(value: number): number {
 
 function buildLatestMonthStats(points: MonthlyDataPoint[]) {
   if (!points.length) return null;
-  const sortedPoints = [...points].sort((a, b) => (a.year - b.year) || (a.month - b.month));
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const sortedPoints = [...points]
+    .filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth))
+    .sort((a, b) => (a.year - b.year) || (a.month - b.month));
+  if (!sortedPoints.length) return null;
   const latest = sortedPoints[sortedPoints.length - 1];
   const comparable = sortedPoints.filter((point) => point.month === latest.month);
   const baseline = comparable.filter((point) => point.year >= 1961 && point.year <= 1990);
@@ -54,7 +60,12 @@ function buildLatestMonthStats(points: MonthlyDataPoint[]) {
 
 function buildLatestThreeMonthStats(points: MonthlyDataPoint[]) {
   if (points.length < 3) return null;
-  const sortedPoints = [...points].sort((a, b) => (a.year - b.year) || (a.month - b.month));
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const sortedPoints = [...points]
+    .filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth))
+    .sort((a, b) => (a.year - b.year) || (a.month - b.month));
   const windows: Array<{ endMonth: number; endYear: number; label: string; value: number }> = [];
 
   for (let index = 2; index < sortedPoints.length; index++) {
@@ -213,7 +224,7 @@ export async function GET(
 
   const cacheKey = `climate:ukregion:${regionId}`;
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v4`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v5`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {

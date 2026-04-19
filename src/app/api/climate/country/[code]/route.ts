@@ -23,8 +23,13 @@ function round2(value: number): number {
 
 function buildLatestMonthStats(monthly: MonthlyPoint[]) {
   if (!monthly.length) return null;
-  const latest = monthly[monthly.length - 1];
-  const comparable = monthly.filter((point) => point.month === latest.month);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const filtered = monthly.filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth));
+  if (!filtered.length) return null;
+  const latest = filtered[filtered.length - 1];
+  const comparable = filtered.filter((point) => point.month === latest.month);
   const baseline = comparable.filter((point) => point.year >= 1961 && point.year <= 1990);
   const baselineAvg = baseline.length ? round2(baseline.reduce((sum, point) => sum + point.temp, 0) / baseline.length) : null;
   const ranked = [...comparable].sort((a, b) => b.temp - a.temp);
@@ -44,11 +49,16 @@ function buildLatestMonthStats(monthly: MonthlyPoint[]) {
 
 function buildLatestThreeMonthStats(monthly: MonthlyPoint[]) {
   if (monthly.length < 3) return null;
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const filtered = monthly.filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth));
+  if (filtered.length < 3) return null;
   const windows: Array<{ endMonth: number; endYear: number; label: string; value: number }> = [];
-  for (let index = 2; index < monthly.length; index++) {
-    const a = monthly[index - 2];
-    const b = monthly[index - 1];
-    const c = monthly[index];
+  for (let index = 2; index < filtered.length; index++) {
+    const a = filtered[index - 2];
+    const b = filtered[index - 1];
+    const c = filtered[index];
     const isContiguous = (a.year * 12 + a.month + 1 === b.year * 12 + b.month)
       && (b.year * 12 + b.month + 1 === c.year * 12 + c.month);
     if (!isContiguous) continue;
@@ -209,7 +219,7 @@ export async function GET(
 
   const cacheKey = `climate:country:${upperCode}`;
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v5`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v6`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);

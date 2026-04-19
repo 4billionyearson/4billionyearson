@@ -34,7 +34,11 @@ function monthlyEntries(monthlyData: Record<string, number>) {
 }
 
 function buildLatestMonthStats(monthlyData: Record<string, number>) {
-  const points = monthlyEntries(monthlyData);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const points = monthlyEntries(monthlyData)
+    .filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth));
   if (!points.length) return null;
   const latest = points[points.length - 1];
   const comparable = points.filter((point) => point.month === latest.month);
@@ -56,7 +60,11 @@ function buildLatestMonthStats(monthlyData: Record<string, number>) {
 }
 
 function buildLatestThreeMonthStats(monthlyData: Record<string, number>) {
-  const points = monthlyEntries(monthlyData);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const points = monthlyEntries(monthlyData)
+    .filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth));
   if (points.length < 3) return null;
   const windows: Array<{ endMonth: number; endYear: number; label: string; value: number }> = [];
   for (let index = 2; index < points.length; index++) {

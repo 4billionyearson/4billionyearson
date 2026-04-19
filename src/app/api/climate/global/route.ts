@@ -12,8 +12,13 @@ function round2(value: number): number {
 
 function buildLatestMonthStats(points: Array<{ year: number; month: number; temp: number }>) {
   if (!points.length) return null;
-  const latest = points[points.length - 1];
-  const comparable = points.filter((point) => point.month === latest.month);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const filtered = points.filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth));
+  if (!filtered.length) return null;
+  const latest = filtered[filtered.length - 1];
+  const comparable = filtered.filter((point) => point.month === latest.month);
   const baseline = comparable.filter((point) => point.year >= 1961 && point.year <= 1990);
   const baselineAvg = baseline.length ? round2(baseline.reduce((sum, point) => sum + point.temp, 0) / baseline.length) : null;
   const ranked = [...comparable].sort((a, b) => b.temp - a.temp);
@@ -33,11 +38,16 @@ function buildLatestMonthStats(points: Array<{ year: number; month: number; temp
 
 function buildLatestThreeMonthStats(points: Array<{ year: number; month: number; temp: number }>) {
   if (points.length < 3) return null;
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const filtered = points.filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth));
+  if (filtered.length < 3) return null;
   const windows: Array<{ endMonth: number; endYear: number; label: string; value: number }> = [];
-  for (let index = 2; index < points.length; index++) {
-    const a = points[index - 2];
-    const b = points[index - 1];
-    const c = points[index];
+  for (let index = 2; index < filtered.length; index++) {
+    const a = filtered[index - 2];
+    const b = filtered[index - 1];
+    const c = filtered[index];
     const isContiguous = (a.year * 12 + a.month + 1 === b.year * 12 + b.month)
       && (b.year * 12 + b.month + 1 === c.year * 12 + c.month);
     if (!isContiguous) continue;
@@ -71,7 +81,7 @@ function buildLatestThreeMonthStats(points: Array<{ year: number; month: number;
 export async function GET() {
   const cacheKey = 'climate:global';
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v4`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v5`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {
