@@ -58,7 +58,7 @@ function buildLatestMonthStats(points: MonthlyDataPoint[], lowerIsBetter = false
   };
 }
 
-function buildLatestThreeMonthStats(points: MonthlyDataPoint[], lowerIsBetter = false) {
+function buildLatestThreeMonthStats(points: MonthlyDataPoint[], lowerIsBetter = false, isSum = false) {
   if (points.length < 3) return null;
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -79,7 +79,9 @@ function buildLatestThreeMonthStats(points: MonthlyDataPoint[], lowerIsBetter = 
       endMonth: c.month,
       endYear: c.year,
       label: `${MONTH_NAMES[a.month - 1]}–${MONTH_NAMES[c.month - 1]} ${c.year}`,
-      value: round2((a.value + b.value + c.value) / 3),
+      value: isSum
+        ? round2(a.value + b.value + c.value)
+        : round2((a.value + b.value + c.value) / 3),
     });
   }
 
@@ -224,7 +226,7 @@ export async function GET(
 
   const cacheKey = `climate:ukregion:${regionId}`;
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v6`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v7`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {
@@ -252,7 +254,7 @@ export async function GET(
         yearly: buildYearly(points, isSum),
         monthlyComparison: buildComparison(points),
         latestMonthStats: buildLatestMonthStats(points, lowerIsBetter),
-        latestThreeMonthStats: buildLatestThreeMonthStats(points, lowerIsBetter),
+        latestThreeMonthStats: buildLatestThreeMonthStats(points, lowerIsBetter, isSum),
       };
     }
 

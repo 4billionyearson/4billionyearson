@@ -125,6 +125,7 @@ type OverviewMetricBlock = {
 
 type OverviewRow = {
   label: string;
+  lowerIsBetter?: boolean;
   latestMonth: OverviewMetricBlock;
   latestQuarter: OverviewMetricBlock;
   annual: OverviewMetricBlock;
@@ -167,18 +168,13 @@ function buildOverviewRow(
   const rank = sorted.findIndex((point) => point.year === latest.year && point.value === latest.value) + 1;
   const record = sorted[0];
 
-  const invertRank = (stats: RankedPeriodStat): RankedPeriodStat => ({
-    ...stats,
-    rank: stats.total - stats.rank + 1,
-  });
-
   const extractYear = (label: string): string => {
     const match = label.match(/(\d{4})/);
     return match ? match[1] : label;
   };
 
   const buildPeriodBlock = (stats?: RankedPeriodStat): OverviewMetricBlock => {
-    const s = stats && lowerIsBetter ? invertRank(stats) : stats;
+    const s = stats;
     return {
       title: s?.label ?? 'n/a',
       value: s ? formatValue(s.value, units, digits) : 'n/a',
@@ -190,6 +186,7 @@ function buildOverviewRow(
 
   return {
     label,
+    lowerIsBetter,
     latestMonth: buildPeriodBlock(latestMonthStats),
     latestQuarter: buildPeriodBlock(latestThreeMonthStats),
     annual: {
@@ -204,42 +201,48 @@ function buildOverviewRow(
 
 function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-6">
-      {panels.map((panel) => (
-        <div key={panel.title} className="rounded-2xl border-2 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden">
-          <div className={`px-4 py-2.5 ${panel.accentClass} flex items-center justify-between`}>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-white/90">{panel.title}</h2>
-          </div>
-          <div className="p-4 space-y-4">
-            {panel.sections.map((section, index) => (
-              <div key={`${panel.title}-${section.title || index}`}>
-                {section.title && <div className="text-xs uppercase tracking-wider text-gray-500 mb-2">{section.title}</div>}
-                <div className="space-y-2">
-                  {section.rows.map((row) => (
-                    <div key={`${panel.title}-${row.label}`} className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-3">
-                      <div className="text-sm font-semibold text-[#D0A65E] mb-2">{row.label}</div>
-                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 text-sm">
-                        {[row.latestMonth, row.latestQuarter, row.annual].map((metric) => (
-                          <div key={`${row.label}-${metric.title}`} className="rounded-lg border border-gray-800/50 bg-gray-950/60 p-2.5">
-                            <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1.5">{metric.title}</div>
-                            <div className="space-y-0.5">
-                              <div className="text-gray-100 font-semibold">{metric.value}</div>
-                              <div className="text-gray-400 text-xs">{metric.anomaly}</div>
-                              <div className="text-gray-400 text-xs">Rank: {metric.rank}</div>
-                              <div className="text-gray-500 text-xs">Record: {metric.record}</div>
-                            </div>
+    <div className="rounded-2xl border-2 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md shadow-xl p-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        {panels.map((panel) => (
+          <div key={panel.title} className="rounded-xl border border-gray-700/50 bg-gray-900/40 overflow-hidden">
+            <div className={`px-4 py-2.5 ${panel.accentClass} flex items-center justify-between`}>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-white">{panel.title}</h2>
+            </div>
+            <div className="p-3 space-y-3">
+              {panel.sections.map((section, index) => (
+                <div key={`${panel.title}-${section.title || index}`}>
+                  {section.title && <div className="text-xs uppercase tracking-wider text-gray-500 mb-2">{section.title}</div>}
+                  <div className="space-y-2">
+                    {section.rows.map((row) => {
+                      const rankSuffix = row.lowerIsBetter ? ' (fewest)' : '';
+                      const recordPrefix = row.lowerIsBetter ? 'Fewest: ' : 'Record: ';
+                      return (
+                        <div key={`${panel.title}-${row.label}`} className="rounded-xl border border-gray-800/60 bg-gray-950/60 p-3">
+                          <div className="text-sm font-semibold text-[#D0A65E] mb-2">{row.label}</div>
+                          <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 text-sm">
+                            {[row.latestMonth, row.latestQuarter, row.annual].map((metric) => (
+                              <div key={`${row.label}-${metric.title}`} className="rounded-lg border border-gray-800/50 bg-gray-950/80 p-2.5">
+                                <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1.5">{metric.title}</div>
+                                <div className="space-y-1">
+                                  <div className="text-white font-bold text-lg">{metric.value}</div>
+                                  <div className="text-white font-bold text-lg">Rank: {metric.rank}{rankSuffix}</div>
+                                  <div className="text-gray-400 text-xs">{metric.anomaly}</div>
+                                  <div className="text-gray-500 text-xs">{recordPrefix}{metric.record}</div>
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="px-4 pb-2 text-[10px] text-gray-600 text-right">Baseline: 1961–1990 average</div>
           </div>
-          <div className="px-4 pb-2 text-[10px] text-gray-600 text-right">Baseline: 1961–1990 average</div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
@@ -254,7 +257,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       data.ukRegionData?.varData?.Tmean?.latestMonthStats || data.usStateData?.paramData?.tavg?.latestMonthStats || data.countryData?.latestMonthStats,
       data.ukRegionData?.varData?.Tmean?.latestThreeMonthStats || data.usStateData?.paramData?.tavg?.latestThreeMonthStats || data.countryData?.latestThreeMonthStats,
       '°C',
-      2,
+      1,
     ),
     buildOverviewRow(
       nationalLabel || 'National',
@@ -262,9 +265,9 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       data.nationalData?.varData?.Tmean?.latestMonthStats || data.nationalData?.paramData?.tavg?.latestMonthStats,
       data.nationalData?.varData?.Tmean?.latestThreeMonthStats || data.nationalData?.paramData?.tavg?.latestThreeMonthStats,
       '°C',
-      2,
+      1,
     ),
-    buildOverviewRow('Global Land', data.globalData?.landYearlyData, data.globalData?.landLatestMonthStats, data.globalData?.landLatestThreeMonthStats, '°C', 2),
+    buildOverviewRow('Global Land', data.globalData?.landYearlyData, data.globalData?.landLatestMonthStats, data.globalData?.landLatestThreeMonthStats, '°C', 1),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (temperatureRows.length) {
@@ -330,8 +333,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (frostRows.length) {
     panels.push({
-      title: 'Frost',
-      accentClass: 'bg-cyan-500/80',
+      title: 'Frost Days',
+      accentClass: 'bg-sky-400/90',
       sections: [{ rows: frostRows }],
     });
   }
@@ -375,6 +378,15 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
   const pageTitle = data?.ukRegionData?.region || region.name;
   const dashboardSearchTerm = data?.ukRegionData?.region || data?.usStateData?.state || data?.name || region.name;
 
+  // Derive the latest data month for the page title
+  const latestMonthLabel = (() => {
+    const stats = data?.ukRegionData?.varData?.Tmean?.latestMonthStats
+      || data?.usStateData?.paramData?.tavg?.latestMonthStats
+      || data?.countryData?.latestMonthStats
+      || data?.globalData?.landLatestMonthStats;
+    return stats?.label || null; // e.g. "Mar 2026"
+  })();
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -386,6 +398,11 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 {pageTitle}
               </h1>
+              {latestMonthLabel && (
+                <p className="text-lg md:text-xl font-semibold mt-1" style={{ color: '#FFF5E7' }}>
+                  Climate Data to {latestMonthLabel}
+                </p>
+              )}
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               {summary ? (

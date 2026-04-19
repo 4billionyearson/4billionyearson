@@ -139,14 +139,14 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
   },
   {
     slug: 'london',
-    name: 'London & South East',
+    name: 'England SE & Central South',
     type: 'uk-region',
     apiCode: 'uk-sec',
-    tagline: 'Urban heat island, air quality and flood risk',
-    description: 'London and South East England climate profile with Met Office temperature, rainfall, and sunshine data. Updated monthly.',
+    tagline: 'London, South East and Central Southern England climate data',
+    description: 'England SE and Central South climate profile with Met Office temperature, rainfall, sunshine and frost data. Updated monthly.',
     emoji: '🏙️',
     dataSources: ['met-office'],
-    keywords: ['London climate data', 'London temperature', 'London heatwave', 'South East England weather', 'London air quality'],
+    keywords: ['London climate data', 'London temperature', 'South East England weather', 'England SE Central South climate'],
   },
 ];
 
