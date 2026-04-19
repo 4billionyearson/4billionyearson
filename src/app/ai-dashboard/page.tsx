@@ -666,7 +666,7 @@ export default function AIDashboardPage() {
                     <thead>
                       <tr className="border-b border-gray-700/50 text-left">
                         <th className="py-2 pr-4 text-gray-400 font-medium">Model</th>
-                        <th className="py-2 pr-4 text-gray-400 font-medium">Organization</th>
+                        <th className="py-2 pr-4 text-gray-400 font-medium">Organisation</th>
                         <th className="py-2 pr-4 text-gray-400 font-medium hidden sm:table-cell">Domain</th>
                         <th className="py-2 text-gray-400 font-medium">Date</th>
                       </tr>
