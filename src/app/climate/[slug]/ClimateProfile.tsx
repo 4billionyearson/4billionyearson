@@ -227,9 +227,9 @@ type OverviewMetricBlock = {
 
 type OverviewRow = {
   label: string;
-  annual: OverviewMetricBlock;
   latestMonth: OverviewMetricBlock;
   latestQuarter: OverviewMetricBlock;
+  annual: OverviewMetricBlock;
 };
 
 type OverviewSection = {
@@ -250,6 +250,7 @@ function buildOverviewRow(
   latestThreeMonthStats: RankedPeriodStat | undefined,
   units: string,
   digits: number,
+  lowerIsBetter = false,
 ): OverviewRow | null {
   if (!yearly?.length) return null;
 
@@ -264,29 +265,37 @@ function buildOverviewRow(
   const baselineAvg = baseline.length
     ? baseline.reduce((sum, point) => sum + point.value, 0) / baseline.length
     : null;
-  const sorted = [...values].sort((a, b) => b.value - a.value);
+  const sorted = [...values].sort((a, b) => lowerIsBetter ? a.value - b.value : b.value - a.value);
   const rank = sorted.findIndex((point) => point.year === latest.year && point.value === latest.value) + 1;
   const record = sorted[0];
 
-  const buildPeriodBlock = (title: string, stats?: RankedPeriodStat): OverviewMetricBlock => ({
-    title,
-    value: stats ? `${formatValue(stats.value, units, digits)} (${stats.label})` : 'n/a',
-    anomaly: stats && stats.diff != null ? `${formatSignedValue(stats.diff, units, digits)} vs baseline` : 'n/a',
-    rank: stats ? `${ordinal(stats.rank)} of ${stats.total}` : 'n/a',
-    record: stats ? `${stats.recordLabel} (${formatValue(stats.recordValue, units, digits)})` : 'n/a',
+  const invertRank = (stats: RankedPeriodStat): RankedPeriodStat => ({
+    ...stats,
+    rank: stats.total - stats.rank + 1,
   });
+
+  const buildPeriodBlock = (stats?: RankedPeriodStat): OverviewMetricBlock => {
+    const s = stats && lowerIsBetter ? invertRank(stats) : stats;
+    return {
+      title: s?.label ?? 'n/a',
+      value: s ? formatValue(s.value, units, digits) : 'n/a',
+      anomaly: s && s.diff != null ? `${formatSignedValue(s.diff, units, digits)} vs avg` : 'n/a',
+      rank: s ? ordinal(s.rank) : 'n/a',
+      record: s ? `${formatValue(s.recordValue, units, digits)} (${s.recordLabel})` : 'n/a',
+    };
+  };
 
   return {
     label,
+    latestMonth: buildPeriodBlock(latestMonthStats),
+    latestQuarter: buildPeriodBlock(latestThreeMonthStats),
     annual: {
-      title: 'Annual',
-      value: `${formatValue(latest.value, units, digits)} (${latest.year})`,
-      anomaly: baselineAvg == null ? 'n/a' : `${formatSignedValue(latest.value - baselineAvg, units, digits)} vs 1961–1990`,
-      rank: `${ordinal(rank)} of ${sorted.length}`,
-      record: `${record.year} (${formatValue(record.value, units, digits)})`,
+      title: `${latest.year}`,
+      value: formatValue(latest.value, units, digits),
+      anomaly: baselineAvg == null ? 'n/a' : `${formatSignedValue(latest.value - baselineAvg, units, digits)} vs avg`,
+      rank: ordinal(rank),
+      record: `${formatValue(record.value, units, digits)} (${record.year})`,
     },
-    latestMonth: buildPeriodBlock('Latest Month', latestMonthStats),
-    latestQuarter: buildPeriodBlock('Latest 3 Months', latestThreeMonthStats),
   };
 }
 
@@ -308,7 +317,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                     <div key={`${panel.title}-${row.label}`} className="rounded-xl border border-gray-800/80 bg-gray-950/60 p-3">
                       <div className="text-sm font-semibold text-[#FFF5E7] mb-2">{row.label}</div>
                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-3 text-sm">
-                        {[row.annual, row.latestMonth, row.latestQuarter].map((metric) => (
+                        {[row.latestMonth, row.latestQuarter, row.annual].map((metric) => (
                           <div key={`${row.label}-${metric.title}`} className="rounded-lg border border-gray-800/80 bg-gray-900/50 p-3">
                             <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">{metric.title}</div>
                             <div className="space-y-1">
@@ -326,6 +335,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
               </div>
             ))}
           </div>
+          <div className="mt-3 text-[10px] text-gray-600 text-right">Baseline: 1961–1990 average</div>
         </div>
       ))}
     </div>
@@ -463,8 +473,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   }
 
   const frostRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, data.ukRegionData?.varData?.AirFrost?.latestMonthStats, data.ukRegionData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.latestMonthStats, data.nationalData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, data.ukRegionData?.varData?.AirFrost?.latestMonthStats, data.ukRegionData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true),
+    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.latestMonthStats, data.nationalData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (frostRows.length) {

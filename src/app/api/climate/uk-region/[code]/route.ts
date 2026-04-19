@@ -30,7 +30,7 @@ function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-function buildLatestMonthStats(points: MonthlyDataPoint[]) {
+function buildLatestMonthStats(points: MonthlyDataPoint[], lowerIsBetter = false) {
   if (!points.length) return null;
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -43,7 +43,7 @@ function buildLatestMonthStats(points: MonthlyDataPoint[]) {
   const comparable = sortedPoints.filter((point) => point.month === latest.month);
   const baseline = comparable.filter((point) => point.year >= 1961 && point.year <= 1990);
   const baselineAvg = baseline.length ? round2(baseline.reduce((sum, point) => sum + point.value, 0) / baseline.length) : null;
-  const ranked = [...comparable].sort((a, b) => b.value - a.value);
+  const ranked = [...comparable].sort((a, b) => lowerIsBetter ? a.value - b.value : b.value - a.value);
   const rank = ranked.findIndex((point) => point.year === latest.year && point.month === latest.month) + 1;
   const record = ranked[0];
 
@@ -58,7 +58,7 @@ function buildLatestMonthStats(points: MonthlyDataPoint[]) {
   };
 }
 
-function buildLatestThreeMonthStats(points: MonthlyDataPoint[]) {
+function buildLatestThreeMonthStats(points: MonthlyDataPoint[], lowerIsBetter = false) {
   if (points.length < 3) return null;
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -88,7 +88,7 @@ function buildLatestThreeMonthStats(points: MonthlyDataPoint[]) {
   const comparable = windows.filter((window) => window.endMonth === latest.endMonth);
   const baseline = comparable.filter((window) => window.endYear >= 1961 && window.endYear <= 1990);
   const baselineAvg = baseline.length ? round2(baseline.reduce((sum, window) => sum + window.value, 0) / baseline.length) : null;
-  const ranked = [...comparable].sort((a, b) => b.value - a.value);
+  const ranked = [...comparable].sort((a, b) => lowerIsBetter ? a.value - b.value : b.value - a.value);
   const rank = ranked.findIndex((window) => window.label === latest.label) + 1;
   const record = ranked[0];
 
@@ -224,7 +224,7 @@ export async function GET(
 
   const cacheKey = `climate:ukregion:${regionId}`;
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v5`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v6`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {
@@ -244,14 +244,15 @@ export async function GET(
       if (points.length === 0) continue;
 
       const isSum = ['Rainfall', 'Sunshine', 'AirFrost', 'Raindays1mm'].includes(varName);
+      const lowerIsBetter = varName === 'AirFrost';
 
       varData[varName] = {
         label: VAR_LABELS[varName],
         units: VAR_UNITS[varName],
         yearly: buildYearly(points, isSum),
         monthlyComparison: buildComparison(points),
-        latestMonthStats: buildLatestMonthStats(points),
-        latestThreeMonthStats: buildLatestThreeMonthStats(points),
+        latestMonthStats: buildLatestMonthStats(points, lowerIsBetter),
+        latestThreeMonthStats: buildLatestThreeMonthStats(points, lowerIsBetter),
       };
     }
 
