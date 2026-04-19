@@ -126,6 +126,7 @@ type OverviewMetricBlock = {
 type OverviewRow = {
   label: string;
   lowerIsBetter?: boolean;
+  isPrimary?: boolean;
   latestMonth: OverviewMetricBlock;
   latestQuarter: OverviewMetricBlock;
   annual: OverviewMetricBlock;
@@ -150,6 +151,7 @@ function buildOverviewRow(
   units: string,
   digits: number,
   lowerIsBetter = false,
+  isPrimary = false,
 ): OverviewRow | null {
   if (!yearly?.length) return null;
 
@@ -187,6 +189,7 @@ function buildOverviewRow(
   return {
     label,
     lowerIsBetter,
+    isPrimary,
     latestMonth: buildPeriodBlock(latestMonthStats),
     latestQuarter: buildPeriodBlock(latestThreeMonthStats),
     annual: {
@@ -214,18 +217,22 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                   {section.title && <div className="text-xs uppercase tracking-wider text-gray-500 mb-2">{section.title}</div>}
                   <div className="space-y-2">
                     {section.rows.map((row) => {
-                      const rankSuffix = row.lowerIsBetter ? ' (fewest)' : '';
                       const recordPrefix = row.lowerIsBetter ? 'Fewest: ' : 'Record: ';
+                      const rowBorder = row.isPrimary ? 'border-gray-700/60' : 'border-gray-800/40';
+                      const rowBg = row.isPrimary ? 'bg-gray-900/60' : 'bg-gray-950/40';
+                      const labelSize = row.isPrimary ? 'text-sm font-bold' : 'text-xs font-medium';
+                      const valueSize = row.isPrimary ? 'text-lg font-bold' : 'text-sm font-semibold';
+                      const rankSize = row.isPrimary ? 'text-lg font-bold' : 'text-sm font-semibold';
                       return (
-                        <div key={`${panel.title}-${row.label}`} className="rounded-xl border border-gray-800/60 bg-gray-950/60 p-3">
-                          <div className="text-sm font-semibold text-[#D0A65E] mb-2">{row.label}</div>
+                        <div key={`${panel.title}-${row.label}`} className={`rounded-xl border ${rowBorder} ${rowBg} ${row.isPrimary ? 'p-3' : 'p-2'}`}>
+                          <div className={`${labelSize} text-[#D0A65E] mb-2`}>{row.label}</div>
                           <div className="grid grid-cols-1 xl:grid-cols-3 gap-2 text-sm">
                             {[row.latestMonth, row.latestQuarter, row.annual].map((metric) => (
-                              <div key={`${row.label}-${metric.title}`} className="rounded-lg border border-gray-800/50 bg-gray-950/80 p-2.5">
+                              <div key={`${row.label}-${metric.title}`} className={`rounded-lg border border-gray-800/50 bg-gray-950/80 ${row.isPrimary ? 'p-2.5' : 'p-2'}`}>
                                 <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-1.5">{metric.title}</div>
                                 <div className="space-y-1">
-                                  <div className="text-white font-bold text-lg">{metric.value}</div>
-                                  <div className="text-white font-bold text-lg">Rank: {metric.rank}{rankSuffix}</div>
+                                  <div className={`text-white ${valueSize}`}>{metric.value}</div>
+                                  <div className={`text-white ${rankSize}`}>Rank: {metric.rank}{row.lowerIsBetter && <span className="text-xs font-normal text-gray-400"> (fewest)</span>}</div>
                                   <div className="text-gray-400 text-xs">{metric.anomaly}</div>
                                   <div className="text-gray-500 text-xs">{recordPrefix}{metric.record}</div>
                                 </div>
@@ -258,6 +265,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       data.ukRegionData?.varData?.Tmean?.latestThreeMonthStats || data.usStateData?.paramData?.tavg?.latestThreeMonthStats || data.countryData?.latestThreeMonthStats,
       '°C',
       1,
+      false,
+      true,
     ),
     buildOverviewRow(
       nationalLabel || 'National',
@@ -267,25 +276,25 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       '°C',
       1,
     ),
-    buildOverviewRow('Global Land', data.globalData?.landYearlyData, data.globalData?.landLatestMonthStats, data.globalData?.landLatestThreeMonthStats, '°C', 1),
+    buildOverviewRow('Global', data.globalData?.landYearlyData, data.globalData?.landLatestMonthStats, data.globalData?.landLatestThreeMonthStats, '°C', 1),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (temperatureRows.length) {
     panels.push({
-      title: 'Temperature',
+      title: 'Temperature — Average',
       accentClass: 'bg-red-500/80',
       sections: [{ rows: temperatureRows }],
     });
   }
 
   const sunshineRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Sunshine?.yearly, data.ukRegionData?.varData?.Sunshine?.latestMonthStats, data.ukRegionData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Sunshine?.yearly, data.ukRegionData?.varData?.Sunshine?.latestMonthStats, data.ukRegionData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0, false, true),
     buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, data.nationalData?.varData?.Sunshine?.latestMonthStats, data.nationalData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (sunshineRows.length) {
     panels.push({
-      title: 'Sunshine',
+      title: 'Sunshine — Total Hours',
       accentClass: 'bg-amber-500/80',
       sections: [{ rows: sunshineRows }],
     });
@@ -299,6 +308,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       data.ukRegionData?.varData?.Rainfall?.latestThreeMonthStats || data.usStateData?.paramData?.pcp?.latestThreeMonthStats,
       ' mm',
       0,
+      false,
+      true,
     ),
     buildOverviewRow(
       nationalLabel || 'National',
@@ -311,13 +322,13 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   ].filter((row): row is OverviewRow => Boolean(row));
 
   const rainDaysRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Raindays1mm?.yearly, data.ukRegionData?.varData?.Raindays1mm?.latestMonthStats, data.ukRegionData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Raindays1mm?.yearly, data.ukRegionData?.varData?.Raindays1mm?.latestMonthStats, data.ukRegionData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0, false, true),
     buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, data.nationalData?.varData?.Raindays1mm?.latestMonthStats, data.nationalData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (rainfallRows.length || rainDaysRows.length) {
     panels.push({
-      title: 'Rainfall & Rain Days',
+      title: 'Rainfall & Rain Days — Totals',
       accentClass: 'bg-blue-500/80',
       sections: [
         ...(rainfallRows.length ? [{ title: 'Rainfall / Precipitation', rows: rainfallRows }] : []),
@@ -327,14 +338,14 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   }
 
   const frostRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, data.ukRegionData?.varData?.AirFrost?.latestMonthStats, data.ukRegionData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true),
+    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, data.ukRegionData?.varData?.AirFrost?.latestMonthStats, data.ukRegionData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true, true),
     buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.latestMonthStats, data.nationalData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (frostRows.length) {
     panels.push({
-      title: 'Frost Days',
-      accentClass: 'bg-sky-400/90',
+      title: 'Frost Days — Total',
+      accentClass: 'bg-sky-300/90',
       sections: [{ rows: frostRows }],
     });
   }
@@ -387,6 +398,16 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
     return stats?.label || null; // e.g. "Mar 2026"
   })();
 
+  // Full month name for the subtitle (e.g. "March" from "Mar 2026")
+  const FULL_MONTHS: Record<string, string> = {
+    Jan: 'January', Feb: 'February', Mar: 'March', Apr: 'April',
+    May: 'May', Jun: 'June', Jul: 'July', Aug: 'August',
+    Sep: 'September', Oct: 'October', Nov: 'November', Dec: 'December',
+  };
+  const latestFullMonth = latestMonthLabel
+    ? FULL_MONTHS[latestMonthLabel.split(' ')[0]] || latestMonthLabel.split(' ')[0]
+    : null;
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -398,18 +419,15 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 {pageTitle}
               </h1>
-              {latestMonthLabel && (
+              {latestFullMonth && (
                 <p className="text-lg md:text-xl font-semibold mt-1" style={{ color: '#FFF5E7' }}>
-                  Climate Data to {latestMonthLabel}
+                  {latestFullMonth} Climate Update
                 </p>
               )}
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               {summary ? (
                 <div>
-                  <h2 className="text-sm font-semibold text-[#D0A65E] uppercase tracking-wider mb-2">
-                    Monthly Climate Update
-                  </h2>
                   <div className="text-gray-300 text-sm leading-relaxed space-y-3">
                     {summary.split('\n\n').map((para, i) => (
                       <p key={i}>{para}</p>
@@ -420,7 +438,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                     href={`/climate-dashboard?q=${encodeURIComponent(dashboardSearchTerm)}`}
                     className="inline-block mt-3 text-sm font-semibold text-[#D0A65E] hover:text-[#E8C97A] transition-colors"
                   >
-                    Full Climate Data →
+                    Full Climate Data for {pageTitle} →
                   </Link>
                 </div>
               ) : !loading && data ? (
@@ -430,7 +448,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                     href={`/climate-dashboard?q=${encodeURIComponent(dashboardSearchTerm)}`}
                     className="inline-block mt-3 text-sm font-semibold text-[#D0A65E] hover:text-[#E8C97A] transition-colors"
                   >
-                    Full Climate Data →
+                    Full Climate Data for {pageTitle} →
                   </Link>
                 </div>
               ) : (
