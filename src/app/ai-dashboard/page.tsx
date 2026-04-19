@@ -40,6 +40,7 @@ interface AIDashboardData {
     latestYear: number;
     globalInvestment: number;
     totalModels2025: number;
+    totalModels2026: number;
     fmTopModel: string;
     fmTopScore: number;
     frontierTotalPowerMW: number;
@@ -342,12 +343,18 @@ export default function AIDashboardPage() {
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                   <StatCard
                     label="2025 AI Models Released"
                     value={String(data.stats.totalModels2025 ?? 0)}
                     color="text-violet-400"
                     subtext="Epoch AI (continuously updated)"
+                  />
+                  <StatCard
+                    label="2026 AI Models (YTD)"
+                    value={String(data.stats.totalModels2026 ?? 0)}
+                    color="text-emerald-400"
+                    subtext="Epoch AI (year to date)"
                   />
                   <StatCard
                     label="Global AI Investment"
@@ -428,9 +435,9 @@ export default function AIDashboardPage() {
                     </div>
                   );
                 })()}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-h-[420px] overflow-y-auto rounded-lg border border-gray-800/50">
                   <table className="w-full text-sm">
-                    <thead>
+                    <thead className="sticky top-0 bg-gray-950/95 backdrop-blur-sm z-10">
                       <tr className="border-b border-gray-700/50 text-left">
                         <th className="py-2 pr-3 text-gray-400 font-medium">Data Center</th>
                         <th className="py-2 pr-3 text-gray-400 font-medium">Owner</th>

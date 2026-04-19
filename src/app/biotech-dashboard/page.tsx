@@ -236,7 +236,7 @@ export default function BiotechDashboardPage() {
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <StatCard
                     label="WHO Outbreak Alerts"
                     value={outbreakData ? outbreakData.stats.totalRecentOutbreaks.toLocaleString() : "—"}
@@ -244,10 +244,10 @@ export default function BiotechDashboardPage() {
                     subtext={outbreakData ? `Across ${outbreakData.stats.countriesAffected} countries (past year)` : "Loading…"}
                   />
                   <StatCard
-                    label="Global DTP3 Coverage"
+                    label="DTP3 Vaccination Coverage"
                     value={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.DTP3 ?? '—'}%` : '—'}
                     color="text-teal-400"
-                    subtext={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.year} (WHO GHO)` : 'Loading…'}
+                    subtext={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.year} · Diphtheria, Tetanus, Pertussis` : 'Loading…'}
                   />
                   <StatCard
                     label="Genome Sequencing Cost"
@@ -267,6 +267,12 @@ export default function BiotechDashboardPage() {
                     color="text-amber-400"
                     subtext="Registered on ClinicalTrials.gov"
                   />
+                  <StatCard
+                    label="Diseases Tracked (WHO)"
+                    value={outbreakData ? outbreakData.stats.diseasesTracked.toLocaleString() : "—"}
+                    color="text-orange-400"
+                    subtext="Distinct diseases in outbreak alerts"
+                  />
                 </div>
                 <p className="text-xs text-gray-400 mt-3">
                   Sources:{" "}
@@ -281,10 +287,11 @@ export default function BiotechDashboardPage() {
                 </p>
               </div>
 
-              {/* ═══ DISEASE OUTBREAKS & IMMUNIZATION ═══ */}
+              {/* ═══ DISEASE OUTBREAKS & IMMUNISATION ═══ */}
+              <Divider icon={<Syringe className="h-4 w-4 text-red-400" />} title="Disease Outbreaks &amp; Immunisation" />
+
               {outbreakData && outbreakData.outbreaks.length > 0 && (
               <>
-              <Divider icon={<MapPin className="h-4 w-4 text-red-400" />} title="Disease Outbreaks" />
 
               <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="WHO Disease Outbreak Map">
                 <DiseaseOutbreakMap outbreaks={outbreakData.outbreaks} />
@@ -338,6 +345,15 @@ export default function BiotechDashboardPage() {
                   DTP3: '#ef4444', MCV1: '#f59e0b', HepB3: '#3b82f6', Polio: '#10b981',
                   MCV2: '#a855f7', PCV3: '#06b6d4', Rotavirus: '#ec4899',
                 };
+                const VACCINE_NAMES: Record<string, string> = {
+                  DTP3: 'DTP3 (Diphtheria, Tetanus, Pertussis – 3rd dose)',
+                  MCV1: 'MCV1 (Measles-containing – 1st dose)',
+                  HepB3: 'HepB3 (Hepatitis B – 3rd dose)',
+                  Polio: 'Polio (Pol3 – 3rd dose)',
+                  MCV2: 'MCV2 (Measles-containing – 2nd dose)',
+                  PCV3: 'PCV3 (Pneumococcal – 3rd dose)',
+                  Rotavirus: 'Rotavirus (final dose)',
+                };
                 return (
               <SectionCard icon={<Syringe className="h-5 w-5 text-teal-400" />} title="Global Immunization Coverage">
                 <div className="h-[380px] w-full">
@@ -347,9 +363,9 @@ export default function BiotechDashboardPage() {
                       <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
                       <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v}%`} />
                       <Tooltip content={<DarkTooltip formatter={(v: number) => `${v}%`} />} />
-                      <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
+                      <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} formatter={(value: string) => VACCINE_NAMES[value] || value} />
                       {vaccineKeys.map(k => (
-                        <Line key={k} type="monotone" dataKey={k} stroke={VACCINE_COLORS[k] || '#6b7280'} strokeWidth={2} dot={false} connectNulls />
+                        <Line key={k} type="monotone" dataKey={k} name={k} stroke={VACCINE_COLORS[k] || '#6b7280'} strokeWidth={2} dot={false} connectNulls />
                       ))}
                       <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10}>
                         <LineChart data={data.immunizationCoverage}>
@@ -362,7 +378,7 @@ export default function BiotechDashboardPage() {
                   </ResponsiveContainer>
                 </div>
                 <p className="text-xs text-gray-400 mt-4">
-                  Global coverage (%) for key childhood vaccines from 2000 to present. DTP3 (diphtheria-tetanus-pertussis, 3rd dose) is the standard benchmark for immunization programmes. Source:{" "}
+                  Global coverage (%) for key childhood vaccines from 2000 to present. DTP3 (diphtheria, tetanus, pertussis – 3rd dose) is the standard WHO benchmark for immunisation programme strength. MCV = measles-containing vaccine, HepB = hepatitis B, PCV = pneumococcal conjugate. Source:{" "}
                   <a href="https://www.who.int/data/gho/data/indicators" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     WHO Global Health Observatory
                   </a>.
