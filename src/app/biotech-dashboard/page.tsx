@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import {
   Loader2, Dna, Activity, FlaskConical,
-  FileText, MapPin,
+  FileText, MapPin, Syringe,
 } from "lucide-react";
 import DiseaseOutbreakMap, { type DiseaseOutbreak } from "../_components/disease-outbreak-map";
 
@@ -18,6 +18,7 @@ interface BiotechDashboardData {
   clinicalTrials: { category: string; count: number }[];
   pubmedCounts: { category: string; count: number }[];
   crisprYearTrend: { year: number; count: number }[];
+  immunizationCoverage: Record<string, number>[];
   stats: {
     genomeCost: number;
     genomeCostYear: number;
@@ -205,7 +206,7 @@ export default function BiotechDashboardPage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Genome sequencing costs, clinical trials, CRISPR research, and biotech publication trends.
+                Disease outbreaks, global immunization coverage, genome sequencing costs, clinical trials, and CRISPR research trends.
               </p>
             </div>
           </div>
@@ -235,7 +236,19 @@ export default function BiotechDashboardPage() {
                     Updated {new Date(data.fetchedAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  <StatCard
+                    label="WHO Outbreak Alerts"
+                    value={outbreakData ? outbreakData.stats.totalRecentOutbreaks.toLocaleString() : "—"}
+                    color="text-red-400"
+                    subtext={outbreakData ? `Across ${outbreakData.stats.countriesAffected} countries (past year)` : "Loading…"}
+                  />
+                  <StatCard
+                    label="Global DTP3 Coverage"
+                    value={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.DTP3 ?? '—'}%` : '—'}
+                    color="text-teal-400"
+                    subtext={data.immunizationCoverage?.length ? `${data.immunizationCoverage[data.immunizationCoverage.length - 1]?.year} (WHO GHO)` : 'Loading…'}
+                  />
                   <StatCard
                     label="Genome Sequencing Cost"
                     value={formatDollars(data.stats.genomeCost)}
@@ -254,12 +267,6 @@ export default function BiotechDashboardPage() {
                     color="text-amber-400"
                     subtext="Registered on ClinicalTrials.gov"
                   />
-                  <StatCard
-                    label="WHO Outbreak Alerts"
-                    value={outbreakData ? outbreakData.stats.totalRecentOutbreaks.toLocaleString() : "—"}
-                    color="text-red-400"
-                    subtext={outbreakData ? `Across ${outbreakData.stats.countriesAffected} countries (past year)` : "Loading…"}
-                  />
                 </div>
                 <p className="text-xs text-gray-400 mt-3">
                   Sources:{" "}
@@ -268,9 +275,101 @@ export default function BiotechDashboardPage() {
                   <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">ClinicalTrials.gov</a>{" "}
                   (CRISPR &amp; gene therapy trials) ·{" "}
                   <a href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">WHO DON</a>{" "}
-                  (outbreak alerts).
+                  (outbreak alerts) ·{" "}
+                  <a href="https://www.who.int/data/gho" target="_blank" rel="noopener noreferrer" className="text-[#FFF5E7]/70 hover:underline">WHO GHO</a>{" "}
+                  (immunization).
                 </p>
               </div>
+
+              {/* ═══ DISEASE OUTBREAKS & IMMUNIZATION ═══ */}
+              {outbreakData && outbreakData.outbreaks.length > 0 && (
+              <>
+              <Divider icon={<MapPin className="h-4 w-4 text-red-400" />} title="Disease Outbreaks" />
+
+              <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="WHO Disease Outbreak Map">
+                <DiseaseOutbreakMap outbreaks={outbreakData.outbreaks} />
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-gray-400">
+                  <span className="text-gray-500 font-medium uppercase tracking-wide">Colour by disease:</span>
+                  {[
+                    ["Influenza", "#dc2626"], ["Ebola / Marburg", "#f97316"], ["Mpox", "#a855f7"],
+                    ["Nipah", "#eab308"], ["Cholera", "#3b82f6"], ["Measles", "#06b6d4"],
+                    ["Polio", "#14b8a6"], ["Meningococcal", "#8b5cf6"], ["Other", "#6b7280"],
+                  ].map(([label, color]) => (
+                    <span key={label} className="flex items-center gap-1">
+                      <span className="inline-block h-2 w-2 rounded-full" style={{ background: color as string }} />
+                      {label}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-xs text-gray-500">Most recent first</p>
+                </div>
+                <div className="mt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
+                  {outbreakData.outbreaks.map((o, i) => (
+                    <a
+                      key={i}
+                      href={o.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-start gap-2 p-2 bg-gray-800/60 rounded-lg hover:bg-gray-700/60 transition-colors group"
+                    >
+                      <span className="shrink-0 mt-0.5 h-2.5 w-2.5 rounded-full" style={{ background: getDiseaseColor(o.disease) }} />
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-gray-200 truncate group-hover:text-[#FFF5E7]">{o.disease}</p>
+                        <p className="text-[10px] text-gray-400">{o.country}</p>
+                        <p className="text-[10px] text-gray-500">{new Date(o.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-400 mt-4">
+                  Recent disease outbreak alerts worldwide (past 12 months), deduplicated by disease and country. Source:{" "}
+                  <a href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
+                    WHO Disease Outbreak News
+                  </a>.
+                </p>
+              </SectionCard>
+              </>
+              )}
+
+              {data.immunizationCoverage?.length > 0 && (() => {
+                const vaccineKeys = Object.keys(data.immunizationCoverage[0]).filter(k => k !== 'year');
+                const VACCINE_COLORS: Record<string, string> = {
+                  DTP3: '#ef4444', MCV1: '#f59e0b', HepB3: '#3b82f6', Polio: '#10b981',
+                  MCV2: '#a855f7', PCV3: '#06b6d4', Rotavirus: '#ec4899',
+                };
+                return (
+              <SectionCard icon={<Syringe className="h-5 w-5 text-teal-400" />} title="Global Immunization Coverage">
+                <div className="h-[380px] w-full">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                    <LineChart data={data.immunizationCoverage} margin={CHART_MARGIN}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#A99B8D" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `${v}%`} />
+                      <Tooltip content={<DarkTooltip formatter={(v: number) => `${v}%`} />} />
+                      <Legend wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
+                      {vaccineKeys.map(k => (
+                        <Line key={k} type="monotone" dataKey={k} stroke={VACCINE_COLORS[k] || '#6b7280'} strokeWidth={2} dot={false} connectNulls />
+                      ))}
+                      <Brush dataKey="year" height={BRUSH_HEIGHT} stroke={ACCENT} fill="#111" travellerWidth={10}>
+                        <LineChart data={data.immunizationCoverage}>
+                          {vaccineKeys.map(k => (
+                            <Line key={k} type="monotone" dataKey={k} stroke={VACCINE_COLORS[k] || '#6b7280'} dot={false} strokeWidth={1} />
+                          ))}
+                        </LineChart>
+                      </Brush>
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <p className="text-xs text-gray-400 mt-4">
+                  Global coverage (%) for key childhood vaccines from 2000 to present. DTP3 (diphtheria-tetanus-pertussis, 3rd dose) is the standard benchmark for immunization programmes. Source:{" "}
+                  <a href="https://www.who.int/data/gho/data/indicators" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
+                    WHO Global Health Observatory
+                  </a>.
+                </p>
+              </SectionCard>
+                );
+              })()}
 
               {/* ═══ GENOMICS & BIOTECHNOLOGY ═══ */}
               <Divider icon={<Dna className="h-5 w-5" />} title="Genomics &amp; Biotechnology" />
@@ -353,56 +452,6 @@ export default function BiotechDashboardPage() {
                   </a>.
                 </p>
               </SectionCard>
-              )}
-
-              {outbreakData && outbreakData.outbreaks.length > 0 && (
-              <>
-              <Divider icon={<MapPin className="h-4 w-4 text-red-400" />} title="Disease Outbreaks" />
-
-              <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="WHO Disease Outbreak Map">
-                <DiseaseOutbreakMap outbreaks={outbreakData.outbreaks} />
-                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-gray-400">
-                  <span className="text-gray-500 font-medium uppercase tracking-wide">Colour by disease:</span>
-                  {[
-                    ["Influenza", "#dc2626"], ["Ebola / Marburg", "#f97316"], ["Mpox", "#a855f7"],
-                    ["Nipah", "#eab308"], ["Cholera", "#3b82f6"], ["Measles", "#06b6d4"],
-                    ["Polio", "#14b8a6"], ["Meningococcal", "#8b5cf6"], ["Other", "#6b7280"],
-                  ].map(([label, color]) => (
-                    <span key={label} className="flex items-center gap-1">
-                      <span className="inline-block h-2 w-2 rounded-full" style={{ background: color as string }} />
-                      {label}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <p className="text-xs text-gray-500">Most recent first</p>
-                </div>
-                <div className="mt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
-                  {outbreakData.outbreaks.map((o, i) => (
-                    <a
-                      key={i}
-                      href={o.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-start gap-2 p-2 bg-gray-800/60 rounded-lg hover:bg-gray-700/60 transition-colors group"
-                    >
-                      <span className="shrink-0 mt-0.5 h-2.5 w-2.5 rounded-full" style={{ background: getDiseaseColor(o.disease) }} />
-                      <div className="min-w-0">
-                        <p className="text-xs font-medium text-gray-200 truncate group-hover:text-[#FFF5E7]">{o.disease}</p>
-                        <p className="text-[10px] text-gray-400">{o.country}</p>
-                        <p className="text-[10px] text-gray-500">{new Date(o.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-400 mt-4">
-                  Recent disease outbreak alerts worldwide (past 12 months), deduplicated by disease and country. Source:{" "}
-                  <a href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
-                    WHO Disease Outbreak News
-                  </a>.
-                </p>
-              </SectionCard>
-              </>
               )}
 
 

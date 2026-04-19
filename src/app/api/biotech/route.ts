@@ -88,6 +88,47 @@ async function fetchPubmedCount(term: string): Promise<{ term: string; count: nu
   return { term, count: Number(data?.esearchresult?.count ?? 0) };
 }
 
+/* ─── WHO GHO immunization coverage ──────────────────────────────────────── */
+
+const VACCINE_INDICATORS: { code: string; label: string }[] = [
+  { code: 'WHS4_100', label: 'DTP3' },
+  { code: 'WHS8_110', label: 'MCV1' },
+  { code: 'WHS4_117', label: 'HepB3' },
+  { code: 'WHS4_544', label: 'Polio' },
+  { code: 'MCV2',     label: 'MCV2' },
+  { code: 'PCV3',     label: 'PCV3' },
+  { code: 'ROTAC',    label: 'Rotavirus' },
+];
+
+async function fetchImmunizationCoverage(): Promise<Record<string, number>[]> {
+  try {
+    const results = await Promise.all(
+      VACCINE_INDICATORS.map(async ({ code, label }) => {
+        const data = await fetchJSON(
+          `https://ghoapi.azureedge.net/api/${code}?$filter=SpatialDim eq 'GLOBAL'&$orderby=TimeDim asc`,
+          30000,
+        );
+        if (!data?.value) return [];
+        return data.value
+          .filter((r: any) => r.NumericValue != null && r.TimeDim)
+          .map((r: any) => ({ year: Number(r.TimeDim), label, value: r.NumericValue }));
+      }),
+    );
+
+    // Merge into { year, DTP3, MCV1, HepB3, … }
+    const byYear = new Map<number, Record<string, number>>();
+    for (const series of results) {
+      for (const pt of series) {
+        if (!byYear.has(pt.year)) byYear.set(pt.year, { year: pt.year });
+        byYear.get(pt.year)![pt.label] = pt.value;
+      }
+    }
+    return Array.from(byYear.values()).sort((a, b) => a.year - b.year);
+  } catch {
+    return [];
+  }
+}
+
 /* ─── PubMed year-by-year publication counts ──────────────────────────────── */
 
 async function fetchPubmedYearSeries(term: string, startYear: number, endYear: number): Promise<{ year: number; count: number }[]> {
@@ -162,6 +203,9 @@ async function fetchBiotechDashboardData() {
   // ─ PubMed year trends for CRISPR ─
   const crisprYearTrend = await fetchPubmedYearSeries('CRISPR', 2012, 2025);
 
+  // ─ WHO immunization coverage ─
+  const immunizationCoverage = await fetchImmunizationCoverage();
+
   // ─ Stats ─
   const latestGenomeCost = genomeRows.sort((a, b) => b.year - a.year)[0];
 
@@ -177,6 +221,7 @@ async function fetchBiotechDashboardData() {
     clinicalTrials,
     pubmedCounts,
     crisprYearTrend,
+    immunizationCoverage,
     stats,
     fetchedAt: new Date().toISOString(),
   };
