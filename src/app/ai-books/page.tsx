@@ -268,83 +268,77 @@ export default async function AIBooksPage() {
           </div>
 
           {/* Books list */}
-          <div className="space-y-8">
-            {BOOKS.map((book) => (
+          <div className="space-y-6">
+            {BOOKS.map((book, index) => (
               <section
                 key={book.asin}
-                className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#88DDFC]/40 hover:border-[#88DDFC] transition-colors"
+                className="bg-gray-950/90 backdrop-blur-md rounded-2xl shadow-xl border-2 border-[#88DDFC] overflow-hidden"
               >
-                <div className="flex flex-col sm:flex-row gap-5 sm:gap-6">
-                  {/* Book Cover and Amazon CTA */}
-                  <div className="flex flex-col items-center gap-3 w-full sm:w-auto sm:min-w-[160px] sm:max-w-[180px] flex-shrink-0">
-                    <img
-                      src={coverUrl(book.cover)}
-                      alt={`${book.title} by ${book.author}`}
-                      className="w-28 sm:w-36 md:w-44 h-auto object-contain rounded-lg shadow-xl"
-                      loading="lazy"
-                    />
-                    <a
-                      href={amazonUrl(book.title, book.author, countryCode)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full text-center bg-[#88DDFC] text-gray-900 font-bold py-2 px-4 rounded-xl hover:bg-[#6BC6E8] transition-colors flex items-center justify-center gap-2"
-                    >
-                      Buy on Amazon <ExternalLink className="h-4 w-4" />
-                    </a>
+                {/* Accent header bar */}
+                <div className="px-5 py-3 flex items-center justify-between" style={{ backgroundColor: '#88DDFC' }}>
+                  <h2 className="text-lg md:text-xl font-bold font-mono text-gray-900 truncate pr-4">
+                    <span className="text-gray-900/50 mr-2">#{index + 1}</span>
+                    {book.title}
+                  </h2>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                    <span className="text-sm font-bold text-gray-900">{book.rating}</span>
                   </div>
+                </div>
 
-                  {/* Content */}
-                  <div className="flex-1 space-y-4">
-                    <div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">{book.title}</h2>
-                      <p className="text-lg text-gray-400 font-medium">{book.author} · {book.year}</p>
-                      
-                      <div className="flex items-center gap-1 mt-2">
-                        <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                        <span className="text-sm text-amber-400 font-semibold">{book.rating}</span>
-                        <span className="text-sm text-gray-500 ml-1">Rating</span>
-                      </div>
+                <div className="p-5 md:p-6">
+                  <div className="flex gap-5">
+                    {/* Cover – always left-aligned, compact */}
+                    <div className="flex flex-col items-center gap-3 flex-shrink-0 w-[100px] sm:w-[130px] md:w-[150px]">
+                      <img
+                        src={coverUrl(book.cover)}
+                        alt={`${book.title} by ${book.author}`}
+                        className="w-full h-auto object-contain rounded-lg shadow-lg"
+                        loading="lazy"
+                      />
+                      <a
+                        href={amazonUrl(book.title, book.author, countryCode)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full text-center bg-[#88DDFC] text-gray-900 font-bold text-xs py-1.5 px-2 rounded-lg hover:bg-[#6BC6E8] transition-colors flex items-center justify-center gap-1"
+                      >
+                        Amazon <ExternalLink className="h-3 w-3" />
+                      </a>
                     </div>
 
-                    <div className="space-y-4">
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 space-y-3">
                       <div>
-                        <h3 className="text-sm tracking-widest uppercase text-gray-500 font-bold mb-2">Curator&apos;s Note</h3>
-                        <p className="text-gray-300 leading-relaxed">{book.curatorNote}</p>
+                        <p className="text-sm text-gray-400 font-medium">{book.author} · {book.year}</p>
                       </div>
 
+                      <p className="text-sm md:text-base text-gray-300 leading-relaxed">{book.curatorNote}</p>
+
                       <div>
-                        <h3 className="text-sm tracking-widest uppercase text-gray-500 font-bold mb-2">Review Highlights</h3>
-                        <ul className="list-disc list-outside ml-4 text-gray-300 space-y-1">
+                        <h3 className="text-xs tracking-widest uppercase text-gray-500 font-bold mb-1.5">Review Highlights</h3>
+                        <ul className="list-disc list-outside ml-4 text-sm text-gray-400 space-y-0.5">
                           {book.reviewHighlights.map((highlight, i) => (
                             <li key={i}>{highlight}</li>
                           ))}
                         </ul>
                       </div>
 
-                      <div className="pt-2">
-                        <h3 className="text-sm tracking-widest uppercase text-gray-500 font-bold mb-2">Best For</h3>
-                        <div className="flex flex-wrap gap-1.5">
-                          {book.bestFor.map((tag, i) => (
-                            <span key={i} className="bg-gray-800 text-gray-300 text-xs px-3 py-1 rounded-full border border-gray-700">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {book.bestFor.map((tag, i) => (
+                          <span key={i} className="bg-[#88DDFC]/10 text-[#88DDFC] text-xs px-2.5 py-0.5 rounded-full border border-[#88DDFC]/30 font-medium">
+                            {tag}
+                          </span>
+                        ))}
                       </div>
-
-                      <div className="mt-6 p-4 rounded-xl bg-gray-900 border border-gray-800">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                          <div>
-                            <p className="text-[#88DDFC] font-bold text-sm uppercase tracking-wide">Why this matters</p>
-                            <p className="text-gray-300 text-sm mt-1">{book.dataConnection.text}</p>
-                          </div>
-                          <a href={book.dataConnection.link} className="text-sm text-white bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg text-center transition-colors border border-gray-600 whitespace-nowrap">
-                            View Data &rarr;
-                          </a>
-                        </div>
-                      </div>
-
                     </div>
+                  </div>
+
+                  {/* Data connection footer */}
+                  <div className="mt-4 pt-4 border-t border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <p className="text-sm text-gray-400">{book.dataConnection.text}</p>
+                    <a href={book.dataConnection.link} className="text-xs text-[#88DDFC] font-bold uppercase tracking-wide hover:underline whitespace-nowrap flex-shrink-0">
+                      View Data &rarr;
+                    </a>
                   </div>
                 </div>
               </section>
