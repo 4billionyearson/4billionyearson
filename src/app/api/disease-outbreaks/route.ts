@@ -119,6 +119,7 @@ const CC: Record<string, [number, number]> = {
   "Russia": [61.5, 105.3],
   "Rwanda": [-1.9, 29.9],
   "Saudi Arabia": [23.9, 45.1],
+  "Kingdom of Saudi Arabia": [23.9, 45.1],
   "Senegal": [14.5, -14.5],
   "Serbia": [44.0, 21.0],
   "Sierra Leone": [8.5, -11.8],
@@ -217,21 +218,31 @@ async function fetchOutbreaks() {
   const twoYearsAgo = new Date();
   twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
 
-  const apiUrl =
-    'https://www.who.int/api/hubs/diseaseoutbreaknews' +
-    '?$orderby=PublicationDateAndTime%20desc' +
-    '&$top=300' +
-    '&$select=Title,PublicationDateAndTime,Summary,DonId,UrlName';
+  const baseUrl = 'https://www.who.int/api/hubs/diseaseoutbreaknews';
+  const params = '$orderby=PublicationDateAndTime%20desc&$top=100&$select=Title,PublicationDateAndTime,Summary,DonId,UrlName';
+  let allItems: any[] = [];
+  let nextUrl: string | null = `${baseUrl}?${params}`;
 
-  const res = await fetch(apiUrl, { signal: AbortSignal.timeout(30_000) });
-  if (!res.ok) throw new Error(`WHO API ${res.status}`);
-  const json = await res.json();
-  const items: any[] = json.value || [];
+  // Paginate through results (WHO caps at 100 per page)
+  while (nextUrl && allItems.length < 300) {
+    const res: Response = await fetch(nextUrl, {
+      signal: AbortSignal.timeout(30_000),
+      headers: { 'Accept': 'application/json' },
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`WHO API ${res.status}: ${text.slice(0, 200)}`);
+    }
+    const json = await res.json();
+    const items: any[] = json.value || [];
+    allItems = allItems.concat(items);
+    nextUrl = json['@odata.nextLink'] || null;
+  }
 
   const outbreaks: DiseaseOutbreak[] = [];
   const seen = new Set<string>();
 
-  for (const item of items) {
+  for (const item of allItems) {
     const pubDate = new Date(item.PublicationDateAndTime);
     if (pubDate < twoYearsAgo) continue;
 

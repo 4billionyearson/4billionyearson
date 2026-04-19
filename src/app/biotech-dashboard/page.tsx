@@ -355,9 +355,10 @@ export default function BiotechDashboardPage() {
               </SectionCard>
               )}
 
+              {outbreakData && outbreakData.outbreaks.length > 0 && (
+              <>
               <Divider icon={<MapPin className="h-4 w-4 text-red-400" />} title="Disease Outbreaks" />
 
-              {outbreakData && outbreakData.outbreaks.length > 0 && (
               <SectionCard icon={<MapPin className="h-5 w-5 text-red-400" />} title="WHO Disease Outbreak Map">
                 <DiseaseOutbreakMap outbreaks={outbreakData.outbreaks} />
                 <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto pr-1">
@@ -384,6 +385,7 @@ export default function BiotechDashboardPage() {
                   </a>.
                 </p>
               </SectionCard>
+              </>
               )}
 
 
