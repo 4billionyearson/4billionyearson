@@ -2,9 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2, Thermometer, Sun, CloudRain, Snowflake, ExternalLink, Database } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, Database, BookOpen } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
+
+// ─── Divider ─────────────────────────────────────────────────────────────────
+
+function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-4 my-6">
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg">
+        {icon} {title}
+      </h2>
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+    </div>
+  );
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -219,7 +233,7 @@ function buildOverviewRow(
   };
 }
 
-function OverviewGrid({ panels, headless }: { panels: OverviewPanel[]; headless?: boolean }) {
+function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
   const periods = ['latestMonth', 'latestQuarter', 'annual'] as const;
   const periodShortLabel = (label: string, period: typeof periods[number]) => {
     if (period === 'annual') return label;
@@ -229,18 +243,11 @@ function OverviewGrid({ panels, headless }: { panels: OverviewPanel[]; headless?
   return (
     <div className="space-y-4">
       {panels.map((panel) => (
-        <div key={panel.title} className={headless ? '' : 'bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]'}>
-          {!headless && (
-            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
-              {panel.icon}
-              {panel.title}
-            </h2>
-          )}
-          {headless && (
-            <h3 className="text-sm font-bold font-mono text-gray-300 mb-2 flex items-center gap-2">
-              {panel.title}
-            </h3>
-          )}
+        <div key={panel.title} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+            {panel.icon}
+            {panel.title}
+          </h2>
           <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden">
             {panel.sections.map((section, sIdx) => (
               <div key={sIdx} className={`${sIdx > 0 ? 'border-t-2 border-gray-600/50' : ''}`}>
@@ -601,10 +608,12 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
           {data && !loading && (
             <>
-              {/* ─── Temperature Section ─── */}
+              {/* ─── Sections with dividers ─── */}
               {(() => {
                 const tempPanels = overviewPanels.filter(p => p.title.startsWith('Temperature'));
-                const otherPanels = overviewPanels.filter(p => !p.title.startsWith('Temperature'));
+                const sunshinePanels = overviewPanels.filter(p => p.title.startsWith('Sunshine'));
+                const rainfallPanels = overviewPanels.filter(p => p.title.startsWith('Rainfall'));
+                const frostPanels = overviewPanels.filter(p => p.title.startsWith('Frost'));
                 const monthlyAll = data.ukRegionData?.varData?.Tmean?.monthlyAll
                   || data.usStateData?.paramData?.tavg?.monthlyAll
                   || data.countryData?.monthlyAll;
@@ -616,19 +625,42 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
                 return (
                   <>
+                    {/* Temperature */}
                     {tempPanels.length > 0 && (
-                      <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] space-y-4">
-                        <h2 className="text-xl font-bold font-mono text-white flex items-center gap-2">
-                          <Thermometer className="h-5 w-5 text-orange-400" />
-                          Temperature
-                        </h2>
-                        <OverviewGrid panels={tempPanels} headless />
-                        {monthlyAll?.length ? (
-                          <TemperatureSpaghettiChart monthlyAll={monthlyAll} regionName={pageTitle} dataSource={chartSource} />
-                        ) : null}
-                      </section>
+                      <>
+                        <Divider icon={<Thermometer className="h-5 w-5" />} title="Temperature" />
+                        <OverviewGrid panels={tempPanels} />
+                      </>
                     )}
-                    {otherPanels.length > 0 && <OverviewGrid panels={otherPanels} />}
+                    {monthlyAll?.length ? (
+                      <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                        <TemperatureSpaghettiChart monthlyAll={monthlyAll} regionName={pageTitle} dataSource={chartSource} />
+                      </section>
+                    ) : null}
+
+                    {/* Sunshine */}
+                    {sunshinePanels.length > 0 && (
+                      <>
+                        <Divider icon={<Sun className="h-5 w-5" />} title="Sunshine" />
+                        <OverviewGrid panels={sunshinePanels} />
+                      </>
+                    )}
+
+                    {/* Rainfall */}
+                    {rainfallPanels.length > 0 && (
+                      <>
+                        <Divider icon={<Droplets className="h-5 w-5" />} title="Rainfall & Precipitation" />
+                        <OverviewGrid panels={rainfallPanels} />
+                      </>
+                    )}
+
+                    {/* Frost */}
+                    {frostPanels.length > 0 && (
+                      <>
+                        <Divider icon={<Snowflake className="h-5 w-5" />} title="Frost" />
+                        <OverviewGrid panels={frostPanels} />
+                      </>
+                    )}
                   </>
                 );
               })()}
@@ -642,6 +674,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   <RelatedLink href="/greenhouse-gases" label="Greenhouse Gases" desc="CO₂, methane, and N₂O levels" />
                   <RelatedLink href="/sea-levels-ice" label="Sea Levels & Ice" desc="Arctic ice and sea-level rise" />
                   <RelatedLink href="/extreme-weather" label="Extreme Weather" desc="Live disaster and weather alerts" />
+                  <RelatedLink href="/climate-explained" label="Climate Explained" desc="ENSO, greenhouse effect, glossary" />
                 </div>
               </section>
 

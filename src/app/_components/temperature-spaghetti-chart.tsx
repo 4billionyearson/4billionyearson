@@ -32,10 +32,12 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
 
     const now = new Date();
     const calendarYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // 1-indexed
 
-    // Group by year
+    // Group by year, excluding current (incomplete) month
     const byYear = new Map<number, Map<number, number>>();
     for (const p of monthlyAll) {
+      if (p.year === calendarYear && p.month >= currentMonth) continue;
       if (!byYear.has(p.year)) byYear.set(p.year, new Map());
       byYear.get(p.year)!.set(p.month, p.value);
     }
