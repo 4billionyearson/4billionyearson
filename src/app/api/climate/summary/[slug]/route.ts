@@ -460,7 +460,7 @@ async function callGemini(
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0.3,
-      maxOutputTokens: 1200,
+      maxOutputTokens: 3000,
     },
   };
   if (useGrounding) {
@@ -483,8 +483,12 @@ async function callGemini(
   }
 
   const data = await res.json();
+  const summary = extractTextFromParts(data);
+  if (!summary) {
+    console.error(`Gemini returned no text (grounding=${useGrounding}):`, JSON.stringify(data).slice(0, 500));
+  }
   return {
-    summary: extractTextFromParts(data),
+    summary,
     sources: useGrounding ? extractGroundingSources(data) : [],
     raw: data,
   };
@@ -515,7 +519,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v14`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v15`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {

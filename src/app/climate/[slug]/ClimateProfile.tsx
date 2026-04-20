@@ -261,7 +261,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                     {section.rows.map((row) => (
                       <div
                         key={row.label}
-                        className={`flex-1 min-w-0 px-2 py-1.5 text-[11px] md:text-xs font-bold truncate ${
+                        className={`flex-1 min-w-0 px-1 md:px-2 py-1.5 text-[11px] md:text-xs font-bold truncate ${
                           row.isPrimary ? 'text-white' : 'text-gray-400'
                         }`}
                       >
@@ -285,13 +285,13 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                             return (
                               <div
                                 key={`${row.label}-${period}`}
-                                className={`flex-1 min-w-0 py-2 px-2 ${
+                                className={`flex-1 min-w-0 py-2 px-1 md:px-2 ${
                                   row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
                                 }`}
                               >
                                 <div className={`text-sm font-bold leading-snug ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
                                   {metric.value}
-                                  <span className={`text-sm font-bold ml-1.5 ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
+                                  <span className={`text-sm font-bold ml-1 ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
                                     · {metric.rank}{row.lowerIsBetter ? ' ↓' : ''}
                                   </span>
                                 </div>
@@ -310,7 +310,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                           {section.rows.map((row) => (
                             <div
                               key={`${row.label}-${period}-record`}
-                              className={`flex-1 min-w-0 py-1.5 px-2 ${
+                              className={`flex-1 min-w-0 py-1.5 px-1 md:px-2 ${
                                 row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
                               }`}
                             >
@@ -338,25 +338,38 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
 function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLabel: string): OverviewPanel[] {
   const panels: OverviewPanel[] = [];
 
+  // For country pages with dedicated national data (UK Met Office / US NOAA), use it as primary
+  // to get all metrics and avoid a duplicate national comparison row
+  const useNationalAsPrimary = data.type === 'country' && !!(data.nationalData?.varData || data.nationalData?.paramData);
+  const nd = data.nationalData;
+
   const temperatureRows = [
     buildOverviewRow(
       regionLabel,
-      data.ukRegionData?.varData?.Tmean?.yearly || data.usStateData?.paramData?.tavg?.yearly || data.countryData?.yearlyData,
-      data.ukRegionData?.varData?.Tmean?.latestMonthStats || data.usStateData?.paramData?.tavg?.latestMonthStats || data.countryData?.latestMonthStats,
-      data.ukRegionData?.varData?.Tmean?.latestThreeMonthStats || data.usStateData?.paramData?.tavg?.latestThreeMonthStats || data.countryData?.latestThreeMonthStats,
+      useNationalAsPrimary
+        ? (nd!.varData?.Tmean?.yearly || nd!.paramData?.tavg?.yearly)
+        : (data.ukRegionData?.varData?.Tmean?.yearly || data.usStateData?.paramData?.tavg?.yearly || data.countryData?.yearlyData),
+      useNationalAsPrimary
+        ? (nd!.varData?.Tmean?.latestMonthStats || nd!.paramData?.tavg?.latestMonthStats)
+        : (data.ukRegionData?.varData?.Tmean?.latestMonthStats || data.usStateData?.paramData?.tavg?.latestMonthStats || data.countryData?.latestMonthStats),
+      useNationalAsPrimary
+        ? (nd!.varData?.Tmean?.latestThreeMonthStats || nd!.paramData?.tavg?.latestThreeMonthStats)
+        : (data.ukRegionData?.varData?.Tmean?.latestThreeMonthStats || data.usStateData?.paramData?.tavg?.latestThreeMonthStats || data.countryData?.latestThreeMonthStats),
       '°C',
       1,
       false,
       true,
     ),
-    buildOverviewRow(
-      nationalLabel || 'National',
-      data.nationalData?.varData?.Tmean?.yearly || data.nationalData?.paramData?.tavg?.yearly,
-      data.nationalData?.varData?.Tmean?.latestMonthStats || data.nationalData?.paramData?.tavg?.latestMonthStats,
-      data.nationalData?.varData?.Tmean?.latestThreeMonthStats || data.nationalData?.paramData?.tavg?.latestThreeMonthStats,
-      '°C',
-      1,
-    ),
+    ...(useNationalAsPrimary ? [] : [
+      buildOverviewRow(
+        nationalLabel || 'National',
+        data.nationalData?.varData?.Tmean?.yearly || data.nationalData?.paramData?.tavg?.yearly,
+        data.nationalData?.varData?.Tmean?.latestMonthStats || data.nationalData?.paramData?.tavg?.latestMonthStats,
+        data.nationalData?.varData?.Tmean?.latestThreeMonthStats || data.nationalData?.paramData?.tavg?.latestThreeMonthStats,
+        '°C',
+        1,
+      ),
+    ]),
     buildOverviewRow('Global', data.globalData?.landYearlyData, data.globalData?.landLatestMonthStats, data.globalData?.landLatestThreeMonthStats, '°C', 1),
   ].filter((row): row is OverviewRow => Boolean(row));
 
@@ -372,8 +385,16 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   }
 
   const sunshineRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Sunshine?.yearly, data.ukRegionData?.varData?.Sunshine?.latestMonthStats, data.ukRegionData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0, false, true),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, data.nationalData?.varData?.Sunshine?.latestMonthStats, data.nationalData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0),
+    buildOverviewRow(
+      regionLabel,
+      useNationalAsPrimary ? nd!.varData?.Sunshine?.yearly : data.ukRegionData?.varData?.Sunshine?.yearly,
+      useNationalAsPrimary ? nd!.varData?.Sunshine?.latestMonthStats : data.ukRegionData?.varData?.Sunshine?.latestMonthStats,
+      useNationalAsPrimary ? nd!.varData?.Sunshine?.latestThreeMonthStats : data.ukRegionData?.varData?.Sunshine?.latestThreeMonthStats,
+      ' hrs', 0, false, true,
+    ),
+    ...(useNationalAsPrimary ? [] : [
+      buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, data.nationalData?.varData?.Sunshine?.latestMonthStats, data.nationalData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0),
+    ]),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (sunshineRows.length) {
@@ -390,27 +411,43 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   const rainfallRows = [
     buildOverviewRow(
       regionLabel,
-      data.ukRegionData?.varData?.Rainfall?.yearly || data.usStateData?.paramData?.pcp?.yearly || data.countryData?.precipYearly,
-      data.ukRegionData?.varData?.Rainfall?.latestMonthStats || data.usStateData?.paramData?.pcp?.latestMonthStats,
-      data.ukRegionData?.varData?.Rainfall?.latestThreeMonthStats || data.usStateData?.paramData?.pcp?.latestThreeMonthStats,
+      useNationalAsPrimary
+        ? (nd!.varData?.Rainfall?.yearly || nd!.paramData?.pcp?.yearly)
+        : (data.ukRegionData?.varData?.Rainfall?.yearly || data.usStateData?.paramData?.pcp?.yearly || data.countryData?.precipYearly),
+      useNationalAsPrimary
+        ? (nd!.varData?.Rainfall?.latestMonthStats || nd!.paramData?.pcp?.latestMonthStats)
+        : (data.ukRegionData?.varData?.Rainfall?.latestMonthStats || data.usStateData?.paramData?.pcp?.latestMonthStats),
+      useNationalAsPrimary
+        ? (nd!.varData?.Rainfall?.latestThreeMonthStats || nd!.paramData?.pcp?.latestThreeMonthStats)
+        : (data.ukRegionData?.varData?.Rainfall?.latestThreeMonthStats || data.usStateData?.paramData?.pcp?.latestThreeMonthStats),
       ' mm',
       0,
       false,
       true,
     ),
-    buildOverviewRow(
-      nationalLabel || 'National',
-      data.nationalData?.varData?.Rainfall?.yearly || data.nationalData?.paramData?.pcp?.yearly,
-      data.nationalData?.varData?.Rainfall?.latestMonthStats || data.nationalData?.paramData?.pcp?.latestMonthStats,
-      data.nationalData?.varData?.Rainfall?.latestThreeMonthStats || data.nationalData?.paramData?.pcp?.latestThreeMonthStats,
-      ' mm',
-      0,
-    ),
+    ...(useNationalAsPrimary ? [] : [
+      buildOverviewRow(
+        nationalLabel || 'National',
+        data.nationalData?.varData?.Rainfall?.yearly || data.nationalData?.paramData?.pcp?.yearly,
+        data.nationalData?.varData?.Rainfall?.latestMonthStats || data.nationalData?.paramData?.pcp?.latestMonthStats,
+        data.nationalData?.varData?.Rainfall?.latestThreeMonthStats || data.nationalData?.paramData?.pcp?.latestThreeMonthStats,
+        ' mm',
+        0,
+      ),
+    ]),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   const rainDaysRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.Raindays1mm?.yearly, data.ukRegionData?.varData?.Raindays1mm?.latestMonthStats, data.ukRegionData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0, false, true),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, data.nationalData?.varData?.Raindays1mm?.latestMonthStats, data.nationalData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0),
+    buildOverviewRow(
+      regionLabel,
+      useNationalAsPrimary ? nd!.varData?.Raindays1mm?.yearly : data.ukRegionData?.varData?.Raindays1mm?.yearly,
+      useNationalAsPrimary ? nd!.varData?.Raindays1mm?.latestMonthStats : data.ukRegionData?.varData?.Raindays1mm?.latestMonthStats,
+      useNationalAsPrimary ? nd!.varData?.Raindays1mm?.latestThreeMonthStats : data.ukRegionData?.varData?.Raindays1mm?.latestThreeMonthStats,
+      ' days', 0, false, true,
+    ),
+    ...(useNationalAsPrimary ? [] : [
+      buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, data.nationalData?.varData?.Raindays1mm?.latestMonthStats, data.nationalData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0),
+    ]),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (rainfallRows.length || rainDaysRows.length) {
@@ -428,8 +465,16 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   }
 
   const frostRows = [
-    buildOverviewRow(regionLabel, data.ukRegionData?.varData?.AirFrost?.yearly, data.ukRegionData?.varData?.AirFrost?.latestMonthStats, data.ukRegionData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true, true),
-    buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.latestMonthStats, data.nationalData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true),
+    buildOverviewRow(
+      regionLabel,
+      useNationalAsPrimary ? nd!.varData?.AirFrost?.yearly : data.ukRegionData?.varData?.AirFrost?.yearly,
+      useNationalAsPrimary ? nd!.varData?.AirFrost?.latestMonthStats : data.ukRegionData?.varData?.AirFrost?.latestMonthStats,
+      useNationalAsPrimary ? nd!.varData?.AirFrost?.latestThreeMonthStats : data.ukRegionData?.varData?.AirFrost?.latestThreeMonthStats,
+      ' days', 0, true, true,
+    ),
+    ...(useNationalAsPrimary ? [] : [
+      buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.latestMonthStats, data.nationalData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true),
+    ]),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (frostRows.length) {
@@ -621,11 +666,13 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 const rainfallPanels = overviewPanels.filter(p => p.title.startsWith('Rainfall'));
                 const frostPanels = overviewPanels.filter(p => p.title.startsWith('Frost'));
                 const monthlyAll = data.ukRegionData?.varData?.Tmean?.monthlyAll
+                  || data.nationalData?.varData?.Tmean?.monthlyAll
                   || data.usStateData?.paramData?.tavg?.monthlyAll
+                  || data.nationalData?.paramData?.tavg?.monthlyAll
                   || data.countryData?.monthlyAll;
-                const chartSource = data.ukRegionData
+                const chartSource = (data.ukRegionData || data.nationalData?.varData)
                   ? 'Data: Met Office UK Regional Series © Crown copyright'
-                  : data.usStateData
+                  : (data.usStateData || data.nationalData?.paramData)
                     ? 'Data: NOAA National Centers for Environmental Information'
                     : 'Data: Our World in Data / NOAA';
 
