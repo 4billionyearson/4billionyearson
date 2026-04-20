@@ -7,19 +7,12 @@ export interface ClimateRegion {
   slug: string;
   name: string;
   type: RegionType;
-  // Code used to call the existing API routes
   apiCode: string;
-  // Short tagline for the index page card
   tagline: string;
-  // SEO description
   description: string;
-  // Emoji or icon hint
   emoji: string;
-  // Data sources available for this region
   dataSources: string[];
-  // SEO keywords
   keywords: string[];
-  // Optional list of major places covered by the page
   coveragePlaces?: string[];
 }
 
@@ -50,7 +43,6 @@ export function getClimateCoverageText(region: ClimateRegion): string | null {
   if (!region.coveragePlaces?.length) return null;
   if (region.coveragePlaces.length === 1) return region.coveragePlaces[0];
   if (region.coveragePlaces.length === 2) return `${region.coveragePlaces[0]} and ${region.coveragePlaces[1]}`;
-
   return `${region.coveragePlaces.slice(0, -1).join(', ')}, and ${region.coveragePlaces[region.coveragePlaces.length - 1]}`;
 }
 
@@ -70,7 +62,6 @@ export function getClimateMetadataDescription(region: ClimateRegion, updateLabel
 }
 
 export const CLIMATE_REGIONS: ClimateRegion[] = [
-  // ─── Countries ─────────────────────────────────────────────────────────────
   {
     slug: 'uk',
     name: 'United Kingdom',
@@ -88,23 +79,21 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     type: 'country',
     apiCode: 'USA',
     tagline: 'The world\'s second-largest emitter and energy transition leader',
-    description: 'Scotland climate profile covering Edinburgh, Glasgow, Aberdeen, Dundee and Inverness with Met Office temperature, rainfall, sunshine and frost data since 1884. Updated monthly.',
+    description: 'United States climate profile with NOAA temperature data, CO₂ emissions history, and energy transition tracking. Updated monthly.',
     emoji: '🇺🇸',
     dataSources: ['owid-temp', 'noaa-national', 'owid-emissions'],
     keywords: ['US climate data', 'US temperature trends', 'NOAA data', 'US emissions', 'US energy transition'],
-    coveragePlaces: ['Edinburgh', 'Glasgow', 'Aberdeen', 'Dundee', 'Inverness'],
   },
   {
-    slug: 'england-se-central-south',
+    slug: 'india',
     name: 'India',
     type: 'country',
     apiCode: 'IND',
-    tagline: 'London, the South East and Central Southern England climate data',
-    description: 'England SE and Central South climate profile covering London, Oxford, Reading, Southampton, Portsmouth and Brighton with Met Office temperature, rainfall, sunshine and frost data. Updated monthly.',
+    tagline: 'Extreme heat, monsoon shifts and the fastest-growing energy market',
+    description: 'India climate profile with temperature anomalies, extreme heat trends, and emissions data. Updated monthly.',
     emoji: '🇮🇳',
     dataSources: ['owid-temp', 'owid-emissions'],
-    keywords: ['England SE and Central South climate', 'London climate data', 'South East England weather', 'Central Southern England climate', 'Met Office regional climate data'],
-    coveragePlaces: ['London', 'Oxford', 'Reading', 'Southampton', 'Portsmouth', 'Brighton'],
+    keywords: ['India climate data', 'India heatwave', 'India monsoon', 'India emissions', 'India renewable energy'],
   },
   {
     slug: 'china',
@@ -139,8 +128,6 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     dataSources: ['owid-temp', 'owid-emissions'],
     keywords: ['Australia climate data', 'Australia bushfires', 'Great Barrier Reef', 'Australia heatwave', 'Australia emissions'],
   },
-
-  // ─── US States ─────────────────────────────────────────────────────────────
   {
     slug: 'florida',
     name: 'Florida',
@@ -174,46 +161,43 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     dataSources: ['noaa-state'],
     keywords: ['Texas climate data', 'Texas wind energy', 'Texas grid', 'Texas heatwave', 'Texas temperature'],
   },
-
-  // ─── UK Regions ────────────────────────────────────────────────────────────
   {
     slug: 'scotland',
     name: 'Scotland',
     type: 'uk-region',
     apiCode: 'uk-sco',
     tagline: 'Wind energy leader with distinct climate targets',
-    description: 'Scotland climate profile with Met Office temperature, rainfall, sunshine, and frost data since 1884. Updated monthly.',
-    emoji: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+    description: 'Scotland climate profile covering Edinburgh, Glasgow, Aberdeen, Dundee and Inverness with Met Office temperature, rainfall, sunshine and frost data since 1884. Updated monthly.',
+    emoji: '🏴',
     dataSources: ['met-office'],
     keywords: ['Scotland climate data', 'Scotland temperature', 'Scotland rainfall', 'Scotland wind energy', 'Scottish weather'],
+    coveragePlaces: ['Edinburgh', 'Glasgow', 'Aberdeen', 'Dundee', 'Inverness'],
   },
   {
-    slug: 'london',
+    slug: 'england-se-central-south',
     name: 'England SE & Central South',
     type: 'uk-region',
     apiCode: 'uk-sec',
-    tagline: 'London, South East and Central Southern England climate data',
-    description: 'England SE and Central South climate profile with Met Office temperature, rainfall, sunshine and frost data. Updated monthly.',
+    tagline: 'London, the South East and Central Southern England climate data',
+    description: 'England SE and Central South climate profile covering London, Oxford, Reading, Southampton, Portsmouth and Brighton with Met Office temperature, rainfall, sunshine and frost data. Updated monthly.',
     emoji: '🏙️',
     dataSources: ['met-office'],
-    keywords: ['London climate data', 'London temperature', 'South East England weather', 'England SE Central South climate'],
+    keywords: ['England SE and Central South climate', 'London climate data', 'South East England weather', 'Central Southern England climate', 'Met Office regional climate data'],
+    coveragePlaces: ['London', 'Oxford', 'Reading', 'Southampton', 'Portsmouth', 'Brighton'],
   },
 ];
 
-// Lookup helpers
 export function getRegionBySlug(slug: string): ClimateRegion | undefined {
-  return CLIMATE_REGIONS.find(r => r.slug === slug);
+  return CLIMATE_REGIONS.find((region) => region.slug === slug);
 }
 
 export function getAllSlugs(): string[] {
-  return CLIMATE_REGIONS.map(r => r.slug);
+  return CLIMATE_REGIONS.map((region) => region.slug);
 }
 
-/** Map a location ID (e.g. 'us-fl', 'c-gbr', 'uk-sco') or OWID code (e.g. 'GBR') to a profile slug, or null if no profile exists */
 export function getProfileSlugForLocation(locationId: string, owidCode?: string): string | null {
-  const region = CLIMATE_REGIONS.find(r =>
-    r.apiCode === locationId ||
-    (owidCode && r.apiCode === owidCode)
+  const region = CLIMATE_REGIONS.find(
+    (entry) => entry.apiCode === locationId || (owidCode && entry.apiCode === owidCode),
   );
   return region ? region.slug : null;
 }
