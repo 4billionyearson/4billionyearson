@@ -321,79 +321,6 @@ function buildNationalComparison(nationalData: any, nationalName: string): strin
   return lines.join('\n');
 }
 
-function getLatestMonthlyPoint(data: any[] | undefined): any | null {
-  if (!data?.length) return null;
-  return [...data].reverse().find((entry) => typeof entry?.diff === 'number') ?? null;
-}
-
-function findMonthlyPoint(data: any[] | undefined, monthLabel: string | undefined): any | null {
-  if (!data?.length || !monthLabel) return null;
-  return data.find((entry) => entry.monthLabel === monthLabel) ?? null;
-}
-
-function averageMonthlyDiff(data: any[] | undefined, count = 12): number | null {
-  if (!data?.length) return null;
-  const values = data
-    .slice(-count)
-    .map((entry) => entry.diff)
-    .filter((value): value is number => typeof value === 'number');
-  if (!values.length) return null;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
-}
-
-function formatSignedValue(value: number, units = '°C', digits = 1): string {
-  const sign = value > 0 ? '+' : '';
-  return `${sign}${value.toFixed(digits)}${units}`;
-}
-
-function buildDeterministicSummary(region: ClimateRegion, profileData: any): string {
-  const regionMonthly = profileData.ukRegionData?.varData?.Tmean?.monthlyComparison
-    || profileData.usStateData?.paramData?.tavg?.monthlyComparison
-    || profileData.countryData?.monthlyComparison
-    || [];
-  const nationalMonthly = profileData.nationalData?.varData?.Tmean?.monthlyComparison
-    || profileData.nationalData?.paramData?.tavg?.monthlyComparison
-    || [];
-  const globalMonthly = profileData.globalData?.landMonthlyComparison || [];
-
-  const latestRegion = getLatestMonthlyPoint(regionMonthly);
-  const latestNational = findMonthlyPoint(nationalMonthly, latestRegion?.monthLabel) ?? getLatestMonthlyPoint(nationalMonthly);
-  const latestGlobal = findMonthlyPoint(globalMonthly, latestRegion?.monthLabel) ?? getLatestMonthlyPoint(globalMonthly);
-  const recentMean = averageMonthlyDiff(regionMonthly, 12);
-
-  const sentence1Parts: string[] = [];
-  if (latestRegion?.diff != null) {
-    sentence1Parts.push(`${region.name} was running ${formatSignedValue(latestRegion.diff)} against the 1961–1990 temperature average in ${latestRegion.monthLabel}`);
-  }
-  if (recentMean != null) {
-    sentence1Parts.push(`the latest 12 months averaged ${formatSignedValue(recentMean)} above that baseline`);
-  }
-  const sentence1 = sentence1Parts.length
-    ? `${sentence1Parts.join(', and ')}.`
-    : `${region.name} remains warmer than its late-20th-century baseline in the latest available climate record.`;
-
-  const comparisons: string[] = [];
-  if (latestRegion?.diff != null && latestNational?.diff != null) {
-    const gap = latestRegion.diff - latestNational.diff;
-    comparisons.push(`The regional anomaly was ${formatSignedValue(Math.abs(gap))} ${gap >= 0 ? 'higher' : 'lower'} than the national reading in the same month.`);
-  }
-  if (latestRegion?.diff != null && latestGlobal?.diff != null) {
-    const gap = latestRegion.diff - latestGlobal.diff;
-    comparisons.push(`Against global land temperatures, the local anomaly sat ${formatSignedValue(Math.abs(gap))} ${gap >= 0 ? 'above' : 'below'} the worldwide signal.`);
-  }
-
-  const keyStats = profileData.keyStats || {};
-  const longTermParts: string[] = [];
-  if (keyStats.latestTemp) longTermParts.push(`The latest full year averaged ${keyStats.latestTemp}`);
-  if (keyStats.warmestYear) longTermParts.push(`the warmest year on record remains ${keyStats.warmestYear}`);
-  if (keyStats.dataRange) longTermParts.push(`the dataset spans ${keyStats.dataRange}`);
-  const sentence2 = longTermParts.length ? `${longTermParts.join(', and ')}.` : '';
-
-  const firstParagraph = [sentence1, ...comparisons].join(' ');
-  const secondParagraph = sentence2 || 'This profile combines regional observations with national and global baselines so the latest anomaly can be read in context.';
-  return `${firstParagraph}\n\n${secondParagraph}`.trim();
-}
-
 function summaryLooksIncomplete(summary: string): boolean {
   return !/[.!?]["')\]]?\s*$/.test(summary.trim());
 }
@@ -599,16 +526,10 @@ export async function GET(
     return NextResponse.json({ error: 'No profile data available' }, { status: 404 });
   }
 
-  const fallbackResult = {
-    summary: buildDeterministicSummary(region, profileData),
-    sources: [] as GroundingSource[],
-    generatedAt: new Date().toISOString(),
-  };
-
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    await setShortTerm(cacheKey, fallbackResult);
-    return NextResponse.json({ ...fallbackResult, source: 'fallback' });
+    // No API key — return empty so frontend shows tagline, don't cache
+    return NextResponse.json({ summary: null, sources: [], generatedAt: new Date().toISOString(), source: 'no-key' });
   }
 
   // Fetch national comparison data for sub-national regions
@@ -634,21 +555,23 @@ export async function GET(
       result = await callGemini(apiKey, prompt, false);
     }
 
-    const finalSummary = result.summary && !summaryLooksIncomplete(result.summary)
-      ? result.summary
-      : fallbackResult.summary;
+    if (!result.summary || summaryLooksIncomplete(result.summary)) {
+      // Both attempts failed — don't cache, so next visitor retries
+      console.error(`Gemini summary failed for ${slug} — not caching`);
+      return NextResponse.json({ summary: null, sources: [], generatedAt: new Date().toISOString(), source: 'failed' });
+    }
 
     const cacheResult = {
-      summary: finalSummary,
-      sources: finalSummary === fallbackResult.summary ? [] : result.sources,
+      summary: result.summary,
+      sources: result.sources,
       generatedAt: new Date().toISOString(),
     };
     await setShortTerm(cacheKey, cacheResult);
 
-    return NextResponse.json({ ...cacheResult, source: finalSummary === fallbackResult.summary ? 'fallback' : 'fresh' });
+    return NextResponse.json({ ...cacheResult, source: 'fresh' });
   } catch (err: any) {
+    // Don't cache errors — next visitor will retry
     console.error('Gemini summary error:', err);
-    await setShortTerm(cacheKey, fallbackResult);
-    return NextResponse.json({ ...fallbackResult, source: 'fallback' });
+    return NextResponse.json({ summary: null, sources: [], generatedAt: new Date().toISOString(), source: 'error' });
   }
 }

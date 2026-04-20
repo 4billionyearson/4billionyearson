@@ -554,21 +554,13 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   <Loader2 className="h-5 w-5 animate-spin text-[#D0A65E] shrink-0" />
                   <p className="text-sm text-gray-400">Generating climate update…</p>
                 </div>
-              ) : !loading && data ? (
+              ) : (
                 <div>
                   {coverageLine && (
                     <p className="text-xs md:text-sm font-medium text-[#D0A65E] mb-3">{coverageLine}</p>
                   )}
-                  <p className="text-sm text-gray-300 leading-relaxed">{buildTextSummary(region, data)}</p>
-                  <Link
-                    href={`/climate-dashboard?q=${encodeURIComponent(dashboardSearchTerm)}`}
-                    className="inline-block mt-3 text-sm font-semibold text-[#D0A65E] hover:text-[#E8C97A] transition-colors"
-                  >
-                    Full Climate Data for {pageTitle} →
-                  </Link>
+                  <p className="text-sm text-gray-400">{region.tagline}</p>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-400">{region.tagline}</p>
               )}
             </div>
           </div>
@@ -641,18 +633,4 @@ function RelatedLink({ href, label, desc }: { href: string; label: string; desc:
       <div className="text-xs text-gray-500 mt-1">{desc}</div>
     </Link>
   );
-}
-
-// ─── Crawlable text summary builder ─────────────────────────────────────────
-
-function buildTextSummary(region: ClimateRegion, data: ProfileData): string {
-  const parts: string[] = [];
-  const ks = data.keyStats;
-  parts.push(`${region.name} climate data profile.`);
-  if (ks.dataRange) parts.push(`Data coverage spans ${ks.dataRange}.`);
-  if (ks.latestTemp) parts.push(`The latest annual average temperature was ${ks.latestTemp}.`);
-  if (ks.tempTrend) parts.push(`The recent decade shows a trend of ${ks.tempTrend}.`);
-  if (ks.warmestYear) parts.push(`The warmest year on record was ${ks.warmestYear}.`);
-  if (ks.latestPrecip) parts.push(`Latest annual precipitation: ${ks.latestPrecip}.`);
-  return parts.join(' ');
 }
