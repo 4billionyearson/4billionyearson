@@ -112,6 +112,17 @@ function ordinal(value: number): string {
   }
 }
 
+function highlightRankings(text: string): string {
+  // Escape HTML entities first to prevent XSS, then apply bold formatting
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // Bold ranking phrases like "3rd warmest January to March period in 127 years of records"
+  // Captures from the ordinal+superlative up to the next comma, period, or semicolon
+  return escaped.replace(
+    /\b(\d+(?:st|nd|rd|th)\s+(?:warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|most|least)\b[^.,;]*)/gi,
+    '<strong>$1</strong>'
+  );
+}
+
 function getPointValue(point: YearlyPoint | PrecipPoint): number | null {
   if (typeof (point as YearlyPoint).value === 'number') return (point as YearlyPoint).value as number;
   if (typeof (point as YearlyPoint).avgTemp === 'number') return (point as YearlyPoint).avgTemp as number;
@@ -529,7 +540,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   )}
                   <div className="text-gray-300 text-sm leading-relaxed space-y-3">
                     {summary.split('\n\n').map((para, i) => (
-                      <p key={i}>{para}</p>
+                      <p key={i} dangerouslySetInnerHTML={{ __html: highlightRankings(para) }} />
                     ))}
                   </div>
                   {summarySources.length > 0 && (
