@@ -219,7 +219,7 @@ export async function GET(
 
   const cacheKey = `climate:country:${upperCode}`;
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v6`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v7`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);

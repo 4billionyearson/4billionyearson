@@ -239,7 +239,7 @@ export async function GET(
     return NextResponse.json({ error: 'US state not found' }, { status: 404 });
   }
 
-  const cacheKey = `climate:usstate:${stateId}-v3`;
+  const cacheKey = `climate:usstate:${stateId}-v4`;
   const prevMonthKey = getPrevMonthKey();
 
   const cached = await getCached<any>(cacheKey);
