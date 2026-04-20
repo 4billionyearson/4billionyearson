@@ -263,7 +263,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                             >
                               <div className={`text-sm font-bold leading-snug ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
                                 {metric.value}
-                                <span className={`text-sm font-bold ml-1.5 ${row.isPrimary ? 'text-white/70' : 'text-gray-400'}`}>
+                                <span className={`text-sm font-bold ml-1.5 ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
                                   · {metric.rank}{row.lowerIsBetter ? ' ↓' : ''}
                                 </span>
                               </div>
@@ -407,10 +407,10 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   if (frostRows.length) {
     panels.push({
       title: 'Frost Days – Total',
-      icon: <Snowflake className="text-indigo-300" />,
-      accentClass: 'bg-indigo-500',
-      accentBg: 'bg-indigo-950/50',
-      accentBorder: 'border-indigo-300/80',
+      icon: <Snowflake style={{ color: '#E6F8F6' }} />,
+      accentClass: 'bg-[#E6F8F6]/20',
+      accentBg: 'bg-[#E6F8F6]/10',
+      accentBorder: 'border-[#E6F8F6]/60',
       sections: [{ rows: frostRows }],
     });
   }
