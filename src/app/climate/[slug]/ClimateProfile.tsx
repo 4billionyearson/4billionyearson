@@ -425,6 +425,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
   const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>([]);
 
   useEffect(() => {
@@ -439,13 +440,15 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
       .finally(() => setLoading(false));
 
     // Fetch Gemini summary (non-blocking) - add cache buster
+    setSummaryLoading(true);
     fetch(`/api/climate/summary/${slug}?_t=${Date.now()}`)
       .then(res => res.ok ? res.json() : null)
       .then(d => {
         if (d?.summary) setSummary(d.summary);
         if (d?.sources?.length) setSummarySources(d.sources);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setSummaryLoading(false));
   }, [slug]);
 
   // Derived labels
@@ -545,6 +548,11 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   >
                     Full Climate Data for {pageTitle} →
                   </Link>
+                </div>
+              ) : summaryLoading ? (
+                <div className="flex items-center gap-3 py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-[#D0A65E] shrink-0" />
+                  <p className="text-sm text-gray-400">Generating climate update…</p>
                 </div>
               ) : !loading && data ? (
                 <div>
