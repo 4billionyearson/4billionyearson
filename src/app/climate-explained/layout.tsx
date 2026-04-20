@@ -26,7 +26,7 @@ const jsonLd = {
     audienceType: "Students, Researchers, Journalists, Educators, General Public",
   },
   keywords:
-    "climate change, global warming, greenhouse gases, CO2, feedback loops, tipping points, Paris Agreement, IPCC, net zero, carbon budget",
+    "climate change, global warming, greenhouse gases, CO2, feedback loops, tipping points, Paris Agreement, IPCC, net zero, carbon budget, El Nino, La Nina, ENSO, NAO, climate patterns",
   publisher: {
     "@type": "Organization",
     name: "4 Billion Years On",

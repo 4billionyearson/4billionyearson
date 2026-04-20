@@ -26,9 +26,12 @@ interface ChartRow {
 }
 
 export default function TemperatureSpaghettiChart({ monthlyAll, regionName, dataSource }: SpaghettiChartProps) {
-  const { chartData, backgroundYears, recordYear, currentYear, minTemp, maxTemp, startYear } = useMemo(() => {
-    const empty = { chartData: [] as ChartRow[], backgroundYears: [] as number[], recordYear: 0, currentYear: 0, minTemp: 0, maxTemp: 0, startYear: 0 };
+  const { chartData, backgroundYears, recordYear, currentYear, minTemp, maxTemp, startYear, latestMonthIdx } = useMemo(() => {
+    const empty = { chartData: [] as ChartRow[], backgroundYears: [] as number[], recordYear: 0, currentYear: 0, minTemp: 0, maxTemp: 0, startYear: 0, latestMonthIdx: -1 };
     if (!monthlyAll?.length) return empty;
+
+    const now = new Date();
+    const calendarYear = now.getFullYear();
 
     // Group by year
     const byYear = new Map<number, Map<number, number>>();
@@ -44,9 +47,6 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
       .sort((a, b) => a - b);
 
     if (allValidYears.length === 0) return empty;
-
-    const now = new Date();
-    const calendarYear = now.getFullYear();
 
     // Find the record warmest year (from complete years only, excluding current calendar year)
     let bestYear = allValidYears[0];
@@ -91,8 +91,13 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
       recordYear: bestYear,
       currentYear: calendarYear,
       minTemp: Math.floor(globalMin - 1),
-      maxTemp: Math.ceil(globalMax + 1),
+      maxTemp: Math.ceil(globalMax + 3),
       startYear: Math.min(...displayYears),
+      latestMonthIdx: (() => {
+        const currentYearMonths = byYear.get(calendarYear);
+        if (!currentYearMonths?.size) return -1;
+        return Math.max(...currentYearMonths.keys()) - 1; // 0-indexed
+      })(),
     };
   }, [monthlyAll]);
 
@@ -123,9 +128,9 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
         </span>
       </div>
 
-      <div className="w-full" style={{ height: 360 }}>
+      <div className="w-full" style={{ height: 480 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 30, right: 50, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
             <XAxis
               dataKey="monthLabel"
@@ -177,7 +182,20 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
               dataKey={`y${currentYear}`}
               stroke="#8B0000"
               strokeWidth={3}
-              dot={false}
+              dot={(props: any) => {
+                const { cx, cy, index, payload } = props;
+                if (index !== latestMonthIdx || cy == null) return <g key={index} />;
+                const val = payload[`y${currentYear}`];
+                if (val == null) return <g key={index} />;
+                return (
+                  <g key={index}>
+                    <circle cx={cx} cy={cy} r={5} fill="#8B0000" stroke="#fff" strokeWidth={1.5} />
+                    <text x={cx} y={cy - 12} textAnchor="middle" fill="#ef4444" fontSize={11} fontWeight="bold">
+                      {MONTH_LABELS[latestMonthIdx]} {currentYear}: {val.toFixed(1)}°C
+                    </text>
+                  </g>
+                );
+              }}
               activeDot={{ r: 5, fill: '#8B0000' }}
               isAnimationActive={false}
               connectNulls
