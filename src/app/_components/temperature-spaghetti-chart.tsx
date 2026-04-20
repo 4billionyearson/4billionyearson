@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from 'react';
+import { Thermometer } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
@@ -107,16 +108,17 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
 
   return (
     <div>
-      <h3 className="text-base font-bold font-mono text-white mb-1">
+      <h2 className="text-xl font-bold font-mono text-white mb-1 flex items-center gap-2">
+        <Thermometer className="h-5 w-5 text-orange-400" />
         Monthly Temperature – All Years
-      </h3>
+      </h2>
       <p className="text-xs text-gray-400 mb-3">
         Each line represents one year of monthly mean temperatures.
       </p>
 
-      <div className="w-full" style={{ height: 480 }}>
+      <div className="w-full h-[360px] md:h-[480px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 30, right: 50, left: -20, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 30, right: 50, left: -12, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
             <XAxis
               dataKey="monthLabel"
@@ -130,7 +132,7 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
               axisLine={{ stroke: '#555' }}
               tickLine={false}
               tickFormatter={(v: number) => `${v}°C`}
-              width={48}
+              width={52}
             />
 
             {/* Background years - thin, gray, no dots */}
@@ -193,7 +195,7 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-x-5 gap-y-1 mt-3 text-xs">
+      <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 mt-3 text-xs">
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-6 h-[2px] bg-gray-600 rounded" />
           <span className="text-gray-500">All years since {startYear}</span>

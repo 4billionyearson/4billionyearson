@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, Database, BookOpen } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, Database, BookOpen, MapPin } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 
@@ -133,7 +133,7 @@ function highlightRankings(text: string): string {
   // Captures from the ordinal+superlative up to the next comma, period, or semicolon
   return escaped.replace(
     /\b(\d+(?:st|nd|rd|th)\s+(?:warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|most|least)\b[^.,;]*)/gi,
-    '<strong>$1</strong>'
+    '<strong style="color:#fff">$1</strong>'
   );
 }
 
@@ -365,7 +365,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       title: 'Temperature – Average',
       icon: <Thermometer className="text-orange-400" />,
       accentClass: 'bg-orange-600',
-      accentBg: 'bg-orange-950/50',
+      accentBg: 'bg-orange-600/50',
       accentBorder: 'border-orange-400/80',
       sections: [{ rows: temperatureRows }],
     });
@@ -380,8 +380,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     panels.push({
       title: 'Sunshine – Total Hours',
       icon: <Sun className="text-amber-400" />,
-      accentClass: 'bg-amber-600',
-      accentBg: 'bg-amber-950/50',
+      accentClass: 'bg-amber-500',
+      accentBg: 'bg-amber-500/50',
       accentBorder: 'border-amber-400/80',
       sections: [{ rows: sunshineRows }],
     });
@@ -511,7 +511,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
     ? `${latestFullMonth} ${latestMonthLabel.split(' ')[1]}`
     : null;
   const coverageLine = region.coveragePlaces?.length
-    ? `Coverage: ${region.coveragePlaces.slice(0, -1).join(', ')}${region.coveragePlaces.length > 1 ? `${region.coveragePlaces.length > 2 ? ',' : ''} and ${region.coveragePlaces[region.coveragePlaces.length - 1]}` : ''}.`
+    ? region.coveragePlaces.slice(0, -1).join(', ') + (region.coveragePlaces.length > 1 ? `${region.coveragePlaces.length > 2 ? ',' : ''} and ${region.coveragePlaces[region.coveragePlaces.length - 1]}` : '')
     : null;
 
   // Responsive font sizes — shrink when the title is long
@@ -550,7 +550,10 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               {summary ? (
                 <div>
                   {coverageLine && (
-                    <p className="text-xs md:text-sm font-medium text-[#D0A65E] mb-3">{coverageLine}</p>
+                    <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
+                      <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
+                      <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">City Coverage:</span> {coverageLine}</p>
+                    </div>
                   )}
                   <div className="text-gray-300 text-sm leading-relaxed space-y-3">
                     {summary.split('\n\n').map((para, i) => (
@@ -585,7 +588,10 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               ) : (
                 <div>
                   {coverageLine && (
-                    <p className="text-xs md:text-sm font-medium text-[#D0A65E] mb-3">{coverageLine}</p>
+                    <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
+                      <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
+                      <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">City Coverage:</span> {coverageLine}</p>
+                    </div>
                   )}
                   <p className="text-sm text-gray-400">{region.tagline}</p>
                 </div>
@@ -664,6 +670,9 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   </>
                 );
               })()}
+
+              {/* ─── Explore & Sources ─── */}
+              <Divider icon={<BookOpen className="h-5 w-5" />} title="Explore & Sources" />
 
               {/* ─── Explore More ─── */}
               <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
