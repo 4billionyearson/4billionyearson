@@ -68,10 +68,11 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     type: 'country',
     apiCode: 'GBR',
     tagline: 'Temperature, rainfall, sunshine & frost data since 1884',
-    description: 'UK climate profile with Met Office regional data, temperature trends, rainfall anomalies, and emissions tracking. Updated monthly.',
+    description: 'UK climate profile covering England, Scotland, Wales and Northern Ireland with Met Office temperature, rainfall, sunshine and frost data since 1884. Updated monthly.',
     emoji: '🇬🇧',
     dataSources: ['owid-temp', 'met-office', 'owid-emissions'],
     keywords: ['UK climate data', 'UK temperature trends', 'Met Office data', 'UK rainfall', 'UK net zero'],
+    coveragePlaces: ['England', 'Scotland', 'Wales', 'Northern Ireland'],
   },
   {
     slug: 'usa',
