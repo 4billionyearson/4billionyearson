@@ -114,25 +114,9 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
         Each line represents one year of monthly mean temperatures.
       </p>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3 text-xs">
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-6 h-[2px] bg-gray-600 rounded" />
-          <span className="text-gray-500">All years since {startYear}</span>
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-6 h-[3px] bg-orange-500 rounded" />
-          <span className="text-orange-400 font-semibold">{recordYear} (warmest)</span>
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-6 h-[3px] bg-[#8B0000] rounded" />
-          <span className="text-red-400 font-semibold">{currentYear} (current year)</span>
-        </span>
-      </div>
-
       <div className="w-full" style={{ height: 480 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 30, right: 50, left: 0, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 30, right: 50, left: -20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
             <XAxis
               dataKey="monthLabel"
@@ -164,26 +148,12 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
               />
             ))}
 
-            {/* Record year - orange, thicker */}
-            {recordYear !== currentYear && (
-              <Line
-                type="monotone"
-                dataKey={`y${recordYear}`}
-                stroke="#F97316"
-                strokeWidth={2.5}
-                dot={false}
-                activeDot={{ r: 4, fill: '#F97316' }}
-                isAnimationActive={false}
-                connectNulls
-              />
-            )}
-
-            {/* Current year - dark red, thickest, on top */}
+            {/* Current year - orange */}
             <Line
               type="monotone"
               dataKey={`y${currentYear}`}
-              stroke="#8B0000"
-              strokeWidth={3}
+              stroke="#F97316"
+              strokeWidth={2.5}
               dot={(props: any) => {
                 const { cx, cy, index, payload } = props;
                 if (index !== latestMonthIdx || cy == null) return <g key={index} />;
@@ -191,21 +161,51 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
                 if (val == null) return <g key={index} />;
                 return (
                   <g key={index}>
-                    <circle cx={cx} cy={cy} r={5} fill="#8B0000" stroke="#fff" strokeWidth={1.5} />
-                    <text x={cx} y={cy - 12} textAnchor="middle" fill="#ef4444" fontSize={11} fontWeight="bold">
+                    <circle cx={cx} cy={cy} r={5} fill="#F97316" stroke="#fff" strokeWidth={1.5} />
+                    <text x={cx} y={cy - 12} textAnchor="middle" fill="#F97316" fontSize={11} fontWeight="bold">
                       {MONTH_LABELS[latestMonthIdx]} {currentYear}: {val.toFixed(1)}°C
                     </text>
                   </g>
                 );
               }}
-              activeDot={{ r: 5, fill: '#8B0000' }}
+              activeDot={{ r: 4, fill: '#F97316' }}
               isAnimationActive={false}
               connectNulls
             />
 
+            {/* Record warmest year - dark red, thickest, on top */}
+            {recordYear !== currentYear && (
+              <Line
+                type="monotone"
+                dataKey={`y${recordYear}`}
+                stroke="#8B0000"
+                strokeWidth={3}
+                dot={false}
+                activeDot={{ r: 5, fill: '#8B0000' }}
+                isAnimationActive={false}
+                connectNulls
+              />
+            )}
+
             <Tooltip content={<SpaghettiTooltip recordYear={recordYear} currentYear={currentYear} />} />
           </LineChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-x-5 gap-y-1 mt-3 text-xs">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block w-6 h-[2px] bg-gray-600 rounded" />
+          <span className="text-gray-500">All years since {startYear}</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block w-6 h-[3px] bg-[#8B0000] rounded" />
+          <span className="text-red-400 font-semibold">{recordYear} (warmest)</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block w-6 h-[3px] bg-orange-500 rounded" />
+          <span className="text-orange-400 font-semibold">{currentYear} (current year)</span>
+        </span>
       </div>
 
       {/* Data source */}
