@@ -131,8 +131,38 @@ function buildRankedHighlights(profileData: any, region: ClimateRegion): string 
       if (ms) lines.push(`  Month: ${formatRankedStat(ms, `${m.label} (${ms.label})`, m.units)}`);
       if (qs) lines.push(`  3‑Month: ${formatRankedStat(qs, `${m.label} (${qs.label})`, m.units)}`);
     }
+  } else if (region.type === 'country' && profileData.nationalData?.varData) {
+    // UK country page — use Met Office national data (all metrics)
+    const vd = profileData.nationalData.varData;
+    const metrics = [
+      { key: 'Tmean', label: 'Mean Temp', units: '°C' },
+      { key: 'Sunshine', label: 'Sunshine', units: ' hrs' },
+      { key: 'Rainfall', label: 'Rainfall', units: ' mm' },
+      { key: 'AirFrost', label: 'Frost Days', units: ' days' },
+      { key: 'Raindays1mm', label: 'Rain Days', units: ' days' },
+    ];
+    for (const m of metrics) {
+      const ms = vd[m.key]?.latestMonthStats;
+      const qs = vd[m.key]?.latestThreeMonthStats;
+      if (ms) lines.push(`  Month: ${formatRankedStat(ms, `${m.label} (${ms.label})`, m.units)}`);
+      if (qs) lines.push(`  3‑Month: ${formatRankedStat(qs, `${m.label} (${qs.label})`, m.units)}`);
+    }
   } else if (region.type === 'us-state' && profileData.usStateData?.paramData) {
     const pd = profileData.usStateData.paramData;
+    const metrics = [
+      { key: 'tavg', label: 'Avg Temp', units: '°C' },
+      { key: 'tmax', label: 'Max Temp', units: '°C' },
+      { key: 'pcp', label: 'Precipitation', units: ' mm' },
+    ];
+    for (const m of metrics) {
+      const ms = pd[m.key]?.latestMonthStats;
+      const qs = pd[m.key]?.latestThreeMonthStats;
+      if (ms) lines.push(`  Month: ${formatRankedStat(ms, `${m.label} (${ms.label})`, m.units)}`);
+      if (qs) lines.push(`  3‑Month: ${formatRankedStat(qs, `${m.label} (${qs.label})`, m.units)}`);
+    }
+  } else if (region.type === 'country' && profileData.nationalData?.paramData) {
+    // USA country page — use NOAA national data (all metrics)
+    const pd = profileData.nationalData.paramData;
     const metrics = [
       { key: 'tavg', label: 'Avg Temp', units: '°C' },
       { key: 'tmax', label: 'Max Temp', units: '°C' },
@@ -390,11 +420,17 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   if (ks.dataRange) lines.push(`Records since: ${ks.dataRange}`);
   lines.push('');
 
-  // Detailed monthly table
+  // Detailed monthly table — prefer national agency data over OWID for countries with it
   if (region.type === 'uk-region' && profileData.ukRegionData?.varData) {
     lines.push(buildUKRegionTable(profileData.ukRegionData.varData));
+  } else if (region.type === 'country' && profileData.nationalData?.varData) {
+    // UK country — use Met Office national data (all 7 metrics)
+    lines.push(buildUKRegionTable(profileData.nationalData.varData));
   } else if (region.type === 'us-state' && profileData.usStateData?.paramData) {
     lines.push(buildUSStateTable(profileData.usStateData.paramData));
+  } else if (region.type === 'country' && profileData.nationalData?.paramData) {
+    // USA country — use NOAA national data
+    lines.push(buildUSStateTable(profileData.nationalData.paramData));
   } else if (region.type === 'country' && profileData.countryData) {
     lines.push(buildCountryTable(profileData.countryData));
   }
@@ -519,7 +555,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v15`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v16`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {
