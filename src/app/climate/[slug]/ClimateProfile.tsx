@@ -242,59 +242,59 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                     ))}
                   </div>
 
-                  {/* Data rows */}
+                  {/* Data rows with record sub-row after each period */}
                   {periods.map((period, pIdx) => {
                     const periodLabel = section.rows[0]?.[period]?.title ?? '';
                     return (
-                      <div key={period} className={`flex gap-px border-t border-gray-600/40 ${pIdx % 2 === 0 ? 'bg-gray-800/40' : ''}`}>
-                        <div className="w-14 md:w-20 shrink-0 py-2 px-1.5 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-400 font-semibold leading-tight flex items-start pt-2.5">
-                          <span className="md:hidden">{periodShortLabel(periodLabel, period)}</span>
-                          <span className="hidden md:inline">{periodLabel}</span>
+                      <React.Fragment key={period}>
+                        <div className={`flex gap-px border-t border-gray-600/40 ${pIdx % 2 === 0 ? 'bg-gray-800/40' : ''}`}>
+                          <div className="w-14 md:w-20 shrink-0 py-2 px-1.5 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-400 font-semibold leading-tight flex items-start pt-2.5">
+                            <span className="md:hidden">{periodShortLabel(periodLabel, period)}</span>
+                            <span className="hidden md:inline">{periodLabel}</span>
+                          </div>
+                          {section.rows.map((row) => {
+                            const metric = row[period];
+                            return (
+                              <div
+                                key={`${row.label}-${period}`}
+                                className={`flex-1 min-w-0 py-2 px-2 ${
+                                  row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
+                                }`}
+                              >
+                                <div className={`text-sm font-bold leading-snug ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
+                                  {metric.value}
+                                  <span className={`text-sm font-bold ml-1.5 ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
+                                    · {metric.rank}{row.lowerIsBetter ? ' ↓' : ''}
+                                  </span>
+                                </div>
+                                <div className={`text-[10px] md:text-[11px] mt-0.5 ${row.isPrimary ? 'text-white/70' : 'text-gray-400'}`}>
+                                  {metric.anomaly.replace(' vs avg', '')}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                        {section.rows.map((row) => {
-                          const metric = row[period];
-                          const recordPrefix = row.lowerIsBetter ? 'Fewest: ' : 'Record: ';
-                          return (
+                        {/* Record sub-row for this period */}
+                        <div className="flex gap-px border-t border-dashed border-gray-500/50">
+                          <div className="w-14 md:w-20 shrink-0 py-1.5 px-1.5 text-[10px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
+                            Record
+                          </div>
+                          {section.rows.map((row) => (
                             <div
-                              key={`${row.label}-${period}`}
-                              className={`flex-1 min-w-0 py-2 px-2 ${
+                              key={`${row.label}-${period}-record`}
+                              className={`flex-1 min-w-0 py-1.5 px-2 ${
                                 row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
                               }`}
                             >
-                              <div className={`text-sm font-bold leading-snug ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
-                                {metric.value}
-                                <span className={`text-sm font-bold ml-1.5 ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
-                                  · {metric.rank}{row.lowerIsBetter ? ' ↓' : ''}
-                                </span>
-                              </div>
-                              <div className={`text-[10px] md:text-[11px] mt-0.5 ${row.isPrimary ? 'text-white/70' : 'text-gray-400'}`}>
-                                {metric.anomaly.replace(' vs avg', '')}
+                              <div className={`text-[10px] md:text-[11px] truncate ${row.isPrimary ? 'text-white/60' : 'text-gray-500'}`}>
+                                {row[period].record}
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
+                          ))}
+                        </div>
+                      </React.Fragment>
                     );
                   })}
-
-                  {/* Record subheading row */}
-                  <div className="flex gap-px border-t border-dashed border-gray-500/50">
-                    <div className="w-14 md:w-20 shrink-0 py-2 px-1.5 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
-                      Record
-                    </div>
-                    {section.rows.map((row) => (
-                      <div
-                        key={`${row.label}-record`}
-                        className={`flex-1 min-w-0 py-2 px-2 ${
-                          row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
-                        }`}
-                      >
-                        <div className={`text-[10px] md:text-[11px] truncate ${row.isPrimary ? 'text-white/60' : 'text-gray-500'}`}>
-                          {row.annual.record}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             ))}
