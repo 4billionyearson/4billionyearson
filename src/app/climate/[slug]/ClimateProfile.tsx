@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2, Thermometer, Sun, CloudRain, Snowflake } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake, ExternalLink, Database } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -253,36 +253,52 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                         </div>
                         {section.rows.map((row) => {
                           const metric = row[period];
-                          const recordPrefix = row.lowerIsBetter ? 'Fewest: ' : 'Record: ';
                           return (
                             <div
                               key={`${row.label}-${period}`}
                               className={`flex-1 min-w-0 py-2 px-2 ${
-                                row.isPrimary ? `${panel.accentBg} border-l-2 ${panel.accentBorder}` : ''
+                                row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
                               }`}
                             >
-                              <div className={`text-sm font-bold ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
+                              <div className={`text-sm font-bold leading-snug ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
                                 {metric.value}
+                                <span className={`font-normal text-[10px] ml-1 ${row.isPrimary ? 'text-white/60' : 'text-gray-500'}`}>
+                                  · {metric.rank}{row.lowerIsBetter ? ' ↓' : ''}
+                                </span>
                               </div>
-                              <div className={`text-sm font-bold ${row.isPrimary ? 'text-white' : 'text-gray-300'}`}>
-                                {metric.rank}
-                                {row.lowerIsBetter && (
-                                  <span className="text-[10px] font-normal text-gray-400"> (fewest)</span>
-                                )}
+                              <div className={`text-[10px] md:text-[11px] mt-0.5 ${row.isPrimary ? 'text-white/70' : 'text-gray-400'}`}>
+                                {metric.anomaly.replace(' vs avg', '')}
                               </div>
-                              <div className="text-gray-300 text-[10px] md:text-[11px]">{metric.anomaly}</div>
-                              <div className="text-gray-400 text-[10px] md:text-[11px] truncate">{recordPrefix}{metric.record}</div>
                             </div>
                           );
                         })}
                       </div>
                     );
                   })}
+
+                  {/* Record row */}
+                  <div className="flex gap-px border-t-2 border-gray-500/40">
+                    <div className="w-14 md:w-20 shrink-0 py-2 px-1.5 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
+                      Record
+                    </div>
+                    {section.rows.map((row) => (
+                      <div
+                        key={`${row.label}-record`}
+                        className={`flex-1 min-w-0 py-2 px-2 ${
+                          row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
+                        }`}
+                      >
+                        <div className={`text-[10px] md:text-[11px] truncate ${row.isPrimary ? 'text-white/60' : 'text-gray-400'}`}>
+                          {row.annual.record}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
 
-            <div className="px-3 pb-2 text-[10px] text-gray-500 text-right">Baseline: 1961–1990 average</div>
+            <div className="px-3 py-2 text-[10px] text-gray-500 border-t border-gray-700/40">Baseline: 1961–1990 mean · Anomaly = difference from baseline · Record = highest (or lowest) value on record</div>
           </div>
         </div>
       ))}
@@ -317,11 +333,11 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (temperatureRows.length) {
     panels.push({
-      title: 'Temperature — Average',
+      title: 'Temperature · Average',
       icon: <Thermometer className="text-red-400" />,
       accentClass: 'bg-red-600',
-      accentBg: 'bg-red-900/60',
-      accentBorder: 'border-red-500/60',
+      accentBg: 'bg-red-950/50',
+      accentBorder: 'border-red-400/80',
       sections: [{ rows: temperatureRows }],
     });
   }
@@ -333,11 +349,11 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (sunshineRows.length) {
     panels.push({
-      title: 'Sunshine — Total Hours',
+      title: 'Sunshine · Total Hours',
       icon: <Sun className="text-amber-400" />,
       accentClass: 'bg-amber-600',
-      accentBg: 'bg-amber-900/60',
-      accentBorder: 'border-amber-500/60',
+      accentBg: 'bg-amber-950/50',
+      accentBorder: 'border-amber-400/80',
       sections: [{ rows: sunshineRows }],
     });
   }
@@ -370,11 +386,11 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (rainfallRows.length || rainDaysRows.length) {
     panels.push({
-      title: 'Rainfall & Rain Days — Totals',
+      title: 'Rainfall & Rain Days · Totals',
       icon: <CloudRain className="text-blue-400" />,
       accentClass: 'bg-blue-600',
-      accentBg: 'bg-blue-900/60',
-      accentBorder: 'border-blue-500/60',
+      accentBg: 'bg-blue-950/50',
+      accentBorder: 'border-blue-400/80',
       sections: [
         ...(rainfallRows.length ? [{ title: 'Rainfall / Precipitation', rows: rainfallRows }] : []),
         ...(rainDaysRows.length ? [{ title: 'Rain Days (≥1mm)', rows: rainDaysRows }] : []),
@@ -389,11 +405,11 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (frostRows.length) {
     panels.push({
-      title: 'Frost Days — Total',
+      title: 'Frost Days · Total',
       icon: <Snowflake className="text-sky-400" />,
       accentClass: 'bg-sky-500',
-      accentBg: 'bg-sky-900/60',
-      accentBorder: 'border-sky-400/60',
+      accentBg: 'bg-sky-950/50',
+      accentBorder: 'border-sky-400/80',
       sections: [{ rows: frostRows }],
     });
   }
@@ -462,12 +478,16 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
     ? `Coverage: ${region.coveragePlaces.slice(0, -1).join(', ')}${region.coveragePlaces.length > 1 ? `${region.coveragePlaces.length > 2 ? ',' : ''} and ${region.coveragePlaces[region.coveragePlaces.length - 1]}` : ''}.`
     : null;
 
-  // Responsive font size for the h1 — shrink when the title is long
+  // Responsive font sizes — shrink when the title is long
   const titleText = `${pageTitle} Climate`;
   const h1SizeClass =
     titleText.length > 28 ? 'text-2xl md:text-3xl' :
     titleText.length > 20 ? 'text-2xl md:text-4xl' :
     'text-3xl md:text-5xl';
+  const subtitleSizeClass =
+    titleText.length > 28 ? 'text-lg md:text-xl' :
+    titleText.length > 20 ? 'text-xl md:text-2xl' :
+    'text-2xl md:text-3xl';
 
   return (
     <main>
@@ -481,11 +501,11 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 {pageTitle} Climate
               </h1>
               {latestMonthYearLabel ? (
-                <p className="text-2xl md:text-3xl font-bold mt-1" style={{ color: '#FFF5E7' }}>
+                <p className={`${subtitleSizeClass} font-bold mt-1`} style={{ color: '#FFF5E7' }}>
                   {latestMonthYearLabel} Update
                 </p>
               ) : (
-                <p className="text-2xl md:text-3xl font-bold mt-1" style={{ color: '#FFF5E7' }}>
+                <p className={`${subtitleSizeClass} font-bold mt-1`} style={{ color: '#FFF5E7' }}>
                   Monthly Climate Update
                 </p>
               )}
@@ -558,16 +578,23 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               </section>
 
               {/* ─── Attribution ─── */}
-              <div className="text-xs text-gray-600 space-y-1">
-                <p>Last updated: {data.lastUpdated} · Source: {data.source === 'cache' ? 'cached' : 'live'}</p>
-                {data.ukRegionData?.attribution && <p>{data.ukRegionData.attribution}</p>}
-                <p>
-                  Data from{' '}
-                  <a href="https://ourworldindata.org" className="text-gray-500 hover:text-gray-400" target="_blank" rel="noopener noreferrer">OWID</a>,{' '}
-                  <a href="https://www.ncei.noaa.gov" className="text-gray-500 hover:text-gray-400" target="_blank" rel="noopener noreferrer">NOAA</a>,{' '}
-                  <a href="https://www.metoffice.gov.uk" className="text-gray-500 hover:text-gray-400" target="_blank" rel="noopener noreferrer">Met Office</a>
-                </p>
-              </div>
+              <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-center gap-2">
+                  <Database className="h-5 w-5 text-[#D0A65E]" />
+                  Data Sources
+                </h2>
+                <div className="text-xs text-gray-400 space-y-1.5">
+                  <p>Last updated: <span className="text-gray-300">{data.lastUpdated}</span> · Source: <span className="text-gray-300">{data.source === 'cache' ? 'cached' : 'live'}</span></p>
+                  {data.ukRegionData?.attribution && <p>{data.ukRegionData.attribution}</p>}
+                  <p>
+                    Temperature, rainfall, sunshine and frost data from the{' '}
+                    <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-and-regional-series" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Met Office UK Regional Series <ExternalLink className="inline w-3 h-3" /></a>.
+                    Global temperature data via{' '}
+                    <a href="https://ourworldindata.org" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Our World in Data <ExternalLink className="inline w-3 h-3" /></a>{' '}
+                    ({' '}<a href="https://www.ncei.noaa.gov" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">NOAA <ExternalLink className="inline w-3 h-3" /></a>).
+                  </p>
+                </div>
+              </section>
             </>
           )}
         </div>
@@ -582,9 +609,10 @@ function RelatedLink({ href, label, desc }: { href: string; label: string; desc:
   return (
     <Link
       href={href}
-      className="block rounded-xl border border-gray-700/50 bg-gray-900/60 p-4 hover:border-[#D0A65E]/50 hover:bg-gray-900 transition-all"
+      className="relative block rounded-xl border border-gray-700/50 bg-gray-900/60 p-4 hover:border-[#D0A65E]/50 hover:bg-gray-900 transition-all"
     >
-      <div className="font-semibold text-gray-200 text-sm">{label}</div>
+      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-gray-600" />
+      <div className="font-semibold text-gray-200 text-sm pr-5">{label}</div>
       <div className="text-xs text-gray-500 mt-1">{desc}</div>
     </Link>
   );
