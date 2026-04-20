@@ -275,7 +275,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                           })}
                         </div>
                         {/* Record sub-row for this period */}
-                        <div className="flex gap-px border-t border-dashed border-gray-500/50">
+                        <div className="flex gap-px border-t border-dashed border-gray-500/50 italic">
                           <div className="w-14 md:w-20 shrink-0 py-1.5 px-1.5 text-[10px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
                             Record
                           </div>
