@@ -16,6 +16,7 @@ interface MonthlyPoint {
 interface SpaghettiChartProps {
   monthlyAll: MonthlyPoint[];
   regionName: string;
+  dataSource?: string;
 }
 
 interface ChartRow {
@@ -24,9 +25,10 @@ interface ChartRow {
   [key: string]: number | string | null; // year columns like "y2024", "y2025"
 }
 
-export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: SpaghettiChartProps) {
-  const { chartData, allYears, backgroundYears, recordYear, currentYear, currentMonth, minTemp, maxTemp, startYear } = useMemo(() => {
-    if (!monthlyAll?.length) return { chartData: [], allYears: [], backgroundYears: [], recordYear: 0, currentYear: 0, currentMonth: 0, minTemp: 0, maxTemp: 0, startYear: 0 };
+export default function TemperatureSpaghettiChart({ monthlyAll, regionName, dataSource }: SpaghettiChartProps) {
+  const { chartData, backgroundYears, recordYear, currentYear, minTemp, maxTemp, startYear } = useMemo(() => {
+    const empty = { chartData: [] as ChartRow[], backgroundYears: [] as number[], recordYear: 0, currentYear: 0, minTemp: 0, maxTemp: 0, startYear: 0 };
+    if (!monthlyAll?.length) return empty;
 
     // Group by year
     const byYear = new Map<number, Map<number, number>>();
@@ -35,26 +37,24 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
       byYear.get(p.year)!.set(p.month, p.value);
     }
 
-    // Find years with at least 6 months of data
+    // All years with at least 6 months (for background), but always include current calendar year even if partial
     const allValidYears = [...byYear.entries()]
-      .filter(([, months]) => months.size >= 6)
+      .filter(([y, months]) => months.size >= 6 || y === calendarYear)
       .map(([y]) => y)
       .sort((a, b) => a - b);
 
-    if (allValidYears.length === 0) return { chartData: [], allYears: [], backgroundYears: [], recordYear: 0, currentYear: 0, currentMonth: 0, minTemp: 0, maxTemp: 0, startYear: 0 };
+    if (allValidYears.length === 0) return empty;
 
-    // Current year = the last year that has data
     const now = new Date();
     const calendarYear = now.getFullYear();
-    const calendarMonth = now.getMonth() + 1;
-    const latestYear = allValidYears[allValidYears.length - 1];
 
-    // Find the record year (highest annual average from complete years)
+    // Find the record warmest year (from complete years only, excluding current calendar year)
     let bestYear = allValidYears[0];
     let bestAvg = -Infinity;
     for (const yr of allValidYears) {
+      if (yr === calendarYear) continue;
       const months = byYear.get(yr)!;
-      if (months.size < 12 && yr === latestYear) continue; // skip incomplete current year
+      if (months.size < 12) continue;
       const vals = [...months.values()];
       const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
       if (avg > bestAvg) {
@@ -63,11 +63,10 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
       }
     }
 
-    // Limit background to last ~40 years (like Copernicus shows since 1940)
-    // Always include record year even if outside range
-    const cutoffYear = latestYear - 39;
-    const displayYears = allValidYears.filter(y => y >= cutoffYear || y === bestYear);
-    const bgYears = displayYears.filter(y => y !== bestYear && y !== latestYear);
+    // Limit background to last ~40 years, always include record year and current calendar year
+    const cutoffYear = calendarYear - 39;
+    const displayYears = allValidYears.filter(y => y >= cutoffYear || y === bestYear || y === calendarYear);
+    const bgYears = displayYears.filter(y => y !== bestYear && y !== calendarYear);
 
     // Build chart data: 12 rows (one per month), each row has a column per year
     let globalMin = Infinity;
@@ -88,26 +87,24 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
 
     return {
       chartData: rows,
-      allYears: displayYears,
       backgroundYears: bgYears,
       recordYear: bestYear,
-      currentYear: latestYear,
-      currentMonth: latestYear === calendarYear ? calendarMonth - 1 : 12,
+      currentYear: calendarYear,
       minTemp: Math.floor(globalMin - 1),
       maxTemp: Math.ceil(globalMax + 1),
-      startYear: displayYears[0],
+      startYear: Math.min(...displayYears),
     };
   }, [monthlyAll]);
 
   if (chartData.length === 0) return null;
 
   return (
-    <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-      <h2 className="text-lg font-bold font-mono text-white mb-1 flex items-center gap-2">
+    <div>
+      <h3 className="text-base font-bold font-mono text-white mb-1">
         Monthly Temperature – All Years
-      </h2>
-      <p className="text-xs text-gray-400 mb-4">
-        Each line represents one year. Data: monthly mean temperature for {regionName}.
+      </h3>
+      <p className="text-xs text-gray-400 mb-3">
+        Each line represents one year of monthly mean temperatures.
       </p>
 
       {/* Legend */}
@@ -122,7 +119,7 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-6 h-[3px] bg-[#8B0000] rounded" />
-          <span className="text-red-400 font-semibold">{currentYear} (latest)</span>
+          <span className="text-red-400 font-semibold">{currentYear} (current year)</span>
         </span>
       </div>
 
@@ -190,7 +187,12 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </section>
+
+      {/* Data source */}
+      {dataSource && (
+        <p className="text-[10px] text-gray-500 mt-2">{dataSource}</p>
+      )}
+    </div>
   );
 }
 

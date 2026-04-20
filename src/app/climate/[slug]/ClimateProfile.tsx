@@ -219,7 +219,7 @@ function buildOverviewRow(
   };
 }
 
-function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
+function OverviewGrid({ panels, headless }: { panels: OverviewPanel[]; headless?: boolean }) {
   const periods = ['latestMonth', 'latestQuarter', 'annual'] as const;
   const periodShortLabel = (label: string, period: typeof periods[number]) => {
     if (period === 'annual') return label;
@@ -229,11 +229,18 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
   return (
     <div className="space-y-4">
       {panels.map((panel) => (
-        <div key={panel.title} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-          <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
-            {panel.icon}
-            {panel.title}
-          </h2>
+        <div key={panel.title} className={headless ? '' : 'bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]'}>
+          {!headless && (
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+              {panel.icon}
+              {panel.title}
+            </h2>
+          )}
+          {headless && (
+            <h3 className="text-sm font-bold font-mono text-gray-300 mb-2 flex items-center gap-2">
+              {panel.title}
+            </h3>
+          )}
           <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden">
             {panel.sections.map((section, sIdx) => (
               <div key={sIdx} className={`${sIdx > 0 ? 'border-t-2 border-gray-600/50' : ''}`}>
@@ -594,16 +601,36 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
           {data && !loading && (
             <>
-              {overviewPanels.length > 0 && <OverviewGrid panels={overviewPanels} />}
-
-              {/* ─── Temperature Spaghetti Chart ─── */}
+              {/* ─── Temperature Section ─── */}
               {(() => {
+                const tempPanels = overviewPanels.filter(p => p.title.startsWith('Temperature'));
+                const otherPanels = overviewPanels.filter(p => !p.title.startsWith('Temperature'));
                 const monthlyAll = data.ukRegionData?.varData?.Tmean?.monthlyAll
                   || data.usStateData?.paramData?.tavg?.monthlyAll
                   || data.countryData?.monthlyAll;
-                return monthlyAll?.length ? (
-                  <TemperatureSpaghettiChart monthlyAll={monthlyAll} regionName={pageTitle} />
-                ) : null;
+                const chartSource = data.ukRegionData
+                  ? 'Data: Met Office UK Regional Series © Crown copyright'
+                  : data.usStateData
+                    ? 'Data: NOAA National Centers for Environmental Information'
+                    : 'Data: Our World in Data / NOAA';
+
+                return (
+                  <>
+                    {tempPanels.length > 0 && (
+                      <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] space-y-4">
+                        <h2 className="text-xl font-bold font-mono text-white flex items-center gap-2">
+                          <Thermometer className="h-5 w-5 text-orange-400" />
+                          Temperature
+                        </h2>
+                        <OverviewGrid panels={tempPanels} headless />
+                        {monthlyAll?.length ? (
+                          <TemperatureSpaghettiChart monthlyAll={monthlyAll} regionName={pageTitle} dataSource={chartSource} />
+                        ) : null}
+                      </section>
+                    )}
+                    {otherPanels.length > 0 && <OverviewGrid panels={otherPanels} />}
+                  </>
+                );
               })()}
 
               {/* ─── Explore More ─── */}
