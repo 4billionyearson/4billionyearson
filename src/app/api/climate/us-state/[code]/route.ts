@@ -266,6 +266,7 @@ export async function GET(
         monthlyComparison: buildMonthlyComparison(result.data, param),
         latestMonthStats: buildLatestMonthStats(result.data),
         latestThreeMonthStats: buildLatestThreeMonthStats(result.data),
+        ...(param === 'tavg' ? { monthlyAll: monthlyEntries(result.data) } : {}),
       };
     }
 

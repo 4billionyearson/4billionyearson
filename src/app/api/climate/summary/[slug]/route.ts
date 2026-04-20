@@ -497,6 +497,10 @@ export async function GET(
     return NextResponse.json({ error: 'Region not found' }, { status: 404 });
   }
 
+  // Dev bypass: ?nocache=1 skips cache read (still writes)
+  const url = new URL(request.url);
+  const skipCache = url.searchParams.get('nocache') === '1';
+
   // Date-aware cache key
   const now = new Date();
   const dayOfMonth = now.getDate();
@@ -507,12 +511,14 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v13`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v14`;
 
-  // Check cache
-  const cached = await getCached<{ summary: string; sources?: GroundingSource[] }>(cacheKey);
-  if (cached) {
-    return NextResponse.json({ ...cached, source: 'cache' });
+  // Check cache (skip if ?nocache=1)
+  if (!skipCache) {
+    const cached = await getCached<{ summary: string; sources?: GroundingSource[] }>(cacheKey);
+    if (cached) {
+      return NextResponse.json({ ...cached, source: 'cache' });
+    }
   }
 
   // Fetch full profile data and GDACS events in parallel

@@ -278,6 +278,7 @@ export async function GET(
       monthlyComparison,
       latestMonthStats: buildLatestMonthStats(monthly),
       latestThreeMonthStats: buildLatestThreeMonthStats(monthly),
+      monthlyAll: monthly.map(m => ({ year: m.year, month: m.month, value: Math.round(m.temp * 100) / 100 })),
       precipYearly,
       dataPoints: monthly.length,
       dateRange: `${monthly[0].date} to ${monthly[monthly.length - 1].date}`,

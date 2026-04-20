@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Loader2, Thermometer, Sun, CloudRain, Snowflake, ExternalLink, Database } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
+import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,7 @@ interface MetricSeries {
   monthlyComparison: MonthlyComparison[];
   latestMonthStats?: RankedPeriodStat;
   latestThreeMonthStats?: RankedPeriodStat;
+  monthlyAll?: { year: number; month: number; value: number }[];
 }
 
 interface ProfileData {
@@ -48,6 +50,7 @@ interface ProfileData {
     monthlyComparison: MonthlyComparison[];
     latestMonthStats?: RankedPeriodStat;
     latestThreeMonthStats?: RankedPeriodStat;
+    monthlyAll?: { year: number; month: number; value: number }[];
     precipYearly?: PrecipPoint[];
     dateRange: string;
   };
@@ -581,6 +584,16 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
           {data && !loading && (
             <>
               {overviewPanels.length > 0 && <OverviewGrid panels={overviewPanels} />}
+
+              {/* ─── Temperature Spaghetti Chart ─── */}
+              {(() => {
+                const monthlyAll = data.ukRegionData?.varData?.Tmean?.monthlyAll
+                  || data.usStateData?.paramData?.tavg?.monthlyAll
+                  || data.countryData?.monthlyAll;
+                return monthlyAll?.length ? (
+                  <TemperatureSpaghettiChart monthlyAll={monthlyAll} regionName={pageTitle} />
+                ) : null;
+              })()}
 
               {/* ─── Explore More ─── */}
               <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">

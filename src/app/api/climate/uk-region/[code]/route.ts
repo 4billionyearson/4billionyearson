@@ -255,6 +255,7 @@ export async function GET(
         monthlyComparison: buildComparison(points),
         latestMonthStats: buildLatestMonthStats(points, lowerIsBetter),
         latestThreeMonthStats: buildLatestThreeMonthStats(points, lowerIsBetter, isSum),
+        ...(varName === 'Tmean' ? { monthlyAll: points.map(p => ({ year: p.year, month: p.month, value: p.value })) } : {}),
       };
     }
 
