@@ -270,15 +270,31 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                               <div className={`text-[10px] md:text-[11px] mt-0.5 ${row.isPrimary ? 'text-white/70' : 'text-gray-400'}`}>
                                 {metric.anomaly.replace(' vs avg', '')}
                               </div>
-                              <div className={`text-[10px] md:text-[11px] truncate ${row.isPrimary ? 'text-white/50' : 'text-gray-500'}`}>
-                                {recordPrefix}{metric.record}
-                              </div>
                             </div>
                           );
                         })}
                       </div>
                     );
                   })}
+
+                  {/* Record subheading row */}
+                  <div className="flex gap-px border-t border-dashed border-gray-500/50">
+                    <div className="w-14 md:w-20 shrink-0 py-2 px-1.5 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
+                      Record
+                    </div>
+                    {section.rows.map((row) => (
+                      <div
+                        key={`${row.label}-record`}
+                        className={`flex-1 min-w-0 py-2 px-2 ${
+                          row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
+                        }`}
+                      >
+                        <div className={`text-[10px] md:text-[11px] truncate ${row.isPrimary ? 'text-white/60' : 'text-gray-500'}`}>
+                          {row.annual.record}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}

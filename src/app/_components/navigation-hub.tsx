@@ -64,6 +64,7 @@ const SECTIONS: Section[] = [
     icon: <Globe className="h-6 w-6" />,
     links: [
       { href: "/climate-dashboard", label: "Global Climate Data", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Temperature anomalies & CO₂ trends" },
+      { href: "/climate", label: "Climate Updates", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Country, state & region updates" },
       { href: "/planetary-boundaries", label: "Planetary Boundaries", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Nine Earth-system thresholds" },
       { href: "/greenhouse-gases", label: "Greenhouse Gases", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "CO₂, methane & N₂O levels" },
       { href: "/sea-levels-ice", label: "Sea Levels & Ice", icon: <Waves className="h-4 w-4" />, badge: "monthly", desc: "Sea level rise & Arctic ice extent" },
