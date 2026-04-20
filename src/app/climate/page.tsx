@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 
 export const metadata: Metadata = {
-  title: 'Climate Profiles — Country, State & Region Climate Data',
+  title: 'Climate Updates — Country, State & Region Climate Data',
   description:
     'Explore climate data profiles for countries, US states, and UK regions. Temperature trends, precipitation, emissions, and monthly summaries with data from OWID, NOAA, and the Met Office.',
   keywords: [
@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     'US state climate data',
     'UK regional climate data',
     'temperature trends',
-    'climate profiles',
+    'climate updates',
     'country emissions data',
   ],
   openGraph: {
-    title: 'Climate Profiles — Country, State & Region Climate Data',
+    title: 'Climate Updates — Country, State & Region Climate Data',
     description:
       'Explore climate data profiles for countries, US states, and UK regions. Temperature trends, precipitation, emissions, and monthly summaries.',
     type: 'website',
@@ -50,7 +50,7 @@ export default function ClimateProfilesIndex() {
           <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-                Climate Profiles
+                Climate Updates
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
@@ -98,10 +98,10 @@ export default function ClimateProfilesIndex() {
 
           {/* SEO content block */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-lg font-bold font-mono text-white mb-3">About Climate Profiles</h2>
+            <h2 className="text-lg font-bold font-mono text-white mb-3">About Climate Updates</h2>
             <div className="text-sm text-gray-400 space-y-3 max-w-3xl">
               <p>
-                Each climate profile provides a data-driven snapshot of how climate change is affecting a specific region. Data is sourced from{' '}
+                Each climate update provides a data-driven snapshot of how climate change is affecting a specific region. Data is sourced from{' '}
                 <a href="https://ourworldindata.org" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Our World in Data</a>,{' '}
                 <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">NOAA Climate at a Glance</a>, and the{' '}
                 <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Met Office HadUK-Grid</a>.

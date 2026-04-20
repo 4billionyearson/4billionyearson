@@ -253,6 +253,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                         </div>
                         {section.rows.map((row) => {
                           const metric = row[period];
+                          const recordPrefix = row.lowerIsBetter ? 'Fewest: ' : 'Record: ';
                           return (
                             <div
                               key={`${row.label}-${period}`}
@@ -262,12 +263,15 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                             >
                               <div className={`text-sm font-bold leading-snug ${row.isPrimary ? 'text-white' : 'text-gray-200'}`}>
                                 {metric.value}
-                                <span className={`font-normal text-[10px] ml-1 ${row.isPrimary ? 'text-white/60' : 'text-gray-500'}`}>
+                                <span className={`text-sm font-bold ml-1.5 ${row.isPrimary ? 'text-white/70' : 'text-gray-400'}`}>
                                   · {metric.rank}{row.lowerIsBetter ? ' ↓' : ''}
                                 </span>
                               </div>
                               <div className={`text-[10px] md:text-[11px] mt-0.5 ${row.isPrimary ? 'text-white/70' : 'text-gray-400'}`}>
                                 {metric.anomaly.replace(' vs avg', '')}
+                              </div>
+                              <div className={`text-[10px] md:text-[11px] truncate ${row.isPrimary ? 'text-white/50' : 'text-gray-500'}`}>
+                                {recordPrefix}{metric.record}
                               </div>
                             </div>
                           );
@@ -275,25 +279,6 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                       </div>
                     );
                   })}
-
-                  {/* Record row */}
-                  <div className="flex gap-px border-t-2 border-gray-500/40">
-                    <div className="w-14 md:w-20 shrink-0 py-2 px-1.5 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
-                      Record
-                    </div>
-                    {section.rows.map((row) => (
-                      <div
-                        key={`${row.label}-record`}
-                        className={`flex-1 min-w-0 py-2 px-2 ${
-                          row.isPrimary ? `${panel.accentBg} border-l-4 ${panel.accentBorder}` : ''
-                        }`}
-                      >
-                        <div className={`text-[10px] md:text-[11px] truncate ${row.isPrimary ? 'text-white/60' : 'text-gray-400'}`}>
-                          {row.annual.record}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             ))}
@@ -333,11 +318,11 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (temperatureRows.length) {
     panels.push({
-      title: 'Temperature · Average',
-      icon: <Thermometer className="text-red-400" />,
-      accentClass: 'bg-red-600',
-      accentBg: 'bg-red-950/50',
-      accentBorder: 'border-red-400/80',
+      title: 'Temperature – Average',
+      icon: <Thermometer className="text-orange-400" />,
+      accentClass: 'bg-orange-600',
+      accentBg: 'bg-orange-950/50',
+      accentBorder: 'border-orange-400/80',
       sections: [{ rows: temperatureRows }],
     });
   }
@@ -349,7 +334,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (sunshineRows.length) {
     panels.push({
-      title: 'Sunshine · Total Hours',
+      title: 'Sunshine – Total Hours',
       icon: <Sun className="text-amber-400" />,
       accentClass: 'bg-amber-600',
       accentBg: 'bg-amber-950/50',
@@ -386,7 +371,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (rainfallRows.length || rainDaysRows.length) {
     panels.push({
-      title: 'Rainfall & Rain Days · Totals',
+      title: 'Rainfall & Rain Days – Totals',
       icon: <CloudRain className="text-blue-400" />,
       accentClass: 'bg-blue-600',
       accentBg: 'bg-blue-950/50',
@@ -405,11 +390,11 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
   if (frostRows.length) {
     panels.push({
-      title: 'Frost Days · Total',
-      icon: <Snowflake className="text-sky-400" />,
-      accentClass: 'bg-sky-500',
-      accentBg: 'bg-sky-950/50',
-      accentBorder: 'border-sky-400/80',
+      title: 'Frost Days – Total',
+      icon: <Snowflake className="text-indigo-300" />,
+      accentClass: 'bg-indigo-500',
+      accentBg: 'bg-indigo-950/50',
+      accentBorder: 'border-indigo-300/80',
       sections: [{ rows: frostRows }],
     });
   }

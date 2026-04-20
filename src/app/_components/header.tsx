@@ -164,7 +164,7 @@ const Header = () => {
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link href="/climate" className={`block px-4 py-2.5 text-sm transition-colors ${pathname?.startsWith('/climate/') || pathname === '/climate' ? 'text-cyan-400 bg-gray-900' : 'text-gray-300 hover:text-cyan-400 hover:bg-gray-900'}`} onClick={closeMenu}>
-                  Climate Profiles<MonthlyBadge />
+                  Climate Updates<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
@@ -359,7 +359,7 @@ const Header = () => {
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link href="/climate" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname?.startsWith('/climate/') || pathname === '/climate' ? 'text-cyan-400' : 'text-gray-300 hover:text-cyan-400'}`} onClick={closeMenu}>
-                  Climate Profiles<MonthlyBadge />
+                  Climate Updates<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-300 hover:text-red-400'}`} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
