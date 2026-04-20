@@ -1,6 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getRegionBySlug, getAllSlugs, CLIMATE_REGIONS } from '@/lib/climate/regions';
+import {
+  getRegionBySlug,
+  getAllSlugs,
+  CLIMATE_REGIONS,
+  getClimateMetadataTitle,
+  getClimateMetadataDescription,
+  getClimatePageUrl,
+} from '@/lib/climate/regions';
 import ClimateProfile from './ClimateProfile';
 
 export async function generateStaticParams() {
@@ -14,16 +21,27 @@ export async function generateMetadata(
   const region = getRegionBySlug(slug);
   if (!region) return {};
 
-  const title = `${region.name} Climate Data — Temperature, Precipitation & Emissions`;
+  const title = getClimateMetadataTitle(region);
+  const description = getClimateMetadataDescription(region);
+  const canonicalUrl = getClimatePageUrl(region);
 
   return {
     title,
-    description: region.description,
+    description,
     keywords: region.keywords,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
-      description: region.description,
+      description,
       type: 'website',
+      url: canonicalUrl,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }
@@ -42,9 +60,9 @@ function DatasetSchema({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: `${region.name} Climate Data`,
-    description: region.description,
-    url: `https://4billionyearson.org/climate/${region.slug}`,
+    name: `${region.name} Climate Update`,
+    description: getClimateMetadataDescription(region),
+    url: getClimatePageUrl(region),
     temporalCoverage: '1950/..',
     spatialCoverage: {
       '@type': 'Place',
@@ -61,6 +79,7 @@ function DatasetSchema({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
     })),
     isAccessibleForFree: true,
     license: 'https://creativecommons.org/licenses/by/4.0/',
+    keywords: region.keywords.join(', '),
   };
 
   return (

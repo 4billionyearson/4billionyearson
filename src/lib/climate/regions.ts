@@ -19,6 +19,54 @@ export interface ClimateRegion {
   dataSources: string[];
   // SEO keywords
   keywords: string[];
+  // Optional list of major places covered by the page
+  coveragePlaces?: string[];
+}
+
+const SITE_URL = 'https://4billionyearson.org';
+
+function stripTrailingPeriod(value: string): string {
+  return value.replace(/\.$/, '');
+}
+
+export function getClimateUpdateDateLabel(date = new Date()): string {
+  const thresholdDate = new Date(date);
+  if (thresholdDate.getDate() < 21) {
+    thresholdDate.setMonth(thresholdDate.getMonth() - 1);
+  }
+
+  return thresholdDate.toLocaleString('en-GB', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
+export function getClimatePageUrl(region: ClimateRegion): string {
+  return `${SITE_URL}/climate/${region.slug}`;
+}
+
+export function getClimateCoverageText(region: ClimateRegion): string | null {
+  if (!region.coveragePlaces?.length) return null;
+  if (region.coveragePlaces.length === 1) return region.coveragePlaces[0];
+  if (region.coveragePlaces.length === 2) return `${region.coveragePlaces[0]} and ${region.coveragePlaces[1]}`;
+
+  return `${region.coveragePlaces.slice(0, -1).join(', ')}, and ${region.coveragePlaces[region.coveragePlaces.length - 1]}`;
+}
+
+export function getClimateMetadataTitle(region: ClimateRegion, updateLabel = getClimateUpdateDateLabel()): string {
+  const topicLabel = region.type === 'uk-region'
+    ? 'Temperature, Rainfall, Sunshine & Frost'
+    : region.type === 'us-state'
+      ? 'Temperature & Precipitation'
+      : 'Temperature, Rainfall & Emissions';
+
+  return `${region.name} Climate Update, ${updateLabel} | ${topicLabel}`;
+}
+
+export function getClimateMetadataDescription(region: ClimateRegion, updateLabel = getClimateUpdateDateLabel()): string {
+  const baseDescription = stripTrailingPeriod(region.description.replace(/\s*Updated monthly\.?$/i, ''));
+  return `${baseDescription}. Latest monthly climate update: ${updateLabel}.`;
 }
 
 export const CLIMATE_REGIONS: ClimateRegion[] = [
@@ -40,21 +88,23 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     type: 'country',
     apiCode: 'USA',
     tagline: 'The world\'s second-largest emitter and energy transition leader',
-    description: 'United States climate profile with NOAA temperature data, CO₂ emissions history, and energy transition tracking. Updated monthly.',
+    description: 'Scotland climate profile covering Edinburgh, Glasgow, Aberdeen, Dundee and Inverness with Met Office temperature, rainfall, sunshine and frost data since 1884. Updated monthly.',
     emoji: '🇺🇸',
     dataSources: ['owid-temp', 'noaa-national', 'owid-emissions'],
     keywords: ['US climate data', 'US temperature trends', 'NOAA data', 'US emissions', 'US energy transition'],
+    coveragePlaces: ['Edinburgh', 'Glasgow', 'Aberdeen', 'Dundee', 'Inverness'],
   },
   {
-    slug: 'india',
+    slug: 'england-se-central-south',
     name: 'India',
     type: 'country',
     apiCode: 'IND',
-    tagline: 'Extreme heat, monsoon shifts and the fastest-growing energy market',
-    description: 'India climate profile with temperature anomalies, extreme heat trends, and emissions data. Updated monthly.',
+    tagline: 'London, the South East and Central Southern England climate data',
+    description: 'England SE and Central South climate profile covering London, Oxford, Reading, Southampton, Portsmouth and Brighton with Met Office temperature, rainfall, sunshine and frost data. Updated monthly.',
     emoji: '🇮🇳',
     dataSources: ['owid-temp', 'owid-emissions'],
-    keywords: ['India climate data', 'India heatwave', 'India monsoon', 'India emissions', 'India renewable energy'],
+    keywords: ['England SE and Central South climate', 'London climate data', 'South East England weather', 'Central Southern England climate', 'Met Office regional climate data'],
+    coveragePlaces: ['London', 'Oxford', 'Reading', 'Southampton', 'Portsmouth', 'Brighton'],
   },
   {
     slug: 'china',

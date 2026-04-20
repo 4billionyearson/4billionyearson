@@ -3,7 +3,7 @@ import { getRegionBySlug } from '@/lib/climate/regions';
 
 export const runtime = 'edge';
 
-export const alt = 'Climate Profile';
+export const alt = 'Climate Update';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -90,11 +90,17 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
         {/* Bottom bar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: 20, color: '#6b7280', marginBottom: '4px' }}>Climate Profile</span>
+            <span style={{ fontSize: 20, color: '#6b7280', marginBottom: '4px' }}>Monthly Climate Update</span>
             <span style={{ fontSize: 24, fontWeight: 700, color: '#e5e7eb' }}>4billionyearson.org</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: 16, color: '#6b7280' }}>Temperature · Precipitation · Emissions</span>
+            <span style={{ fontSize: 16, color: '#6b7280' }}>
+              {region.type === 'uk-region'
+                ? 'Temperature · Rainfall · Sunshine · Frost'
+                : region.type === 'us-state'
+                  ? 'Temperature · Precipitation'
+                  : 'Temperature · Rainfall · Emissions'}
+            </span>
           </div>
         </div>
 

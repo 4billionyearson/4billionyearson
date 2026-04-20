@@ -293,6 +293,12 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any)
     lines.push('5. GLOBAL CONTEXT: How does this country\'s warming trend compare to the global average?');
   }
   lines.push('6. MAKE IT RELATABLE: Use everyday language where helpful — "fewer frosty mornings", "a notably dry spring" — alongside the data.');
+  if (region.type === 'uk-region') {
+    lines.push('7. Use the official Met Office region name exactly as provided. Do not rename the region to a single city.');
+    if (region.coveragePlaces?.length) {
+      lines.push(`8. If helpful, you may mention that the page covers ${region.coveragePlaces.join(', ')}, but keep the official region name as the main label.`);
+    }
+  }
   lines.push('');
   lines.push('RULES:');
   lines.push('- British English spelling throughout.');
@@ -355,7 +361,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v9`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v10`;
 
   // Check cache
   const cached = await getCached<{ summary: string }>(cacheKey);

@@ -450,6 +450,12 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
   const latestFullMonth = latestMonthLabel
     ? FULL_MONTHS[latestMonthLabel.split(' ')[0]] || latestMonthLabel.split(' ')[0]
     : null;
+  const latestMonthYearLabel = latestMonthLabel
+    ? `${latestFullMonth} ${latestMonthLabel.split(' ')[1]}`
+    : null;
+  const coverageLine = region.coveragePlaces?.length
+    ? `Coverage: ${region.coveragePlaces.slice(0, -1).join(', ')}${region.coveragePlaces.length > 1 ? `${region.coveragePlaces.length > 2 ? ',' : ''} and ${region.coveragePlaces[region.coveragePlaces.length - 1]}` : ''}.`
+    : null;
 
   return (
     <main>
@@ -460,17 +466,24 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
           <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-                {pageTitle}
+                {pageTitle} Climate
               </h1>
-              {latestFullMonth && (
+              {latestMonthYearLabel ? (
                 <p className="text-2xl md:text-3xl font-bold mt-1" style={{ color: '#FFF5E7' }}>
-                  {latestFullMonth} Climate Update
+                  {latestMonthYearLabel} Update
+                </p>
+              ) : (
+                <p className="text-2xl md:text-3xl font-bold mt-1" style={{ color: '#FFF5E7' }}>
+                  Monthly Climate Update
                 </p>
               )}
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               {summary ? (
                 <div>
+                  {coverageLine && (
+                    <p className="text-xs md:text-sm font-medium text-[#D0A65E] mb-3">{coverageLine}</p>
+                  )}
                   <div className="text-gray-300 text-sm leading-relaxed space-y-3">
                     {summary.split('\n\n').map((para, i) => (
                       <p key={i}>{para}</p>
@@ -486,6 +499,9 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 </div>
               ) : !loading && data ? (
                 <div>
+                  {coverageLine && (
+                    <p className="text-xs md:text-sm font-medium text-[#D0A65E] mb-3">{coverageLine}</p>
+                  )}
                   <p className="text-sm text-gray-300 leading-relaxed">{buildTextSummary(region, data)}</p>
                   <Link
                     href={`/climate-dashboard?q=${encodeURIComponent(dashboardSearchTerm)}`}
