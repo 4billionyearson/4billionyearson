@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { CalendarDays, Globe2, Loader2, Map, MapPinned } from 'lucide-react';
-import { getClimateCoverageText, type ClimateRegion } from '@/lib/climate/regions';
+import { Loader2 } from 'lucide-react';
+import type { ClimateRegion } from '@/lib/climate/regions';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -453,14 +453,9 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
   const latestMonthYearLabel = latestMonthLabel
     ? `${latestFullMonth} ${latestMonthLabel.split(' ')[1]}`
     : null;
-  const coverageText = getClimateCoverageText(region);
-  const coverageLine = coverageText ? `This update covers ${coverageText}.` : null;
-  const TitleIcon = region.type === 'country' ? Globe2 : region.type === 'us-state' ? Map : MapPinned;
-  const titleIconClass = region.type === 'country'
-    ? 'text-cyan-100'
-    : region.type === 'us-state'
-      ? 'text-emerald-100'
-      : 'text-sky-100';
+  const coverageLine = region.coveragePlaces?.length
+    ? `Coverage: ${region.coveragePlaces.slice(0, -1).join(', ')}${region.coveragePlaces.length > 1 ? `${region.coveragePlaces.length > 2 ? ',' : ''} and ${region.coveragePlaces[region.coveragePlaces.length - 1]}` : ''}.`
+    : null;
 
   return (
     <main>
@@ -470,32 +465,24 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
           {/* ─── Header ─── */}
           <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-              <div className="flex items-start gap-3 md:gap-4">
-                <div className="mt-1 rounded-xl border border-white/20 bg-black/10 p-2.5 md:p-3 shadow-sm">
-                  <TitleIcon className={`h-6 w-6 md:h-8 md:w-8 ${titleIconClass}`} />
-                </div>
-                <div>
-                  <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-                    {pageTitle}
-                  </h1>
-                  <p className="mt-2 text-sm md:text-base font-semibold uppercase tracking-[0.22em] text-[#FFF5E7]/80">
-                    Climate Update
-                  </p>
-                </div>
-              </div>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+                {pageTitle} Climate
+              </h1>
+              {latestMonthYearLabel ? (
+                <p className="text-2xl md:text-3xl font-bold mt-1" style={{ color: '#FFF5E7' }}>
+                  {latestMonthYearLabel} Update
+                </p>
+              ) : (
+                <p className="text-2xl md:text-3xl font-bold mt-1" style={{ color: '#FFF5E7' }}>
+                  Monthly Climate Update
+                </p>
+              )}
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               {summary ? (
                 <div>
-                  <div className="mb-4 flex items-center gap-2 text-lg md:text-xl font-bold font-mono text-white">
-                    <CalendarDays className="h-5 w-5 text-[#D0A65E]" />
-                    <span>{latestMonthYearLabel ? `${latestMonthYearLabel} Update` : 'Monthly Climate Update'}</span>
-                  </div>
                   {coverageLine && (
-                    <div className="mb-4 flex items-start gap-2 rounded-xl border border-cyan-500/35 bg-cyan-500/10 px-3 py-2.5 text-sm text-cyan-100 shadow-sm">
-                      <Map className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
-                      <p className="leading-relaxed">{coverageLine}</p>
-                    </div>
+                    <p className="text-xs md:text-sm font-medium text-[#D0A65E] mb-3">{coverageLine}</p>
                   )}
                   <div className="text-gray-300 text-sm leading-relaxed space-y-3">
                     {summary.split('\n\n').map((para, i) => (
@@ -512,15 +499,8 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 </div>
               ) : !loading && data ? (
                 <div>
-                  <div className="mb-4 flex items-center gap-2 text-lg md:text-xl font-bold font-mono text-white">
-                    <CalendarDays className="h-5 w-5 text-[#D0A65E]" />
-                    <span>{latestMonthYearLabel ? `${latestMonthYearLabel} Update` : 'Monthly Climate Update'}</span>
-                  </div>
                   {coverageLine && (
-                    <div className="mb-4 flex items-start gap-2 rounded-xl border border-cyan-500/35 bg-cyan-500/10 px-3 py-2.5 text-sm text-cyan-100 shadow-sm">
-                      <Map className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
-                      <p className="leading-relaxed">{coverageLine}</p>
-                    </div>
+                    <p className="text-xs md:text-sm font-medium text-[#D0A65E] mb-3">{coverageLine}</p>
                   )}
                   <p className="text-sm text-gray-300 leading-relaxed">{buildTextSummary(region, data)}</p>
                   <Link
@@ -531,19 +511,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   </Link>
                 </div>
               ) : (
-                <div>
-                  <div className="mb-4 flex items-center gap-2 text-lg md:text-xl font-bold font-mono text-white">
-                    <CalendarDays className="h-5 w-5 text-[#D0A65E]" />
-                    <span>{latestMonthYearLabel ? `${latestMonthYearLabel} Update` : 'Monthly Climate Update'}</span>
-                  </div>
-                  {coverageLine && (
-                    <div className="mb-4 flex items-start gap-2 rounded-xl border border-cyan-500/35 bg-cyan-500/10 px-3 py-2.5 text-sm text-cyan-100 shadow-sm">
-                      <Map className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
-                      <p className="leading-relaxed">{coverageLine}</p>
-                    </div>
-                  )}
-                  <p className="text-sm text-gray-400">{region.tagline}</p>
-                </div>
+                <p className="text-sm text-gray-400">{region.tagline}</p>
               )}
             </div>
           </div>
