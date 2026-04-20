@@ -30,6 +30,127 @@ function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
+// ─── GDACS country mapping ─────────────────────────────────────────────────
+
+const REGION_TO_GDACS_COUNTRY: Record<string, string[]> = {
+  GBR: ['United Kingdom'],
+  USA: ['United States of America', 'United States'],
+  IND: ['India'],
+  CHN: ['China'],
+  DEU: ['Germany'],
+  AUS: ['Australia'],
+};
+
+const US_STATE_NAMES: Record<string, string> = {
+  'us-fl': 'Florida',
+  'us-ca': 'California',
+  'us-tx': 'Texas',
+};
+
+function getGDACSCountries(region: ClimateRegion): string[] {
+  if (region.type === 'country') return REGION_TO_GDACS_COUNTRY[region.apiCode] || [region.name];
+  if (region.type === 'us-state') return REGION_TO_GDACS_COUNTRY['USA'] || ['United States'];
+  if (region.type === 'uk-region') return REGION_TO_GDACS_COUNTRY['GBR'] || ['United Kingdom'];
+  return [region.name];
+}
+
+function filterGDACSEvents(events: any[], region: ClimateRegion): any[] {
+  const countries = getGDACSCountries(region);
+  const stateName = region.type === 'us-state' ? US_STATE_NAMES[region.apiCode] : null;
+
+  return events.filter((e: any) => {
+    const matchCountry = countries.some(c => e.country?.toLowerCase().includes(c.toLowerCase()));
+    if (!matchCountry) return false;
+    // For US states, also check if the event name mentions the state
+    if (stateName && !e.name?.toLowerCase().includes(stateName.toLowerCase()) && !e.country?.toLowerCase().includes(stateName.toLowerCase())) {
+      // Allow through if event is orange/red alert (major enough for whole country)
+      return e.alertLevel === 'Orange' || e.alertLevel === 'Red';
+    }
+    return true;
+  });
+}
+
+function buildGDACSSection(events: any[]): string {
+  if (!events.length) return '';
+  const lines: string[] = [];
+  lines.push('\n═══ ACTIVE EXTREME WEATHER EVENTS (GDACS) ═══');
+  const sorted = [...events].sort((a, b) => {
+    const order: Record<string, number> = { Red: 0, Orange: 1, Green: 2 };
+    return (order[a.alertLevel] ?? 3) - (order[b.alertLevel] ?? 3);
+  });
+  for (const e of sorted.slice(0, 5)) {
+    lines.push(`  [${e.alertLevel?.toUpperCase()}] ${e.type}: ${e.name} (${e.country})`);
+    if (e.severity) lines.push(`    Severity: ${e.severity}`);
+    if (e.fromDate) lines.push(`    Period: ${e.fromDate} – ${e.toDate || 'ongoing'}`);
+  }
+  return lines.join('\n');
+}
+
+// ─── Ranked period stats for prompt ─────────────────────────────────────────
+
+function formatRankedStat(stat: any, label: string, units: string): string {
+  if (!stat) return '';
+  const parts: string[] = [];
+  parts.push(`${label}: ${stat.value}${units}`);
+  if (stat.diff != null) parts.push(`anomaly ${stat.diff > 0 ? '+' : ''}${stat.diff.toFixed(1)}${units} vs baseline`);
+  parts.push(`ranked ${ordinal(stat.rank)} of ${stat.total}`);
+  if (stat.recordLabel) parts.push(`record: ${stat.recordValue}${units} (${stat.recordLabel})`);
+  return parts.join(' · ');
+}
+
+function buildRankedHighlights(profileData: any, region: ClimateRegion): string {
+  const lines: string[] = [];
+  lines.push('\n═══ RANKED HIGHLIGHTS (priority data for the update) ═══');
+  lines.push('Priority 1: LATEST MONTH — lead with this');
+  lines.push('Priority 2: LATEST 3 MONTHS — seasonal context');
+  lines.push('Priority 3: ANNUAL — long-term perspective');
+  lines.push('');
+
+  if (region.type === 'uk-region' && profileData.ukRegionData?.varData) {
+    const vd = profileData.ukRegionData.varData;
+    const metrics = [
+      { key: 'Tmean', label: 'Mean Temp', units: '°C' },
+      { key: 'Sunshine', label: 'Sunshine', units: ' hrs' },
+      { key: 'Rainfall', label: 'Rainfall', units: ' mm' },
+      { key: 'AirFrost', label: 'Frost Days', units: ' days' },
+      { key: 'Raindays1mm', label: 'Rain Days', units: ' days' },
+    ];
+    for (const m of metrics) {
+      const ms = vd[m.key]?.latestMonthStats;
+      const qs = vd[m.key]?.latestThreeMonthStats;
+      if (ms) lines.push(`  Month: ${formatRankedStat(ms, `${m.label} (${ms.label})`, m.units)}`);
+      if (qs) lines.push(`  3‑Month: ${formatRankedStat(qs, `${m.label} (${qs.label})`, m.units)}`);
+    }
+  } else if (region.type === 'us-state' && profileData.usStateData?.paramData) {
+    const pd = profileData.usStateData.paramData;
+    const metrics = [
+      { key: 'tavg', label: 'Avg Temp', units: '°C' },
+      { key: 'tmax', label: 'Max Temp', units: '°C' },
+      { key: 'pcp', label: 'Precipitation', units: ' mm' },
+    ];
+    for (const m of metrics) {
+      const ms = pd[m.key]?.latestMonthStats;
+      const qs = pd[m.key]?.latestThreeMonthStats;
+      if (ms) lines.push(`  Month: ${formatRankedStat(ms, `${m.label} (${ms.label})`, m.units)}`);
+      if (qs) lines.push(`  3‑Month: ${formatRankedStat(qs, `${m.label} (${qs.label})`, m.units)}`);
+    }
+  } else if (region.type === 'country' && profileData.countryData) {
+    const cd = profileData.countryData;
+    const ms = cd.latestMonthStats;
+    const qs = cd.latestThreeMonthStats;
+    if (ms) lines.push(`  Month: ${formatRankedStat(ms, `Temperature (${ms.label})`, '°C')}`);
+    if (qs) lines.push(`  3‑Month: ${formatRankedStat(qs, `Temperature (${qs.label})`, '°C')}`);
+  }
+
+  // Global context
+  const gms = profileData.globalData?.landLatestMonthStats;
+  const gqs = profileData.globalData?.landLatestThreeMonthStats;
+  if (gms) lines.push(`  Global Month: ${formatRankedStat(gms, `Global Land Temp (${gms.label})`, '°C')}`);
+  if (gqs) lines.push(`  Global 3‑Month: ${formatRankedStat(gqs, `Global Land Temp (${gqs.label})`, '°C')}`);
+
+  return lines.join('\n');
+}
+
 // ─── Cross-variable monthly table for UK regions ────────────────────────────
 
 function buildUKRegionTable(varData: Record<string, any>): string {
@@ -273,30 +394,37 @@ function summaryLooksIncomplete(summary: string): boolean {
 
 // ─── Prompt builder ─────────────────────────────────────────────────────────
 
-function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any): string {
+function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any, gdacsEvents: any[]): string {
   const lines: string[] = [];
 
-  lines.push(`You are a climate data analyst writing a monthly update for ${region.name}.`);
+  lines.push(`You are a climate journalist writing a compelling monthly update for ${region.name}.`);
+  lines.push('Your audience is searching for the latest climate news and data for this area.');
   lines.push('');
-  lines.push('TASK: Write exactly 2 short paragraphs (120–160 words total) that tell a STORY from the data.');
+  lines.push('TASK: Write exactly 2–3 paragraphs (150–200 words total) that tell a compelling, data-driven narrative.');
+  lines.push('');
+  lines.push('CONTENT PRIORITY (follow this order strictly):');
+  lines.push('1. LATEST MONTH (Priority 1): Lead with the most recent month\'s data. Use the RANKED HIGHLIGHTS section — if anything ranks in the top 5 or bottom 5 of all time, that IS the headline. If a record was broken, that\'s the lead.');
+  lines.push('2. LATEST 3 MONTHS (Priority 2): Put the month in seasonal context. How do the last 3 months as a period rank? Any records?');
+  lines.push('3. ANNUAL / LONG-TERM (Priority 3): What was the previous full year like? Is this part of an accelerating trend?');
+  lines.push('4. EXTREME WEATHER: If there are active GDACS alerts or recent extreme weather events affecting this area, weave them into the narrative naturally. Use your Google Search results to add context about major weather events (storms, floods, heatwaves, droughts) in this area.');
+  lines.push('5. CLIMATE DRIVERS: If El Niño, La Niña, the North Atlantic Oscillation, or other climate patterns are relevant to this area\'s current conditions, briefly mention them using information from your web search.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
-  lines.push('1. CROSS-VARIABLE: Show how different variables interact. If temperatures are up and frost days are down, connect them. If March was dry but sunny after a wet January/February, say so.');
-  lines.push('2. MOST STRIKING PATTERN FIRST: Lead with the single most notable finding — the thing that would make someone say "wow, really?" For example, frost days consistently well below average across the entire winter might be the standout pattern.');
-  lines.push('3. MONTHLY CONTEXT: How does the latest month compare to the previous 2–3 months? Has there been a shift (e.g. wet → suddenly dry)?');
-  lines.push('4. TRENDS: Place in the context of the decade and long-term record. Is this winter\'s warmth part of an accelerating trend?');
+  lines.push('- CROSS-VARIABLE: Connect variables — if temperatures are up and frost days are down, say so. If it was dry but sunny, connect them.');
+  lines.push('- MOST STRIKING FINDING FIRST: Lead with the "wow, really?" data point from the rankings. A record or near-record month IS the headline.');
+  lines.push('- NARRATIVE FLOW: Tell a story — don\'t just list numbers. "The region\'s warmest March in 140 years of records capped a winter that..." is better than separate facts.');
   if (region.type === 'uk-region') {
-    lines.push('5. NATIONAL CONTEXT: Compare to UK-wide data provided. Is this region\'s pattern more or less extreme than the national picture?');
+    lines.push('- NATIONAL CONTEXT: Compare to UK-wide data provided. Is this region warmer/wetter/sunnier than the national average?');
   } else if (region.type === 'us-state') {
-    lines.push('5. NATIONAL CONTEXT: Compare to US-wide data provided. Is this state experiencing the same trends as nationally?');
+    lines.push('- NATIONAL CONTEXT: Compare to US-wide data. Is this state experiencing the same trends as nationally?');
   } else {
-    lines.push('5. GLOBAL CONTEXT: How does this country\'s warming trend compare to the global average?');
+    lines.push('- GLOBAL CONTEXT: How does this country\'s pattern compare to the global average?');
   }
-  lines.push('6. MAKE IT RELATABLE: Use everyday language where helpful — "fewer frosty mornings", "a notably dry spring" — alongside the data.');
+  lines.push('- MAKE IT RELATABLE: "fewer frosty mornings", "a notably dry spring" alongside the data.');
   if (region.type === 'uk-region') {
-    lines.push('7. Use the official Met Office region name exactly as provided. Do not rename the region to a single city.');
+    lines.push('- Use the official Met Office region name exactly as provided. Do not rename the region to a single city.');
     if (region.coveragePlaces?.length) {
-      lines.push(`8. If helpful, you may mention that the page covers ${region.coveragePlaces.join(', ')}, but keep the official region name as the main label.`);
+      lines.push(`- You may mention that the region covers ${region.coveragePlaces.join(', ')}, but keep the official name as the main label.`);
     }
   }
   lines.push('');
@@ -304,9 +432,14 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any)
   lines.push('- British English spelling throughout.');
   lines.push('- Plain text only — no markdown, bullet points, or headings.');
   lines.push('- Be specific with numbers but weave them into natural prose.');
-  lines.push('- Do NOT invent data. Only reference what is provided below.');
-  lines.push('- No policy recommendations or speculation about future trends.');
+  lines.push('- You MUST reference data from the tables below. Do NOT invent statistics.');
+  lines.push('- For web search findings about weather events, summarise in your own words. Do not copy text verbatim.');
+  lines.push('- No policy recommendations.');
   lines.push('- CRITICAL: Ensure you complete your final sentence. Do not abruptly truncate the text.');
+  lines.push('');
+
+  // Ranked highlights (priority data)
+  lines.push(buildRankedHighlights(profileData, region));
   lines.push('');
 
   // Region data
@@ -335,10 +468,44 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any)
     lines.push(buildNationalComparison(nationalData, nationalName));
   }
 
+  // GDACS extreme weather events
+  if (gdacsEvents.length > 0) {
+    lines.push(buildGDACSSection(gdacsEvents));
+  }
+
+  // Search instruction
+  lines.push('');
+  lines.push(`═══ WEB SEARCH INSTRUCTION ═══`);
+  lines.push(`Use Google Search to find recent weather news and climate events for ${region.name} in the last 1–3 months.`);
+  lines.push(`Look for: major storms, floods, heatwaves, droughts, wildfires, or other extreme weather events.`);
+  lines.push(`Also check: Is El Niño or La Niña currently active? Is the ENSO state affecting ${region.name}?`);
+  lines.push(`Summarise any relevant findings in your own words and weave them into the update narrative.`);
+
   return lines.join('\n');
 }
 
 // ─── Route handler ──────────────────────────────────────────────────────────
+
+interface GroundingSource {
+  title: string;
+  uri: string;
+}
+
+function extractGroundingSources(geminiData: any): GroundingSource[] {
+  const chunks = geminiData?.candidates?.[0]?.groundingMetadata?.groundingChunks;
+  if (!Array.isArray(chunks)) return [];
+  const seen = new Set<string>();
+  const sources: GroundingSource[] = [];
+  for (const chunk of chunks) {
+    const uri = chunk?.web?.uri;
+    const title = chunk?.web?.title;
+    if (uri && title && !seen.has(uri)) {
+      seen.add(uri);
+      sources.push({ title, uri });
+    }
+  }
+  return sources.slice(0, 5);
+}
 
 export async function GET(
   request: Request,
@@ -361,23 +528,28 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v11`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v12`;
 
   // Check cache
-  const cached = await getCached<{ summary: string }>(cacheKey);
+  const cached = await getCached<{ summary: string; sources?: GroundingSource[] }>(cacheKey);
   if (cached) {
     return NextResponse.json({ ...cached, source: 'cache' });
   }
 
-  // Fetch full profile data
+  // Fetch full profile data and GDACS events in parallel
   const base = getBaseUrl();
-  const profileData = await fetchJSON(`${base}/api/climate/profile/${slug}`);
+  const [profileData, extremeWeatherData] = await Promise.all([
+    fetchJSON(`${base}/api/climate/profile/${slug}`),
+    fetchJSON(`${base}/api/climate/extreme-weather`),
+  ]);
+
   if (!profileData) {
     return NextResponse.json({ error: 'No profile data available' }, { status: 404 });
   }
 
   const fallbackResult = {
     summary: buildDeterministicSummary(region, profileData),
+    sources: [] as GroundingSource[],
     generatedAt: new Date().toISOString(),
   };
 
@@ -395,7 +567,12 @@ export async function GET(
     nationalData = await fetchJSON(`${base}/api/climate/profile/usa`);
   }
 
-  const prompt = buildPrompt(region, profileData, nationalData);
+  // Filter GDACS events for this region
+  const gdacsEvents = extremeWeatherData?.gdacsEvents
+    ? filterGDACSEvents(extremeWeatherData.gdacsEvents, region)
+    : [];
+
+  const prompt = buildPrompt(region, profileData, nationalData, gdacsEvents);
 
   try {
     const geminiRes = await fetch(
@@ -405,9 +582,10 @@ export async function GET(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
+          tools: [{ google_search: {} }],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 900,
+            maxOutputTokens: 1200,
           },
         }),
       }
@@ -422,12 +600,17 @@ export async function GET(
 
     const geminiData = await geminiRes.json();
     const summary = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const groundingSources = extractGroundingSources(geminiData);
 
     const finalSummary = !summary || summaryLooksIncomplete(summary)
       ? fallbackResult.summary
       : summary;
 
-    const result = { summary: finalSummary, generatedAt: new Date().toISOString() };
+    const result = {
+      summary: finalSummary,
+      sources: finalSummary === fallbackResult.summary ? [] : groundingSources,
+      generatedAt: new Date().toISOString(),
+    };
     await setShortTerm(cacheKey, result);
 
     return NextResponse.json({ ...result, source: finalSummary === fallbackResult.summary ? 'fallback' : 'fresh' });
