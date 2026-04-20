@@ -577,15 +577,13 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
     'City Coverage:';
 
   // Responsive font sizes — shrink when the title is long
-  const titleText = `${pageTitle} Climate`;
+  // Combine title and subtitle for header
+  const combinedTitle = `${pageTitle} Climate${latestMonthYearLabel ? ` – ${latestMonthYearLabel} Update` : ''}`;
   const h1SizeClass =
-    titleText.length > 28 ? 'text-2xl md:text-3xl' :
-    titleText.length > 20 ? 'text-2xl md:text-4xl' :
+    combinedTitle.length > 38 ? 'text-xl md:text-2xl' :
+    combinedTitle.length > 28 ? 'text-2xl md:text-3xl' :
+    combinedTitle.length > 20 ? 'text-2xl md:text-4xl' :
     'text-3xl md:text-5xl';
-  const subtitleSizeClass =
-    titleText.length > 28 ? 'text-lg md:text-xl' :
-    titleText.length > 20 ? 'text-xl md:text-2xl' :
-    'text-2xl md:text-3xl';
 
   return (
     <main>
@@ -596,17 +594,8 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
           <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className={`${h1SizeClass} font-bold font-mono tracking-wide leading-tight`} style={{ color: '#FFF5E7' }}>
-                {pageTitle} Climate
+                {combinedTitle}
               </h1>
-              {latestMonthYearLabel ? (
-                <p className={`${subtitleSizeClass} font-bold mt-1`} style={{ color: '#FFF5E7' }}>
-                  {latestMonthYearLabel} Update
-                </p>
-              ) : (
-                <p className={`${subtitleSizeClass} font-bold mt-1`} style={{ color: '#FFF5E7' }}>
-                  Monthly Climate Update
-                </p>
-              )}
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               {summary ? (
