@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -139,6 +139,7 @@ type OverviewSection = {
 
 type OverviewPanel = {
   title: string;
+  icon: React.ReactNode;
   accentClass: string;
   accentBg: string;
   accentBorder: string;
@@ -212,14 +213,14 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
   };
 
   return (
-    <div className="rounded-2xl border-2 border-[#D0A65E] bg-gray-900/80 backdrop-blur-md shadow-xl p-3 md:p-4">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        {panels.map((panel) => (
-          <div key={panel.title} className="rounded-xl border-2 border-gray-600/50 bg-gray-800/60 overflow-hidden">
-            <div className={`px-4 py-2.5 ${panel.accentClass}`}>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-white">{panel.title}</h2>
-            </div>
-
+    <div className="space-y-4">
+      {panels.map((panel) => (
+        <div key={panel.title} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+            {panel.icon}
+            {panel.title}
+          </h2>
+          <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden">
             {panel.sections.map((section, sIdx) => (
               <div key={sIdx} className={`${sIdx > 0 ? 'border-t-2 border-gray-600/50' : ''}`}>
                 {section.title && (
@@ -283,8 +284,8 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
 
             <div className="px-3 pb-2 text-[10px] text-gray-500 text-right">Baseline: 1961–1990 average</div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -317,6 +318,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   if (temperatureRows.length) {
     panels.push({
       title: 'Temperature — Average',
+      icon: <Thermometer className="text-red-400" />,
       accentClass: 'bg-red-600',
       accentBg: 'bg-red-900/60',
       accentBorder: 'border-red-500/60',
@@ -332,6 +334,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   if (sunshineRows.length) {
     panels.push({
       title: 'Sunshine — Total Hours',
+      icon: <Sun className="text-amber-400" />,
       accentClass: 'bg-amber-600',
       accentBg: 'bg-amber-900/60',
       accentBorder: 'border-amber-500/60',
@@ -368,6 +371,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   if (rainfallRows.length || rainDaysRows.length) {
     panels.push({
       title: 'Rainfall & Rain Days — Totals',
+      icon: <CloudRain className="text-blue-400" />,
       accentClass: 'bg-blue-600',
       accentBg: 'bg-blue-900/60',
       accentBorder: 'border-blue-500/60',
@@ -386,6 +390,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   if (frostRows.length) {
     panels.push({
       title: 'Frost Days — Total',
+      icon: <Snowflake className="text-sky-400" />,
       accentClass: 'bg-sky-500',
       accentBg: 'bg-sky-900/60',
       accentBorder: 'border-sky-400/60',
@@ -457,6 +462,13 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
     ? `Coverage: ${region.coveragePlaces.slice(0, -1).join(', ')}${region.coveragePlaces.length > 1 ? `${region.coveragePlaces.length > 2 ? ',' : ''} and ${region.coveragePlaces[region.coveragePlaces.length - 1]}` : ''}.`
     : null;
 
+  // Responsive font size for the h1 — shrink when the title is long
+  const titleText = `${pageTitle} Climate`;
+  const h1SizeClass =
+    titleText.length > 28 ? 'text-2xl md:text-3xl' :
+    titleText.length > 20 ? 'text-2xl md:text-4xl' :
+    'text-3xl md:text-5xl';
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -465,7 +477,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
           {/* ─── Header ─── */}
           <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+              <h1 className={`${h1SizeClass} font-bold font-mono tracking-wide leading-tight`} style={{ color: '#FFF5E7' }}>
                 {pageTitle} Climate
               </h1>
               {latestMonthYearLabel ? (
