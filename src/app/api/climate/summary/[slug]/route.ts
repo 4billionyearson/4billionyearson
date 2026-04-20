@@ -91,10 +91,14 @@ function buildGDACSSection(events: any[]): string {
 function formatRankedStat(stat: any, label: string, units: string): string {
   if (!stat) return '';
   const parts: string[] = [];
-  parts.push(`${label}: ${stat.value}${units}`);
-  if (stat.diff != null) {
-    const sign = stat.diff > 0 ? '+' : '';
-    parts.push(`anomaly ${sign}${stat.diff.toFixed(1)}${units} vs 1961–1990 baseline`);
+  // Round count-based metrics (frost days, rain days, sunshine hours) to integers
+  const isCount = [' days', ' hrs'].some(u => units.includes(u));
+  const displayValue = isCount ? Math.round(stat.value) : stat.value;
+  const displayDiff = stat.diff != null ? (isCount ? Math.round(stat.diff) : Number(stat.diff.toFixed(1))) : null;
+  parts.push(`${label}: ${displayValue}${units}`);
+  if (displayDiff != null) {
+    const sign = displayDiff > 0 ? '+' : '';
+    parts.push(`anomaly ${sign}${displayDiff}${units} vs 1961–1990 baseline`);
   }
   parts.push(`RANKED ${ordinal(stat.rank)} of ${stat.total} years on record`);
   if (stat.recordLabel) parts.push(`all-time record: ${stat.recordValue}${units} (${stat.recordLabel})`);

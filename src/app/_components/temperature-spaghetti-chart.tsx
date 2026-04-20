@@ -25,8 +25,8 @@ interface ChartRow {
 }
 
 export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: SpaghettiChartProps) {
-  const { chartData, allYears, recordYear, currentYear, currentMonth, minTemp, maxTemp } = useMemo(() => {
-    if (!monthlyAll?.length) return { chartData: [], allYears: [], recordYear: 0, currentYear: 0, currentMonth: 0, minTemp: 0, maxTemp: 0 };
+  const { chartData, allYears, backgroundYears, recordYear, currentYear, currentMonth, minTemp, maxTemp, startYear } = useMemo(() => {
+    if (!monthlyAll?.length) return { chartData: [], allYears: [], backgroundYears: [], recordYear: 0, currentYear: 0, currentMonth: 0, minTemp: 0, maxTemp: 0, startYear: 0 };
 
     // Group by year
     const byYear = new Map<number, Map<number, number>>();
@@ -36,23 +36,23 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
     }
 
     // Find years with at least 6 months of data
-    const validYears = [...byYear.entries()]
+    const allValidYears = [...byYear.entries()]
       .filter(([, months]) => months.size >= 6)
       .map(([y]) => y)
       .sort((a, b) => a - b);
 
-    if (validYears.length === 0) return { chartData: [], allYears: [], recordYear: 0, currentYear: 0, currentMonth: 0, minTemp: 0, maxTemp: 0 };
+    if (allValidYears.length === 0) return { chartData: [], allYears: [], backgroundYears: [], recordYear: 0, currentYear: 0, currentMonth: 0, minTemp: 0, maxTemp: 0, startYear: 0 };
 
     // Current year = the last year that has data
     const now = new Date();
     const calendarYear = now.getFullYear();
     const calendarMonth = now.getMonth() + 1;
-    const latestYear = validYears[validYears.length - 1];
+    const latestYear = allValidYears[allValidYears.length - 1];
 
     // Find the record year (highest annual average from complete years)
-    let bestYear = validYears[0];
+    let bestYear = allValidYears[0];
     let bestAvg = -Infinity;
-    for (const yr of validYears) {
+    for (const yr of allValidYears) {
       const months = byYear.get(yr)!;
       if (months.size < 12 && yr === latestYear) continue; // skip incomplete current year
       const vals = [...months.values()];
@@ -63,13 +63,19 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
       }
     }
 
+    // Limit background to last ~40 years (like Copernicus shows since 1940)
+    // Always include record year even if outside range
+    const cutoffYear = latestYear - 39;
+    const displayYears = allValidYears.filter(y => y >= cutoffYear || y === bestYear);
+    const bgYears = displayYears.filter(y => y !== bestYear && y !== latestYear);
+
     // Build chart data: 12 rows (one per month), each row has a column per year
     let globalMin = Infinity;
     let globalMax = -Infinity;
     const rows: ChartRow[] = [];
     for (let m = 1; m <= 12; m++) {
       const row: ChartRow = { month: m, monthLabel: MONTH_LABELS[m - 1] };
-      for (const yr of validYears) {
+      for (const yr of displayYears) {
         const val = byYear.get(yr)?.get(m) ?? null;
         row[`y${yr}`] = val !== null ? Math.round(val * 100) / 100 : null;
         if (val !== null) {
@@ -82,19 +88,18 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
 
     return {
       chartData: rows,
-      allYears: validYears,
+      allYears: displayYears,
+      backgroundYears: bgYears,
       recordYear: bestYear,
       currentYear: latestYear,
       currentMonth: latestYear === calendarYear ? calendarMonth - 1 : 12,
       minTemp: Math.floor(globalMin - 1),
       maxTemp: Math.ceil(globalMax + 1),
+      startYear: displayYears[0],
     };
   }, [monthlyAll]);
 
   if (chartData.length === 0) return null;
-
-  // Separate years into background, record, and current
-  const backgroundYears = allYears.filter(y => y !== recordYear && y !== currentYear);
 
   return (
     <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
@@ -109,7 +114,7 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName }: Sp
       <div className="flex flex-wrap gap-x-5 gap-y-1 mb-3 text-xs">
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-6 h-[2px] bg-gray-600 rounded" />
-          <span className="text-gray-500">All other years ({allYears[0]}–{allYears[allYears.length - 1]})</span>
+          <span className="text-gray-500">All years since {startYear}</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-6 h-[3px] bg-orange-500 rounded" />
