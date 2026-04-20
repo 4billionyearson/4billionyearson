@@ -92,9 +92,15 @@ function formatRankedStat(stat: any, label: string, units: string): string {
   if (!stat) return '';
   const parts: string[] = [];
   parts.push(`${label}: ${stat.value}${units}`);
-  if (stat.diff != null) parts.push(`anomaly ${stat.diff > 0 ? '+' : ''}${stat.diff.toFixed(1)}${units} vs baseline`);
-  parts.push(`ranked ${ordinal(stat.rank)} of ${stat.total}`);
-  if (stat.recordLabel) parts.push(`record: ${stat.recordValue}${units} (${stat.recordLabel})`);
+  if (stat.diff != null) {
+    const sign = stat.diff > 0 ? '+' : '';
+    parts.push(`anomaly ${sign}${stat.diff.toFixed(1)}${units} vs 1961–1990 baseline`);
+  }
+  parts.push(`RANKED ${ordinal(stat.rank)} of ${stat.total} years on record`);
+  if (stat.recordLabel) parts.push(`all-time record: ${stat.recordValue}${units} (${stat.recordLabel})`);
+  // Flag standout rankings
+  if (stat.rank <= 5) parts.push('⬆️ TOP 5 — MUST MENTION');
+  if (stat.rank >= stat.total - 4 && stat.total > 20) parts.push('⬇️ BOTTOM 5 — MUST MENTION');
   return parts.join(' · ');
 }
 
@@ -403,26 +409,26 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('TASK: Write exactly 2–3 paragraphs (150–200 words total) that tell a compelling, data-driven narrative.');
   lines.push('');
   lines.push('CONTENT PRIORITY (follow this order strictly):');
-  lines.push('1. LATEST MONTH (Priority 1): Lead with the most recent month\'s data. Use the RANKED HIGHLIGHTS section — if anything ranks in the top 5 or bottom 5 of all time, that IS the headline. If a record was broken, that\'s the lead.');
-  lines.push('2. LATEST 3 MONTHS (Priority 2): Put the month in seasonal context. How do the last 3 months as a period rank? Any records?');
-  lines.push('3. ANNUAL / LONG-TERM (Priority 3): What was the previous full year like? Is this part of an accelerating trend?');
-  lines.push('4. EXTREME WEATHER: If there are active GDACS alerts or recent extreme weather events affecting this area, weave them into the narrative naturally. Use your Google Search results to add context about major weather events (storms, floods, heatwaves, droughts) in this area.');
-  lines.push('5. CLIMATE DRIVERS: If El Niño, La Niña, the North Atlantic Oscillation, or other climate patterns are relevant to this area\'s current conditions, briefly mention them using information from your web search.');
+  lines.push('1. RANKED HIGHLIGHTS (Priority 1): Study the RANKED HIGHLIGHTS section below FIRST. The 3-month rankings are the most SEO-valuable — if sunshine was 3rd highest or frost days were 4th lowest of all time, THAT is your headline. Scan ALL variables for standout rankings (top 5 or bottom 5 of all time).');
+  lines.push('2. LATEST MONTH (Priority 2): After the seasonal ranking lead, discuss the most recent single month. What ranked highest/lowest?');
+  lines.push('3. ANNUAL / LONG-TERM (Priority 3): Put it all in context — previous full year, warming trend.');
+  lines.push('4. EXTREME WEATHER: If there are active GDACS alerts or recent extreme weather events, weave them in naturally.');
+  lines.push('5. CLIMATE DRIVERS: If El Niño, La Niña, NAO etc. are relevant, briefly mention them.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
-  lines.push('- CROSS-VARIABLE: Connect variables — if temperatures are up and frost days are down, say so. If it was dry but sunny, connect them.');
-  lines.push('- MOST STRIKING FINDING FIRST: Lead with the "wow, really?" data point from the rankings. A record or near-record month IS the headline.');
-  lines.push('- NARRATIVE FLOW: Tell a story — don\'t just list numbers. "The region\'s warmest March in 140 years of records capped a winter that..." is better than separate facts.');
+  lines.push('- RANKINGS ARE THE STORY: The ranked data IS the narrative. "The 3rd sunniest January–March on record" or "the 4th fewest frost days in over a century of records" — these are the headlines. If a metric ranks in the top/bottom 10, it MUST be mentioned.');
+  lines.push('- MAKE ANOMALIES RELATABLE: Don\'t just say "18 fewer frost days than average" — say "that\'s 18 fewer mornings scraping ice off the car compared to a typical winter." Connect to everyday life.');
+  lines.push('- CROSS-VARIABLE CONNECTIONS: Connect variables into a story — "a winter of exceptional sunshine and almost no frost made for..." Link cause and effect.');
+  lines.push('- NARRATIVE FLOW: Tell a story, not a data dump. "The region recorded its 3rd sunniest start to the year in records stretching back to 1900, while frost days..." is better than separate facts.');
   if (region.type === 'uk-region') {
-    lines.push('- NATIONAL CONTEXT: Compare to UK-wide data provided. Is this region warmer/wetter/sunnier than the national average?');
+    lines.push('- NATIONAL CONTEXT: Compare to UK-wide data. Is this region more or less extreme than the national picture?');
   } else if (region.type === 'us-state') {
-    lines.push('- NATIONAL CONTEXT: Compare to US-wide data. Is this state experiencing the same trends as nationally?');
+    lines.push('- NATIONAL CONTEXT: Compare to US-wide data. Same trends or different?');
   } else {
     lines.push('- GLOBAL CONTEXT: How does this country\'s pattern compare to the global average?');
   }
-  lines.push('- MAKE IT RELATABLE: "fewer frosty mornings", "a notably dry spring" alongside the data.');
   if (region.type === 'uk-region') {
-    lines.push('- Use the official Met Office region name exactly as provided. Do not rename the region to a single city.');
+    lines.push('- Use the official Met Office region name exactly as provided. Do not rename to a single city.');
     if (region.coveragePlaces?.length) {
       lines.push(`- You may mention that the region covers ${region.coveragePlaces.join(', ')}, but keep the official name as the main label.`);
     }
@@ -507,6 +513,52 @@ function extractGroundingSources(geminiData: any): GroundingSource[] {
   return sources.slice(0, 5);
 }
 
+function extractTextFromParts(geminiData: any): string | null {
+  const parts = geminiData?.candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) return null;
+  const textParts = parts.filter((p: any) => typeof p.text === 'string').map((p: any) => p.text);
+  return textParts.length ? textParts.join('').trim() : null;
+}
+
+async function callGemini(
+  apiKey: string,
+  prompt: string,
+  useGrounding: boolean,
+): Promise<{ summary: string | null; sources: GroundingSource[]; raw: any }> {
+  const body: any = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 1200,
+    },
+  };
+  if (useGrounding) {
+    body.tools = [{ google_search: {} }];
+  }
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+  );
+
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error(`Gemini API error (grounding=${useGrounding}):`, errText);
+    return { summary: null, sources: [], raw: null };
+  }
+
+  const data = await res.json();
+  return {
+    summary: extractTextFromParts(data),
+    sources: useGrounding ? extractGroundingSources(data) : [],
+    raw: data,
+  };
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -528,7 +580,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v12`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v13`;
 
   // Check cache
   const cached = await getCached<{ summary: string; sources?: GroundingSource[] }>(cacheKey);
@@ -575,45 +627,25 @@ export async function GET(
   const prompt = buildPrompt(region, profileData, nationalData, gdacsEvents);
 
   try {
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          tools: [{ google_search: {} }],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1200,
-          },
-        }),
-      }
-    );
-
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      console.error('Gemini API error:', errText);
-      await setShortTerm(cacheKey, fallbackResult);
-      return NextResponse.json({ ...fallbackResult, source: 'fallback' });
+    // Try with Google Search grounding first, fall back to without
+    let result = await callGemini(apiKey, prompt, true);
+    if (!result.summary || summaryLooksIncomplete(result.summary)) {
+      console.log(`Grounded call failed/incomplete for ${slug}, retrying without grounding`);
+      result = await callGemini(apiKey, prompt, false);
     }
 
-    const geminiData = await geminiRes.json();
-    const summary = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    const groundingSources = extractGroundingSources(geminiData);
+    const finalSummary = result.summary && !summaryLooksIncomplete(result.summary)
+      ? result.summary
+      : fallbackResult.summary;
 
-    const finalSummary = !summary || summaryLooksIncomplete(summary)
-      ? fallbackResult.summary
-      : summary;
-
-    const result = {
+    const cacheResult = {
       summary: finalSummary,
-      sources: finalSummary === fallbackResult.summary ? [] : groundingSources,
+      sources: finalSummary === fallbackResult.summary ? [] : result.sources,
       generatedAt: new Date().toISOString(),
     };
-    await setShortTerm(cacheKey, result);
+    await setShortTerm(cacheKey, cacheResult);
 
-    return NextResponse.json({ ...result, source: finalSummary === fallbackResult.summary ? 'fallback' : 'fresh' });
+    return NextResponse.json({ ...cacheResult, source: finalSummary === fallbackResult.summary ? 'fallback' : 'fresh' });
   } catch (err: any) {
     console.error('Gemini summary error:', err);
     await setShortTerm(cacheKey, fallbackResult);
