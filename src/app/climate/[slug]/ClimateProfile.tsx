@@ -129,19 +129,23 @@ function ordinal(value: number): string {
 function highlightRankings(text: string): string {
   // Escape HTML entities first to prevent XSS, then apply bold formatting
   const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  // Bold ranking phrases — supports both numeric ordinals ("3rd warmest") and
-  // word ordinals ("the warmest", "the fourth warmest", "the second driest")
-  const superlatives = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|most|least';
-  const wordOrdinals = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth';
-  // Match: "3rd warmest ...", "fourth wettest ...", or "the warmest ..." (up to next , . or ;)
-  const pattern = new RegExp(
-    `\\b((?:\\d+(?:st|nd|rd|th)|${wordOrdinals})\\s+(?:${superlatives})\\b[^.,;]*)` +
-    `|\\b(the\\s+(?:${superlatives})\\b[^.,;]*)`,
-    'gi'
-  );
-  return escaped.replace(pattern, (match) =>
-    `<strong style="color:#fff">${match}</strong>`
-  );
+  // Bold ranking phrases — supports numeric ordinals ("3rd warmest") and
+  // word ordinals ("the warmest", "fourth driest")
+  // Stops before value citations (numbers, "at X°C", "of X.X mm") so bold
+  // doesn't bleed into the rest of the sentence.
+  const sup = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|most|least';
+  const supNoMost = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|least';
+  const wordOrd = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth';
+  // Words that don't introduce a value — letters only or hyphenated numbers like "12-month"
+  const w = `(?:\\s+(?!on\\s+record|in\\s+\\d|of\\s+\\d+\\s*year|of\\s+\\d+[.,°]|at\\s+\\d|with\\s+\\d|averaging\\s)(?:[a-zA-Z][a-zA-Z'\\u2019-]*|\\d+[-\\u2013]\\w+))*`;
+  // Optional "on record" / "in N years of records" / "of N years on record"
+  const rec = '(?:\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?))?';
+  // Pattern 1: ordinal + superlative + descriptor words + optional "on record"
+  const p1 = `(?:\\d+(?:st|nd|rd|th)|${wordOrd})\\s+(?:${sup})\\b${w}${rec}`;
+  // Pattern 2: "the" + superlative (no "most") — REQUIRES "on record" / "of N years"
+  const p2 = `the\\s+(?:${supNoMost})\\b${w}\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?)`;
+  const pattern = new RegExp(`\\b(${p1}|${p2})`, 'gi');
+  return escaped.replace(pattern, (m) => `<strong style="color:#fff">${m}</strong>`);
 }
 
 function getPointValue(point: YearlyPoint | PrecipPoint): number | null {
@@ -565,6 +569,12 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
   const coverageLine = region.coveragePlaces?.length
     ? region.coveragePlaces.slice(0, -1).join(', ') + (region.coveragePlaces.length > 1 ? `${region.coveragePlaces.length > 2 ? ',' : ''} and ${region.coveragePlaces[region.coveragePlaces.length - 1]}` : '')
     : null;
+  const coverageLabel =
+    region.slug === 'uk' ? 'Coverage:' :
+    region.slug === 'usa' ? 'Key States:' :
+    region.type === 'country' ? 'Top 5 Cities:' :
+    region.type === 'us-state' ? 'Top 5 Cities:' :
+    'City Coverage:';
 
   // Responsive font sizes — shrink when the title is long
   const titleText = `${pageTitle} Climate`;
@@ -604,7 +614,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   {coverageLine && (
                     <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
                       <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
-                      <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{region.type === 'country' ? 'Coverage:' : 'City Coverage:'}</span> {coverageLine}</p>
+                      <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
                   <div className="text-gray-300 text-sm leading-relaxed space-y-3">
@@ -642,7 +652,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   {coverageLine && (
                     <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
                       <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
-                      <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{region.type === 'country' ? 'Coverage:' : 'City Coverage:'}</span> {coverageLine}</p>
+                      <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
                   <p className="text-sm text-gray-400">{region.tagline}</p>

@@ -84,6 +84,7 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '🇺🇸',
     dataSources: ['owid-temp', 'noaa-national', 'owid-emissions'],
     keywords: ['US climate data', 'US temperature trends', 'NOAA data', 'US emissions', 'US energy transition'],
+    coveragePlaces: ['California', 'Texas', 'Florida', 'New York', 'Alaska'],
   },
   {
     slug: 'india',
@@ -95,6 +96,7 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '🇮🇳',
     dataSources: ['owid-temp', 'owid-emissions'],
     keywords: ['India climate data', 'India heatwave', 'India monsoon', 'India emissions', 'India renewable energy'],
+    coveragePlaces: ['Delhi', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata'],
   },
   {
     slug: 'china',
@@ -106,6 +108,7 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '🇨🇳',
     dataSources: ['owid-temp', 'owid-emissions'],
     keywords: ['China climate data', 'China emissions', 'China renewable energy', 'China coal', 'China solar'],
+    coveragePlaces: ['Beijing', 'Shanghai', 'Guangzhou', 'Shenzhen', 'Chengdu'],
   },
   {
     slug: 'germany',
@@ -117,6 +120,7 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '🇩🇪',
     dataSources: ['owid-temp', 'owid-emissions'],
     keywords: ['Germany climate data', 'Energiewende', 'Germany emissions', 'Germany renewable energy'],
+    coveragePlaces: ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne'],
   },
   {
     slug: 'australia',
@@ -128,6 +132,7 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '🇦🇺',
     dataSources: ['owid-temp', 'owid-emissions'],
     keywords: ['Australia climate data', 'Australia bushfires', 'Great Barrier Reef', 'Australia heatwave', 'Australia emissions'],
+    coveragePlaces: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide'],
   },
   {
     slug: 'florida',
@@ -139,6 +144,7 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '🌴',
     dataSources: ['noaa-state'],
     keywords: ['Florida climate data', 'Florida hurricanes', 'Florida sea level rise', 'Florida temperature', 'Florida insurance'],
+    coveragePlaces: ['Miami', 'Tampa', 'Orlando', 'Jacksonville', 'Fort Lauderdale'],
   },
   {
     slug: 'california',
@@ -150,6 +156,7 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '☀️',
     dataSources: ['noaa-state'],
     keywords: ['California climate data', 'California drought', 'California wildfire', 'California solar', 'California temperature'],
+    coveragePlaces: ['Los Angeles', 'San Francisco', 'San Diego', 'Sacramento', 'San Jose'],
   },
   {
     slug: 'texas',
@@ -161,6 +168,7 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '🤠',
     dataSources: ['noaa-state'],
     keywords: ['Texas climate data', 'Texas wind energy', 'Texas grid', 'Texas heatwave', 'Texas temperature'],
+    coveragePlaces: ['Houston', 'Dallas', 'Austin', 'San Antonio', 'El Paso'],
   },
   {
     slug: 'scotland',
