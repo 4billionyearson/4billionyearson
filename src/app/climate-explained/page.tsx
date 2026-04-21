@@ -125,9 +125,9 @@ export default function ClimateExplainedPage() {
 
           {/* Natural climate patterns: ENSO, NAO, etc. */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5 flex items-center gap-2">
-              <Waves className="h-5 w-5 text-blue-400" />
-              Natural Climate Patterns
+            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5 flex items-start gap-2">
+              <Waves className="h-5 w-5 shrink-0 text-blue-400 mt-1" />
+              <span className="min-w-0 flex-1">Natural Climate Patterns</span>
             </h2>
             <p className="text-sm text-gray-400 mb-5 leading-relaxed">
               Earth&apos;s climate isn&apos;t driven by greenhouse gases alone. Several large-scale ocean–atmosphere cycles shift weather patterns around the globe on timescales of months to decades. Understanding these patterns is essential for interpreting year-to-year swings in temperature, rainfall, and extreme weather.

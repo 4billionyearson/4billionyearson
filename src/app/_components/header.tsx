@@ -62,6 +62,7 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const pathname = usePathname();
+  const isClimateUpdatesPage = pathname === '/climate' || pathname?.startsWith('/climate/');
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -73,6 +74,17 @@ const Header = () => {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+
+  const desktopDropdownItemClass = (isActive: boolean, activeClasses: string, hoverClasses: string) =>
+    `block px-4 py-2.5 text-sm transition-colors ${isActive ? `${activeClasses} bg-gray-900 hover:bg-gray-800/80` : `text-gray-300 ${hoverClasses} hover:bg-gray-900`}`;
+
+  const mobileDropdownItemClass = (
+    isActive: boolean,
+    activeClasses: string,
+    hoverClasses: string,
+    borderClasses = 'border-b border-gray-800/50'
+  ) =>
+    `text-sm pl-10 pr-6 py-3 ${borderClasses} w-full block transition-colors ${isActive ? `${activeClasses} bg-gray-900/80 hover:bg-gray-900` : `text-gray-300 ${hoverClasses}`}`;
 
   return (
     <header className="w-full bg-transparent py-2 relative z-50">
@@ -99,17 +111,17 @@ const Header = () => {
             {isAIOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
-                <Link href="/ai-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/ai-dashboard' ? 'text-[#88DDFC] bg-gray-900' : 'text-gray-300 hover:text-[#88DDFC] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/ai-dashboard" className={desktopDropdownItemClass(pathname === '/ai-dashboard', 'text-[#88DDFC]', 'hover:text-[#88DDFC]')} onClick={closeMenu}>
                   AI Industry Data<MonthlyBadge />
                 </Link>
-                <Link href="/ai-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/ai-explained' ? 'text-violet-300 bg-gray-900' : 'text-gray-300 hover:text-violet-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/ai-explained" className={desktopDropdownItemClass(pathname === '/ai-explained', 'text-violet-300', 'hover:text-violet-300')} onClick={closeMenu}>
                   AI Explained
                 </Link>
-                <Link href="/ai-books" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/ai-books' ? 'text-violet-300 bg-gray-900' : 'text-gray-300 hover:text-violet-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/ai-books" className={desktopDropdownItemClass(pathname === '/ai-books', 'text-violet-300', 'hover:text-violet-300')} onClick={closeMenu}>
                   Books on AI
                 </Link>
                 <div className="border-t border-gray-700/50">
-                <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#88DDFC] bg-gray-900' : 'text-gray-300 hover:text-[#88DDFC] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/artificial-intelligence" className={desktopDropdownItemClass(pathname === '/category/artificial-intelligence', 'text-[#88DDFC]', 'hover:text-[#88DDFC]')} onClick={closeMenu}>
                   Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
                 </div>
@@ -128,20 +140,20 @@ const Header = () => {
             {isRenewablesOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[260px]">
-                <Link href="/energy-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-dashboard' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/energy-dashboard" className={desktopDropdownItemClass(pathname === '/energy-dashboard', 'text-emerald-400', 'hover:text-emerald-400')} onClick={closeMenu}>
                   Local & Global Energy Data<AnnualBadge />
                 </Link>
-                <Link href="/energy-rankings" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400 bg-gray-900' : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/energy-rankings" className={desktopDropdownItemClass(pathname === '/energy-rankings', 'text-emerald-400', 'hover:text-emerald-400')} onClick={closeMenu}>
                   Global Energy Rankings<AnnualBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
-                <Link href="/energy-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300 bg-gray-900' : 'text-gray-300 hover:text-emerald-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/energy-explained" className={desktopDropdownItemClass(pathname === '/energy-explained', 'text-emerald-300', 'hover:text-emerald-300')} onClick={closeMenu}>
                   Energy Explained
                 </Link>
-                <Link href="/energy-books" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/energy-books' ? 'text-emerald-300 bg-gray-900' : 'text-gray-300 hover:text-emerald-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/energy-books" className={desktopDropdownItemClass(pathname === '/energy-books', 'text-emerald-300', 'hover:text-emerald-300')} onClick={closeMenu}>
                   Books on Energy
                 </Link>
-                <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/renewable-energy" className={desktopDropdownItemClass(pathname === '/category/renewable-energy', 'text-[#D1E368]', 'hover:text-[#D1E368]')} onClick={closeMenu}>
                   Blog{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
                 </Link>
                 </div>
@@ -160,35 +172,35 @@ const Header = () => {
             {isClimateChangeOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[280px]">
-                <Link href="/climate-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-dashboard' ? 'text-white bg-gray-900' : 'text-gray-300 hover:text-white hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-white', 'hover:text-white')} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
-                <Link href="/climate" className={`block px-4 py-2.5 text-sm transition-colors ${pathname?.startsWith('/climate/') || pathname === '/climate' ? 'text-cyan-400 bg-gray-900' : 'text-gray-300 hover:text-cyan-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/climate" className={desktopDropdownItemClass(isClimateUpdatesPage, 'text-cyan-400', 'hover:text-cyan-400')} onClick={closeMenu}>
                   Climate Updates<MonthlyBadge />
                 </Link>
-                <Link href="/planetary-boundaries" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400 bg-gray-900' : 'text-gray-300 hover:text-red-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/planetary-boundaries" className={desktopDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
                 </Link>
-                <Link href="/greenhouse-gases" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400 bg-gray-900' : 'text-gray-300 hover:text-amber-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/greenhouse-gases" className={desktopDropdownItemClass(pathname === '/greenhouse-gases', 'text-amber-400', 'hover:text-amber-400')} onClick={closeMenu}>
                   Greenhouse Gases<MonthlyBadge />
                 </Link>
-                <Link href="/sea-levels-ice" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400 bg-gray-900' : 'text-gray-300 hover:text-teal-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/sea-levels-ice" className={desktopDropdownItemClass(pathname === '/sea-levels-ice', 'text-teal-400', 'hover:text-teal-400')} onClick={closeMenu}>
                   Sea Levels & Ice<MonthlyBadge />
                 </Link>
-                <Link href="/extreme-weather" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400 bg-gray-900' : 'text-gray-300 hover:text-orange-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/extreme-weather" className={desktopDropdownItemClass(pathname === '/extreme-weather', 'text-orange-400', 'hover:text-orange-400')} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
                 </Link>
-                <Link href="/emissions" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/emissions' ? 'text-rose-400 bg-gray-900' : 'text-gray-300 hover:text-rose-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/emissions" className={desktopDropdownItemClass(pathname === '/emissions', 'text-rose-400', 'hover:text-rose-400')} onClick={closeMenu}>
                   CO₂ Emissions<AnnualBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
-                <Link href="/climate-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-explained' ? 'text-sky-400 bg-gray-900' : 'text-gray-300 hover:text-sky-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/climate-explained" className={desktopDropdownItemClass(pathname === '/climate-explained', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
                   Climate Explained
                 </Link>
-                <Link href="/climate-books" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/climate-books' ? 'text-sky-400 bg-gray-900' : 'text-gray-300 hover:text-sky-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/climate-books" className={desktopDropdownItemClass(pathname === '/climate-books', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
                   Books on Climate
                 </Link>
-                <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/climate-change" className={desktopDropdownItemClass(pathname === '/category/climate-change', 'text-[#D0A65E]', 'hover:text-[#D0A65E]')} onClick={closeMenu}>
                   Blog{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
                 </Link>
                 </div>
@@ -207,17 +219,17 @@ const Header = () => {
             {isBiotechOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[200px]">
-                <Link href="/biotech-dashboard" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/biotech-dashboard' ? 'text-pink-400 bg-gray-900' : 'text-gray-300 hover:text-pink-400 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/biotech-dashboard" className={desktopDropdownItemClass(pathname === '/biotech-dashboard', 'text-pink-400', 'hover:text-pink-400')} onClick={closeMenu}>
                   Biotech Data<AnnualBadge />
                 </Link>
-                <Link href="/biotech-explained" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/biotech-explained' ? 'text-fuchsia-300 bg-gray-900' : 'text-gray-300 hover:text-fuchsia-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/biotech-explained" className={desktopDropdownItemClass(pathname === '/biotech-explained', 'text-fuchsia-300', 'hover:text-fuchsia-300')} onClick={closeMenu}>
                   Biotech Explained
                 </Link>
-                <Link href="/biotech-books" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/biotech-books' ? 'text-fuchsia-300 bg-gray-900' : 'text-gray-300 hover:text-fuchsia-300 hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/biotech-books" className={desktopDropdownItemClass(pathname === '/biotech-books', 'text-fuchsia-300', 'hover:text-fuchsia-300')} onClick={closeMenu}>
                   Books on Biotech
                 </Link>
                 <div className="border-t border-gray-700/50">
-                <Link href="/category/biotechnology" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742] bg-gray-900' : 'text-gray-300 hover:text-[#D26742] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/biotechnology" className={desktopDropdownItemClass(pathname === '/category/biotechnology', 'text-[#D26742]', 'hover:text-[#D26742]')} onClick={closeMenu}>
                   Blog{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
                 </div>
@@ -236,16 +248,16 @@ const Header = () => {
             {isBlogOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[160px]">
-                <Link href="/category/artificial-intelligence" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD] bg-gray-900' : 'text-gray-300 hover:text-[#89DEFD] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/artificial-intelligence" className={desktopDropdownItemClass(pathname === '/category/artificial-intelligence', 'text-[#89DEFD]', 'hover:text-[#89DEFD]')} onClick={closeMenu}>
                   AI{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
-                <Link href="/category/biotechnology" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742] bg-gray-900' : 'text-gray-300 hover:text-[#D26742] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/biotechnology" className={desktopDropdownItemClass(pathname === '/category/biotechnology', 'text-[#D26742]', 'hover:text-[#D26742]')} onClick={closeMenu}>
                   Biotech{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
-                <Link href="/category/climate-change" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E] bg-gray-900' : 'text-gray-300 hover:text-[#D0A65E] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/climate-change" className={desktopDropdownItemClass(pathname === '/category/climate-change', 'text-[#D0A65E]', 'hover:text-[#D0A65E]')} onClick={closeMenu}>
                   Climate{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
                 </Link>
-                <Link href="/category/renewable-energy" className={`block px-4 py-2.5 text-sm transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368] bg-gray-900' : 'text-gray-300 hover:text-[#D1E368] hover:bg-gray-900'}`} onClick={closeMenu}>
+                <Link href="/category/renewable-energy" className={desktopDropdownItemClass(pathname === '/category/renewable-energy', 'text-[#D1E368]', 'hover:text-[#D1E368]')} onClick={closeMenu}>
                   Renewables{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
                 </Link>
                 </div>
@@ -302,16 +314,16 @@ const Header = () => {
             </button>
             {mobileAIOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/ai-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/ai-dashboard' ? 'text-[#88DDFC]' : 'text-gray-300 hover:text-[#88DDFC]'}`} onClick={closeMenu}>
+                <Link href="/ai-dashboard" className={mobileDropdownItemClass(pathname === '/ai-dashboard', 'text-[#88DDFC]', 'hover:text-[#88DDFC]')} onClick={closeMenu}>
                   AI Industry Data<MonthlyBadge />
                 </Link>
-                <Link href="/ai-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/ai-explained' ? 'text-violet-300' : 'text-gray-300 hover:text-violet-300'}`} onClick={closeMenu}>
+                <Link href="/ai-explained" className={mobileDropdownItemClass(pathname === '/ai-explained', 'text-violet-300', 'hover:text-violet-300')} onClick={closeMenu}>
                   AI Explained
                 </Link>
-                <Link href="/ai-books" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/ai-books' ? 'text-violet-300' : 'text-gray-300 hover:text-violet-300'}`} onClick={closeMenu}>
+                <Link href="/ai-books" className={mobileDropdownItemClass(pathname === '/ai-books', 'text-violet-300', 'hover:text-violet-300')} onClick={closeMenu}>
                   Books on AI
                 </Link>
-                <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#88DDFC]' : 'text-gray-300 hover:text-[#88DDFC]'}`} onClick={closeMenu}>
+                <Link href="/category/artificial-intelligence" className={mobileDropdownItemClass(pathname === '/category/artificial-intelligence', 'text-[#88DDFC]', 'hover:text-[#88DDFC]', 'border-b border-gray-600/50')} onClick={closeMenu}>
                   Blog{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
               </div>
@@ -327,19 +339,19 @@ const Header = () => {
             </button>
             {mobileRenewablesOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/energy-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-dashboard' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'}`} onClick={closeMenu}>
+                <Link href="/energy-dashboard" className={mobileDropdownItemClass(pathname === '/energy-dashboard', 'text-emerald-400', 'hover:text-emerald-400')} onClick={closeMenu}>
                   Local & Global Energy Data<AnnualBadge />
                 </Link>
-                <Link href="/energy-rankings" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-rankings' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'}`} onClick={closeMenu}>
+                <Link href="/energy-rankings" className={mobileDropdownItemClass(pathname === '/energy-rankings', 'text-emerald-400', 'hover:text-emerald-400')} onClick={closeMenu}>
                   Global Energy Rankings<AnnualBadge />
                 </Link>
-                <Link href="/energy-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-explained' ? 'text-emerald-300' : 'text-gray-300 hover:text-emerald-300'}`} onClick={closeMenu}>
+                <Link href="/energy-explained" className={mobileDropdownItemClass(pathname === '/energy-explained', 'text-emerald-300', 'hover:text-emerald-300')} onClick={closeMenu}>
                   Energy Explained
                 </Link>
-                <Link href="/energy-books" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/energy-books' ? 'text-emerald-300' : 'text-gray-300 hover:text-emerald-300'}`} onClick={closeMenu}>
+                <Link href="/energy-books" className={mobileDropdownItemClass(pathname === '/energy-books', 'text-emerald-300', 'hover:text-emerald-300')} onClick={closeMenu}>
                   Books on Energy
                 </Link>
-                <Link href="/category/renewable-energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368]' : 'text-gray-300 hover:text-[#D1E368]'}`} onClick={closeMenu}>
+                <Link href="/category/renewable-energy" className={mobileDropdownItemClass(pathname === '/category/renewable-energy', 'text-[#D1E368]', 'hover:text-[#D1E368]', 'border-b border-gray-600/50')} onClick={closeMenu}>
                   Blog{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
                 </Link>
               </div>
@@ -355,34 +367,34 @@ const Header = () => {
             </button>
             {mobileClimateOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/climate-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-dashboard' ? 'text-white' : 'text-gray-300 hover:text-white'}`} onClick={closeMenu}>
+                <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-white', 'hover:text-white')} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
-                <Link href="/climate" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname?.startsWith('/climate/') || pathname === '/climate' ? 'text-cyan-400' : 'text-gray-300 hover:text-cyan-400'}`} onClick={closeMenu}>
+                <Link href="/climate" className={mobileDropdownItemClass(isClimateUpdatesPage, 'text-cyan-400', 'hover:text-cyan-400')} onClick={closeMenu}>
                   Climate Updates<MonthlyBadge />
                 </Link>
-                <Link href="/planetary-boundaries" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/planetary-boundaries' ? 'text-red-400' : 'text-gray-300 hover:text-red-400'}`} onClick={closeMenu}>
+                <Link href="/planetary-boundaries" className={mobileDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
                 </Link>
-                <Link href="/greenhouse-gases" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/greenhouse-gases' ? 'text-amber-400' : 'text-gray-300 hover:text-amber-400'}`} onClick={closeMenu}>
+                <Link href="/greenhouse-gases" className={mobileDropdownItemClass(pathname === '/greenhouse-gases', 'text-amber-400', 'hover:text-amber-400')} onClick={closeMenu}>
                   Greenhouse Gases<MonthlyBadge />
                 </Link>
-                <Link href="/sea-levels-ice" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/sea-levels-ice' ? 'text-teal-400' : 'text-gray-300 hover:text-teal-400'}`} onClick={closeMenu}>
+                <Link href="/sea-levels-ice" className={mobileDropdownItemClass(pathname === '/sea-levels-ice', 'text-teal-400', 'hover:text-teal-400')} onClick={closeMenu}>
                   Sea Levels & Ice<MonthlyBadge />
                 </Link>
-                <Link href="/extreme-weather" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/extreme-weather' ? 'text-orange-400' : 'text-gray-300 hover:text-orange-400'}`} onClick={closeMenu}>
+                <Link href="/extreme-weather" className={mobileDropdownItemClass(pathname === '/extreme-weather', 'text-orange-400', 'hover:text-orange-400')} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
                 </Link>
-                <Link href="/emissions" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/emissions' ? 'text-rose-400' : 'text-gray-300 hover:text-rose-400'}`} onClick={closeMenu}>
+                <Link href="/emissions" className={mobileDropdownItemClass(pathname === '/emissions', 'text-rose-400', 'hover:text-rose-400')} onClick={closeMenu}>
                   CO₂ Emissions<AnnualBadge />
                 </Link>
-                <Link href="/climate-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-explained' ? 'text-sky-400' : 'text-gray-300 hover:text-sky-400'}`} onClick={closeMenu}>
+                <Link href="/climate-explained" className={mobileDropdownItemClass(pathname === '/climate-explained', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
                   Climate Explained
                 </Link>
-                <Link href="/climate-books" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/climate-books' ? 'text-sky-400' : 'text-gray-300 hover:text-sky-400'}`} onClick={closeMenu}>
+                <Link href="/climate-books" className={mobileDropdownItemClass(pathname === '/climate-books', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
                   Books on Climate
                 </Link>
-                <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-300 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
+                <Link href="/category/climate-change" className={mobileDropdownItemClass(pathname === '/category/climate-change', 'text-[#D0A65E]', 'hover:text-[#D0A65E]', 'border-b border-gray-600/50')} onClick={closeMenu}>
                   Blog{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
                 </Link>
               </div>
@@ -398,16 +410,16 @@ const Header = () => {
             </button>
             {mobileBiotechOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/biotech-dashboard" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/biotech-dashboard' ? 'text-pink-400' : 'text-gray-300 hover:text-pink-400'}`} onClick={closeMenu}>
+                <Link href="/biotech-dashboard" className={mobileDropdownItemClass(pathname === '/biotech-dashboard', 'text-pink-400', 'hover:text-pink-400')} onClick={closeMenu}>
                   Biotech Data<AnnualBadge />
                 </Link>
-                <Link href="/biotech-explained" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/biotech-explained' ? 'text-fuchsia-300' : 'text-gray-300 hover:text-fuchsia-300'}`} onClick={closeMenu}>
+                <Link href="/biotech-explained" className={mobileDropdownItemClass(pathname === '/biotech-explained', 'text-fuchsia-300', 'hover:text-fuchsia-300')} onClick={closeMenu}>
                   Biotech Explained
                 </Link>
-                <Link href="/biotech-books" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/biotech-books' ? 'text-fuchsia-300' : 'text-gray-300 hover:text-fuchsia-300'}`} onClick={closeMenu}>
+                <Link href="/biotech-books" className={mobileDropdownItemClass(pathname === '/biotech-books', 'text-fuchsia-300', 'hover:text-fuchsia-300')} onClick={closeMenu}>
                   Books on Biotech
                 </Link>
-                <Link href="/category/biotechnology" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742]' : 'text-gray-300 hover:text-[#D26742]'}`} onClick={closeMenu}>
+                <Link href="/category/biotechnology" className={mobileDropdownItemClass(pathname === '/category/biotechnology', 'text-[#D26742]', 'hover:text-[#D26742]', 'border-b border-gray-600/50')} onClick={closeMenu}>
                   Blog{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
               </div>
@@ -423,16 +435,16 @@ const Header = () => {
             </button>
             {mobileBlogOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/category/artificial-intelligence" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/category/artificial-intelligence' ? 'text-[#89DEFD]' : 'text-gray-300 hover:text-[#89DEFD]'}`} onClick={closeMenu}>
+                <Link href="/category/artificial-intelligence" className={mobileDropdownItemClass(pathname === '/category/artificial-intelligence', 'text-[#89DEFD]', 'hover:text-[#89DEFD]')} onClick={closeMenu}>
                   AI{recentCategories['artificial-intelligence'] && <ArticleBadge cat="artificial-intelligence" />}
                 </Link>
-                <Link href="/category/biotechnology" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/category/biotechnology' ? 'text-[#D26742]' : 'text-gray-300 hover:text-[#D26742]'}`} onClick={closeMenu}>
+                <Link href="/category/biotechnology" className={mobileDropdownItemClass(pathname === '/category/biotechnology', 'text-[#D26742]', 'hover:text-[#D26742]')} onClick={closeMenu}>
                   Biotech{recentCategories['biotechnology'] && <ArticleBadge cat="biotechnology" />}
                 </Link>
-                <Link href="/category/climate-change" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors ${pathname === '/category/climate-change' ? 'text-[#D0A65E]' : 'text-gray-300 hover:text-[#D0A65E]'}`} onClick={closeMenu}>
+                <Link href="/category/climate-change" className={mobileDropdownItemClass(pathname === '/category/climate-change', 'text-[#D0A65E]', 'hover:text-[#D0A65E]')} onClick={closeMenu}>
                   Climate{recentCategories['climate-change'] && <ArticleBadge cat="climate-change" />}
                 </Link>
-                <Link href="/category/renewable-energy" className={`text-sm pl-10 pr-6 py-3 border-b border-gray-600/50 w-full block transition-colors ${pathname === '/category/renewable-energy' ? 'text-[#D1E368]' : 'text-gray-300 hover:text-[#D1E368]'}`} onClick={closeMenu}>
+                <Link href="/category/renewable-energy" className={mobileDropdownItemClass(pathname === '/category/renewable-energy', 'text-[#D1E368]', 'hover:text-[#D1E368]', 'border-b border-gray-600/50')} onClick={closeMenu}>
                   Renewables{recentCategories['renewable-energy'] && <ArticleBadge cat="renewable-energy" />}
                 </Link>
               </div>

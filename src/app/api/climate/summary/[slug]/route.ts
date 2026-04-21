@@ -390,9 +390,6 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   }
   if (region.type === 'uk-region') {
     lines.push('- Use the official Met Office region name exactly as provided. Do not rename to a single city.');
-    if (region.coveragePlaces?.length) {
-      lines.push(`- You may mention that the region covers ${region.coveragePlaces.join(', ')}, but keep the official name as the main label.`);
-    }
   }
   lines.push('');
   lines.push('RULES:');
@@ -403,6 +400,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('- Use the EXACT values and rankings from the RANKED HIGHLIGHTS and DATA TABLE provided — do NOT substitute with values from web searches, as these may differ due to rounding or methodology.');
   lines.push('- When citing temperature, use the AVERAGE temperature (Avg Temp / Mean Temp) from our data as the primary figure. Only mention maximum or minimum temperature if you explicitly label it as such (e.g. "maximum temperatures reached X°C"). Never present max temp figures as if they are the average.');
   lines.push('- Always use numeric ordinals (1st, 2nd, 3rd, 4th) rather than written-out words (first, second, third, fourth).');
+  lines.push('- Do not list coverage cities or example places in the summary. City coverage is shown separately in the page UI.');
   lines.push('- For web search findings about weather events, summarise in your own words. Do not copy text verbatim.');
   lines.push('- No policy recommendations.');
   lines.push('- CRITICAL: Ensure you complete your final sentence. Do not abruptly truncate the text.');
@@ -558,7 +556,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v17`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v18`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {

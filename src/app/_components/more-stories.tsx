@@ -14,9 +14,9 @@ export function MoreStories({ posts, title = "More Articles", hideTitle = false 
       {!hideTitle && (
         <div className="flex items-center gap-4 my-6">
           <div className="h-px bg-[#FFF5E7]/30 flex-1" />
-          <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#FFF5E7]/50 shadow-lg">
+          <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#FFF5E7]/50 shadow-lg [&>svg]:shrink-0">
             <Newspaper className="h-4 w-4" />
-            {title}
+            <span>{title}</span>
           </h2>
           <div className="h-px bg-[#FFF5E7]/30 flex-1" />
         </div>

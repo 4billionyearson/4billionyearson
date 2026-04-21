@@ -12,8 +12,9 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-4 my-6">
       <div className="h-px bg-[#D0A65E]/30 flex-1" />
-      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg">
-        {icon} {title}
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+        {icon}
+        <span>{title}</span>
       </h2>
       <div className="h-px bg-[#D0A65E]/30 flex-1" />
     </div>
@@ -255,9 +256,9 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
     <div className="space-y-4">
       {panels.map((panel) => (
         <div key={panel.title} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-          <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+          <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
             {panel.icon}
-            {panel.title}
+            <span className="min-w-0 flex-1">{panel.title}</span>
           </h2>
           <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden">
             {panel.sections.map((section, sIdx) => (
@@ -268,7 +269,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                 <div className="p-2 md:p-3 pt-1">
                   {/* Column headers */}
                   <div className="flex gap-px">
-                    <div className="w-14 md:w-20 shrink-0" />
+                    <div className="w-10 md:w-20 shrink-0" />
                     {section.rows.map((row) => (
                       <div
                         key={row.label}
@@ -287,7 +288,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                     return (
                       <React.Fragment key={period}>
                         <div className={`flex gap-px border-t border-gray-600/40 ${pIdx % 2 === 0 ? 'bg-gray-800/40' : ''}`}>
-                          <div className="w-14 md:w-20 shrink-0 py-2 px-1.5 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-400 font-semibold leading-tight flex items-start pt-2.5">
+                          <div className="w-10 md:w-20 shrink-0 py-2 px-1 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-400 font-semibold leading-tight flex items-start pt-2.5">
                             <span className="md:hidden">{periodShortLabel(periodLabel, period)}</span>
                             <span className="hidden md:inline">{periodLabel}</span>
                           </div>
@@ -315,7 +316,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                         </div>
                         {/* Record sub-row for this period */}
                         <div className="flex gap-px border-t border-dashed border-gray-500/50 italic">
-                          <div className="w-14 md:w-20 shrink-0 py-1.5 px-1.5 text-[10px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
+                          <div className="w-10 md:w-20 shrink-0 py-1.5 px-1 text-[10px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
                             Record
                           </div>
                           {section.rows.map((row) => (
@@ -742,9 +743,9 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
               {/* ─── Attribution ─── */}
               <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-center gap-2">
-                  <Database className="h-5 w-5 text-[#D0A65E]" />
-                  Data Sources
+                <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+                  <Database className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+                  <span className="min-w-0 flex-1">Data Sources</span>
                 </h2>
                 <div className="text-xs text-gray-400 space-y-1.5">
                   <p>Last updated: <span className="text-gray-300">{data.lastUpdated}</span> · Source: <span className="text-gray-300">{data.source === 'cache' ? 'cached' : 'live'}</span></p>

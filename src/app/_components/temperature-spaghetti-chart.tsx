@@ -108,9 +108,11 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
 
   return (
     <div>
-      <h2 className="text-xl font-bold font-mono text-white mb-1 flex items-center gap-2">
-        <Thermometer className="h-5 w-5 text-orange-400" />
-        {regionName} – Monthly Temperature – All Years
+      <h2 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
+        <Thermometer className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
+        <span className="min-w-0 flex-1">
+          {regionName} – Monthly Temperature – All Years
+        </span>
       </h2>
       <p className="text-xs text-gray-400 mb-3">
         Each line represents one year of monthly mean temperatures.

@@ -92,9 +92,9 @@ function DarkTooltip({ active, payload, label, formatter }: any) {
 function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#FFF5E7]">
-      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-center gap-2 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+      <h2 className="text-xl font-bold font-mono text-white mb-5 flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
         {icon}
-        {title}
+        <span className="min-w-0 flex-1">{title}</span>
       </h2>
       {children}
     </div>
@@ -105,8 +105,9 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-4 my-6">
       <div className="h-px bg-[#FFF5E7]/30 flex-1" />
-      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#FFF5E7]/50 shadow-lg">
-        {icon} {title}
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#FFF5E7]/50 shadow-lg [&>svg]:shrink-0">
+        {icon}
+        <span>{title}</span>
       </h2>
       <div className="h-px bg-[#FFF5E7]/30 flex-1" />
     </div>

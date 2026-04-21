@@ -62,8 +62,9 @@ export default function ClimateProfilesIndex() {
 
           {/* Countries */}
           <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
-              <span>🌍</span> Countries
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2">
+              <span className="shrink-0 mt-1">🌍</span>
+              <span className="min-w-0 flex-1">Countries</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {countries.map(region => (
@@ -74,8 +75,9 @@ export default function ClimateProfilesIndex() {
 
           {/* US States */}
           <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
-              <span>🇺🇸</span> US States
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2">
+              <span className="shrink-0 mt-1">🇺🇸</span>
+              <span className="min-w-0 flex-1">US States</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {usStates.map(region => (
@@ -86,8 +88,9 @@ export default function ClimateProfilesIndex() {
 
           {/* UK Regions */}
           <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
-              <span>🇬🇧</span> UK Regions
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2">
+              <span className="shrink-0 mt-1">🇬🇧</span>
+              <span className="min-w-0 flex-1">UK Regions</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {ukRegions.map(region => (
