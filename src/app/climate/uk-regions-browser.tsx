@@ -412,9 +412,10 @@ function UKMapView({
   onSelectRegion: (slug: string) => void;
 }) {
   const highlightedGroup = selectedRegion?.group ?? null;
+  const selectedMarkerPosition = selectedRegion ? REGION_MARKER_POSITIONS[selectedRegion.region.slug] : null;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] items-start">
+    <div className="space-y-4">
       <div className="rounded-2xl border border-[#D0A65E]/30 bg-[radial-gradient(circle_at_top,_rgba(208,166,94,0.12),_transparent_38%),linear-gradient(180deg,rgba(18,24,38,0.95),rgba(7,11,22,0.98))] p-4 lg:p-5">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
@@ -424,11 +425,16 @@ function UKMapView({
           <div className="text-xs text-gray-500">Approximate regional placement</div>
         </div>
 
-        <div className="relative mx-auto aspect-[0.88] max-w-[520px] overflow-hidden rounded-[28px] border border-gray-800 bg-[#070b16]">
+        <div className="relative mx-auto aspect-[1.26] w-full max-w-[900px] overflow-hidden rounded-[28px] border border-gray-800 bg-[#070b16]">
           <div className="absolute inset-[14%_26%_6%_22%] rounded-[45%_42%_48%_46%] bg-gradient-to-b from-[#1b2435] to-[#101726] opacity-95" />
           <div className="absolute left-[35%] top-[8%] h-[27%] w-[22%] rounded-[48%_44%_35%_42%] bg-gradient-to-b from-[#1b2435] to-[#101726] opacity-95" />
           <div className="absolute left-[11%] top-[42%] h-[18%] w-[16%] rounded-[42%_58%_48%_44%] bg-gradient-to-b from-[#1b2435] to-[#101726] opacity-95" />
           <div className="absolute left-[44%] top-[89%] h-[6%] w-[12%] rounded-full bg-gradient-to-b from-[#1b2435] to-[#101726] opacity-90" />
+
+          <span className="absolute left-[42%] top-[14%] text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">Scotland</span>
+          <span className="absolute left-[49%] top-[67%] text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">England</span>
+          <span className="absolute left-[27%] top-[70%] text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">Wales</span>
+          <span className="absolute left-[8%] top-[50%] text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">N. Ireland</span>
 
           <div className={`absolute inset-[14%_26%_6%_22%] rounded-[45%_42%_48%_46%] border transition-colors ${
             highlightedGroup === 'england' ? 'border-[#D0A65E]/65' : 'border-[#D0A65E]/15'
@@ -464,18 +470,24 @@ function UKMapView({
                 }`}>
                   <MapPin className="h-4 w-4" />
                 </span>
-                <span className={`pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border px-2 py-1 text-[10px] font-semibold tracking-wide transition-all ${
-                  pos.align === 'left' ? 'right-[calc(100%+8px)]' : 'left-[calc(100%+8px)]'
-                } ${selected ? 'border-[#D0A65E]/55 bg-[#1b2435] text-white' : 'border-gray-700 bg-[#0e1524]/95 text-gray-300'}`}>
-                  {item.region.name}
-                </span>
               </button>
             );
           })}
+
+          {selectedRegion && selectedMarkerPosition && (
+            <div
+              className="pointer-events-none absolute -translate-x-1/2"
+              style={{ left: `${selectedMarkerPosition.x}%`, top: `calc(${selectedMarkerPosition.y}% - 42px)` }}
+            >
+              <span className="whitespace-nowrap rounded-full border border-[#D0A65E]/55 bg-[#1b2435] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-lg">
+                {selectedRegion.region.name}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr] items-start">
         {selectedRegion ? (
           <>
             <div className="rounded-2xl border border-[#D0A65E]/30 bg-gray-900/70 p-4">
@@ -505,7 +517,7 @@ function UKMapView({
             </div>
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900/50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Other visible regions</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Visible regions</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {filteredRegions.map((item) => {
                   const active = item.region.slug === selectedRegion.region.slug;
