@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { LayoutGrid, Map as MapIcon, MapPin, Search, X } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
@@ -17,11 +18,10 @@ type UKRegionCardData = {
   representativeCities: string[];
 };
 
-type RegionMarkerPosition = {
-  x: number;
-  y: number;
-  align?: 'left' | 'right';
-};
+const UKRegionsLeafletMap = dynamic(() => import('./uk-regions-leaflet-map'), {
+  ssr: false,
+  loading: () => <div className="h-[420px] md:h-[520px] w-full rounded-[28px] bg-gray-900 animate-pulse" />,
+});
 
 const FILTER_LABELS: Record<UkCountryFilter, string> = {
   all: 'All',
@@ -60,23 +60,23 @@ const URL_PARAM_KEYS = {
   region: 'ukregion',
 } as const;
 
-const REGION_MARKER_POSITIONS: Record<string, RegionMarkerPosition> = {
-  england: { x: 62, y: 70, align: 'right' },
-  wales: { x: 41, y: 72, align: 'left' },
-  scotland: { x: 53, y: 26 },
-  'northern-ireland': { x: 15, y: 48, align: 'left' },
-  'england-and-wales': { x: 51, y: 62, align: 'left' },
-  'england-north': { x: 57, y: 54, align: 'right' },
-  'england-south': { x: 60, y: 81, align: 'right' },
-  'scotland-east': { x: 61, y: 21, align: 'right' },
-  'scotland-north': { x: 53, y: 9 },
-  'scotland-west': { x: 41, y: 30, align: 'left' },
-  'england-east-and-north-east': { x: 70, y: 58, align: 'right' },
-  'england-nw-and-north-wales': { x: 43, y: 60, align: 'left' },
-  midlands: { x: 56, y: 68, align: 'right' },
-  'east-anglia': { x: 74, y: 73, align: 'right' },
-  'england-sw-and-south-wales': { x: 36, y: 79, align: 'left' },
-  'england-se-central-south': { x: 70, y: 84, align: 'right' },
+const REGION_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  england: { lat: 52.7, lng: -1.6 },
+  wales: { lat: 52.3, lng: -3.7 },
+  scotland: { lat: 56.5, lng: -4.1 },
+  'northern-ireland': { lat: 54.7, lng: -6.8 },
+  'england-and-wales': { lat: 52.4, lng: -2.6 },
+  'england-north': { lat: 54.9, lng: -2.1 },
+  'england-south': { lat: 51.6, lng: -1.2 },
+  'scotland-east': { lat: 56.3, lng: -2.7 },
+  'scotland-north': { lat: 57.8, lng: -4.1 },
+  'scotland-west': { lat: 56.0, lng: -5.0 },
+  'england-east-and-north-east': { lat: 53.9, lng: -0.9 },
+  'england-nw-and-north-wales': { lat: 53.5, lng: -3.1 },
+  midlands: { lat: 52.5, lng: -1.6 },
+  'east-anglia': { lat: 52.4, lng: 0.8 },
+  'england-sw-and-south-wales': { lat: 51.3, lng: -3.9 },
+  'england-se-central-south': { lat: 51.3, lng: -0.7 },
 };
 
 function titleCaseCity(value: string): string {
@@ -178,6 +178,21 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
     if (!filteredRegions.length) return null;
     return filteredRegions.find((item) => item.region.slug === selectedSlug) ?? filteredRegions[0];
   }, [filteredRegions, selectedSlug]);
+
+  const mapMarkers = useMemo(() => (
+    filteredRegions
+      .map((item) => {
+        const coords = REGION_COORDINATES[item.region.slug];
+        if (!coords) return null;
+        return {
+          slug: item.region.slug,
+          name: item.region.name,
+          lat: coords.lat,
+          lng: coords.lng,
+        };
+      })
+      .filter((item): item is { slug: string; name: string; lat: number; lng: number } => Boolean(item))
+  ), [filteredRegions]);
 
   useEffect(() => {
     const nextQuery = searchParams.get(URL_PARAM_KEYS.query) ?? '';
@@ -347,6 +362,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
             filteredRegions={filteredRegions}
             normalizedQuery={normalizedQuery}
             selectedRegion={selectedRegion}
+            mapMarkers={mapMarkers}
             onSelectRegion={(slug) => setSelectedSlug(slug)}
           />
         ) : (
@@ -404,87 +420,30 @@ function UKMapView({
   filteredRegions,
   normalizedQuery,
   selectedRegion,
+  mapMarkers,
   onSelectRegion,
 }: {
   filteredRegions: UKRegionCardData[];
   normalizedQuery: string;
   selectedRegion: UKRegionCardData | null;
+  mapMarkers: Array<{ slug: string; name: string; lat: number; lng: number }>;
   onSelectRegion: (slug: string) => void;
 }) {
-  const highlightedGroup = selectedRegion?.group ?? null;
-  const selectedMarkerPosition = selectedRegion ? REGION_MARKER_POSITIONS[selectedRegion.region.slug] : null;
-
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-[#D0A65E]/30 bg-[radial-gradient(circle_at_top,_rgba(208,166,94,0.12),_transparent_38%),linear-gradient(180deg,rgba(18,24,38,0.95),rgba(7,11,22,0.98))] p-4 lg:p-5">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-white">Region locator</p>
-            <p className="text-xs text-gray-500">Click a marker to focus a region, then open its climate update.</p>
+            <p className="text-xs text-gray-500">Click a marker on the map to focus a region, then open its climate update.</p>
           </div>
-          <div className="text-xs text-gray-500">Approximate regional placement</div>
+          <div className="text-xs text-gray-500">Leaflet basemap</div>
         </div>
-
-        <div className="relative mx-auto aspect-[1.26] w-full max-w-[900px] overflow-hidden rounded-[28px] border border-gray-800 bg-[#070b16]">
-          <div className="absolute inset-[14%_26%_6%_22%] rounded-[45%_42%_48%_46%] bg-gradient-to-b from-[#1b2435] to-[#101726] opacity-95" />
-          <div className="absolute left-[35%] top-[8%] h-[27%] w-[22%] rounded-[48%_44%_35%_42%] bg-gradient-to-b from-[#1b2435] to-[#101726] opacity-95" />
-          <div className="absolute left-[11%] top-[42%] h-[18%] w-[16%] rounded-[42%_58%_48%_44%] bg-gradient-to-b from-[#1b2435] to-[#101726] opacity-95" />
-          <div className="absolute left-[44%] top-[89%] h-[6%] w-[12%] rounded-full bg-gradient-to-b from-[#1b2435] to-[#101726] opacity-90" />
-
-          <span className="absolute left-[42%] top-[14%] text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">Scotland</span>
-          <span className="absolute left-[49%] top-[67%] text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">England</span>
-          <span className="absolute left-[27%] top-[70%] text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">Wales</span>
-          <span className="absolute left-[8%] top-[50%] text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">N. Ireland</span>
-
-          <div className={`absolute inset-[14%_26%_6%_22%] rounded-[45%_42%_48%_46%] border transition-colors ${
-            highlightedGroup === 'england' ? 'border-[#D0A65E]/65' : 'border-[#D0A65E]/15'
-          }`} />
-          <div className={`absolute left-[35%] top-[8%] h-[27%] w-[22%] rounded-[48%_44%_35%_42%] border transition-colors ${
-            highlightedGroup === 'scotland' ? 'border-[#D0A65E]/65' : 'border-[#D0A65E]/15'
-          }`} />
-          <div className={`absolute left-[11%] top-[42%] h-[18%] w-[16%] rounded-[42%_58%_48%_44%] border transition-colors ${
-            highlightedGroup === 'northern-ireland' ? 'border-[#D0A65E]/65' : 'border-[#D0A65E]/15'
-          }`} />
-          <div className={`absolute left-[29%] top-[60%] h-[17%] w-[10%] rounded-[44%_36%_50%_44%] border transition-colors ${
-            highlightedGroup === 'wales' ? 'border-[#D0A65E]/65' : 'border-[#D0A65E]/15'
-          }`} />
-
-          {filteredRegions.map((item) => {
-            const pos = REGION_MARKER_POSITIONS[item.region.slug];
-            if (!pos) return null;
-            const selected = selectedRegion?.region.slug === item.region.slug;
-
-            return (
-              <button
-                key={item.region.slug}
-                type="button"
-                onClick={() => onSelectRegion(item.region.slug)}
-                className="absolute -translate-x-1/2 -translate-y-1/2 text-left"
-                style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-                aria-label={`Select ${item.region.name}`}
-              >
-                <span className={`flex h-8 w-8 items-center justify-center rounded-full border shadow-lg transition-all ${
-                  selected
-                    ? 'border-[#D0A65E] bg-[#D0A65E] text-[#0b1020] scale-110'
-                    : 'border-[#D0A65E]/45 bg-[#121a2a]/92 text-[#D0A65E] hover:border-[#D0A65E] hover:bg-[#182236]'
-                }`}>
-                  <MapPin className="h-4 w-4" />
-                </span>
-              </button>
-            );
-          })}
-
-          {selectedRegion && selectedMarkerPosition && (
-            <div
-              className="pointer-events-none absolute -translate-x-1/2"
-              style={{ left: `${selectedMarkerPosition.x}%`, top: `calc(${selectedMarkerPosition.y}% - 42px)` }}
-            >
-              <span className="whitespace-nowrap rounded-full border border-[#D0A65E]/55 bg-[#1b2435] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-lg">
-                {selectedRegion.region.name}
-              </span>
-            </div>
-          )}
-        </div>
+        <UKRegionsLeafletMap
+          markers={mapMarkers}
+          selectedSlug={selectedRegion?.region.slug ?? null}
+          onSelectRegion={onSelectRegion}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr] items-start">
