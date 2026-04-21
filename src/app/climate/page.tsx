@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import UKRegionsBrowser from './uk-regions-browser';
 
@@ -85,7 +86,9 @@ export default function ClimateProfilesIndex() {
             </div>
           </section>
 
-          <UKRegionsBrowser regions={ukRegions} />
+          <Suspense fallback={<UKRegionsFallback />}> 
+            <UKRegionsBrowser regions={ukRegions} />
+          </Suspense>
 
           {/* SEO content block */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
@@ -105,6 +108,29 @@ export default function ClimateProfilesIndex() {
         </div>
       </div>
     </main>
+  );
+}
+
+function UKRegionsFallback() {
+  return (
+    <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+      <div className="flex items-start gap-2 mb-4">
+        <span className="text-[#D0A65E] mt-1">⌖</span>
+        <div>
+          <h2 className="text-xl font-bold font-mono text-white">UK Regions</h2>
+          <p className="mt-2 text-sm text-gray-400 max-w-3xl">Loading UK region browser…</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="rounded-xl border border-gray-800 bg-gray-900/50 p-4 animate-pulse">
+            <div className="h-5 w-36 bg-gray-800 rounded" />
+            <div className="mt-3 h-4 w-52 bg-gray-800 rounded" />
+            <div className="mt-2 h-4 w-44 bg-gray-900 rounded" />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
