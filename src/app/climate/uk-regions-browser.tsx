@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { LayoutGrid, Map, MapPin, Search, X } from 'lucide-react';
+import { LayoutGrid, Map as MapIcon, MapPin, Search, X } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { UK_CITY_REGION_MAP } from '@/lib/climate/locations';
 
@@ -232,7 +232,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
       <div className="flex flex-col gap-4 md:gap-5">
         <div>
           <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2">
-            <Map className="h-5 w-5 shrink-0 mt-1 text-[#D0A65E]" />
+            <MapIcon className="h-5 w-5 shrink-0 mt-1 text-[#D0A65E]" />
             <span className="min-w-0 flex-1">UK Regions</span>
           </h2>
           <p className="mt-2 text-sm text-gray-400 max-w-3xl">
@@ -286,7 +286,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
           <div className="flex flex-wrap gap-2">
             {(Object.keys(VIEW_LABELS) as BrowserView[]).map((option) => {
               const active = view === option;
-              const Icon = option === 'list' ? LayoutGrid : Map;
+              const Icon = option === 'list' ? LayoutGrid : MapIcon;
               return (
                 <button
                   key={option}
