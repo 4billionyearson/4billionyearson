@@ -56,8 +56,12 @@ const VIEW_LABELS: Record<BrowserView, string> = {
   map: 'Map',
 };
 
-const FILTER_BUTTON_BASE = 'inline-flex h-11 items-center rounded-lg border px-4 text-sm font-medium tracking-[0.01em] transition-colors';
-const VIEW_BUTTON_BASE = 'inline-flex h-11 min-w-[112px] items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors';
+const FILTER_BUTTON_BASE = 'inline-flex h-10 items-center rounded-xl border px-3.5 text-sm font-medium transition-colors';
+const VIEW_BUTTON_BASE = 'inline-flex h-10 min-w-[108px] items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-colors';
+const FILTER_BUTTON_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/10 text-[#FFF5E7]';
+const FILTER_BUTTON_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
+const VIEW_BUTTON_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#D0A65E]';
+const VIEW_BUTTON_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/20 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 
 const URL_PARAM_KEYS = {
   query: 'ukq',
@@ -283,13 +287,13 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
           <div className="bg-gray-950/90 backdrop-blur-md px-4 py-5 md:px-6 md:py-6 space-y-5">
             <div className="space-y-4">
               <div className="relative max-w-2xl">
-                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#D0A65E' }} />
+                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'rgba(208, 166, 94, 0.8)' }} />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search by city, region or nation"
-                  className="w-full rounded-xl border border-[#D0A65E]/50 bg-gray-900/60 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#D0A65E]/60 outline-none transition-all focus:border-[#D0A65E] focus:ring-2 focus:ring-[#D0A65E]/30"
+                  className="w-full rounded-xl border border-[#D0A65E]/35 bg-gray-900/50 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#FFF5E7]/35 outline-none transition-all focus:border-[#D0A65E]/55 focus:ring-2 focus:ring-[#D0A65E]/20"
                   autoComplete="off"
                 />
                 {query && (
@@ -314,9 +318,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
                         type="button"
                         onClick={() => setFilter(option)}
                         className={`${FILTER_BUTTON_BASE} ${
-                          active
-                            ? 'border-sky-500 bg-sky-500/15 text-sky-300'
-                            : 'border-gray-700 bg-gray-800/60 text-gray-300 hover:border-gray-600 hover:bg-gray-800 hover:text-white'
+                          active ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE
                         }`}
                       >
                         {FILTER_LABELS[option]}
@@ -337,9 +339,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
                         type="button"
                         onClick={() => setView(option)}
                         className={`${VIEW_BUTTON_BASE} ${
-                          active
-                            ? 'border-[#D0A65E] bg-[#D0A65E]/10 text-[#D0A65E]'
-                            : 'border-gray-700 bg-gray-800/60 text-gray-300 hover:border-gray-600 hover:text-white'
+                          active ? VIEW_BUTTON_ACTIVE : VIEW_BUTTON_INACTIVE
                         }`}
                       >
                         <Icon className="h-4 w-4" />
@@ -347,7 +347,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
                       </button>
                     );
                   })}
-                  <span className="ml-auto text-sm text-gray-600">
+                  <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
                     {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
                     {normalizedQuery ? ` matching "${query.trim()}"` : ''}
                   </span>
@@ -364,9 +364,9 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
               return (
                 <div key={group} className="space-y-3">
                   <div className="flex items-center gap-3 mb-3">
-                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">{GROUP_TITLES[group]}</h3>
-                    <span className="flex-1 h-px bg-gray-800" />
-                    <span className="text-xs text-gray-600">{items.length}</span>
+                    <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">{GROUP_TITLES[group]}</h3>
+                    <span className="flex-1 h-px bg-[#D0A65E]/15" />
+                    <span className="text-[11px] text-gray-500">{items.length}</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {items.map((item) => (
@@ -423,18 +423,20 @@ function UKRegionCard({
     <Link
       href={`/climate/${region.slug}`}
       className={`group block rounded-xl border p-3.5 transition-all duration-200 ${
-        selected ? 'border-sky-600/50 bg-sky-950/30' : 'border-gray-700/60 bg-gray-800/40 hover:border-gray-600 hover:bg-gray-800/70'
+        selected
+          ? 'border-[#D0A65E]/45 bg-[#D0A65E]/8'
+          : 'border-gray-800/80 bg-gray-900/40 hover:border-[#D0A65E]/25 hover:bg-white/[0.03]'
       }`}
       onMouseEnter={onPointerEnter}
     >
       <div className="flex items-center gap-2 mb-1.5">
-        <MapPin className="h-4 w-4 shrink-0 text-[#FFF5E7]/80 group-hover:text-sky-400 transition-colors" />
-        <h4 className="font-semibold text-gray-100 group-hover:text-white leading-tight">{region.name}</h4>
+        <MapPin className="h-4 w-4 shrink-0 text-[#D0A65E]/75 group-hover:text-[#FFF5E7] transition-colors" />
+        <h4 className="text-sm font-medium text-[#FFF5E7] group-hover:text-white leading-tight">{region.name}</h4>
       </div>
-      <p className="text-xs font-medium text-gray-300 leading-snug">{cityPreview}</p>
-      <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{region.tagline}</p>
+      <p className="text-[13px] font-medium text-gray-300 leading-snug">{cityPreview}</p>
+      <p className="mt-1 text-[11px] leading-relaxed text-gray-500 line-clamp-2">{region.tagline}</p>
       {matchedCities.length > 0 && (
-        <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-sky-400">
+        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#D0A65E]/20 bg-[#D0A65E]/10 px-2 py-1 text-[11px] font-medium text-[#D0A65E]">
           <MapPin className="h-3 w-3 shrink-0" />
           <span>{matchedCities.join(', ')}</span>
         </div>
@@ -474,34 +476,34 @@ function UKMapView({
         {selectedRegion ? (
           <>
             <div className="space-y-3">
-              <div className="rounded-xl border border-sky-600/45 bg-sky-950/25 p-3.5">
+              <div className="rounded-xl border border-[#D0A65E]/35 bg-gray-900/55 p-4">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <MapPin className="h-4 w-4 shrink-0 text-[#FFF5E7]/80" />
-                  <h3 className="font-semibold text-gray-100 leading-tight">{selectedRegion.region.name}</h3>
+                  <MapPin className="h-4 w-4 shrink-0 text-[#D0A65E]/75" />
+                  <h3 className="text-sm font-medium text-[#FFF5E7] leading-tight">{selectedRegion.region.name}</h3>
                 </div>
-                <p className="text-xs font-medium text-gray-300 leading-snug">
+                <p className="text-[13px] font-medium text-gray-300 leading-snug">
                   {representativeCityText(selectedRegion.representativeCities)}
                 </p>
-                <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{selectedRegion.region.tagline}</p>
+                <p className="mt-1 text-[11px] leading-relaxed text-gray-500 line-clamp-2">{selectedRegion.region.tagline}</p>
               </div>
 
               <div className={`grid gap-3 ${selectedMatchText ? 'sm:grid-cols-2' : ''}`}>
                 {selectedMatchText ? (
-                  <div className="flex min-h-[68px] items-center gap-3 rounded-xl border border-sky-800/35 bg-sky-950/20 px-4 py-3">
-                    <MapPin className="h-4 w-4 shrink-0 text-sky-300" />
+                  <div className="flex min-h-[68px] items-center gap-3 rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3">
+                    <MapPin className="h-4 w-4 shrink-0 text-[#D0A65E]/75" />
                     <div className="min-w-0">
-                      <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-sky-300/70">Matches</p>
-                      <p className="truncate text-sm font-medium text-sky-300">{selectedMatchText}</p>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#FFF5E7]/45">Matches</p>
+                      <p className="truncate text-sm font-medium text-gray-200">{selectedMatchText}</p>
                     </div>
                   </div>
                 ) : null}
 
                 <Link
                   href={`/climate/${selectedRegion.region.slug}`}
-                  className="flex min-h-[68px] items-center justify-between gap-3 rounded-xl border border-[#D0A65E]/35 bg-[#D0A65E]/10 px-4 py-3 text-left transition-colors hover:bg-[#D0A65E]/20 hover:text-[#E8C97A]"
+                  className="flex min-h-[68px] items-center justify-between gap-3 rounded-xl border border-[#D0A65E]/40 bg-[#D0A65E]/12 px-4 py-3 text-left transition-colors hover:bg-[#D0A65E]/18"
                 >
                   <div className="min-w-0">
-                    <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#D0A65E]/70">Region page</p>
+                    <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#D0A65E]/72">Region page</p>
                     <p className="text-sm font-medium text-[#D0A65E]">Open climate update</p>
                   </div>
                   <ChevronRight className="h-4 w-4 shrink-0 text-[#D0A65E]/80" />
@@ -509,8 +511,8 @@ function UKMapView({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-800 bg-gray-900/50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Visible regions</p>
+            <div className="rounded-xl border border-gray-800/80 bg-gray-950/40 p-4">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#FFF5E7]/45">Visible regions</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {filteredRegions.map((item) => {
                   const active = item.region.slug === selectedRegion.region.slug;
@@ -520,9 +522,7 @@ function UKMapView({
                       type="button"
                       onClick={() => onSelectRegion(item.region.slug)}
                       className={`${FILTER_BUTTON_BASE} ${
-                        active
-                          ? 'border-sky-500 bg-sky-500/15 text-sky-300'
-                          : 'border-gray-700 bg-gray-800/60 text-gray-300 hover:border-gray-600 hover:bg-gray-800 hover:text-white'
+                        active ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE
                       }`}
                     >
                       {item.region.name}

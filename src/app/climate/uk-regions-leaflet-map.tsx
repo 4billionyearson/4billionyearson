@@ -121,9 +121,9 @@ export default function UKRegionsLeafletMap({
             center={[marker.lat, marker.lng]}
             radius={selected ? 11 : 8}
             pathOptions={{
-              color: selected ? '#38bdf8' : '#64748b',
+              color: selected ? '#FFF5E7' : '#64748b',
               weight: selected ? 2.5 : 1.5,
-              fillColor: selected ? '#0ea5e9' : '#1e293b',
+              fillColor: selected ? '#D0A65E' : '#1e293b',
               fillOpacity: selected ? 0.9 : 0.85,
             }}
             eventHandlers={{ click: () => onSelectRegion(marker.slug) }}
