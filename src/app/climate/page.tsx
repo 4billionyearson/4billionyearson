@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CLIMATE_REGIONS } from '@/lib/climate/regions';
+import { CLIMATE_REGIONS, getClimateCoverageText } from '@/lib/climate/regions';
 
 export const metadata: Metadata = {
   title: 'Climate Updates — Country, State & Region Climate Data',
@@ -121,6 +121,8 @@ export default function ClimateProfilesIndex() {
 }
 
 function RegionCard({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
+  const coverageText = region.type === 'uk-region' ? getClimateCoverageText(region) : null;
+
   return (
     <Link
       href={`/climate/${region.slug}`}
@@ -137,7 +139,14 @@ function RegionCard({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
               {TYPE_LABELS[region.type]}
             </span>
           </div>
-          <p className="text-sm text-gray-400 line-clamp-2">{region.tagline}</p>
+          {coverageText ? (
+            <>
+              <p className="text-sm text-gray-300 line-clamp-3">{coverageText}</p>
+              <p className="text-xs text-gray-500 mt-1 line-clamp-2">{region.tagline}</p>
+            </>
+          ) : (
+            <p className="text-sm text-gray-400 line-clamp-2">{region.tagline}</p>
+          )}
         </div>
       </div>
     </Link>
