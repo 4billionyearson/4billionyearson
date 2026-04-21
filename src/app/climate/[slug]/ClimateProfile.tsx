@@ -269,7 +269,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                 <div className="p-2 md:p-3 pt-1">
                   {/* Column headers */}
                   <div className="flex gap-px">
-                    <div className="w-10 md:w-20 shrink-0" />
+                    <div className="w-12 md:w-20 shrink-0" />
                     {section.rows.map((row) => (
                       <div
                         key={row.label}
@@ -288,7 +288,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                     return (
                       <React.Fragment key={period}>
                         <div className={`flex gap-px border-t border-gray-600/40 ${pIdx % 2 === 0 ? 'bg-gray-800/40' : ''}`}>
-                          <div className="w-10 md:w-20 shrink-0 py-2 px-1 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-400 font-semibold leading-tight flex items-start pt-2.5">
+                          <div className="w-12 md:w-20 shrink-0 py-2 px-1 text-[10px] md:text-[11px] uppercase tracking-wider text-gray-400 font-semibold leading-tight flex items-start pt-2.5">
                             <span className="md:hidden">{periodShortLabel(periodLabel, period)}</span>
                             <span className="hidden md:inline">{periodLabel}</span>
                           </div>
@@ -316,7 +316,7 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                         </div>
                         {/* Record sub-row for this period */}
                         <div className="flex gap-px border-t border-dashed border-gray-500/50 italic">
-                          <div className="w-10 md:w-20 shrink-0 py-1.5 px-1 text-[10px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
+                          <div className="w-12 md:w-20 shrink-0 py-1.5 px-1 text-[10px] uppercase tracking-wider text-gray-500 font-semibold leading-tight flex items-center">
                             Record
                           </div>
                           {section.rows.map((row) => (

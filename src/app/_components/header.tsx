@@ -176,7 +176,7 @@ const Header = () => {
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link href="/climate" className={desktopDropdownItemClass(isClimateUpdatesPage, 'text-cyan-400', 'hover:text-cyan-400')} onClick={closeMenu}>
-                  Climate Updates<MonthlyBadge />
+                  <span className={isClimateUpdatesPage ? 'text-cyan-400' : ''}>Climate Updates</span><MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={desktopDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
@@ -371,7 +371,7 @@ const Header = () => {
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link href="/climate" className={mobileDropdownItemClass(isClimateUpdatesPage, 'text-cyan-400', 'hover:text-cyan-400')} onClick={closeMenu}>
-                  Climate Updates<MonthlyBadge />
+                  <span className={isClimateUpdatesPage ? 'text-cyan-400' : ''}>Climate Updates</span><MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={mobileDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
