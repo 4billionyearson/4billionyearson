@@ -8,12 +8,12 @@ import { ChevronRight, LayoutGrid, Map as MapIcon, MapPin, Search, X } from 'luc
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { UK_CITY_REGION_MAP } from '@/lib/climate/locations';
 
-type UkCountryFilter = 'all' | 'england' | 'wales' | 'scotland' | 'northern-ireland' | 'cross-border';
+type RegionGroupFilter = 'all' | 'england' | 'wales' | 'scotland' | 'northern-ireland' | 'ireland' | 'cross-border';
 type BrowserView = 'list' | 'map';
 
 type UKRegionCardData = {
   region: ClimateRegion;
-  group: Exclude<UkCountryFilter, 'all'>;
+  group: Exclude<RegionGroupFilter, 'all'>;
   searchableCities: string[];
   representativeCities: string[];
 };
@@ -23,28 +23,31 @@ const UKRegionsLeafletMap = dynamic(() => import('./uk-regions-leaflet-map'), {
   loading: () => <div className="h-[420px] md:h-[520px] w-full rounded-[28px] bg-gray-900 animate-pulse" />,
 });
 
-const FILTER_LABELS: Record<UkCountryFilter, string> = {
+const FILTER_LABELS: Record<RegionGroupFilter, string> = {
   all: 'All',
   england: 'England',
   wales: 'Wales',
   scotland: 'Scotland',
   'northern-ireland': 'Northern Ireland',
+  ireland: 'Ireland',
   'cross-border': 'Cross-border',
 };
 
-const GROUP_ORDER: Array<Exclude<UkCountryFilter, 'all'>> = [
+const GROUP_ORDER: Array<Exclude<RegionGroupFilter, 'all'>> = [
   'england',
   'wales',
   'scotland',
   'northern-ireland',
+  'ireland',
   'cross-border',
 ];
 
-const GROUP_TITLES: Record<Exclude<UkCountryFilter, 'all'>, string> = {
+const GROUP_TITLES: Record<Exclude<RegionGroupFilter, 'all'>, string> = {
   england: 'England',
   wales: 'Wales',
   scotland: 'Scotland',
   'northern-ireland': 'Northern Ireland',
+  ireland: 'Ireland',
   'cross-border': 'Cross-border Regions',
 };
 
@@ -65,6 +68,7 @@ const REGION_COORDINATES: Record<string, { lat: number; lng: number }> = {
   wales: { lat: 52.3, lng: -3.7 },
   scotland: { lat: 56.5, lng: -4.1 },
   'northern-ireland': { lat: 54.7, lng: -6.8 },
+  ireland: { lat: 53.35, lng: -8.1 },
   'england-and-wales': { lat: 52.4, lng: -2.6 },
   'england-north': { lat: 54.9, lng: -2.1 },
   'england-south': { lat: 51.6, lng: -1.2 },
@@ -86,7 +90,11 @@ function titleCaseCity(value: string): string {
     .join(' ');
 }
 
-function getUKGroup(region: ClimateRegion): Exclude<UkCountryFilter, 'all'> {
+function getRegionGroup(region: ClimateRegion): Exclude<RegionGroupFilter, 'all'> {
+  if (region.slug === 'ireland') {
+    return 'ireland';
+  }
+
   switch (region.apiCode) {
     case 'uk-wal':
       return 'wales';
@@ -142,7 +150,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
   const searchParams = useSearchParams();
   const [isExpanded, setIsExpanded] = useState(true);
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<UkCountryFilter>('all');
+  const [filter, setFilter] = useState<RegionGroupFilter>('all');
   const [view, setView] = useState<BrowserView>('list');
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 
@@ -151,7 +159,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
       const representativeCities = region.coveragePlaces ?? [];
       return {
         region,
-        group: getUKGroup(region),
+        group: getRegionGroup(region),
         representativeCities,
         searchableCities: buildSearchableCities(region.apiCode, representativeCities),
       };
@@ -167,7 +175,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
   ), [browserRegions, filter, normalizedQuery]);
 
   const groupedRegions = useMemo(() => {
-    const grouped = new Map<Exclude<UkCountryFilter, 'all'>, UKRegionCardData[]>();
+    const grouped = new Map<Exclude<RegionGroupFilter, 'all'>, UKRegionCardData[]>();
     for (const group of GROUP_ORDER) grouped.set(group, []);
     for (const region of filteredRegions) {
       grouped.get(region.group)?.push(region);
@@ -202,7 +210,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
     const nextRegion = searchParams.get(URL_PARAM_KEYS.region);
 
     const nextFilter = (nextFilterParam && nextFilterParam in FILTER_LABELS)
-      ? nextFilterParam as UkCountryFilter
+      ? nextFilterParam as RegionGroupFilter
       : 'all';
     const nextView = (nextViewParam && nextViewParam in VIEW_LABELS)
       ? nextViewParam as BrowserView
@@ -258,7 +266,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
             <MapIcon className="h-6 w-6" />
           </div>
           <h2 className="flex-1 min-w-0 font-mono font-bold text-base md:text-lg tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-            UK Regions
+            UK and Ireland
           </h2>
           <ChevronRight
             className={`h-4 w-4 flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-90' : 'group-hover:translate-x-0.5'}`}
@@ -268,21 +276,22 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
       </button>
 
       <div className={`grid transition-all duration-500 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-        <div className="overflow-hidden bg-gray-950/95 px-4 py-4 md:px-5 md:py-5">
-          <div>
+        <div className="min-h-0 overflow-hidden">
+          <div className="bg-gray-950/95 px-4 py-4 md:px-5 md:py-5">
+            <div>
             <p className="text-sm text-gray-400 max-w-3xl">
-              Search by city or region, or browse by country. Some Met Office regions overlap national borders; those remain listed as cross-border because that is how the source data is published.
+              Search by city, country or region, or browse by nation. Some Met Office regions overlap national borders; those remain listed as cross-border because that is how the source data is published.
             </p>
-          </div>
+            </div>
 
-          <div className="flex flex-col gap-3 mt-4">
+            <div className="flex flex-col gap-3 mt-4">
           <div className="relative max-w-2xl">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D0A65E]" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by city or region"
+              placeholder="Search by city, country or region"
               className="w-full rounded-xl border border-[#D0A65E]/40 bg-gray-900/70 py-2.5 pl-10 pr-10 text-sm text-white placeholder:text-[#D0A65E]/55 outline-none transition-all focus:border-[#D0A65E] focus:ring-2 focus:ring-[#D0A65E]/30"
               autoComplete="off"
             />
@@ -299,7 +308,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {(Object.keys(FILTER_LABELS) as UkCountryFilter[]).map((option) => {
+            {(Object.keys(FILTER_LABELS) as RegionGroupFilter[]).map((option) => {
               const active = filter === option;
               return (
                 <button
@@ -345,9 +354,9 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
             {normalizedQuery && <span>Matching “{query.trim()}”</span>}
             <span>Representative cities shown on cards; profiles contain fuller coverage</span>
           </div>
-          </div>
+            </div>
 
-          <div className="mt-5">
+            <div className="mt-5">
         {view === 'list' ? (
           <div className="space-y-5">
             {GROUP_ORDER.map((group) => {
@@ -389,6 +398,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
         ) : (
           <EmptyState />
         )}
+            </div>
           </div>
         </div>
       </div>

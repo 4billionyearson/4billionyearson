@@ -123,6 +123,18 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     coveragePlaces: ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne'],
   },
   {
+    slug: 'ireland',
+    name: 'Ireland',
+    type: 'country',
+    apiCode: 'IRL',
+    tagline: 'Atlantic storms, shifting rainfall and rising temperatures across the island',
+    description: 'Ireland climate profile with temperature trends, rainfall changes, and emissions data. Updated monthly.',
+    emoji: '🇮🇪',
+    dataSources: ['owid-temp', 'owid-emissions'],
+    keywords: ['Ireland climate data', 'Ireland temperature trends', 'Ireland rainfall', 'Ireland emissions', 'Dublin climate'],
+    coveragePlaces: ['Dublin', 'Cork', 'Galway', 'Limerick', 'Waterford'],
+  },
+  {
     slug: 'australia',
     name: 'Australia',
     type: 'country',

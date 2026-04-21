@@ -37,9 +37,9 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export default function ClimateProfilesIndex() {
-  const countries = CLIMATE_REGIONS.filter(r => r.type === 'country');
+  const countries = CLIMATE_REGIONS.filter(r => r.type === 'country' && r.slug !== 'ireland');
   const usStates = CLIMATE_REGIONS.filter(r => r.type === 'us-state');
-  const ukRegions = CLIMATE_REGIONS.filter(r => r.type === 'uk-region');
+  const ukAndIrelandRegions = CLIMATE_REGIONS.filter(r => r.type === 'uk-region' || r.slug === 'ireland');
 
   return (
     <main>
@@ -87,7 +87,7 @@ export default function ClimateProfilesIndex() {
           </section>
 
           <Suspense fallback={<UKRegionsFallback />}> 
-            <UKRegionsBrowser regions={ukRegions} />
+            <UKRegionsBrowser regions={ukAndIrelandRegions} />
           </Suspense>
 
           {/* SEO content block */}
@@ -117,8 +117,8 @@ function UKRegionsFallback() {
       <div className="flex items-start gap-2 mb-4">
         <span className="text-[#D0A65E] mt-1">⌖</span>
         <div>
-          <h2 className="text-xl font-bold font-mono text-white">UK Regions</h2>
-          <p className="mt-2 text-sm text-gray-400 max-w-3xl">Loading UK region browser…</p>
+          <h2 className="text-xl font-bold font-mono text-white">UK and Ireland</h2>
+          <p className="mt-2 text-sm text-gray-400 max-w-3xl">Loading UK and Ireland browser…</p>
         </div>
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
