@@ -60,7 +60,9 @@ export function getClimateMetadataTitle(region: ClimateRegion, updateLabel = get
     ? 'Temperature, Rainfall, Sunshine & Frost'
     : region.type === 'us-state'
       ? 'Temperature & Precipitation'
-      : 'Temperature, Rainfall & Emissions';
+      : region.type === 'special'
+        ? 'Global Temperature, Land vs Ocean & Paris Thresholds'
+        : 'Temperature, Rainfall & Emissions';
 
   return `${region.name} Climate Update, ${updateLabel} | ${topicLabel}`;
 }
@@ -71,6 +73,25 @@ export function getClimateMetadataDescription(region: ClimateRegion, updateLabel
 }
 
 export const CURATED_CLIMATE_REGIONS: ClimateRegion[] = [
+  {
+    slug: 'global',
+    name: 'Global',
+    type: 'special',
+    apiCode: 'global',
+    tagline: 'The whole-planet temperature record — how the world is warming',
+    description: 'Global climate update with NOAA land-and-ocean temperature anomaly, ERA5 land surface temperature, progress versus the 1.5°C and 2.0°C Paris thresholds, and month-by-month context against the 1961–1990 baseline. Updated monthly.',
+    emoji: '🌍',
+    dataSources: ['noaa-global', 'owid-temp'],
+    keywords: [
+      'global temperature anomaly',
+      'global warming data',
+      'world climate update',
+      '1.5 degree threshold',
+      'global land ocean temperature',
+      'NOAA global temperature',
+      'Paris Agreement tracking',
+    ],
+  },
   {
     slug: 'uk',
     name: 'United Kingdom',

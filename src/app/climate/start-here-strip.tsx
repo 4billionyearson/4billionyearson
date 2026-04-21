@@ -75,7 +75,7 @@ function monthLabel(asOf: string | null): string | null {
 }
 
 function TypeBadge({ type }: { type: ClimateRegion['type'] }) {
-  const label = type === 'country' ? 'Country' : type === 'us-state' ? 'US State' : type === 'uk-region' ? 'UK Region' : 'Special';
+  const label = type === 'country' ? 'Country' : type === 'us-state' ? 'US State' : type === 'uk-region' ? 'UK Region' : 'Global';
   return (
     <span className="inline-flex items-center rounded-full border border-gray-800 bg-gray-900/60 px-2 py-0.5 text-[10px] font-medium text-gray-400">
       {label}

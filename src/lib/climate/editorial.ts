@@ -13,6 +13,8 @@
  * Order here is the order they appear in the UI.
  */
 export const EDITORS_PICKS: string[] = [
+  // Planet first
+  'global',
   // Countries — global emitters, debate shapers & vulnerable nations
   'usa',
   'china',
@@ -39,6 +41,7 @@ export const EDITORS_PICKS: string[] = [
  * entries already cover them (by slug) in CURATED_CLIMATE_REGIONS.
  */
 export const CURATED_SLUGS = new Set<string>([
+  'global',
   'uk',
   'usa',
   'india',

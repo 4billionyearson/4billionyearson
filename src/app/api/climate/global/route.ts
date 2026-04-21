@@ -81,7 +81,7 @@ function buildLatestThreeMonthStats(points: Array<{ year: number; month: number;
 export async function GET() {
   const cacheKey = 'climate:global';
   const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v5`;
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v6`;
 
   const cached = await getCached<any>(cacheKey);
   if (cached && cached.lastUpdated === currentMonthKey) {
@@ -276,6 +276,7 @@ export async function GET() {
       monthlyComparison,
       landYearlyData,
       landMonthlyComparison,
+      landMonthlyAll: landMonthlyData.map((p) => ({ year: p.year, month: p.month, value: p.temp })),
       landLatestMonthStats: landMonthlyData.length ? buildLatestMonthStats(landMonthlyData) : null,
       landLatestThreeMonthStats: landMonthlyData.length ? buildLatestThreeMonthStats(landMonthlyData) : null,
       landVsOceanMonthly,
