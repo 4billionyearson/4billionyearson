@@ -1,6 +1,13 @@
 // Climate Profile region definitions
 // Each region maps to an existing API route for data
 
+import { ALL_LOCATIONS, countryFlag } from './locations';
+import {
+  CURATED_LOCATION_IDS,
+  buildStubCopy,
+  locationIdToSlug,
+} from './editorial';
+
 export type RegionType = 'country' | 'us-state' | 'uk-region' | 'special';
 
 export interface ClimateRegion {
@@ -14,6 +21,8 @@ export interface ClimateRegion {
   dataSources: string[];
   keywords: string[];
   coveragePlaces?: string[];
+  /** true when the region uses auto-generated copy (not hand-curated). */
+  isStub?: boolean;
 }
 
 const SITE_URL = 'https://4billionyearson.org';
@@ -61,7 +70,7 @@ export function getClimateMetadataDescription(region: ClimateRegion, updateLabel
   return `${baseDescription}. Latest monthly climate update: ${updateLabel}.`;
 }
 
-export const CLIMATE_REGIONS: ClimateRegion[] = [
+export const CURATED_CLIMATE_REGIONS: ClimateRegion[] = [
   {
     slug: 'uk',
     name: 'United Kingdom',
@@ -374,6 +383,61 @@ export const CLIMATE_REGIONS: ClimateRegion[] = [
     keywords: ['England SE and Central South climate', 'London climate data', 'South East England weather', 'Central Southern England climate', 'Met Office regional climate data'],
     coveragePlaces: ['London', 'Oxford', 'Reading', 'Southampton', 'Portsmouth', 'Brighton'],
   },
+];
+
+// ─── Auto-generated stubs for every remaining location ────────────────────────
+// We publish a profile for every country, US state and UK region defined in
+// `locations.ts`. Entries above are the hand-crafted set; everything else
+// gets a stub with generated copy so the page still exists and is indexed.
+
+function buildStubs(): ClimateRegion[] {
+  const stubs: ClimateRegion[] = [];
+  for (const loc of ALL_LOCATIONS) {
+    if (CURATED_LOCATION_IDS.has(loc.id)) continue;
+    const slug = locationIdToSlug(loc.id, loc.name, loc.type);
+    const copy = buildStubCopy(loc.name, loc.type);
+    let apiCode = '';
+    let emoji = '🌍';
+    const dataSources: string[] = [];
+    if (loc.type === 'country' && loc.owidCode) {
+      apiCode = loc.owidCode;
+      emoji = countryFlag(loc.owidCode);
+      dataSources.push('owid-temp', 'owid-emissions');
+    } else if (loc.type === 'us-state') {
+      apiCode = loc.id; // e.g. us-ny
+      emoji = '🇺🇸';
+      dataSources.push('noaa-state');
+    } else if (loc.type === 'uk-region') {
+      apiCode = loc.id; // e.g. uk-eng
+      emoji = '🏴';
+      dataSources.push('met-office');
+    }
+    if (!apiCode) continue;
+    stubs.push({
+      slug,
+      name: loc.name,
+      type: loc.type,
+      apiCode,
+      tagline: copy.tagline,
+      description: copy.description,
+      emoji,
+      dataSources,
+      keywords: copy.keywords,
+      isStub: true,
+    });
+  }
+  return stubs;
+}
+
+export const STUB_CLIMATE_REGIONS: ClimateRegion[] = buildStubs();
+
+/**
+ * The full catalogue: curated entries first, auto-generated stubs
+ * second. Anywhere you used to read `CLIMATE_REGIONS` still works.
+ */
+export const CLIMATE_REGIONS: ClimateRegion[] = [
+  ...CURATED_CLIMATE_REGIONS,
+  ...STUB_CLIMATE_REGIONS,
 ];
 
 export function getRegionBySlug(slug: string): ClimateRegion | undefined {

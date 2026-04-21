@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import {
   getRegionBySlug,
-  getAllSlugs,
+  CURATED_CLIMATE_REGIONS,
   CLIMATE_REGIONS,
   getClimateMetadataTitle,
   getClimateMetadataDescription,
@@ -10,8 +10,12 @@ import {
 } from '@/lib/climate/regions';
 import ClimateProfile from './ClimateProfile';
 
+// Build curated pages eagerly; stub (auto-generated) pages render
+// on-demand and are then cached, so builds stay fast.
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
-  return getAllSlugs().map(slug => ({ slug }));
+  return CURATED_CLIMATE_REGIONS.map(region => ({ slug: region.slug }));
 }
 
 export async function generateMetadata(

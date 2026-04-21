@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { Suspense } from 'react';
+import { Globe2, Flag } from 'lucide-react';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import UKRegionsBrowser from './uk-regions-browser';
+import ClimateRegionsBrowser from './climate-regions-browser';
+import StartHereStrip from './start-here-strip';
 
 export const metadata: Metadata = {
   title: 'Climate Updates — Country, State & Region Climate Data',
@@ -22,18 +24,6 @@ export const metadata: Metadata = {
       'Explore climate data profiles for countries, US states, and UK regions. Temperature trends, precipitation, emissions, and monthly summaries.',
     type: 'website',
   },
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  country: 'Country',
-  'us-state': 'US State',
-  special: 'Special',
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  country: 'text-sky-400 bg-sky-400/10 border-sky-400/20',
-  'us-state': 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  special: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
 };
 
 export default function ClimateProfilesIndex() {
@@ -60,31 +50,26 @@ export default function ClimateProfilesIndex() {
             </div>
           </div>
 
+          {/* Start here — curated picks + biggest shift */}
+          <StartHereStrip regions={CLIMATE_REGIONS} />
+
           {/* Countries */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2">
-              <span className="shrink-0 mt-1">🌍</span>
-              <span className="min-w-0 flex-1">Countries</span>
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {countries.map(region => (
-                <RegionCard key={region.slug} region={region} />
-              ))}
-            </div>
-          </section>
+          <ClimateRegionsBrowser
+            title="Countries"
+            icon={<Globe2 className="h-6 w-6" />}
+            regions={countries}
+            mode="country"
+            intro="Climate profiles for every country we publish, grouped by continent. Data from Our World in Data and OWID-aggregated national sources."
+          />
 
           {/* US States */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2">
-              <span className="shrink-0 mt-1">🇺🇸</span>
-              <span className="min-w-0 flex-1">US States</span>
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {usStates.map(region => (
-                <RegionCard key={region.slug} region={region} />
-              ))}
-            </div>
-          </section>
+          <ClimateRegionsBrowser
+            title="US States"
+            icon={<Flag className="h-6 w-6" />}
+            regions={usStates}
+            mode="us-state"
+            intro="NOAA Climate at a Glance temperature and precipitation data for every US state, grouped by Census Bureau region."
+          />
 
           <Suspense fallback={<UKRegionsFallback />}> 
             <UKRegionsBrowser regions={ukAndIrelandRegions} />
@@ -131,29 +116,5 @@ function UKRegionsFallback() {
         ))}
       </div>
     </section>
-  );
-}
-
-function RegionCard({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
-  return (
-    <Link
-      href={`/climate/${region.slug}`}
-      className="group block rounded-xl border border-gray-700/50 bg-gray-900/60 p-4 hover:border-[#D0A65E]/50 hover:bg-gray-900 transition-all duration-200"
-    >
-      <div className="flex items-start gap-3">
-        <span className="text-2xl">{region.emoji}</span>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-gray-100 group-hover:text-white truncate">
-              {region.name}
-            </h3>
-            <span className={`text-xs px-1.5 py-0.5 rounded border ${TYPE_COLORS[region.type]}`}>
-              {TYPE_LABELS[region.type]}
-            </span>
-          </div>
-          <p className="text-sm text-gray-400 line-clamp-2">{region.tagline}</p>
-        </div>
-      </div>
-    </Link>
   );
 }
