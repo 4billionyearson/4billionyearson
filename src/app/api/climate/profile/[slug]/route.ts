@@ -1,27 +1,19 @@
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { getRegionBySlug } from '@/lib/climate/regions';
 
-// Internal base URL for calling our own API routes
-function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return 'http://localhost:3000';
-}
+const SNAPSHOT_ROOT = resolve(process.cwd(), 'public', 'data', 'climate');
 
-async function fetchJSON(url: string, timeout = 30000): Promise<any | null> {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
+async function loadSnapshot(relativePath: string): Promise<any | null> {
   try {
-    const res = await fetch(url, { signal: controller.signal, redirect: 'follow' });
-    if (!res.ok) return null;
-    return await res.json();
+    const raw = await readFile(resolve(SNAPSHOT_ROOT, relativePath), 'utf8');
+    return JSON.parse(raw);
   } catch {
     return null;
-  } finally {
-    clearTimeout(id);
   }
 }
 
@@ -46,15 +38,13 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v12`;
+  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v13`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
   if (cached) {
     return NextResponse.json({ ...cached, source: 'cache' });
   }
-
-  const base = getBaseUrl();
 
   try {
     let countryData = null;
@@ -64,31 +54,31 @@ export async function GET(
     let owidCountryData = null; // OWID country data (for sub-national comparison)
     let globalData = null;
 
-    // Always fetch global context
-    const globalPromise = fetchJSON(`${base}/api/climate/global`);
+    // Always load global context
+    const globalPromise = loadSnapshot('global-history.json');
 
     if (region.type === 'country') {
-      countryData = await fetchJSON(`${base}/api/climate/country/${region.apiCode}`);
-      // For UK/USA countries, also fetch national Met Office / NOAA data
+      countryData = await loadSnapshot(`country/${region.apiCode}.json`);
+      // For UK/USA countries, also load national Met Office / NOAA data
       if (region.apiCode === 'GBR') {
-        nationalData = await fetchJSON(`${base}/api/climate/uk-region/uk-uk`);
+        nationalData = await loadSnapshot('uk-region/uk-uk.json');
       } else if (region.apiCode === 'USA') {
-        nationalData = await fetchJSON(`${base}/api/climate/us-national`);
+        nationalData = await loadSnapshot('us-national.json');
       }
     } else if (region.type === 'us-state') {
       const [stateRes, countryRes, nationalRes] = await Promise.all([
-        fetchJSON(`${base}/api/climate/us-state/${region.apiCode}`),
-        fetchJSON(`${base}/api/climate/country/USA`),
-        fetchJSON(`${base}/api/climate/us-national`),
+        loadSnapshot(`us-state/${region.apiCode}.json`),
+        loadSnapshot('country/USA.json'),
+        loadSnapshot('us-national.json'),
       ]);
       usStateData = stateRes;
       owidCountryData = countryRes;
       nationalData = nationalRes;
     } else if (region.type === 'uk-region') {
       const [regionRes, countryRes, ukNationalRes] = await Promise.all([
-        fetchJSON(`${base}/api/climate/uk-region/${region.apiCode}`),
-        fetchJSON(`${base}/api/climate/country/GBR`),
-        fetchJSON(`${base}/api/climate/uk-region/uk-uk`),
+        loadSnapshot(`uk-region/${region.apiCode}.json`),
+        loadSnapshot('country/GBR.json'),
+        loadSnapshot('uk-region/uk-uk.json'),
       ]);
       ukRegionData = regionRes;
       owidCountryData = countryRes;

@@ -9,6 +9,8 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { CLIMATE_REGIONS, type ClimateRegion } from '@/lib/climate/regions';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
@@ -42,23 +44,30 @@ function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return 'http://localhost:3000';
-}
+const SNAPSHOT_ROOT = resolve(process.cwd(), 'public', 'data', 'climate');
 
-async function fetchJSON(url: string, timeout = 8000): Promise<any | null> {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
+/**
+ * Load a region's snapshot directly from disk. Snapshots are bundled
+ * into the serverless function via `outputFileTracingIncludes` in
+ * next.config.ts, so this is purely a local file read — no HTTP hop.
+ */
+async function loadSnapshot(region: ClimateRegion): Promise<any | null> {
+  let relativePath: string | null = null;
+  if (region.type === 'country') {
+    relativePath = `country/${region.apiCode}.json`;
+  } else if (region.type === 'us-state') {
+    relativePath = `us-state/${region.apiCode}.json`;
+  } else if (region.type === 'uk-region') {
+    relativePath = `uk-region/${region.apiCode}.json`;
+  }
+  if (!relativePath) return null;
+
+  const fullPath = resolve(SNAPSHOT_ROOT, relativePath);
   try {
-    const res = await fetch(url, { signal: controller.signal });
-    if (!res.ok) return null;
-    return await res.json();
+    const raw = await readFile(fullPath, 'utf8');
+    return JSON.parse(raw);
   } catch {
     return null;
-  } finally {
-    clearTimeout(id);
   }
 }
 
@@ -168,35 +177,21 @@ function extractRow(region: ClimateRegion, data: any): RankingRow | null {
   };
 }
 
-function sourceUrlFor(region: ClimateRegion, base: string): string | null {
-  if (region.type === 'country') return `${base}/api/climate/country/${region.apiCode}`;
-  if (region.type === 'us-state') return `${base}/api/climate/us-state/${region.apiCode}`;
-  if (region.type === 'uk-region') return `${base}/api/climate/uk-region/${region.apiCode}`;
-  return null;
-}
-
 async function computeRankings(): Promise<RankingsResponse> {
-  const base = getBaseUrl();
   const rows: RankingRow[] = [];
   const regions = CLIMATE_REGIONS.filter((r) => r.type !== 'special');
 
-  // Process in wide batches so we finish inside Vercel's 60s cap even on a
-  // cold cache across ~150 regions. Most regions hit their own Redis cache
-  // after the first visit, so subsequent calls are near-instant.
-  const batchSize = 30;
-  for (let i = 0; i < regions.length; i += batchSize) {
-    const batch = regions.slice(i, i + batchSize);
-    const results = await Promise.all(
-      batch.map(async (region) => {
-        const url = sourceUrlFor(region, base);
-        if (!url) return null;
-        const data = await fetchJSON(url);
-        return extractRow(region, data);
-      })
-    );
-    for (const row of results) {
-      if (row) rows.push(row);
-    }
+  // Snapshots are local JSON files bundled into the function, so we can
+  // comfortably load all ~150 regions in parallel without touching the
+  // network at all.
+  const results = await Promise.all(
+    regions.map(async (region) => {
+      const data = await loadSnapshot(region);
+      return extractRow(region, data);
+    }),
+  );
+  for (const row of results) {
+    if (row) rows.push(row);
   }
 
   const now = new Date();
