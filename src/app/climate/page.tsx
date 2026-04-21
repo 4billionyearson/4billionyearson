@@ -36,22 +36,12 @@ export default function ClimateProfilesIndex() {
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
 
-          {/* Hero */}
-          <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
-            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-                Climate Updates
-              </h1>
-            </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4">
-              <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Temperature trends, precipitation data, and emissions tracking for countries, US states, and UK regions — updated monthly from OWID, NOAA, and the Met Office.
-              </p>
-            </div>
-          </div>
-
-          {/* Start here — curated picks + biggest shift */}
-          <StartHereStrip regions={CLIMATE_REGIONS} />
+          {/* Hero + Start here — combined */}
+          <StartHereStrip
+            regions={CLIMATE_REGIONS}
+            title="Climate Updates"
+            description="Temperature trends, precipitation data, and emissions tracking for countries, US states, and UK regions — updated monthly from OWID, NOAA, and the Met Office."
+          />
 
           {/* Countries */}
           <ClimateRegionsBrowser

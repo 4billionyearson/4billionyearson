@@ -48,7 +48,7 @@ function getBaseUrl(): string {
   return 'http://localhost:3000';
 }
 
-async function fetchJSON(url: string, timeout = 20000): Promise<any | null> {
+async function fetchJSON(url: string, timeout = 8000): Promise<any | null> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   try {
@@ -180,9 +180,10 @@ async function computeRankings(): Promise<RankingsResponse> {
   const rows: RankingRow[] = [];
   const regions = CLIMATE_REGIONS.filter((r) => r.type !== 'special');
 
-  // Process in batches of 10 to stay under Vercel's 60s function limit
-  // even on a cold cache across ~150 regions.
-  const batchSize = 10;
+  // Process in wide batches so we finish inside Vercel's 60s cap even on a
+  // cold cache across ~150 regions. Most regions hit their own Redis cache
+  // after the first visit, so subsequent calls are near-instant.
+  const batchSize = 30;
   for (let i = 0; i < regions.length; i += batchSize) {
     const batch = regions.slice(i, i + batchSize);
     const results = await Promise.all(

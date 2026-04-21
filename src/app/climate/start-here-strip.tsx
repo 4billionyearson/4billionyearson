@@ -32,6 +32,8 @@ interface RankingsResponse {
 
 interface StartHereStripProps {
   regions: ClimateRegion[];
+  title?: string;
+  description?: string;
 }
 
 // ─── Shared styles ───────────────────────────────────────────────────────────
@@ -132,20 +134,24 @@ function ShiftRow({ row, window, rank }: { row: RankingRow; window: Window; rank
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
-export default function StartHereStrip({ regions }: StartHereStripProps) {
+export default function StartHereStrip({ regions, title, description }: StartHereStripProps) {
   const [tab, setTab] = useState<Tab>('picks');
   const [windowSel, setWindowSel] = useState<Window>('3m');
   const [rankings, setRankings] = useState<RankingsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Lazy-load rankings the first time the Shift tab opens
+  // Lazy-load rankings the first time the Shift tab opens. A 55s client-side
+  // abort stops the spinner hanging forever if the endpoint itself takes
+  // longer than Vercel's 60s function cap on a cold cache.
   useEffect(() => {
     if (tab !== 'shift' || rankings || loading) return;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 55000);
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetch('/api/climate/rankings')
+    fetch('/api/climate/rankings', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -154,12 +160,21 @@ export default function StartHereStrip({ regions }: StartHereStripProps) {
         if (!cancelled) setRankings(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err?.message || 'Unable to load rankings');
+        if (cancelled) return;
+        const msg = err?.name === 'AbortError'
+          ? 'Rankings took too long to load. Please try again in a moment.'
+          : err?.message || 'Unable to load rankings';
+        setError(msg);
       })
       .finally(() => {
+        clearTimeout(timeoutId);
         if (!cancelled) setLoading(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [tab, rankings, loading]);
 
   const pickedRegions = useMemo<ClimateRegion[]>(() => {
@@ -186,12 +201,30 @@ export default function StartHereStrip({ regions }: StartHereStripProps) {
       className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
       style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}
     >
-      <div className="px-4 py-3 md:px-5 md:py-4 flex items-center gap-2" style={{ backgroundColor: '#D0A65E' }}>
-        <Sparkles className="h-5 w-5" style={{ color: '#FFF5E7' }} />
-        <h2 className="flex-1 min-w-0 font-mono font-bold text-base md:text-lg tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-          Start here
-        </h2>
+      <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+        {title ? (
+          <h1
+            className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight"
+            style={{ color: '#FFF5E7' }}
+          >
+            {title}
+          </h1>
+        ) : (
+          <h2
+            className="flex items-center gap-2 text-base md:text-lg font-bold font-mono tracking-wide leading-tight"
+            style={{ color: '#FFF5E7' }}
+          >
+            <Sparkles className="h-5 w-5" />
+            Start here
+          </h2>
+        )}
       </div>
+
+      {description ? (
+        <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5 border-b border-gray-800/60">
+          <p className="text-sm md:text-lg text-gray-300 leading-relaxed">{description}</p>
+        </div>
+      ) : null}
 
       <div className="bg-gray-950/90 backdrop-blur-md px-4 py-5 md:px-6 md:py-6 space-y-4">
         {/* Tab switcher */}
