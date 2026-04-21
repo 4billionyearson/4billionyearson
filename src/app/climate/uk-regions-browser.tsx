@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { LayoutGrid, Map as MapIcon, MapPin, Search, X } from 'lucide-react';
+import { ChevronRight, LayoutGrid, Map as MapIcon, MapPin, Search, X } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { UK_CITY_REGION_MAP } from '@/lib/climate/locations';
 
@@ -140,6 +140,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isExpanded, setIsExpanded] = useState(true);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<UkCountryFilter>('all');
   const [view, setView] = useState<BrowserView>('list');
@@ -243,19 +244,38 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
   }, [query, filter, view, selectedSlug, pathname, router, searchParams]);
 
   return (
-    <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-      <div className="flex flex-col gap-4 md:gap-5">
-        <div>
-          <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2">
-            <MapIcon className="h-5 w-5 shrink-0 mt-1 text-[#D0A65E]" />
-            <span className="min-w-0 flex-1">UK Regions</span>
+    <section
+      className="relative rounded-2xl border-2 transition-all duration-500 ease-out overflow-hidden"
+      style={{
+        borderColor: '#D0A65E',
+        background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)',
+        boxShadow: isExpanded ? '0 4px 24px rgba(208,166,94,0.2)' : '0 4px 12px rgba(0,0,0,0.4)',
+      }}
+    >
+      <button type="button" onClick={() => setIsExpanded((prev) => !prev)} className="w-full text-left group">
+        <div className="px-4 py-3 md:px-5 md:py-4 flex items-center gap-2" style={{ backgroundColor: '#D0A65E' }}>
+          <div className={`transition-transform duration-300 flex-shrink-0 ${isExpanded ? 'scale-110' : 'group-hover:scale-105'}`} style={{ color: '#FFF5E7' }}>
+            <MapIcon className="h-6 w-6" />
+          </div>
+          <h2 className="flex-1 min-w-0 font-mono font-bold text-base md:text-lg tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+            UK Regions
           </h2>
-          <p className="mt-2 text-sm text-gray-400 max-w-3xl">
-            Search by city or region, or browse by country. Some Met Office regions overlap national borders; those remain listed as cross-border because that is how the source data is published.
-          </p>
+          <ChevronRight
+            className={`h-4 w-4 flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-90' : 'group-hover:translate-x-0.5'}`}
+            style={{ color: 'rgba(255,245,231,0.7)' }}
+          />
         </div>
+      </button>
 
-        <div className="flex flex-col gap-3">
+      <div className={`grid transition-all duration-500 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div className="overflow-hidden bg-gray-950/95 px-4 py-4 md:px-5 md:py-5">
+          <div>
+            <p className="text-sm text-gray-400 max-w-3xl">
+              Search by city or region, or browse by country. Some Met Office regions overlap national borders; those remain listed as cross-border because that is how the source data is published.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 mt-4">
           <div className="relative max-w-2xl">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D0A65E]" />
             <input
@@ -325,8 +345,9 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
             {normalizedQuery && <span>Matching “{query.trim()}”</span>}
             <span>Representative cities shown on cards; profiles contain fuller coverage</span>
           </div>
-        </div>
+          </div>
 
+          <div className="mt-5">
         {view === 'list' ? (
           <div className="space-y-5">
             {GROUP_ORDER.map((group) => {
@@ -368,6 +389,8 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
         ) : (
           <EmptyState />
         )}
+          </div>
+        </div>
       </div>
     </section>
   );

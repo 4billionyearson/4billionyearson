@@ -13,13 +13,13 @@ type UKMapMarker = {
 };
 
 const MAP_CENTER: [number, number] = [54.8, -3.2];
-const MAP_BOUNDS: [[number, number], [number, number]] = [[49.7, -9.2], [59.2, 2.7]];
+const MAP_BOUNDS: [[number, number], [number, number]] = [[49.8, -8.6], [59.4, 1.9]];
 
 function FitUKBounds() {
   const map = useMap();
 
   useEffect(() => {
-    map.fitBounds(MAP_BOUNDS, { padding: [24, 24] });
+    map.fitBounds(MAP_BOUNDS, { padding: [12, 12] });
   }, [map]);
 
   return null;
@@ -30,7 +30,7 @@ function FocusSelectedMarker({ marker }: { marker: UKMapMarker | null }) {
 
   useEffect(() => {
     if (!marker) return;
-    map.flyTo([marker.lat, marker.lng], Math.max(map.getZoom(), 6), {
+    map.flyTo([marker.lat, marker.lng], Math.max(map.getZoom(), 5.8), {
       duration: 0.8,
     });
   }, [map, marker]);
@@ -56,13 +56,13 @@ export default function UKRegionsLeafletMap({
     <div className="overflow-hidden rounded-[28px] border border-gray-800 bg-[#070b16]">
       <MapContainer
         center={MAP_CENTER}
-        zoom={5.4}
+        zoom={5.7}
         minZoom={5}
         maxZoom={8}
         maxBounds={MAP_BOUNDS}
         maxBoundsViscosity={1}
         scrollWheelZoom={true}
-        className="h-[420px] md:h-[520px] w-full z-0"
+        className="h-[420px] md:h-[540px] w-full z-0"
         style={{ background: '#0b1020' }}
       >
         <TileLayer
