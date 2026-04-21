@@ -27,12 +27,16 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_PATH = resolve(__dirname, '..', 'public', 'data', 'climate', 'global-history.json');
 
-const GLOBAL_BASELINE = 13.9; // NOAA 20th-century mean absolute temp (°C)
-const PRE_INDUSTRIAL_BASELINE = 13.5; // ~1850–1900 reference
+const GLOBAL_BASELINE = 13.9; // NOAA 20th-century mean global land+ocean (°C)
+const GLOBAL_LAND_BASELINE = 8.6; // NOAA 20th-century mean global land only (°C)
+const GLOBAL_OCEAN_BASELINE = 16.1; // NOAA 20th-century mean global ocean only (°C)
+const PRE_INDUSTRIAL_BASELINE = 13.5; // ~1850–1900 reference (NOAA land+ocean)
 const OWID_WORLD_ENTITY = 355;
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const NOAA_URL = 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026.json';
+const NOAA_LAND_OCEAN_URL = 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026.json';
+const NOAA_LAND_URL = 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land/1/0/1950-2026.json';
+const NOAA_OCEAN_URL = 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/ocean/1/0/1950-2026.json';
 const OWID_URL = 'https://api.ourworldindata.org/v1/indicators/1005195.data.json';
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -140,7 +144,7 @@ function buildLatestThreeMonthStats(points, now) {
 // ───────────────────────────────────────────────────────────────────────────
 // NOAA → monthly land+ocean
 
-function parseNoaa(json) {
+function parseNoaa(json, baseline) {
   const monthly = [];
   for (const [key, val] of Object.entries(json.data)) {
     const year = parseInt(key.substring(0, 4), 10);
@@ -152,7 +156,7 @@ function parseNoaa(json) {
       year,
       month,
       anomaly: round2(anomaly),
-      absoluteTemp: round2(GLOBAL_BASELINE + anomaly),
+      absoluteTemp: round2(baseline + anomaly),
     });
   }
   monthly.sort((a, b) => a.date.localeCompare(b.date));
@@ -298,19 +302,25 @@ async function main() {
   const now = new Date();
   console.log(`Build started at ${now.toISOString()}`);
 
-  // Fetch both sources in parallel, but give OWID a generous timeout — its
-  // response is ~10MB and sometimes takes 60+ seconds.
-  const [noaaJson, owidJson] = await Promise.all([
-    fetchWithRetry(NOAA_URL, { label: 'NOAA', timeoutMs: 60_000, attempts: 4 }),
+  // Fetch all sources in parallel. OWID gets a generous timeout because its
+  // response is ~10MB. The three NOAA series are small.
+  const [noaaLoJson, noaaLandJson, noaaOceanJson, owidJson] = await Promise.all([
+    fetchWithRetry(NOAA_LAND_OCEAN_URL, { label: 'NOAA land+ocean', timeoutMs: 60_000, attempts: 4 }),
+    fetchWithRetry(NOAA_LAND_URL, { label: 'NOAA land', timeoutMs: 60_000, attempts: 4 }),
+    fetchWithRetry(NOAA_OCEAN_URL, { label: 'NOAA ocean', timeoutMs: 60_000, attempts: 4 }),
     fetchWithRetry(OWID_URL, { label: 'OWID', timeoutMs: 180_000, attempts: 4 }),
   ]);
 
-  const noaaMonthly = parseNoaa(noaaJson);
+  const noaaMonthly = parseNoaa(noaaLoJson, GLOBAL_BASELINE);
+  const noaaLandMonthly = parseNoaa(noaaLandJson, GLOBAL_LAND_BASELINE);
+  const noaaOceanMonthly = parseNoaa(noaaOceanJson, GLOBAL_OCEAN_BASELINE);
   const landMonthly = parseOwid(owidJson, now);
-  console.log(`NOAA monthly points: ${noaaMonthly.length}`);
-  console.log(`OWID/ERA5 land monthly points: ${landMonthly.length}`);
+  console.log(`NOAA land+ocean monthly points: ${noaaMonthly.length}`);
+  console.log(`NOAA land-only monthly points:  ${noaaLandMonthly.length}`);
+  console.log(`NOAA ocean-only monthly points: ${noaaOceanMonthly.length}`);
+  console.log(`OWID/ERA5 land monthly points:  ${landMonthly.length}`);
 
-  if (!noaaMonthly.length) throw new Error('NOAA parse yielded zero points');
+  if (!noaaMonthly.length) throw new Error('NOAA land+ocean parse yielded zero points');
   if (!landMonthly.length) console.warn('⚠ OWID parse yielded zero points — continuing with NOAA only');
 
   const yearlyData = buildYearlyNoaa(noaaMonthly);
@@ -322,7 +332,29 @@ async function main() {
 
   const landPointsForStats = landMonthly.map((p) => ({ year: p.year, month: p.month, temp: p.temp }));
 
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v7`;
+  // NOAA per-series ranked stats — same shape as `landLatestMonthStats`
+  // so the UI can render Land / Ocean / Land+Ocean rows identically.
+  // Ranking uses the absolute temp (equivalent to ranking by anomaly).
+  const toStatPoints = (arr) => arr.map((p) => ({ year: p.year, month: p.month, temp: p.absoluteTemp }));
+  const noaaStats = {
+    landOcean: {
+      yearly: buildYearlyNoaa(noaaMonthly).map((y) => ({ year: y.year, avgTemp: y.absoluteTemp, rollingAvg: y.rollingAvg })),
+      latestMonthStats: buildLatestMonthStats(toStatPoints(noaaMonthly), now),
+      latestThreeMonthStats: buildLatestThreeMonthStats(toStatPoints(noaaMonthly), now),
+    },
+    land: {
+      yearly: buildYearlyNoaa(noaaLandMonthly).map((y) => ({ year: y.year, avgTemp: y.absoluteTemp, rollingAvg: y.rollingAvg })),
+      latestMonthStats: buildLatestMonthStats(toStatPoints(noaaLandMonthly), now),
+      latestThreeMonthStats: buildLatestThreeMonthStats(toStatPoints(noaaLandMonthly), now),
+    },
+    ocean: {
+      yearly: buildYearlyNoaa(noaaOceanMonthly).map((y) => ({ year: y.year, avgTemp: y.absoluteTemp, rollingAvg: y.rollingAvg })),
+      latestMonthStats: buildLatestMonthStats(toStatPoints(noaaOceanMonthly), now),
+      latestThreeMonthStats: buildLatestThreeMonthStats(toStatPoints(noaaOceanMonthly), now),
+    },
+  };
+
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-v8`;
 
   const result = {
     yearlyData,
@@ -333,7 +365,10 @@ async function main() {
     landLatestMonthStats: landMonthly.length ? buildLatestMonthStats(landPointsForStats, now) : null,
     landLatestThreeMonthStats: landMonthly.length ? buildLatestThreeMonthStats(landPointsForStats, now) : null,
     landVsOceanMonthly,
+    noaaStats,
     globalBaseline: GLOBAL_BASELINE,
+    globalLandBaseline: GLOBAL_LAND_BASELINE,
+    globalOceanBaseline: GLOBAL_OCEAN_BASELINE,
     preIndustrialBaseline: PRE_INDUSTRIAL_BASELINE,
     keyThresholds: {
       plus1_5: PRE_INDUSTRIAL_BASELINE + 1.5,
@@ -344,6 +379,14 @@ async function main() {
     sources: [
       {
         label: 'NOAA Climate at a Glance — Global Land+Ocean',
+        url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global',
+      },
+      {
+        label: 'NOAA Climate at a Glance — Global Land',
+        url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global',
+      },
+      {
+        label: 'NOAA Climate at a Glance — Global Ocean',
         url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global',
       },
       {

@@ -6259,17 +6259,1208 @@
       "landOceanTemp": 15.21
     }
   ],
+  "noaaStats": {
+    "landOcean": {
+      "yearly": [
+        {
+          "year": 1950,
+          "avgTemp": 13.77
+        },
+        {
+          "year": 1951,
+          "avgTemp": 13.89
+        },
+        {
+          "year": 1952,
+          "avgTemp": 13.95
+        },
+        {
+          "year": 1953,
+          "avgTemp": 14
+        },
+        {
+          "year": 1954,
+          "avgTemp": 13.83
+        },
+        {
+          "year": 1955,
+          "avgTemp": 13.77
+        },
+        {
+          "year": 1956,
+          "avgTemp": 13.73
+        },
+        {
+          "year": 1957,
+          "avgTemp": 13.96
+        },
+        {
+          "year": 1958,
+          "avgTemp": 13.99
+        },
+        {
+          "year": 1959,
+          "avgTemp": 13.98,
+          "rollingAvg": 13.89
+        },
+        {
+          "year": 1960,
+          "avgTemp": 13.89,
+          "rollingAvg": 13.9
+        },
+        {
+          "year": 1961,
+          "avgTemp": 13.98,
+          "rollingAvg": 13.91
+        },
+        {
+          "year": 1962,
+          "avgTemp": 13.94,
+          "rollingAvg": 13.91
+        },
+        {
+          "year": 1963,
+          "avgTemp": 13.96,
+          "rollingAvg": 13.9
+        },
+        {
+          "year": 1964,
+          "avgTemp": 13.72,
+          "rollingAvg": 13.89
+        },
+        {
+          "year": 1965,
+          "avgTemp": 13.82,
+          "rollingAvg": 13.9
+        },
+        {
+          "year": 1966,
+          "avgTemp": 13.87,
+          "rollingAvg": 13.91
+        },
+        {
+          "year": 1967,
+          "avgTemp": 13.9,
+          "rollingAvg": 13.91
+        },
+        {
+          "year": 1968,
+          "avgTemp": 13.85,
+          "rollingAvg": 13.89
+        },
+        {
+          "year": 1969,
+          "avgTemp": 13.99,
+          "rollingAvg": 13.89
+        },
+        {
+          "year": 1970,
+          "avgTemp": 13.94,
+          "rollingAvg": 13.9
+        },
+        {
+          "year": 1971,
+          "avgTemp": 13.82,
+          "rollingAvg": 13.88
+        },
+        {
+          "year": 1972,
+          "avgTemp": 13.96,
+          "rollingAvg": 13.88
+        },
+        {
+          "year": 1973,
+          "avgTemp": 14.07,
+          "rollingAvg": 13.89
+        },
+        {
+          "year": 1974,
+          "avgTemp": 13.85,
+          "rollingAvg": 13.91
+        },
+        {
+          "year": 1975,
+          "avgTemp": 13.9,
+          "rollingAvg": 13.92
+        },
+        {
+          "year": 1976,
+          "avgTemp": 13.84,
+          "rollingAvg": 13.91
+        },
+        {
+          "year": 1977,
+          "avgTemp": 14.1,
+          "rollingAvg": 13.93
+        },
+        {
+          "year": 1978,
+          "avgTemp": 14.02,
+          "rollingAvg": 13.95
+        },
+        {
+          "year": 1979,
+          "avgTemp": 14.09,
+          "rollingAvg": 13.96
+        },
+        {
+          "year": 1980,
+          "avgTemp": 14.19,
+          "rollingAvg": 13.98
+        },
+        {
+          "year": 1981,
+          "avgTemp": 14.23,
+          "rollingAvg": 14.03
+        },
+        {
+          "year": 1982,
+          "avgTemp": 14.06,
+          "rollingAvg": 14.04
+        },
+        {
+          "year": 1983,
+          "avgTemp": 14.22,
+          "rollingAvg": 14.05
+        },
+        {
+          "year": 1984,
+          "avgTemp": 14.07,
+          "rollingAvg": 14.07
+        },
+        {
+          "year": 1985,
+          "avgTemp": 14.05,
+          "rollingAvg": 14.09
+        },
+        {
+          "year": 1986,
+          "avgTemp": 14.12,
+          "rollingAvg": 14.11
+        },
+        {
+          "year": 1987,
+          "avgTemp": 14.23,
+          "rollingAvg": 14.13
+        },
+        {
+          "year": 1988,
+          "avgTemp": 14.28,
+          "rollingAvg": 14.15
+        },
+        {
+          "year": 1989,
+          "avgTemp": 14.16,
+          "rollingAvg": 14.16
+        },
+        {
+          "year": 1990,
+          "avgTemp": 14.32,
+          "rollingAvg": 14.17
+        },
+        {
+          "year": 1991,
+          "avgTemp": 14.31,
+          "rollingAvg": 14.18
+        },
+        {
+          "year": 1992,
+          "avgTemp": 14.13,
+          "rollingAvg": 14.19
+        },
+        {
+          "year": 1993,
+          "avgTemp": 14.16,
+          "rollingAvg": 14.18
+        },
+        {
+          "year": 1994,
+          "avgTemp": 14.22,
+          "rollingAvg": 14.2
+        },
+        {
+          "year": 1995,
+          "avgTemp": 14.36,
+          "rollingAvg": 14.23
+        },
+        {
+          "year": 1996,
+          "avgTemp": 14.24,
+          "rollingAvg": 14.24
+        },
+        {
+          "year": 1997,
+          "avgTemp": 14.38,
+          "rollingAvg": 14.26
+        },
+        {
+          "year": 1998,
+          "avgTemp": 14.51,
+          "rollingAvg": 14.28
+        },
+        {
+          "year": 1999,
+          "avgTemp": 14.3,
+          "rollingAvg": 14.29
+        },
+        {
+          "year": 2000,
+          "avgTemp": 14.3,
+          "rollingAvg": 14.29
+        },
+        {
+          "year": 2001,
+          "avgTemp": 14.43,
+          "rollingAvg": 14.3
+        },
+        {
+          "year": 2002,
+          "avgTemp": 14.49,
+          "rollingAvg": 14.34
+        },
+        {
+          "year": 2003,
+          "avgTemp": 14.5,
+          "rollingAvg": 14.37
+        },
+        {
+          "year": 2004,
+          "avgTemp": 14.44,
+          "rollingAvg": 14.4
+        },
+        {
+          "year": 2005,
+          "avgTemp": 14.57,
+          "rollingAvg": 14.42
+        },
+        {
+          "year": 2006,
+          "avgTemp": 14.53,
+          "rollingAvg": 14.44
+        },
+        {
+          "year": 2007,
+          "avgTemp": 14.52,
+          "rollingAvg": 14.46
+        },
+        {
+          "year": 2008,
+          "avgTemp": 14.43,
+          "rollingAvg": 14.45
+        },
+        {
+          "year": 2009,
+          "avgTemp": 14.55,
+          "rollingAvg": 14.48
+        },
+        {
+          "year": 2010,
+          "avgTemp": 14.61,
+          "rollingAvg": 14.51
+        },
+        {
+          "year": 2011,
+          "avgTemp": 14.5,
+          "rollingAvg": 14.51
+        },
+        {
+          "year": 2012,
+          "avgTemp": 14.53,
+          "rollingAvg": 14.52
+        },
+        {
+          "year": 2013,
+          "avgTemp": 14.56,
+          "rollingAvg": 14.52
+        },
+        {
+          "year": 2014,
+          "avgTemp": 14.63,
+          "rollingAvg": 14.54
+        },
+        {
+          "year": 2015,
+          "avgTemp": 14.78,
+          "rollingAvg": 14.56
+        },
+        {
+          "year": 2016,
+          "avgTemp": 14.9,
+          "rollingAvg": 14.6
+        },
+        {
+          "year": 2017,
+          "avgTemp": 14.83,
+          "rollingAvg": 14.63
+        },
+        {
+          "year": 2018,
+          "avgTemp": 14.76,
+          "rollingAvg": 14.67
+        },
+        {
+          "year": 2019,
+          "avgTemp": 14.89,
+          "rollingAvg": 14.7
+        },
+        {
+          "year": 2020,
+          "avgTemp": 14.91,
+          "rollingAvg": 14.73
+        },
+        {
+          "year": 2021,
+          "avgTemp": 14.76,
+          "rollingAvg": 14.76
+        },
+        {
+          "year": 2022,
+          "avgTemp": 14.79,
+          "rollingAvg": 14.78
+        },
+        {
+          "year": 2023,
+          "avgTemp": 15.07,
+          "rollingAvg": 14.83
+        },
+        {
+          "year": 2024,
+          "avgTemp": 15.16,
+          "rollingAvg": 14.89
+        },
+        {
+          "year": 2025,
+          "avgTemp": 15.02,
+          "rollingAvg": 14.91
+        }
+      ],
+      "latestMonthStats": {
+        "label": "Mar 2026",
+        "value": 15.21,
+        "diff": 1.15,
+        "rank": 3,
+        "total": 77,
+        "recordLabel": "Mar 2025",
+        "recordValue": 15.22
+      },
+      "latestThreeMonthStats": {
+        "label": "Jan–Mar 2026",
+        "value": 15.09,
+        "diff": 1.06,
+        "rank": 4,
+        "total": 77,
+        "recordLabel": "Jan–Mar 2024",
+        "recordValue": 15.23
+      }
+    },
+    "land": {
+      "yearly": [
+        {
+          "year": 1950,
+          "avgTemp": 8.39
+        },
+        {
+          "year": 1951,
+          "avgTemp": 8.52
+        },
+        {
+          "year": 1952,
+          "avgTemp": 8.6
+        },
+        {
+          "year": 1953,
+          "avgTemp": 8.81
+        },
+        {
+          "year": 1954,
+          "avgTemp": 8.56
+        },
+        {
+          "year": 1955,
+          "avgTemp": 8.49
+        },
+        {
+          "year": 1956,
+          "avgTemp": 8.29
+        },
+        {
+          "year": 1957,
+          "avgTemp": 8.57
+        },
+        {
+          "year": 1958,
+          "avgTemp": 8.64
+        },
+        {
+          "year": 1959,
+          "avgTemp": 8.71,
+          "rollingAvg": 8.56
+        },
+        {
+          "year": 1960,
+          "avgTemp": 8.5,
+          "rollingAvg": 8.57
+        },
+        {
+          "year": 1961,
+          "avgTemp": 8.67,
+          "rollingAvg": 8.58
+        },
+        {
+          "year": 1962,
+          "avgTemp": 8.64,
+          "rollingAvg": 8.59
+        },
+        {
+          "year": 1963,
+          "avgTemp": 8.64,
+          "rollingAvg": 8.57
+        },
+        {
+          "year": 1964,
+          "avgTemp": 8.25,
+          "rollingAvg": 8.54
+        },
+        {
+          "year": 1965,
+          "avgTemp": 8.44,
+          "rollingAvg": 8.54
+        },
+        {
+          "year": 1966,
+          "avgTemp": 8.44,
+          "rollingAvg": 8.55
+        },
+        {
+          "year": 1967,
+          "avgTemp": 8.62,
+          "rollingAvg": 8.56
+        },
+        {
+          "year": 1968,
+          "avgTemp": 8.39,
+          "rollingAvg": 8.53
+        },
+        {
+          "year": 1969,
+          "avgTemp": 8.51,
+          "rollingAvg": 8.51
+        },
+        {
+          "year": 1970,
+          "avgTemp": 8.6,
+          "rollingAvg": 8.52
+        },
+        {
+          "year": 1971,
+          "avgTemp": 8.54,
+          "rollingAvg": 8.51
+        },
+        {
+          "year": 1972,
+          "avgTemp": 8.52,
+          "rollingAvg": 8.49
+        },
+        {
+          "year": 1973,
+          "avgTemp": 8.89,
+          "rollingAvg": 8.52
+        },
+        {
+          "year": 1974,
+          "avgTemp": 8.46,
+          "rollingAvg": 8.54
+        },
+        {
+          "year": 1975,
+          "avgTemp": 8.67,
+          "rollingAvg": 8.56
+        },
+        {
+          "year": 1976,
+          "avgTemp": 8.39,
+          "rollingAvg": 8.56
+        },
+        {
+          "year": 1977,
+          "avgTemp": 8.8,
+          "rollingAvg": 8.58
+        },
+        {
+          "year": 1978,
+          "avgTemp": 8.63,
+          "rollingAvg": 8.6
+        },
+        {
+          "year": 1979,
+          "avgTemp": 8.64,
+          "rollingAvg": 8.61
+        },
+        {
+          "year": 1980,
+          "avgTemp": 8.95,
+          "rollingAvg": 8.65
+        },
+        {
+          "year": 1981,
+          "avgTemp": 9.16,
+          "rollingAvg": 8.71
+        },
+        {
+          "year": 1982,
+          "avgTemp": 8.61,
+          "rollingAvg": 8.72
+        },
+        {
+          "year": 1983,
+          "avgTemp": 8.99,
+          "rollingAvg": 8.73
+        },
+        {
+          "year": 1984,
+          "avgTemp": 8.73,
+          "rollingAvg": 8.76
+        },
+        {
+          "year": 1985,
+          "avgTemp": 8.7,
+          "rollingAvg": 8.76
+        },
+        {
+          "year": 1986,
+          "avgTemp": 8.82,
+          "rollingAvg": 8.8
+        },
+        {
+          "year": 1987,
+          "avgTemp": 8.85,
+          "rollingAvg": 8.81
+        },
+        {
+          "year": 1988,
+          "avgTemp": 9.14,
+          "rollingAvg": 8.86
+        },
+        {
+          "year": 1989,
+          "avgTemp": 8.89,
+          "rollingAvg": 8.88
+        },
+        {
+          "year": 1990,
+          "avgTemp": 9.21,
+          "rollingAvg": 8.91
+        },
+        {
+          "year": 1991,
+          "avgTemp": 9.19,
+          "rollingAvg": 8.91
+        },
+        {
+          "year": 1992,
+          "avgTemp": 8.81,
+          "rollingAvg": 8.93
+        },
+        {
+          "year": 1993,
+          "avgTemp": 8.87,
+          "rollingAvg": 8.92
+        },
+        {
+          "year": 1994,
+          "avgTemp": 8.99,
+          "rollingAvg": 8.95
+        },
+        {
+          "year": 1995,
+          "avgTemp": 9.37,
+          "rollingAvg": 9.01
+        },
+        {
+          "year": 1996,
+          "avgTemp": 9.02,
+          "rollingAvg": 9.03
+        },
+        {
+          "year": 1997,
+          "avgTemp": 9.12,
+          "rollingAvg": 9.06
+        },
+        {
+          "year": 1998,
+          "avgTemp": 9.45,
+          "rollingAvg": 9.09
+        },
+        {
+          "year": 1999,
+          "avgTemp": 9.22,
+          "rollingAvg": 9.13
+        },
+        {
+          "year": 2000,
+          "avgTemp": 9.17,
+          "rollingAvg": 9.12
+        },
+        {
+          "year": 2001,
+          "avgTemp": 9.35,
+          "rollingAvg": 9.14
+        },
+        {
+          "year": 2002,
+          "avgTemp": 9.51,
+          "rollingAvg": 9.21
+        },
+        {
+          "year": 2003,
+          "avgTemp": 9.48,
+          "rollingAvg": 9.27
+        },
+        {
+          "year": 2004,
+          "avgTemp": 9.3,
+          "rollingAvg": 9.3
+        },
+        {
+          "year": 2005,
+          "avgTemp": 9.73,
+          "rollingAvg": 9.34
+        },
+        {
+          "year": 2006,
+          "avgTemp": 9.61,
+          "rollingAvg": 9.39
+        },
+        {
+          "year": 2007,
+          "avgTemp": 9.76,
+          "rollingAvg": 9.46
+        },
+        {
+          "year": 2008,
+          "avgTemp": 9.47,
+          "rollingAvg": 9.46
+        },
+        {
+          "year": 2009,
+          "avgTemp": 9.56,
+          "rollingAvg": 9.49
+        },
+        {
+          "year": 2010,
+          "avgTemp": 9.76,
+          "rollingAvg": 9.55
+        },
+        {
+          "year": 2011,
+          "avgTemp": 9.63,
+          "rollingAvg": 9.58
+        },
+        {
+          "year": 2012,
+          "avgTemp": 9.62,
+          "rollingAvg": 9.59
+        },
+        {
+          "year": 2013,
+          "avgTemp": 9.62,
+          "rollingAvg": 9.61
+        },
+        {
+          "year": 2014,
+          "avgTemp": 9.65,
+          "rollingAvg": 9.64
+        },
+        {
+          "year": 2015,
+          "avgTemp": 9.9,
+          "rollingAvg": 9.66
+        },
+        {
+          "year": 2016,
+          "avgTemp": 10.2,
+          "rollingAvg": 9.72
+        },
+        {
+          "year": 2017,
+          "avgTemp": 10.04,
+          "rollingAvg": 9.75
+        },
+        {
+          "year": 2018,
+          "avgTemp": 9.91,
+          "rollingAvg": 9.79
+        },
+        {
+          "year": 2019,
+          "avgTemp": 10.09,
+          "rollingAvg": 9.84
+        },
+        {
+          "year": 2020,
+          "avgTemp": 10.23,
+          "rollingAvg": 9.89
+        },
+        {
+          "year": 2021,
+          "avgTemp": 9.96,
+          "rollingAvg": 9.92
+        },
+        {
+          "year": 2022,
+          "avgTemp": 9.97,
+          "rollingAvg": 9.96
+        },
+        {
+          "year": 2023,
+          "avgTemp": 10.37,
+          "rollingAvg": 10.03
+        },
+        {
+          "year": 2024,
+          "avgTemp": 10.54,
+          "rollingAvg": 10.12
+        },
+        {
+          "year": 2025,
+          "avgTemp": 10.37,
+          "rollingAvg": 10.17
+        }
+      ],
+      "latestMonthStats": {
+        "label": "Mar 2026",
+        "value": 10.79,
+        "diff": 1.97,
+        "rank": 3,
+        "total": 77,
+        "recordLabel": "Mar 2016",
+        "recordValue": 11.01
+      },
+      "latestThreeMonthStats": {
+        "label": "Jan–Mar 2026",
+        "value": 10.51,
+        "diff": 1.77,
+        "rank": 5,
+        "total": 77,
+        "recordLabel": "Jan–Mar 2016",
+        "recordValue": 10.86
+      }
+    },
+    "ocean": {
+      "yearly": [
+        {
+          "year": 1950,
+          "avgTemp": 16.01
+        },
+        {
+          "year": 1951,
+          "avgTemp": 16.12
+        },
+        {
+          "year": 1952,
+          "avgTemp": 16.17
+        },
+        {
+          "year": 1953,
+          "avgTemp": 16.16
+        },
+        {
+          "year": 1954,
+          "avgTemp": 16.01
+        },
+        {
+          "year": 1955,
+          "avgTemp": 15.97
+        },
+        {
+          "year": 1956,
+          "avgTemp": 16
+        },
+        {
+          "year": 1957,
+          "avgTemp": 16.2
+        },
+        {
+          "year": 1958,
+          "avgTemp": 16.21
+        },
+        {
+          "year": 1959,
+          "avgTemp": 16.17,
+          "rollingAvg": 16.1
+        },
+        {
+          "year": 1960,
+          "avgTemp": 16.13,
+          "rollingAvg": 16.11
+        },
+        {
+          "year": 1961,
+          "avgTemp": 16.18,
+          "rollingAvg": 16.12
+        },
+        {
+          "year": 1962,
+          "avgTemp": 16.14,
+          "rollingAvg": 16.12
+        },
+        {
+          "year": 1963,
+          "avgTemp": 16.17,
+          "rollingAvg": 16.12
+        },
+        {
+          "year": 1964,
+          "avgTemp": 16,
+          "rollingAvg": 16.12
+        },
+        {
+          "year": 1965,
+          "avgTemp": 16.05,
+          "rollingAvg": 16.13
+        },
+        {
+          "year": 1966,
+          "avgTemp": 16.12,
+          "rollingAvg": 16.14
+        },
+        {
+          "year": 1967,
+          "avgTemp": 16.09,
+          "rollingAvg": 16.13
+        },
+        {
+          "year": 1968,
+          "avgTemp": 16.12,
+          "rollingAvg": 16.12
+        },
+        {
+          "year": 1969,
+          "avgTemp": 16.27,
+          "rollingAvg": 16.13
+        },
+        {
+          "year": 1970,
+          "avgTemp": 16.15,
+          "rollingAvg": 16.13
+        },
+        {
+          "year": 1971,
+          "avgTemp": 16.01,
+          "rollingAvg": 16.11
+        },
+        {
+          "year": 1972,
+          "avgTemp": 16.22,
+          "rollingAvg": 16.12
+        },
+        {
+          "year": 1973,
+          "avgTemp": 16.22,
+          "rollingAvg": 16.13
+        },
+        {
+          "year": 1974,
+          "avgTemp": 16.1,
+          "rollingAvg": 16.14
+        },
+        {
+          "year": 1975,
+          "avgTemp": 16.06,
+          "rollingAvg": 16.14
+        },
+        {
+          "year": 1976,
+          "avgTemp": 16.11,
+          "rollingAvg": 16.14
+        },
+        {
+          "year": 1977,
+          "avgTemp": 16.3,
+          "rollingAvg": 16.16
+        },
+        {
+          "year": 1978,
+          "avgTemp": 16.25,
+          "rollingAvg": 16.17
+        },
+        {
+          "year": 1979,
+          "avgTemp": 16.36,
+          "rollingAvg": 16.18
+        },
+        {
+          "year": 1980,
+          "avgTemp": 16.36,
+          "rollingAvg": 16.2
+        },
+        {
+          "year": 1981,
+          "avgTemp": 16.33,
+          "rollingAvg": 16.23
+        },
+        {
+          "year": 1982,
+          "avgTemp": 16.32,
+          "rollingAvg": 16.24
+        },
+        {
+          "year": 1983,
+          "avgTemp": 16.39,
+          "rollingAvg": 16.26
+        },
+        {
+          "year": 1984,
+          "avgTemp": 16.29,
+          "rollingAvg": 16.28
+        },
+        {
+          "year": 1985,
+          "avgTemp": 16.27,
+          "rollingAvg": 16.3
+        },
+        {
+          "year": 1986,
+          "avgTemp": 16.32,
+          "rollingAvg": 16.32
+        },
+        {
+          "year": 1987,
+          "avgTemp": 16.46,
+          "rollingAvg": 16.34
+        },
+        {
+          "year": 1988,
+          "avgTemp": 16.41,
+          "rollingAvg": 16.35
+        },
+        {
+          "year": 1989,
+          "avgTemp": 16.35,
+          "rollingAvg": 16.35
+        },
+        {
+          "year": 1990,
+          "avgTemp": 16.43,
+          "rollingAvg": 16.36
+        },
+        {
+          "year": 1991,
+          "avgTemp": 16.42,
+          "rollingAvg": 16.37
+        },
+        {
+          "year": 1992,
+          "avgTemp": 16.35,
+          "rollingAvg": 16.37
+        },
+        {
+          "year": 1993,
+          "avgTemp": 16.35,
+          "rollingAvg": 16.36
+        },
+        {
+          "year": 1994,
+          "avgTemp": 16.39,
+          "rollingAvg": 16.38
+        },
+        {
+          "year": 1995,
+          "avgTemp": 16.42,
+          "rollingAvg": 16.39
+        },
+        {
+          "year": 1996,
+          "avgTemp": 16.41,
+          "rollingAvg": 16.4
+        },
+        {
+          "year": 1997,
+          "avgTemp": 16.56,
+          "rollingAvg": 16.41
+        },
+        {
+          "year": 1998,
+          "avgTemp": 16.6,
+          "rollingAvg": 16.43
+        },
+        {
+          "year": 1999,
+          "avgTemp": 16.41,
+          "rollingAvg": 16.43
+        },
+        {
+          "year": 2000,
+          "avgTemp": 16.43,
+          "rollingAvg": 16.43
+        },
+        {
+          "year": 2001,
+          "avgTemp": 16.53,
+          "rollingAvg": 16.45
+        },
+        {
+          "year": 2002,
+          "avgTemp": 16.55,
+          "rollingAvg": 16.47
+        },
+        {
+          "year": 2003,
+          "avgTemp": 16.57,
+          "rollingAvg": 16.49
+        },
+        {
+          "year": 2004,
+          "avgTemp": 16.56,
+          "rollingAvg": 16.5
+        },
+        {
+          "year": 2005,
+          "avgTemp": 16.56,
+          "rollingAvg": 16.52
+        },
+        {
+          "year": 2006,
+          "avgTemp": 16.56,
+          "rollingAvg": 16.53
+        },
+        {
+          "year": 2007,
+          "avgTemp": 16.49,
+          "rollingAvg": 16.53
+        },
+        {
+          "year": 2008,
+          "avgTemp": 16.48,
+          "rollingAvg": 16.51
+        },
+        {
+          "year": 2009,
+          "avgTemp": 16.61,
+          "rollingAvg": 16.53
+        },
+        {
+          "year": 2010,
+          "avgTemp": 16.61,
+          "rollingAvg": 16.55
+        },
+        {
+          "year": 2011,
+          "avgTemp": 16.51,
+          "rollingAvg": 16.55
+        },
+        {
+          "year": 2012,
+          "avgTemp": 16.56,
+          "rollingAvg": 16.55
+        },
+        {
+          "year": 2013,
+          "avgTemp": 16.61,
+          "rollingAvg": 16.56
+        },
+        {
+          "year": 2014,
+          "avgTemp": 16.69,
+          "rollingAvg": 16.57
+        },
+        {
+          "year": 2015,
+          "avgTemp": 16.79,
+          "rollingAvg": 16.59
+        },
+        {
+          "year": 2016,
+          "avgTemp": 16.83,
+          "rollingAvg": 16.62
+        },
+        {
+          "year": 2017,
+          "avgTemp": 16.8,
+          "rollingAvg": 16.65
+        },
+        {
+          "year": 2018,
+          "avgTemp": 16.76,
+          "rollingAvg": 16.68
+        },
+        {
+          "year": 2019,
+          "avgTemp": 16.86,
+          "rollingAvg": 16.7
+        },
+        {
+          "year": 2020,
+          "avgTemp": 16.83,
+          "rollingAvg": 16.72
+        },
+        {
+          "year": 2021,
+          "avgTemp": 16.73,
+          "rollingAvg": 16.75
+        },
+        {
+          "year": 2022,
+          "avgTemp": 16.78,
+          "rollingAvg": 16.77
+        },
+        {
+          "year": 2023,
+          "avgTemp": 17,
+          "rollingAvg": 16.81
+        },
+        {
+          "year": 2024,
+          "avgTemp": 17.05,
+          "rollingAvg": 16.84
+        },
+        {
+          "year": 2025,
+          "avgTemp": 16.94,
+          "rollingAvg": 16.86
+        }
+      ],
+      "latestMonthStats": {
+        "label": "Mar 2026",
+        "value": 17.01,
+        "diff": 0.78,
+        "rank": 2,
+        "total": 77,
+        "recordLabel": "Mar 2024",
+        "recordValue": 17.07
+      },
+      "latestThreeMonthStats": {
+        "label": "Jan–Mar 2026",
+        "value": 16.97,
+        "diff": 0.74,
+        "rank": 3,
+        "total": 77,
+        "recordLabel": "Jan–Mar 2024",
+        "recordValue": 17.11
+      }
+    }
+  },
   "globalBaseline": 13.9,
+  "globalLandBaseline": 8.6,
+  "globalOceanBaseline": 16.1,
   "preIndustrialBaseline": 13.5,
   "keyThresholds": {
     "plus1_5": 15,
     "plus2_0": 15.5
   },
-  "lastUpdated": "2026-04-v7",
-  "generatedAt": "2026-04-21T17:40:47.631Z",
+  "lastUpdated": "2026-04-v8",
+  "generatedAt": "2026-04-21T18:47:36.377Z",
   "sources": [
     {
       "label": "NOAA Climate at a Glance — Global Land+Ocean",
+      "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global"
+    },
+    {
+      "label": "NOAA Climate at a Glance — Global Land",
+      "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global"
+    },
+    {
+      "label": "NOAA Climate at a Glance — Global Ocean",
       "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global"
     },
     {

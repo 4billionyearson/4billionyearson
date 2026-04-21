@@ -51,7 +51,14 @@ interface GlobalData {
   landLatestMonthStats: RankedStat | null;
   landLatestThreeMonthStats: RankedStat | null;
   landVsOceanMonthly: LandVsOceanPoint[] | null;
+  noaaStats?: {
+    landOcean: { yearly: LandYearlyPoint[]; latestMonthStats: RankedStat | null; latestThreeMonthStats: RankedStat | null };
+    land:      { yearly: LandYearlyPoint[]; latestMonthStats: RankedStat | null; latestThreeMonthStats: RankedStat | null };
+    ocean:     { yearly: LandYearlyPoint[]; latestMonthStats: RankedStat | null; latestThreeMonthStats: RankedStat | null };
+  };
   globalBaseline: number;
+  globalLandBaseline?: number;
+  globalOceanBaseline?: number;
   preIndustrialBaseline: number;
   keyThresholds: { plus1_5: number; plus2_0: number };
   lastUpdated: string;
@@ -202,35 +209,21 @@ export default function GlobalProfile() {
   const yearMin = yearlyChartData.length ? yearlyChartData[0].year : 1950;
   const yearMax = yearlyChartData.length ? yearlyChartData[yearlyChartData.length - 1].year : 2026;
 
-  // Build the overview panel (month / 3-month / year) to match country pages
+  // Build the overview panel (month / 3-month / year) — three NOAA rows so
+  // rankings match what NOAA and Copernicus publish in press releases.
   const overviewPanels = useMemo<OverviewPanel[]>(() => {
-    if (!data) return [];
-    const landRow: OverviewRow | null = buildOverviewRow(
-      'Global Land',
-      data.landYearlyData ?? undefined,
-      data.landLatestMonthStats ?? undefined,
-      data.landLatestThreeMonthStats ?? undefined,
-      '°C',
-      1,
-      false,
-      true,
-    );
-    // Second row: Land+Ocean annual only (NOAA monthly ranked stats aren't
-    // computed on this endpoint, so the month / 3-month columns render n/a).
-    const landOceanRow: OverviewRow | null = buildOverviewRow(
-      'Global Land+Ocean',
-      data.yearlyData,
-      undefined,
-      undefined,
-      '°C',
-      1,
-      false,
-      false,
-    );
-    const rows = [landRow, landOceanRow].filter((r): r is OverviewRow => Boolean(r));
+    if (!data?.noaaStats) return [];
+    const { landOcean, land, ocean } = data.noaaStats;
+    const rows: OverviewRow[] = [];
+    const landRow = buildOverviewRow('Global Land', land.yearly, land.latestMonthStats ?? undefined, land.latestThreeMonthStats ?? undefined, '°C', 1, false, false);
+    const oceanRow = buildOverviewRow('Global Ocean', ocean.yearly, ocean.latestMonthStats ?? undefined, ocean.latestThreeMonthStats ?? undefined, '°C', 1, false, false);
+    const landOceanRow = buildOverviewRow('Global Land + Ocean', landOcean.yearly, landOcean.latestMonthStats ?? undefined, landOcean.latestThreeMonthStats ?? undefined, '°C', 1, false, true);
+    if (landRow) rows.push(landRow);
+    if (oceanRow) rows.push(oceanRow);
+    if (landOceanRow) rows.push(landOceanRow);
     if (!rows.length) return [];
     return [{
-      title: 'Temperature — Average',
+      title: 'Temperature — Average (NOAA)',
       icon: <Thermometer className="text-orange-400" />,
       accentClass: 'bg-orange-600',
       accentBg: 'bg-orange-600/50',
@@ -335,21 +328,83 @@ export default function GlobalProfile() {
                 </>
               )}
 
-              {/* Paris threshold callout (10-year rolling vs pre-industrial) */}
-              {rolling10yr != null && vsPreIndustrial != null && (
-                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                  <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">10-Year Rolling · Land+Ocean · vs Pre-Industrial</p>
-                  <div className="flex items-baseline gap-3 mt-2 flex-wrap">
-                    <p className={`text-4xl font-bold font-mono ${vsPreIndustrial >= 1.3 ? 'text-red-300' : 'text-orange-300'}`}>
-                      {formatSigned(vsPreIndustrial)}°C
+              {/* Paris Agreement tracker — 10-year mean vs pre-industrial (WMO/IPCC methodology) */}
+              {rolling10yr != null && vsPreIndustrial != null && (() => {
+                const pct15 = Math.min(100, Math.max(0, (vsPreIndustrial / 1.5) * 100));
+                const pct20 = Math.min(100, Math.max(0, (vsPreIndustrial / 2.0) * 100));
+                const latestYearValue = latestYearly?.absoluteTemp ?? null;
+                const latestYearDelta = latestYearValue != null ? latestYearValue - data.preIndustrialBaseline : null;
+                const decadeStart = (latestYearly?.year ?? 0) - 9;
+                const decadeEnd = latestYearly?.year ?? 0;
+                const atOrPast15 = vsPreIndustrial >= 1.5;
+                return (
+                  <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div>
+                        <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Paris Agreement Tracker</p>
+                        <h3 className="text-lg md:text-xl font-bold text-white mt-1">How close are we to 1.5°C and 2°C?</h3>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-4xl md:text-5xl font-bold font-mono ${atOrPast15 ? 'text-red-300' : 'text-orange-300'}`}>
+                          {formatSigned(vsPreIndustrial)}°C
+                        </p>
+                        <p className="text-xs text-gray-400">above pre-industrial</p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-gray-300 mt-3">
+                      Earth&apos;s surface is currently <span className="font-semibold text-white">{vsPreIndustrial.toFixed(2)}°C</span> warmer than the pre-industrial (1850–1900) average, based on the 10-year mean for <span className="font-semibold text-white">{decadeStart}–{decadeEnd}</span>. Climate scientists use a decade average rather than a single year to smooth out natural variability (El Niño, volcanoes) and define long-term warming, in line with <a href="https://wmo.int/news/media-centre/wmo-confirms-2024-warmest-year-record-about-155degc-above-pre-industrial-level" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">WMO</a> and <a href="https://www.ipcc.ch/sr15/chapter/spm/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">IPCC AR6</a> methodology.
                     </p>
-                    <p className="text-sm text-gray-400">{latestYearly?.year} decade average</p>
+
+                    {/* 1.5°C progress bar */}
+                    <div className="mt-5">
+                      <div className="flex items-baseline justify-between text-sm">
+                        <span className="font-semibold text-white">Paris 1.5°C limit</span>
+                        <span className={`font-mono ${atOrPast15 ? 'text-red-300' : 'text-orange-300'}`}>{pct15.toFixed(0)}% of the way there</span>
+                      </div>
+                      <div className="mt-1.5 h-3 rounded-full bg-gray-800 overflow-hidden ring-1 ring-gray-700">
+                        <div
+                          className={`h-full rounded-full ${atOrPast15 ? 'bg-red-400' : 'bg-orange-400'}`}
+                          style={{ width: `${pct15}%` }}
+                        />
+                      </div>
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        1.5°C ≈ {data.keyThresholds.plus1_5.toFixed(1)}°C absolute · aspirational lower limit agreed at COP21 Paris (2015)
+                      </p>
+                    </div>
+
+                    {/* 2.0°C progress bar */}
+                    <div className="mt-4">
+                      <div className="flex items-baseline justify-between text-sm">
+                        <span className="font-semibold text-white">Paris 2.0°C upper bound</span>
+                        <span className="font-mono text-amber-300">{pct20.toFixed(0)}% of the way there</span>
+                      </div>
+                      <div className="mt-1.5 h-3 rounded-full bg-gray-800 overflow-hidden ring-1 ring-gray-700">
+                        <div className="h-full rounded-full bg-amber-400" style={{ width: `${pct20}%` }} />
+                      </div>
+                      <p className="text-[11px] text-gray-500 mt-1">
+                        2.0°C ≈ {data.keyThresholds.plus2_0.toFixed(1)}°C absolute · dangerous-warming ceiling; every 0.1°C above 1.5°C measurably worsens heatwaves, sea-level rise and ecosystem loss
+                      </p>
+                    </div>
+
+                    {/* Secondary stats */}
+                    <div className="mt-5 pt-4 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Most recent full year ({decadeEnd})</p>
+                        <p className="font-mono text-white mt-0.5">
+                          {latestYearDelta != null ? formatSigned(latestYearDelta) : '—'}°C <span className="text-gray-500 font-sans">above pre-industrial</span>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">10-year mean ({decadeStart}–{decadeEnd})</p>
+                        <p className="font-mono text-white mt-0.5">
+                          {rolling10yr.toFixed(2)}°C absolute <span className="text-gray-500 font-sans">({formatSigned(vsPreIndustrial)}°C anomaly)</span>
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Absolute: {rolling10yr.toFixed(2)}°C · Pre-industrial baseline ~{data.preIndustrialBaseline.toFixed(1)}°C · Paris 1.5°C threshold: {data.keyThresholds.plus1_5.toFixed(1)}°C · Paris 2°C threshold: {data.keyThresholds.plus2_0.toFixed(1)}°C
-                  </p>
-                </div>
-              )}
+                );
+              })()}
 
               {/* Spaghetti chart */}
               {data.landMonthlyAll?.length > 0 && (

@@ -95,6 +95,11 @@ interface ProfileData {
     landMonthlyComparison: MonthlyComparison[];
     landLatestMonthStats?: RankedPeriodStat;
     landLatestThreeMonthStats?: RankedPeriodStat;
+    noaaStats?: {
+      landOcean?: { yearly?: YearlyPoint[]; latestMonthStats?: RankedPeriodStat; latestThreeMonthStats?: RankedPeriodStat };
+      land?:      { yearly?: YearlyPoint[]; latestMonthStats?: RankedPeriodStat; latestThreeMonthStats?: RankedPeriodStat };
+      ocean?:     { yearly?: YearlyPoint[]; latestMonthStats?: RankedPeriodStat; latestThreeMonthStats?: RankedPeriodStat };
+    };
     keyThresholds: { plus1_5: number; plus2_0: number };
   };
   lastUpdated: string;
@@ -391,7 +396,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
         1,
       ),
     ]),
-    buildOverviewRow('Global', data.globalData?.landYearlyData, data.globalData?.landLatestMonthStats, data.globalData?.landLatestThreeMonthStats, '°C', 1),
+    buildOverviewRow('Global (land + ocean)', data.globalData?.noaaStats?.landOcean?.yearly ?? data.globalData?.landYearlyData, data.globalData?.noaaStats?.landOcean?.latestMonthStats ?? data.globalData?.landLatestMonthStats, data.globalData?.noaaStats?.landOcean?.latestThreeMonthStats ?? data.globalData?.landLatestThreeMonthStats, '°C', 1),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (temperatureRows.length) {
