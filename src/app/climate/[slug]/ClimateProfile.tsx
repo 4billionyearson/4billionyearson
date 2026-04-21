@@ -101,6 +101,15 @@ interface ProfileData {
   source?: string;
 }
 
+type SummaryResponse = {
+  summary: string | null;
+  sources?: { title: string; uri: string }[];
+  generatedAt?: string;
+  source?: string;
+  message?: string;
+  retryable?: boolean;
+};
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatSignedValue(value: number, units = '°C', digits = 1): string {
@@ -512,6 +521,38 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
   const [summary, setSummary] = useState<string | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
   const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>([]);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [summaryRetryable, setSummaryRetryable] = useState(false);
+
+  const fetchSummary = async (forceFresh = false) => {
+    setSummaryLoading(true);
+    setSummary(null);
+    setSummarySources([]);
+    setSummaryError(null);
+    setSummaryRetryable(false);
+
+    try {
+      const url = `/api/climate/summary/${slug}?_t=${Date.now()}${forceFresh ? '&nocache=1' : ''}`;
+      const res = await fetch(url);
+      const payload: SummaryResponse | null = await res.json().catch(() => null);
+
+      if (payload?.summary) {
+        setSummary(payload.summary);
+        setSummarySources(payload.sources || []);
+        return;
+      }
+
+      setSummaryError(
+        payload?.message || 'The AI-generated climate update is temporarily unavailable. The underlying climate data below is still live.'
+      );
+      setSummaryRetryable(payload?.retryable ?? payload?.source !== 'no-key');
+    } catch {
+      setSummaryError('The AI-generated climate update could not be loaded right now. The underlying climate data below is still live.');
+      setSummaryRetryable(true);
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Add cache buster to bypass Next.js client caching
@@ -524,16 +565,8 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
 
-    // Fetch Gemini summary (non-blocking) - add cache buster
-    setSummaryLoading(true);
-    fetch(`/api/climate/summary/${slug}?_t=${Date.now()}`)
-      .then(res => res.ok ? res.json() : null)
-      .then(d => {
-        if (d?.summary) setSummary(d.summary);
-        if (d?.sources?.length) setSummarySources(d.sources);
-      })
-      .catch(() => {})
-      .finally(() => setSummaryLoading(false));
+    // Fetch Gemini summary (non-blocking)
+    void fetchSummary();
   }, [slug]);
 
   // Derived labels
@@ -645,7 +678,23 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <p className="text-sm text-gray-400">{region.tagline}</p>
+                  <div className="rounded-xl border border-amber-700/40 bg-amber-950/20 px-4 py-3">
+                    <p className="text-sm font-medium text-amber-200">Climate update temporarily unavailable</p>
+                    <p className="mt-1 text-sm text-gray-300">{summaryError || 'The AI-generated climate update is temporarily unavailable. The measured climate data below is still available and up to date.'}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      {summaryRetryable && (
+                        <button
+                          type="button"
+                          onClick={() => void fetchSummary(true)}
+                          className="inline-flex items-center gap-2 rounded-lg border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-3 py-2 text-sm font-semibold text-[#D0A65E] transition-colors hover:bg-[#D0A65E]/20 hover:text-[#E8C97A]"
+                        >
+                          Try again
+                        </button>
+                      )}
+                      <span className="text-xs text-gray-500">No fallback summary is shown when the Gemini request fails.</span>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-sm text-gray-400">{region.tagline}</p>
                 </div>
               )}
             </div>

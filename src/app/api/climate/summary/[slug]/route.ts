@@ -579,8 +579,14 @@ export async function GET(
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    // No API key — return empty so frontend shows tagline, don't cache
-    return NextResponse.json({ summary: null, sources: [], generatedAt: new Date().toISOString(), source: 'no-key' });
+    return NextResponse.json({
+      summary: null,
+      sources: [],
+      generatedAt: new Date().toISOString(),
+      source: 'no-key',
+      retryable: false,
+      message: 'The AI-generated climate update is not available because the summary service is not configured.',
+    }, { status: 503 });
   }
 
   // Fetch national comparison data for sub-national regions
@@ -609,7 +615,14 @@ export async function GET(
     if (!result.summary || summaryLooksIncomplete(result.summary)) {
       // Both attempts failed — don't cache, so next visitor retries
       console.error(`Gemini summary failed for ${slug} — not caching`);
-      return NextResponse.json({ summary: null, sources: [], generatedAt: new Date().toISOString(), source: 'failed' });
+      return NextResponse.json({
+        summary: null,
+        sources: [],
+        generatedAt: new Date().toISOString(),
+        source: 'failed',
+        retryable: true,
+        message: 'The AI-generated climate update could not be produced just now. You can try again.',
+      }, { status: 503 });
     }
 
     const cacheResult = {
@@ -623,6 +636,13 @@ export async function GET(
   } catch (err: any) {
     // Don't cache errors — next visitor will retry
     console.error('Gemini summary error:', err);
-    return NextResponse.json({ summary: null, sources: [], generatedAt: new Date().toISOString(), source: 'error' });
+    return NextResponse.json({
+      summary: null,
+      sources: [],
+      generatedAt: new Date().toISOString(),
+      source: 'error',
+      retryable: true,
+      message: 'The AI-generated climate update could not be loaded right now. You can try again.',
+    }, { status: 503 });
   }
 }

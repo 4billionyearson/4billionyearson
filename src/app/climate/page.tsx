@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CLIMATE_REGIONS, getClimateCoverageText } from '@/lib/climate/regions';
+import { CLIMATE_REGIONS } from '@/lib/climate/regions';
+import UKRegionsBrowser from './uk-regions-browser';
 
 export const metadata: Metadata = {
   title: 'Climate Updates — Country, State & Region Climate Data',
@@ -25,14 +26,12 @@ export const metadata: Metadata = {
 const TYPE_LABELS: Record<string, string> = {
   country: 'Country',
   'us-state': 'US State',
-  'uk-region': 'UK Region',
   special: 'Special',
 };
 
 const TYPE_COLORS: Record<string, string> = {
   country: 'text-sky-400 bg-sky-400/10 border-sky-400/20',
   'us-state': 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  'uk-region': 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
   special: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
 };
 
@@ -86,18 +85,7 @@ export default function ClimateProfilesIndex() {
             </div>
           </section>
 
-          {/* UK Regions */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2">
-              <span className="shrink-0 mt-1">🇬🇧</span>
-              <span className="min-w-0 flex-1">UK Regions</span>
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {ukRegions.map(region => (
-                <RegionCard key={region.slug} region={region} />
-              ))}
-            </div>
-          </section>
+          <UKRegionsBrowser regions={ukRegions} />
 
           {/* SEO content block */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
@@ -121,8 +109,6 @@ export default function ClimateProfilesIndex() {
 }
 
 function RegionCard({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
-  const coverageText = region.type === 'uk-region' ? getClimateCoverageText(region) : null;
-
   return (
     <Link
       href={`/climate/${region.slug}`}
@@ -139,14 +125,7 @@ function RegionCard({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
               {TYPE_LABELS[region.type]}
             </span>
           </div>
-          {coverageText ? (
-            <>
-              <p className="text-sm text-gray-300 line-clamp-3">{coverageText}</p>
-              <p className="text-xs text-gray-500 mt-1 line-clamp-2">{region.tagline}</p>
-            </>
-          ) : (
-            <p className="text-sm text-gray-400 line-clamp-2">{region.tagline}</p>
-          )}
+          <p className="text-sm text-gray-400 line-clamp-2">{region.tagline}</p>
         </div>
       </div>
     </Link>
