@@ -2,9 +2,8 @@
 
 import 'leaflet/dist/leaflet.css';
 
-import L from 'leaflet';
-import { useEffect, useMemo } from 'react';
-import { CircleMarker, MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
+import { useEffect, useRef } from 'react';
+import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet';
 
 type UKMapMarker = {
   slug: string;
@@ -19,11 +18,6 @@ const MAP_BOUNDS: [[number, number], [number, number]] = [[49.8, -8.6], [59.4, 1
 function SetupPanes() {
   const map = useMap();
   useEffect(() => {
-    if (!map.getPane('labels')) {
-      const pane = map.createPane('labels');
-      pane.style.zIndex = '450';
-      pane.style.pointerEvents = 'none';
-    }
     const ttPane = map.getPane('tooltipPane');
     if (ttPane) ttPane.style.zIndex = '700';
   }, [map]);
@@ -40,34 +34,20 @@ function FitUKBounds() {
 
 function FocusSelectedMarker({ marker }: { marker: UKMapMarker | null }) {
   const map = useMap();
+  const isFirst = useRef(true);
+
   useEffect(() => {
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
     if (!marker) return;
     map.flyTo([marker.lat, marker.lng], Math.max(map.getZoom(), 5.8), {
-      duration: 0.8,
+      duration: 0.7,
     });
   }, [map, marker]);
+
   return null;
-}
-
-function RegionLabel({ marker, selected }: { marker: UKMapMarker; selected: boolean }) {
-  const icon = useMemo(
-    () =>
-      L.divIcon({
-        className: selected ? 'uk-region-label' : 'country-label',
-        html: `<span>${marker.name}</span>`,
-        iconAnchor: [0, -14],
-      }),
-    [marker.name, selected],
-  );
-
-  return (
-    <Marker
-      position={[marker.lat, marker.lng]}
-      icon={icon}
-      interactive={false}
-      pane="labels"
-    />
-  );
 }
 
 export default function UKRegionsLeafletMap({
@@ -79,10 +59,7 @@ export default function UKRegionsLeafletMap({
   selectedSlug: string | null;
   onSelectRegion: (slug: string) => void;
 }) {
-  const selectedMarker = useMemo(
-    () => markers.find((marker) => marker.slug === selectedSlug) ?? null,
-    [markers, selectedSlug],
-  );
+  const selectedMarker = markers.find((m) => m.slug === selectedSlug) ?? null;
 
   return (
     <MapContainer
@@ -117,16 +94,21 @@ export default function UKRegionsLeafletMap({
               fillOpacity: selected ? 0.9 : 0.85,
             }}
             eventHandlers={{ click: () => onSelectRegion(marker.slug) }}
-          />
+          >
+            <Tooltip
+              direction="top"
+              offset={[0, -10]}
+              opacity={1}
+              permanent={selected}
+              sticky={false}
+              className={selected ? 'uk-map-tooltip uk-map-tooltip--active' : 'uk-map-tooltip'}
+            >
+              <span>{marker.name}</span>
+            </Tooltip>
+          </CircleMarker>
         );
       })}
-      {markers.map((marker) => (
-        <RegionLabel
-          key={`label-${marker.slug}`}
-          marker={marker}
-          selected={marker.slug === selectedSlug}
-        />
-      ))}
     </MapContainer>
   );
 }
+

@@ -277,7 +277,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
 
       <div className={`grid transition-all duration-500 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="min-h-0 overflow-hidden">
-          <div className="bg-gray-900 px-4 py-5 md:px-6 md:py-6 space-y-5">
+          <div className="bg-gray-950/90 backdrop-blur-md px-4 py-5 md:px-6 md:py-6 space-y-5">
             <p className="text-sm text-gray-400 max-w-3xl leading-relaxed">
               Search by city, country or region, or browse by nation. Some Met Office regions overlap national borders; those remain listed as cross-border because that is how the source data is published.
             </p>
