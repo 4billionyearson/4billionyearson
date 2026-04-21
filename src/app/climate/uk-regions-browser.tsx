@@ -274,7 +274,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
             <MapIcon className="h-6 w-6" />
           </div>
           <h2 className="flex-1 min-w-0 font-mono font-bold text-base md:text-lg tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-            UK and Ireland
+            UK Regions & Ireland
           </h2>
           <ChevronRight
             className={`h-4 w-4 flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-90' : 'group-hover:translate-x-0.5'}`}

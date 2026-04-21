@@ -92,8 +92,8 @@ function UKRegionsFallback() {
       <div className="flex items-start gap-2 mb-4">
         <span className="text-[#D0A65E] mt-1">⌖</span>
         <div>
-          <h2 className="text-xl font-bold font-mono text-white">UK and Ireland</h2>
-          <p className="mt-2 text-sm text-gray-400 max-w-3xl">Loading UK and Ireland browser…</p>
+          <h2 className="text-xl font-bold font-mono text-white">UK Regions & Ireland</h2>
+          <p className="mt-2 text-sm text-gray-400 max-w-3xl">Loading UK Regions & Ireland browser…</p>
         </div>
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
