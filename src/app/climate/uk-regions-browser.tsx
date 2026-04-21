@@ -278,8 +278,8 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
       <div className={`grid transition-all duration-500 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="min-h-0 overflow-hidden">
           <div className="bg-gray-950/90 backdrop-blur-md px-4 py-5 md:px-6 md:py-6 space-y-5">
-            <p className="text-sm font-medium max-w-3xl leading-relaxed" style={{ color: '#D0A65E' }}>
-              Search by city, country or region, or browse by nation. Some Met Office regions overlap national borders; those remain listed as cross-border because that is how the source data is published.
+            <p className="text-sm font-medium max-w-3xl leading-relaxed" style={{ color: '#FFF5E7' }}>
+              Search by city, region or nation.
             </p>
 
             <div className="flex flex-col gap-3">
@@ -420,27 +420,23 @@ function UKRegionCard({
   return (
     <Link
       href={`/climate/${region.slug}`}
-      className={`group block rounded-xl border p-4 transition-all duration-200 ${
+      className={`group block rounded-xl border p-3.5 transition-all duration-200 ${
         selected ? 'border-sky-600/50 bg-sky-950/30' : 'border-gray-700/60 bg-gray-800/40 hover:border-gray-600 hover:bg-gray-800/70'
       }`}
       onMouseEnter={onPointerEnter}
     >
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-600 bg-gray-700/50 text-sky-400">
-          <MapPin className="h-4.5 w-4.5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h4 className="font-semibold text-gray-100 group-hover:text-white">{region.name}</h4>
-          <p className="mt-1 text-sm font-medium text-gray-200">{cityPreview}</p>
-          <p className="mt-1 text-sm text-gray-500 line-clamp-2">{region.tagline}</p>
-          {matchedCities.length > 0 && (
-            <div className="mt-3 inline-flex items-start gap-2 rounded-lg border border-sky-800/40 bg-sky-900/20 px-2.5 py-1.5 text-xs text-sky-400">
-              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span>Matches: {matchedCities.join(', ')}</span>
-            </div>
-          )}
-        </div>
+      <div className="flex items-center gap-2 mb-1.5">
+        <MapPin className="h-4 w-4 shrink-0 text-[#FFF5E7]/80 group-hover:text-sky-400 transition-colors" />
+        <h4 className="font-semibold text-gray-100 group-hover:text-white leading-tight">{region.name}</h4>
       </div>
+      <p className="text-xs font-medium text-gray-300 leading-snug">{cityPreview}</p>
+      <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{region.tagline}</p>
+      {matchedCities.length > 0 && (
+        <div className="mt-2 inline-flex items-center gap-1.5 text-xs text-sky-400">
+          <MapPin className="h-3 w-3 shrink-0" />
+          <span>{matchedCities.join(', ')}</span>
+        </div>
+      )}
     </Link>
   );
 }
