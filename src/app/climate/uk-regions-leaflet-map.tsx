@@ -2,8 +2,9 @@
 
 import 'leaflet/dist/leaflet.css';
 
-import { useEffect, useRef } from 'react';
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import { useEffect, useMemo, useRef } from 'react';
+import { CircleMarker, MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
 
 type UKMapMarker = {
   slug: string;
@@ -18,6 +19,11 @@ const MAP_BOUNDS: [[number, number], [number, number]] = [[49.8, -8.6], [59.4, 1
 function SetupPanes() {
   const map = useMap();
   useEffect(() => {
+    if (!map.getPane('labels')) {
+      const pane = map.createPane('labels');
+      pane.style.zIndex = '450';
+      pane.style.pointerEvents = 'none';
+    }
     const ttPane = map.getPane('tooltipPane');
     if (ttPane) ttPane.style.zIndex = '700';
   }, [map]);
@@ -34,20 +40,47 @@ function FitUKBounds() {
 
 function FocusSelectedMarker({ marker }: { marker: UKMapMarker | null }) {
   const map = useMap();
-  const isFirst = useRef(true);
+  // undefined = not yet initialised; null = no selection; string = slug
+  const prevSlug = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
-    if (isFirst.current) {
-      isFirst.current = false;
+    const newSlug = marker?.slug ?? null;
+    if (prevSlug.current === undefined) {
+      // First render after mount — record current state, don't fly
+      prevSlug.current = newSlug;
       return;
     }
-    if (!marker) return;
-    map.flyTo([marker.lat, marker.lng], Math.max(map.getZoom(), 5.8), {
-      duration: 0.7,
-    });
+    if (marker && newSlug !== prevSlug.current) {
+      map.flyTo([marker.lat, marker.lng], Math.max(map.getZoom(), 5.8), {
+        duration: 0.7,
+      });
+    }
+    prevSlug.current = newSlug;
   }, [map, marker]);
 
   return null;
+}
+
+function SelectedLabel({ marker }: { marker: UKMapMarker }) {
+  const icon = useMemo(
+    () =>
+      L.divIcon({
+        className: 'uk-map-selected-label',
+        html: `<span>${marker.name}</span>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
+      }),
+    [marker.name],
+  );
+
+  return (
+    <Marker
+      position={[marker.lat, marker.lng]}
+      icon={icon}
+      interactive={false}
+      pane="labels"
+    />
+  );
 }
 
 export default function UKRegionsLeafletMap({
@@ -99,15 +132,16 @@ export default function UKRegionsLeafletMap({
               direction="top"
               offset={[0, -10]}
               opacity={1}
-              permanent={selected}
-              sticky={false}
-              className={selected ? 'uk-map-tooltip uk-map-tooltip--active' : 'uk-map-tooltip'}
+              className="uk-map-tooltip"
             >
               <span>{marker.name}</span>
             </Tooltip>
           </CircleMarker>
         );
       })}
+      {selectedMarker && (
+        <SelectedLabel key={`sel-${selectedMarker.slug}`} marker={selectedMarker} />
+      )}
     </MapContainer>
   );
 }
