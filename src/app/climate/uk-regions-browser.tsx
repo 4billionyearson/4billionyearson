@@ -56,6 +56,9 @@ const VIEW_LABELS: Record<BrowserView, string> = {
   map: 'Map',
 };
 
+const FILTER_BUTTON_BASE = 'inline-flex h-11 items-center rounded-lg border px-4 text-sm font-medium tracking-[0.01em] transition-colors';
+const VIEW_BUTTON_BASE = 'inline-flex h-11 min-w-[112px] items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors';
+
 const URL_PARAM_KEYS = {
   query: 'ukq',
   filter: 'ukfilter',
@@ -278,79 +281,78 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
       <div className={`grid transition-all duration-500 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="min-h-0 overflow-hidden">
           <div className="bg-gray-950/90 backdrop-blur-md px-4 py-5 md:px-6 md:py-6 space-y-5">
-            <p className="text-sm font-medium max-w-3xl leading-relaxed" style={{ color: '#FFF5E7' }}>
-              Search by city, region or nation.
-            </p>
+            <div className="space-y-4">
+              <div className="relative max-w-2xl">
+                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#D0A65E' }} />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search by city, region or nation"
+                  className="w-full rounded-xl border border-[#D0A65E]/50 bg-gray-900/60 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#D0A65E]/60 outline-none transition-all focus:border-[#D0A65E] focus:ring-2 focus:ring-[#D0A65E]/30"
+                  autoComplete="off"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery('')}
+                    className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-700 hover:text-white"
+                    aria-label="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
 
-            <div className="flex flex-col gap-3">
-          <div className="relative max-w-2xl">
-            <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#D0A65E' }} />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by city, country or region"
-              className="w-full rounded-lg border border-[#D0A65E]/50 bg-gray-900/60 py-2 pl-9 pr-10 text-sm text-white placeholder:text-[#D0A65E]/60 outline-none transition-all focus:border-[#D0A65E] focus:ring-2 focus:ring-[#D0A65E]/30"
-              autoComplete="off"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery('')}
-                className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-700 hover:text-white"
-                aria-label="Clear search"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
+              <div className="border-t border-gray-800/80 pt-4">
+                <div className="flex flex-wrap gap-2">
+                  {(Object.keys(FILTER_LABELS) as RegionGroupFilter[]).map((option) => {
+                    const active = filter === option;
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => setFilter(option)}
+                        className={`${FILTER_BUTTON_BASE} ${
+                          active
+                            ? 'border-sky-500 bg-sky-500/15 text-sky-300'
+                            : 'border-gray-700 bg-gray-800/60 text-gray-300 hover:border-gray-600 hover:bg-gray-800 hover:text-white'
+                        }`}
+                      >
+                        {FILTER_LABELS[option]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          <div className="flex flex-wrap gap-2">
-            {(Object.keys(FILTER_LABELS) as RegionGroupFilter[]).map((option) => {
-              const active = filter === option;
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => setFilter(option)}
-                  className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors ${
-                    active
-                      ? 'border-sky-500 bg-sky-500/15 text-sky-300'
-                      : 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-sky-500/40 hover:text-sky-300'
-                  }`}
-                >
-                  {FILTER_LABELS[option]}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center gap-2">
-            {(Object.keys(VIEW_LABELS) as BrowserView[]).map((option) => {
-              const active = view === option;
-              const Icon = option === 'list' ? LayoutGrid : MapIcon;
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => setView(option)}
-                  className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                    active
-                      ? 'border-[#D0A65E] bg-[#D0A65E]/10 text-[#D0A65E]'
-                      : 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-gray-600 hover:text-white'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  {VIEW_LABELS[option]}
-                </button>
-              );
-            })}
-            <span className="ml-auto text-xs text-gray-600">
-              {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
-              {normalizedQuery ? ` matching "${query.trim()}"` : ''}
-            </span>
-          </div>
-
+              <div className="border-t border-gray-800/80 pt-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  {(Object.keys(VIEW_LABELS) as BrowserView[]).map((option) => {
+                    const active = view === option;
+                    const Icon = option === 'list' ? LayoutGrid : MapIcon;
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => setView(option)}
+                        className={`${VIEW_BUTTON_BASE} ${
+                          active
+                            ? 'border-[#D0A65E] bg-[#D0A65E]/10 text-[#D0A65E]'
+                            : 'border-gray-700 bg-gray-800/60 text-gray-300 hover:border-gray-600 hover:text-white'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        {VIEW_LABELS[option]}
+                      </button>
+                    );
+                  })}
+                  <span className="ml-auto text-sm text-gray-600">
+                    {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
+                    {normalizedQuery ? ` matching "${query.trim()}"` : ''}
+                  </span>
+                </div>
+              </div>
             </div>
 
             {view === 'list' ? (
@@ -454,6 +456,10 @@ function UKMapView({
   mapMarkers: Array<{ slug: string; name: string; lat: number; lng: number }>;
   onSelectRegion: (slug: string) => void;
 }) {
+  const selectedMatchText = selectedRegion && normalizedQuery
+    ? getMatchedCities(selectedRegion, normalizedQuery).join(', ') || 'Region name match'
+    : null;
+
   return (
     <div className="space-y-4">
       <div className="overflow-hidden rounded-xl border border-gray-700 bg-gray-950">
@@ -467,29 +473,39 @@ function UKMapView({
       <div className="grid gap-4 lg:grid-cols-[1fr_1fr] items-start">
         {selectedRegion ? (
           <>
-            <div className="rounded-xl border border-sky-900/40 bg-sky-950/20 p-4">
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-sky-700/40 bg-sky-900/30 text-sky-400">
-                  <MapPin className="h-4.5 w-4.5" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-400">Selected region</p>
-                  <h3 className="mt-1 text-xl font-bold text-white">{selectedRegion.region.name}</h3>
-                  <p className="mt-2 text-sm font-medium text-gray-200">{representativeCityText(selectedRegion.representativeCities)}</p>
-                  <p className="mt-2 text-sm text-gray-400">{selectedRegion.region.tagline}</p>
-                  {normalizedQuery ? (
-                    <div className="mt-3 inline-flex items-start gap-2 rounded-lg border border-sky-800/40 bg-sky-900/20 px-2.5 py-1.5 text-xs text-sky-400">
-                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                      <span>Matches: {getMatchedCities(selectedRegion, normalizedQuery).join(', ') || 'Region name match'}</span>
-                    </div>
-                  ) : null}
-                  <Link
-                    href={`/climate/${selectedRegion.region.slug}`}
-                    className="inline-flex items-center gap-2 mt-4 rounded-lg border border-[#D0A65E]/35 bg-[#D0A65E]/10 px-3 py-2 text-sm font-semibold text-[#D0A65E] transition-colors hover:bg-[#D0A65E]/20 hover:text-[#E8C97A]"
-                  >
-                    Open climate update
-                  </Link>
+            <div className="space-y-3">
+              <div className="rounded-xl border border-sky-600/45 bg-sky-950/25 p-3.5">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <MapPin className="h-4 w-4 shrink-0 text-[#FFF5E7]/80" />
+                  <h3 className="font-semibold text-gray-100 leading-tight">{selectedRegion.region.name}</h3>
                 </div>
+                <p className="text-xs font-medium text-gray-300 leading-snug">
+                  {representativeCityText(selectedRegion.representativeCities)}
+                </p>
+                <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">{selectedRegion.region.tagline}</p>
+              </div>
+
+              <div className={`grid gap-3 ${selectedMatchText ? 'sm:grid-cols-2' : ''}`}>
+                {selectedMatchText ? (
+                  <div className="flex min-h-[68px] items-center gap-3 rounded-xl border border-sky-800/35 bg-sky-950/20 px-4 py-3">
+                    <MapPin className="h-4 w-4 shrink-0 text-sky-300" />
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-sky-300/70">Matches</p>
+                      <p className="truncate text-sm font-medium text-sky-300">{selectedMatchText}</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                <Link
+                  href={`/climate/${selectedRegion.region.slug}`}
+                  className="flex min-h-[68px] items-center justify-between gap-3 rounded-xl border border-[#D0A65E]/35 bg-[#D0A65E]/10 px-4 py-3 text-left transition-colors hover:bg-[#D0A65E]/20 hover:text-[#E8C97A]"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#D0A65E]/70">Region page</p>
+                    <p className="text-sm font-medium text-[#D0A65E]">Open climate update</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-[#D0A65E]/80" />
+                </Link>
               </div>
             </div>
 
@@ -503,10 +519,10 @@ function UKMapView({
                       key={item.region.slug}
                       type="button"
                       onClick={() => onSelectRegion(item.region.slug)}
-                      className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                      className={`${FILTER_BUTTON_BASE} ${
                         active
                           ? 'border-sky-500 bg-sky-500/15 text-sky-300'
-                          : 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-sky-500/40 hover:text-sky-300'
+                          : 'border-gray-700 bg-gray-800/60 text-gray-300 hover:border-gray-600 hover:bg-gray-800 hover:text-white'
                       }`}
                     >
                       {item.region.name}

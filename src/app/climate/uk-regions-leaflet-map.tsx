@@ -2,8 +2,9 @@
 
 import 'leaflet/dist/leaflet.css';
 
-import { useEffect, useRef } from 'react';
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import { useEffect, useMemo, useRef } from 'react';
+import { CircleMarker, MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
 
 type UKMapMarker = {
   slug: string;
@@ -60,6 +61,28 @@ function FocusSelectedMarker({ marker }: { marker: UKMapMarker | null }) {
   return null;
 }
 
+function SelectedLabel({ marker }: { marker: UKMapMarker }) {
+  const icon = useMemo(
+    () =>
+      L.divIcon({
+        className: 'uk-map-selected-label',
+        html: `<span>${marker.name}</span>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
+      }),
+    [marker.name],
+  );
+
+  return (
+    <Marker
+      position={[marker.lat, marker.lng]}
+      icon={icon}
+      interactive={false}
+      pane="labels"
+    />
+  );
+}
+
 export default function UKRegionsLeafletMap({
   markers,
   selectedSlug,
@@ -106,18 +129,17 @@ export default function UKRegionsLeafletMap({
             eventHandlers={{ click: () => onSelectRegion(marker.slug) }}
           >
             <Tooltip
-              key={selected ? 'perm' : 'hover'}
               direction="top"
               offset={[0, -10]}
               opacity={1}
-              permanent={selected}
-              className={selected ? 'uk-map-label-active' : 'uk-map-tooltip'}
+              className="uk-map-tooltip"
             >
               <span>{marker.name}</span>
             </Tooltip>
           </CircleMarker>
         );
       })}
+      {selectedMarker ? <SelectedLabel key={`sel-${selectedMarker.slug}`} marker={selectedMarker} /> : null}
     </MapContainer>
   );
 }
