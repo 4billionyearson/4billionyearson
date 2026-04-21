@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ChevronRight, LayoutGrid, Map as MapIcon, MapPin, Search, X } from 'lucide-react';
+import { ChevronRight, LayoutGrid, Map as MapIcon, MapPin, X } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { UK_CITY_REGION_MAP } from '@/lib/climate/locations';
 
@@ -278,19 +278,19 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
       <div className={`grid transition-all duration-500 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="min-h-0 overflow-hidden">
           <div className="bg-gray-950/90 backdrop-blur-md px-4 py-5 md:px-6 md:py-6 space-y-5">
-            <p className="text-sm text-gray-400 max-w-3xl leading-relaxed">
+            <p className="text-sm font-medium max-w-3xl leading-relaxed" style={{ color: '#D0A65E' }}>
               Search by city, country or region, or browse by nation. Some Met Office regions overlap national borders; those remain listed as cross-border because that is how the source data is published.
             </p>
 
             <div className="flex flex-col gap-3">
           <div className="relative max-w-2xl">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-sky-400" />
+            <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#D0A65E' }} />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by city, country or region"
-              className="w-full rounded-xl border border-gray-700 bg-gray-800/80 py-2.5 pl-10 pr-10 text-sm text-white placeholder:text-gray-500 outline-none transition-all focus:border-sky-500/60 focus:ring-2 focus:ring-sky-500/20"
+              className="w-full rounded-lg border border-[#D0A65E]/50 bg-gray-900/60 py-2 pl-9 pr-10 text-sm text-white placeholder:text-[#D0A65E]/60 outline-none transition-all focus:border-[#D0A65E] focus:ring-2 focus:ring-[#D0A65E]/30"
               autoComplete="off"
             />
             {query && (
