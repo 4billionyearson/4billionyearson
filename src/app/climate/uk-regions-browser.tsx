@@ -277,30 +277,28 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
 
       <div className={`grid transition-all duration-500 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="min-h-0 overflow-hidden">
-          <div className="bg-gray-950/95 px-4 py-4 md:px-5 md:py-5">
-            <div>
-            <p className="text-sm text-gray-400 max-w-3xl">
+          <div className="bg-gray-900 px-4 py-5 md:px-6 md:py-6 space-y-5">
+            <p className="text-sm text-gray-400 max-w-3xl leading-relaxed">
               Search by city, country or region, or browse by nation. Some Met Office regions overlap national borders; those remain listed as cross-border because that is how the source data is published.
             </p>
-            </div>
 
-            <div className="flex flex-col gap-3 mt-4">
+            <div className="flex flex-col gap-3">
           <div className="relative max-w-2xl">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#D0A65E]" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-sky-400" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by city, country or region"
-              className="w-full rounded-xl border border-[#D0A65E]/40 bg-gray-900/70 py-2.5 pl-10 pr-10 text-sm text-white placeholder:text-[#D0A65E]/55 outline-none transition-all focus:border-[#D0A65E] focus:ring-2 focus:ring-[#D0A65E]/30"
+              className="w-full rounded-xl border border-gray-700 bg-gray-800/80 py-2.5 pl-10 pr-10 text-sm text-white placeholder:text-gray-500 outline-none transition-all focus:border-sky-500/60 focus:ring-2 focus:ring-sky-500/20"
               autoComplete="off"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-800 hover:text-white"
-                aria-label="Clear UK region search"
+                className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-700 hover:text-white"
+                aria-label="Clear search"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -315,10 +313,10 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
                   key={option}
                   type="button"
                   onClick={() => setFilter(option)}
-                  className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                  className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors ${
                     active
-                      ? 'border-[#D0A65E] bg-[#D0A65E]/15 text-[#FFF5E7]'
-                      : 'border-gray-700 bg-gray-900/60 text-gray-400 hover:border-[#D0A65E]/40 hover:text-white'
+                      ? 'border-sky-500 bg-sky-500/15 text-sky-300'
+                      : 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-sky-500/40 hover:text-sky-300'
                   }`}
                 >
                   {FILTER_LABELS[option]}
@@ -327,7 +325,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
             })}
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2">
             {(Object.keys(VIEW_LABELS) as BrowserView[]).map((option) => {
               const active = view === option;
               const Icon = option === 'list' ? LayoutGrid : MapIcon;
@@ -336,10 +334,10 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
                   key={option}
                   type="button"
                   onClick={() => setView(option)}
-                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                  className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
                     active
-                      ? 'border-[#D0A65E] bg-[#D0A65E]/15 text-[#FFF5E7]'
-                      : 'border-gray-700 bg-gray-900/60 text-gray-400 hover:border-[#D0A65E]/40 hover:text-white'
+                      ? 'border-[#D0A65E] bg-[#D0A65E]/10 text-[#D0A65E]'
+                      : 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-gray-600 hover:text-white'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -347,29 +345,28 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
                 </button>
               );
             })}
+            <span className="ml-auto text-xs text-gray-600">
+              {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
+              {normalizedQuery ? ` matching "${query.trim()}"` : ''}
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-            <span>{filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}</span>
-            {normalizedQuery && <span>Matching “{query.trim()}”</span>}
-            <span>Representative cities shown on cards; profiles contain fuller coverage</span>
-          </div>
             </div>
 
-            <div className="mt-5">
-        {view === 'list' ? (
-          <div className="space-y-5">
+            {view === 'list' ? (
+              <div className="space-y-6">
             {GROUP_ORDER.map((group) => {
               const items = groupedRegions.get(group) ?? [];
               if (!items.length) return null;
 
               return (
                 <div key={group} className="space-y-3">
-                  <div className="flex items-center justify-between gap-3 border-b border-gray-800 pb-2">
-                    <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-[#D0A65E]">{GROUP_TITLES[group]}</h3>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">{GROUP_TITLES[group]}</h3>
+                    <span className="flex-1 h-px bg-gray-800" />
                     <span className="text-xs text-gray-600">{items.length}</span>
                   </div>
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {items.map((item) => (
                       <UKRegionCard
                         key={item.region.slug}
@@ -398,7 +395,6 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
         ) : (
           <EmptyState />
         )}
-            </div>
           </div>
         </div>
       </div>
@@ -424,13 +420,13 @@ function UKRegionCard({
   return (
     <Link
       href={`/climate/${region.slug}`}
-      className={`group block rounded-xl border bg-gray-900/60 p-4 transition-all duration-200 hover:border-[#D0A65E]/50 hover:bg-gray-900 ${
-        selected ? 'border-[#D0A65E]/45 shadow-[0_0_0_1px_rgba(208,166,94,0.18)]' : 'border-gray-700/50'
+      className={`group block rounded-xl border p-4 transition-all duration-200 ${
+        selected ? 'border-sky-600/50 bg-sky-950/30' : 'border-gray-700/60 bg-gray-800/40 hover:border-gray-600 hover:bg-gray-800/70'
       }`}
       onMouseEnter={onPointerEnter}
     >
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#D0A65E]/25 bg-[#D0A65E]/8 text-[#D0A65E]">
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-600 bg-gray-700/50 text-sky-400">
           <MapPin className="h-4.5 w-4.5" />
         </span>
         <div className="min-w-0 flex-1">
@@ -438,7 +434,7 @@ function UKRegionCard({
           <p className="mt-1 text-sm font-medium text-gray-200">{cityPreview}</p>
           <p className="mt-1 text-sm text-gray-500 line-clamp-2">{region.tagline}</p>
           {matchedCities.length > 0 && (
-            <div className="mt-3 inline-flex items-start gap-2 rounded-lg border border-[#D0A65E]/25 bg-[#D0A65E]/5 px-2.5 py-1.5 text-xs text-[#D0A65E]">
+            <div className="mt-3 inline-flex items-start gap-2 rounded-lg border border-sky-800/40 bg-sky-900/20 px-2.5 py-1.5 text-xs text-sky-400">
               <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
               <span>Matches: {matchedCities.join(', ')}</span>
             </div>
@@ -464,14 +460,7 @@ function UKMapView({
 }) {
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-[#D0A65E]/30 bg-[radial-gradient(circle_at_top,_rgba(208,166,94,0.12),_transparent_38%),linear-gradient(180deg,rgba(18,24,38,0.95),rgba(7,11,22,0.98))] p-4 lg:p-5">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-white">Region locator</p>
-            <p className="text-xs text-gray-500">Click a marker on the map to focus a region, then open its climate update.</p>
-          </div>
-          <div className="text-xs text-gray-500">Leaflet basemap</div>
-        </div>
+      <div className="overflow-hidden rounded-xl border border-gray-700 bg-gray-950">
         <UKRegionsLeafletMap
           markers={mapMarkers}
           selectedSlug={selectedRegion?.region.slug ?? null}
@@ -479,21 +468,21 @@ function UKMapView({
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr] items-start">
+      <div className="grid gap-4 lg:grid-cols-[1fr_1fr] items-start">
         {selectedRegion ? (
           <>
-            <div className="rounded-2xl border border-[#D0A65E]/30 bg-gray-900/70 p-4">
+            <div className="rounded-xl border border-sky-900/40 bg-sky-950/20 p-4">
               <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D0A65E]/25 bg-[#D0A65E]/8 text-[#D0A65E]">
+                <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-sky-700/40 bg-sky-900/30 text-sky-400">
                   <MapPin className="h-4.5 w-4.5" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#D0A65E]">Selected region</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-400">Selected region</p>
                   <h3 className="mt-1 text-xl font-bold text-white">{selectedRegion.region.name}</h3>
                   <p className="mt-2 text-sm font-medium text-gray-200">{representativeCityText(selectedRegion.representativeCities)}</p>
                   <p className="mt-2 text-sm text-gray-400">{selectedRegion.region.tagline}</p>
                   {normalizedQuery ? (
-                    <div className="mt-3 inline-flex items-start gap-2 rounded-lg border border-[#D0A65E]/25 bg-[#D0A65E]/5 px-2.5 py-1.5 text-xs text-[#D0A65E]">
+                    <div className="mt-3 inline-flex items-start gap-2 rounded-lg border border-sky-800/40 bg-sky-900/20 px-2.5 py-1.5 text-xs text-sky-400">
                       <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                       <span>Matches: {getMatchedCities(selectedRegion, normalizedQuery).join(', ') || 'Region name match'}</span>
                     </div>
@@ -520,8 +509,8 @@ function UKMapView({
                       onClick={() => onSelectRegion(item.region.slug)}
                       className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                         active
-                          ? 'border-[#D0A65E] bg-[#D0A65E]/15 text-[#FFF5E7]'
-                          : 'border-gray-700 bg-gray-950/60 text-gray-400 hover:border-[#D0A65E]/40 hover:text-white'
+                          ? 'border-sky-500 bg-sky-500/15 text-sky-300'
+                          : 'border-gray-700 bg-gray-800/60 text-gray-400 hover:border-sky-500/40 hover:text-sky-300'
                       }`}
                     >
                       {item.region.name}

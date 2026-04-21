@@ -76,6 +76,24 @@ html {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* Active region label for UK/Ireland map (sky-blue) */
+.uk-region-label {
+  background: none !important;
+  border: none !important;
+}
+.uk-region-label span {
+  display: block;
+  white-space: nowrap;
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 11px;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
 /* Dark labels for light-background maps (extreme weather) */
 .country-label-dark,
 .continent-label-dark {
