@@ -1,0 +1,60 @@
+name: Monthly — rebuild climate snapshots
+
+# Runs on the 5th of each month at 04:00 UTC (both NOAA and OWID normally
+# have the previous month's data by then), and can be triggered manually
+# from the Actions tab.
+#
+# Refreshes all pre-computed climate JSON snapshots under
+# public/data/climate/ by running the matching build scripts.
+on:
+  schedule:
+    - cron: '0 4 5 * *'
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── Global (world-level NOAA + OWID) ────────────────────────────
+      - name: Rebuild global snapshot
+        run: node scripts/build-global-snapshot.mjs
+
+      # ── Per-country (OWID land temperature + precipitation) ─────────
+      - name: Rebuild country snapshots
+        run: node scripts/build-country-snapshots.mjs
+
+      # ── US national (NOAA national time series) ─────────────────────
+      - name: Rebuild US national snapshot
+        run: node scripts/build-us-national-snapshot.mjs
+
+      # ── US states (NOAA statewide time series, ~30 min) ────────────
+      - name: Rebuild US state snapshots
+        run: node scripts/build-us-state-snapshots.mjs
+
+      # ── UK regions (Met Office datasets) ────────────────────────────
+      - name: Rebuild UK region snapshots
+        run: node scripts/build-uk-region-snapshots.mjs
+
+      - name: Commit updated snapshots
+        run: |
+          if git diff --quiet -- public/data/climate/; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "climate-snapshot-bot"
+          git config user.email "climate-snapshot-bot@users.noreply.github.com"
+          git add public/data/climate/
+          git commit -m "chore(climate): refresh snapshots ($(date -u +%Y-%m-%d))"
+          git push
