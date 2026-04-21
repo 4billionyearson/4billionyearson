@@ -225,7 +225,7 @@ export async function GET(request: Request) {
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:rankings:${cacheMonth}-v1`;
+  const cacheKey = `climate:rankings:${cacheMonth}-v2`;
 
   if (!force) {
     const cached = await getCached<RankingsResponse>(cacheKey);
