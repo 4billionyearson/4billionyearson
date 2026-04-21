@@ -175,8 +175,16 @@ const Header = () => {
                 <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-white', 'hover:text-white')} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
-                <Link href="/climate" className={desktopDropdownItemClass(isClimateUpdatesPage, 'text-cyan-400', 'hover:text-cyan-400')} onClick={closeMenu}>
-                  <span className={isClimateUpdatesPage ? 'text-cyan-400' : ''}>Climate Updates</span><MonthlyBadge />
+                <Link
+                  href="/climate"
+                  className={isClimateUpdatesPage
+                    ? 'block px-4 py-2.5 text-sm transition-colors bg-gray-900 hover:bg-gray-800/80'
+                    : 'block px-4 py-2.5 text-sm transition-colors text-gray-300 hover:text-cyan-400 hover:bg-gray-900'
+                  }
+                  style={isClimateUpdatesPage ? { color: '#38bdf8' } : undefined}
+                  onClick={closeMenu}
+                >
+                  Climate Updates<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={desktopDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
@@ -370,8 +378,16 @@ const Header = () => {
                 <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-white', 'hover:text-white')} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
-                <Link href="/climate" className={mobileDropdownItemClass(isClimateUpdatesPage, 'text-cyan-400', 'hover:text-cyan-400')} onClick={closeMenu}>
-                  <span className={isClimateUpdatesPage ? 'text-cyan-400' : ''}>Climate Updates</span><MonthlyBadge />
+                <Link
+                  href="/climate"
+                  className={isClimateUpdatesPage
+                    ? 'text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors bg-gray-900/80 hover:bg-gray-900'
+                    : 'text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors text-gray-300 hover:text-cyan-400'
+                  }
+                  style={isClimateUpdatesPage ? { color: '#38bdf8' } : undefined}
+                  onClick={closeMenu}
+                >
+                  Climate Updates<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={mobileDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
