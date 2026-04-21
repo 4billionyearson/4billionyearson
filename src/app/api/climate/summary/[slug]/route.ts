@@ -531,6 +531,109 @@ async function callGemini(
   };
 }
 
+// ─── Global prompt builder ─────────────────────────────────────────────────
+
+function buildGlobalPrompt(globalData: any): string {
+  const lines: string[] = [];
+
+  lines.push('You are a climate journalist writing the monthly Global Climate Update for a general audience.');
+  lines.push('This is the planet-wide update — the single most-read climate summary on the site.');
+  lines.push('');
+  lines.push('TASK: Write exactly 2–3 paragraphs (150–200 words total) telling a compelling, data-driven narrative about the current state of global warming.');
+  lines.push('');
+  lines.push('CONTENT PRIORITY:');
+  lines.push('1. LEAD WITH THE LATEST MONTH — the most recent global land anomaly vs the 1961–1990 baseline. State the figure, whether it was unusually warm or cool, and the all-time ranking.');
+  lines.push('2. 10-YEAR ROLLING AVERAGE vs PRE-INDUSTRIAL — how close is the rolling global land+ocean mean to the Paris 1.5°C and 2°C thresholds? This is the headline climate policy number.');
+  lines.push('3. LAND vs OCEAN — briefly note that global land is warming faster than the ocean, with a concrete recent example if the data supports it.');
+  lines.push('4. WEB-GROUNDED CONTEXT — if Google Search surfaces relevant current events (ENSO state, notable extreme weather month, major climate report release, COP outcomes), weave them in naturally. Verify ENSO state against the month being summarised.');
+  lines.push('');
+  lines.push('KEY PRINCIPLES:');
+  lines.push('- MAKE IT CONCRETE: Translate anomalies into tangible terms. "+1.4°C above the 20th-century average" should be followed with what that feels like in the real world — record ocean heat, bleaching, heatwaves, altered jet streams, etc.');
+  lines.push('- PARIS THRESHOLDS: Treat 1.5°C and 2°C above pre-industrial as the key benchmarks. If the rolling average is close to or past 1.5°C, say so plainly.');
+  lines.push('- NARRATIVE FLOW: Tell a story, not a list of statistics. Connect the monthly figure to the decadal trend to the policy thresholds.');
+  lines.push('- DO NOT COMPARE TO A SINGLE COUNTRY — this is the planetary-scale update.');
+  lines.push('');
+  lines.push('RULES:');
+  lines.push('- British English spelling throughout.');
+  lines.push('- Plain text only — no markdown, bullet points, or headings.');
+  lines.push('- Be specific with numbers but weave them into natural prose.');
+  lines.push('- Use the EXACT values from the DATA section below. Do NOT invent figures.');
+  lines.push('- Use numeric ordinals (1st, 2nd, 3rd) rather than written-out words.');
+  lines.push('- No policy recommendations.');
+  lines.push('- CRITICAL: Ensure you complete your final sentence. Do not abruptly truncate.');
+  lines.push('');
+  lines.push('═══ GLOBAL CLIMATE DATA ═══');
+  lines.push(`Baseline (WMO standard): 1961–1990`);
+  lines.push(`Pre-industrial reference (~1850–1900): ${globalData.preIndustrialBaseline}°C absolute`);
+  lines.push(`20th-century mean (NOAA): ${globalData.globalBaseline}°C absolute`);
+  lines.push(`Paris 1.5°C threshold: ${globalData.keyThresholds?.plus1_5}°C absolute`);
+  lines.push(`Paris 2.0°C threshold: ${globalData.keyThresholds?.plus2_0}°C absolute`);
+  lines.push('');
+
+  const gms = globalData.landLatestMonthStats;
+  const gqs = globalData.landLatestThreeMonthStats;
+  if (gms) {
+    lines.push('LATEST MONTH — Global Land (Our World in Data / ERA5):');
+    lines.push(`  ${gms.label}: ${gms.value}°C absolute${gms.diff != null ? ` · anomaly ${gms.diff > 0 ? '+' : ''}${gms.diff.toFixed(2)}°C vs 1961–1990` : ''}`);
+    lines.push(`  Ranked ${ordinal(gms.rank)} of ${gms.total} same-month values on record`);
+    if (gms.recordLabel) lines.push(`  All-time record: ${gms.recordValue}°C (${gms.recordLabel})`);
+    if (gms.rank <= 5) lines.push('  ⬆️ TOP 5 — MUST MENTION');
+  }
+  if (gqs) {
+    lines.push('');
+    lines.push('LATEST 3-MONTH WINDOW — Global Land:');
+    lines.push(`  ${gqs.label}: ${gqs.value}°C absolute${gqs.diff != null ? ` · anomaly ${gqs.diff > 0 ? '+' : ''}${gqs.diff.toFixed(2)}°C vs 1961–1990` : ''}`);
+    lines.push(`  Ranked ${ordinal(gqs.rank)} of ${gqs.total} on record`);
+  }
+
+  const yearly = globalData.yearlyData || [];
+  if (yearly.length) {
+    const latest = yearly[yearly.length - 1];
+    const sorted = [...yearly].sort((a: any, b: any) => b.anomaly - a.anomaly);
+    const rank = sorted.findIndex((y: any) => y.year === latest.year) + 1;
+    lines.push('');
+    lines.push('ANNUAL — Global Land+Ocean (NOAA):');
+    lines.push(`  ${latest.year}: ${latest.absoluteTemp}°C absolute · anomaly ${latest.anomaly > 0 ? '+' : ''}${latest.anomaly}°C vs 20th-century mean`);
+    lines.push(`  Ranked ${ordinal(rank)} of ${yearly.length} years on record`);
+    lines.push(`  Top 5 warmest years: ${sorted.slice(0, 5).map((y: any) => `${y.year} (+${y.anomaly}°C)`).join(', ')}`);
+    if (latest.rollingAvg != null) {
+      const vsPI = (latest.rollingAvg - globalData.preIndustrialBaseline).toFixed(2);
+      lines.push(`  10-year rolling mean (${latest.year - 9}-${latest.year}): ${latest.rollingAvg}°C absolute · +${vsPI}°C above pre-industrial`);
+    }
+  }
+
+  const mc = globalData.monthlyComparison || [];
+  if (mc.length) {
+    lines.push('');
+    lines.push('LAST 12 MONTHS — anomaly vs 1961–1990 (land+ocean):');
+    for (const m of mc) {
+      if (m.diff == null) continue;
+      const sign = m.diff > 0 ? '+' : '';
+      lines.push(`  ${m.monthLabel}: ${sign}${m.diff.toFixed(2)}°C`);
+    }
+  }
+
+  const lvo = globalData.landVsOceanMonthly || [];
+  if (lvo.length) {
+    lines.push('');
+    lines.push('LAND vs LAND+OCEAN — last 12 months absolute temperatures:');
+    for (const p of lvo) {
+      if (p.landTemp == null && p.landOceanTemp == null) continue;
+      const landStr = p.landTemp != null ? `${p.landTemp}°C` : '—';
+      const loStr = p.landOceanTemp != null ? `${p.landOceanTemp}°C` : '—';
+      lines.push(`  ${p.monthLabel}: land ${landStr} · land+ocean ${loStr}`);
+    }
+  }
+
+  lines.push('');
+  lines.push('═══ WEB SEARCH INSTRUCTION ═══');
+  lines.push('Use Google Search to find relevant planetary-scale climate news from the last 1–3 months.');
+  lines.push('Look for: current ENSO state (El Niño / La Niña / neutral), notable global climate records, major heat or storm events with clear climate-change attribution, key IPCC / WMO / Copernicus / NOAA announcements, COP outcomes.');
+  lines.push('Summarise any relevant findings in your own words and weave them into the update narrative.');
+
+  return lines.join('\n');
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -566,17 +669,6 @@ export async function GET(
     }
   }
 
-  // Fetch full profile data and GDACS events in parallel
-  const base = getBaseUrl();
-  const [profileData, extremeWeatherData] = await Promise.all([
-    fetchJSON(`${base}/api/climate/profile/${slug}`),
-    fetchJSON(`${base}/api/climate/extreme-weather`),
-  ]);
-
-  if (!profileData) {
-    return NextResponse.json({ error: 'No profile data available' }, { status: 404 });
-  }
-
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json({
@@ -587,6 +679,66 @@ export async function GET(
       retryable: false,
       message: 'The AI-generated climate update is not available because the summary service is not configured.',
     }, { status: 503 });
+  }
+
+  const base = getBaseUrl();
+
+  // ─── Special branch: global planet-level summary ───────────────────────
+  if (region.type === 'special' && slug === 'global') {
+    const globalData = await fetchJSON(`${base}/api/climate/global`);
+    if (!globalData) {
+      return NextResponse.json({ error: 'No global data available' }, { status: 503 });
+    }
+
+    const prompt = buildGlobalPrompt(globalData);
+
+    try {
+      let result = await callGemini(apiKey, prompt, true);
+      if (!result.summary || summaryLooksIncomplete(result.summary)) {
+        console.log('Grounded call failed/incomplete for global, retrying without grounding');
+        result = await callGemini(apiKey, prompt, false);
+      }
+
+      if (!result.summary || summaryLooksIncomplete(result.summary)) {
+        return NextResponse.json({
+          summary: null,
+          sources: [],
+          generatedAt: new Date().toISOString(),
+          source: 'failed',
+          retryable: true,
+          message: 'The AI-generated global climate update could not be produced just now. You can try again.',
+        }, { status: 503 });
+      }
+
+      const cacheResult = {
+        summary: result.summary,
+        sources: result.sources,
+        generatedAt: new Date().toISOString(),
+      };
+      await setShortTerm(cacheKey, cacheResult);
+      return NextResponse.json({ ...cacheResult, source: 'fresh' });
+    } catch (err: any) {
+      console.error('Gemini global summary error:', err);
+      return NextResponse.json({
+        summary: null,
+        sources: [],
+        generatedAt: new Date().toISOString(),
+        source: 'error',
+        retryable: true,
+        message: 'The AI-generated global climate update could not be loaded right now. You can try again.',
+      }, { status: 503 });
+    }
+  }
+
+  // ─── Regional summaries (existing path) ────────────────────────────────
+  // Fetch full profile data and GDACS events in parallel
+  const [profileData, extremeWeatherData] = await Promise.all([
+    fetchJSON(`${base}/api/climate/profile/${slug}`),
+    fetchJSON(`${base}/api/climate/extreme-weather`),
+  ]);
+
+  if (!profileData) {
+    return NextResponse.json({ error: 'No profile data available' }, { status: 404 });
   }
 
   // Fetch national comparison data for sub-national regions

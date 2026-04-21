@@ -8,6 +8,12 @@ import {
 import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import { getRegionBySlug } from '@/lib/climate/regions';
+import {
+  OverviewGrid,
+  buildOverviewRow,
+  type OverviewPanel,
+  type OverviewRow,
+} from '../_shared/overview-grid';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -58,17 +64,6 @@ function formatSigned(value: number, digits = 2): string {
   return `${sign}${value.toFixed(digits)}`;
 }
 
-function ordinal(n: number): string {
-  const r = n % 100;
-  if (r >= 11 && r <= 13) return `${n}th`;
-  switch (n % 10) {
-    case 1: return `${n}st`;
-    case 2: return `${n}nd`;
-    case 3: return `${n}rd`;
-    default: return `${n}th`;
-  }
-}
-
 function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-4 my-6">
@@ -82,6 +77,28 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
+type SummaryResponse = {
+  summary: string | null;
+  sources?: { title: string; uri: string }[];
+  generatedAt?: string;
+  source?: string;
+  message?: string;
+  retryable?: boolean;
+};
+
+function highlightRankings(text: string): string {
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const sup = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|most|least';
+  const supNoMost = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|least';
+  const wordOrd = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth';
+  const w = `(?:\\s+(?!on\\s+record|in\\s+\\d|of\\s+\\d+\\s*year|of\\s+\\d+[.,°]|at\\s+\\d|with\\s+\\d|averaging\\s)(?:[a-zA-Z][a-zA-Z'\\u2019-]*|\\d+[-\\u2013]\\w+))*`;
+  const rec = '(?:\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?))?';
+  const p1 = `(?:\\d+(?:st|nd|rd|th)|${wordOrd})\\s+(?:${sup})\\b${w}${rec}`;
+  const p2 = `the\\s+(?:${supNoMost})\\b${w}\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?)`;
+  const pattern = new RegExp(`\\b(${p1}|${p2})`, 'gi');
+  return escaped.replace(pattern, (m) => `<strong style="color:#fff">${m}</strong>`);
+}
+
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function GlobalProfile() {
@@ -89,6 +106,40 @@ export default function GlobalProfile() {
   const [data, setData] = useState<GlobalData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Gemini summary state
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>([]);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [summaryRetryable, setSummaryRetryable] = useState(false);
+
+  const fetchSummary = async (forceFresh = false) => {
+    setSummaryLoading(true);
+    setSummary(null);
+    setSummarySources([]);
+    setSummaryError(null);
+    setSummaryRetryable(false);
+    try {
+      const url = `/api/climate/summary/global?_t=${Date.now()}${forceFresh ? '&nocache=1' : ''}`;
+      const res = await fetch(url);
+      const payload: SummaryResponse | null = await res.json().catch(() => null);
+      if (payload?.summary) {
+        setSummary(payload.summary);
+        setSummarySources(payload.sources || []);
+        return;
+      }
+      setSummaryError(
+        payload?.message || 'The AI-generated global climate update is temporarily unavailable. The underlying data below is still live.'
+      );
+      setSummaryRetryable(payload?.retryable ?? payload?.source !== 'no-key');
+    } catch {
+      setSummaryError('The AI-generated global climate update could not be loaded right now.');
+      setSummaryRetryable(true);
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -106,6 +157,8 @@ export default function GlobalProfile() {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+
+    void fetchSummary();
     return () => { cancelled = true; };
   }, []);
 
@@ -149,6 +202,43 @@ export default function GlobalProfile() {
   const yearMin = yearlyChartData.length ? yearlyChartData[0].year : 1950;
   const yearMax = yearlyChartData.length ? yearlyChartData[yearlyChartData.length - 1].year : 2026;
 
+  // Build the overview panel (month / 3-month / year) to match country pages
+  const overviewPanels = useMemo<OverviewPanel[]>(() => {
+    if (!data) return [];
+    const landRow: OverviewRow | null = buildOverviewRow(
+      'Global Land',
+      data.landYearlyData ?? undefined,
+      data.landLatestMonthStats ?? undefined,
+      data.landLatestThreeMonthStats ?? undefined,
+      '°C',
+      1,
+      false,
+      true,
+    );
+    // Second row: Land+Ocean annual only (NOAA monthly ranked stats aren't
+    // computed on this endpoint, so the month / 3-month columns render n/a).
+    const landOceanRow: OverviewRow | null = buildOverviewRow(
+      'Global Land+Ocean',
+      data.yearlyData,
+      undefined,
+      undefined,
+      '°C',
+      1,
+      false,
+      false,
+    );
+    const rows = [landRow, landOceanRow].filter((r): r is OverviewRow => Boolean(r));
+    if (!rows.length) return [];
+    return [{
+      title: 'Temperature — Average',
+      icon: <Thermometer className="text-orange-400" />,
+      accentClass: 'bg-orange-600',
+      accentBg: 'bg-orange-600/50',
+      accentBorder: 'border-orange-400/80',
+      sections: [{ rows }],
+    }];
+  }, [data]);
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -168,14 +258,51 @@ export default function GlobalProfile() {
                   <span className="font-semibold">Coverage:</span> Whole Earth — land and ocean surface temperature
                 </p>
               </div>
-              <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                The global surface temperature record is the single most important climate
-                measurement. This page tracks the planet&rsquo;s land-and-ocean temperature
-                anomaly against the 1961&ndash;1990 baseline and the Paris Agreement&rsquo;s
-                1.5&deg;C and 2&deg;C pre-industrial thresholds. Data is sourced from NOAA
-                Climate at a Glance (land+ocean) and Our World in Data / ERA5 (land surface),
-                and refreshed monthly.
-              </p>
+
+              {summary ? (
+                <div>
+                  <div className="text-gray-300 text-sm leading-relaxed space-y-3">
+                    {summary.split('\n\n').map((para, i) => (
+                      <p key={i} dangerouslySetInnerHTML={{ __html: highlightRankings(para) }} />
+                    ))}
+                  </div>
+                  {summarySources.length > 0 && (
+                    <div className="mt-3 pt-2 border-t border-gray-800">
+                      <p className="text-gray-600 text-xs mb-1">Sources:</p>
+                      <div className="flex flex-wrap gap-x-3 gap-y-1">
+                        {summarySources.map((s, i) => (
+                          <a key={i} href={s.uri} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-[#D0A65E] transition-colors">
+                            {s.title} ↗
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-gray-600 text-xs mt-2 italic">Generated by Gemini from climate data and web sources</p>
+                </div>
+              ) : summaryLoading ? (
+                <div className="flex items-center gap-3 py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-[#D0A65E] shrink-0" />
+                  <p className="text-sm text-gray-400">Generating global climate update…</p>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-amber-700/40 bg-amber-950/20 px-4 py-3">
+                  <p className="text-sm font-medium text-amber-200">Global climate update temporarily unavailable</p>
+                  <p className="mt-1 text-sm text-gray-300">{summaryError || 'The AI-generated update is temporarily unavailable. The measured global climate data below is still live.'}</p>
+                  {summaryRetryable && (
+                    <div className="mt-3">
+                      <button
+                        type="button"
+                        onClick={() => void fetchSummary(true)}
+                        className="inline-flex items-center gap-2 rounded-lg border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-3 py-2 text-sm font-semibold text-[#D0A65E] transition-colors hover:bg-[#D0A65E]/20 hover:text-[#E8C97A]"
+                      >
+                        Try again
+                      </button>
+                    </div>
+                  )}
+                  <p className="mt-3 text-sm text-gray-400">{region.tagline}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -200,54 +327,29 @@ export default function GlobalProfile() {
 
           {data && !loading && !error && (
             <>
-              {/* Key stats grid */}
-              <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Headline Numbers" />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {/* Latest month vs 1961-90 */}
-                {data.landLatestMonthStats && (
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Latest Month · Global Land</p>
-                    <p className="text-sm text-gray-300 mt-1">{data.landLatestMonthStats.label}</p>
-                    <p className={`text-4xl font-bold font-mono mt-2 ${(data.landLatestMonthStats.diff ?? 0) >= 1 ? 'text-red-300' : 'text-orange-300'}`}>
-                      {data.landLatestMonthStats.diff != null ? `${formatSigned(data.landLatestMonthStats.diff)}°C` : '—'}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">vs 1961–1990 baseline</p>
-                    <p className="text-[11px] text-gray-600 mt-2">
-                      {ordinal(data.landLatestMonthStats.rank)} warmest {data.landLatestMonthStats.label.split(' ')[0]} in {data.landLatestMonthStats.total} years on record
-                    </p>
-                  </div>
-                )}
+              {/* Overview table: month / 3-month / year — matches country & region pages */}
+              {overviewPanels.length > 0 && (
+                <>
+                  <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Global Temperature — At a Glance" />
+                  <OverviewGrid panels={overviewPanels} />
+                </>
+              )}
 
-                {/* 10-year rolling vs pre-industrial */}
-                {rolling10yr != null && vsPreIndustrial != null && (
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">10-Year Rolling · Land+Ocean</p>
-                    <p className="text-sm text-gray-300 mt-1">{latestYearly?.year} decade average</p>
-                    <p className={`text-4xl font-bold font-mono mt-2 ${vsPreIndustrial >= 1.3 ? 'text-red-300' : 'text-orange-300'}`}>
+              {/* Paris threshold callout (10-year rolling vs pre-industrial) */}
+              {rolling10yr != null && vsPreIndustrial != null && (
+                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                  <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">10-Year Rolling · Land+Ocean · vs Pre-Industrial</p>
+                  <div className="flex items-baseline gap-3 mt-2 flex-wrap">
+                    <p className={`text-4xl font-bold font-mono ${vsPreIndustrial >= 1.3 ? 'text-red-300' : 'text-orange-300'}`}>
                       {formatSigned(vsPreIndustrial)}°C
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">vs pre-industrial (~{data.preIndustrialBaseline.toFixed(1)}°C)</p>
-                    <p className="text-[11px] text-gray-600 mt-2">
-                      Absolute: {rolling10yr.toFixed(2)}°C · Paris 1.5°C threshold: {data.keyThresholds.plus1_5.toFixed(1)}°C
-                    </p>
+                    <p className="text-sm text-gray-400">{latestYearly?.year} decade average</p>
                   </div>
-                )}
-
-                {/* Latest annual anomaly */}
-                {latestYearly && (
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">{latestYearly.year} · Land+Ocean</p>
-                    <p className="text-sm text-gray-300 mt-1">Full-year anomaly</p>
-                    <p className={`text-4xl font-bold font-mono mt-2 ${latestYearly.anomaly >= 1 ? 'text-red-300' : latestYearly.anomaly >= 0.5 ? 'text-orange-300' : 'text-amber-300'}`}>
-                      {formatSigned(latestYearly.anomaly)}°C
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">vs 20th-century mean (NOAA)</p>
-                    <p className="text-[11px] text-gray-600 mt-2">
-                      Absolute: {latestYearly.absoluteTemp.toFixed(2)}°C
-                    </p>
-                  </div>
-                )}
-              </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Absolute: {rolling10yr.toFixed(2)}°C · Pre-industrial baseline ~{data.preIndustrialBaseline.toFixed(1)}°C · Paris 1.5°C threshold: {data.keyThresholds.plus1_5.toFixed(1)}°C · Paris 2°C threshold: {data.keyThresholds.plus2_0.toFixed(1)}°C
+                  </p>
+                </div>
+              )}
 
               {/* Spaghetti chart */}
               {data.landMonthlyAll?.length > 0 && (
