@@ -181,7 +181,7 @@ const Header = () => {
                     ? 'block px-4 py-2.5 text-sm transition-colors bg-gray-900 hover:bg-gray-800/80'
                     : 'block px-4 py-2.5 text-sm transition-colors text-gray-300 hover:text-cyan-400 hover:bg-gray-900'
                   }
-                  style={isClimateUpdatesPage ? { color: '#38bdf8' } : undefined}
+                  style={isClimateUpdatesPage ? { color: '#ffffff' } : undefined}
                   onClick={closeMenu}
                 >
                   Climate Updates<MonthlyBadge />
@@ -384,7 +384,7 @@ const Header = () => {
                     ? 'text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors bg-gray-900/80 hover:bg-gray-900'
                     : 'text-sm pl-10 pr-6 py-3 border-b border-gray-800/50 w-full block transition-colors text-gray-300 hover:text-cyan-400'
                   }
-                  style={isClimateUpdatesPage ? { color: '#38bdf8' } : undefined}
+                  style={isClimateUpdatesPage ? { color: '#ffffff' } : undefined}
                   onClick={closeMenu}
                 >
                   Climate Updates<MonthlyBadge />
