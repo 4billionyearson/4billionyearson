@@ -215,9 +215,9 @@ export default function GlobalProfile() {
     if (!data?.noaaStats) return [];
     const { landOcean, land, ocean } = data.noaaStats;
     const rows: OverviewRow[] = [];
-    const landRow = buildOverviewRow('Global Land', land.yearly, land.latestMonthStats ?? undefined, land.latestThreeMonthStats ?? undefined, '°C', 1, false, false);
-    const oceanRow = buildOverviewRow('Global Ocean', ocean.yearly, ocean.latestMonthStats ?? undefined, ocean.latestThreeMonthStats ?? undefined, '°C', 1, false, false);
-    const landOceanRow = buildOverviewRow('Global Land + Ocean', landOcean.yearly, landOcean.latestMonthStats ?? undefined, landOcean.latestThreeMonthStats ?? undefined, '°C', 1, false, true);
+    const landRow = buildOverviewRow('Land', land.yearly, land.latestMonthStats ?? undefined, land.latestThreeMonthStats ?? undefined, '°C', 1, false, false);
+    const oceanRow = buildOverviewRow('Ocean', ocean.yearly, ocean.latestMonthStats ?? undefined, ocean.latestThreeMonthStats ?? undefined, '°C', 1, false, false);
+    const landOceanRow = buildOverviewRow('Land + Ocean', landOcean.yearly, landOcean.latestMonthStats ?? undefined, landOcean.latestThreeMonthStats ?? undefined, '°C', 1, false, true);
     if (landRow) rows.push(landRow);
     if (oceanRow) rows.push(oceanRow);
     if (landOceanRow) rows.push(landOceanRow);
@@ -337,6 +337,20 @@ export default function GlobalProfile() {
                 const decadeStart = (latestYearly?.year ?? 0) - 9;
                 const decadeEnd = latestYearly?.year ?? 0;
                 const atOrPast15 = vsPreIndustrial >= 1.5;
+
+                // Milestone calculations from the yearly series (annual anomalies)
+                const yearlyWithAnom = (data.yearlyData ?? []).map((p) => ({
+                  year: p.year,
+                  absoluteTemp: p.absoluteTemp,
+                  rollingAvg: p.rollingAvg ?? null,
+                  annualAnomaly: p.absoluteTemp - data.preIndustrialBaseline,
+                  decadeAnomaly: p.rollingAvg != null ? p.rollingAvg - data.preIndustrialBaseline : null,
+                }));
+                const hottestYear = yearlyWithAnom.length
+                  ? yearlyWithAnom.reduce((best, p) => p.annualAnomaly > best.annualAnomaly ? p : best)
+                  : null;
+                const firstAnnualBreach15 = yearlyWithAnom.find((p) => p.annualAnomaly >= 1.5);
+
                 return (
                   <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -353,10 +367,10 @@ export default function GlobalProfile() {
                     </div>
 
                     <p className="text-sm text-gray-300 mt-3">
-                      Earth&apos;s surface is currently <span className="font-semibold text-white">{vsPreIndustrial.toFixed(2)}°C</span> warmer than the pre-industrial (1850–1900) average, based on the 10-year mean for <span className="font-semibold text-white">{decadeStart}–{decadeEnd}</span>. Climate scientists use a decade average rather than a single year to smooth out natural variability (El Niño, volcanoes) and define long-term warming, in line with <a href="https://wmo.int/news/media-centre/wmo-confirms-2024-warmest-year-record-about-155degc-above-pre-industrial-level" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">WMO</a> and <a href="https://www.ipcc.ch/sr15/chapter/spm/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">IPCC AR6</a> methodology.
+                      Earth&apos;s surface is currently <span className="font-semibold text-white">{vsPreIndustrial.toFixed(2)}°C</span> warmer than the pre-industrial (1850–1900) average, based on the 10-year mean for <span className="font-semibold text-white">{decadeStart}–{decadeEnd}</span>. Climate scientists use a decade average — not a single year — to smooth out natural variability (El Niño, volcanoes) and define long-term warming, in line with <a href="https://wmo.int/news/media-centre/wmo-confirms-2024-warmest-year-record-about-155degc-above-pre-industrial-level" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">WMO</a> and <a href="https://www.ipcc.ch/sr15/chapter/spm/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">IPCC AR6</a> methodology. A single year can cross 1.5°C and then fall back; the Paris limit is considered breached only once the 10-year mean stays above it.
                     </p>
 
-                    {/* 1.5°C progress bar */}
+                    {/* Progress bars */}
                     <div className="mt-5">
                       <div className="flex items-baseline justify-between text-sm">
                         <span className="font-semibold text-white">Paris 1.5°C limit</span>
@@ -373,7 +387,6 @@ export default function GlobalProfile() {
                       </p>
                     </div>
 
-                    {/* 2.0°C progress bar */}
                     <div className="mt-4">
                       <div className="flex items-baseline justify-between text-sm">
                         <span className="font-semibold text-white">Paris 2.0°C upper bound</span>
@@ -387,20 +400,88 @@ export default function GlobalProfile() {
                       </p>
                     </div>
 
-                    {/* Secondary stats */}
-                    <div className="mt-5 pt-4 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Most recent full year ({decadeEnd})</p>
-                        <p className="font-mono text-white mt-0.5">
-                          {latestYearDelta != null ? formatSigned(latestYearDelta) : '—'}°C <span className="text-gray-500 font-sans">above pre-industrial</span>
+                    {/* Visual chart: annual + 10-yr mean vs Paris limits, shown as anomaly °C */}
+                    {yearlyWithAnom.length > 0 && (
+                      <div className="mt-6 pt-4 border-t border-gray-800">
+                        <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2">
+                          Warming above pre-industrial, 1950–{yearlyWithAnom[yearlyWithAnom.length - 1].year}
+                        </p>
+                        <div className="h-60">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={yearlyWithAnom} margin={{ top: 5, right: 40, left: 0, bottom: 5 }}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                              <XAxis dataKey="year" stroke="#9CA3AF" fontSize={11} />
+                              <YAxis
+                                stroke="#9CA3AF"
+                                fontSize={11}
+                                domain={[-0.4, 2.2]}
+                                ticks={[0, 0.5, 1.0, 1.5, 2.0]}
+                                tickFormatter={(v) => `${v > 0 ? '+' : ''}${v.toFixed(1)}°C`}
+                              />
+                              <Tooltip
+                                contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8 }}
+                                labelStyle={{ color: '#FFF5E7' }}
+                                formatter={(v: any, name: any) => [typeof v === 'number' ? `${formatSigned(v)}°C` : '—', name]}
+                              />
+                              <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 11 }} />
+                              <ReferenceLine y={0} stroke="#60a5fa" strokeDasharray="2 2" label={{ value: 'Pre-industrial (1850–1900)', fill: '#93c5fd', fontSize: 10, position: 'insideBottomRight' }} />
+                              <ReferenceLine y={1.5} stroke="#ef4444" strokeDasharray="4 4" label={{ value: '+1.5°C Paris', fill: '#fca5a5', fontSize: 10, position: 'insideTopRight' }} />
+                              <ReferenceLine y={2.0} stroke="#b91c1c" strokeDasharray="4 4" label={{ value: '+2.0°C Paris', fill: '#fecaca', fontSize: 10, position: 'insideTopRight' }} />
+                              {firstAnnualBreach15 && (
+                                <ReferenceLine x={firstAnnualBreach15.year} stroke="#f97316" strokeDasharray="2 4" label={{ value: `1st annual >1.5°C (${firstAnnualBreach15.year})`, fill: '#fdba74', fontSize: 10, angle: -90, position: 'insideTopLeft' }} />
+                              )}
+                              <Line type="monotone" dataKey="annualAnomaly" name="Annual anomaly" stroke="#fb923c" strokeWidth={1} dot={false} isAnimationActive={false} />
+                              <Line type="monotone" dataKey="decadeAnomaly" name="10-year mean" stroke="#fbbf24" strokeWidth={3} dot={false} connectNulls isAnimationActive={false} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <p className="text-[11px] text-gray-500 mt-1">
+                          Thin orange line = individual years. Thick gold line = 10-year mean (the official Paris tracker). Red dashes = Paris 1.5 & 2.0°C limits. Values are anomalies vs 1850–1900.
                         </p>
                       </div>
+                    )}
+
+                    {/* Key milestones */}
+                    <div className="mt-5 pt-4 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
                       <div>
                         <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">10-year mean ({decadeStart}–{decadeEnd})</p>
                         <p className="font-mono text-white mt-0.5">
-                          {rolling10yr.toFixed(2)}°C absolute <span className="text-gray-500 font-sans">({formatSigned(vsPreIndustrial)}°C anomaly)</span>
+                          <span className={atOrPast15 ? 'text-red-300' : 'text-orange-300'}>{formatSigned(vsPreIndustrial)}°C</span>
+                        </p>
+                        <p className="text-[11px] text-gray-500">{rolling10yr.toFixed(2)}°C absolute · official Paris metric</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Latest full year ({decadeEnd})</p>
+                        <p className="font-mono text-white mt-0.5">
+                          {latestYearDelta != null ? formatSigned(latestYearDelta) : '—'}°C
+                        </p>
+                        <p className="text-[11px] text-gray-500">{latestYearValue != null ? `${latestYearValue.toFixed(2)}°C absolute` : '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Hottest year on record</p>
+                        <p className="font-mono text-white mt-0.5">
+                          {hottestYear ? `${formatSigned(hottestYear.annualAnomaly)}°C` : '—'}
+                        </p>
+                        <p className="text-[11px] text-gray-500">{hottestYear ? `in ${hottestYear.year}` : '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">First year above 1.5°C</p>
+                        <p className="font-mono text-white mt-0.5">
+                          {firstAnnualBreach15 ? firstAnnualBreach15.year : 'not yet'}
+                        </p>
+                        <p className="text-[11px] text-gray-500">
+                          {firstAnnualBreach15 ? `${formatSigned(firstAnnualBreach15.annualAnomaly)}°C — a single-year breach, not yet the 10-yr mean` : 'annual basis, NOAA'}
                         </p>
                       </div>
+                    </div>
+
+                    {/* Baselines explainer — moved up so readers can see what each number means */}
+                    <div className="mt-5 pt-4 border-t border-gray-800">
+                      <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Two baselines, two purposes</p>
+                      <ul className="text-xs text-gray-400 space-y-1.5">
+                        <li><span className="text-white font-semibold">Pre-industrial (1850–1900)</span> ≈ {data.preIndustrialBaseline.toFixed(1)}°C — used <em>only</em> for the Paris 1.5°C and 2.0°C limits above.</li>
+                        <li><span className="text-white font-semibold">1961–1990 (WMO standard)</span> — used for the monthly/quarterly rankings in the table above and on country pages. A relatively stable mid-20th-century reference.</li>
+                      </ul>
                     </div>
                   </div>
                 );
@@ -425,7 +506,7 @@ export default function GlobalProfile() {
                 <>
                   <Divider icon={<Globe2 className="h-5 w-5 text-orange-400" />} title="Long-Term Temperature Trend" />
                   <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-base font-semibold text-white mb-1">Global Land+Ocean absolute temperature, {yearMin}–{yearMax}</h3>
+                    <h3 className="text-base font-semibold text-white mb-1">Global Land + Ocean absolute temperature, {yearMin}–{yearMax}</h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Annual average (thin line) with a 10-year rolling mean (thick line). Horizontal lines mark the Paris 1.5°C and 2.0°C thresholds above pre-industrial.
                     </p>
@@ -437,7 +518,7 @@ export default function GlobalProfile() {
                           <YAxis
                             stroke="#9CA3AF"
                             fontSize={11}
-                            domain={['dataMin - 0.2', 'dataMax + 0.2']}
+                            domain={[(dataMin: number) => Math.min(dataMin, data.preIndustrialBaseline) - 0.2, () => data.keyThresholds.plus2_0 + 0.2]}
                             tickFormatter={(v) => `${v.toFixed(1)}°C`}
                           />
                           <Tooltip
@@ -464,7 +545,7 @@ export default function GlobalProfile() {
                   <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Last 12 Months vs 1961–1990" />
                   <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <p className="text-xs text-gray-400 mb-4">
-                      Each bar is the difference between that month&rsquo;s global land+ocean temperature and the 1961–1990 average for the same month. Red bars are warmer than baseline, blue are cooler.
+                      Each bar is the difference between that month&rsquo;s global land + ocean temperature and the 1961–1990 average for the same month. Red bars are warmer than baseline, blue are cooler.
                     </p>
                     <div className="h-72">
                       <ResponsiveContainer width="100%" height="100%">
@@ -496,7 +577,7 @@ export default function GlobalProfile() {
               {/* Land vs Ocean */}
               {data.landVsOceanMonthly && data.landVsOceanMonthly.length > 0 && (
                 <>
-                  <Divider icon={<Globe2 className="h-5 w-5 text-orange-400" />} title="Land vs Land+Ocean — Last 12 Months" />
+                  <Divider icon={<Globe2 className="h-5 w-5 text-orange-400" />} title="Land vs Land + Ocean — Last 12 Months" />
                   <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <p className="text-xs text-gray-400 mb-4">
                       Land surfaces warm roughly twice as fast as the ocean. This chart compares the global land-only temperature (ERA5, via Our World in Data) against the combined land+ocean series (NOAA) for each of the last 12 months.
@@ -506,7 +587,7 @@ export default function GlobalProfile() {
                         <LineChart data={data.landVsOceanMonthly} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="monthLabel" stroke="#9CA3AF" fontSize={10} angle={-30} textAnchor="end" height={60} />
-                          <YAxis stroke="#9CA3AF" fontSize={11} tickFormatter={(v) => `${v.toFixed(1)}°C`} />
+                          <YAxis stroke="#9CA3AF" fontSize={11} domain={[10, 20]} ticks={[10, 12, 14, 16, 18, 20]} tickFormatter={(v) => `${v.toFixed(0)}°C`} />
                           <Tooltip
                             contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8 }}
                             formatter={(v: any) => typeof v === 'number' ? `${v.toFixed(2)}°C` : '—'}
@@ -525,11 +606,11 @@ export default function GlobalProfile() {
               <Divider icon={<Database className="h-5 w-5 text-[#D0A65E]" />} title="Context & Sources" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                  <h3 className="text-base font-bold text-white mb-2">What the baselines mean</h3>
+                  <h3 className="text-base font-bold text-white mb-2">Baselines & methodology</h3>
                   <ul className="text-sm text-gray-300 space-y-2">
-                    <li><strong className="text-[#FFF5E7]">1961–1990 baseline</strong> — the WMO standard reference period used for monthly and quarterly anomalies on this site. It brackets the relatively stable mid-20th-century climate.</li>
-                    <li><strong className="text-[#FFF5E7]">Pre-industrial (1850–1900)</strong> ~{data.preIndustrialBaseline.toFixed(1)}°C absolute — the reference point for the Paris Agreement&rsquo;s 1.5°C and 2.0°C temperature limits.</li>
-                    <li><strong className="text-[#FFF5E7]">20th-century mean</strong> {data.globalBaseline}°C — the long-run average NOAA uses when reporting anomalies for individual months or years.</li>
+                    <li><strong className="text-[#FFF5E7]">1961–1990 baseline</strong> — the WMO standard reference period used for the monthly and quarterly anomalies shown in the table above and on every country/state/region page.</li>
+                    <li><strong className="text-[#FFF5E7]">Pre-industrial (1850–1900)</strong> ≈ {data.preIndustrialBaseline.toFixed(1)}°C absolute — used only for the Paris Agreement 1.5°C and 2.0°C limits. The Paris tracker uses a 10-year mean so single El Niño years don&rsquo;t falsely trigger it.</li>
+                    <li><strong className="text-[#FFF5E7]">20th-century mean</strong> {data.globalBaseline}°C — NOAA&rsquo;s reference for reporting individual monthly and yearly anomalies (converted into absolute °C values on this page).</li>
                   </ul>
                 </div>
                 <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
