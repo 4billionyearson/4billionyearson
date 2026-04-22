@@ -172,12 +172,12 @@ const Header = () => {
             {isClimateChangeOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[280px]">
-                <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#D0A65E]')} onClick={closeMenu}>
+                <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-gray-300', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link
                   href="/climate"
-                  className={desktopDropdownItemClass(isClimateUpdatesPage, 'text-[#E8C97A]', 'hover:text-[#E8C97A]')}
+                  className={desktopDropdownItemClass(isClimateUpdatesPage, 'text-gray-300', 'hover:text-[#E8C97A]')}
                   onClick={closeMenu}
                 >
                   Climate Updates<MonthlyBadge />
@@ -371,12 +371,12 @@ const Header = () => {
             </button>
             {mobileClimateOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#D0A65E]')} onClick={closeMenu}>
+                <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-gray-300', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link
                   href="/climate"
-                  className={mobileDropdownItemClass(isClimateUpdatesPage, 'text-[#E8C97A]', 'hover:text-[#E8C97A]')}
+                  className={mobileDropdownItemClass(isClimateUpdatesPage, 'text-gray-300', 'hover:text-[#E8C97A]')}
                   onClick={closeMenu}
                 >
                   Climate Updates<MonthlyBadge />
