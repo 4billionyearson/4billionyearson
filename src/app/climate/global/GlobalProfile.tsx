@@ -545,9 +545,9 @@ export default function GlobalProfile() {
                             formatter={(v: any) => typeof v === 'number' ? `${v.toFixed(2)}°C` : '—'}
                           />
                           <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 12 }} />
-                          <ReferenceLine y={data.keyThresholds.plus1_5} stroke="#ef4444" strokeDasharray="4 4" label={{ value: '+1.5°C Paris', fill: '#fca5a5', fontSize: 10, position: 'insideTopRight' }} />
-                          <ReferenceLine y={data.keyThresholds.plus2_0} stroke="#b91c1c" strokeDasharray="4 4" label={{ value: '+2.0°C Paris', fill: '#fecaca', fontSize: 10, position: 'insideTopRight' }} />
-                          <ReferenceLine y={data.preIndustrialBaseline} stroke="#60a5fa" strokeDasharray="2 2" label={{ value: 'Pre-industrial', fill: '#93c5fd', fontSize: 10, position: 'insideBottomRight' }} />
+                          <ReferenceLine y={data.keyThresholds.plus1_5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5} label={{ value: '+1.5°C Paris limit', fill: '#fbbf24', fontSize: 10, position: 'insideTopLeft' }} />
+                          <ReferenceLine y={data.keyThresholds.plus2_0} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5} label={{ value: '+2.0°C Critical limit', fill: '#fca5a5', fontSize: 10, position: 'insideTopLeft' }} />
+                          <ReferenceLine y={data.preIndustrialBaseline} stroke="#60a5fa" strokeDasharray="2 2" strokeWidth={1.5} label={{ value: 'Pre-industrial 1850–1900 baseline', fill: '#93c5fd', fontSize: 10, position: 'insideBottomLeft' }} />
                           <Line type="monotone" dataKey="absoluteTemp" name="Annual mean" stroke="#fb923c" strokeWidth={1} dot={false} isAnimationActive={false} />
                           <Line type="monotone" dataKey="rollingAvg" name="10-year rolling" stroke="#fbbf24" strokeWidth={3} dot={false} connectNulls isAnimationActive={false} />
                         </LineChart>

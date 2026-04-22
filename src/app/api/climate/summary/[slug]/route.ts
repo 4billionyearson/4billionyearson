@@ -542,9 +542,9 @@ function buildGlobalPrompt(globalData: any): string {
   lines.push('TASK: Write exactly 2–3 paragraphs (150–200 words total) telling a compelling, data-driven narrative about the current state of global warming.');
   lines.push('');
   lines.push('CONTENT PRIORITY:');
-  lines.push('1. LEAD WITH THE LATEST MONTH — the most recent global land anomaly vs the 1961–1990 baseline. State the figure, whether it was unusually warm or cool, and the all-time ranking.');
-  lines.push('2. 10-YEAR ROLLING AVERAGE vs PRE-INDUSTRIAL — how close is the rolling global land+ocean mean to the Paris 1.5°C and 2°C thresholds? This is the headline climate policy number.');
-  lines.push('3. LAND vs OCEAN — briefly note that global land is warming faster than the ocean, with a concrete recent example if the data supports it.');
+  lines.push('1. LEAD WITH THE LATEST MONTH — the most recent NOAA global LAND+OCEAN anomaly vs the 1961–1990 WMO baseline. State the figure, whether it was unusually warm or cool, and the all-time ranking. This is the headline number used by Copernicus, WMO and the world\'s climate press; use it rather than any land-only series.');
+  lines.push('2. 10-YEAR ROLLING AVERAGE vs PRE-INDUSTRIAL — how close is the 10-year global land+ocean mean to the Paris 1.5°C and 2°C thresholds? This is the headline climate policy number (WMO/IPCC AR6 methodology).');
+  lines.push('3. LAND vs OCEAN — briefly note that global land is warming faster than the ocean, ideally with a concrete figure from the separate NOAA land-only and ocean-only series below.');
   lines.push('4. WEB-GROUNDED CONTEXT — if Google Search surfaces relevant current events (ENSO state, notable extreme weather month, major climate report release, COP outcomes), weave them in naturally. Verify ENSO state against the month being summarised.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
@@ -565,25 +565,50 @@ function buildGlobalPrompt(globalData: any): string {
   lines.push('═══ GLOBAL CLIMATE DATA ═══');
   lines.push(`Baseline (WMO standard): 1961–1990`);
   lines.push(`Pre-industrial reference (~1850–1900): ${globalData.preIndustrialBaseline}°C absolute`);
-  lines.push(`20th-century mean (NOAA): ${globalData.globalBaseline}°C absolute`);
+  lines.push(`20th-century mean (NOAA, land+ocean): ${globalData.globalBaseline}°C absolute`);
   lines.push(`Paris 1.5°C threshold: ${globalData.keyThresholds?.plus1_5}°C absolute`);
   lines.push(`Paris 2.0°C threshold: ${globalData.keyThresholds?.plus2_0}°C absolute`);
   lines.push('');
 
+  // HEADLINE: NOAA land+ocean (the number used by Copernicus / WMO / climate press)
+  const nStats = globalData.noaaStats || {};
+  const noaaLO = nStats.landOcean?.latestMonthStats;
+  const noaaLO3 = nStats.landOcean?.latestThreeMonthStats;
+  if (noaaLO) {
+    lines.push('LATEST MONTH — Global Land+Ocean (NOAA, headline figure used by Copernicus / WMO):');
+    lines.push(`  ${noaaLO.label}: ${noaaLO.value}°C absolute${noaaLO.diff != null ? ` · anomaly ${noaaLO.diff > 0 ? '+' : ''}${noaaLO.diff.toFixed(2)}°C vs 1961–1990` : ''}`);
+    lines.push(`  Ranked ${ordinal(noaaLO.rank)} of ${noaaLO.total} same-month values on record`);
+    if (noaaLO.recordLabel) lines.push(`  All-time record for this month: ${noaaLO.recordValue}°C (${noaaLO.recordLabel})`);
+    if (noaaLO.rank <= 5) lines.push('  ⬆️ TOP 5 — MUST MENTION');
+  }
+  if (noaaLO3) {
+    lines.push('');
+    lines.push('LATEST 3-MONTH WINDOW — Global Land+Ocean (NOAA):');
+    lines.push(`  ${noaaLO3.label}: ${noaaLO3.value}°C absolute${noaaLO3.diff != null ? ` · anomaly ${noaaLO3.diff > 0 ? '+' : ''}${noaaLO3.diff.toFixed(2)}°C vs 1961–1990` : ''}`);
+    lines.push(`  Ranked ${ordinal(noaaLO3.rank)} of ${noaaLO3.total} on record`);
+  }
+
+  // NOAA land-only and ocean-only — for the land-vs-ocean contrast
+  const noaaLand = nStats.land?.latestMonthStats;
+  const noaaOcean = nStats.ocean?.latestMonthStats;
+  if (noaaLand || noaaOcean) {
+    lines.push('');
+    lines.push('LATEST MONTH — NOAA land-only vs ocean-only (for land/ocean contrast):');
+    if (noaaLand) lines.push(`  Land only: ${noaaLand.value}°C absolute${noaaLand.diff != null ? ` · anomaly ${noaaLand.diff > 0 ? '+' : ''}${noaaLand.diff.toFixed(2)}°C vs 1961–1990` : ''} · ${ordinal(noaaLand.rank)} of ${noaaLand.total}`);
+    if (noaaOcean) lines.push(`  Ocean only: ${noaaOcean.value}°C absolute${noaaOcean.diff != null ? ` · anomaly ${noaaOcean.diff > 0 ? '+' : ''}${noaaOcean.diff.toFixed(2)}°C vs 1961–1990` : ''} · ${ordinal(noaaOcean.rank)} of ${noaaOcean.total}`);
+  }
+
+  // Supplementary: OWID/ERA5 land-only (kept for backwards compatibility; do not lead with this)
   const gms = globalData.landLatestMonthStats;
   const gqs = globalData.landLatestThreeMonthStats;
   if (gms) {
-    lines.push('LATEST MONTH — Global Land (Our World in Data / ERA5):');
+    lines.push('');
+    lines.push('SUPPLEMENTARY — Global Land (Our World in Data / ERA5, reanalysis alternative):');
     lines.push(`  ${gms.label}: ${gms.value}°C absolute${gms.diff != null ? ` · anomaly ${gms.diff > 0 ? '+' : ''}${gms.diff.toFixed(2)}°C vs 1961–1990` : ''}`);
     lines.push(`  Ranked ${ordinal(gms.rank)} of ${gms.total} same-month values on record`);
-    if (gms.recordLabel) lines.push(`  All-time record: ${gms.recordValue}°C (${gms.recordLabel})`);
-    if (gms.rank <= 5) lines.push('  ⬆️ TOP 5 — MUST MENTION');
   }
   if (gqs) {
-    lines.push('');
-    lines.push('LATEST 3-MONTH WINDOW — Global Land:');
-    lines.push(`  ${gqs.label}: ${gqs.value}°C absolute${gqs.diff != null ? ` · anomaly ${gqs.diff > 0 ? '+' : ''}${gqs.diff.toFixed(2)}°C vs 1961–1990` : ''}`);
-    lines.push(`  Ranked ${ordinal(gqs.rank)} of ${gqs.total} on record`);
+    lines.push(`  3-month window ${gqs.label}: ${gqs.value}°C absolute${gqs.diff != null ? ` · anomaly ${gqs.diff > 0 ? '+' : ''}${gqs.diff.toFixed(2)}°C vs 1961–1990` : ''} · ${ordinal(gqs.rank)} of ${gqs.total}`);
   }
 
   const yearly = globalData.yearlyData || [];
@@ -659,7 +684,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v18`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v19`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {
