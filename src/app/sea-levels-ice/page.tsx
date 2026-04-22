@@ -155,56 +155,104 @@ const CorrelationTooltip = ({ active, payload, label }: any) => {
 
 const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-function SeaIceSpaghettiCard({ seaIce }: { seaIce: { baseline: string; recent60: { year: number; month: number; extent: number }[] } }) {
-  // Pivot recent60 into year-lines: { month: 'Jan', 2022: 16.1, 2023: 15.8, ... }
-  const years = Array.from(new Set(seaIce.recent60.map(p => p.year))).sort((a, b) => a - b);
-  const latestYear = Math.max(...years);
-  const byMonth: Record<number, Record<string, number | null>> = {};
-  for (let m = 1; m <= 12; m++) {
-    byMonth[m] = { month: m } as any;
-    for (const y of years) byMonth[m][String(y)] = null;
-  }
-  for (const p of seaIce.recent60) {
-    byMonth[p.month][String(p.year)] = p.extent;
-  }
-  const chartData = Object.values(byMonth).map((row: any) => ({ ...row, monthLabel: MONTH_LABELS[row.month - 1] }));
+// ─── Per-hemisphere spaghetti chart (Arctic / Antarctic) ────────────────────
+// Full 1979-present monthly series from NSIDC Sea Ice Index v4. Every year is
+// drawn as a faint grey line; the current year is emphasised in bright colour;
+// the all-time lowest year for the *same calendar month* as the latest data
+// point is picked out in red so viewers can see where we sit in the record.
 
-  // Color older years faded, latest year bold cyan
-  const yearColor = (y: number, idx: number, total: number): { stroke: string; width: number; opacity: number } => {
-    if (y === latestYear) return { stroke: '#22d3ee', width: 3, opacity: 1 };
-    const palette = ['#6b7280', '#64748b', '#0ea5e9', '#38bdf8', '#7dd3fc'];
-    return { stroke: palette[idx % palette.length], width: 1.5, opacity: 0.55 };
-  };
+interface HemisphereSeaIce {
+  label: string;
+  unit: string;
+  baseline: string;
+  latest: { year: number; month: number; extent: number };
+  climatology: number | null;
+  anomaly: number | null;
+  rankLowestOfSameMonth: number;
+  totalYearsInMonth: number;
+  recordLow: { year: number; month: number; extent: number };
+  previousLowest: { year: number; month: number; extent: number } | null;
+  monthly: { year: number; month: number; extent: number }[];
+}
+
+function HemisphereSeaIceCard({ data, accent }: { data: HemisphereSeaIce; accent: 'cyan' | 'sky' }) {
+  const years = useMemo(() => Array.from(new Set(data.monthly.map(p => p.year))).sort((a, b) => a - b), [data]);
+  const latestYear = data.latest.year;
+  const recordYear = data.recordLow.year;
+
+  const chartData = useMemo(() => {
+    const byMonth: Record<number, Record<string, number | null>> = {};
+    for (let m = 1; m <= 12; m++) {
+      byMonth[m] = { month: m } as any;
+      for (const y of years) byMonth[m][String(y)] = null;
+    }
+    for (const p of data.monthly) byMonth[p.month][String(p.year)] = p.extent;
+    return Object.values(byMonth).map((row: any) => ({ ...row, monthLabel: MONTH_LABELS[row.month - 1] }));
+  }, [data.monthly, years]);
+
+  const currentColor = accent === 'cyan' ? '#22d3ee' : '#38bdf8';
+  const recordColor = '#f87171'; // red-400 for the record-low year
+
+  // Only the two emphasised lines appear in the legend; the rest are "Other years".
+  const legendShown = new Set<number>([latestYear]);
+  if (recordYear !== latestYear) legendShown.add(recordYear);
+
+  const rankLabel = (() => {
+    const { rankLowestOfSameMonth: r, totalYearsInMonth: n } = data;
+    if (r === 1) return `lowest on record`;
+    if (r === 2) return `2nd-lowest on record`;
+    if (r === 3) return `3rd-lowest on record`;
+    return `${r}th-lowest of ${n} years`;
+  })();
+
+  const isRecordLow = data.rankLowestOfSameMonth === 1;
+  const latestLabel = `${MONTH_LABELS[data.latest.month - 1]} ${data.latest.year}`;
+  const recordLabel = `${MONTH_LABELS[data.recordLow.month - 1]} ${data.recordLow.year}`;
 
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-      <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
-        <Snowflake className="h-5 w-5 text-cyan-300" />
-        <span className="min-w-0 flex-1">Year-on-Year Sea Ice — {years[0]}–{latestYear}</span>
+      <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2">
+        <Snowflake className={`h-5 w-5 shrink-0 mt-1 ${accent === 'cyan' ? 'text-cyan-300' : 'text-sky-300'}`} />
+        <span className="min-w-0 flex-1">{data.label} — {years[0]}–{latestYear}</span>
       </h2>
-      <p className="text-xs text-gray-400 mt-1 mb-4">
-        One line per year, January through December. Current year ({latestYear}) is highlighted in cyan. Annual minimum typically falls in February (Arctic + Antarctic combined).
+      <p className="text-xs text-gray-400 mt-1 mb-3">
+        One line per year since satellite records began. <span style={{ color: currentColor }}>{latestYear}</span> is highlighted;
+        the lowest {MONTH_LABELS[data.latest.month - 1]} on record (<span style={{ color: recordColor }}>{recordYear}</span>) is picked out in red.
       </p>
-      <div className="h-[320px] w-full">
+
+      {/* Headline ranking */}
+      <div className={`flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-3 px-3 py-2 rounded-lg border ${isRecordLow ? 'border-red-500/50 bg-red-950/30' : 'border-gray-800 bg-gray-900/50'}`}>
+        <span className="text-sm text-gray-300">{latestLabel}:</span>
+        <span className="text-xl font-bold font-mono text-white">{data.latest.extent.toFixed(2)}<span className="text-sm text-gray-400 font-normal"> Mkm²</span></span>
+        <span className={`text-sm font-semibold ${isRecordLow ? 'text-red-300' : 'text-amber-300'}`}>{rankLabel}</span>
+        {data.anomaly !== null && (
+          <span className="text-xs text-gray-400">· {data.anomaly > 0 ? '+' : ''}{data.anomaly.toFixed(2)} vs {data.baseline}</span>
+        )}
+      </div>
+
+      <div className="h-[340px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
             <XAxis dataKey="monthLabel" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
             <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} width={44} tickFormatter={(v) => `${v}`} unit=" M" />
             <Tooltip content={<DarkTooltip />} />
-            <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 11, paddingTop: 8 }} />
-            {years.map((y, i) => {
-              const cfg = yearColor(y, i, years.length);
+            {years.map((y) => {
+              const isCurrent = y === latestYear;
+              const isRecord = y === recordYear && y !== latestYear;
+              const stroke = isCurrent ? currentColor : isRecord ? recordColor : '#6b7280';
+              const width = isCurrent ? 3 : isRecord ? 2 : 1;
+              const opacity = isCurrent ? 1 : isRecord ? 0.95 : 0.35;
               return (
                 <Line
                   key={y}
                   type="monotone"
                   dataKey={String(y)}
-                  name={String(y)}
-                  stroke={cfg.stroke}
-                  strokeWidth={cfg.width}
-                  strokeOpacity={cfg.opacity}
-                  dot={y === latestYear ? { r: 3, fill: cfg.stroke } : false}
+                  name={legendShown.has(y) ? String(y) : 'Other years'}
+                  stroke={stroke}
+                  strokeWidth={width}
+                  strokeOpacity={opacity}
+                  dot={isCurrent ? { r: 3, fill: stroke } : false}
                   connectNulls={false}
                   isAnimationActive={false}
                 />
@@ -213,8 +261,16 @@ function SeaIceSpaghettiCard({ seaIce }: { seaIce: { baseline: string; recent60:
           </LineChart>
         </ResponsiveContainer>
       </div>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-gray-300">
+        <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-0.5" style={{ backgroundColor: currentColor }} />{latestYear} (current year)</span>
+        {recordYear !== latestYear && (
+          <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-0.5" style={{ backgroundColor: recordColor }} />{recordYear} (record low for {MONTH_LABELS[data.latest.month - 1]})</span>
+        )}
+        <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-0.5 bg-gray-500 opacity-60" />Other years</span>
+      </div>
       <p className="text-xs text-gray-500 mt-3">
-        Source: <a href="https://nsidc.org/data/seaice_index" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">NSIDC Sea Ice Index</a> via global-warming.org · monthly averages · {seaIce.baseline} climatology
+        Record low for {MONTH_LABELS[data.latest.month - 1]}: {recordLabel} at {data.recordLow.extent.toFixed(2)} Mkm². Source:{' '}
+        <a href="https://nsidc.org/data/g02135" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">NSIDC Sea Ice Index v4</a> · monthly averages · {data.baseline} climatology.
       </p>
     </div>
   );
@@ -229,9 +285,12 @@ export default function SeaLevelsIcePage() {
   const [activeIceYear, setActiveIceYear] = useState<string>("1979");
   const handleIceYearChange = useCallback((y: string) => setActiveIceYear(y), []);
 
-  // Global sea-ice headline (Arctic + Antarctic combined) — sourced from the
-  // same global-climate snapshot used on /climate/global.
+  // Global sea-ice headline (Arctic + Antarctic combined) and per-hemisphere
+  // spaghetti-chart payloads — sourced from the same global-climate snapshot
+  // used on /climate/global.
   const [globalSeaIce, setGlobalSeaIce] = useState<any>(null);
+  const [arcticSeaIce, setArcticSeaIce] = useState<HemisphereSeaIce | null>(null);
+  const [antarcticSeaIce, setAntarcticSeaIce] = useState<HemisphereSeaIce | null>(null);
 
   useEffect(() => {
     fetch('/api/climate/greenhouse-gases')
@@ -244,7 +303,11 @@ export default function SeaLevelsIcePage() {
   useEffect(() => {
     fetch('/data/climate/global-history.json')
       .then(r => r.json())
-      .then(d => setGlobalSeaIce(d?.seaIceStats ?? null))
+      .then(d => {
+        setGlobalSeaIce(d?.seaIceStats ?? null);
+        setArcticSeaIce(d?.arcticSeaIce ?? null);
+        setAntarcticSeaIce(d?.antarcticSeaIce ?? null);
+      })
       .catch(() => {});
   }, []);
 
@@ -393,11 +456,12 @@ export default function SeaLevelsIcePage() {
 
               {/* ═══ GLOBAL SEA ICE HEADLINE ═══ */}
               {globalSeaIce && (
-                <>
-                  <SeaIceTile seaIce={globalSeaIce} variant="section" />
-                  <SeaIceSpaghettiCard seaIce={globalSeaIce} />
-                </>
+                <SeaIceTile seaIce={globalSeaIce} variant="section" />
               )}
+
+              {/* ═══ PER-HEMISPHERE SPAGHETTI CHARTS ═══ */}
+              {arcticSeaIce && <HemisphereSeaIceCard data={arcticSeaIce} accent="cyan" />}
+              {antarcticSeaIce && <HemisphereSeaIceCard data={antarcticSeaIce} accent="sky" />}
 
               {/* ═══ ICE EXTENT + ANOMALY PANEL ═══ */}
               <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">

@@ -53,6 +53,13 @@ const NOAA_N2O_URL = 'https://gml.noaa.gov/webdata/ccgg/trends/n2o/n2o_mm_gl.txt
 // anomaly vs 1991–2020, and the climatological monthly mean.)
 const GLOBAL_SEA_ICE_URL = 'https://global-warming.org/api/arctic-api';
 
+// NSIDC Sea Ice Index v4 — per-hemisphere monthly extent, 1979-present.
+// Each hemisphere has 12 CSVs (one per calendar month) at:
+//   https://noaadata.apps.nsidc.org/NOAA/G02135/{north|south}/monthly/data/{N|S}_MM_extent_v4.0.csv
+// Columns: year, mo, source_dataset, region, extent, area (Mkm²).
+const NSIDC_HEMISPHERE_URL = (hemisphere /* 'north' | 'south' */, mm /* 1..12 */) =>
+  `https://noaadata.apps.nsidc.org/NOAA/G02135/${hemisphere}/monthly/data/${hemisphere === 'north' ? 'N' : 'S'}_${String(mm).padStart(2, '0')}_extent_v4.0.csv`;
+
 // NOAA continental / hemispheric anomalies (file-slug matches NOAA's own URL
 // scheme: full region names, not ISO codes).
 const NOAA_CONTINENTS = [
@@ -430,6 +437,70 @@ function buildGhgStats(monthly, label, unit, preindustrial) {
 }
 
 // ───────────────────────────────────────────────────────────────────────────
+// NSIDC per-hemisphere monthly sea-ice extent. Parses one CSV per calendar
+// month (1979-present) and merges into a flat monthly series.
+function parseNsidcMonthlyCsv(text) {
+  if (!text) return [];
+  const rows = [];
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('year')) continue;
+    const cols = trimmed.split(',').map((s) => s.trim());
+    if (cols.length < 5) continue;
+    const year = Number(cols[0]);
+    const month = Number(cols[1]);
+    const extent = Number(cols[4]);
+    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(extent) || extent <= 0) continue;
+    rows.push({ year, month, extent: round2(extent) });
+  }
+  return rows;
+}
+
+async function fetchNsidcHemisphere(hemisphere) {
+  const all = [];
+  const texts = await Promise.all(
+    Array.from({ length: 12 }, (_, i) =>
+      tryFetchText(NSIDC_HEMISPHERE_URL(hemisphere, i + 1), { label: `NSIDC ${hemisphere} ${String(i + 1).padStart(2, '0')}`, timeoutMs: 30_000, attempts: 3 })
+    )
+  );
+  for (const text of texts) {
+    if (text) all.push(...parseNsidcMonthlyCsv(text));
+  }
+  all.sort((a, b) => (a.year - b.year) || (a.month - b.month));
+  return all;
+}
+
+// Build the per-hemisphere spaghetti-chart payload: full monthly series
+// (1979-present) + latest-month ranking vs every other year for the same
+// calendar month + climatological mean + record-low year.
+function buildHemisphereSeaIce(monthly, hemisphereLabel) {
+  if (!monthly?.length) return null;
+  const latest = monthly[monthly.length - 1];
+  const sameMonth = monthly.filter((p) => p.month === latest.month);
+  const ranked = [...sameMonth].sort((a, b) => a.extent - b.extent); // ascending
+  const rankLow = ranked.findIndex((p) => p.year === latest.year) + 1; // 1 = lowest ever
+  const recordLow = ranked[0];
+  const previousLowest = rankLow === 1 && ranked.length > 1 ? ranked[1] : null;
+  // Climatology = 1991–2020 mean for the same month
+  const climBase = sameMonth.filter((p) => p.year >= 1991 && p.year <= 2020);
+  const climatology = climBase.length ? round2(climBase.reduce((s, p) => s + p.extent, 0) / climBase.length) : null;
+  const anomaly = climatology !== null ? round2(latest.extent - climatology) : null;
+  return {
+    label: hemisphereLabel,
+    unit: 'million km²',
+    baseline: '1991–2020',
+    latest,
+    climatology,
+    anomaly,
+    rankLowestOfSameMonth: rankLow,
+    totalYearsInMonth: sameMonth.length,
+    recordLow: { year: recordLow.year, month: recordLow.month, extent: recordLow.extent },
+    previousLowest: previousLowest ? { year: previousLowest.year, month: previousLowest.month, extent: previousLowest.extent } : null,
+    monthly, // full 1979-present series
+  };
+}
+
+// ───────────────────────────────────────────────────────────────────────────
 // Global sea-ice (Arctic + Antarctic combined) from global-warming.org aggregator.
 // Response includes `value` (extent, Mkm²), `anom` (anomaly vs 1991–2020) and
 // `monthlyMean` (climatological mean for that calendar month).
@@ -632,6 +703,17 @@ async function main() {
     n2o: buildGhgStats(n2oMonthly, 'Nitrous oxide', 'ppb', 270),
   };
   const seaIceStats = parseGlobalSeaIce(globalIceJson);
+
+  // Per-hemisphere spaghetti charts — fetch NSIDC Sea Ice Index v4 directly
+  // (12 CSVs per hemisphere) so we get the full 1979-present series.
+  const [arcticMonthlyNsidc, antarcticMonthlyNsidc] = await Promise.all([
+    fetchNsidcHemisphere('north').catch((e) => { console.warn(`⚠ NSIDC north failed: ${e?.message ?? e}`); return []; }),
+    fetchNsidcHemisphere('south').catch((e) => { console.warn(`⚠ NSIDC south failed: ${e?.message ?? e}`); return []; }),
+  ]);
+  const arcticSeaIce = buildHemisphereSeaIce(arcticMonthlyNsidc, 'Arctic sea ice');
+  const antarcticSeaIce = buildHemisphereSeaIce(antarcticMonthlyNsidc, 'Antarctic sea ice');
+  if (arcticSeaIce) console.log(`Arctic sea ice — ${arcticSeaIce.latest.extent}Mkm² (${arcticSeaIce.latest.year}-${String(arcticSeaIce.latest.month).padStart(2,'0')}, rank ${arcticSeaIce.rankLowestOfSameMonth}/${arcticSeaIce.totalYearsInMonth} lowest, ${arcticMonthlyNsidc.length} points)`);
+  if (antarcticSeaIce) console.log(`Antarctic sea ice — ${antarcticSeaIce.latest.extent}Mkm² (${antarcticSeaIce.latest.year}-${String(antarcticSeaIce.latest.month).padStart(2,'0')}, rank ${antarcticSeaIce.rankLowestOfSameMonth}/${antarcticSeaIce.totalYearsInMonth} lowest, ${antarcticMonthlyNsidc.length} points)`);
   const continentStats = continentJsons
     .map((json, i) => {
       if (!json) return null;
@@ -665,6 +747,8 @@ async function main() {
     enso,
     ghgStats,
     seaIceStats,
+    arcticSeaIce,
+    antarcticSeaIce,
     continentStats,
     countryAnomalies,
     globalBaseline: GLOBAL_BASELINE,
