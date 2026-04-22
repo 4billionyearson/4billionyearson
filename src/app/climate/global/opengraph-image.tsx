@@ -37,7 +37,11 @@ export default async function OgImage() {
   const co2 = data?.ghgStats?.co2?.latest?.value ?? null;
   const seaIce = data?.seaIceStats ?? null;
   const enso = data?.enso ?? null;
-  const lastUpdated = data?.lastUpdated ? new Date(data.lastUpdated).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
+  // lastUpdated is a cache key like "2026-04-v9"; prefer generatedAt (ISO).
+  const genDate = data?.generatedAt ? new Date(data.generatedAt) : null;
+  const lastUpdated = genDate && !isNaN(genDate.getTime())
+    ? genDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : '';
 
   return new ImageResponse(
     (
@@ -59,7 +63,7 @@ export default async function OgImage() {
           <span style={{ fontSize: 60, fontWeight: 800, color: '#D0A65E' }}>Global Climate Update</span>
         </div>
         <div style={{ display: 'flex', marginBottom: '32px' }}>
-          <span style={{ fontSize: 26, color: '#9ca3af' }}>{lastUpdated} · Land + ocean surface temperature, GHGs, sea ice, ENSO</span>
+          <span style={{ fontSize: 26, color: '#9ca3af' }}>{lastUpdated ? `${lastUpdated} · ` : ''}Land + ocean surface temperature, GHGs, sea ice, ENSO</span>
         </div>
 
         {/* Stat grid */}
@@ -85,7 +89,7 @@ export default async function OgImage() {
           <div style={{ display: 'flex', gap: '16px' }}>
             {/* CO2 */}
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, background: 'rgba(168,85,247,0.10)', border: '1px solid rgba(168,85,247,0.35)', borderRadius: 16, padding: '20px 24px' }}>
-              <span style={{ fontSize: 18, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: 1 }}>CO₂</span>
+              <span style={{ fontSize: 18, color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: 1 }}>CO2 concentration</span>
               <span style={{ fontSize: 48, fontWeight: 800, color: '#ddd6fe', marginTop: 4 }}>
                 {co2 != null ? `${co2.toFixed(1)} ppm` : '—'}
               </span>
