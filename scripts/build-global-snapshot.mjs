@@ -567,6 +567,41 @@ function buildContinentStats(parsedMonthly, label, key) {
 // Country anomalies — read per-country snapshots already on disk and extract
 // each country's latest-month anomaly so the /climate/global map stays in
 // sync with the individual country pages.
+// We also compute 3-month and 12-month rolling anomalies so the map can
+// offer window toggles mirroring the Biggest-Shift strip.
+function compute12mAnomaly(monthlyAll) {
+  if (!Array.isArray(monthlyAll) || monthlyAll.length < 12) return { anomaly: null, label: null };
+  const now = new Date();
+  const yNow = now.getFullYear();
+  const mNow = now.getMonth() + 1;
+  const before = monthlyAll.filter((p) => p.year < yNow || (p.year === yNow && p.month < mNow));
+  if (before.length < 12) return { anomaly: null, label: null };
+  const sorted = [...before].sort((a, b) => (a.year * 12 + a.month) - (b.year * 12 + b.month));
+  const last12 = sorted.slice(-12);
+  const end = last12[last12.length - 1];
+  const start = last12[0];
+  const span = (end.year * 12 + end.month) - (start.year * 12 + start.month);
+  if (span !== 11) return { anomaly: null, label: null };
+  const recentAvg = last12.reduce((s, p) => s + (p.value ?? p.temp ?? 0), 0) / 12;
+  const byMonth = {};
+  for (const p of sorted) {
+    if (p.year < 1961 || p.year > 1990) continue;
+    const v = p.value ?? p.temp;
+    if (v == null) continue;
+    (byMonth[p.month] ||= []).push(v);
+  }
+  const perMonthAvgs = [];
+  for (let m = 1; m <= 12; m++) {
+    const arr = byMonth[m];
+    if (!arr?.length) return { anomaly: null, label: null };
+    perMonthAvgs.push(arr.reduce((a, b) => a + b, 0) / arr.length);
+  }
+  const baseline = perMonthAvgs.reduce((a, b) => a + b, 0) / 12;
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const label = `${MONTHS[start.month - 1]} ${start.year} – ${MONTHS[end.month - 1]} ${end.year}`;
+  return { anomaly: round2(recentAvg - baseline), label };
+}
+
 async function buildCountryAnomalies() {
   const { readdir, readFile } = await import('node:fs/promises');
   const { resolve: pathResolve } = await import('node:path');
@@ -581,16 +616,24 @@ async function buildCountryAnomalies() {
       const snap = JSON.parse(raw);
       const iso3 = snap.code || name.replace(/\.json$/, '');
       const country = snap.country || iso3;
-      const latest = snap.latestMonthStats;
-      if (!latest || !Number.isFinite(latest.diff)) continue;
+      const one = snap.latestMonthStats;
+      const three = snap.latestThreeMonthStats;
+      if (!one || !Number.isFinite(one.diff)) continue;
+      const twelve = compute12mAnomaly(snap.monthlyAll);
       results.push({
         iso3,
         name: country,
-        anomaly: Math.round(latest.diff * 100) / 100,
-        value: Math.round(latest.value * 100) / 100,
-        monthLabel: latest.label,
-        rank: latest.rank,
-        total: latest.total,
+        anomaly: round2(one.diff),
+        value: round2(one.value),
+        monthLabel: one.label,
+        rank: one.rank,
+        total: one.total,
+        anomaly1m: round2(one.diff),
+        label1m: one.label,
+        anomaly3m: three && Number.isFinite(three.diff) ? round2(three.diff) : null,
+        label3m: three?.label ?? null,
+        anomaly12m: twelve.anomaly,
+        label12m: twelve.label,
       });
     } catch {
       // skip unreadable file

@@ -13564,7 +13564,13 @@
       "value": 22.03,
       "monthLabel": "Mar 2026",
       "rank": 18,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.01,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 0.49,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "ARG",
@@ -13573,7 +13579,13 @@
       "value": 18.69,
       "monthLabel": "Mar 2026",
       "rank": 21,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.82,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.79,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 0.87,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "AUS",
@@ -13582,7 +13594,13 @@
       "value": 27.49,
       "monthLabel": "Mar 2026",
       "rank": 2,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.02,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.94,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.22,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "AUT",
@@ -13591,7 +13609,13 @@
       "value": 4.18,
       "monthLabel": "Mar 2026",
       "rank": 7,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 3.34,
+      "label1m": "Mar 2026",
+      "anomaly3m": 3.02,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.75,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "BEL",
@@ -13600,7 +13624,13 @@
       "value": 7.47,
       "monthLabel": "Mar 2026",
       "rank": 17,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.43,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.54,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.67,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "BGD",
@@ -13609,7 +13639,13 @@
       "value": 19.87,
       "monthLabel": "Mar 2026",
       "rank": 55,
-      "total": 86
+      "total": 86,
+      "anomaly1m": -0.18,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.17,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 0.97,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "BOL",
@@ -13618,7 +13654,13 @@
       "value": 21.25,
       "monthLabel": "Mar 2026",
       "rank": 20,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.81,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.13,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.71,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "BRA",
@@ -13627,7 +13669,13 @@
       "value": 25.66,
       "monthLabel": "Mar 2026",
       "rank": 6,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.07,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.9,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.29,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "CAN",
@@ -13636,7 +13684,13 @@
       "value": -13.89,
       "monthLabel": "Mar 2026",
       "rank": 34,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.4,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.47,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.83,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "CHE",
@@ -13645,7 +13699,13 @@
       "value": 27.59,
       "monthLabel": "Mar 2026",
       "rank": 29,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.61,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.37,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.3,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "CHL",
@@ -13654,7 +13714,13 @@
       "value": 12.14,
       "monthLabel": "Mar 2026",
       "rank": 25,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.63,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.98,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 0.58,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "CHN",
@@ -13663,7 +13729,13 @@
       "value": 2.09,
       "monthLabel": "Mar 2026",
       "rank": 20,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.42,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.78,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.05,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "COD",
@@ -13672,7 +13744,13 @@
       "value": 26.79,
       "monthLabel": "Mar 2026",
       "rank": 7,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.16,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.2,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.13,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "COG",
@@ -13681,7 +13759,13 @@
       "value": 26.34,
       "monthLabel": "Mar 2026",
       "rank": 6,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.47,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.51,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.67,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "COL",
@@ -13690,7 +13774,13 @@
       "value": 24.77,
       "monthLabel": "Mar 2026",
       "rank": 13,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.71,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.68,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.34,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "CRI",
@@ -13699,7 +13789,13 @@
       "value": 23.73,
       "monthLabel": "Mar 2026",
       "rank": 11,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.74,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.72,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "CYP",
@@ -13708,7 +13804,13 @@
       "value": 15.7,
       "monthLabel": "Mar 2026",
       "rank": 4,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.62,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.12,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.64,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "CZE",
@@ -13717,7 +13819,13 @@
       "value": 5.62,
       "monthLabel": "Mar 2026",
       "rank": 11,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 3.02,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.33,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.36,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "DEU",
@@ -13726,7 +13834,13 @@
       "value": 6.08,
       "monthLabel": "Mar 2026",
       "rank": 16,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.46,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.07,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.07,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "DNK",
@@ -13735,7 +13849,13 @@
       "value": 5.44,
       "monthLabel": "Mar 2026",
       "rank": 8,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 3.23,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.58,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.99,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "DZA",
@@ -13744,7 +13864,13 @@
       "value": 25.74,
       "monthLabel": "Mar 2026",
       "rank": 4,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.16,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.1,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.35,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "EGY",
@@ -13753,7 +13879,13 @@
       "value": 20.07,
       "monthLabel": "Mar 2026",
       "rank": 10,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.97,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.73,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.08,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "ESP",
@@ -13762,7 +13894,13 @@
       "value": 9.21,
       "monthLabel": "Mar 2026",
       "rank": 51,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.5,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.42,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.76,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "ETH",
@@ -13771,7 +13909,13 @@
       "value": 25.56,
       "monthLabel": "Mar 2026",
       "rank": 7,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.55,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.56,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.64,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "FIN",
@@ -13780,7 +13924,13 @@
       "value": 3,
       "monthLabel": "Mar 2026",
       "rank": 2,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 5.51,
+      "label1m": "Mar 2026",
+      "anomaly3m": 5.23,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 3.48,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "FRA",
@@ -13789,7 +13939,13 @@
       "value": 10.41,
       "monthLabel": "Mar 2026",
       "rank": 24,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.57,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.46,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.43,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "GBR",
@@ -13798,7 +13954,13 @@
       "value": 7.17,
       "monthLabel": "Mar 2026",
       "rank": 9,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.37,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.48,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.34,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "GHA",
@@ -13807,7 +13969,13 @@
       "value": 24.08,
       "monthLabel": "Mar 2026",
       "rank": 6,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.84,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.93,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.09,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "GRC",
@@ -13816,7 +13984,13 @@
       "value": 11.58,
       "monthLabel": "Mar 2026",
       "rank": 2,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.93,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.99,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.12,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "GUY",
@@ -13825,7 +13999,13 @@
       "value": 25.35,
       "monthLabel": "Mar 2026",
       "rank": 23,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.46,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.62,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.4,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "HUN",
@@ -13834,7 +14014,13 @@
       "value": 0.75,
       "monthLabel": "Mar 2026",
       "rank": 13,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 4.78,
+      "label1m": "Mar 2026",
+      "anomaly3m": 4.7,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.3,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "IDN",
@@ -13843,7 +14029,13 @@
       "value": 25.65,
       "monthLabel": "Mar 2026",
       "rank": 8,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.24,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.29,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.51,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "IND",
@@ -13852,7 +14044,13 @@
       "value": 24.82,
       "monthLabel": "Mar 2026",
       "rank": 14,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.04,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.11,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.1,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "IRL",
@@ -13861,7 +14059,13 @@
       "value": 17.62,
       "monthLabel": "Mar 2026",
       "rank": 14,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.64,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.31,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.96,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "IRN",
@@ -13870,7 +14074,13 @@
       "value": 25.65,
       "monthLabel": "Mar 2026",
       "rank": 8,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.24,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.29,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.51,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "IRQ",
@@ -13879,7 +14089,13 @@
       "value": 13.9,
       "monthLabel": "Mar 2026",
       "rank": 15,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 3.09,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.24,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.13,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "ISL",
@@ -13888,7 +14104,13 @@
       "value": 15.72,
       "monthLabel": "Mar 2026",
       "rank": 8,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.45,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.18,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.95,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "ISR",
@@ -13897,7 +14119,13 @@
       "value": 17.54,
       "monthLabel": "Mar 2026",
       "rank": 6,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.72,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.52,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.05,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "ITA",
@@ -13906,7 +14134,13 @@
       "value": 9.39,
       "monthLabel": "Mar 2026",
       "rank": 10,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.31,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.42,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.2,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "JAM",
@@ -13915,7 +14149,13 @@
       "value": 25.66,
       "monthLabel": "Mar 2026",
       "rank": 2,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.58,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.72,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.73,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "JPN",
@@ -13924,7 +14164,13 @@
       "value": 5.32,
       "monthLabel": "Mar 2026",
       "rank": 13,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.93,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.37,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.06,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "KEN",
@@ -13933,7 +14179,13 @@
       "value": 27.02,
       "monthLabel": "Mar 2026",
       "rank": 23,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.05,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.17,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.45,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "KOR",
@@ -13942,7 +14194,13 @@
       "value": 7.15,
       "monthLabel": "Mar 2026",
       "rank": 8,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.57,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.45,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.19,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "LBN",
@@ -13951,7 +14209,13 @@
       "value": 12.49,
       "monthLabel": "Mar 2026",
       "rank": 5,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 3.48,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.74,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.25,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "LKA",
@@ -13960,7 +14224,13 @@
       "value": 21.84,
       "monthLabel": "Mar 2026",
       "rank": 9,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.15,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.2,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.48,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "MAR",
@@ -13969,7 +14239,13 @@
       "value": 14.12,
       "monthLabel": "Mar 2026",
       "rank": 39,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.59,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.92,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.97,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "MEX",
@@ -13978,7 +14254,13 @@
       "value": 20.29,
       "monthLabel": "Mar 2026",
       "rank": 4,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.04,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.87,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.04,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "MMR",
@@ -13987,7 +14269,13 @@
       "value": 4.63,
       "monthLabel": "Mar 2026",
       "rank": 4,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 5.4,
+      "label1m": "Mar 2026",
+      "anomaly3m": 4.98,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 3.41,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "MWI",
@@ -13996,7 +14284,13 @@
       "value": 23.16,
       "monthLabel": "Mar 2026",
       "rank": 18,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.75,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.94,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.13,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "MYS",
@@ -14005,7 +14299,13 @@
       "value": 25.88,
       "monthLabel": "Mar 2026",
       "rank": 10,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.07,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.45,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "NGA",
@@ -14014,7 +14314,13 @@
       "value": 30.92,
       "monthLabel": "Mar 2026",
       "rank": 2,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.97,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.5,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.23,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "NIC",
@@ -14023,7 +14329,13 @@
       "value": 26.35,
       "monthLabel": "Mar 2026",
       "rank": 7,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.12,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.2,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.36,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "NLD",
@@ -14032,7 +14344,13 @@
       "value": 7.02,
       "monthLabel": "Mar 2026",
       "rank": 20,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.09,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.48,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.74,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "NOR",
@@ -14041,7 +14359,13 @@
       "value": 25.09,
       "monthLabel": "Mar 2026",
       "rank": 5,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.51,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.55,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.57,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "NZL",
@@ -14050,7 +14374,13 @@
       "value": 14.13,
       "monthLabel": "Mar 2026",
       "rank": 21,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.63,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.65,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 0.9,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "PAK",
@@ -14059,7 +14389,13 @@
       "value": 18.01,
       "monthLabel": "Mar 2026",
       "rank": 14,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.85,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.76,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.51,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "PER",
@@ -14068,7 +14404,13 @@
       "value": 19.54,
       "monthLabel": "Mar 2026",
       "rank": 10,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.82,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.87,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.53,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "PHL",
@@ -14077,7 +14419,13 @@
       "value": 25.44,
       "monthLabel": "Mar 2026",
       "rank": 18,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.61,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.68,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.06,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "POL",
@@ -14086,7 +14434,13 @@
       "value": 6.01,
       "monthLabel": "Mar 2026",
       "rank": 5,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 4.07,
+      "label1m": "Mar 2026",
+      "anomaly3m": 3.49,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.88,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "PRK",
@@ -14095,7 +14449,13 @@
       "value": 1.73,
       "monthLabel": "Mar 2026",
       "rank": 10,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 3.07,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.25,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.55,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "PRT",
@@ -14104,7 +14464,13 @@
       "value": 11.38,
       "monthLabel": "Mar 2026",
       "rank": 49,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.43,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.26,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.35,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "PSE",
@@ -14113,7 +14479,13 @@
       "value": 17.21,
       "monthLabel": "Mar 2026",
       "rank": 6,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.75,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.42,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.89,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "ROU",
@@ -14122,7 +14494,13 @@
       "value": 26.14,
       "monthLabel": "Mar 2026",
       "rank": 8,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.11,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.29,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.4,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "RUS",
@@ -14131,7 +14509,13 @@
       "value": 8.19,
       "monthLabel": "Mar 2026",
       "rank": 13,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 2.58,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.14,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.98,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "SAU",
@@ -14140,7 +14524,13 @@
       "value": 26.09,
       "monthLabel": "Mar 2026",
       "rank": 29,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.77,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.36,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.56,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "SGP",
@@ -14149,7 +14539,13 @@
       "value": 23.18,
       "monthLabel": "Mar 2026",
       "rank": 25,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.72,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.83,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.76,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "SOM",
@@ -14158,7 +14554,13 @@
       "value": 27.64,
       "monthLabel": "Mar 2026",
       "rank": 6,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.98,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.54,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.25,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "SSD",
@@ -14167,7 +14569,13 @@
       "value": 31.05,
       "monthLabel": "Mar 2026",
       "rank": 17,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.85,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.42,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.43,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "SUR",
@@ -14176,7 +14584,13 @@
       "value": 25.61,
       "monthLabel": "Mar 2026",
       "rank": 27,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.42,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.51,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.34,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "SWE",
@@ -14185,7 +14599,13 @@
       "value": 0.5,
       "monthLabel": "Mar 2026",
       "rank": 4,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 4.33,
+      "label1m": "Mar 2026",
+      "anomaly3m": 4.18,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.61,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "SYR",
@@ -14194,7 +14614,13 @@
       "value": 15.81,
       "monthLabel": "Mar 2026",
       "rank": 4,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 4.05,
+      "label1m": "Mar 2026",
+      "anomaly3m": 2.01,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.38,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "THA",
@@ -14203,7 +14629,13 @@
       "value": 19.02,
       "monthLabel": "Mar 2026",
       "rank": 54,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.14,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.56,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.07,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "TUR",
@@ -14212,7 +14644,13 @@
       "value": -1.57,
       "monthLabel": "Mar 2026",
       "rank": 8,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 4.02,
+      "label1m": "Mar 2026",
+      "anomaly3m": 4.75,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 3.07,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "TZA",
@@ -14221,7 +14659,13 @@
       "value": 23.78,
       "monthLabel": "Mar 2026",
       "rank": 8,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.41,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.58,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.27,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "UGA",
@@ -14230,7 +14674,13 @@
       "value": 24.76,
       "monthLabel": "Mar 2026",
       "rank": 7,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 1.67,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.52,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 2.31,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "UKR",
@@ -14239,7 +14689,13 @@
       "value": 8.95,
       "monthLabel": "Mar 2026",
       "rank": 13,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 4.03,
+      "label1m": "Mar 2026",
+      "anomaly3m": 3.23,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.82,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "USA",
@@ -14248,7 +14704,13 @@
       "value": 5.52,
       "monthLabel": "Mar 2026",
       "rank": 3,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 3.29,
+      "label1m": "Mar 2026",
+      "anomaly3m": 1.93,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.87,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "VNM",
@@ -14257,7 +14719,13 @@
       "value": 22.71,
       "monthLabel": "Mar 2026",
       "rank": 47,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.29,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.28,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 1.19,
+      "label12m": "Apr 2025 – Mar 2026"
     },
     {
       "iso3": "ZAF",
@@ -14266,7 +14734,13 @@
       "value": 12.14,
       "monthLabel": "Mar 2026",
       "rank": 25,
-      "total": 86
+      "total": 86,
+      "anomaly1m": 0.63,
+      "label1m": "Mar 2026",
+      "anomaly3m": 0.98,
+      "label3m": "Jan–Mar 2026",
+      "anomaly12m": 0.58,
+      "label12m": "Apr 2025 – Mar 2026"
     }
   ],
   "globalBaseline": 13.9,

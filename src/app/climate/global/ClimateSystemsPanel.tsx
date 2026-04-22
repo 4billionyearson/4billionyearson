@@ -18,9 +18,9 @@ function Tile({ children, className = '' }: { children: React.ReactNode; classNa
 
 function TileHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
   return (
-    <div className="mb-2">
-      <h3 className="text-[15px] font-semibold text-white flex items-center gap-2">{icon}{title}</h3>
-      {subtitle ? <p className="text-[11px] text-gray-400 mt-0.5">{subtitle}</p> : null}
+    <div className="mb-3">
+      <h3 className="text-xl font-bold font-mono text-white flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-5 [&>svg]:w-5">{icon}<span className="min-w-0 flex-1">{title}</span></h3>
+      {subtitle ? <p className="text-xs text-gray-400 mt-1">{subtitle}</p> : null}
     </div>
   );
 }
@@ -48,8 +48,8 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
   return (
     <Tile>
       <TileHeader
-        icon={<Wind className="h-4 w-4 text-sky-300" />}
-        title="ENSO — El Niño / La Niña state"
+        icon={<Wind className="h-5 w-5 text-sky-300" />}
+        title="ENSO — El Niño / La Niña State"
         subtitle={`NOAA CPC Oceanic Niño Index (3-month running mean of Niño 3.4 SST)`}
       />
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
@@ -148,8 +148,8 @@ export function GhgTile({ ghgStats }: { ghgStats: { co2: GhgStat | null; ch4: Gh
   return (
     <Tile>
       <TileHeader
-        icon={<Flame className="h-4 w-4 text-amber-400" />}
-        title="Greenhouse gases — latest monthly mean"
+        icon={<Flame className="h-5 w-5 text-amber-400" />}
+        title="Greenhouse Gases — Latest Monthly Mean"
         subtitle="NOAA Global Monitoring Laboratory · globally-averaged marine surface sites"
       />
       {co2 && <GhgRow stat={co2} color="#fb923c" />}
@@ -210,8 +210,8 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
         </div>
       ) : (
         <TileHeader
-          icon={<Snowflake className="h-4 w-4 text-sky-300" />}
-          title="Global sea ice extent"
+          icon={<Snowflake className="h-5 w-5 text-sky-300" />}
+          title="Global Sea Ice Extent"
           subtitle={`Arctic + Antarctic combined · anomaly vs ${seaIce.baseline}`}
         />
       )}
@@ -281,8 +281,8 @@ export function ContinentalBar({ continents }: { continents: ContinentStat[] | n
   return (
     <Tile>
       <TileHeader
-        icon={<Waves className="h-4 w-4 text-orange-300" />}
-        title="Continental land anomalies — latest month"
+        icon={<Waves className="h-5 w-5 text-orange-300" />}
+        title="Continental Land Anomalies — Latest Month"
         subtitle={`${MONTH_NAMES[latest.month]} ${latest.year} vs 1901–2000 average (NOAA, land only)`}
       />
       <div className="h-56">
@@ -343,8 +343,8 @@ export function WhatChangedTile({
   return (
     <Tile>
       <TileHeader
-        icon={<Flame className="h-4 w-4 text-orange-300" />}
-        title="What changed since last month"
+        icon={<Flame className="h-5 w-5 text-orange-300" />}
+        title="What Changed Since Last Month"
         subtitle="Rank and anomaly movement of the latest monthly reading"
       />
       <div className="grid grid-cols-2 gap-4 text-sm">

@@ -24,7 +24,16 @@ interface CountryAnomaly {
   monthLabel: string;
   rank: number;
   total: number;
+  // Optional windowed anomalies (populated by scripts/patch-country-anomalies.mjs)
+  anomaly1m?: number | null;
+  label1m?: string | null;
+  anomaly3m?: number | null;
+  label3m?: string | null;
+  anomaly12m?: number | null;
+  label12m?: string | null;
 }
+
+export type AnomalyWindow = '1m' | '3m' | '12m';
 
 // Antimeridian fix (reused from emissions-choropleth-map).
 // Without this, Russia / Fiji / Antarctica render a giant horizontal
@@ -102,7 +111,7 @@ function InvalidateOnMount() {
   return null;
 }
 
-export default function GlobalAnomalyMap({ countryAnomalies }: { countryAnomalies: CountryAnomaly[] }) {
+export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [selected, setSelected] = useState<{
@@ -133,26 +142,38 @@ export default function GlobalAnomalyMap({ countryAnomalies }: { countryAnomalie
     return map;
   }, [countryAnomalies]);
 
+  // Resolve the anomaly/label for the chosen window. Falls back to the
+  // legacy 1-month fields so this component still works against older
+  // snapshots that don't yet have 3m/12m data.
+  const pick = useCallback((c: CountryAnomaly | undefined) => {
+    if (!c) return { anomaly: null as number | null, label: null as string | null };
+    if (windowSel === '3m') return { anomaly: c.anomaly3m ?? null, label: c.label3m ?? null };
+    if (windowSel === '12m') return { anomaly: c.anomaly12m ?? null, label: c.label12m ?? null };
+    return { anomaly: c.anomaly1m ?? c.anomaly ?? null, label: c.label1m ?? c.monthLabel ?? null };
+  }, [windowSel]);
+
   const style = useCallback((feature: Feature | undefined): PathOptions => {
     if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
     const name = ((feature.properties as any)?.name as string) ?? '';
     const rec = lookup.get(name.toLowerCase());
+    const { anomaly } = pick(rec);
     return {
-      fillColor: rec ? anomalyColor(rec.anomaly) : '#1f2937',
+      fillColor: anomaly != null ? anomalyColor(anomaly) : '#1f2937',
       fillOpacity: 0.85,
       weight: 0.4,
       color: '#0b1220',
     };
-  }, [lookup]);
+  }, [lookup, pick]);
 
   const onEachFeature = useCallback((feature: Feature, layer: Layer) => {
     const name = ((feature.properties as any)?.name as string) ?? '';
     const rec = lookup.get(name.toLowerCase());
-    const color = rec ? anomalyColor(rec.anomaly) : '#1f2937';
+    const { anomaly, label } = pick(rec);
+    const color = anomaly != null ? anomalyColor(anomaly) : '#1f2937';
     const show = () => setSelected({
       name,
-      anomaly: rec?.anomaly ?? null,
-      monthLabel: rec?.monthLabel,
+      anomaly,
+      monthLabel: label ?? undefined,
       value: rec?.value,
       rank: rec?.rank,
       total: rec?.total,
@@ -161,9 +182,10 @@ export default function GlobalAnomalyMap({ countryAnomalies }: { countryAnomalie
     layer.on('mouseover', show);
     layer.on('click', show);
     layer.on('mouseout', () => setSelected(null));
-  }, [lookup]);
+  }, [lookup, pick]);
 
-  const monthLabel = countryAnomalies[0]?.monthLabel ?? '';
+  const headlineLabel = pick(countryAnomalies[0]).label ?? '';
+  const windowPhrase = windowSel === '12m' ? '12-month rolling' : windowSel === '3m' ? '3-month rolling' : 'monthly';
 
   if (loadError) {
     return (
@@ -202,7 +224,7 @@ export default function GlobalAnomalyMap({ countryAnomalies }: { countryAnomalie
             opacity={0.55}
           />
           <GeoJSON
-            key={`anomaly-${lookup.size}`}
+            key={`anomaly-${windowSel}-${lookup.size}`}
             data={geo}
             style={style}
             onEachFeature={onEachFeature}
@@ -235,7 +257,7 @@ export default function GlobalAnomalyMap({ countryAnomalies }: { countryAnomalie
       {/* Legend */}
       <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-300">
         <span className="font-semibold text-gray-200">
-          {monthLabel ? `${monthLabel} land anomaly vs 1961–1990` : 'Land anomaly vs 1961–1990'}
+          {headlineLabel ? `${headlineLabel} land anomaly (${windowPhrase}) vs 1961–1990` : `Land anomaly (${windowPhrase}) vs 1961–1990`}
         </span>
         <div className="flex items-center gap-2">
           <span>-5°C</span>

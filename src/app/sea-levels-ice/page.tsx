@@ -213,7 +213,7 @@ function HemisphereSeaIceCard({ data, accent }: { data: HemisphereSeaIce; accent
     <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2">
         <Snowflake className={`h-5 w-5 shrink-0 mt-1 ${accent === 'cyan' ? 'text-cyan-300' : 'text-sky-300'}`} />
-        <span className="min-w-0 flex-1">{data.label} — {years[0]}–{latestYear}</span>
+        <span className="min-w-0 flex-1">{data.label.replace(/sea ice/i, 'Sea Ice')} — {years[0]}–{latestYear}</span>
       </h2>
       <p className="text-xs text-gray-400 mt-1 mb-3">
         One line per year since satellite records began. <span style={{ color: currentColor }}>{latestYear}</span> is highlighted;
@@ -454,6 +454,9 @@ export default function SeaLevelsIcePage() {
                 </div>
               </div>
 
+              {/* ═══ MONTHLY INDICATORS ═══ */}
+              <Divider icon={<Snowflake className="h-5 w-5 text-sky-300" />} title="Monthly Indicators" />
+
               {/* ═══ GLOBAL SEA ICE HEADLINE ═══ */}
               {globalSeaIce && (
                 <SeaIceTile seaIce={globalSeaIce} variant="section" />
@@ -462,6 +465,9 @@ export default function SeaLevelsIcePage() {
               {/* ═══ PER-HEMISPHERE SPAGHETTI CHARTS ═══ */}
               {arcticSeaIce && <HemisphereSeaIceCard data={arcticSeaIce} accent="cyan" />}
               {antarcticSeaIce && <HemisphereSeaIceCard data={antarcticSeaIce} accent="sky" />}
+
+              {/* ═══ ANNUAL HISTORY ═══ */}
+              <Divider icon={<MapPin className="h-5 w-5 text-cyan-400" />} title="Annual History" />
 
               {/* ═══ ICE EXTENT + ANOMALY PANEL ═══ */}
               <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
