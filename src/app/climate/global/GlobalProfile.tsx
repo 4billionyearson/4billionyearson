@@ -367,7 +367,7 @@ export default function GlobalProfile() {
                     </div>
 
                     <p className="text-sm text-gray-300 mt-3">
-                      Earth&apos;s surface is currently <span className="font-semibold text-white">{vsPreIndustrial.toFixed(2)}°C</span> warmer than the pre-industrial (1850–1900) average, based on the 10-year mean for <span className="font-semibold text-white">{decadeStart}–{decadeEnd}</span>. Climate scientists use a decade average — not a single year — to smooth out natural variability (El Niño, volcanoes) and define long-term warming, in line with <a href="https://wmo.int/news/media-centre/wmo-confirms-2024-warmest-year-record-about-155degc-above-pre-industrial-level" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">WMO</a> and <a href="https://www.ipcc.ch/sr15/chapter/spm/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">IPCC AR6</a> methodology. A single year can cross 1.5°C and then fall back; the Paris limit is considered breached only once the 10-year mean stays above it.
+                      Earth&apos;s surface is currently <span className="font-semibold text-white">{vsPreIndustrial.toFixed(2)}°C</span> warmer than the pre-industrial (1850–1900) average, based on the 10-year mean for <span className="font-semibold text-white">{decadeStart}–{decadeEnd}</span>. Climate scientists use a decade average, not a single year, to smooth out natural variability (El Niño, volcanoes) and define long-term warming, in line with <a href="https://wmo.int/news/media-centre/wmo-confirms-2024-warmest-year-record-about-155degc-above-pre-industrial-level" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">WMO</a> and <a href="https://www.ipcc.ch/sr15/chapter/spm/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">IPCC AR6</a> methodology. A single year can cross 1.5°C and then fall back; the Paris limit is considered breached only once the 10-year mean stays above it.
                     </p>
 
                     {/* Progress bars */}
@@ -438,13 +438,14 @@ export default function GlobalProfile() {
                                 formatter={(v: any, name: any) => [typeof v === 'number' ? `${formatSigned(v)}°C` : '—', name]}
                               />
                               <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 11 }} />
+                              <ReferenceLine y={0} stroke="#10b981" strokeDasharray="2 2" strokeWidth={1.5} label={{ value: 'Pre-industrial 1850–1900 baseline', fill: '#6ee7b7', fontSize: 10, position: 'insideBottomLeft' }} />
                               {wmoBaselineAnom != null && (
                                 <ReferenceLine y={wmoBaselineAnom} stroke="#60a5fa" strokeDasharray="2 2" strokeWidth={1.5} label={{ value: 'WMO 1961–1990 baseline', fill: '#93c5fd', fontSize: 10, position: 'insideBottomLeft' }} />
                               )}
                               <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5} label={{ value: '+1.5°C Paris limit', fill: '#fbbf24', fontSize: 10, position: 'insideTopLeft' }} />
                               <ReferenceLine y={2.0} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5} label={{ value: '+2.0°C Critical limit', fill: '#fca5a5', fontSize: 10, position: 'insideTopLeft' }} />
                               {firstAnnualBreach15 && firstAnnualBreach15.year >= chartStart && (
-                                <ReferenceLine x={firstAnnualBreach15.year} stroke="#f97316" strokeDasharray="2 4" label={{ value: `1st annual >1.5°C (${firstAnnualBreach15.year})`, fill: '#fdba74', fontSize: 10, angle: -90, position: 'insideTopRight' }} />
+                                <ReferenceLine x={firstAnnualBreach15.year} stroke="#f97316" strokeDasharray="2 4" strokeWidth={1.5} />
                               )}
                               <Line type="monotone" dataKey="annualAnomaly" name="Annual anomaly" stroke="#fb923c" strokeWidth={1.5} dot={false} isAnimationActive={false} />
                               <Line type="monotone" dataKey="decadeAnomaly" name="10-year mean" stroke="#fbbf24" strokeWidth={3} dot={false} connectNulls isAnimationActive={false} />
@@ -452,7 +453,7 @@ export default function GlobalProfile() {
                           </ResponsiveContainer>
                         </div>
                         <p className="text-[11px] text-gray-500 mt-1">
-                          Thin orange line = individual years. Thick gold line = 10-year mean (the official Paris tracker). Amber dashes = Paris 1.5°C limit · red dashes = 2.0°C critical limit · blue dashes = WMO 1961–1990 standard baseline. All values are anomalies vs the 1850–1900 pre-industrial average.
+                          Thin orange line = individual years · thick gold line = 10-year mean (the official Paris tracker) · amber dashes = +1.5°C Paris limit · red dashes = +2.0°C critical limit · green dashes = pre-industrial 1850–1900 baseline · blue dashes = WMO 1961–1990 standard baseline{firstAnnualBreach15 && firstAnnualBreach15.year >= chartStart ? <> · <span className="text-orange-400">vertical orange dash</span> = first annual anomaly above +1.5°C ({firstAnnualBreach15.year})</> : null}. All values are anomalies vs the 1850–1900 pre-industrial average.
                         </p>
                       </div>
                       );
