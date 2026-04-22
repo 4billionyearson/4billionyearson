@@ -209,10 +209,22 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const force = url.searchParams.get('refresh') === '1';
 
+  // Fast path: serve the static file committed by
+  // `scripts/build-rankings.ts`. Avoids a 144-file cold-start compute
+  // under Vercel's 60s function cap.
+  if (!force) {
+    try {
+      const staticPath = resolve(SNAPSHOT_ROOT, 'rankings.json');
+      const raw = await readFile(staticPath, 'utf8');
+      const parsed = JSON.parse(raw) as RankingsResponse;
+      return NextResponse.json({ ...parsed, source: 'static' });
+    } catch {
+      // Fall through to cache / live compute.
+    }
+  }
+
   const now = new Date();
   const dayOfMonth = now.getDate();
-  // Same cutover logic as the profile route: after the 21st, assume current
-  // month's data is available; else fall back to previous month.
   const cacheMonth = dayOfMonth >= 21
     ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
     : (() => {

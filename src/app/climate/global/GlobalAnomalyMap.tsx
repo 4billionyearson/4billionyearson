@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
+import type { FeatureCollection, Feature } from 'geojson';
+import type { Layer, PathOptions } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -8,7 +12,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 const NAME_ALIAS: Record<string, string> = {
   'united states': 'united states of america',
   'dr congo': 'democratic republic of the congo',
-  'singapore': 'singapore', // fallback — geojson omits it (tiny country)
+  'singapore': 'singapore', // geojson omits it (tiny country)
   'south sudan': 'south sudan',
 };
 
@@ -22,52 +26,42 @@ interface CountryAnomaly {
   total: number;
 }
 
-type GeoJson = {
-  type: 'FeatureCollection';
-  features: Array<{
-    type: 'Feature';
-    id?: string;
-    properties: { id: string; name: string };
-    geometry:
-      | { type: 'Polygon'; coordinates: number[][][] }
-      | { type: 'MultiPolygon'; coordinates: number[][][][] };
-  }>;
-};
-
-// Equirectangular projection (lat/lng → SVG x/y within a viewBox)
-function project(lng: number, lat: number, width: number, height: number): [number, number] {
-  const x = ((lng + 180) / 360) * width;
-  const y = ((90 - lat) / 180) * height;
-  return [x, y];
-}
-
-function ringToPath(ring: number[][], width: number, height: number): string {
-  if (!ring.length) return '';
-  let d = '';
-  for (let i = 0; i < ring.length; i++) {
-    const [lng, lat] = ring[i];
-    const [x, y] = project(lng, lat, width, height);
-    d += (i === 0 ? 'M' : 'L') + x.toFixed(2) + ',' + y.toFixed(2);
-  }
-  return d + 'Z';
-}
-
-function featureToPath(feature: GeoJson['features'][0], width: number, height: number): string {
-  const g = feature.geometry;
-  if (!g) return '';
-  if (g.type === 'Polygon') {
-    return g.coordinates.map((ring) => ringToPath(ring, width, height)).join(' ');
-  }
-  return g.coordinates.flatMap((poly) => poly.map((ring) => ringToPath(ring, width, height))).join(' ');
+// Antimeridian fix (reused from emissions-choropleth-map).
+// Without this, Russia / Fiji / Antarctica render a giant horizontal
+// strip across the equirectangular projection because the ring wraps
+// from +170°E to −170°W.
+function fixAntimeridian(geo: FeatureCollection): FeatureCollection {
+  const targets = new Set(['Russia', 'Fiji', 'Antarctica']);
+  return {
+    ...geo,
+    features: geo.features.map((f) => {
+      if (!targets.has((f.properties as any)?.name)) return f;
+      if (f.geometry.type === 'MultiPolygon') {
+        const fixed: number[][][][] = [];
+        for (const polygon of (f.geometry as any).coordinates as number[][][][]) {
+          for (const ring of polygon) {
+            const hasHigh = ring.some((c) => c[0] > 170);
+            const hasLow = ring.some((c) => c[0] < -170);
+            if (hasHigh && hasLow) {
+              fixed.push([ring.map((c) => (c[0] < 0 ? [c[0] + 360, c[1]] : [...c]))]);
+              fixed.push([ring.map((c) => (c[0] > 0 ? [c[0] - 360, c[1]] : [...c]))]);
+            } else {
+              fixed.push([ring]);
+            }
+          }
+        }
+        return { ...f, geometry: { type: 'MultiPolygon', coordinates: fixed } };
+      }
+      return f;
+    }),
+  };
 }
 
 // Color ramp: anomaly (°C) → hex. Blue below 0, orange/red above.
 function anomalyColor(anom: number | null | undefined): string {
-  if (anom == null || !Number.isFinite(anom)) return '#1f2937'; // slate for missing
-  // Clamp to ±5°C
+  if (anom == null || !Number.isFinite(anom)) return '#1f2937';
   const v = Math.max(-5, Math.min(5, anom));
   if (v >= 0) {
-    // 0 → #fef3c7 (pale), 2.5 → #fb923c, 5 → #7f1d1d
     if (v < 1) return lerp('#fef3c7', '#fde68a', v);
     if (v < 2) return lerp('#fde68a', '#fb923c', v - 1);
     if (v < 3) return lerp('#fb923c', '#ea580c', v - 2);
@@ -99,25 +93,33 @@ function normalizeName(s: string): string {
   return NAME_ALIAS[lower] ?? lower;
 }
 
+function InvalidateOnMount() {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 250);
+    return () => clearTimeout(t);
+  }, [map]);
+  return null;
+}
+
 export default function GlobalAnomalyMap({ countryAnomalies }: { countryAnomalies: CountryAnomaly[] }) {
-  const [geo, setGeo] = useState<GeoJson | null>(null);
+  const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [hover, setHover] = useState<{
+  const [selected, setSelected] = useState<{
     name: string;
     anomaly: number | null;
     monthLabel?: string;
     value?: number;
     rank?: number;
     total?: number;
-    x: number;
-    y: number;
+    color: string;
   } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     fetch('/data/world-countries.json')
       .then((r) => r.json())
-      .then((j) => { if (!cancelled) setGeo(j); })
+      .then((j) => { if (!cancelled) setGeo(fixAntimeridian(j)); })
       .catch((e) => { if (!cancelled) setLoadError(String(e?.message ?? e)); });
     return () => { cancelled = true; };
   }, []);
@@ -131,15 +133,36 @@ export default function GlobalAnomalyMap({ countryAnomalies }: { countryAnomalie
     return map;
   }, [countryAnomalies]);
 
-  const WIDTH = 1000;
-  const HEIGHT = 500;
-  // Trim Antarctica: it adds a huge visual strip but we have no data for it.
-  // Viewport covers roughly lat -60 → 85.
-  const viewX = 0;
-  const viewY = (90 - 85) / 180 * HEIGHT; // top
-  const viewH = (145 / 180) * HEIGHT;
+  const style = useCallback((feature: Feature | undefined): PathOptions => {
+    if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
+    const name = ((feature.properties as any)?.name as string) ?? '';
+    const rec = lookup.get(name.toLowerCase());
+    return {
+      fillColor: rec ? anomalyColor(rec.anomaly) : '#1f2937',
+      fillOpacity: 0.85,
+      weight: 0.4,
+      color: '#0b1220',
+    };
+  }, [lookup]);
 
-  // Latest month label (take first record's month as the canonical label)
+  const onEachFeature = useCallback((feature: Feature, layer: Layer) => {
+    const name = ((feature.properties as any)?.name as string) ?? '';
+    const rec = lookup.get(name.toLowerCase());
+    const color = rec ? anomalyColor(rec.anomaly) : '#1f2937';
+    const show = () => setSelected({
+      name,
+      anomaly: rec?.anomaly ?? null,
+      monthLabel: rec?.monthLabel,
+      value: rec?.value,
+      rank: rec?.rank,
+      total: rec?.total,
+      color,
+    });
+    layer.on('mouseover', show);
+    layer.on('click', show);
+    layer.on('mouseout', () => setSelected(null));
+  }, [lookup]);
+
   const monthLabel = countryAnomalies[0]?.monthLabel ?? '';
 
   if (loadError) {
@@ -151,106 +174,81 @@ export default function GlobalAnomalyMap({ countryAnomalies }: { countryAnomalie
   }
   if (!geo) {
     return (
-      <div className="rounded-xl border border-gray-800 bg-gray-900/40 p-6 text-center text-sm text-gray-400">
-        Loading world map…
+      <div className="h-[320px] md:h-[500px] w-full rounded-xl bg-gray-900/40 flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-2 border-[#D0A65E] border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="relative">
-      <svg
-        viewBox={`${viewX} ${viewY} ${WIDTH} ${viewH}`}
-        preserveAspectRatio="xMidYMid meet"
-        className="w-full h-auto rounded-xl bg-[#0b1220] border border-gray-800"
-        style={{ display: 'block' }}
-        aria-label="World map of temperature anomalies"
-        role="img"
-      >
-        {/* Graticule-free ocean background */}
-        <rect x={viewX} y={viewY} width={WIDTH} height={viewH} fill="#0b1220" />
-        {geo.features.map((f, i) => {
-          const rec = lookup.get(f.properties.name.toLowerCase());
-          const color = rec ? anomalyColor(rec.anomaly) : '#1f2937';
-          const d = featureToPath(f, WIDTH, HEIGHT);
-          return (
-            <path
-              key={f.id ?? f.properties.id ?? i}
-              d={d}
-              fill={color}
-              stroke="#0b1220"
-              strokeWidth={0.4}
-              onMouseEnter={(e) => {
-                const target = e.currentTarget;
-                const bbox = target.getBoundingClientRect();
-                const parentBox = target.ownerSVGElement?.getBoundingClientRect();
-                setHover({
-                  name: f.properties.name,
-                  anomaly: rec?.anomaly ?? null,
-                  monthLabel: rec?.monthLabel,
-                  value: rec?.value,
-                  rank: rec?.rank,
-                  total: rec?.total,
-                  x: bbox.left + bbox.width / 2 - (parentBox?.left ?? 0),
-                  y: bbox.top - (parentBox?.top ?? 0),
-                });
-              }}
-              onMouseLeave={() => setHover(null)}
-              style={{ cursor: rec ? 'pointer' : 'default' }}
-            >
-              <title>
-                {f.properties.name}
-                {rec ? ` — ${rec.anomaly > 0 ? '+' : ''}${rec.anomaly.toFixed(2)}°C (${rec.monthLabel})` : ' — no data'}
-              </title>
-            </path>
-          );
-        })}
-      </svg>
-
-      {/* Hover card */}
-      {hover && (
-        <div
-          className="pointer-events-none absolute z-10 rounded-lg border border-[#D0A65E]/50 bg-gray-950/95 px-3 py-2 text-xs text-gray-200 shadow-xl"
-          style={{
-            left: `${Math.min(hover.x, 800)}px`,
-            top: `${Math.max(0, hover.y - 70)}px`,
-            transform: 'translateX(-50%)',
-          }}
+    <div>
+      <div className="relative rounded-xl overflow-hidden border border-gray-800">
+        <MapContainer
+          center={[20, 0]}
+          zoom={2}
+          minZoom={1}
+          maxZoom={8}
+          scrollWheelZoom
+          maxBounds={[[-60, -180], [85, 180]]}
+          maxBoundsViscosity={1.0}
+          worldCopyJump
+          className="h-[320px] md:h-[500px] w-full z-0"
+          style={{ background: '#0b1220' }}
         >
-          <p className="font-semibold text-white">{hover.name}</p>
-          {hover.anomaly != null ? (
-            <>
-              <p className="font-mono mt-0.5" style={{ color: hover.anomaly > 0 ? '#fb923c' : '#60a5fa' }}>
-                {hover.anomaly > 0 ? '+' : ''}{hover.anomaly.toFixed(2)}°C vs 1961–1990
-              </p>
-              <p className="text-gray-400">
-                {hover.value != null ? `${hover.value.toFixed(2)}°C absolute · ` : ''}
-                {hover.monthLabel}
-              </p>
-              {hover.rank && hover.total ? (
-                <p className="text-gray-500">Rank {hover.rank} of {hover.total}</p>
-              ) : null}
-            </>
-          ) : (
-            <p className="text-gray-500 mt-0.5">No monthly data on this site</p>
-          )}
-        </div>
-      )}
+          <InvalidateOnMount />
+          <TileLayer
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+            opacity={0.55}
+          />
+          <GeoJSON
+            key={`anomaly-${lookup.size}`}
+            data={geo}
+            style={style}
+            onEachFeature={onEachFeature}
+          />
+        </MapContainer>
+
+        {selected && (
+          <div className="absolute bottom-0 left-0 right-0 z-[500] bg-gray-950/90 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm pointer-events-none">
+            <span className="font-bold text-gray-100">{selected.name}</span>
+            {selected.anomaly != null ? (
+              <>
+                <span className="font-mono font-semibold" style={{ color: selected.color }}>
+                  {selected.anomaly > 0 ? '+' : ''}{selected.anomaly.toFixed(2)}°C vs 1961–1990
+                </span>
+                <span className="text-gray-300">
+                  {selected.value != null ? `${selected.value.toFixed(2)}°C absolute` : ''}
+                  {selected.monthLabel ? ` · ${selected.monthLabel}` : ''}
+                </span>
+                {selected.rank && selected.total ? (
+                  <span className="text-gray-300">Rank {selected.rank} of {selected.total}</span>
+                ) : null}
+              </>
+            ) : (
+              <span className="text-gray-300">No monthly data on this site</span>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Legend */}
-      <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-[11px] text-gray-400">
-        <span className="font-semibold text-gray-300">{monthLabel ? `${monthLabel} land anomaly vs 1961–1990` : 'Land anomaly vs 1961–1990'}</span>
+      <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-300">
+        <span className="font-semibold text-gray-200">
+          {monthLabel ? `${monthLabel} land anomaly vs 1961–1990` : 'Land anomaly vs 1961–1990'}
+        </span>
         <div className="flex items-center gap-2">
           <span>-5°C</span>
           <div
             className="h-3 w-40 rounded"
             style={{
-              background: 'linear-gradient(to right, #1e3a8a 0%, #2563eb 20%, #60a5fa 35%, #bae6fd 48%, #fef3c7 52%, #fde68a 58%, #fb923c 70%, #ea580c 78%, #b91c1c 88%, #7f1d1d 100%)',
+              background:
+                'linear-gradient(to right, #1e3a8a 0%, #2563eb 20%, #60a5fa 35%, #bae6fd 48%, #fef3c7 52%, #fde68a 58%, #fb923c 70%, #ea580c 78%, #b91c1c 88%, #7f1d1d 100%)',
             }}
           />
           <span>+5°C</span>
         </div>
-        <span className="text-gray-500">Grey = no data (country not tracked on this site)</span>
+        <span className="text-gray-400">Grey = no data · scroll / pinch to zoom, drag to pan</span>
       </div>
     </div>
   );

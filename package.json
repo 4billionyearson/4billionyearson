@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "build:climate-rankings": "tsx scripts/build-rankings.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.1.6",

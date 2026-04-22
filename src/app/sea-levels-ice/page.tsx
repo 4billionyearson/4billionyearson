@@ -9,6 +9,7 @@ import {
 import { Loader2, Activity, Snowflake, Waves, Thermometer, ArrowUp, Link2, MapPin } from 'lucide-react';
 
 const ArcticIceMap = dynamic(() => import("@/app/_components/arctic-ice-map"), { ssr: false });
+import { SeaIceTile } from '@/app/climate/global/ClimateSystemsPanel';
 const ICE_YEARS = ["1979","1985","1990","1995","2000","2005","2010","2012","2015","2020","2024"];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -160,12 +161,23 @@ export default function SeaLevelsIcePage() {
   const [activeIceYear, setActiveIceYear] = useState<string>("1979");
   const handleIceYearChange = useCallback((y: string) => setActiveIceYear(y), []);
 
+  // Global sea-ice headline (Arctic + Antarctic combined) — sourced from the
+  // same global-climate snapshot used on /climate/global.
+  const [globalSeaIce, setGlobalSeaIce] = useState<any>(null);
+
   useEffect(() => {
     fetch('/api/climate/greenhouse-gases')
       .then(r => r.json())
       .then(d => { if (d.error) throw new Error(d.error); setData(d); })
       .catch(e => setError(e.message || 'Failed to load data'))
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetch('/data/climate/global-history.json')
+      .then(r => r.json())
+      .then(d => setGlobalSeaIce(d?.seaIceStats ?? null))
+      .catch(() => {});
   }, []);
 
   // ─── Correlation datasets ──────────────────────────────────────────────────
@@ -310,6 +322,11 @@ export default function SeaLevelsIcePage() {
                   )}
                 </div>
               </div>
+
+              {/* ═══ GLOBAL SEA ICE HEADLINE ═══ */}
+              {globalSeaIce && (
+                <SeaIceTile seaIce={globalSeaIce} />
+              )}
 
               {/* ═══ ICE EXTENT + ANOMALY PANEL ═══ */}
               <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">

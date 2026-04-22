@@ -9,7 +9,7 @@ import { Waves, Snowflake, Flame, Wind, ExternalLink } from 'lucide-react';
 // Shared tile shell
 function Tile({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl border-2 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md p-4 shadow-xl ${className}`}>
+    <div className={`rounded-2xl border-2 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md p-3.5 md:p-4 shadow-xl flex flex-col ${className}`}>
       {children}
     </div>
   );
@@ -18,8 +18,8 @@ function Tile({ children, className = '' }: { children: React.ReactNode; classNa
 function TileHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
   return (
     <div className="mb-2">
-      <h3 className="text-base font-semibold text-white flex items-center gap-2">{icon}{title}</h3>
-      {subtitle ? <p className="text-[11px] text-gray-500 mt-0.5">{subtitle}</p> : null}
+      <h3 className="text-[15px] font-semibold text-white flex items-center gap-2">{icon}{title}</h3>
+      {subtitle ? <p className="text-[11px] text-gray-400 mt-0.5">{subtitle}</p> : null}
     </div>
   );
 }
@@ -54,19 +54,19 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
         <div>
           <p className={`text-3xl font-bold font-mono ${accent}`}>{state}</p>
-          {enso.strength ? <p className="text-xs text-gray-500 capitalize">{enso.strength}</p> : null}
+          {enso.strength ? <p className="text-xs text-gray-400 capitalize">{enso.strength}</p> : null}
         </div>
         <div className="text-right">
           <p className="font-mono text-white text-lg">{enso.anomaly > 0 ? '+' : ''}{enso.anomaly.toFixed(2)}°C</p>
-          <p className="text-[11px] text-gray-500">{enso.season} {enso.seasonYear}</p>
+          <p className="text-[11px] text-gray-400">{enso.season} {enso.seasonYear}</p>
         </div>
       </div>
-      <div className="h-32 mt-3">
+      <div className="h-36 mt-3 -ml-1">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chart} margin={{ top: 4, right: 4, left: -8, bottom: 0 }}>
+          <BarChart data={chart} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="label" stroke="#9CA3AF" fontSize={9} interval={5} />
-            <YAxis stroke="#9CA3AF" fontSize={10} domain={[-3, 3]} ticks={[-2, -1, 0, 1, 2]} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
+            <YAxis stroke="#9CA3AF" fontSize={10} width={28} domain={[-3, 3]} ticks={[-2, -1, 0, 1, 2]} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
             <Tooltip
               contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12 }}
               formatter={(v: any) => [typeof v === 'number' ? `${v > 0 ? '+' : ''}${v.toFixed(2)}°C` : '—', 'ONI anomaly']}
@@ -83,10 +83,10 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-[11px] text-gray-500 mt-1">
+      <p className="text-[11px] text-gray-400 mt-1">
         ≥ +0.5°C = El Niño · ≤ -0.5°C = La Niña · between = Neutral. El Niño years tend to push global temperature up; La Niña years temporarily damp it.
       </p>
-      <p className="text-[11px] text-gray-600 mt-1">
+      <p className="text-[11px] text-gray-400 mt-1">
         <span style={{ color }} /> Source:&nbsp;
         <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
           NOAA CPC ONI <ExternalLink className="h-2.5 w-2.5" />
@@ -116,7 +116,7 @@ function GhgRow({ stat, color }: { stat: GhgStat; color: string }) {
       <div className="flex items-baseline justify-between gap-2">
         <div>
           <p className="text-sm font-semibold text-white">{stat.label}</p>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-gray-400">
             {stat.latest.value.toFixed(stat.unit === 'ppm' ? 2 : 1)} {stat.unit} ({stat.latest.year}-{String(stat.latest.month).padStart(2, '0')})
           </p>
         </div>
@@ -125,7 +125,7 @@ function GhgRow({ stat, color }: { stat: GhgStat; color: string }) {
             <p className="text-sm font-mono" style={{ color }}>+{stat.vsPreindustrialPct.toFixed(0)}% vs 1750</p>
           )}
           {stat.yoy?.absolute != null && (
-            <p className="text-[11px] text-gray-500">+{stat.yoy.absolute.toFixed(stat.unit === 'ppm' ? 2 : 1)} {stat.unit}/yr</p>
+            <p className="text-[11px] text-gray-400">+{stat.yoy.absolute.toFixed(stat.unit === 'ppm' ? 2 : 1)} {stat.unit}/yr</p>
           )}
         </div>
       </div>
@@ -154,10 +154,10 @@ export function GhgTile({ ghgStats }: { ghgStats: { co2: GhgStat | null; ch4: Gh
       {co2 && <GhgRow stat={co2} color="#fb923c" />}
       {ch4 && <GhgRow stat={ch4} color="#f472b6" />}
       {n2o && <GhgRow stat={n2o} color="#a78bfa" />}
-      <p className="text-[11px] text-gray-500 mt-2">
+      <p className="text-[11px] text-gray-400 mt-2">
         Sparklines: last 10 years of monthly values. Pre-industrial reference values: CO₂ 280 ppm, CH₄ 722 ppb, N₂O 270 ppb.
       </p>
-      <p className="text-[11px] text-gray-600 mt-1">
+      <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
         <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
           NOAA GML Trends <ExternalLink className="h-2.5 w-2.5" />
@@ -198,26 +198,26 @@ export function SeaIceTile({ seaIce }: { seaIce: SeaIceStats | null }) {
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
         <div>
           <p className="text-3xl font-bold font-mono text-white">{seaIce.latest.extent.toFixed(2)}<span className="text-sm text-gray-400 font-normal"> Mkm²</span></p>
-          <p className="text-[11px] text-gray-500">{MONTH_NAMES[seaIce.latest.month]} {seaIce.latest.year}</p>
+          <p className="text-[11px] text-gray-400">{MONTH_NAMES[seaIce.latest.month]} {seaIce.latest.year}</p>
         </div>
         <div className="text-right">
           <p className={`text-lg font-mono ${anomColor}`}>
             {seaIce.anomaly > 0 ? '+' : ''}{seaIce.anomaly.toFixed(2)} Mkm²
           </p>
           {seaIce.anomalyPct != null && (
-            <p className="text-[11px] text-gray-500">{seaIce.anomalyPct > 0 ? '+' : ''}{seaIce.anomalyPct.toFixed(1)}% vs {seaIce.baseline}</p>
+            <p className="text-[11px] text-gray-400">{seaIce.anomalyPct > 0 ? '+' : ''}{seaIce.anomalyPct.toFixed(1)}% vs {seaIce.baseline}</p>
           )}
-          <p className="text-[11px] text-gray-500 mt-0.5">
+          <p className="text-[11px] text-gray-400 mt-0.5">
             Rank: <span className="text-white font-semibold">{seaIce.rankLowestOfSameMonth}</span> lowest of {seaIce.totalYearsInMonth} {MONTH_NAMES[seaIce.latest.month]}s
           </p>
         </div>
       </div>
-      <div className="h-24 mt-3">
+      <div className="h-28 mt-3 -ml-1">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chart} margin={{ top: 4, right: 4, left: -8, bottom: 0 }}>
+          <LineChart data={chart} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="label" stroke="#9CA3AF" fontSize={9} interval={11} />
-            <YAxis stroke="#9CA3AF" fontSize={10} domain={[14, 26]} tickFormatter={(v) => `${v}`} />
+            <YAxis stroke="#9CA3AF" fontSize={10} width={26} domain={[14, 26]} tickFormatter={(v) => `${v}`} />
             <Tooltip
               contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12 }}
               formatter={(v: any) => [typeof v === 'number' ? `${v.toFixed(2)} Mkm²` : '—', 'Extent']}
@@ -226,8 +226,8 @@ export function SeaIceTile({ seaIce }: { seaIce: SeaIceStats | null }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-[11px] text-gray-500 mt-1">Last 60 months. Long-term trend is down — Arctic loss exceeds Antarctic variability.</p>
-      <p className="text-[11px] text-gray-600 mt-1">
+      <p className="text-[11px] text-gray-400 mt-1">Last 60 months. Long-term trend is down — Arctic loss exceeds Antarctic variability.</p>
+      <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
         <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
           NSIDC via global-warming.org <ExternalLink className="h-2.5 w-2.5" />
@@ -279,10 +279,10 @@ export function ContinentalBar({ continents }: { continents: ContinentStat[] | n
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-[11px] text-gray-500 mt-2">
+      <p className="text-[11px] text-gray-400 mt-2">
         Ranked warmest to coolest for the most recent complete month. Each bar shows the continent&apos;s land-surface temperature anomaly relative to its 20th-century average.
       </p>
-      <p className="text-[11px] text-gray-600 mt-1">
+      <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
         <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
           NOAA Climate at a Glance <ExternalLink className="h-2.5 w-2.5" />
