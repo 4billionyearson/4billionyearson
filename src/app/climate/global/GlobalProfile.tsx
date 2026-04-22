@@ -400,21 +400,35 @@ export default function GlobalProfile() {
                       </p>
                     </div>
 
-                    {/* Visual chart: annual + 10-yr mean vs Paris limits, shown as anomaly °C */}
-                    {yearlyWithAnom.length > 0 && (
+                    {/* Visual chart: annual + 10-yr mean vs Paris limits, shown as anomaly °C.
+                        Compressed to 2000→present so the recent acceleration and the
+                        approach toward 1.5°C are visually obvious. */}
+                    {yearlyWithAnom.length > 0 && (() => {
+                      const chartData = yearlyWithAnom.filter((p) => p.year >= 2000);
+                      if (!chartData.length) return null;
+                      const chartStart = chartData[0].year;
+                      const chartEnd = chartData[chartData.length - 1].year;
+
+                      // WMO 1961–1990 baseline, expressed as anomaly vs 1850–1900
+                      const wmoYears = yearlyWithAnom.filter((p) => p.year >= 1961 && p.year <= 1990);
+                      const wmoBaselineAnom = wmoYears.length
+                        ? wmoYears.reduce((s, p) => s + p.annualAnomaly, 0) / wmoYears.length
+                        : null;
+
+                      return (
                       <div className="mt-6 pt-4 border-t border-gray-800">
                         <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2">
-                          Warming above pre-industrial, 1950–{yearlyWithAnom[yearlyWithAnom.length - 1].year}
+                          Warming above pre-industrial, {chartStart}–{chartEnd}
                         </p>
-                        <div className="h-60">
+                        <div className="h-64">
                           <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={yearlyWithAnom} margin={{ top: 5, right: 40, left: 0, bottom: 5 }}>
+                            <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
                               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                               <XAxis dataKey="year" stroke="#9CA3AF" fontSize={11} />
                               <YAxis
                                 stroke="#9CA3AF"
                                 fontSize={11}
-                                domain={[-0.4, 2.2]}
+                                domain={[0, 2.2]}
                                 ticks={[0, 0.5, 1.0, 1.5, 2.0]}
                                 tickFormatter={(v) => `${v > 0 ? '+' : ''}${v.toFixed(1)}°C`}
                               />
@@ -424,22 +438,25 @@ export default function GlobalProfile() {
                                 formatter={(v: any, name: any) => [typeof v === 'number' ? `${formatSigned(v)}°C` : '—', name]}
                               />
                               <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 11 }} />
-                              <ReferenceLine y={0} stroke="#60a5fa" strokeDasharray="2 2" label={{ value: 'Pre-industrial (1850–1900)', fill: '#93c5fd', fontSize: 10, position: 'insideBottomRight' }} />
-                              <ReferenceLine y={1.5} stroke="#ef4444" strokeDasharray="4 4" label={{ value: '+1.5°C Paris', fill: '#fca5a5', fontSize: 10, position: 'insideTopRight' }} />
-                              <ReferenceLine y={2.0} stroke="#b91c1c" strokeDasharray="4 4" label={{ value: '+2.0°C Paris', fill: '#fecaca', fontSize: 10, position: 'insideTopRight' }} />
-                              {firstAnnualBreach15 && (
-                                <ReferenceLine x={firstAnnualBreach15.year} stroke="#f97316" strokeDasharray="2 4" label={{ value: `1st annual >1.5°C (${firstAnnualBreach15.year})`, fill: '#fdba74', fontSize: 10, angle: -90, position: 'insideTopLeft' }} />
+                              {wmoBaselineAnom != null && (
+                                <ReferenceLine y={wmoBaselineAnom} stroke="#60a5fa" strokeDasharray="2 2" strokeWidth={1.5} label={{ value: 'WMO 1961–1990 baseline', fill: '#93c5fd', fontSize: 10, position: 'insideBottomLeft' }} />
                               )}
-                              <Line type="monotone" dataKey="annualAnomaly" name="Annual anomaly" stroke="#fb923c" strokeWidth={1} dot={false} isAnimationActive={false} />
+                              <ReferenceLine y={1.5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5} label={{ value: '+1.5°C Paris limit', fill: '#fbbf24', fontSize: 10, position: 'insideTopLeft' }} />
+                              <ReferenceLine y={2.0} stroke="#ef4444" strokeDasharray="4 4" strokeWidth={1.5} label={{ value: '+2.0°C Critical limit', fill: '#fca5a5', fontSize: 10, position: 'insideTopLeft' }} />
+                              {firstAnnualBreach15 && firstAnnualBreach15.year >= chartStart && (
+                                <ReferenceLine x={firstAnnualBreach15.year} stroke="#f97316" strokeDasharray="2 4" label={{ value: `1st annual >1.5°C (${firstAnnualBreach15.year})`, fill: '#fdba74', fontSize: 10, angle: -90, position: 'insideTopRight' }} />
+                              )}
+                              <Line type="monotone" dataKey="annualAnomaly" name="Annual anomaly" stroke="#fb923c" strokeWidth={1.5} dot={false} isAnimationActive={false} />
                               <Line type="monotone" dataKey="decadeAnomaly" name="10-year mean" stroke="#fbbf24" strokeWidth={3} dot={false} connectNulls isAnimationActive={false} />
                             </LineChart>
                           </ResponsiveContainer>
                         </div>
                         <p className="text-[11px] text-gray-500 mt-1">
-                          Thin orange line = individual years. Thick gold line = 10-year mean (the official Paris tracker). Red dashes = Paris 1.5 & 2.0°C limits. Values are anomalies vs 1850–1900.
+                          Thin orange line = individual years. Thick gold line = 10-year mean (the official Paris tracker). Amber dashes = Paris 1.5°C limit · red dashes = 2.0°C critical limit · blue dashes = WMO 1961–1990 standard baseline. All values are anomalies vs the 1850–1900 pre-industrial average.
                         </p>
                       </div>
-                    )}
+                      );
+                    })()}
 
                     {/* Key milestones */}
                     <div className="mt-5 pt-4 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
@@ -479,8 +496,8 @@ export default function GlobalProfile() {
                     <div className="mt-5 pt-4 border-t border-gray-800">
                       <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Two baselines, two purposes</p>
                       <ul className="text-xs text-gray-400 space-y-1.5">
-                        <li><span className="text-white font-semibold">Pre-industrial (1850–1900)</span> ≈ {data.preIndustrialBaseline.toFixed(1)}°C — used <em>only</em> for the Paris 1.5°C and 2.0°C limits above.</li>
-                        <li><span className="text-white font-semibold">1961–1990 (WMO standard)</span> — used for the monthly/quarterly rankings in the table above and on country pages. A relatively stable mid-20th-century reference.</li>
+                        <li><span className="text-white font-semibold">Pre-industrial (1850-1900)</span> ≈ {data.preIndustrialBaseline.toFixed(1)}°C - used <em>only</em> for the Paris 1.5°C and 2.0°C limits above.</li>
+                        <li><span className="text-white font-semibold">1961-1990 (WMO standard)</span> - used for the monthly/quarterly rankings in the table above and on country pages. A relatively stable mid-20th-century reference.</li>
                       </ul>
                     </div>
                   </div>
