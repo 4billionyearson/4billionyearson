@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell,
 } from 'recharts';
-import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin } from 'lucide-react';
+import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import { getRegionBySlug } from '@/lib/climate/regions';
 import {
@@ -14,6 +14,8 @@ import {
   type OverviewPanel,
   type OverviewRow,
 } from '../_shared/overview-grid';
+import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar, WhatChangedTile } from './ClimateSystemsPanel';
+import GlobalAnomalyMap from './GlobalAnomalyMap';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -63,6 +65,49 @@ interface GlobalData {
   preIndustrialBaseline: number;
   keyThresholds: { plus1_5: number; plus2_0: number };
   lastUpdated: string;
+  enso?: {
+    state: 'El Niño' | 'La Niña' | 'Neutral';
+    strength: string;
+    anomaly: number;
+    season: string;
+    seasonYear: number;
+    history: { season: string; year: number; anom: number }[];
+  } | null;
+  ghgStats?: {
+    co2: GhgStat | null;
+    ch4: GhgStat | null;
+    n2o: GhgStat | null;
+  } | null;
+  seaIceStats?: {
+    label: string;
+    baseline: string;
+    unit: string;
+    latest: { year: number; month: number; extent: number };
+    climatology: number;
+    anomaly: number;
+    anomalyPct: number | null;
+    rankLowestOfSameMonth: number;
+    totalYearsInMonth: number;
+    recent60: { year: number; month: number; extent: number }[];
+  } | null;
+  continentStats?: { key: string; label: string; latest: { year: number; month: number; anomaly: number } | null }[] | null;
+  countryAnomalies?: { iso3: string; name: string; anomaly: number; value: number; monthLabel: string; rank: number; total: number }[] | null;
+  previousLatestMonthStats?: {
+    landOcean?: RankedStat | null;
+    land?: RankedStat | null;
+    ocean?: RankedStat | null;
+  } | null;
+}
+
+interface GhgStat {
+  label: string;
+  unit: string;
+  latest: { year: number; month: number; value: number };
+  yoy: { absolute: number | null; pct: number | null } | null;
+  tenYr: { absolute: number | null; pct: number | null } | null;
+  preindustrial: number;
+  vsPreindustrialPct: number | null;
+  sparkline: { year: number; month: number; value: number }[];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -424,7 +469,7 @@ export default function GlobalProfile() {
                         </p>
                         <div className="h-64">
                           <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
+                            <LineChart data={chartData} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
                               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                               <XAxis dataKey="year" stroke="#9CA3AF" fontSize={11} />
                               <YAxis
@@ -541,13 +586,13 @@ export default function GlobalProfile() {
               {/* Yearly trend chart */}
               {yearlyChartData.length > 0 && (
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-base font-semibold text-white mb-1">Global Land + Ocean absolute temperature, {yearMin}–{yearMax}</h3>
+                    <h3 className="text-base font-semibold text-white mb-1 flex items-center gap-2"><Globe2 className="h-4 w-4 text-orange-400" />Global Land + Ocean absolute temperature, {yearMin}–{yearMax}</h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Annual average (thin line) with a 10-year rolling mean (thick line). Horizontal lines mark the Paris 1.5°C and 2.0°C thresholds above pre-industrial.
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={yearlyChartData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
+                        <LineChart data={yearlyChartData} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="year" stroke="#9CA3AF" fontSize={11} />
                           <YAxis
@@ -576,13 +621,13 @@ export default function GlobalProfile() {
               {/* Monthly comparison — last 12 months (land+ocean) */}
               {data.monthlyComparison?.length > 0 && (
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-base font-semibold text-white mb-1">Last 12 months vs 1961–1990 (global land + ocean)</h3>
+                    <h3 className="text-base font-semibold text-white mb-1 flex items-center gap-2"><Thermometer className="h-4 w-4 text-orange-400" />Last 12 months vs 1961–1990 (global land + ocean)</h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Each bar is the difference between that month&rsquo;s global land + ocean temperature and the 1961–1990 average for the same month. Red bars are warmer than baseline, blue are cooler.
                     </p>
                     <div className="h-72">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data.monthlyComparison} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
+                        <BarChart data={data.monthlyComparison} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="monthLabel" stroke="#9CA3AF" fontSize={10} interval={0} angle={-30} textAnchor="end" height={60} />
                           <YAxis
@@ -609,13 +654,13 @@ export default function GlobalProfile() {
               {/* Land vs Ocean */}
               {data.landVsOceanMonthly && data.landVsOceanMonthly.length > 0 && (
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-base font-semibold text-white mb-1">Land vs Land + Ocean — last 12 months</h3>
+                    <h3 className="text-base font-semibold text-white mb-1 flex items-center gap-2"><Globe2 className="h-4 w-4 text-orange-400" />Land vs Land + Ocean — last 12 months</h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Land surfaces warm roughly twice as fast as the ocean. This chart compares the global land-only temperature (ERA5, via Our World in Data) against the combined land+ocean series (NOAA) for each of the last 12 months.
                     </p>
                     <div className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={data.landVsOceanMonthly} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
+                        <LineChart data={data.landVsOceanMonthly} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="monthLabel" stroke="#9CA3AF" fontSize={10} angle={-30} textAnchor="end" height={60} />
                           <YAxis stroke="#9CA3AF" fontSize={11} domain={[10, 20]} ticks={[10, 12, 14, 16, 18, 20]} tickFormatter={(v) => `${v.toFixed(0)}°C`} />
@@ -630,6 +675,49 @@ export default function GlobalProfile() {
                       </ResponsiveContainer>
                     </div>
                 </div>
+              )}
+
+              {/* Climate systems — ENSO, GHG, sea ice, continents */}
+              {(data.enso || data.ghgStats || data.seaIceStats || data.continentStats?.length || data.previousLatestMonthStats) && (
+                <>
+                  <Divider icon={<Wind className="h-5 w-5 text-sky-300" />} title="Climate Systems" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {data.enso && <EnsoCard enso={data.enso} />}
+                    {data.ghgStats && <GhgTile ghgStats={data.ghgStats} />}
+                    {data.seaIceStats && <SeaIceTile seaIce={data.seaIceStats} />}
+                    {data.noaaStats?.landOcean?.latestMonthStats && data.previousLatestMonthStats?.landOcean && (
+                      <WhatChangedTile
+                        current={data.noaaStats.landOcean.latestMonthStats}
+                        previous={data.previousLatestMonthStats.landOcean}
+                      />
+                    )}
+                  </div>
+                  {data.continentStats?.length ? (
+                    <div className="mt-3">
+                      <ContinentalBar continents={data.continentStats} />
+                    </div>
+                  ) : null}
+                </>
+              )}
+
+              {/* World anomaly map — country-level temperature anomalies */}
+              {data.countryAnomalies && data.countryAnomalies.length > 0 && (
+                <>
+                  <Divider icon={<Globe2 className="h-5 w-5 text-[#D0A65E]" />} title="World — Latest Month" />
+                  <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                    <h3 className="text-base font-semibold text-white mb-1 flex items-center gap-2">
+                      <Globe2 className="h-4 w-4 text-[#D0A65E]" />
+                      Country-by-country temperature anomaly
+                    </h3>
+                    <p className="text-xs text-gray-400 mb-3">
+                      Each country is coloured by its latest monthly land-surface temperature anomaly against its own 1961–1990 baseline — the same figures shown on each country&rsquo;s climate page on this site. Countries without a dedicated page are shown in grey.
+                    </p>
+                    <GlobalAnomalyMap countryAnomalies={data.countryAnomalies} />
+                    <p className="text-xs text-gray-500 mt-3">
+                      Data source: NOAA Climate at a Glance (country-level monthly averages), pre-computed nightly. Each country is independently ranked against its own 77-year (or longer) record, so the colour scale reflects <em>relative</em> warming for each place, not absolute temperature.
+                    </p>
+                  </div>
+                </>
               )}
 
               {/* Context + Sources */}

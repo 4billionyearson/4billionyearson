@@ -11234,789 +11234,3041 @@
       "yearly": [
         {
           "year": 1950,
-          "avgTemp": 8.39
+          "avgTemp": 13.69
         },
         {
           "year": 1951,
-          "avgTemp": 8.52
+          "avgTemp": 13.82
         },
         {
           "year": 1952,
-          "avgTemp": 8.6
+          "avgTemp": 13.9
         },
         {
           "year": 1953,
-          "avgTemp": 8.81
+          "avgTemp": 14.11
         },
         {
           "year": 1954,
-          "avgTemp": 8.56
+          "avgTemp": 13.86
         },
         {
           "year": 1955,
-          "avgTemp": 8.49
+          "avgTemp": 13.79
         },
         {
           "year": 1956,
-          "avgTemp": 8.29
+          "avgTemp": 13.59
         },
         {
           "year": 1957,
-          "avgTemp": 8.57
+          "avgTemp": 13.87
         },
         {
           "year": 1958,
-          "avgTemp": 8.64
+          "avgTemp": 13.94
         },
         {
           "year": 1959,
-          "avgTemp": 8.71,
-          "rollingAvg": 8.56
+          "avgTemp": 14.01,
+          "rollingAvg": 13.86
         },
         {
           "year": 1960,
-          "avgTemp": 8.5,
-          "rollingAvg": 8.57
+          "avgTemp": 13.8,
+          "rollingAvg": 13.87
         },
         {
           "year": 1961,
-          "avgTemp": 8.67,
-          "rollingAvg": 8.58
+          "avgTemp": 13.97,
+          "rollingAvg": 13.88
         },
         {
           "year": 1962,
-          "avgTemp": 8.64,
-          "rollingAvg": 8.59
+          "avgTemp": 13.94,
+          "rollingAvg": 13.89
         },
         {
           "year": 1963,
-          "avgTemp": 8.64,
-          "rollingAvg": 8.57
+          "avgTemp": 13.94,
+          "rollingAvg": 13.87
         },
         {
           "year": 1964,
-          "avgTemp": 8.25,
-          "rollingAvg": 8.54
+          "avgTemp": 13.55,
+          "rollingAvg": 13.84
         },
         {
           "year": 1965,
-          "avgTemp": 8.44,
-          "rollingAvg": 8.54
+          "avgTemp": 13.74,
+          "rollingAvg": 13.84
         },
         {
           "year": 1966,
-          "avgTemp": 8.44,
-          "rollingAvg": 8.55
+          "avgTemp": 13.74,
+          "rollingAvg": 13.85
         },
         {
           "year": 1967,
-          "avgTemp": 8.62,
-          "rollingAvg": 8.56
+          "avgTemp": 13.92,
+          "rollingAvg": 13.85
         },
         {
           "year": 1968,
-          "avgTemp": 8.39,
-          "rollingAvg": 8.53
+          "avgTemp": 13.69,
+          "rollingAvg": 13.83
         },
         {
           "year": 1969,
-          "avgTemp": 8.51,
-          "rollingAvg": 8.51
+          "avgTemp": 13.81,
+          "rollingAvg": 13.81
         },
         {
           "year": 1970,
-          "avgTemp": 8.6,
-          "rollingAvg": 8.52
+          "avgTemp": 13.9,
+          "rollingAvg": 13.82
         },
         {
           "year": 1971,
-          "avgTemp": 8.54,
-          "rollingAvg": 8.51
+          "avgTemp": 13.84,
+          "rollingAvg": 13.81
         },
         {
           "year": 1972,
-          "avgTemp": 8.52,
-          "rollingAvg": 8.49
+          "avgTemp": 13.82,
+          "rollingAvg": 13.8
         },
         {
           "year": 1973,
-          "avgTemp": 8.89,
-          "rollingAvg": 8.52
+          "avgTemp": 14.19,
+          "rollingAvg": 13.82
         },
         {
           "year": 1974,
-          "avgTemp": 8.46,
-          "rollingAvg": 8.54
+          "avgTemp": 13.76,
+          "rollingAvg": 13.84
         },
         {
           "year": 1975,
-          "avgTemp": 8.67,
-          "rollingAvg": 8.56
+          "avgTemp": 13.97,
+          "rollingAvg": 13.86
         },
         {
           "year": 1976,
-          "avgTemp": 8.39,
-          "rollingAvg": 8.56
+          "avgTemp": 13.69,
+          "rollingAvg": 13.86
         },
         {
           "year": 1977,
-          "avgTemp": 8.8,
-          "rollingAvg": 8.58
+          "avgTemp": 14.1,
+          "rollingAvg": 13.88
         },
         {
           "year": 1978,
-          "avgTemp": 8.63,
-          "rollingAvg": 8.6
+          "avgTemp": 13.93,
+          "rollingAvg": 13.9
         },
         {
           "year": 1979,
-          "avgTemp": 8.64,
-          "rollingAvg": 8.61
+          "avgTemp": 13.94,
+          "rollingAvg": 13.91
         },
         {
           "year": 1980,
-          "avgTemp": 8.95,
-          "rollingAvg": 8.65
+          "avgTemp": 14.25,
+          "rollingAvg": 13.95
         },
         {
           "year": 1981,
-          "avgTemp": 9.16,
-          "rollingAvg": 8.71
+          "avgTemp": 14.46,
+          "rollingAvg": 14.01
         },
         {
           "year": 1982,
-          "avgTemp": 8.61,
-          "rollingAvg": 8.72
+          "avgTemp": 13.91,
+          "rollingAvg": 14.02
         },
         {
           "year": 1983,
-          "avgTemp": 8.99,
-          "rollingAvg": 8.73
+          "avgTemp": 14.29,
+          "rollingAvg": 14.03
         },
         {
           "year": 1984,
-          "avgTemp": 8.73,
-          "rollingAvg": 8.76
+          "avgTemp": 14.03,
+          "rollingAvg": 14.06
         },
         {
           "year": 1985,
-          "avgTemp": 8.7,
-          "rollingAvg": 8.76
+          "avgTemp": 14,
+          "rollingAvg": 14.06
         },
         {
           "year": 1986,
-          "avgTemp": 8.82,
-          "rollingAvg": 8.8
+          "avgTemp": 14.12,
+          "rollingAvg": 14.1
         },
         {
           "year": 1987,
-          "avgTemp": 8.85,
-          "rollingAvg": 8.81
+          "avgTemp": 14.15,
+          "rollingAvg": 14.11
         },
         {
           "year": 1988,
-          "avgTemp": 9.14,
-          "rollingAvg": 8.86
+          "avgTemp": 14.44,
+          "rollingAvg": 14.16
         },
         {
           "year": 1989,
-          "avgTemp": 8.89,
-          "rollingAvg": 8.88
+          "avgTemp": 14.19,
+          "rollingAvg": 14.18
         },
         {
           "year": 1990,
-          "avgTemp": 9.21,
-          "rollingAvg": 8.91
+          "avgTemp": 14.51,
+          "rollingAvg": 14.21
         },
         {
           "year": 1991,
-          "avgTemp": 9.19,
-          "rollingAvg": 8.91
+          "avgTemp": 14.49,
+          "rollingAvg": 14.21
         },
         {
           "year": 1992,
-          "avgTemp": 8.81,
-          "rollingAvg": 8.93
+          "avgTemp": 14.11,
+          "rollingAvg": 14.23
         },
         {
           "year": 1993,
-          "avgTemp": 8.87,
-          "rollingAvg": 8.92
+          "avgTemp": 14.17,
+          "rollingAvg": 14.22
         },
         {
           "year": 1994,
-          "avgTemp": 8.99,
-          "rollingAvg": 8.95
+          "avgTemp": 14.29,
+          "rollingAvg": 14.25
         },
         {
           "year": 1995,
-          "avgTemp": 9.37,
-          "rollingAvg": 9.01
+          "avgTemp": 14.67,
+          "rollingAvg": 14.31
         },
         {
           "year": 1996,
-          "avgTemp": 9.02,
-          "rollingAvg": 9.03
+          "avgTemp": 14.32,
+          "rollingAvg": 14.33
         },
         {
           "year": 1997,
-          "avgTemp": 9.12,
-          "rollingAvg": 9.06
+          "avgTemp": 14.42,
+          "rollingAvg": 14.36
         },
         {
           "year": 1998,
-          "avgTemp": 9.45,
-          "rollingAvg": 9.09
+          "avgTemp": 14.75,
+          "rollingAvg": 14.39
         },
         {
           "year": 1999,
-          "avgTemp": 9.22,
-          "rollingAvg": 9.13
+          "avgTemp": 14.52,
+          "rollingAvg": 14.43
         },
         {
           "year": 2000,
-          "avgTemp": 9.17,
-          "rollingAvg": 9.12
+          "avgTemp": 14.47,
+          "rollingAvg": 14.42
         },
         {
           "year": 2001,
-          "avgTemp": 9.35,
-          "rollingAvg": 9.14
+          "avgTemp": 14.65,
+          "rollingAvg": 14.44
         },
         {
           "year": 2002,
-          "avgTemp": 9.51,
-          "rollingAvg": 9.21
+          "avgTemp": 14.81,
+          "rollingAvg": 14.51
         },
         {
           "year": 2003,
-          "avgTemp": 9.48,
-          "rollingAvg": 9.27
+          "avgTemp": 14.78,
+          "rollingAvg": 14.57
         },
         {
           "year": 2004,
-          "avgTemp": 9.3,
-          "rollingAvg": 9.3
+          "avgTemp": 14.6,
+          "rollingAvg": 14.6
         },
         {
           "year": 2005,
-          "avgTemp": 9.73,
-          "rollingAvg": 9.34
+          "avgTemp": 15.03,
+          "rollingAvg": 14.64
         },
         {
           "year": 2006,
-          "avgTemp": 9.61,
-          "rollingAvg": 9.39
+          "avgTemp": 14.91,
+          "rollingAvg": 14.69
         },
         {
           "year": 2007,
-          "avgTemp": 9.76,
-          "rollingAvg": 9.46
+          "avgTemp": 15.06,
+          "rollingAvg": 14.76
         },
         {
           "year": 2008,
-          "avgTemp": 9.47,
-          "rollingAvg": 9.46
+          "avgTemp": 14.77,
+          "rollingAvg": 14.76
         },
         {
           "year": 2009,
-          "avgTemp": 9.56,
-          "rollingAvg": 9.49
+          "avgTemp": 14.86,
+          "rollingAvg": 14.79
         },
         {
           "year": 2010,
-          "avgTemp": 9.76,
-          "rollingAvg": 9.55
+          "avgTemp": 15.06,
+          "rollingAvg": 14.85
         },
         {
           "year": 2011,
-          "avgTemp": 9.63,
-          "rollingAvg": 9.58
+          "avgTemp": 14.93,
+          "rollingAvg": 14.88
         },
         {
           "year": 2012,
-          "avgTemp": 9.62,
-          "rollingAvg": 9.59
+          "avgTemp": 14.92,
+          "rollingAvg": 14.89
         },
         {
           "year": 2013,
-          "avgTemp": 9.62,
-          "rollingAvg": 9.61
+          "avgTemp": 14.92,
+          "rollingAvg": 14.91
         },
         {
           "year": 2014,
-          "avgTemp": 9.65,
-          "rollingAvg": 9.64
+          "avgTemp": 14.95,
+          "rollingAvg": 14.94
         },
         {
           "year": 2015,
-          "avgTemp": 9.9,
-          "rollingAvg": 9.66
+          "avgTemp": 15.2,
+          "rollingAvg": 14.96
         },
         {
           "year": 2016,
-          "avgTemp": 10.2,
-          "rollingAvg": 9.72
+          "avgTemp": 15.5,
+          "rollingAvg": 15.02
         },
         {
           "year": 2017,
-          "avgTemp": 10.04,
-          "rollingAvg": 9.75
+          "avgTemp": 15.34,
+          "rollingAvg": 15.05
         },
         {
           "year": 2018,
-          "avgTemp": 9.91,
-          "rollingAvg": 9.79
+          "avgTemp": 15.21,
+          "rollingAvg": 15.09
         },
         {
           "year": 2019,
-          "avgTemp": 10.09,
-          "rollingAvg": 9.84
+          "avgTemp": 15.39,
+          "rollingAvg": 15.14
         },
         {
           "year": 2020,
-          "avgTemp": 10.23,
-          "rollingAvg": 9.89
+          "avgTemp": 15.53,
+          "rollingAvg": 15.19
         },
         {
           "year": 2021,
-          "avgTemp": 9.96,
-          "rollingAvg": 9.92
+          "avgTemp": 15.26,
+          "rollingAvg": 15.22
         },
         {
           "year": 2022,
-          "avgTemp": 9.97,
-          "rollingAvg": 9.96
+          "avgTemp": 15.27,
+          "rollingAvg": 15.26
         },
         {
           "year": 2023,
-          "avgTemp": 10.37,
-          "rollingAvg": 10.03
+          "avgTemp": 15.67,
+          "rollingAvg": 15.33
         },
         {
           "year": 2024,
-          "avgTemp": 10.54,
-          "rollingAvg": 10.12
+          "avgTemp": 15.84,
+          "rollingAvg": 15.42
         },
         {
           "year": 2025,
-          "avgTemp": 10.37,
-          "rollingAvg": 10.17
+          "avgTemp": 15.67,
+          "rollingAvg": 15.47
         }
       ],
       "latestMonthStats": {
         "label": "Mar 2026",
-        "value": 10.79,
+        "value": 16.09,
         "diff": 1.97,
         "rank": 3,
         "total": 77,
         "recordLabel": "Mar 2016",
-        "recordValue": 11.01
+        "recordValue": 16.31
       },
       "latestThreeMonthStats": {
         "label": "Jan–Mar 2026",
-        "value": 10.51,
+        "value": 15.81,
         "diff": 1.77,
         "rank": 5,
         "total": 77,
         "recordLabel": "Jan–Mar 2016",
-        "recordValue": 10.86
+        "recordValue": 16.16
       }
     },
     "ocean": {
       "yearly": [
         {
           "year": 1950,
-          "avgTemp": 16.01
+          "avgTemp": 13.81
         },
         {
           "year": 1951,
-          "avgTemp": 16.12
+          "avgTemp": 13.92
         },
         {
           "year": 1952,
-          "avgTemp": 16.17
+          "avgTemp": 13.97
         },
         {
           "year": 1953,
-          "avgTemp": 16.16
+          "avgTemp": 13.96
         },
         {
           "year": 1954,
-          "avgTemp": 16.01
+          "avgTemp": 13.81
         },
         {
           "year": 1955,
-          "avgTemp": 15.97
+          "avgTemp": 13.77
         },
         {
           "year": 1956,
-          "avgTemp": 16
+          "avgTemp": 13.8
         },
         {
           "year": 1957,
-          "avgTemp": 16.2
+          "avgTemp": 14
         },
         {
           "year": 1958,
-          "avgTemp": 16.21
+          "avgTemp": 14.01
         },
         {
           "year": 1959,
-          "avgTemp": 16.17,
-          "rollingAvg": 16.1
+          "avgTemp": 13.97,
+          "rollingAvg": 13.9
         },
         {
           "year": 1960,
-          "avgTemp": 16.13,
-          "rollingAvg": 16.11
+          "avgTemp": 13.93,
+          "rollingAvg": 13.91
         },
         {
           "year": 1961,
-          "avgTemp": 16.18,
-          "rollingAvg": 16.12
+          "avgTemp": 13.98,
+          "rollingAvg": 13.92
         },
         {
           "year": 1962,
-          "avgTemp": 16.14,
-          "rollingAvg": 16.12
+          "avgTemp": 13.94,
+          "rollingAvg": 13.92
         },
         {
           "year": 1963,
-          "avgTemp": 16.17,
-          "rollingAvg": 16.12
+          "avgTemp": 13.96,
+          "rollingAvg": 13.92
         },
         {
           "year": 1964,
-          "avgTemp": 16,
-          "rollingAvg": 16.12
+          "avgTemp": 13.8,
+          "rollingAvg": 13.92
         },
         {
           "year": 1965,
-          "avgTemp": 16.05,
-          "rollingAvg": 16.13
+          "avgTemp": 13.85,
+          "rollingAvg": 13.92
         },
         {
           "year": 1966,
-          "avgTemp": 16.12,
-          "rollingAvg": 16.14
+          "avgTemp": 13.92,
+          "rollingAvg": 13.94
         },
         {
           "year": 1967,
-          "avgTemp": 16.09,
-          "rollingAvg": 16.13
+          "avgTemp": 13.89,
+          "rollingAvg": 13.93
         },
         {
           "year": 1968,
-          "avgTemp": 16.12,
-          "rollingAvg": 16.12
+          "avgTemp": 13.92,
+          "rollingAvg": 13.92
         },
         {
           "year": 1969,
-          "avgTemp": 16.27,
-          "rollingAvg": 16.13
+          "avgTemp": 14.07,
+          "rollingAvg": 13.93
         },
         {
           "year": 1970,
-          "avgTemp": 16.15,
-          "rollingAvg": 16.13
+          "avgTemp": 13.95,
+          "rollingAvg": 13.93
         },
         {
           "year": 1971,
-          "avgTemp": 16.01,
-          "rollingAvg": 16.11
+          "avgTemp": 13.81,
+          "rollingAvg": 13.91
         },
         {
           "year": 1972,
-          "avgTemp": 16.22,
-          "rollingAvg": 16.12
+          "avgTemp": 14.02,
+          "rollingAvg": 13.92
         },
         {
           "year": 1973,
-          "avgTemp": 16.22,
-          "rollingAvg": 16.13
+          "avgTemp": 14.02,
+          "rollingAvg": 13.93
         },
         {
           "year": 1974,
-          "avgTemp": 16.1,
-          "rollingAvg": 16.14
+          "avgTemp": 13.9,
+          "rollingAvg": 13.93
         },
         {
           "year": 1975,
-          "avgTemp": 16.06,
-          "rollingAvg": 16.14
+          "avgTemp": 13.86,
+          "rollingAvg": 13.94
         },
         {
           "year": 1976,
-          "avgTemp": 16.11,
-          "rollingAvg": 16.14
+          "avgTemp": 13.91,
+          "rollingAvg": 13.93
         },
         {
           "year": 1977,
-          "avgTemp": 16.3,
-          "rollingAvg": 16.16
+          "avgTemp": 14.1,
+          "rollingAvg": 13.96
         },
         {
           "year": 1978,
-          "avgTemp": 16.25,
-          "rollingAvg": 16.17
+          "avgTemp": 14.05,
+          "rollingAvg": 13.97
         },
         {
           "year": 1979,
-          "avgTemp": 16.36,
-          "rollingAvg": 16.18
+          "avgTemp": 14.16,
+          "rollingAvg": 13.98
         },
         {
           "year": 1980,
-          "avgTemp": 16.36,
-          "rollingAvg": 16.2
+          "avgTemp": 14.16,
+          "rollingAvg": 14
         },
         {
           "year": 1981,
-          "avgTemp": 16.33,
-          "rollingAvg": 16.23
+          "avgTemp": 14.13,
+          "rollingAvg": 14.03
         },
         {
           "year": 1982,
-          "avgTemp": 16.32,
-          "rollingAvg": 16.24
+          "avgTemp": 14.12,
+          "rollingAvg": 14.04
         },
         {
           "year": 1983,
-          "avgTemp": 16.39,
-          "rollingAvg": 16.26
+          "avgTemp": 14.19,
+          "rollingAvg": 14.06
         },
         {
           "year": 1984,
-          "avgTemp": 16.29,
-          "rollingAvg": 16.28
+          "avgTemp": 14.09,
+          "rollingAvg": 14.08
         },
         {
           "year": 1985,
-          "avgTemp": 16.27,
-          "rollingAvg": 16.3
+          "avgTemp": 14.07,
+          "rollingAvg": 14.1
         },
         {
           "year": 1986,
-          "avgTemp": 16.32,
-          "rollingAvg": 16.32
+          "avgTemp": 14.12,
+          "rollingAvg": 14.12
         },
         {
           "year": 1987,
-          "avgTemp": 16.46,
-          "rollingAvg": 16.34
+          "avgTemp": 14.26,
+          "rollingAvg": 14.14
         },
         {
           "year": 1988,
-          "avgTemp": 16.41,
-          "rollingAvg": 16.35
+          "avgTemp": 14.21,
+          "rollingAvg": 14.15
         },
         {
           "year": 1989,
-          "avgTemp": 16.35,
-          "rollingAvg": 16.35
+          "avgTemp": 14.15,
+          "rollingAvg": 14.15
         },
         {
           "year": 1990,
-          "avgTemp": 16.43,
-          "rollingAvg": 16.36
+          "avgTemp": 14.23,
+          "rollingAvg": 14.16
         },
         {
           "year": 1991,
-          "avgTemp": 16.42,
-          "rollingAvg": 16.37
+          "avgTemp": 14.22,
+          "rollingAvg": 14.17
         },
         {
           "year": 1992,
-          "avgTemp": 16.35,
-          "rollingAvg": 16.37
+          "avgTemp": 14.15,
+          "rollingAvg": 14.17
         },
         {
           "year": 1993,
-          "avgTemp": 16.35,
-          "rollingAvg": 16.36
+          "avgTemp": 14.15,
+          "rollingAvg": 14.17
         },
         {
           "year": 1994,
-          "avgTemp": 16.39,
-          "rollingAvg": 16.38
+          "avgTemp": 14.19,
+          "rollingAvg": 14.18
         },
         {
           "year": 1995,
-          "avgTemp": 16.42,
-          "rollingAvg": 16.39
+          "avgTemp": 14.22,
+          "rollingAvg": 14.19
         },
         {
           "year": 1996,
-          "avgTemp": 16.41,
-          "rollingAvg": 16.4
+          "avgTemp": 14.21,
+          "rollingAvg": 14.2
         },
         {
           "year": 1997,
-          "avgTemp": 16.56,
-          "rollingAvg": 16.41
+          "avgTemp": 14.36,
+          "rollingAvg": 14.21
         },
         {
           "year": 1998,
-          "avgTemp": 16.6,
-          "rollingAvg": 16.43
+          "avgTemp": 14.4,
+          "rollingAvg": 14.23
         },
         {
           "year": 1999,
-          "avgTemp": 16.41,
-          "rollingAvg": 16.43
+          "avgTemp": 14.21,
+          "rollingAvg": 14.23
         },
         {
           "year": 2000,
-          "avgTemp": 16.43,
-          "rollingAvg": 16.43
+          "avgTemp": 14.23,
+          "rollingAvg": 14.23
         },
         {
           "year": 2001,
-          "avgTemp": 16.53,
-          "rollingAvg": 16.45
+          "avgTemp": 14.33,
+          "rollingAvg": 14.25
         },
         {
           "year": 2002,
-          "avgTemp": 16.55,
-          "rollingAvg": 16.47
+          "avgTemp": 14.35,
+          "rollingAvg": 14.27
         },
         {
           "year": 2003,
-          "avgTemp": 16.57,
-          "rollingAvg": 16.49
+          "avgTemp": 14.37,
+          "rollingAvg": 14.29
         },
         {
           "year": 2004,
-          "avgTemp": 16.56,
-          "rollingAvg": 16.5
+          "avgTemp": 14.36,
+          "rollingAvg": 14.3
         },
         {
           "year": 2005,
-          "avgTemp": 16.56,
-          "rollingAvg": 16.52
+          "avgTemp": 14.36,
+          "rollingAvg": 14.32
         },
         {
           "year": 2006,
-          "avgTemp": 16.56,
-          "rollingAvg": 16.53
+          "avgTemp": 14.36,
+          "rollingAvg": 14.33
         },
         {
           "year": 2007,
-          "avgTemp": 16.49,
-          "rollingAvg": 16.53
+          "avgTemp": 14.28,
+          "rollingAvg": 14.33
         },
         {
           "year": 2008,
-          "avgTemp": 16.48,
-          "rollingAvg": 16.51
+          "avgTemp": 14.28,
+          "rollingAvg": 14.31
         },
         {
           "year": 2009,
-          "avgTemp": 16.61,
-          "rollingAvg": 16.53
+          "avgTemp": 14.41,
+          "rollingAvg": 14.33
         },
         {
           "year": 2010,
-          "avgTemp": 16.61,
-          "rollingAvg": 16.55
+          "avgTemp": 14.41,
+          "rollingAvg": 14.35
         },
         {
           "year": 2011,
-          "avgTemp": 16.51,
-          "rollingAvg": 16.55
+          "avgTemp": 14.31,
+          "rollingAvg": 14.35
         },
         {
           "year": 2012,
-          "avgTemp": 16.56,
-          "rollingAvg": 16.55
+          "avgTemp": 14.36,
+          "rollingAvg": 14.35
         },
         {
           "year": 2013,
-          "avgTemp": 16.61,
-          "rollingAvg": 16.56
+          "avgTemp": 14.41,
+          "rollingAvg": 14.35
         },
         {
           "year": 2014,
-          "avgTemp": 16.69,
-          "rollingAvg": 16.57
+          "avgTemp": 14.49,
+          "rollingAvg": 14.37
         },
         {
           "year": 2015,
-          "avgTemp": 16.79,
-          "rollingAvg": 16.59
+          "avgTemp": 14.59,
+          "rollingAvg": 14.39
         },
         {
           "year": 2016,
-          "avgTemp": 16.83,
-          "rollingAvg": 16.62
+          "avgTemp": 14.63,
+          "rollingAvg": 14.42
         },
         {
           "year": 2017,
-          "avgTemp": 16.8,
-          "rollingAvg": 16.65
+          "avgTemp": 14.6,
+          "rollingAvg": 14.45
         },
         {
           "year": 2018,
-          "avgTemp": 16.76,
-          "rollingAvg": 16.68
+          "avgTemp": 14.56,
+          "rollingAvg": 14.48
         },
         {
           "year": 2019,
-          "avgTemp": 16.86,
-          "rollingAvg": 16.7
+          "avgTemp": 14.66,
+          "rollingAvg": 14.5
         },
         {
           "year": 2020,
-          "avgTemp": 16.83,
-          "rollingAvg": 16.72
+          "avgTemp": 14.63,
+          "rollingAvg": 14.52
         },
         {
           "year": 2021,
-          "avgTemp": 16.73,
-          "rollingAvg": 16.75
+          "avgTemp": 14.53,
+          "rollingAvg": 14.55
         },
         {
           "year": 2022,
-          "avgTemp": 16.78,
-          "rollingAvg": 16.77
+          "avgTemp": 14.58,
+          "rollingAvg": 14.57
         },
         {
           "year": 2023,
-          "avgTemp": 17,
-          "rollingAvg": 16.81
+          "avgTemp": 14.8,
+          "rollingAvg": 14.61
         },
         {
           "year": 2024,
-          "avgTemp": 17.05,
-          "rollingAvg": 16.84
+          "avgTemp": 14.85,
+          "rollingAvg": 14.64
         },
         {
           "year": 2025,
-          "avgTemp": 16.94,
-          "rollingAvg": 16.86
+          "avgTemp": 14.74,
+          "rollingAvg": 14.66
         }
       ],
       "latestMonthStats": {
         "label": "Mar 2026",
-        "value": 17.01,
+        "value": 14.81,
         "diff": 0.78,
         "rank": 2,
         "total": 77,
         "recordLabel": "Mar 2024",
-        "recordValue": 17.07
+        "recordValue": 14.87
       },
       "latestThreeMonthStats": {
         "label": "Jan–Mar 2026",
-        "value": 16.97,
+        "value": 14.77,
         "diff": 0.74,
         "rank": 3,
         "total": 77,
         "recordLabel": "Jan–Mar 2024",
-        "recordValue": 17.11
+        "recordValue": 14.91
       }
     }
   },
+  "previousLatestMonthStats": {
+    "landOcean": {
+      "label": "Feb 2026",
+      "value": 15.06,
+      "diff": 1.04,
+      "rank": 5,
+      "total": 77,
+      "recordLabel": "Feb 2024",
+      "recordValue": 15.29
+    },
+    "land": {
+      "label": "Feb 2026",
+      "value": 15.71,
+      "diff": 1.71,
+      "rank": 6,
+      "total": 77,
+      "recordLabel": "Feb 2016",
+      "recordValue": 16.37
+    },
+    "ocean": {
+      "label": "Feb 2026",
+      "value": 14.77,
+      "diff": 0.74,
+      "rank": 2,
+      "total": 77,
+      "recordLabel": "Feb 2024",
+      "recordValue": 14.93
+    }
+  },
+  "enso": {
+    "state": "Neutral",
+    "strength": "",
+    "anomaly": -0.16,
+    "season": "JFM",
+    "seasonYear": 2026,
+    "history": [
+      {
+        "season": "FMA",
+        "year": 2023,
+        "anom": -0.02
+      },
+      {
+        "season": "MAM",
+        "year": 2023,
+        "anom": 0.27
+      },
+      {
+        "season": "AMJ",
+        "year": 2023,
+        "anom": 0.57
+      },
+      {
+        "season": "MJJ",
+        "year": 2023,
+        "anom": 0.84
+      },
+      {
+        "season": "JJA",
+        "year": 2023,
+        "anom": 1.12
+      },
+      {
+        "season": "JAS",
+        "year": 2023,
+        "anom": 1.37
+      },
+      {
+        "season": "ASO",
+        "year": 2023,
+        "anom": 1.6
+      },
+      {
+        "season": "SON",
+        "year": 2023,
+        "anom": 1.83
+      },
+      {
+        "season": "OND",
+        "year": 2023,
+        "anom": 1.99
+      },
+      {
+        "season": "NDJ",
+        "year": 2023,
+        "anom": 2.06
+      },
+      {
+        "season": "DJF",
+        "year": 2024,
+        "anom": 1.92
+      },
+      {
+        "season": "JFM",
+        "year": 2024,
+        "anom": 1.62
+      },
+      {
+        "season": "FMA",
+        "year": 2024,
+        "anom": 1.26
+      },
+      {
+        "season": "MAM",
+        "year": 2024,
+        "anom": 0.82
+      },
+      {
+        "season": "AMJ",
+        "year": 2024,
+        "anom": 0.49
+      },
+      {
+        "season": "MJJ",
+        "year": 2024,
+        "anom": 0.22
+      },
+      {
+        "season": "JJA",
+        "year": 2024,
+        "anom": 0.08
+      },
+      {
+        "season": "JAS",
+        "year": 2024,
+        "anom": -0.07
+      },
+      {
+        "season": "ASO",
+        "year": 2024,
+        "anom": -0.17
+      },
+      {
+        "season": "SON",
+        "year": 2024,
+        "anom": -0.21
+      },
+      {
+        "season": "OND",
+        "year": 2024,
+        "anom": -0.3
+      },
+      {
+        "season": "NDJ",
+        "year": 2024,
+        "anom": -0.42
+      },
+      {
+        "season": "DJF",
+        "year": 2025,
+        "anom": -0.45
+      },
+      {
+        "season": "JFM",
+        "year": 2025,
+        "anom": -0.24
+      },
+      {
+        "season": "FMA",
+        "year": 2025,
+        "anom": -0.06
+      },
+      {
+        "season": "MAM",
+        "year": 2025,
+        "anom": 0.02
+      },
+      {
+        "season": "AMJ",
+        "year": 2025,
+        "anom": -0.02
+      },
+      {
+        "season": "MJJ",
+        "year": 2025,
+        "anom": -0.04
+      },
+      {
+        "season": "JJA",
+        "year": 2025,
+        "anom": -0.14
+      },
+      {
+        "season": "JAS",
+        "year": 2025,
+        "anom": -0.28
+      },
+      {
+        "season": "ASO",
+        "year": 2025,
+        "anom": -0.4
+      },
+      {
+        "season": "SON",
+        "year": 2025,
+        "anom": -0.51
+      },
+      {
+        "season": "OND",
+        "year": 2025,
+        "anom": -0.55
+      },
+      {
+        "season": "NDJ",
+        "year": 2025,
+        "anom": -0.54
+      },
+      {
+        "season": "DJF",
+        "year": 2026,
+        "anom": -0.37
+      },
+      {
+        "season": "JFM",
+        "year": 2026,
+        "anom": -0.16
+      }
+    ]
+  },
+  "ghgStats": {
+    "co2": {
+      "label": "Carbon dioxide",
+      "unit": "ppm",
+      "latest": {
+        "year": 2026,
+        "month": 2,
+        "value": 429.35
+      },
+      "yoy": 2.26,
+      "tenYr": 25.1,
+      "preindustrial": 280,
+      "vsPreindustrialPct": 53.34,
+      "sparkline": [
+        {
+          "year": 2021,
+          "month": 3,
+          "value": 417.61
+        },
+        {
+          "year": 2021,
+          "month": 4,
+          "value": 419.01
+        },
+        {
+          "year": 2021,
+          "month": 5,
+          "value": 419.09
+        },
+        {
+          "year": 2021,
+          "month": 6,
+          "value": 418.93
+        },
+        {
+          "year": 2021,
+          "month": 7,
+          "value": 416.9
+        },
+        {
+          "year": 2021,
+          "month": 8,
+          "value": 414.42
+        },
+        {
+          "year": 2021,
+          "month": 9,
+          "value": 413.26
+        },
+        {
+          "year": 2021,
+          "month": 10,
+          "value": 413.9
+        },
+        {
+          "year": 2021,
+          "month": 11,
+          "value": 414.97
+        },
+        {
+          "year": 2021,
+          "month": 12,
+          "value": 416.67
+        },
+        {
+          "year": 2022,
+          "month": 1,
+          "value": 418.13
+        },
+        {
+          "year": 2022,
+          "month": 2,
+          "value": 419.24
+        },
+        {
+          "year": 2022,
+          "month": 3,
+          "value": 418.76
+        },
+        {
+          "year": 2022,
+          "month": 4,
+          "value": 420.19
+        },
+        {
+          "year": 2022,
+          "month": 5,
+          "value": 420.97
+        },
+        {
+          "year": 2022,
+          "month": 6,
+          "value": 420.94
+        },
+        {
+          "year": 2022,
+          "month": 7,
+          "value": 418.85
+        },
+        {
+          "year": 2022,
+          "month": 8,
+          "value": 417.15
+        },
+        {
+          "year": 2022,
+          "month": 9,
+          "value": 415.91
+        },
+        {
+          "year": 2022,
+          "month": 10,
+          "value": 415.74
+        },
+        {
+          "year": 2022,
+          "month": 11,
+          "value": 417.47
+        },
+        {
+          "year": 2022,
+          "month": 12,
+          "value": 418.99
+        },
+        {
+          "year": 2023,
+          "month": 1,
+          "value": 419.47
+        },
+        {
+          "year": 2023,
+          "month": 2,
+          "value": 420.31
+        },
+        {
+          "year": 2023,
+          "month": 3,
+          "value": 420.99
+        },
+        {
+          "year": 2023,
+          "month": 4,
+          "value": 423.31
+        },
+        {
+          "year": 2023,
+          "month": 5,
+          "value": 424
+        },
+        {
+          "year": 2023,
+          "month": 6,
+          "value": 423.68
+        },
+        {
+          "year": 2023,
+          "month": 7,
+          "value": 421.83
+        },
+        {
+          "year": 2023,
+          "month": 8,
+          "value": 419.68
+        },
+        {
+          "year": 2023,
+          "month": 9,
+          "value": 418.5
+        },
+        {
+          "year": 2023,
+          "month": 10,
+          "value": 418.82
+        },
+        {
+          "year": 2023,
+          "month": 11,
+          "value": 420.46
+        },
+        {
+          "year": 2023,
+          "month": 12,
+          "value": 421.86
+        },
+        {
+          "year": 2024,
+          "month": 1,
+          "value": 422.8
+        },
+        {
+          "year": 2024,
+          "month": 2,
+          "value": 424.55
+        },
+        {
+          "year": 2024,
+          "month": 3,
+          "value": 425.38
+        },
+        {
+          "year": 2024,
+          "month": 4,
+          "value": 426.51
+        },
+        {
+          "year": 2024,
+          "month": 5,
+          "value": 426.9
+        },
+        {
+          "year": 2024,
+          "month": 6,
+          "value": 426.91
+        },
+        {
+          "year": 2024,
+          "month": 7,
+          "value": 425.55
+        },
+        {
+          "year": 2024,
+          "month": 8,
+          "value": 422.99
+        },
+        {
+          "year": 2024,
+          "month": 9,
+          "value": 422.03
+        },
+        {
+          "year": 2024,
+          "month": 10,
+          "value": 422.38
+        },
+        {
+          "year": 2024,
+          "month": 11,
+          "value": 423.85
+        },
+        {
+          "year": 2024,
+          "month": 12,
+          "value": 425.4
+        },
+        {
+          "year": 2025,
+          "month": 1,
+          "value": 426.65
+        },
+        {
+          "year": 2025,
+          "month": 2,
+          "value": 427.09
+        },
+        {
+          "year": 2025,
+          "month": 3,
+          "value": 428.15
+        },
+        {
+          "year": 2025,
+          "month": 4,
+          "value": 429.64
+        },
+        {
+          "year": 2025,
+          "month": 5,
+          "value": 430.51
+        },
+        {
+          "year": 2025,
+          "month": 6,
+          "value": 429.61
+        },
+        {
+          "year": 2025,
+          "month": 7,
+          "value": 427.87
+        },
+        {
+          "year": 2025,
+          "month": 8,
+          "value": 425.48
+        },
+        {
+          "year": 2025,
+          "month": 9,
+          "value": 424.37
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "value": 424.87
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "value": 426.46
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "value": 427.49
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "value": 428.62
+        },
+        {
+          "year": 2026,
+          "month": 2,
+          "value": 429.35
+        }
+      ]
+    },
+    "ch4": {
+      "label": "Methane",
+      "unit": "ppb",
+      "latest": {
+        "year": 2025,
+        "month": 11,
+        "value": 1945.85
+      },
+      "yoy": 5.85,
+      "tenYr": 101.31,
+      "preindustrial": 722,
+      "vsPreindustrialPct": 169.51,
+      "sparkline": [
+        {
+          "year": 2020,
+          "month": 12,
+          "value": 1890.97
+        },
+        {
+          "year": 2021,
+          "month": 1,
+          "value": 1888.62
+        },
+        {
+          "year": 2021,
+          "month": 2,
+          "value": 1886.66
+        },
+        {
+          "year": 2021,
+          "month": 3,
+          "value": 1887.99
+        },
+        {
+          "year": 2021,
+          "month": 4,
+          "value": 1890.8
+        },
+        {
+          "year": 2021,
+          "month": 5,
+          "value": 1891.28
+        },
+        {
+          "year": 2021,
+          "month": 6,
+          "value": 1888.08
+        },
+        {
+          "year": 2021,
+          "month": 7,
+          "value": 1885.99
+        },
+        {
+          "year": 2021,
+          "month": 8,
+          "value": 1892.32
+        },
+        {
+          "year": 2021,
+          "month": 9,
+          "value": 1902.43
+        },
+        {
+          "year": 2021,
+          "month": 10,
+          "value": 1907.92
+        },
+        {
+          "year": 2021,
+          "month": 11,
+          "value": 1909.23
+        },
+        {
+          "year": 2021,
+          "month": 12,
+          "value": 1907.95
+        },
+        {
+          "year": 2022,
+          "month": 1,
+          "value": 1906.33
+        },
+        {
+          "year": 2022,
+          "month": 2,
+          "value": 1906.42
+        },
+        {
+          "year": 2022,
+          "month": 3,
+          "value": 1907.77
+        },
+        {
+          "year": 2022,
+          "month": 4,
+          "value": 1908.84
+        },
+        {
+          "year": 2022,
+          "month": 5,
+          "value": 1907.49
+        },
+        {
+          "year": 2022,
+          "month": 6,
+          "value": 1904.83
+        },
+        {
+          "year": 2022,
+          "month": 7,
+          "value": 1904
+        },
+        {
+          "year": 2022,
+          "month": 8,
+          "value": 1908.32
+        },
+        {
+          "year": 2022,
+          "month": 9,
+          "value": 1915.03
+        },
+        {
+          "year": 2022,
+          "month": 10,
+          "value": 1919.46
+        },
+        {
+          "year": 2022,
+          "month": 11,
+          "value": 1922.21
+        },
+        {
+          "year": 2022,
+          "month": 12,
+          "value": 1922.02
+        },
+        {
+          "year": 2023,
+          "month": 1,
+          "value": 1919.9
+        },
+        {
+          "year": 2023,
+          "month": 2,
+          "value": 1918.93
+        },
+        {
+          "year": 2023,
+          "month": 3,
+          "value": 1918.73
+        },
+        {
+          "year": 2023,
+          "month": 4,
+          "value": 1919.7
+        },
+        {
+          "year": 2023,
+          "month": 5,
+          "value": 1919.12
+        },
+        {
+          "year": 2023,
+          "month": 6,
+          "value": 1915.05
+        },
+        {
+          "year": 2023,
+          "month": 7,
+          "value": 1912.94
+        },
+        {
+          "year": 2023,
+          "month": 8,
+          "value": 1916.7
+        },
+        {
+          "year": 2023,
+          "month": 9,
+          "value": 1924.38
+        },
+        {
+          "year": 2023,
+          "month": 10,
+          "value": 1930.11
+        },
+        {
+          "year": 2023,
+          "month": 11,
+          "value": 1931.55
+        },
+        {
+          "year": 2023,
+          "month": 12,
+          "value": 1931.15
+        },
+        {
+          "year": 2024,
+          "month": 1,
+          "value": 1928.22
+        },
+        {
+          "year": 2024,
+          "month": 2,
+          "value": 1925.73
+        },
+        {
+          "year": 2024,
+          "month": 3,
+          "value": 1927.15
+        },
+        {
+          "year": 2024,
+          "month": 4,
+          "value": 1928.55
+        },
+        {
+          "year": 2024,
+          "month": 5,
+          "value": 1925.56
+        },
+        {
+          "year": 2024,
+          "month": 6,
+          "value": 1921.35
+        },
+        {
+          "year": 2024,
+          "month": 7,
+          "value": 1920.39
+        },
+        {
+          "year": 2024,
+          "month": 8,
+          "value": 1924.85
+        },
+        {
+          "year": 2024,
+          "month": 9,
+          "value": 1934.31
+        },
+        {
+          "year": 2024,
+          "month": 10,
+          "value": 1940.75
+        },
+        {
+          "year": 2024,
+          "month": 11,
+          "value": 1940
+        },
+        {
+          "year": 2024,
+          "month": 12,
+          "value": 1937.41
+        },
+        {
+          "year": 2025,
+          "month": 1,
+          "value": 1935.39
+        },
+        {
+          "year": 2025,
+          "month": 2,
+          "value": 1933.83
+        },
+        {
+          "year": 2025,
+          "month": 3,
+          "value": 1933.64
+        },
+        {
+          "year": 2025,
+          "month": 4,
+          "value": 1934.48
+        },
+        {
+          "year": 2025,
+          "month": 5,
+          "value": 1933.03
+        },
+        {
+          "year": 2025,
+          "month": 6,
+          "value": 1928.79
+        },
+        {
+          "year": 2025,
+          "month": 7,
+          "value": 1926.54
+        },
+        {
+          "year": 2025,
+          "month": 8,
+          "value": 1930.61
+        },
+        {
+          "year": 2025,
+          "month": 9,
+          "value": 1939.45
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "value": 1946.16
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "value": 1945.85
+        }
+      ]
+    },
+    "n2o": {
+      "label": "Nitrous oxide",
+      "unit": "ppb",
+      "latest": {
+        "year": 2025,
+        "month": 11,
+        "value": 339.46
+      },
+      "yoy": 1.38,
+      "tenYr": 10.85,
+      "preindustrial": 270,
+      "vsPreindustrialPct": 25.73,
+      "sparkline": [
+        {
+          "year": 2020,
+          "month": 12,
+          "value": 333.76
+        },
+        {
+          "year": 2021,
+          "month": 1,
+          "value": 333.88
+        },
+        {
+          "year": 2021,
+          "month": 2,
+          "value": 333.96
+        },
+        {
+          "year": 2021,
+          "month": 3,
+          "value": 334.01
+        },
+        {
+          "year": 2021,
+          "month": 4,
+          "value": 334.06
+        },
+        {
+          "year": 2021,
+          "month": 5,
+          "value": 334.1
+        },
+        {
+          "year": 2021,
+          "month": 6,
+          "value": 334.12
+        },
+        {
+          "year": 2021,
+          "month": 7,
+          "value": 334.15
+        },
+        {
+          "year": 2021,
+          "month": 8,
+          "value": 334.23
+        },
+        {
+          "year": 2021,
+          "month": 9,
+          "value": 334.41
+        },
+        {
+          "year": 2021,
+          "month": 10,
+          "value": 334.63
+        },
+        {
+          "year": 2021,
+          "month": 11,
+          "value": 334.85
+        },
+        {
+          "year": 2021,
+          "month": 12,
+          "value": 335.05
+        },
+        {
+          "year": 2022,
+          "month": 1,
+          "value": 335.22
+        },
+        {
+          "year": 2022,
+          "month": 2,
+          "value": 335.31
+        },
+        {
+          "year": 2022,
+          "month": 3,
+          "value": 335.38
+        },
+        {
+          "year": 2022,
+          "month": 4,
+          "value": 335.43
+        },
+        {
+          "year": 2022,
+          "month": 5,
+          "value": 335.45
+        },
+        {
+          "year": 2022,
+          "month": 6,
+          "value": 335.47
+        },
+        {
+          "year": 2022,
+          "month": 7,
+          "value": 335.54
+        },
+        {
+          "year": 2022,
+          "month": 8,
+          "value": 335.63
+        },
+        {
+          "year": 2022,
+          "month": 9,
+          "value": 335.75
+        },
+        {
+          "year": 2022,
+          "month": 10,
+          "value": 335.92
+        },
+        {
+          "year": 2022,
+          "month": 11,
+          "value": 336.12
+        },
+        {
+          "year": 2022,
+          "month": 12,
+          "value": 336.29
+        },
+        {
+          "year": 2023,
+          "month": 1,
+          "value": 336.41
+        },
+        {
+          "year": 2023,
+          "month": 2,
+          "value": 336.49
+        },
+        {
+          "year": 2023,
+          "month": 3,
+          "value": 336.53
+        },
+        {
+          "year": 2023,
+          "month": 4,
+          "value": 336.54
+        },
+        {
+          "year": 2023,
+          "month": 5,
+          "value": 336.54
+        },
+        {
+          "year": 2023,
+          "month": 6,
+          "value": 336.56
+        },
+        {
+          "year": 2023,
+          "month": 7,
+          "value": 336.6
+        },
+        {
+          "year": 2023,
+          "month": 8,
+          "value": 336.65
+        },
+        {
+          "year": 2023,
+          "month": 9,
+          "value": 336.73
+        },
+        {
+          "year": 2023,
+          "month": 10,
+          "value": 336.89
+        },
+        {
+          "year": 2023,
+          "month": 11,
+          "value": 337.09
+        },
+        {
+          "year": 2023,
+          "month": 12,
+          "value": 337.3
+        },
+        {
+          "year": 2024,
+          "month": 1,
+          "value": 337.46
+        },
+        {
+          "year": 2024,
+          "month": 2,
+          "value": 337.54
+        },
+        {
+          "year": 2024,
+          "month": 3,
+          "value": 337.57
+        },
+        {
+          "year": 2024,
+          "month": 4,
+          "value": 337.6
+        },
+        {
+          "year": 2024,
+          "month": 5,
+          "value": 337.66
+        },
+        {
+          "year": 2024,
+          "month": 6,
+          "value": 337.69
+        },
+        {
+          "year": 2024,
+          "month": 7,
+          "value": 337.66
+        },
+        {
+          "year": 2024,
+          "month": 8,
+          "value": 337.62
+        },
+        {
+          "year": 2024,
+          "month": 9,
+          "value": 337.67
+        },
+        {
+          "year": 2024,
+          "month": 10,
+          "value": 337.85
+        },
+        {
+          "year": 2024,
+          "month": 11,
+          "value": 338.08
+        },
+        {
+          "year": 2024,
+          "month": 12,
+          "value": 338.29
+        },
+        {
+          "year": 2025,
+          "month": 1,
+          "value": 338.44
+        },
+        {
+          "year": 2025,
+          "month": 2,
+          "value": 338.53
+        },
+        {
+          "year": 2025,
+          "month": 3,
+          "value": 338.6
+        },
+        {
+          "year": 2025,
+          "month": 4,
+          "value": 338.64
+        },
+        {
+          "year": 2025,
+          "month": 5,
+          "value": 338.64
+        },
+        {
+          "year": 2025,
+          "month": 6,
+          "value": 338.67
+        },
+        {
+          "year": 2025,
+          "month": 7,
+          "value": 338.77
+        },
+        {
+          "year": 2025,
+          "month": 8,
+          "value": 338.88
+        },
+        {
+          "year": 2025,
+          "month": 9,
+          "value": 338.99
+        },
+        {
+          "year": 2025,
+          "month": 10,
+          "value": 339.21
+        },
+        {
+          "year": 2025,
+          "month": 11,
+          "value": 339.46
+        }
+      ]
+    }
+  },
+  "seaIceStats": {
+    "label": "Global sea ice (Arctic + Antarctic)",
+    "baseline": "1991–2020",
+    "unit": "million km²",
+    "latest": {
+      "year": 2026,
+      "month": 3,
+      "extent": 17.7
+    },
+    "climatology": 19.11,
+    "anomaly": -1.41,
+    "anomalyPct": -7.38,
+    "rankLowestOfSameMonth": 6,
+    "totalYearsInMonth": 48,
+    "recent60": [
+      {
+        "year": 2021,
+        "month": 4,
+        "extent": 20.92
+      },
+      {
+        "year": 2021,
+        "month": 5,
+        "extent": 23.08
+      },
+      {
+        "year": 2021,
+        "month": 6,
+        "extent": 24.31
+      },
+      {
+        "year": 2021,
+        "month": 7,
+        "extent": 24.1
+      },
+      {
+        "year": 2021,
+        "month": 8,
+        "extent": 23.9
+      },
+      {
+        "year": 2021,
+        "month": 9,
+        "extent": 23.46
+      },
+      {
+        "year": 2021,
+        "month": 10,
+        "extent": 24.51
+      },
+      {
+        "year": 2021,
+        "month": 11,
+        "extent": 24.87
+      },
+      {
+        "year": 2021,
+        "month": 12,
+        "extent": 21.39
+      },
+      {
+        "year": 2022,
+        "month": 1,
+        "extent": 17.81
+      },
+      {
+        "year": 2022,
+        "month": 2,
+        "extent": 16.82
+      },
+      {
+        "year": 2022,
+        "month": 3,
+        "extent": 17.45
+      },
+      {
+        "year": 2022,
+        "month": 4,
+        "extent": 19.94
+      },
+      {
+        "year": 2022,
+        "month": 5,
+        "extent": 22.3
+      },
+      {
+        "year": 2022,
+        "month": 6,
+        "extent": 23.1
+      },
+      {
+        "year": 2022,
+        "month": 7,
+        "extent": 23.28
+      },
+      {
+        "year": 2022,
+        "month": 8,
+        "extent": 23
+      },
+      {
+        "year": 2022,
+        "month": 9,
+        "extent": 22.96
+      },
+      {
+        "year": 2022,
+        "month": 10,
+        "extent": 24.13
+      },
+      {
+        "year": 2022,
+        "month": 11,
+        "extent": 24.89
+      },
+      {
+        "year": 2022,
+        "month": 12,
+        "extent": 20.73
+      },
+      {
+        "year": 2023,
+        "month": 1,
+        "extent": 16.66
+      },
+      {
+        "year": 2023,
+        "month": 2,
+        "extent": 16.17
+      },
+      {
+        "year": 2023,
+        "month": 3,
+        "extent": 17.27
+      },
+      {
+        "year": 2023,
+        "month": 4,
+        "extent": 19.48
+      },
+      {
+        "year": 2023,
+        "month": 5,
+        "extent": 21.27
+      },
+      {
+        "year": 2023,
+        "month": 6,
+        "extent": 22.1
+      },
+      {
+        "year": 2023,
+        "month": 7,
+        "extent": 21.78
+      },
+      {
+        "year": 2023,
+        "month": 8,
+        "extent": 21.08
+      },
+      {
+        "year": 2023,
+        "month": 9,
+        "extent": 21.27
+      },
+      {
+        "year": 2023,
+        "month": 10,
+        "extent": 22.69
+      },
+      {
+        "year": 2023,
+        "month": 11,
+        "extent": 24.06
+      },
+      {
+        "year": 2023,
+        "month": 12,
+        "extent": 20.74
+      },
+      {
+        "year": 2024,
+        "month": 1,
+        "extent": 17.97
+      },
+      {
+        "year": 2024,
+        "month": 2,
+        "extent": 16.8
+      },
+      {
+        "year": 2024,
+        "month": 3,
+        "extent": 18.09
+      },
+      {
+        "year": 2024,
+        "month": 4,
+        "extent": 20.31
+      },
+      {
+        "year": 2024,
+        "month": 5,
+        "extent": 22.1
+      },
+      {
+        "year": 2024,
+        "month": 6,
+        "extent": 22.7
+      },
+      {
+        "year": 2024,
+        "month": 7,
+        "extent": 22.07
+      },
+      {
+        "year": 2024,
+        "month": 8,
+        "extent": 21.54
+      },
+      {
+        "year": 2024,
+        "month": 9,
+        "extent": 21.5
+      },
+      {
+        "year": 2024,
+        "month": 10,
+        "extent": 22.58
+      },
+      {
+        "year": 2024,
+        "month": 11,
+        "extent": 23.46
+      },
+      {
+        "year": 2024,
+        "month": 12,
+        "extent": 21
+      },
+      {
+        "year": 2025,
+        "month": 1,
+        "extent": 17.8
+      },
+      {
+        "year": 2025,
+        "month": 2,
+        "extent": 15.97
+      },
+      {
+        "year": 2025,
+        "month": 3,
+        "extent": 17.12
+      },
+      {
+        "year": 2025,
+        "month": 4,
+        "extent": 20.02
+      },
+      {
+        "year": 2025,
+        "month": 5,
+        "extent": 21.79
+      },
+      {
+        "year": 2025,
+        "month": 6,
+        "extent": 22.55
+      },
+      {
+        "year": 2025,
+        "month": 7,
+        "extent": 22.32
+      },
+      {
+        "year": 2025,
+        "month": 8,
+        "extent": 21.88
+      },
+      {
+        "year": 2025,
+        "month": 9,
+        "extent": 22.39
+      },
+      {
+        "year": 2025,
+        "month": 10,
+        "extent": 23.28
+      },
+      {
+        "year": 2025,
+        "month": 11,
+        "extent": 23.35
+      },
+      {
+        "year": 2025,
+        "month": 12,
+        "extent": 20.44
+      },
+      {
+        "year": 2026,
+        "month": 1,
+        "extent": 17.6
+      },
+      {
+        "year": 2026,
+        "month": 2,
+        "extent": 17.01
+      },
+      {
+        "year": 2026,
+        "month": 3,
+        "extent": 17.7
+      }
+    ]
+  },
+  "continentStats": [
+    {
+      "key": "northernHemisphere",
+      "label": "Northern Hemisphere",
+      "latestMonth": {
+        "year": 2026,
+        "month": 3,
+        "anomaly": 2.56
+      },
+      "rank": 4,
+      "total": 77
+    },
+    {
+      "key": "southernHemisphere",
+      "label": "Southern Hemisphere",
+      "latestMonth": {
+        "year": 2026,
+        "month": 3,
+        "anomaly": 1.35
+      },
+      "rank": 2,
+      "total": 77
+    },
+    {
+      "key": "europe",
+      "label": "Europe",
+      "latestMonth": {
+        "year": 2026,
+        "month": 3,
+        "anomaly": 2.77
+      },
+      "rank": 3,
+      "total": 77
+    },
+    {
+      "key": "asia",
+      "label": "Asia",
+      "latestMonth": {
+        "year": 2026,
+        "month": 3,
+        "anomaly": 3.12
+      },
+      "rank": 8,
+      "total": 77
+    },
+    {
+      "key": "africa",
+      "label": "Africa",
+      "latestMonth": {
+        "year": 2026,
+        "month": 3,
+        "anomaly": 1.47
+      },
+      "rank": 6,
+      "total": 77
+    }
+  ],
+  "countryAnomalies": [
+    {
+      "iso3": "ARE",
+      "name": "United Arab Emirates",
+      "anomaly": 1.01,
+      "value": 22.03,
+      "monthLabel": "Mar 2026",
+      "rank": 18,
+      "total": 86
+    },
+    {
+      "iso3": "ARG",
+      "name": "Argentina",
+      "anomaly": 0.82,
+      "value": 18.69,
+      "monthLabel": "Mar 2026",
+      "rank": 21,
+      "total": 86
+    },
+    {
+      "iso3": "AUS",
+      "name": "Australia",
+      "anomaly": 2.02,
+      "value": 27.49,
+      "monthLabel": "Mar 2026",
+      "rank": 2,
+      "total": 86
+    },
+    {
+      "iso3": "AUT",
+      "name": "Austria",
+      "anomaly": 3.34,
+      "value": 4.18,
+      "monthLabel": "Mar 2026",
+      "rank": 7,
+      "total": 86
+    },
+    {
+      "iso3": "BEL",
+      "name": "Belgium",
+      "anomaly": 2.43,
+      "value": 7.47,
+      "monthLabel": "Mar 2026",
+      "rank": 17,
+      "total": 86
+    },
+    {
+      "iso3": "BGD",
+      "name": "Bangladesh",
+      "anomaly": -0.18,
+      "value": 19.87,
+      "monthLabel": "Mar 2026",
+      "rank": 55,
+      "total": 86
+    },
+    {
+      "iso3": "BOL",
+      "name": "Bolivia",
+      "anomaly": 0.81,
+      "value": 21.25,
+      "monthLabel": "Mar 2026",
+      "rank": 20,
+      "total": 86
+    },
+    {
+      "iso3": "BRA",
+      "name": "Brazil",
+      "anomaly": 1.07,
+      "value": 25.66,
+      "monthLabel": "Mar 2026",
+      "rank": 6,
+      "total": 86
+    },
+    {
+      "iso3": "CAN",
+      "name": "Canada",
+      "anomaly": 1.4,
+      "value": -13.89,
+      "monthLabel": "Mar 2026",
+      "rank": 34,
+      "total": 86
+    },
+    {
+      "iso3": "CHE",
+      "name": "Switzerland",
+      "anomaly": 0.61,
+      "value": 27.59,
+      "monthLabel": "Mar 2026",
+      "rank": 29,
+      "total": 86
+    },
+    {
+      "iso3": "CHL",
+      "name": "Chile",
+      "anomaly": 0.63,
+      "value": 12.14,
+      "monthLabel": "Mar 2026",
+      "rank": 25,
+      "total": 86
+    },
+    {
+      "iso3": "CHN",
+      "name": "China",
+      "anomaly": 1.42,
+      "value": 2.09,
+      "monthLabel": "Mar 2026",
+      "rank": 20,
+      "total": 86
+    },
+    {
+      "iso3": "COD",
+      "name": "DR Congo",
+      "anomaly": 1.16,
+      "value": 26.79,
+      "monthLabel": "Mar 2026",
+      "rank": 7,
+      "total": 86
+    },
+    {
+      "iso3": "COG",
+      "name": "Congo",
+      "anomaly": 1.47,
+      "value": 26.34,
+      "monthLabel": "Mar 2026",
+      "rank": 6,
+      "total": 86
+    },
+    {
+      "iso3": "COL",
+      "name": "Colombia",
+      "anomaly": 0.71,
+      "value": 24.77,
+      "monthLabel": "Mar 2026",
+      "rank": 13,
+      "total": 86
+    },
+    {
+      "iso3": "CRI",
+      "name": "Costa Rica",
+      "anomaly": 0.74,
+      "value": 23.73,
+      "monthLabel": "Mar 2026",
+      "rank": 11,
+      "total": 86
+    },
+    {
+      "iso3": "CYP",
+      "name": "Cyprus",
+      "anomaly": 2.62,
+      "value": 15.7,
+      "monthLabel": "Mar 2026",
+      "rank": 4,
+      "total": 86
+    },
+    {
+      "iso3": "CZE",
+      "name": "Czechia",
+      "anomaly": 3.02,
+      "value": 5.62,
+      "monthLabel": "Mar 2026",
+      "rank": 11,
+      "total": 86
+    },
+    {
+      "iso3": "DEU",
+      "name": "Germany",
+      "anomaly": 2.46,
+      "value": 6.08,
+      "monthLabel": "Mar 2026",
+      "rank": 16,
+      "total": 86
+    },
+    {
+      "iso3": "DNK",
+      "name": "Denmark",
+      "anomaly": 3.23,
+      "value": 5.44,
+      "monthLabel": "Mar 2026",
+      "rank": 8,
+      "total": 86
+    },
+    {
+      "iso3": "DZA",
+      "name": "Algeria",
+      "anomaly": 1.16,
+      "value": 25.74,
+      "monthLabel": "Mar 2026",
+      "rank": 4,
+      "total": 86
+    },
+    {
+      "iso3": "EGY",
+      "name": "Egypt",
+      "anomaly": 1.97,
+      "value": 20.07,
+      "monthLabel": "Mar 2026",
+      "rank": 10,
+      "total": 86
+    },
+    {
+      "iso3": "ESP",
+      "name": "Spain",
+      "anomaly": 0.5,
+      "value": 9.21,
+      "monthLabel": "Mar 2026",
+      "rank": 51,
+      "total": 86
+    },
+    {
+      "iso3": "ETH",
+      "name": "Ethiopia",
+      "anomaly": 1.55,
+      "value": 25.56,
+      "monthLabel": "Mar 2026",
+      "rank": 7,
+      "total": 86
+    },
+    {
+      "iso3": "FIN",
+      "name": "Finland",
+      "anomaly": 5.51,
+      "value": 3,
+      "monthLabel": "Mar 2026",
+      "rank": 2,
+      "total": 86
+    },
+    {
+      "iso3": "FRA",
+      "name": "France",
+      "anomaly": 1.57,
+      "value": 10.41,
+      "monthLabel": "Mar 2026",
+      "rank": 24,
+      "total": 86
+    },
+    {
+      "iso3": "GBR",
+      "name": "United Kingdom",
+      "anomaly": 2.37,
+      "value": 7.17,
+      "monthLabel": "Mar 2026",
+      "rank": 9,
+      "total": 86
+    },
+    {
+      "iso3": "GHA",
+      "name": "Ghana",
+      "anomaly": 1.84,
+      "value": 24.08,
+      "monthLabel": "Mar 2026",
+      "rank": 6,
+      "total": 86
+    },
+    {
+      "iso3": "GRC",
+      "name": "Greece",
+      "anomaly": 2.93,
+      "value": 11.58,
+      "monthLabel": "Mar 2026",
+      "rank": 2,
+      "total": 86
+    },
+    {
+      "iso3": "GUY",
+      "name": "Guyana",
+      "anomaly": 0.46,
+      "value": 25.35,
+      "monthLabel": "Mar 2026",
+      "rank": 23,
+      "total": 86
+    },
+    {
+      "iso3": "HUN",
+      "name": "Hungary",
+      "anomaly": 4.78,
+      "value": 0.75,
+      "monthLabel": "Mar 2026",
+      "rank": 13,
+      "total": 86
+    },
+    {
+      "iso3": "IDN",
+      "name": "Indonesia",
+      "anomaly": 1.24,
+      "value": 25.65,
+      "monthLabel": "Mar 2026",
+      "rank": 8,
+      "total": 86
+    },
+    {
+      "iso3": "IND",
+      "name": "India",
+      "anomaly": 1.04,
+      "value": 24.82,
+      "monthLabel": "Mar 2026",
+      "rank": 14,
+      "total": 86
+    },
+    {
+      "iso3": "IRL",
+      "name": "Ireland",
+      "anomaly": 2.64,
+      "value": 17.62,
+      "monthLabel": "Mar 2026",
+      "rank": 14,
+      "total": 86
+    },
+    {
+      "iso3": "IRN",
+      "name": "Iran",
+      "anomaly": 1.24,
+      "value": 25.65,
+      "monthLabel": "Mar 2026",
+      "rank": 8,
+      "total": 86
+    },
+    {
+      "iso3": "IRQ",
+      "name": "Iraq",
+      "anomaly": 3.09,
+      "value": 13.9,
+      "monthLabel": "Mar 2026",
+      "rank": 15,
+      "total": 86
+    },
+    {
+      "iso3": "ISL",
+      "name": "Iceland",
+      "anomaly": 2.45,
+      "value": 15.72,
+      "monthLabel": "Mar 2026",
+      "rank": 8,
+      "total": 86
+    },
+    {
+      "iso3": "ISR",
+      "name": "Israel",
+      "anomaly": 2.72,
+      "value": 17.54,
+      "monthLabel": "Mar 2026",
+      "rank": 6,
+      "total": 86
+    },
+    {
+      "iso3": "ITA",
+      "name": "Italy",
+      "anomaly": 2.31,
+      "value": 9.39,
+      "monthLabel": "Mar 2026",
+      "rank": 10,
+      "total": 86
+    },
+    {
+      "iso3": "JAM",
+      "name": "Jamaica",
+      "anomaly": 1.58,
+      "value": 25.66,
+      "monthLabel": "Mar 2026",
+      "rank": 2,
+      "total": 86
+    },
+    {
+      "iso3": "JPN",
+      "name": "Japan",
+      "anomaly": 1.93,
+      "value": 5.32,
+      "monthLabel": "Mar 2026",
+      "rank": 13,
+      "total": 86
+    },
+    {
+      "iso3": "KEN",
+      "name": "Kenya",
+      "anomaly": 1.05,
+      "value": 27.02,
+      "monthLabel": "Mar 2026",
+      "rank": 23,
+      "total": 86
+    },
+    {
+      "iso3": "KOR",
+      "name": "South Korea",
+      "anomaly": 2.57,
+      "value": 7.15,
+      "monthLabel": "Mar 2026",
+      "rank": 8,
+      "total": 86
+    },
+    {
+      "iso3": "LBN",
+      "name": "Lebanon",
+      "anomaly": 3.48,
+      "value": 12.49,
+      "monthLabel": "Mar 2026",
+      "rank": 5,
+      "total": 86
+    },
+    {
+      "iso3": "LKA",
+      "name": "Sri Lanka",
+      "anomaly": 1.15,
+      "value": 21.84,
+      "monthLabel": "Mar 2026",
+      "rank": 9,
+      "total": 86
+    },
+    {
+      "iso3": "MAR",
+      "name": "Morocco",
+      "anomaly": 0.59,
+      "value": 14.12,
+      "monthLabel": "Mar 2026",
+      "rank": 39,
+      "total": 86
+    },
+    {
+      "iso3": "MEX",
+      "name": "Mexico",
+      "anomaly": 2.04,
+      "value": 20.29,
+      "monthLabel": "Mar 2026",
+      "rank": 4,
+      "total": 86
+    },
+    {
+      "iso3": "MMR",
+      "name": "Myanmar",
+      "anomaly": 5.4,
+      "value": 4.63,
+      "monthLabel": "Mar 2026",
+      "rank": 4,
+      "total": 86
+    },
+    {
+      "iso3": "MWI",
+      "name": "Malawi",
+      "anomaly": 0.75,
+      "value": 23.16,
+      "monthLabel": "Mar 2026",
+      "rank": 18,
+      "total": 86
+    },
+    {
+      "iso3": "MYS",
+      "name": "Malaysia",
+      "anomaly": 1,
+      "value": 25.88,
+      "monthLabel": "Mar 2026",
+      "rank": 10,
+      "total": 86
+    },
+    {
+      "iso3": "NGA",
+      "name": "Nigeria",
+      "anomaly": 1.97,
+      "value": 30.92,
+      "monthLabel": "Mar 2026",
+      "rank": 2,
+      "total": 86
+    },
+    {
+      "iso3": "NIC",
+      "name": "Nicaragua",
+      "anomaly": 1.12,
+      "value": 26.35,
+      "monthLabel": "Mar 2026",
+      "rank": 7,
+      "total": 86
+    },
+    {
+      "iso3": "NLD",
+      "name": "Netherlands",
+      "anomaly": 2.09,
+      "value": 7.02,
+      "monthLabel": "Mar 2026",
+      "rank": 20,
+      "total": 86
+    },
+    {
+      "iso3": "NOR",
+      "name": "Norway",
+      "anomaly": 1.51,
+      "value": 25.09,
+      "monthLabel": "Mar 2026",
+      "rank": 5,
+      "total": 86
+    },
+    {
+      "iso3": "NZL",
+      "name": "New Zealand",
+      "anomaly": 0.63,
+      "value": 14.13,
+      "monthLabel": "Mar 2026",
+      "rank": 21,
+      "total": 86
+    },
+    {
+      "iso3": "PAK",
+      "name": "Pakistan",
+      "anomaly": 1.85,
+      "value": 18.01,
+      "monthLabel": "Mar 2026",
+      "rank": 14,
+      "total": 86
+    },
+    {
+      "iso3": "PER",
+      "name": "Peru",
+      "anomaly": 0.82,
+      "value": 19.54,
+      "monthLabel": "Mar 2026",
+      "rank": 10,
+      "total": 86
+    },
+    {
+      "iso3": "PHL",
+      "name": "Philippines",
+      "anomaly": 0.61,
+      "value": 25.44,
+      "monthLabel": "Mar 2026",
+      "rank": 18,
+      "total": 86
+    },
+    {
+      "iso3": "POL",
+      "name": "Poland",
+      "anomaly": 4.07,
+      "value": 6.01,
+      "monthLabel": "Mar 2026",
+      "rank": 5,
+      "total": 86
+    },
+    {
+      "iso3": "PRK",
+      "name": "North Korea",
+      "anomaly": 3.07,
+      "value": 1.73,
+      "monthLabel": "Mar 2026",
+      "rank": 10,
+      "total": 86
+    },
+    {
+      "iso3": "PRT",
+      "name": "Portugal",
+      "anomaly": 0.43,
+      "value": 11.38,
+      "monthLabel": "Mar 2026",
+      "rank": 49,
+      "total": 86
+    },
+    {
+      "iso3": "PSE",
+      "name": "Palestine",
+      "anomaly": 2.75,
+      "value": 17.21,
+      "monthLabel": "Mar 2026",
+      "rank": 6,
+      "total": 86
+    },
+    {
+      "iso3": "ROU",
+      "name": "Romania",
+      "anomaly": 1.11,
+      "value": 26.14,
+      "monthLabel": "Mar 2026",
+      "rank": 8,
+      "total": 86
+    },
+    {
+      "iso3": "RUS",
+      "name": "Russia",
+      "anomaly": 2.58,
+      "value": 8.19,
+      "monthLabel": "Mar 2026",
+      "rank": 13,
+      "total": 86
+    },
+    {
+      "iso3": "SAU",
+      "name": "Saudi Arabia",
+      "anomaly": 0.77,
+      "value": 26.09,
+      "monthLabel": "Mar 2026",
+      "rank": 29,
+      "total": 86
+    },
+    {
+      "iso3": "SGP",
+      "name": "Singapore",
+      "anomaly": 0.72,
+      "value": 23.18,
+      "monthLabel": "Mar 2026",
+      "rank": 25,
+      "total": 86
+    },
+    {
+      "iso3": "SOM",
+      "name": "Somalia",
+      "anomaly": 0.98,
+      "value": 27.64,
+      "monthLabel": "Mar 2026",
+      "rank": 6,
+      "total": 86
+    },
+    {
+      "iso3": "SSD",
+      "name": "South Sudan",
+      "anomaly": 1.85,
+      "value": 31.05,
+      "monthLabel": "Mar 2026",
+      "rank": 17,
+      "total": 86
+    },
+    {
+      "iso3": "SUR",
+      "name": "Suriname",
+      "anomaly": 0.42,
+      "value": 25.61,
+      "monthLabel": "Mar 2026",
+      "rank": 27,
+      "total": 86
+    },
+    {
+      "iso3": "SWE",
+      "name": "Sweden",
+      "anomaly": 4.33,
+      "value": 0.5,
+      "monthLabel": "Mar 2026",
+      "rank": 4,
+      "total": 86
+    },
+    {
+      "iso3": "SYR",
+      "name": "Syria",
+      "anomaly": 4.05,
+      "value": 15.81,
+      "monthLabel": "Mar 2026",
+      "rank": 4,
+      "total": 86
+    },
+    {
+      "iso3": "THA",
+      "name": "Thailand",
+      "anomaly": 0.14,
+      "value": 19.02,
+      "monthLabel": "Mar 2026",
+      "rank": 54,
+      "total": 86
+    },
+    {
+      "iso3": "TUR",
+      "name": "Turkey",
+      "anomaly": 4.02,
+      "value": -1.57,
+      "monthLabel": "Mar 2026",
+      "rank": 8,
+      "total": 86
+    },
+    {
+      "iso3": "TZA",
+      "name": "Tanzania",
+      "anomaly": 1.41,
+      "value": 23.78,
+      "monthLabel": "Mar 2026",
+      "rank": 8,
+      "total": 86
+    },
+    {
+      "iso3": "UGA",
+      "name": "Uganda",
+      "anomaly": 1.67,
+      "value": 24.76,
+      "monthLabel": "Mar 2026",
+      "rank": 7,
+      "total": 86
+    },
+    {
+      "iso3": "UKR",
+      "name": "Ukraine",
+      "anomaly": 4.03,
+      "value": 8.95,
+      "monthLabel": "Mar 2026",
+      "rank": 13,
+      "total": 86
+    },
+    {
+      "iso3": "USA",
+      "name": "United States",
+      "anomaly": 3.29,
+      "value": 5.52,
+      "monthLabel": "Mar 2026",
+      "rank": 3,
+      "total": 86
+    },
+    {
+      "iso3": "VNM",
+      "name": "Vietnam",
+      "anomaly": 0.29,
+      "value": 22.71,
+      "monthLabel": "Mar 2026",
+      "rank": 47,
+      "total": 86
+    },
+    {
+      "iso3": "ZAF",
+      "name": "South Africa",
+      "anomaly": 0.63,
+      "value": 12.14,
+      "monthLabel": "Mar 2026",
+      "rank": 25,
+      "total": 86
+    }
+  ],
   "globalBaseline": 13.9,
   "globalLandBaseline": 8.6,
   "globalOceanBaseline": 16.1,
@@ -12025,8 +14277,8 @@
     "plus1_5": 15,
     "plus2_0": 15.5
   },
-  "lastUpdated": "2026-04-v8",
-  "generatedAt": "2026-04-22T08:06:19.209Z",
+  "lastUpdated": "2026-04-v9",
+  "generatedAt": "2026-04-22T08:54:04.709Z",
   "sources": [
     {
       "label": "NOAA Climate at a Glance — Global Land+Ocean",
@@ -12043,6 +14295,26 @@
     {
       "label": "Our World in Data / ERA5 — Global Land Surface Temperature",
       "url": "https://ourworldindata.org/grapher/monthly-average-surface-temperatures-by-year"
+    },
+    {
+      "label": "NOAA CPC — Oceanic Niño Index (ONI)",
+      "url": "https://origin.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php"
+    },
+    {
+      "label": "NOAA GML — Mauna Loa CO₂ monthly",
+      "url": "https://gml.noaa.gov/ccgg/trends/data.html"
+    },
+    {
+      "label": "NOAA GML — Global CH₄ and N₂O monthly means",
+      "url": "https://gml.noaa.gov/ccgg/trends_ch4/"
+    },
+    {
+      "label": "NSIDC — Monthly sea-ice extent (Arctic + Antarctic)",
+      "url": "https://nsidc.org/data/seaice_index"
+    },
+    {
+      "label": "NOAA Climate at a Glance — Continental land temperatures",
+      "url": "https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global"
     }
   ]
 }
