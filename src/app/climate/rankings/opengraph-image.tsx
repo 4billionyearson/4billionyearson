@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 export const runtime = 'nodejs';
 
-export const alt = 'Climate Rankings — league table of temperature anomalies';
+export const alt = 'Climate Rankings & Monthly Trends — league table of temperature anomalies';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -107,7 +107,7 @@ export default async function OgImage() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: 28, color: '#D0A65E', textTransform: 'uppercase', letterSpacing: 2, fontWeight: 700 }}>
-                Climate Rankings
+                Climate Rankings & Monthly Trends
               </span>
               <span style={{ fontSize: 48, fontWeight: 800, color: '#FFF5E7', textShadow: '0 2px 10px rgba(0,0,0,0.9)', marginTop: 4 }}>
                 Warmest regions · {latestLabel}

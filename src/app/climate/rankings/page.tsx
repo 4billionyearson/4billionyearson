@@ -8,14 +8,24 @@ import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 
 export const metadata: Metadata = {
-  title: 'Climate Rankings — 144 Countries, US States & UK Regions',
+  title: 'Climate Rankings & Monthly Trends — 144 Regions Compared',
   description:
-    'Sortable league table of monthly temperature anomalies for every country, US state and UK region we track. Filter, search, and compare how far above or below the 1961–1990 baseline each region sits right now.',
+    'Sortable league table and monthly trend analysis for every country, US state and UK region we track. See who is warmest this month, the biggest rank movers since last month, continent-level roll-ups, and how your region compares against its climate peers — all against the 1961–1990 baseline.',
   alternates: { canonical: 'https://4billionyearson.org/climate/rankings' },
+  keywords: [
+    'climate rankings',
+    'country temperature rankings',
+    'warmest countries this month',
+    'climate league table',
+    'climate trends monthly',
+    'temperature anomaly comparison',
+    'biggest climate movers',
+    'continent temperature anomaly',
+  ],
   openGraph: {
-    title: 'Climate Rankings — Who is warmest this month?',
+    title: 'Climate Rankings & Monthly Trends — Who is warmest this month?',
     description:
-      'Live league table of monthly temperature anomalies across 144 countries, US states and UK regions.',
+      'Live league table and trend analysis across 144 countries, US states and UK regions — anomalies, movers, peers and continent roll-ups, updated monthly.',
     url: 'https://4billionyearson.org/climate/rankings',
     type: 'website',
   },
@@ -269,13 +279,12 @@ export default async function RankingsPage() {
           >
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-                Climate Rankings{latestLabel ? ` — ${latestLabel}` : ''}
+                Climate Rankings & Monthly Trends{latestLabel ? ` — ${latestLabel}` : ''}
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5 space-y-4">
               <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                Every country, US state and UK region we track, ranked by how warm the <strong className="text-white">most recent month</strong> was
-                compared to its 1961–1990 climatological baseline. Click any column to sort, filter by region type, or search for a specific place.
+                How <strong className="text-white">144 regions</strong> compare this month — every country, US state and UK region we track, ranked by how far the <strong className="text-white">most recent month</strong> sat above or below its 1961–1990 climatological baseline. Sort, filter or search the league table; see which regions <strong className="text-white">climbed or dropped</strong> the most since last month; and read the continent-level roll-ups below.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

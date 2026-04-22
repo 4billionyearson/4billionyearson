@@ -451,7 +451,14 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push(`You are a climate journalist writing a compelling monthly update for ${region.name}.`);
   lines.push('Your audience is searching for the latest climate news and data for this area.');
   lines.push('');
-  lines.push('TASK: Write exactly 2–3 paragraphs (150–200 words total) that tell a compelling, data-driven narrative.');
+  lines.push('TASK: Write 3–4 short paragraphs (total 180–240 words) telling a compelling, data-driven narrative.');
+  lines.push('');
+  lines.push('STRUCTURE — organise the update using these short sub-headings, each on its own line prefixed with "## " exactly (two hashes and a space). Omit a section if you have nothing specific to say about it.');
+  lines.push('  ## This month in numbers   — lead with the latest-month anomaly, ranking, and the 1 or 2 most newsworthy RANKED HIGHLIGHTS.');
+  lines.push('  ## What changed          — 3-month/seasonal trend, how this region compares to the national/global picture, and (if relevant) its CROSS-REGION rank or cluster.');
+  lines.push('  ## Context               — climate drivers (ENSO, NAO, jet stream) and any active GDACS or recent notable weather events woven in.');
+  lines.push('  ## Looking ahead         — ONE carefully hedged forward-looking sentence (e.g. what forecasters or outlooks suggest). Only include if there is a concrete source to cite; otherwise omit.');
+  lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
   lines.push('');
   lines.push('CONTENT PRIORITY (follow this order strictly):');
   lines.push('1. RANKED HIGHLIGHTS (Priority 1): Study the RANKED HIGHLIGHTS section below FIRST. The 3-month rankings are the most SEO-valuable — if sunshine was 3rd highest or frost days were 4th lowest of all time, THAT is your headline. Scan ALL variables for standout rankings (top 5 or bottom 5 of all time).');
@@ -479,7 +486,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('');
   lines.push('RULES:');
   lines.push('- British English spelling throughout.');
-  lines.push('- Plain text only — no markdown, bullet points, or headings.');
+  lines.push('- Plain text only — no markdown, bullet points, or other headings, EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line.');
   lines.push('- Be specific with numbers but weave them into natural prose.');
   lines.push('- You MUST reference data from the tables below. Do NOT invent statistics.');
   lines.push('- Use the EXACT values and rankings from the RANKED HIGHLIGHTS and DATA TABLE provided — do NOT substitute with values from web searches, as these may differ due to rounding or methodology.');
@@ -635,7 +642,14 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
   lines.push('You are a climate journalist writing the monthly Global Climate Update for a general audience.');
   lines.push('This is the planet-wide update — the single most-read climate summary on the site.');
   lines.push('');
-  lines.push('TASK: Write exactly 2–3 paragraphs (150–200 words total) telling a compelling, data-driven narrative about the current state of global warming.');
+  lines.push('TASK: Write 3–4 short paragraphs (total 180–240 words) telling a compelling, data-driven narrative about the current state of global warming.');
+  lines.push('');
+  lines.push('STRUCTURE — organise the update using these short sub-headings, each on its own line prefixed with "## " exactly (two hashes and a space). Omit a section only if truly nothing to say.');
+  lines.push('  ## This month in numbers  — lead with the latest-month NOAA land+ocean anomaly, its ranking, and the 10-year mean vs pre-industrial (Paris thresholds).');
+  lines.push('  ## Land vs ocean          — contrast land-only and ocean-only figures; note that land is warming faster.');
+  lines.push('  ## Cross-region picture   — one striking pattern from the CROSS-REGION RANKINGS section (e.g. "8 of the 10 hottest were US states") with 2–3 named regions.');
+  lines.push('  ## Context               — ENSO state, any major climate events, key announcements from Copernicus / WMO / NOAA / IPCC / COP, or notable record-setting events verified by web search.');
+  lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
   lines.push('');
   lines.push('CONTENT PRIORITY:');
   lines.push('1. LEAD WITH THE LATEST MONTH — the most recent NOAA global LAND+OCEAN anomaly vs the 1961–1990 WMO baseline. State the figure, whether it was unusually warm or cool, and the all-time ranking. This is the headline number used by Copernicus, WMO and the world\'s climate press; use it rather than any land-only series.');
@@ -652,7 +666,7 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
   lines.push('');
   lines.push('RULES:');
   lines.push('- British English spelling throughout.');
-  lines.push('- Plain text only — no markdown, bullet points, or headings.');
+  lines.push('- Plain text only — no markdown, bullet points, or other headings, EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line.');
   lines.push('- Be specific with numbers but weave them into natural prose.');
   lines.push('- Use the EXACT values from the DATA section below. Do NOT invent figures.');
   lines.push('- Use numeric ordinals (1st, 2nd, 3rd) rather than written-out words.');
@@ -787,7 +801,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v21`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v22`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {

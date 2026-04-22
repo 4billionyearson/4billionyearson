@@ -16,6 +16,7 @@ import {
   type OverviewRow,
 } from '../_shared/overview-grid';
 import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar, WhatChangedTile } from './ClimateSystemsPanel';
+import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
 import type { ComponentType } from 'react';
 import type { default as GlobalAnomalyMapType } from './GlobalAnomalyMap';
 const GlobalAnomalyMap = dynamic(() => import('./GlobalAnomalyMap'), {
@@ -322,13 +323,28 @@ export default function GlobalProfile() {
                   <span className="font-semibold">Coverage:</span> Whole Earth — land and ocean surface temperature
                 </p>
               </div>
+              <div className="mb-3">
+                <GlobalRankingsTeaser />
+              </div>
 
               {summary ? (
                 <div>
                   <div className="text-gray-300 text-sm leading-relaxed space-y-3">
-                    {summary.split('\n\n').map((para, i) => (
-                      <p key={i} dangerouslySetInnerHTML={{ __html: highlightRankings(para) }} />
-                    ))}
+                    {summary.split('\n\n').map((para, i) => {
+                      const trimmed = para.trim();
+                      const headingMatch = trimmed.match(/^##\s+(.+?)(?:\n([\s\S]*))?$/);
+                      if (headingMatch) {
+                        const heading = headingMatch[1].trim();
+                        const body = (headingMatch[2] || '').trim();
+                        return (
+                          <div key={i} className="space-y-1.5">
+                            <h3 className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#D0A65E]">{heading}</h3>
+                            {body && <p dangerouslySetInnerHTML={{ __html: highlightRankings(body) }} />}
+                          </div>
+                        );
+                      }
+                      return <p key={i} dangerouslySetInnerHTML={{ __html: highlightRankings(trimmed) }} />;
+                    })}
                   </div>
                   {summarySources.length > 0 && (
                     <div className="mt-3 pt-2 border-t border-gray-800">
@@ -862,6 +878,12 @@ export default function GlobalProfile() {
                     className="inline-flex items-center h-8 rounded-full border border-[#D0A65E]/55 bg-[#D0A65E]/10 px-3 text-[13px] font-semibold text-[#FFF5E7] transition-colors hover:bg-[#D0A65E]/20"
                   >
                     Browse all regions →
+                  </Link>
+                  <Link
+                    href="/climate/rankings"
+                    className="inline-flex items-center h-8 rounded-full border border-[#D0A65E]/55 bg-[#D0A65E]/10 px-3 text-[13px] font-semibold text-[#FFF5E7] transition-colors hover:bg-[#D0A65E]/20"
+                  >
+                    Rankings & trends →
                   </Link>
                 </div>
               </div>

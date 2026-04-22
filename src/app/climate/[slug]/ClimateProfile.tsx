@@ -654,11 +654,25 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <ClimateRankPill slug={slug} />
+                  <div className="mb-3">
+                    <ClimateRankPill slug={slug} />
+                  </div>
                   <div className="mt-3 text-gray-300 text-sm leading-relaxed space-y-3">
-                    {summary.split('\n\n').map((para, i) => (
-                      <p key={i} dangerouslySetInnerHTML={{ __html: highlightRankings(para) }} />
-                    ))}
+                    {summary.split('\n\n').map((para, i) => {
+                      const trimmed = para.trim();
+                      const headingMatch = trimmed.match(/^##\s+(.+?)(?:\n([\s\S]*))?$/);
+                      if (headingMatch) {
+                        const heading = headingMatch[1].trim();
+                        const body = (headingMatch[2] || '').trim();
+                        return (
+                          <div key={i} className="space-y-1.5">
+                            <h3 className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#D0A65E]">{heading}</h3>
+                            {body && <p dangerouslySetInnerHTML={{ __html: highlightRankings(body) }} />}
+                          </div>
+                        );
+                      }
+                      return <p key={i} dangerouslySetInnerHTML={{ __html: highlightRankings(trimmed) }} />;
+                    })}
                   </div>
                   {summarySources.length > 0 && (
                     <div className="mt-3 pt-2 border-t border-gray-800">
@@ -693,7 +707,9 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <ClimateRankPill slug={slug} />
+                  <div className="mb-3">
+                    <ClimateRankPill slug={slug} />
+                  </div>
                   <div className="mt-3 rounded-xl border border-amber-700/40 bg-amber-950/20 px-4 py-3">
                     <p className="text-sm font-medium text-amber-200">Climate update temporarily unavailable</p>
                     <p className="mt-1 text-sm text-gray-300">{summaryError || 'The AI-generated climate update is temporarily unavailable. The measured climate data below is still available and up to date.'}</p>

@@ -110,7 +110,7 @@ export default function ClimateRankPill({ slug }: { slug: string }) {
           </span>
         </>
       )}
-      <span className="ml-auto text-[11px] text-[#D0A65E]">See league table →</span>
+      <span className="ml-auto text-[11px] text-[#D0A65E]">See all 144 regions →</span>
     </Link>
   );
 }
