@@ -19,6 +19,60 @@ async function loadDataUrl(relativePath: string, mime: string): Promise<string |
   }
 }
 
+interface RankedStat {
+  label?: string;
+  value?: number;
+  diff?: number;
+  rank?: number;
+  total?: number;
+}
+
+async function loadRegionSnapshot(region: ReturnType<typeof getRegionBySlug>): Promise<{
+  one: RankedStat | null;
+  three: RankedStat | null;
+  unit: string;
+} | null> {
+  if (!region) return null;
+  const base = resolve(process.cwd(), 'public', 'data', 'climate');
+  let path: string | null = null;
+  if (region.type === 'country') path = resolve(base, 'country', `${region.apiCode}.json`);
+  else if (region.type === 'us-state') path = resolve(base, 'us-state', `${region.apiCode}.json`);
+  else if (region.type === 'uk-region') path = resolve(base, 'uk-region', `${region.apiCode}.json`);
+  if (!path) return null;
+  try {
+    const raw = await readFile(path, 'utf8');
+    const d = JSON.parse(raw);
+    if (region.type === 'country') {
+      return { one: d.latestMonthStats ?? null, three: d.latestThreeMonthStats ?? null, unit: '°C' };
+    }
+    if (region.type === 'us-state') {
+      const t = d?.paramData?.tavg;
+      return { one: t?.latestMonthStats ?? null, three: t?.latestThreeMonthStats ?? null, unit: '°F' };
+    }
+    if (region.type === 'uk-region') {
+      const t = d?.varData?.Tmean;
+      return { one: t?.latestMonthStats ?? null, three: t?.latestThreeMonthStats ?? null, unit: '°C' };
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function fmtSigned(n: number, d = 2): string {
+  return `${n > 0 ? '+' : ''}${n.toFixed(d)}`;
+}
+
+function tone(diff: number | null | undefined): string {
+  if (diff == null) return '#e5e7eb';
+  if (diff >= 1.5) return '#fca5a5';
+  if (diff >= 0.8) return '#fdba74';
+  if (diff >= 0.2) return '#fcd34d';
+  if (diff <= -0.8) return '#7dd3fc';
+  if (diff <= -0.2) return '#bae6fd';
+  return '#e5e7eb';
+}
+
 export default async function OgImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const region = getRegionBySlug(slug);
@@ -34,9 +88,10 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
     );
   }
 
-  const [bgUrl, logoUrl] = await Promise.all([
+  const [bgUrl, logoUrl, snap] = await Promise.all([
     loadDataUrl('background.png', 'image/png'),
     loadDataUrl('header-logo.png', 'image/png'),
+    loadRegionSnapshot(region),
   ]);
 
   const sourceLabels: Record<string, string> = {
@@ -47,8 +102,11 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
     'noaa-national': 'NOAA',
     'arctic-ice': 'Arctic Ice',
   };
+  const sources = region.dataSources.map((s) => sourceLabels[s] || s);
 
-  const sources = region.dataSources.map(s => sourceLabels[s] || s);
+  const one = snap?.one ?? null;
+  const three = snap?.three ?? null;
+  const unit = snap?.unit ?? '°C';
 
   return new ImageResponse(
     (
@@ -63,7 +121,6 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
           fontFamily: 'system-ui, sans-serif',
         }}
       >
-        {/* Brand background */}
         {bgUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -74,57 +131,99 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : null}
-        {/* Dark readability overlay */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
             display: 'flex',
-            background: 'linear-gradient(135deg, rgba(3,7,18,0.84) 0%, rgba(15,23,42,0.80) 50%, rgba(3,7,18,0.92) 100%)',
+            background: 'linear-gradient(135deg, rgba(3,7,18,0.88) 0%, rgba(15,23,42,0.82) 50%, rgba(3,7,18,0.92) 100%)',
           }}
         />
 
-        {/* Content */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             width: '100%',
             height: '100%',
-            padding: '60px',
+            padding: '52px 60px',
             position: 'relative',
           }}
         >
-          {/* Gold top bar */}
-          <div style={{ display: 'flex', width: '100%', height: '4px', background: '#D0A65E', borderRadius: '2px', marginBottom: '40px' }} />
-
-          {/* Emoji + Name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '16px' }}>
-            <span style={{ fontSize: 72 }}>{region.emoji}</span>
-            <span style={{ fontSize: 56, fontWeight: 800, color: '#D0A65E' }}>
-              {region.name}
-            </span>
+          {/* Top row: region name (left) + logo (right) */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <span style={{ fontSize: 72 }}>{region.emoji}</span>
+              <span style={{ fontSize: 60, fontWeight: 800, color: '#D0A65E', textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>{region.name}</span>
+            </div>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="4 Billion Years On" width={340} height={60} style={{ objectFit: 'contain' }} />
+            ) : (
+              <span style={{ fontSize: 26, fontWeight: 700, color: '#e5e7eb' }}>4billionyearson.org</span>
+            )}
           </div>
 
-          {/* Tagline */}
-          <div style={{ display: 'flex', marginBottom: '36px' }}>
-            <span style={{ fontSize: 28, color: '#cbd5e1', lineHeight: 1.4 }}>
+          <div style={{ display: 'flex', marginBottom: '28px' }}>
+            <span style={{ fontSize: 28, color: '#e2e8f0', lineHeight: 1.3, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
               {region.tagline}
             </span>
           </div>
 
-          {/* Data source pills */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '40px', flexWrap: 'wrap' }}>
+          {/* Stats panel — opaque backdrop so values stay legible
+              over any central colour bars in the background image. */}
+          {(one || three) && (
+            <div
+              style={{
+                display: 'flex',
+                gap: '16px',
+                background: 'rgba(3,7,18,0.88)',
+                border: '1px solid rgba(208,166,94,0.4)',
+                borderRadius: 18,
+                padding: '22px 26px',
+                marginBottom: '22px',
+              }}
+            >
+              {one && typeof one.diff === 'number' && (
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  <span style={{ fontSize: 15, color: '#D0A65E', textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                    {one.label ?? 'Latest month'} · Anomaly
+                  </span>
+                  <span style={{ fontSize: 60, fontWeight: 800, color: tone(one.diff), marginTop: 2, lineHeight: 1 }}>
+                    {fmtSigned(one.diff, 2)}{unit}
+                  </span>
+                  <span style={{ fontSize: 16, color: '#cbd5e1', marginTop: 4 }}>
+                    vs 1961–1990{one.rank && one.total ? ` · rank ${one.rank} of ${one.total}` : ''}
+                  </span>
+                </div>
+              )}
+              {three && typeof three.diff === 'number' && (
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: 20 }}>
+                  <span style={{ fontSize: 15, color: '#D0A65E', textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                    {three.label ?? '3-month'} · Anomaly
+                  </span>
+                  <span style={{ fontSize: 60, fontWeight: 800, color: tone(three.diff), marginTop: 2, lineHeight: 1 }}>
+                    {fmtSigned(three.diff, 2)}{unit}
+                  </span>
+                  <span style={{ fontSize: 16, color: '#cbd5e1', marginTop: 4 }}>
+                    vs 1961–1990{three.rank && three.total ? ` · rank ${three.rank} of ${three.total}` : ''}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             {sources.map((src) => (
               <div
                 key={src}
                 style={{
                   display: 'flex',
-                  background: 'rgba(208, 166, 94, 0.18)',
-                  border: '1px solid rgba(208, 166, 94, 0.5)',
+                  background: 'rgba(208, 166, 94, 0.22)',
+                  border: '1px solid rgba(208, 166, 94, 0.55)',
                   borderRadius: '999px',
-                  padding: '8px 20px',
-                  fontSize: 18,
+                  padding: '7px 18px',
+                  fontSize: 17,
                   color: '#E8C97A',
                 }}
               >
@@ -133,14 +232,12 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
             ))}
           </div>
 
-          {/* Spacer */}
           <div style={{ display: 'flex', flex: 1 }} />
 
-          {/* Bottom bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: 20, color: '#94a3b8', marginBottom: '4px' }}>Monthly Climate Update</span>
-              <span style={{ fontSize: 22, color: '#94a3b8' }}>
+              <span style={{ fontSize: 18, color: '#94a3b8', marginBottom: 4, textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>Monthly Climate Update</span>
+              <span style={{ fontSize: 20, color: '#cbd5e1', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
                 {region.type === 'uk-region'
                   ? 'Temperature · Rainfall · Sunshine · Frost'
                   : region.type === 'us-state'
@@ -148,16 +245,10 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
                     : 'Temperature · Rainfall · Emissions'}
               </span>
             </div>
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="4 Billion Years On" width={228} height={40} style={{ objectFit: 'contain' }} />
-            ) : (
-              <span style={{ fontSize: 24, fontWeight: 700, color: '#e5e7eb' }}>4billionyearson.org</span>
-            )}
+            <span style={{ fontSize: 20, fontWeight: 700, color: '#e5e7eb', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+              4billionyearson.org/climate/{region.slug}
+            </span>
           </div>
-
-          {/* Gold bottom bar */}
-          <div style={{ display: 'flex', width: '100%', height: '4px', background: '#D0A65E', borderRadius: '2px', marginTop: '20px' }} />
         </div>
       </div>
     ),
