@@ -137,7 +137,6 @@ function SimpleYearlyChart({ data, dataKey, label, unit, color, fillColor }: {
 }
 
 // ─── Correlation Tooltip ─────────────────────────────────────────────────────
-
 const CorrelationTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
@@ -151,6 +150,75 @@ const CorrelationTooltip = ({ active, payload, label }: any) => {
     </div>
   );
 };
+
+// ─── Sea-ice spaghetti chart ────────────────────────────────────────────────
+
+const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function SeaIceSpaghettiCard({ seaIce }: { seaIce: { baseline: string; recent60: { year: number; month: number; extent: number }[] } }) {
+  // Pivot recent60 into year-lines: { month: 'Jan', 2022: 16.1, 2023: 15.8, ... }
+  const years = Array.from(new Set(seaIce.recent60.map(p => p.year))).sort((a, b) => a - b);
+  const latestYear = Math.max(...years);
+  const byMonth: Record<number, Record<string, number | null>> = {};
+  for (let m = 1; m <= 12; m++) {
+    byMonth[m] = { month: m } as any;
+    for (const y of years) byMonth[m][String(y)] = null;
+  }
+  for (const p of seaIce.recent60) {
+    byMonth[p.month][String(p.year)] = p.extent;
+  }
+  const chartData = Object.values(byMonth).map((row: any) => ({ ...row, monthLabel: MONTH_LABELS[row.month - 1] }));
+
+  // Color older years faded, latest year bold cyan
+  const yearColor = (y: number, idx: number, total: number): { stroke: string; width: number; opacity: number } => {
+    if (y === latestYear) return { stroke: '#22d3ee', width: 3, opacity: 1 };
+    const palette = ['#6b7280', '#64748b', '#0ea5e9', '#38bdf8', '#7dd3fc'];
+    return { stroke: palette[idx % palette.length], width: 1.5, opacity: 0.55 };
+  };
+
+  return (
+    <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+      <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+        <Snowflake className="h-5 w-5 text-cyan-300" />
+        <span className="min-w-0 flex-1">Year-on-Year Sea Ice — {years[0]}–{latestYear}</span>
+      </h2>
+      <p className="text-xs text-gray-400 mt-1 mb-4">
+        One line per year, January through December. Current year ({latestYear}) is highlighted in cyan. Annual minimum typically falls in February (Arctic + Antarctic combined).
+      </p>
+      <div className="h-[320px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+            <XAxis dataKey="monthLabel" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+            <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} width={44} tickFormatter={(v) => `${v}`} unit=" M" />
+            <Tooltip content={<DarkTooltip />} />
+            <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 11, paddingTop: 8 }} />
+            {years.map((y, i) => {
+              const cfg = yearColor(y, i, years.length);
+              return (
+                <Line
+                  key={y}
+                  type="monotone"
+                  dataKey={String(y)}
+                  name={String(y)}
+                  stroke={cfg.stroke}
+                  strokeWidth={cfg.width}
+                  strokeOpacity={cfg.opacity}
+                  dot={y === latestYear ? { r: 3, fill: cfg.stroke } : false}
+                  connectNulls={false}
+                  isAnimationActive={false}
+                />
+              );
+            })}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <p className="text-xs text-gray-500 mt-3">
+        Source: <a href="https://nsidc.org/data/seaice_index" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-300">NSIDC Sea Ice Index</a> via global-warming.org · monthly averages · {seaIce.baseline} climatology
+      </p>
+    </div>
+  );
+}
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
@@ -325,7 +393,10 @@ export default function SeaLevelsIcePage() {
 
               {/* ═══ GLOBAL SEA ICE HEADLINE ═══ */}
               {globalSeaIce && (
-                <SeaIceTile seaIce={globalSeaIce} />
+                <>
+                  <SeaIceTile seaIce={globalSeaIce} variant="section" />
+                  <SeaIceSpaghettiCard seaIce={globalSeaIce} />
+                </>
               )}
 
               {/* ═══ ICE EXTENT + ANOMALY PANEL ═══ */}

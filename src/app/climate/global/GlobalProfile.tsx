@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell,
 } from 'recharts';
-import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen } from 'lucide-react';
+import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import { getRegionBySlug } from '@/lib/climate/regions';
 import {
@@ -379,7 +379,7 @@ export default function GlobalProfile() {
               {/* Overview table: month / 3-month / year — matches country & region pages */}
               {overviewPanels.length > 0 && (
                 <>
-                  <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Global Temperature — At a Glance" />
+                  <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="At a Glance" />
                   <OverviewGrid panels={overviewPanels} />
                 </>
               )}
@@ -411,7 +411,10 @@ export default function GlobalProfile() {
                   <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <div className="flex items-start justify-between gap-3 flex-wrap">
                       <div>
-                        <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Paris Agreement Tracker</p>
+                        <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold flex items-center gap-1.5">
+                          <Scale className="h-3.5 w-3.5 text-[#D0A65E]" />
+                          Paris Agreement Tracker
+                        </p>
                         <h3 className="text-lg md:text-xl font-bold text-white mt-1">How close are we to 1.5°C and 2°C?</h3>
                         <p className="text-[11px] text-gray-400 mt-1">Global land + ocean surface temperature (NOAA) — the series used by Copernicus, WMO and the IPCC.</p>
                       </div>
@@ -485,6 +488,7 @@ export default function GlobalProfile() {
                               <YAxis
                                 stroke="#9CA3AF"
                                 fontSize={11}
+                                width={44}
                                 domain={[0, 2.2]}
                                 ticks={[0, 0.5, 1.0, 1.5, 2.0]}
                                 tickFormatter={(v) => `${v > 0 ? '+' : ''}${v.toFixed(1)}°C`}
@@ -608,6 +612,7 @@ export default function GlobalProfile() {
                           <YAxis
                             stroke="#9CA3AF"
                             fontSize={11}
+                            width={44}
                             domain={[(dataMin: number) => Math.min(dataMin, data.preIndustrialBaseline) - 0.2, () => data.keyThresholds.plus2_0 + 0.2]}
                             tickFormatter={(v) => `${v.toFixed(1)}°C`}
                           />
@@ -643,6 +648,7 @@ export default function GlobalProfile() {
                           <YAxis
                             stroke="#9CA3AF"
                             fontSize={11}
+                            width={44}
                             tickFormatter={(v) => `${formatSigned(v, 1)}°C`}
                           />
                           <Tooltip
@@ -673,7 +679,7 @@ export default function GlobalProfile() {
                         <LineChart data={data.landVsOceanMonthly} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="monthLabel" stroke="#9CA3AF" fontSize={10} angle={-30} textAnchor="end" height={60} />
-                          <YAxis stroke="#9CA3AF" fontSize={11} domain={[10, 20]} ticks={[10, 12, 14, 16, 18, 20]} tickFormatter={(v) => `${v.toFixed(0)}°C`} />
+                          <YAxis stroke="#9CA3AF" fontSize={11} width={36} domain={[10, 20]} ticks={[10, 12, 14, 16, 18, 20]} tickFormatter={(v) => `${v.toFixed(0)}°C`} />
                           <Tooltip
                             contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8 }}
                             formatter={(v: any) => typeof v === 'number' ? `${v.toFixed(2)}°C` : '—'}
@@ -691,7 +697,7 @@ export default function GlobalProfile() {
               {(data.enso || data.ghgStats || data.seaIceStats || data.continentStats?.length || data.previousLatestMonthStats) && (
                 <>
                   <Divider icon={<Wind className="h-5 w-5 text-sky-300" />} title="Climate Systems" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {data.enso && <EnsoCard enso={data.enso} />}
                     {data.ghgStats && <GhgTile ghgStats={data.ghgStats} />}
                     {data.seaIceStats && <SeaIceTile seaIce={data.seaIceStats} />}
@@ -814,7 +820,10 @@ export default function GlobalProfile() {
 
           {/* SEO footer */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-lg font-bold font-mono text-white mb-3">About this page</h2>
+            <h2 className="text-lg font-bold font-mono text-white mb-3 flex items-center gap-2">
+              <Info className="h-5 w-5 text-[#D0A65E]" />
+              About this page
+            </h2>
             <div className="text-sm text-gray-400 space-y-3 max-w-3xl">
               <p>
                 {region.description}

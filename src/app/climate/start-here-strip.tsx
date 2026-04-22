@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, TrendingUp, ChevronRight, Loader2, AlertCircle, MapPin } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
@@ -140,12 +140,16 @@ export default function StartHereStrip({ regions, title, description }: StartHer
   const [rankings, setRankings] = useState<RankingsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchStartedRef = useRef(false);
 
   // Lazy-load rankings the first time the Shift tab opens. A 55s client-side
   // abort stops the spinner hanging forever if the endpoint itself takes
-  // longer than Vercel's 60s function cap on a cold cache.
+  // longer than Vercel's 60s function cap on a cold cache. A ref guards
+  // against StrictMode double-invocations and effect re-runs after errors
+  // that would otherwise restart the fetch in an infinite loop.
   useEffect(() => {
-    if (tab !== 'shift' || rankings || loading) return;
+    if (tab !== 'shift' || fetchStartedRef.current) return;
+    fetchStartedRef.current = true;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 55000);
     let cancelled = false;
@@ -165,6 +169,8 @@ export default function StartHereStrip({ regions, title, description }: StartHer
           ? 'Rankings took too long to load. Please try again in a moment.'
           : err?.message || 'Unable to load rankings';
         setError(msg);
+        // Allow the user to retry by flipping the tab away and back.
+        fetchStartedRef.current = false;
       })
       .finally(() => {
         clearTimeout(timeoutId);
@@ -175,7 +181,7 @@ export default function StartHereStrip({ regions, title, description }: StartHer
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [tab, rankings, loading]);
+  }, [tab]);
 
   const pickedRegions = useMemo<ClimateRegion[]>(() => {
     const bySlug = new Map(regions.map((r) => [r.slug, r]));

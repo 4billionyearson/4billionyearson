@@ -1,8 +1,9 @@
 "use client";
 
 import React from 'react';
+import Link from 'next/link';
 import { LineChart, Line, BarChart, Bar, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
-import { Waves, Snowflake, Flame, Wind, ExternalLink } from 'lucide-react';
+import { Waves, Snowflake, Flame, Wind, ExternalLink, ArrowUpRight } from 'lucide-react';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -157,6 +158,14 @@ export function GhgTile({ ghgStats }: { ghgStats: { co2: GhgStat | null; ch4: Gh
       <p className="text-[11px] text-gray-400 mt-2">
         Sparklines: last 10 years of monthly values. Pre-industrial reference values: CO₂ 280 ppm, CH₄ 722 ppb, N₂O 270 ppb.
       </p>
+      <div className="mt-auto pt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+        <Link href="/greenhouse-gases" className="inline-flex items-center gap-1 text-[#D0A65E] hover:text-[#E8C97A] font-semibold">
+          Greenhouse gases dashboard <ArrowUpRight className="h-3 w-3" />
+        </Link>
+        <Link href="/emissions" className="inline-flex items-center gap-1 text-[#D0A65E] hover:text-[#E8C97A] font-semibold">
+          Emissions by country <ArrowUpRight className="h-3 w-3" />
+        </Link>
+      </div>
       <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
         <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
@@ -184,17 +193,28 @@ interface SeaIceStats {
 
 const MONTH_NAMES = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export function SeaIceTile({ seaIce }: { seaIce: SeaIceStats | null }) {
+export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats | null; variant?: 'tile' | 'section' }) {
   if (!seaIce) return null;
   const chart = seaIce.recent60.map((p, i) => ({ i, label: `${MONTH_NAMES[p.month]} ${String(p.year).slice(-2)}`, extent: p.extent }));
   const anomColor = seaIce.anomaly < 0 ? 'text-sky-300' : 'text-emerald-300';
+  const isSection = variant === 'section';
   return (
-    <Tile>
-      <TileHeader
-        icon={<Snowflake className="h-4 w-4 text-sky-300" />}
-        title="Global sea ice extent"
-        subtitle={`Arctic + Antarctic combined · anomaly vs ${seaIce.baseline}`}
-      />
+    <Tile className={isSection ? 'p-4 md:p-5' : ''}>
+      {isSection ? (
+        <div className="mb-4">
+          <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+            <Snowflake className="h-5 w-5 text-sky-300" />
+            <span className="min-w-0 flex-1">Global Sea Ice Extent</span>
+          </h2>
+          <p className="text-xs text-gray-400 mt-1">Arctic + Antarctic combined · anomaly vs {seaIce.baseline}</p>
+        </div>
+      ) : (
+        <TileHeader
+          icon={<Snowflake className="h-4 w-4 text-sky-300" />}
+          title="Global sea ice extent"
+          subtitle={`Arctic + Antarctic combined · anomaly vs ${seaIce.baseline}`}
+        />
+      )}
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
         <div>
           <p className="text-3xl font-bold font-mono text-white">{seaIce.latest.extent.toFixed(2)}<span className="text-sm text-gray-400 font-normal"> Mkm²</span></p>
@@ -227,6 +247,11 @@ export function SeaIceTile({ seaIce }: { seaIce: SeaIceStats | null }) {
         </ResponsiveContainer>
       </div>
       <p className="text-[11px] text-gray-400 mt-1">Last 60 months. Long-term trend is down — Arctic loss exceeds Antarctic variability.</p>
+      <div className="mt-auto pt-2 text-[11px]">
+        <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-[#D0A65E] hover:text-[#E8C97A] font-semibold">
+          Sea levels &amp; ice dashboard <ArrowUpRight className="h-3 w-3" />
+        </Link>
+      </div>
       <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
         <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">

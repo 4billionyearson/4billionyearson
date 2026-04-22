@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "tsx scripts/build-rankings.ts && next build",
     "start": "next start",
     "build:climate-rankings": "tsx scripts/build-rankings.ts"
   },
