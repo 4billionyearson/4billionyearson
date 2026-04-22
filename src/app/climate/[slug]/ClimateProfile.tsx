@@ -179,6 +179,7 @@ type OverviewMetricBlock = {
 
 type OverviewRow = {
   label: string;
+  sublabel?: string;
   lowerIsBetter?: boolean;
   isPrimary?: boolean;
   latestMonth: OverviewMetricBlock;
@@ -287,11 +288,14 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                     {section.rows.map((row) => (
                       <div
                         key={row.label}
-                        className={`flex-1 min-w-0 px-1 md:px-2 py-1.5 text-[11px] md:text-xs font-bold truncate ${
+                        className={`flex-1 min-w-0 px-1 md:px-2 py-1.5 text-[11px] md:text-xs font-bold ${
                           row.isPrimary ? 'text-white' : 'text-gray-400'
                         }`}
                       >
-                        {row.label}
+                        <div className="truncate">{row.label}</div>
+                        {row.sublabel ? (
+                          <div className="text-[9px] md:text-[10px] font-normal text-gray-500 truncate normal-case">{row.sublabel}</div>
+                        ) : null}
                       </div>
                     ))}
                   </div>
@@ -396,7 +400,10 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
         1,
       ),
     ]),
-    buildOverviewRow('Global (land + ocean)', data.globalData?.noaaStats?.landOcean?.yearly ?? data.globalData?.landYearlyData, data.globalData?.noaaStats?.landOcean?.latestMonthStats ?? data.globalData?.landLatestMonthStats, data.globalData?.noaaStats?.landOcean?.latestThreeMonthStats ?? data.globalData?.landLatestThreeMonthStats, '°C', 1),
+    (() => {
+      const row = buildOverviewRow('Global', data.globalData?.noaaStats?.landOcean?.yearly ?? data.globalData?.landYearlyData, data.globalData?.noaaStats?.landOcean?.latestMonthStats ?? data.globalData?.landLatestMonthStats, data.globalData?.noaaStats?.landOcean?.latestThreeMonthStats ?? data.globalData?.landLatestThreeMonthStats, '°C', 1);
+      return row ? { ...row, sublabel: 'Land + Ocean' } : null;
+    })(),
   ].filter((row): row is OverviewRow => Boolean(row));
 
   if (temperatureRows.length) {
@@ -827,11 +834,11 @@ function RelatedLink({ href, label, desc }: { href: string; label: string; desc:
   return (
     <Link
       href={href}
-      className="relative block rounded-xl border border-gray-700/50 bg-gray-900/60 p-4 hover:border-[#D0A65E]/50 hover:bg-gray-900 transition-all"
+      className="relative block rounded-xl border border-[#D0A65E]/40 bg-gray-900 hover:bg-gray-800 hover:border-[#D0A65E]/70 p-4 transition-all shadow-md"
     >
-      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-gray-600" />
-      <div className="font-semibold text-gray-200 text-sm pr-5">{label}</div>
-      <div className="text-xs text-gray-500 mt-1">{desc}</div>
+      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-[#D0A65E]/70" />
+      <div className="font-semibold text-white text-sm pr-5">{label}</div>
+      <div className="text-xs text-gray-300 mt-1">{desc}</div>
     </Link>
   );
 }

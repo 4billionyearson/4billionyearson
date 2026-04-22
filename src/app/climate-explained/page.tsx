@@ -229,7 +229,7 @@ export default function ClimateExplainedPage() {
                 <a
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
+                  className="flex items-center gap-3 bg-gray-900 rounded-xl p-3.5 border border-[#D0A65E]/30 hover:border-[#D0A65E]/60 hover:bg-gray-800 transition-colors group"
                 >
                   <ArrowUpRight className={`h-4 w-4 ${color} flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
                   <div>
@@ -251,7 +251,7 @@ export default function ClimateExplainedPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
+                  className="flex items-start gap-3 bg-gray-900 rounded-xl p-3.5 border border-[#D0A65E]/30 hover:border-[#D0A65E]/60 hover:bg-gray-800 transition-colors group"
                 >
                   <ExternalLink className="h-4 w-4 text-[#D0A65E] flex-shrink-0 mt-0.5" />
                   <div>

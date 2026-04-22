@@ -49,7 +49,7 @@ function RegionCard({ region }: { region: ClimateRegion }) {
   return (
     <Link
       href={`/climate/${region.slug}`}
-      className="group block rounded-xl border border-gray-800/80 bg-gray-900/40 p-3.5 transition-all duration-200 hover:border-[#D0A65E]/35 hover:bg-white/[0.03]"
+      className="group block rounded-xl border border-[#D0A65E]/30 bg-gray-900/85 p-3.5 transition-all duration-200 hover:border-[#D0A65E]/60 hover:bg-gray-800"
     >
       <div className="flex items-start gap-3">
         <span className="text-xl leading-none mt-0.5">{region.emoji}</span>

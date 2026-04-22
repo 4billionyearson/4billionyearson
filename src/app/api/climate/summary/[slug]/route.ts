@@ -356,7 +356,14 @@ function buildNationalComparison(nationalData: any, nationalName: string): strin
 }
 
 function summaryLooksIncomplete(summary: string): boolean {
-  return !/[.!?]["')\]]?\s*$/.test(summary.trim());
+  // Consider the summary complete if it ends with sentence-ending punctuation,
+  // possibly followed by a closing quote/bracket/citation marker, or if it's
+  // long enough (>= 400 chars) that the user gets a useful paragraph even if
+  // the final sentence was cut. The old regex was too strict and caused
+  // otherwise-good summaries to be rejected repeatedly.
+  const trimmed = summary.trim();
+  if (trimmed.length >= 400) return false;
+  return !/[.!?]["')\]\s]*$/.test(trimmed);
 }
 
 // ─── Prompt builder ─────────────────────────────────────────────────────────
@@ -497,7 +504,11 @@ async function callGemini(
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0.3,
-      maxOutputTokens: 3000,
+      maxOutputTokens: 8000,
+      // gemini-2.5-flash uses "thinking" tokens by default which can eat the
+      // entire maxOutputTokens budget before any text is emitted. Disable it
+      // for this short-form summarisation task.
+      thinkingConfig: { thinkingBudget: 0 },
     },
   };
   if (useGrounding) {
@@ -520,9 +531,10 @@ async function callGemini(
   }
 
   const data = await res.json();
+  const finishReason = data?.candidates?.[0]?.finishReason;
   const summary = extractTextFromParts(data);
   if (!summary) {
-    console.error(`Gemini returned no text (grounding=${useGrounding}):`, JSON.stringify(data).slice(0, 500));
+    console.error(`Gemini returned no text (grounding=${useGrounding}, finishReason=${finishReason}):`, JSON.stringify(data).slice(0, 500));
   }
   return {
     summary,

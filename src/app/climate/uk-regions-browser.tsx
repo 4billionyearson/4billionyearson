@@ -426,7 +426,7 @@ function UKRegionCard({
       className={`group block rounded-xl border p-3.5 transition-all duration-200 ${
         selected
           ? 'border-[#D0A65E]/45 bg-[#D0A65E]/8'
-          : 'border-gray-800/80 bg-gray-900/40 hover:border-[#D0A65E]/25 hover:bg-white/[0.03]'
+          : 'border-[#D0A65E]/30 bg-gray-900/85 hover:border-[#D0A65E]/60 hover:bg-gray-800'
       }`}
       onMouseEnter={onPointerEnter}
     >

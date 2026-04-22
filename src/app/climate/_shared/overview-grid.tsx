@@ -37,6 +37,7 @@ export type OverviewMetricBlock = {
 
 export type OverviewRow = {
   label: string;
+  sublabel?: string;
   lowerIsBetter?: boolean;
   isPrimary?: boolean;
   latestMonth: OverviewMetricBlock;
@@ -176,11 +177,14 @@ export function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                     {section.rows.map((row) => (
                       <div
                         key={row.label}
-                        className={`flex-1 min-w-0 px-1 md:px-2 py-1.5 text-[11px] md:text-xs font-bold truncate ${
+                        className={`flex-1 min-w-0 px-1 md:px-2 py-1.5 text-[11px] md:text-xs font-bold ${
                           row.isPrimary ? 'text-white' : 'text-gray-400'
                         }`}
                       >
-                        {row.label}
+                        <div className="truncate">{row.label}</div>
+                        {row.sublabel ? (
+                          <div className="text-[9px] md:text-[10px] font-normal text-gray-500 truncate normal-case">{row.sublabel}</div>
+                        ) : null}
                       </div>
                     ))}
                   </div>
