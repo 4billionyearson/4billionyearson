@@ -649,7 +649,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               {summary ? (
                 <div>
                   {coverageLine && (
-                    <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
+                    <div className="inline-flex items-start gap-2 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
                       <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
