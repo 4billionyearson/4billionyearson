@@ -749,7 +749,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                     {/* Temperature */}
                     {tempPanels.length > 0 && (
                       <>
-                        <Divider icon={<Thermometer className="h-5 w-5" />} title="Temperature" />
+                        <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature" />
                         <OverviewGrid panels={tempPanels} />
                       </>
                     )}
@@ -762,7 +762,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                     {/* Sunshine */}
                     {sunshinePanels.length > 0 && (
                       <>
-                        <Divider icon={<Sun className="h-5 w-5" />} title="Sunshine" />
+                        <Divider icon={<Sun className="h-5 w-5 text-amber-300" />} title="Sunshine" />
                         <OverviewGrid panels={sunshinePanels} />
                       </>
                     )}
@@ -770,7 +770,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                     {/* Rainfall */}
                     {rainfallPanels.length > 0 && (
                       <>
-                        <Divider icon={<Droplets className="h-5 w-5" />} title="Rainfall & Precipitation" />
+                        <Divider icon={<Droplets className="h-5 w-5 text-sky-300" />} title="Rainfall & Precipitation" />
                         <OverviewGrid panels={rainfallPanels} />
                       </>
                     )}
@@ -778,7 +778,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                     {/* Frost */}
                     {frostPanels.length > 0 && (
                       <>
-                        <Divider icon={<Snowflake className="h-5 w-5" />} title="Frost" />
+                        <Divider icon={<Snowflake className="h-5 w-5 text-cyan-200" />} title="Frost" />
                         <OverviewGrid panels={frostPanels} />
                       </>
                     )}
@@ -787,7 +787,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               })()}
 
               {/* ─── Explore & Sources ─── */}
-              <Divider icon={<BookOpen className="h-5 w-5" />} title="Explore & Sources" />
+              <Divider icon={<BookOpen className="h-5 w-5 text-[#D0A65E]" />} title="Explore & Sources" />
 
               {/* ─── Explore More ─── */}
               <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
