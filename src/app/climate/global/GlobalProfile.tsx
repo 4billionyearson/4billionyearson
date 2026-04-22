@@ -424,7 +424,7 @@ export default function GlobalProfile() {
                         </p>
                         <div className="h-64">
                           <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
+                            <LineChart data={chartData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
                               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                               <XAxis dataKey="year" stroke="#9CA3AF" fontSize={11} />
                               <YAxis
@@ -510,49 +510,44 @@ export default function GlobalProfile() {
               {/* Spaghetti chart — Land + Ocean (headline global series) */}
               {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (
                 <>
-                  <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year — Global Land + Ocean" />
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <p className="text-xs text-gray-400 mb-3">
-                      Each line is a single year; the current year is highlighted. This is the headline global surface-temperature series — the same land + ocean dataset used by Copernicus, WMO and NOAA — and the one to cite when comparing the planet as a whole against a single country, state or region (shown on the individual climate pages).
-                    </p>
+                  <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Temperature" />
+                  <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <TemperatureSpaghettiChart
                       monthlyAll={data.landOceanMonthlyAll}
                       regionName="Global Land + Ocean"
                       dataSource="NOAA Climate at a Glance — Global Land+Ocean"
                     />
+                    <p className="text-xs text-gray-400 mt-3">
+                      Each line is a single year; the current year is highlighted. This is the headline global surface-temperature series — the same land + ocean dataset used by Copernicus, WMO and NOAA — and the one to cite when comparing the planet as a whole against a single country, state or region (shown on the individual climate pages).
+                    </p>
                   </div>
                 </>
               )}
 
               {/* Spaghetti chart — Land only (for direct comparison with country/state/region pages) */}
               {data.landMonthlyAll?.length > 0 && (
-                <>
-                  <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year — Global Land" />
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <p className="text-xs text-gray-400 mb-3">
-                      The same chart style as the individual country, state and region climate pages — which use land-only temperatures because there&rsquo;s no ocean inside their borders. This land-only global version is included so you can compare any specific place on those pages against the global land average on equal terms.
-                    </p>
-                    <TemperatureSpaghettiChart
-                      monthlyAll={data.landMonthlyAll}
-                      regionName="Global Land"
-                      dataSource="Our World in Data / ERA5"
-                    />
-                  </div>
-                </>
+                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                  <TemperatureSpaghettiChart
+                    monthlyAll={data.landMonthlyAll}
+                    regionName="Global Land"
+                    dataSource="Our World in Data / ERA5"
+                  />
+                  <p className="text-xs text-gray-400 mt-3">
+                    The same chart style as the individual country, state and region climate pages — which use land-only temperatures because there&rsquo;s no ocean inside their borders. This land-only global version is included so you can compare any specific place on those pages against the global land average on equal terms.
+                  </p>
+                </div>
               )}
 
               {/* Yearly trend chart */}
               {yearlyChartData.length > 0 && (
-                <>
-                  <Divider icon={<Globe2 className="h-5 w-5 text-orange-400" />} title="Long-Term Temperature Trend" />
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <h3 className="text-base font-semibold text-white mb-1">Global Land + Ocean absolute temperature, {yearMin}–{yearMax}</h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Annual average (thin line) with a 10-year rolling mean (thick line). Horizontal lines mark the Paris 1.5°C and 2.0°C thresholds above pre-industrial.
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={yearlyChartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <LineChart data={yearlyChartData} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="year" stroke="#9CA3AF" fontSize={11} />
                           <YAxis
@@ -575,21 +570,19 @@ export default function GlobalProfile() {
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
-                  </div>
-                </>
+                </div>
               )}
 
               {/* Monthly comparison — last 12 months (land+ocean) */}
               {data.monthlyComparison?.length > 0 && (
-                <>
-                  <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Last 12 Months vs 1961–1990" />
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                    <h3 className="text-base font-semibold text-white mb-1">Last 12 months vs 1961–1990 (global land + ocean)</h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Each bar is the difference between that month&rsquo;s global land + ocean temperature and the 1961–1990 average for the same month. Red bars are warmer than baseline, blue are cooler.
                     </p>
                     <div className="h-72">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data.monthlyComparison} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <BarChart data={data.monthlyComparison} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="monthLabel" stroke="#9CA3AF" fontSize={10} interval={0} angle={-30} textAnchor="end" height={60} />
                           <YAxis
@@ -610,21 +603,19 @@ export default function GlobalProfile() {
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
-                  </div>
-                </>
+                </div>
               )}
 
               {/* Land vs Ocean */}
               {data.landVsOceanMonthly && data.landVsOceanMonthly.length > 0 && (
-                <>
-                  <Divider icon={<Globe2 className="h-5 w-5 text-orange-400" />} title="Land vs Land + Ocean — Last 12 Months" />
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                    <h3 className="text-base font-semibold text-white mb-1">Land vs Land + Ocean — last 12 months</h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Land surfaces warm roughly twice as fast as the ocean. This chart compares the global land-only temperature (ERA5, via Our World in Data) against the combined land+ocean series (NOAA) for each of the last 12 months.
                     </p>
                     <div className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={data.landVsOceanMonthly} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <LineChart data={data.landVsOceanMonthly} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="monthLabel" stroke="#9CA3AF" fontSize={10} angle={-30} textAnchor="end" height={60} />
                           <YAxis stroke="#9CA3AF" fontSize={11} domain={[10, 20]} ticks={[10, 12, 14, 16, 18, 20]} tickFormatter={(v) => `${v.toFixed(0)}°C`} />
@@ -638,8 +629,7 @@ export default function GlobalProfile() {
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
-                  </div>
-                </>
+                </div>
               )}
 
               {/* Context + Sources */}

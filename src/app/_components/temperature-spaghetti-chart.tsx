@@ -120,7 +120,7 @@ export default function TemperatureSpaghettiChart({ monthlyAll, regionName, data
 
       <div className="w-full h-[360px] md:h-[480px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 30, right: 50, left: -12, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 30, right: 50, left: -20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
             <XAxis
               dataKey="monthLabel"
