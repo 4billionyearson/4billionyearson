@@ -5,6 +5,7 @@ import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import UKRegionsBrowser from './uk-regions-browser';
 import ClimateRegionsBrowser from './climate-regions-browser';
 import StartHereStrip from './start-here-strip';
+import ClimateHubSubNav from './climate-hub-sub-nav';
 
 export const metadata: Metadata = {
   title: 'Climate Updates — Country, State & Region Climate Data',
@@ -43,27 +44,42 @@ export default function ClimateProfilesIndex() {
             description="Monthly climate updates for every country, US state and UK region we track — 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news. Dive into a specific region below, or jump to the full league table and monthly movers."
           />
 
-          {/* Countries */}
-          <ClimateRegionsBrowser
-            title="Countries"
-            icon={<Globe2 className="h-6 w-6" />}
-            regions={countries}
-            mode="country"
-            intro="Climate profiles for every country we publish, grouped by continent. Data from Our World in Data and OWID-aggregated national sources."
+          {/* Sticky jump-to chips */}
+          <ClimateHubSubNav
+            counts={{
+              countries: countries.length,
+              usStates: usStates.length,
+              ukRegions: ukAndIrelandRegions.length,
+            }}
           />
+
+          {/* Countries */}
+          <div id="countries" style={{ scrollMarginTop: '72px' }}>
+            <ClimateRegionsBrowser
+              title="Countries"
+              icon={<Globe2 className="h-6 w-6" />}
+              regions={countries}
+              mode="country"
+              intro="Climate profiles for every country we publish, grouped by continent. Data from Our World in Data and OWID-aggregated national sources."
+            />
+          </div>
 
           {/* US States */}
-          <ClimateRegionsBrowser
-            title="US States"
-            icon={<Flag className="h-6 w-6" />}
-            regions={usStates}
-            mode="us-state"
-            intro="NOAA Climate at a Glance temperature and precipitation data for every US state, grouped by Census Bureau region."
-          />
+          <div id="us-states" style={{ scrollMarginTop: '72px' }}>
+            <ClimateRegionsBrowser
+              title="US States"
+              icon={<Flag className="h-6 w-6" />}
+              regions={usStates}
+              mode="us-state"
+              intro="NOAA Climate at a Glance temperature and precipitation data for every US state, grouped by Census Bureau region."
+            />
+          </div>
 
-          <Suspense fallback={<UKRegionsFallback />}> 
-            <UKRegionsBrowser regions={ukAndIrelandRegions} />
-          </Suspense>
+          <div id="uk-regions" style={{ scrollMarginTop: '72px' }}>
+            <Suspense fallback={<UKRegionsFallback />}>
+              <UKRegionsBrowser regions={ukAndIrelandRegions} />
+            </Suspense>
+          </div>
 
           {/* SEO content block */}
           <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">

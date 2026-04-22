@@ -85,7 +85,7 @@ export default function StartHereStrip({ regions, title, description }: StartHer
         </div>
       ) : null}
 
-      <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5 space-y-4">
+      <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5 space-y-4" id="editors-picks" style={{ scrollMarginTop: '72px' }}>
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#FFF5E7]">
             <Sparkles className="h-4 w-4 text-[#D0A65E]" />
@@ -121,4 +121,3 @@ export default function StartHereStrip({ regions, title, description }: StartHer
     </section>
   );
 }
-"use client";
