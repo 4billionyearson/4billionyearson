@@ -600,7 +600,10 @@ export default function GlobalProfile() {
               {/* Yearly trend chart */}
               {yearlyChartData.length > 0 && (
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-base font-semibold text-white mb-1 flex items-center gap-2"><Globe2 className="h-4 w-4 text-orange-400" />Global Land + Ocean absolute temperature, {yearMin}–{yearMax}</h3>
+                    <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
+                      <Globe2 className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
+                      <span className="min-w-0 flex-1">Global Land + Ocean Absolute Temperature, {yearMin}–{yearMax}</span>
+                    </h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Annual average (thin line) with a 10-year rolling mean (thick line). Horizontal lines mark the Paris 1.5°C and 2.0°C thresholds above pre-industrial.
                     </p>
@@ -636,7 +639,10 @@ export default function GlobalProfile() {
               {/* Monthly comparison — last 12 months (land+ocean) */}
               {data.monthlyComparison?.length > 0 && (
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-base font-semibold text-white mb-1 flex items-center gap-2"><Thermometer className="h-4 w-4 text-orange-400" />Last 12 months vs 1961–1990 (global land + ocean)</h3>
+                    <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
+                      <Thermometer className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
+                      <span className="min-w-0 flex-1">Last 12 Months vs 1961–1990 (Global Land + Ocean)</span>
+                    </h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Each bar is the difference between that month&rsquo;s global land + ocean temperature and the 1961–1990 average for the same month. Red bars are warmer than baseline, blue are cooler.
                     </p>
@@ -670,7 +676,10 @@ export default function GlobalProfile() {
               {/* Land vs Ocean */}
               {data.landVsOceanMonthly && data.landVsOceanMonthly.length > 0 && (
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-base font-semibold text-white mb-1 flex items-center gap-2"><Globe2 className="h-4 w-4 text-orange-400" />Land vs Land + Ocean — last 12 months</h3>
+                    <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
+                      <Globe2 className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
+                      <span className="min-w-0 flex-1">Land vs Land + Ocean — Last 12 Months</span>
+                    </h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Land surfaces warm roughly twice as fast as the ocean. This chart compares the global land-only temperature (ERA5, via Our World in Data) against the combined land+ocean series (NOAA) for each of the last 12 months.
                     </p>
@@ -721,9 +730,9 @@ export default function GlobalProfile() {
                 <>
                   <Divider icon={<Globe2 className="h-5 w-5 text-[#D0A65E]" />} title="World — Latest Month" />
                   <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-base font-semibold text-white mb-1 flex items-center gap-2">
-                      <Globe2 className="h-4 w-4 text-[#D0A65E]" />
-                      Country-by-country temperature anomaly
+                    <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
+                      <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+                      <span className="min-w-0 flex-1">Country-by-Country Temperature Anomaly</span>
                     </h3>
                     <p className="text-xs text-gray-400 mb-3">
                       Each country is coloured by its latest monthly land-surface temperature anomaly against its own 1961–1990 baseline — the same figures shown on each country&rsquo;s climate page on this site. Countries without a dedicated page are shown in grey.
@@ -740,9 +749,9 @@ export default function GlobalProfile() {
               <Divider icon={<Database className="h-5 w-5 text-[#D0A65E]" />} title="Context & Sources" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                  <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-                    <Info className="h-4 w-4 text-[#D0A65E]" />
-                    Baselines &amp; methodology
+                  <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+                    <Info className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+                    <span className="min-w-0 flex-1">Baselines &amp; Methodology</span>
                   </h3>
                   <ul className="text-sm text-gray-300 space-y-2">
                     <li><strong className="text-[#FFF5E7]">1961–1990 baseline</strong> — the WMO standard reference period used for the monthly and quarterly anomalies shown in the table above and on every country/state/region page.</li>
@@ -751,9 +760,9 @@ export default function GlobalProfile() {
                   </ul>
                 </div>
                 <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                  <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-[#D0A65E]" />
-                    Sources
+                  <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+                    <BookOpen className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+                    <span className="min-w-0 flex-1">Sources</span>
                   </h3>
                   <ul className="text-sm text-gray-300 space-y-2">
                     <li>
@@ -780,9 +789,9 @@ export default function GlobalProfile() {
 
               {/* Cross-links */}
               <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                <h2 className="text-lg font-bold font-mono text-white mb-2 flex items-center gap-2">
-                  <Globe2 className="h-5 w-5 text-[#D0A65E]" />
-                  Zoom in — country & regional updates
+                <h2 className="text-xl font-bold font-mono text-white mb-2 flex items-start gap-2">
+                  <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+                  <span className="min-w-0 flex-1">Zoom In — Country &amp; Regional Updates</span>
                 </h2>
                 <p className="text-sm text-gray-400 mb-4 max-w-3xl">
                   Global figures hide huge regional variation: the Arctic is warming about four times faster than the global mean, and heat extremes are outpacing rainfall change across much of the tropics and mid-latitudes. Dive into individual profiles:
@@ -820,9 +829,9 @@ export default function GlobalProfile() {
 
           {/* SEO footer */}
           <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-lg font-bold font-mono text-white mb-3 flex items-center gap-2">
-              <Info className="h-5 w-5 text-[#D0A65E]" />
-              About this page
+            <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+              <Info className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+              <span className="min-w-0 flex-1">About This Page</span>
             </h2>
             <div className="text-sm text-gray-400 space-y-3 max-w-3xl">
               <p>

@@ -791,7 +791,10 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
               {/* ─── Explore More ─── */}
               <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                <h2 className="text-xl font-bold font-mono text-white mb-4">Explore Climate Data</h2>
+                <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2">
+                  <BookOpen className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+                  <span className="min-w-0 flex-1">Explore Climate Data</span>
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   <RelatedLink href="/climate-dashboard" label="Climate Dashboard" desc="Interactive global climate data" />
                   <RelatedLink href="/emissions" label="CO₂ Emissions" desc="Global and per-country emissions" />
