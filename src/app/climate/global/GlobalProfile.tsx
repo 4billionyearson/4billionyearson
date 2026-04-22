@@ -48,6 +48,7 @@ interface GlobalData {
   landYearlyData: LandYearlyPoint[] | null;
   landMonthlyComparison: MonthlyComparisonPoint[] | null;
   landMonthlyAll: { year: number; month: number; value: number }[];
+  landOceanMonthlyAll?: { year: number; month: number; value: number }[];
   landLatestMonthStats: RankedStat | null;
   landLatestThreeMonthStats: RankedStat | null;
   landVsOceanMonthly: LandVsOceanPoint[] | null;
@@ -357,6 +358,7 @@ export default function GlobalProfile() {
                       <div>
                         <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Paris Agreement Tracker</p>
                         <h3 className="text-lg md:text-xl font-bold text-white mt-1">How close are we to 1.5°C and 2°C?</h3>
+                        <p className="text-[11px] text-gray-500 mt-1">Global land + ocean surface temperature (NOAA) — the series used by Copernicus, WMO and the IPCC.</p>
                       </div>
                       <div className="text-right">
                         <p className={`text-4xl md:text-5xl font-bold font-mono ${atOrPast15 ? 'text-red-300' : 'text-orange-300'}`}>
@@ -505,11 +507,31 @@ export default function GlobalProfile() {
                 );
               })()}
 
-              {/* Spaghetti chart */}
+              {/* Spaghetti chart — Land + Ocean (headline global series) */}
+              {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (
+                <>
+                  <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year — Global Land + Ocean" />
+                  <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                    <p className="text-xs text-gray-400 mb-3">
+                      Each line is a single year; the current year is highlighted. This is the headline global surface-temperature series — the same land + ocean dataset used by Copernicus, WMO and NOAA — and the one to cite when comparing the planet as a whole against a single country, state or region (shown on the individual climate pages).
+                    </p>
+                    <TemperatureSpaghettiChart
+                      monthlyAll={data.landOceanMonthlyAll}
+                      regionName="Global Land + Ocean"
+                      dataSource="NOAA Climate at a Glance — Global Land+Ocean"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Spaghetti chart — Land only (for direct comparison with country/state/region pages) */}
               {data.landMonthlyAll?.length > 0 && (
                 <>
                   <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year — Global Land" />
                   <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                    <p className="text-xs text-gray-400 mb-3">
+                      The same chart style as the individual country, state and region climate pages — which use land-only temperatures because there&rsquo;s no ocean inside their borders. This land-only global version is included so you can compare any specific place on those pages against the global land average on equal terms.
+                    </p>
                     <TemperatureSpaghettiChart
                       monthlyAll={data.landMonthlyAll}
                       regionName="Global Land"

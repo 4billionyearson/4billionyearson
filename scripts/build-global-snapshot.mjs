@@ -362,6 +362,7 @@ async function main() {
     landYearlyData,
     landMonthlyComparison,
     landMonthlyAll: landMonthly.map((p) => ({ year: p.year, month: p.month, value: p.temp })),
+    landOceanMonthlyAll: noaaMonthly.map((p) => ({ year: p.year, month: p.month, value: p.absoluteTemp })),
     landLatestMonthStats: landMonthly.length ? buildLatestMonthStats(landPointsForStats, now) : null,
     landLatestThreeMonthStats: landMonthly.length ? buildLatestThreeMonthStats(landPointsForStats, now) : null,
     landVsOceanMonthly,
