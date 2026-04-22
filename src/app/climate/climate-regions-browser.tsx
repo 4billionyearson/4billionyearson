@@ -45,22 +45,39 @@ const US_REGION_ORDER: USRegion[] = ['Northeast', 'Midwest', 'South', 'West'];
 
 // ─── Region card ─────────────────────────────────────────────────────────────
 
+function TypeBadge({ type }: { type: ClimateRegion['type'] }) {
+  const { label, cls } =
+    type === 'country'
+      ? { label: 'Country', cls: 'border-sky-500/40 bg-sky-500/10 text-sky-300' }
+      : type === 'us-state'
+        ? { label: 'US State', cls: 'border-orange-500/40 bg-orange-500/10 text-orange-300' }
+        : type === 'uk-region'
+          ? { label: 'UK Region', cls: 'border-[#D0A65E]/45 bg-[#D0A65E]/10 text-[#D0A65E]' }
+          : { label: 'Global', cls: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' };
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${cls}`}>
+      {label}
+    </span>
+  );
+}
+
 function RegionCard({ region }: { region: ClimateRegion }) {
   return (
     <Link
       href={`/climate/${region.slug}`}
-      className="group block rounded-xl border border-[#D0A65E]/30 bg-gray-900/85 p-3.5 transition-all duration-200 hover:border-[#D0A65E]/60 hover:bg-gray-800"
+      className="group flex flex-col rounded-xl border border-[#D0A65E]/30 bg-gray-900/85 p-3.5 transition-all duration-200 hover:border-[#D0A65E]/60 hover:bg-gray-800"
     >
-      <div className="flex items-start gap-3">
-        <span className="text-xl leading-none mt-0.5">{region.emoji}</span>
-        <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-[#FFF5E7] group-hover:text-white truncate">
-            {region.name}
-          </h4>
-          <p className="text-[12px] text-gray-400 line-clamp-2 mt-0.5">{region.tagline}</p>
-        </div>
-        <ChevronRight className="h-4 w-4 shrink-0 text-[#D0A65E]/50 group-hover:text-[#D0A65E]" />
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <span className="text-3xl leading-none" aria-hidden>{region.emoji}</span>
+        <TypeBadge type={region.type} />
       </div>
+      <h4 className="text-sm font-semibold text-[#FFF5E7] group-hover:text-white leading-tight">
+        {region.name}
+      </h4>
+      <p className="text-[12px] text-gray-400 line-clamp-2 mt-1 flex-1">{region.tagline}</p>
+      <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[#D0A65E]/80 group-hover:text-[#D0A65E]">
+        Open climate update <ChevronRight className="h-3 w-3" />
+      </span>
     </Link>
   );
 }
