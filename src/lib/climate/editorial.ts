@@ -160,41 +160,197 @@ export function locationIdToSlug(
 }
 
 /**
+ * Top cities per country (ISO-3) — used to populate the "Top 5 Cities:"
+ * coverage pill on auto-generated stub profiles, and to surface city
+ * names in the page description/keywords for SEO and LLM search.
+ */
+export const COUNTRY_TOP_CITIES: Record<string, string[]> = {
+  // Europe
+  FRA: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice'],
+  ITA: ['Rome', 'Milan', 'Naples', 'Turin', 'Palermo'],
+  ESP: ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza'],
+  POL: ['Warsaw', 'Kraków', 'Łódź', 'Wrocław', 'Poznań'],
+  NLD: ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven'],
+  BEL: ['Brussels', 'Antwerp', 'Ghent', 'Charleroi', 'Liège'],
+  SWE: ['Stockholm', 'Gothenburg', 'Malmö', 'Uppsala', 'Västerås'],
+  NOR: ['Oslo', 'Bergen', 'Stavanger', 'Trondheim', 'Drammen'],
+  DNK: ['Copenhagen', 'Aarhus', 'Odense', 'Aalborg', 'Esbjerg'],
+  FIN: ['Helsinki', 'Espoo', 'Tampere', 'Vantaa', 'Oulu'],
+  PRT: ['Lisbon', 'Porto', 'Braga', 'Coimbra', 'Funchal'],
+  GRC: ['Athens', 'Thessaloniki', 'Patras', 'Piraeus', 'Larissa'],
+  AUT: ['Vienna', 'Graz', 'Linz', 'Salzburg', 'Innsbruck'],
+  CHE: ['Zurich', 'Geneva', 'Basel', 'Bern', 'Lausanne'],
+  UKR: ['Kyiv', 'Kharkiv', 'Odesa', 'Dnipro', 'Lviv'],
+  ROU: ['Bucharest', 'Cluj-Napoca', 'Timișoara', 'Iași', 'Constanța'],
+  HUN: ['Budapest', 'Debrecen', 'Szeged', 'Miskolc', 'Pécs'],
+  CZE: ['Prague', 'Brno', 'Ostrava', 'Plzeň', 'Liberec'],
+  CYP: ['Nicosia', 'Limassol', 'Larnaca', 'Famagusta', 'Paphos'],
+  ISL: ['Reykjavík', 'Kópavogur', 'Hafnarfjörður', 'Akureyri', 'Reykjanesbær'],
+  // Americas
+  CAN: ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa'],
+  MEX: ['Mexico City', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana'],
+  BRA: ['São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza'],
+  ARG: ['Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata'],
+  CHL: ['Santiago', 'Valparaíso', 'Concepción', 'La Serena', 'Antofagasta'],
+  COL: ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena'],
+  PER: ['Lima', 'Arequipa', 'Trujillo', 'Chiclayo', 'Cusco'],
+  BOL: ['La Paz', 'Santa Cruz de la Sierra', 'Cochabamba', 'Sucre', 'El Alto'],
+  CRI: ['San José', 'Alajuela', 'Cartago', 'Heredia', 'Liberia'],
+  GUY: ['Georgetown', 'Linden', 'New Amsterdam', 'Anna Regina', 'Bartica'],
+  NIC: ['Managua', 'León', 'Masaya', 'Matagalpa', 'Chinandega'],
+  SUR: ['Paramaribo', 'Lelydorp', 'Nieuw Nickerie', 'Moengo', 'Albina'],
+  JAM: ['Kingston', 'Montego Bay', 'Spanish Town', 'Portmore', 'Mandeville'],
+  // Asia
+  JPN: ['Tokyo', 'Osaka', 'Yokohama', 'Nagoya', 'Sapporo'],
+  KOR: ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon'],
+  PRK: ['Pyongyang', 'Hamhung', 'Chongjin', 'Nampo', 'Wonsan'],
+  IDN: ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang'],
+  MYS: ['Kuala Lumpur', 'Johor Bahru', 'Ipoh', 'Kuching', 'George Town'],
+  THA: ['Bangkok', 'Chiang Mai', 'Pattaya', 'Phuket', 'Nonthaburi'],
+  VNM: ['Hanoi', 'Ho Chi Minh City', 'Hai Phong', 'Da Nang', 'Can Tho'],
+  PHL: ['Manila', 'Quezon City', 'Davao', 'Cebu', 'Caloocan'],
+  SGP: ['Singapore', 'Jurong', 'Woodlands', 'Tampines', 'Bedok'],
+  PAK: ['Karachi', 'Lahore', 'Islamabad', 'Faisalabad', 'Rawalpindi'],
+  BGD: ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Sylhet'],
+  LKA: ['Colombo', 'Kandy', 'Galle', 'Jaffna', 'Negombo'],
+  MMR: ['Yangon', 'Mandalay', 'Naypyidaw', 'Mawlamyine', 'Bago'],
+  // Middle East
+  SAU: ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam'],
+  ARE: ['Dubai', 'Abu Dhabi', 'Sharjah', 'Al Ain', 'Ajman'],
+  IRQ: ['Baghdad', 'Basra', 'Mosul', 'Erbil', 'Sulaymaniyah'],
+  IRN: ['Tehran', 'Mashhad', 'Isfahan', 'Karaj', 'Shiraz'],
+  ISR: ['Jerusalem', 'Tel Aviv', 'Haifa', 'Rishon LeZion', 'Petah Tikva'],
+  PSE: ['Gaza', 'Hebron', 'Nablus', 'Ramallah', 'Bethlehem'],
+  LBN: ['Beirut', 'Tripoli', 'Sidon', 'Tyre', 'Zahlé'],
+  SYR: ['Damascus', 'Aleppo', 'Homs', 'Latakia', 'Hama'],
+  TUR: ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya'],
+  // Africa
+  EGY: ['Cairo', 'Alexandria', 'Giza', 'Shubra El Kheima', 'Port Said'],
+  DZA: ['Algiers', 'Oran', 'Constantine', 'Annaba', 'Blida'],
+  MAR: ['Casablanca', 'Rabat', 'Fes', 'Marrakesh', 'Tangier'],
+  NGA: ['Lagos', 'Kano', 'Ibadan', 'Abuja', 'Port Harcourt'],
+  KEN: ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret'],
+  ETH: ['Addis Ababa', 'Dire Dawa', 'Mekelle', 'Adama', 'Gondar'],
+  SOM: ['Mogadishu', 'Hargeisa', 'Bosaso', 'Kismayo', 'Baidoa'],
+  SSD: ['Juba', 'Wau', 'Malakal', 'Yei', 'Aweil'],
+  TZA: ['Dar es Salaam', 'Dodoma', 'Mwanza', 'Arusha', 'Zanzibar City'],
+  UGA: ['Kampala', 'Gulu', 'Lira', 'Mbarara', 'Jinja'],
+  GHA: ['Accra', 'Kumasi', 'Tamale', 'Takoradi', 'Cape Coast'],
+  COD: ['Kinshasa', 'Lubumbashi', 'Mbuji-Mayi', 'Kisangani', 'Goma'],
+  COG: ['Brazzaville', 'Pointe-Noire', 'Dolisie', 'Nkayi', 'Owando'],
+  MWI: ['Lilongwe', 'Blantyre', 'Mzuzu', 'Zomba', 'Karonga'],
+  ZAF: ['Johannesburg', 'Cape Town', 'Durban', 'Pretoria', 'Port Elizabeth'],
+  // Oceania
+  NZL: ['Auckland', 'Wellington', 'Christchurch', 'Hamilton', 'Tauranga'],
+  // Russia
+  RUS: ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Yekaterinburg', 'Kazan'],
+};
+
+/**
+ * Top cities per US state — used to populate the "Top 5 Cities:" pill
+ * and SEO metadata on auto-generated US-state stubs.
+ */
+export const US_STATE_TOP_CITIES: Record<string, string[]> = {
+  'Alabama': ['Birmingham', 'Montgomery', 'Huntsville', 'Mobile', 'Tuscaloosa'],
+  'Alaska': ['Anchorage', 'Fairbanks', 'Juneau', 'Wasilla', 'Sitka'],
+  'Arizona': ['Phoenix', 'Tucson', 'Mesa', 'Chandler', 'Scottsdale'],
+  'Arkansas': ['Little Rock', 'Fort Smith', 'Fayetteville', 'Springdale', 'Jonesboro'],
+  'Colorado': ['Denver', 'Colorado Springs', 'Aurora', 'Fort Collins', 'Lakewood'],
+  'Connecticut': ['Bridgeport', 'New Haven', 'Stamford', 'Hartford', 'Waterbury'],
+  'Delaware': ['Wilmington', 'Dover', 'Newark', 'Middletown', 'Smyrna'],
+  'Georgia': ['Atlanta', 'Augusta', 'Columbus', 'Macon', 'Savannah'],
+  'Hawaii': ['Honolulu', 'Hilo', 'Kailua', 'Pearl City', 'Waipahu'],
+  'Idaho': ['Boise', 'Meridian', 'Nampa', 'Idaho Falls', 'Pocatello'],
+  'Illinois': ['Chicago', 'Aurora', 'Rockford', 'Joliet', 'Naperville'],
+  'Indiana': ['Indianapolis', 'Fort Wayne', 'Evansville', 'South Bend', 'Carmel'],
+  'Iowa': ['Des Moines', 'Cedar Rapids', 'Davenport', 'Sioux City', 'Iowa City'],
+  'Kansas': ['Wichita', 'Overland Park', 'Kansas City', 'Topeka', 'Olathe'],
+  'Kentucky': ['Louisville', 'Lexington', 'Bowling Green', 'Owensboro', 'Covington'],
+  'Louisiana': ['New Orleans', 'Baton Rouge', 'Shreveport', 'Lafayette', 'Lake Charles'],
+  'Maine': ['Portland', 'Lewiston', 'Bangor', 'South Portland', 'Auburn'],
+  'Maryland': ['Baltimore', 'Columbia', 'Germantown', 'Silver Spring', 'Waldorf'],
+  'Massachusetts': ['Boston', 'Worcester', 'Springfield', 'Cambridge', 'Lowell'],
+  'Michigan': ['Detroit', 'Grand Rapids', 'Warren', 'Sterling Heights', 'Ann Arbor'],
+  'Minnesota': ['Minneapolis', 'Saint Paul', 'Rochester', 'Duluth', 'Bloomington'],
+  'Mississippi': ['Jackson', 'Gulfport', 'Southaven', 'Hattiesburg', 'Biloxi'],
+  'Missouri': ['Kansas City', 'St. Louis', 'Springfield', 'Columbia', 'Independence'],
+  'Montana': ['Billings', 'Missoula', 'Great Falls', 'Bozeman', 'Butte'],
+  'Nebraska': ['Omaha', 'Lincoln', 'Bellevue', 'Grand Island', 'Kearney'],
+  'Nevada': ['Las Vegas', 'Henderson', 'Reno', 'North Las Vegas', 'Sparks'],
+  'New Hampshire': ['Manchester', 'Nashua', 'Concord', 'Dover', 'Rochester'],
+  'New Jersey': ['Newark', 'Jersey City', 'Paterson', 'Elizabeth', 'Edison'],
+  'New Mexico': ['Albuquerque', 'Las Cruces', 'Rio Rancho', 'Santa Fe', 'Roswell'],
+  'New York': ['New York City', 'Buffalo', 'Rochester', 'Yonkers', 'Syracuse'],
+  'North Carolina': ['Charlotte', 'Raleigh', 'Greensboro', 'Durham', 'Winston-Salem'],
+  'North Dakota': ['Fargo', 'Bismarck', 'Grand Forks', 'Minot', 'West Fargo'],
+  'Ohio': ['Columbus', 'Cleveland', 'Cincinnati', 'Toledo', 'Akron'],
+  'Oklahoma': ['Oklahoma City', 'Tulsa', 'Norman', 'Broken Arrow', 'Edmond'],
+  'Oregon': ['Portland', 'Salem', 'Eugene', 'Gresham', 'Hillsboro'],
+  'Pennsylvania': ['Philadelphia', 'Pittsburgh', 'Allentown', 'Erie', 'Reading'],
+  'Rhode Island': ['Providence', 'Warwick', 'Cranston', 'Pawtucket', 'East Providence'],
+  'South Carolina': ['Charleston', 'Columbia', 'North Charleston', 'Mount Pleasant', 'Rock Hill'],
+  'South Dakota': ['Sioux Falls', 'Rapid City', 'Aberdeen', 'Brookings', 'Watertown'],
+  'Tennessee': ['Nashville', 'Memphis', 'Knoxville', 'Chattanooga', 'Clarksville'],
+  'Utah': ['Salt Lake City', 'West Valley City', 'Provo', 'West Jordan', 'Orem'],
+  'Vermont': ['Burlington', 'Essex', 'South Burlington', 'Colchester', 'Rutland'],
+  'Virginia': ['Virginia Beach', 'Norfolk', 'Chesapeake', 'Richmond', 'Newport News'],
+  'Washington': ['Seattle', 'Spokane', 'Tacoma', 'Vancouver', 'Bellevue'],
+  'West Virginia': ['Charleston', 'Huntington', 'Morgantown', 'Parkersburg', 'Wheeling'],
+  'Wisconsin': ['Milwaukee', 'Madison', 'Green Bay', 'Kenosha', 'Racine'],
+  'Wyoming': ['Cheyenne', 'Casper', 'Laramie', 'Gillette', 'Rock Springs'],
+};
+
+/**
  * Default tagline/description text used for auto-generated stub
  * entries (i.e. regions without hand-crafted editorial copy).
+ *
+ * `cities` — if provided — are woven into the description and keywords
+ * so the page ranks for city-name searches and surfaces cleanly in
+ * LLM-generated answers.
  */
-export function buildStubCopy(name: string, type: 'country' | 'us-state' | 'uk-region') {
+export function buildStubCopy(
+  name: string,
+  type: 'country' | 'us-state' | 'uk-region',
+  cities?: string[],
+) {
+  const cityList = cities && cities.length ? cities.slice(0, 5) : null;
+  const cityPhrase = cityList ? ` covering ${cityList.join(', ')}` : '';
+  const cityKeywords = cityList ? cityList.map((c) => `${c} climate`) : [];
+
   if (type === 'country') {
     return {
       tagline: `Temperature, rainfall and emissions data for ${name}`,
-      description: `${name} climate profile with temperature trends, rainfall data where available, and CO₂ emissions tracking. Updated monthly.`,
+      description: `${name} climate profile${cityPhrase} with temperature trends, rainfall data where available, and CO₂ emissions tracking. Updated monthly.`,
       keywords: [
         `${name} climate data`,
         `${name} temperature trends`,
         `${name} emissions`,
         `${name} climate change`,
+        ...cityKeywords,
       ],
     };
   }
   if (type === 'us-state') {
     return {
       tagline: `${name} climate data from NOAA Climate at a Glance`,
-      description: `${name} climate profile with NOAA temperature and precipitation data, baselines and monthly anomalies. Updated monthly.`,
+      description: `${name} climate profile${cityPhrase} with NOAA temperature and precipitation data, baselines and monthly anomalies. Updated monthly.`,
       keywords: [
         `${name} climate data`,
         `${name} temperature`,
         `${name} precipitation`,
         `NOAA ${name}`,
+        ...cityKeywords,
       ],
     };
   }
   return {
     tagline: `${name} climate data from the Met Office regional series`,
-    description: `${name} climate profile with Met Office temperature, rainfall, sunshine and frost data. Updated monthly.`,
+    description: `${name} climate profile${cityPhrase} with Met Office temperature, rainfall, sunshine and frost data. Updated monthly.`,
     keywords: [
       `${name} climate data`,
       `${name} temperature`,
       `${name} rainfall`,
+      ...cityKeywords,
     ],
   };
 }

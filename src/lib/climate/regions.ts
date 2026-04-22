@@ -6,6 +6,8 @@ import {
   CURATED_LOCATION_IDS,
   buildStubCopy,
   locationIdToSlug,
+  COUNTRY_TOP_CITIES,
+  US_STATE_TOP_CITIES,
 } from './editorial';
 
 export type RegionType = 'country' | 'us-state' | 'uk-region' | 'special';
@@ -416,24 +418,27 @@ function buildStubs(): ClimateRegion[] {
   for (const loc of ALL_LOCATIONS) {
     if (CURATED_LOCATION_IDS.has(loc.id)) continue;
     const slug = locationIdToSlug(loc.id, loc.name, loc.type);
-    const copy = buildStubCopy(loc.name, loc.type);
     let apiCode = '';
     let emoji = '🌍';
     const dataSources: string[] = [];
+    let cities: string[] | undefined;
     if (loc.type === 'country' && loc.owidCode) {
       apiCode = loc.owidCode;
       emoji = countryFlag(loc.owidCode);
       dataSources.push('owid-temp', 'owid-emissions');
+      cities = COUNTRY_TOP_CITIES[loc.owidCode];
     } else if (loc.type === 'us-state') {
       apiCode = loc.id; // e.g. us-ny
       emoji = '🇺🇸';
       dataSources.push('noaa-state');
+      cities = US_STATE_TOP_CITIES[loc.name];
     } else if (loc.type === 'uk-region') {
       apiCode = loc.id; // e.g. uk-eng
       emoji = '🏴';
       dataSources.push('met-office');
     }
     if (!apiCode) continue;
+    const copy = buildStubCopy(loc.name, loc.type, cities);
     stubs.push({
       slug,
       name: loc.name,
@@ -444,6 +449,7 @@ function buildStubs(): ClimateRegion[] {
       emoji,
       dataSources,
       keywords: copy.keywords,
+      coveragePlaces: cities,
       isStub: true,
     });
   }
