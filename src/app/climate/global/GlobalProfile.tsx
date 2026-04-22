@@ -788,8 +788,8 @@ export default function GlobalProfile() {
 
               {/* Context + Sources */}
               <Divider icon={<Database className="h-5 w-5 text-[#D0A65E]" />} title="Context & Sources" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                   <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
                     <Info className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
                     <span className="min-w-0 flex-1">Baselines &amp; Methodology</span>
@@ -800,7 +800,7 @@ export default function GlobalProfile() {
                     <li><strong className="text-[#FFF5E7]">20th-century mean</strong> {data.globalBaseline}°C — NOAA&rsquo;s reference for reporting individual monthly and yearly anomalies (converted into absolute °C values on this page).</li>
                   </ul>
                 </div>
-                <div className="bg-gray-950/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                   <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
                     <BookOpen className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
                     <span className="min-w-0 flex-1">Sources</span>
@@ -829,7 +829,7 @@ export default function GlobalProfile() {
               </div>
 
               {/* Cross-links */}
-              <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+              <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                 <h2 className="text-xl font-bold font-mono text-white mb-2 flex items-start gap-2">
                   <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
                   <span className="min-w-0 flex-1">Zoom In — Country &amp; Regional Updates</span>
@@ -869,7 +869,7 @@ export default function GlobalProfile() {
           )}
 
           {/* SEO footer */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
             <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
               <Info className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
               <span className="min-w-0 flex-1">About This Page</span>

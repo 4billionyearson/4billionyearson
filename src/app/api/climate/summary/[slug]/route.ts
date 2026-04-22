@@ -366,9 +366,86 @@ function summaryLooksIncomplete(summary: string): boolean {
   return !/[.!?]["')\]\s]*$/.test(trimmed);
 }
 
+// ─── Cross-region rankings insight ─────────────────────────────────────────
+
+interface RankingRow {
+  slug: string;
+  name: string;
+  type: 'country' | 'us-state' | 'uk-region';
+  emoji?: string;
+  anomaly1m: number | null;
+  anomaly3m: number | null;
+  anomaly12m: number | null;
+  latestLabel: string | null;
+}
+
+function buildRankingsInsights(rankings: any, focusSlug?: string): string {
+  if (!rankings?.rows?.length) return '';
+  const rows: RankingRow[] = rankings.rows;
+  const lines: string[] = [];
+  const windows: Array<{ key: 'anomaly1m' | 'anomaly3m' | 'anomaly12m'; label: string }> = [
+    { key: 'anomaly1m', label: '1-month anomaly (latest month)' },
+    { key: 'anomaly3m', label: '3-month anomaly' },
+    { key: 'anomaly12m', label: '12-month rolling anomaly' },
+  ];
+
+  lines.push('\n═══ CROSS-REGION RANKINGS (site-exclusive — lean into patterns) ═══');
+  lines.push(`Every country, US state and UK region we track (${rows.length} in total) ranked by temperature anomaly vs 1961–1990.`);
+  lines.push('This ranked cross-region view is rare — use it to highlight STRIKING GEOGRAPHIC PATTERNS (e.g. if 8 of the top 10 1-month anomalies are US states, that is a real, tell-able story worth a sentence).');
+  lines.push('');
+
+  const typeLabel = (t: string) => (t === 'us-state' ? 'US state' : t === 'uk-region' ? 'UK region' : 'country');
+  const countByType = (arr: RankingRow[]) => {
+    const counts: Record<string, number> = {};
+    for (const r of arr) counts[r.type] = (counts[r.type] ?? 0) + 1;
+    return counts;
+  };
+
+  for (const w of windows) {
+    const valid = rows.filter((r) => typeof r[w.key] === 'number');
+    if (valid.length < 10) continue;
+    const sorted = [...valid].sort((a, b) => (b[w.key] as number) - (a[w.key] as number));
+    const top10 = sorted.slice(0, 10);
+    const bottom5 = sorted.slice(-5).reverse();
+
+    lines.push(`── Top 10 warmest — ${w.label} ──`);
+    top10.forEach((r, i) => {
+      const v = r[w.key] as number;
+      const sign = v > 0 ? '+' : '';
+      lines.push(`  ${i + 1}. ${r.name} (${typeLabel(r.type)}): ${sign}${v.toFixed(2)}°C`);
+    });
+
+    const counts = countByType(top10);
+    const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    if (dominant && dominant[1] >= 6) {
+      lines.push(`  PATTERN: ${dominant[1]} of the top 10 are ${typeLabel(dominant[0])}s — a striking concentration worth mentioning.`);
+    }
+
+    lines.push('');
+    lines.push(`── 5 coolest — ${w.label} ──`);
+    bottom5.forEach((r, i) => {
+      const v = r[w.key] as number;
+      const sign = v > 0 ? '+' : '';
+      lines.push(`  ${i + 1}. ${r.name} (${typeLabel(r.type)}): ${sign}${v.toFixed(2)}°C`);
+    });
+    lines.push('');
+
+    if (focusSlug) {
+      const idx = sorted.findIndex((r) => r.slug === focusSlug);
+      if (idx !== -1) {
+        const v = sorted[idx][w.key] as number;
+        lines.push(`  FOCUS: ${sorted[idx].name} sits ${ordinal(idx + 1)} of ${sorted.length} for ${w.label} (${v > 0 ? '+' : ''}${v.toFixed(2)}°C). Mention this if the rank is in the top 20 or bottom 10.`);
+        lines.push('');
+      }
+    }
+  }
+
+  return lines.join('\n');
+}
+
 // ─── Prompt builder ─────────────────────────────────────────────────────────
 
-function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any, gdacsEvents: any[]): string {
+function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any, gdacsEvents: any[], rankings: any): string {
   const lines: string[] = [];
 
   lines.push(`You are a climate journalist writing a compelling monthly update for ${region.name}.`);
@@ -382,6 +459,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('3. ANNUAL / LONG-TERM (Priority 3): Put it all in context — previous full year, warming trend.');
   lines.push('4. EXTREME WEATHER: If there are active GDACS alerts or recent extreme weather events, weave them in naturally.');
   lines.push('5. CLIMATE DRIVERS: If El Niño, La Niña, NAO etc. are relevant, briefly mention them.');
+  lines.push('6. CROSS-REGION RANKINGS: If this region is in the top 20 (or bottom 10) of any window in the CROSS-REGION RANKINGS section, mention the rank. If the top 10 shows a striking geographic concentration (e.g. mostly US states), that pattern is worth a single sentence of context.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
   lines.push('- RANKINGS ARE THE STORY: The ranked data IS the narrative. "The 3rd sunniest January–March on record" or "the 4th fewest frost days in over a century of records" — these are the headlines. If a metric ranks in the top/bottom 10, it MUST be mentioned.');
@@ -452,6 +530,12 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   // GDACS extreme weather events
   if (gdacsEvents.length > 0) {
     lines.push(buildGDACSSection(gdacsEvents));
+  }
+
+  // Cross-region rankings
+  const rankingsSection = buildRankingsInsights(rankings, region.slug);
+  if (rankingsSection) {
+    lines.push(rankingsSection);
   }
 
   // Search instruction
@@ -545,7 +629,7 @@ async function callGemini(
 
 // ─── Global prompt builder ─────────────────────────────────────────────────
 
-function buildGlobalPrompt(globalData: any): string {
+function buildGlobalPrompt(globalData: any, rankings: any): string {
   const lines: string[] = [];
 
   lines.push('You are a climate journalist writing the monthly Global Climate Update for a general audience.');
@@ -558,6 +642,7 @@ function buildGlobalPrompt(globalData: any): string {
   lines.push('2. 10-YEAR ROLLING AVERAGE vs PRE-INDUSTRIAL — how close is the 10-year global land+ocean mean to the Paris 1.5°C and 2°C thresholds? This is the headline climate policy number (WMO/IPCC AR6 methodology).');
   lines.push('3. LAND vs OCEAN — briefly note that global land is warming faster than the ocean, ideally with a concrete figure from the separate NOAA land-only and ocean-only series below.');
   lines.push('4. WEB-GROUNDED CONTEXT — if Google Search surfaces relevant current events (ENSO state, notable extreme weather month, major climate report release, COP outcomes), weave them in naturally. Verify ENSO state against the month being summarised.');
+  lines.push('5. CROSS-REGION RANKINGS — the CROSS-REGION RANKINGS section below is a site-exclusive view across every country, US state and UK region we track. Call out the most striking pattern from it in ONE sentence (e.g. "Eight of the ten hottest 1-month anomalies this month were US states" or similar). Name 2–3 specific regions from the top 10 where they make the pattern vivid.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
   lines.push('- MAKE IT CONCRETE: Translate anomalies into tangible terms. "+1.4°C above the 20th-century average" should be followed with what that feels like in the real world — record ocean heat, bleaching, heatwaves, altered jet streams, etc.');
@@ -668,6 +753,12 @@ function buildGlobalPrompt(globalData: any): string {
   lines.push('Look for: current ENSO state (El Niño / La Niña / neutral), notable global climate records, major heat or storm events with clear climate-change attribution, key IPCC / WMO / Copernicus / NOAA announcements, COP outcomes.');
   lines.push('Summarise any relevant findings in your own words and weave them into the update narrative.');
 
+  // Cross-region rankings
+  const rankingsSection = buildRankingsInsights(rankings);
+  if (rankingsSection) {
+    lines.push(rankingsSection);
+  }
+
   return lines.join('\n');
 }
 
@@ -696,7 +787,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v20`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v21`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {
@@ -722,12 +813,15 @@ export async function GET(
 
   // ─── Special branch: global planet-level summary ───────────────────────
   if (region.type === 'special' && slug === 'global') {
-    const globalData = await fetchJSON(`${base}/api/climate/global`);
+    const [globalData, rankings] = await Promise.all([
+      fetchJSON(`${base}/api/climate/global`),
+      fetchJSON(`${base}/data/climate/rankings.json`),
+    ]);
     if (!globalData) {
       return NextResponse.json({ error: 'No global data available' }, { status: 503 });
     }
 
-    const prompt = buildGlobalPrompt(globalData);
+    const prompt = buildGlobalPrompt(globalData, rankings);
 
     try {
       let result = await callGemini(apiKey, prompt, true);
@@ -768,10 +862,11 @@ export async function GET(
   }
 
   // ─── Regional summaries (existing path) ────────────────────────────────
-  // Fetch full profile data and GDACS events in parallel
-  const [profileData, extremeWeatherData] = await Promise.all([
+  // Fetch full profile data, GDACS events and cross-region rankings in parallel
+  const [profileData, extremeWeatherData, rankings] = await Promise.all([
     fetchJSON(`${base}/api/climate/profile/${slug}`),
     fetchJSON(`${base}/api/climate/extreme-weather`),
+    fetchJSON(`${base}/data/climate/rankings.json`),
   ]);
 
   if (!profileData) {
@@ -791,7 +886,7 @@ export async function GET(
     ? filterGDACSEvents(extremeWeatherData.gdacsEvents, region)
     : [];
 
-  const prompt = buildPrompt(region, profileData, nationalData, gdacsEvents);
+  const prompt = buildPrompt(region, profileData, nationalData, gdacsEvents, rankings);
 
   try {
     // Try with Google Search grounding first, fall back to without
