@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import Link from 'next/link';
 import { ArrowLeft, Trophy, TrendingUp, TrendingDown, Globe2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import RankingsTable from './RankingsTable';
+import RankingsAnalysis from './RankingsAnalysis';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 
@@ -327,6 +328,9 @@ export default async function RankingsPage() {
               </div>
             </div>
           </div>
+
+          {/* Monthly cross-region analysis (Gemini, web-grounded) */}
+          <RankingsAnalysis />
 
           {/* Biggest movers (only shown when a previous snapshot exists) */}
           {(movers.climbers.length || movers.fallers.length) ? (

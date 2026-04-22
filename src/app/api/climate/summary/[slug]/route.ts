@@ -551,6 +551,8 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push(`Use Google Search to find recent weather news and climate events for ${region.name} in the last 1–3 months.`);
   lines.push(`Look for: major storms, floods, heatwaves, droughts, wildfires, or other extreme weather events.`);
   lines.push(`Also check: Is El Niño or La Niña currently active? Is the ENSO state affecting ${region.name}?`);
+  lines.push(`Source quality: PREFER national meteorological services (Met Office, NOAA, Meteo France, DWD, JMA, BoM), Copernicus C3S, WMO, peer-reviewed journals, and established newspapers (BBC, Reuters, AP, Guardian, NYT, FT). AVOID aggregator sites, blogs, or paywalled sources that add no primary information.`);
+  lines.push(`Verify dates: only cite events and ENSO states active during or close to ${region.name}'s latest data month. Do NOT carry over a previous month's ENSO state without checking.`);
   lines.push(`Summarise any relevant findings in your own words and weave them into the update narrative.`);
 
   return lines.join('\n');
@@ -765,6 +767,8 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
   lines.push('═══ WEB SEARCH INSTRUCTION ═══');
   lines.push('Use Google Search to find relevant planetary-scale climate news from the last 1–3 months.');
   lines.push('Look for: current ENSO state (El Niño / La Niña / neutral), notable global climate records, major heat or storm events with clear climate-change attribution, key IPCC / WMO / Copernicus / NOAA announcements, COP outcomes.');
+  lines.push('Source quality: PREFER Copernicus C3S monthly bulletins, NOAA Monthly Climate Reports, WMO press releases, NASA GISS updates, Met Office press releases, peer-reviewed journals, and established newspapers (BBC, Reuters, AP, Guardian, NYT, FT). AVOID aggregator sites, blogs, or paywalled sources that add no primary information.');
+  lines.push('Verify the ENSO state against the month being summarised — do NOT carry over a previous month’s state without checking.');
   lines.push('Summarise any relevant findings in your own words and weave them into the update narrative.');
 
   // Cross-region rankings
@@ -801,7 +805,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v22`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v23`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {

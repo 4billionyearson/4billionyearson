@@ -56,7 +56,7 @@ export default function GlobalRankingsTeaser() {
           </span>
         </React.Fragment>
       ))}
-      <span className="ml-auto text-[11px] text-[#D0A65E]">See rankings & trends for all {rows.length} regions →</span>
+      <span className="ml-auto text-[11px] text-[#D0A65E]">Rankings, movers & monthly analysis →</span>
     </Link>
   );
 }
