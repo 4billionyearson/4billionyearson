@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, Database, BookOpen, MapPin } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
+import ClimateRankPill from '@/app/_components/climate-rank-pill';
+import ClimatePeersCard from '@/app/_components/climate-peers-card';
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
 
@@ -652,7 +654,8 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <div className="text-gray-300 text-sm leading-relaxed space-y-3">
+                  <ClimateRankPill slug={slug} />
+                  <div className="mt-3 text-gray-300 text-sm leading-relaxed space-y-3">
                     {summary.split('\n\n').map((para, i) => (
                       <p key={i} dangerouslySetInnerHTML={{ __html: highlightRankings(para) }} />
                     ))}
@@ -690,7 +693,8 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <div className="rounded-xl border border-amber-700/40 bg-amber-950/20 px-4 py-3">
+                  <ClimateRankPill slug={slug} />
+                  <div className="mt-3 rounded-xl border border-amber-700/40 bg-amber-950/20 px-4 py-3">
                     <p className="text-sm font-medium text-amber-200">Climate update temporarily unavailable</p>
                     <p className="mt-1 text-sm text-gray-300">{summaryError || 'The AI-generated climate update is temporarily unavailable. The measured climate data below is still available and up to date.'}</p>
                     <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -787,6 +791,8 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               })()}
 
               {/* ─── Explore & Sources ─── */}
+              <ClimatePeersCard slug={slug} />
+
               <Divider icon={<BookOpen className="h-5 w-5 text-[#D0A65E]" />} title="Explore & Sources" />
 
               {/* ─── Explore More ─── */}

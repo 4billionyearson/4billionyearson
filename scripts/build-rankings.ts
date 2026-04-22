@@ -26,6 +26,7 @@ import { CLIMATE_REGIONS, type ClimateRegion } from '../src/lib/climate/regions'
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SNAPSHOT_ROOT = resolve(__dirname, '..', 'public', 'data', 'climate');
 const OUTPUT_PATH = resolve(SNAPSHOT_ROOT, 'rankings.json');
+const PREVIOUS_PATH = resolve(SNAPSHOT_ROOT, 'rankings-previous.json');
 
 interface MonthlyPoint {
   year: number;
@@ -174,12 +175,27 @@ async function main() {
   }
 
   const now = new Date();
+  const cacheMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const response: RankingsResponse = {
     generatedAt: now.toISOString(),
-    cacheMonth: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`,
+    cacheMonth,
     count: rows.length,
     rows,
   };
+
+  // Preserve the previous snapshot so the "biggest movers" card can compute
+  // month-over-month rank deltas. Only archive when the cacheMonth differs,
+  // so re-running the script mid-month doesn't overwrite an older baseline.
+  try {
+    const existingRaw = await readFile(OUTPUT_PATH, 'utf8');
+    const existing = JSON.parse(existingRaw) as RankingsResponse | null;
+    if (existing?.cacheMonth && existing.cacheMonth !== cacheMonth) {
+      await writeFile(PREVIOUS_PATH, existingRaw, 'utf8');
+      console.log(`  Archived previous snapshot (${existing.cacheMonth}) → rankings-previous.json`);
+    }
+  } catch {
+    // no existing snapshot yet
+  }
 
   await writeFile(OUTPUT_PATH, JSON.stringify(response, null, 2) + '\n', 'utf8');
   console.log(`✓ Wrote ${rows.length} rows → ${OUTPUT_PATH}`);
