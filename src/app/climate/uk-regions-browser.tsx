@@ -315,12 +315,12 @@ function UKRegionCard({
       href={`/climate/${region.slug}`}
       className="group flex flex-col rounded-xl border border-[#D0A65E]/30 bg-gray-900/85 p-3.5 transition-all duration-200 hover:border-[#D0A65E]/60 hover:bg-gray-800"
     >
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="text-3xl leading-none" aria-hidden>{region.emoji}</span>
+      <div className="flex items-center gap-2 mb-1.5">
+        <span className="text-xl leading-none shrink-0" aria-hidden>{region.emoji}</span>
+        <h4 className="flex-1 min-w-0 text-sm font-semibold text-[#FFF5E7] group-hover:text-white leading-tight truncate">{region.name}</h4>
         <TypeBadge isIreland={region.slug === 'ireland'} />
       </div>
-      <h4 className="text-sm font-semibold text-[#FFF5E7] group-hover:text-white leading-tight">{region.name}</h4>
-      <p className="mt-1 text-[13px] font-medium text-gray-300 leading-snug">{cityPreview}</p>
+      <p className="text-[13px] font-medium text-gray-300 leading-snug">{cityPreview}</p>
       <p className="mt-1 text-[11px] leading-relaxed text-gray-500 line-clamp-2">{region.tagline}</p>
       {matchedCities.length > 0 && (
         <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#D0A65E]/20 bg-[#D0A65E]/10 px-2 py-1 text-[11px] font-medium text-[#D0A65E]">

@@ -37,20 +37,20 @@ export default function ClimateProfilesIndex() {
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
 
-          {/* Hero + Start here — combined */}
-          <StartHereStrip
-            regions={CLIMATE_REGIONS}
-            title="Climate Updates"
-            description="Monthly climate updates for every country, US state and UK region we track — 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news. Dive into a specific region below, or jump to the full league table and monthly movers."
-          />
-
-          {/* Sticky jump-to chips */}
+          {/* Sticky jump-to chips — above the hero so they're visible from the start */}
           <ClimateHubSubNav
             counts={{
               countries: countries.length,
               usStates: usStates.length,
               ukRegions: ukAndIrelandRegions.length,
             }}
+          />
+
+          {/* Hero + Start here — combined */}
+          <StartHereStrip
+            regions={CLIMATE_REGIONS}
+            title="Climate Updates"
+            description="Monthly climate updates for every country, US state and UK region we track — 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news. Dive into a specific region below, or jump to the full league table and monthly movers."
           />
 
           {/* Countries */}

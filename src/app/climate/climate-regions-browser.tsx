@@ -67,14 +67,14 @@ function RegionCard({ region }: { region: ClimateRegion }) {
       href={`/climate/${region.slug}`}
       className="group flex flex-col rounded-xl border border-[#D0A65E]/30 bg-gray-900/85 p-3.5 transition-all duration-200 hover:border-[#D0A65E]/60 hover:bg-gray-800"
     >
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="text-3xl leading-none" aria-hidden>{region.emoji}</span>
+      <div className="flex items-center gap-2 mb-1.5">
+        <span className="text-xl leading-none shrink-0" aria-hidden>{region.emoji}</span>
+        <h4 className="flex-1 min-w-0 text-sm font-semibold text-[#FFF5E7] group-hover:text-white leading-tight truncate">
+          {region.name}
+        </h4>
         <TypeBadge type={region.type} />
       </div>
-      <h4 className="text-sm font-semibold text-[#FFF5E7] group-hover:text-white leading-tight">
-        {region.name}
-      </h4>
-      <p className="text-[12px] text-gray-400 line-clamp-2 mt-1 flex-1">{region.tagline}</p>
+      <p className="text-[12px] text-gray-400 line-clamp-2 flex-1">{region.tagline}</p>
       <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[#D0A65E]/80 group-hover:text-[#D0A65E]">
         Open climate update <ChevronRight className="h-3 w-3" />
       </span>
