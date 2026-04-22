@@ -172,15 +172,22 @@ const Header = () => {
             {isClimateChangeOpen && (
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[280px]">
-                <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-gray-300', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
+                <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link
                   href="/climate"
-                  className={desktopDropdownItemClass(isClimateUpdatesPage, 'text-gray-300', 'hover:text-[#E8C97A]')}
+                  className={desktopDropdownItemClass(isClimateUpdatesPage && pathname !== '/climate/rankings', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
                   onClick={closeMenu}
                 >
                   Climate Updates<MonthlyBadge />
+                </Link>
+                <Link
+                  href="/climate/rankings"
+                  className={desktopDropdownItemClass(pathname === '/climate/rankings', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
+                  onClick={closeMenu}
+                >
+                  Climate Rankings<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={desktopDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />
@@ -371,15 +378,22 @@ const Header = () => {
             </button>
             {mobileClimateOpen && (
               <div className="bg-gray-950/50">
-                <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-gray-300', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
+                <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link
                   href="/climate"
-                  className={mobileDropdownItemClass(isClimateUpdatesPage, 'text-gray-300', 'hover:text-[#E8C97A]')}
+                  className={mobileDropdownItemClass(isClimateUpdatesPage && pathname !== '/climate/rankings', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
                   onClick={closeMenu}
                 >
                   Climate Updates<MonthlyBadge />
+                </Link>
+                <Link
+                  href="/climate/rankings"
+                  className={mobileDropdownItemClass(pathname === '/climate/rankings', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
+                  onClick={closeMenu}
+                >
+                  Climate Rankings<MonthlyBadge />
                 </Link>
                 <Link href="/planetary-boundaries" className={mobileDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   The Nine Factors<MonthlyBadge />

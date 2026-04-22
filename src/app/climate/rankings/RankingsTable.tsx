@@ -137,26 +137,26 @@ export default function RankingsTable({ rows, generatedAt }: { rows: RankingRow[
         <table className="min-w-full text-sm">
           <thead className="bg-gray-900/80 text-xs uppercase tracking-wider text-gray-400">
             <tr>
-              <th className="px-3 py-2 text-left font-semibold">#</th>
-              <th className="px-3 py-2 text-left font-semibold">
+              <th className="px-1.5 md:px-3 py-2 text-left font-semibold">#</th>
+              <th className="px-1.5 md:px-3 py-2 text-left font-semibold">
                 <button onClick={() => toggleSort('name')} className="inline-flex items-center gap-1 hover:text-white">
                   Region <SortIcon k="name" />
                 </button>
               </th>
               <th className="hidden sm:table-cell px-3 py-2 text-left font-semibold">Type</th>
-              <th className="px-3 py-2 text-right font-semibold">
+              <th className="px-1.5 md:px-3 py-2 text-right font-semibold">
                 <button onClick={() => toggleSort('anomaly1m')} className="inline-flex items-center gap-1 hover:text-white">
-                  1-month <SortIcon k="anomaly1m" />
+                  1-mo <SortIcon k="anomaly1m" />
                 </button>
               </th>
-              <th className="hidden md:table-cell px-3 py-2 text-right font-semibold">
+              <th className="px-1.5 md:px-3 py-2 text-right font-semibold">
                 <button onClick={() => toggleSort('anomaly3m')} className="inline-flex items-center gap-1 hover:text-white">
-                  3-month <SortIcon k="anomaly3m" />
+                  3-mo <SortIcon k="anomaly3m" />
                 </button>
               </th>
-              <th className="px-3 py-2 text-right font-semibold">
+              <th className="px-1.5 md:px-3 py-2 text-right font-semibold">
                 <button onClick={() => toggleSort('anomaly12m')} className="inline-flex items-center gap-1 hover:text-white">
-                  12-month <SortIcon k="anomaly12m" />
+                  12-mo <SortIcon k="anomaly12m" />
                 </button>
               </th>
               <th className="hidden lg:table-cell px-3 py-2 text-left font-semibold">Latest</th>
@@ -167,17 +167,17 @@ export default function RankingsTable({ rows, generatedAt }: { rows: RankingRow[
               const gRank = globalRanks[sortKey === 'name' ? 'anomaly1m' : sortKey].get(r.slug);
               return (
                 <tr key={r.slug} className={`border-t border-gray-800 hover:bg-gray-900/60 ${idx % 2 === 0 ? 'bg-gray-950/40' : ''}`}>
-                  <td className="px-3 py-2 text-gray-400 font-mono text-xs">{gRank ?? '—'}</td>
-                  <td className="px-3 py-2">
-                    <Link href={`/climate/${r.slug}`} className="inline-flex items-center gap-2 font-semibold text-white hover:text-[#E8C97A] transition-colors">
-                      <span className="text-base">{r.emoji || ''}</span>
+                  <td className="px-1.5 md:px-3 py-2 text-gray-400 font-mono text-xs">{gRank ?? '—'}</td>
+                  <td className="px-1.5 md:px-3 py-2">
+                    <Link href={`/climate/${r.slug}`} className="inline-flex items-center gap-1.5 md:gap-2 font-semibold text-white hover:text-[#E8C97A] transition-colors">
+                      <span className="hidden sm:inline text-base">{r.emoji || ''}</span>
                       <span>{r.name}</span>
                     </Link>
                   </td>
                   <td className="hidden sm:table-cell px-3 py-2 text-xs text-gray-400">{TYPE_LABEL[r.type]}</td>
-                  <td className={`px-3 py-2 text-right font-mono ${tone(r.anomaly1m)}`}>{fmt(r.anomaly1m)}</td>
-                  <td className={`hidden md:table-cell px-3 py-2 text-right font-mono ${tone(r.anomaly3m)}`}>{fmt(r.anomaly3m)}</td>
-                  <td className={`px-3 py-2 text-right font-mono ${tone(r.anomaly12m)}`}>{fmt(r.anomaly12m)}</td>
+                  <td className={`px-1.5 md:px-3 py-2 text-right font-mono ${tone(r.anomaly1m)}`}>{fmt(r.anomaly1m)}</td>
+                  <td className={`px-1.5 md:px-3 py-2 text-right font-mono ${tone(r.anomaly3m)}`}>{fmt(r.anomaly3m)}</td>
+                  <td className={`px-1.5 md:px-3 py-2 text-right font-mono ${tone(r.anomaly12m)}`}>{fmt(r.anomaly12m)}</td>
                   <td className="hidden lg:table-cell px-3 py-2 text-xs text-gray-400">{r.latestLabel ?? '—'}</td>
                 </tr>
               );

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import Link from 'next/link';
-import { ArrowLeft, Trophy, TrendingUp, TrendingDown, Globe2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Trophy, TrendingUp, TrendingDown, Globe2, ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
 import RankingsTable from './RankingsTable';
 import RankingsAnalysis from './RankingsAnalysis';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
@@ -266,13 +266,6 @@ export default async function RankingsPage() {
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-8 md:pt-4 md:pb-10 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
-          <Link
-            href="/climate/global"
-            className="inline-flex items-center gap-1.5 text-sm text-[#D0A65E] hover:text-[#E8C97A] transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back to Global Climate
-          </Link>
-
           {/* Hero */}
           <div
             className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
@@ -411,9 +404,12 @@ export default async function RankingsPage() {
           </section>
 
           {/* Footer */}
-          <section className="bg-gray-950/60 backdrop-blur-md p-4 rounded-2xl border border-gray-800 text-xs text-gray-400 space-y-1.5">
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] text-xs text-gray-400 space-y-1.5">
+            <h2 className="flex items-center gap-2 text-base font-semibold text-[#D0A65E]">
+              <Info className="h-4 w-4" /> Methodology
+            </h2>
             <p>
-              <span className="font-semibold text-gray-300">Methodology:</span> Anomaly = monthly mean temperature − 1961–1990 mean for the same calendar month. The 12-month figure is the trailing 12-month mean minus the 12-month baseline. Country data is from Our World in Data / NOAA; UK regions from the Met Office Regional Series; US states from NOAA Climate at a Glance.
+              Anomaly = monthly mean temperature − 1961–1990 mean for the same calendar month. The 12-month figure is the trailing 12-month mean minus the 12-month baseline. Country data is from Our World in Data / NOAA; UK regions from the Met Office Regional Series; US states from NOAA Climate at a Glance.
             </p>
             <p>Data snapshot: {new Date(data.generatedAt).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' })}.</p>
           </section>

@@ -317,7 +317,7 @@ export default function GlobalProfile() {
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
-              <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
+              <div className="inline-flex items-start gap-2 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
                 <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
                 <p className="text-xs md:text-sm font-medium text-[#D0A65E]">
                   <span className="font-semibold">Coverage:</span> Whole Earth — land and ocean surface temperature
