@@ -93,21 +93,23 @@ export default function ClimateRankPill({ slug }: { slug: string }) {
       <span>
         <span className={`font-mono font-semibold ${tone}`}>{sign}{myAnom.toFixed(2)}°C</span>
       </span>
-      <span className="text-gray-500">·</span>
-      <span>
-        <span className="font-semibold text-white">{ordinal(globalRank)}</span>{' '}
-        <span className="text-gray-400">of {globalTotal} regions</span>
+      <span className="inline-flex items-center gap-1.5">
+        <span className="text-gray-500">·</span>
+        <span>
+          <span className="font-semibold text-white">{ordinal(globalRank)}</span>{' '}
+          <span className="text-gray-400">of {globalTotal} regions</span>
+        </span>
       </span>
       {peerTotal > 1 && (
-        <>
+        <span className="inline-flex items-center gap-1.5">
           <span className="text-gray-500">·</span>
           <span>
             <span className="font-semibold text-white">{ordinal(peerRank)}</span>{' '}
             <span className="text-gray-400">of {peerTotal} {peerLabel}</span>
           </span>
-        </>
+        </span>
       )}
-      <span className="ml-auto text-[11px] text-[#D0A65E]">See all 144 regions →</span>
+      <span className="ml-auto text-[11px] text-teal-300">See all 144 regions →</span>
     </Link>
   );
 }

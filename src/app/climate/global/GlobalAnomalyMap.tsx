@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { CircleMarker, MapContainer, TileLayer, GeoJSON, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
 import type { FeatureCollection, Feature } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -113,8 +113,8 @@ function InvalidateOnMount() {
 
 /* ─── Sub-national overlays (US states + UK nations) ─────────────────────── */
 
-const US_STATES_ZOOM = 4;
-const UK_REGIONS_ZOOM = 5;
+const US_STATES_ZOOM = 3;
+const UK_REGIONS_ZOOM = 4;
 
 interface RankingRow {
   slug: string;
@@ -133,13 +133,9 @@ function rankingValue(row: RankingRow | undefined, win: AnomalyWindow): number |
   return row.anomaly1m;
 }
 
-// UK nation centroids (approximate) for circle-marker overlay.
-const UK_NATIONS: { slug: string; name: string; lat: number; lng: number }[] = [
-  { slug: 'england',          name: 'England',          lat: 52.9, lng: -1.2 },
-  { slug: 'scotland',         name: 'Scotland',         lat: 56.8, lng: -4.2 },
-  { slug: 'wales',            name: 'Wales',            lat: 52.3, lng: -3.7 },
-  { slug: 'northern-ireland', name: 'Northern Ireland', lat: 54.7, lng: -6.7 },
-];
+// UK-nation slugs that map to polygon features in /data/uk-nations.json
+// (feature `slug` property matches rankings.json `slug`).
+const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
 
 function USStatesOverlay({
   rankings,
@@ -225,50 +221,66 @@ function UKRegionsOverlay({
 }) {
   const map = useMap();
   const [visible, setVisible] = useState(map.getZoom() >= UK_REGIONS_ZOOM);
+  const [geo, setGeo] = useState<FeatureCollection | null>(null);
+
   useMapEvents({ zoomend: () => setVisible(map.getZoom() >= UK_REGIONS_ZOOM) });
+
+  useEffect(() => {
+    if (!visible || geo) return;
+    fetch('/data/uk-nations.json')
+      .then((r) => r.json())
+      .then((g: FeatureCollection) => setGeo(g))
+      .catch(() => {});
+  }, [visible, geo]);
 
   const bySlug = useMemo(() => {
     const m = new Map<string, RankingRow>();
     if (rankings) {
       for (const r of rankings) {
-        if (r.type === 'uk-region') m.set(r.slug, r);
+        if (r.type === 'uk-region' && UK_NATION_SLUGS.has(r.slug)) m.set(r.slug, r);
       }
     }
     return m;
   }, [rankings]);
 
-  if (!visible) return null;
+  const style = useCallback(
+    (feature: Feature | undefined): PathOptions => {
+      const slug = ((feature?.properties as any)?.slug as string) ?? '';
+      const row = bySlug.get(slug);
+      const v = rankingValue(row, windowSel);
+      return {
+        fillColor: v != null ? anomalyColor(v) : '#1f2937',
+        fillOpacity: 0.9,
+        weight: 0.8,
+        color: '#0b1220',
+      };
+    },
+    [bySlug, windowSel],
+  );
 
+  const onEachFeature = useCallback(
+    (feature: Feature, layer: Layer) => {
+      const slug = ((feature.properties as any)?.slug as string) ?? '';
+      const name = ((feature.properties as any)?.name as string) ?? '';
+      const row = bySlug.get(slug);
+      const v = rankingValue(row, windowSel);
+      const color = v != null ? anomalyColor(v) : '#1f2937';
+      const show = () => onInfo({ name, anomaly: v, label: row?.latestLabel ?? null, color });
+      layer.on('mouseover', show);
+      layer.on('click', show);
+      layer.on('mouseout', () => onInfo(null));
+    },
+    [bySlug, windowSel, onInfo],
+  );
+
+  if (!visible || !geo) return null;
   return (
-    <>
-      {UK_NATIONS.map((n) => {
-        const row = bySlug.get(n.slug);
-        const v = rankingValue(row, windowSel);
-        const color = v != null ? anomalyColor(v) : '#1f2937';
-        return (
-          <CircleMarker
-            key={`uk-${n.slug}`}
-            center={[n.lat, n.lng]}
-            radius={10}
-            pathOptions={{
-              fillColor: color,
-              fillOpacity: 0.9,
-              color: '#0b1220',
-              weight: 1,
-            }}
-            eventHandlers={{
-              mouseover: () => onInfo({ name: n.name, anomaly: v, label: row?.latestLabel ?? null, color }),
-              click: () => onInfo({ name: n.name, anomaly: v, label: row?.latestLabel ?? null, color }),
-              mouseout: () => onInfo(null),
-            }}
-          >
-            <Tooltip direction="top" offset={[0, -6]} opacity={0.9} permanent={false}>
-              <span style={{ fontSize: 11, fontWeight: 600 }}>{n.name}</span>
-            </Tooltip>
-          </CircleMarker>
-        );
-      })}
-    </>
+    <GeoJSON
+      key={`uk-nations-${windowSel}-${bySlug.size}`}
+      data={geo}
+      style={style}
+      onEachFeature={onEachFeature}
+    />
   );
 }
 

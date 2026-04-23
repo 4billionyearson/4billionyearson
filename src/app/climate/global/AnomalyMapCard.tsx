@@ -54,9 +54,7 @@ export default function AnomalyMapCard({
 
   if (!countryAnomalies || countryAnomalies.length === 0) return null;
 
-  const windowTitle =
-    anomalyWindow === '12m' ? '12-Month Rolling' : anomalyWindow === '3m' ? '3-Month' : 'Latest Month';
-  const cardTitle = `Temperature Anomaly — ${windowTitle}`;
+  const cardTitle = 'Temperature Anomaly';
 
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
@@ -79,10 +77,10 @@ export default function AnomalyMapCard({
       </div>
       <GlobalAnomalyMap countryAnomalies={countryAnomalies} window={anomalyWindow} />
       <p className="text-xs text-gray-400 mt-3">
-        Each country is coloured by its {anomalyWindow === '12m' ? '12-month rolling' : anomalyWindow === '3m' ? '3-month' : 'latest monthly'} land-surface temperature anomaly against its own 1961&ndash;1990 baseline. Zoom in over the US or UK to see state- and nation-level data from the same rankings. Countries without a dedicated page are shown in grey.
+        Each region is coloured by its temperature anomaly vs its own 1961&ndash;1990 baseline. Zoom in over the US or UK for state- and nation-level data. Grey = no data.
       </p>
-      <p className="text-xs text-gray-400 mt-2">
-        Data source: NOAA Climate at a Glance (country-level monthly averages), pre-computed nightly. Each country is independently ranked against its own 77-year (or longer) record, so the colour scale reflects <em>relative</em> warming for each place, not absolute temperature.
+      <p className="text-xs text-gray-500 mt-1">
+        Source: NOAA Climate at a Glance &middot; Met Office (UK) &middot; each region ranked against its own record, so colour reflects <em>relative</em> warming.
       </p>
     </div>
   );
