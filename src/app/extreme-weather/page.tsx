@@ -643,6 +643,8 @@ function LiveEventsSection({
   disastersByType: YearlyByType[];
 }) {
   const [filter, setFilter] = useState<string>("all");
+  const [showAll, setShowAll] = useState<boolean>(false);
+  const [expandedCluster, setExpandedCluster] = useState<string | null>(null);
 
   const sorted = useMemo(() => {
     const alertOrder: Record<string, number> = { Red: 0, Orange: 1, Green: 2 };
@@ -745,7 +747,7 @@ function LiveEventsSection({
 
   return (
     <div>
-      {/* Summary stats */}
+      {/* 1. Alert-level summary */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
           <div className="text-2xl font-bold text-red-400">{alertCounts.Red}</div>
@@ -753,7 +755,7 @@ function LiveEventsSection({
         </div>
         <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 text-center">
           <div className="text-2xl font-bold text-orange-400">{alertCounts.Orange}</div>
-          <div className="text-xs text-orange-400/70 uppercase">Orange Alert</div>
+          <div className="text-xs text-orange-400/70 uppercase">Amber Alert</div>
         </div>
         <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
           <div className="text-2xl font-bold text-emerald-400">{alertCounts.Green}</div>
@@ -761,11 +763,18 @@ function LiveEventsSection({
         </div>
       </div>
 
-      {/* Hotspot clusters */}
-      {hotspots.length > 0 && (
-        <SubSection title="Hotspot Clusters (multiple active alerts)">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+      {/* 2. Map */}
+      <div className="mb-6">
+        <EventsMap events={sorted} />
+      </div>
+
+      {/* 3. Overview — hotspot clusters + expandable full list */}
+      <SubSection title={hotspots.length > 0 ? "Overview — Active Hotspots" : "Active Events"}>
+        {hotspots.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
             {hotspots.map((h, i) => {
+              const clusterKey = `${h.country}|${h.type}`;
+              const isExpanded = expandedCluster === clusterKey;
               const pctOfFeed = Math.round((h.count / events.length) * 100);
               const dominantAlert =
                 (h.alerts.Red || 0) > 0 ? "Red" : (h.alerts.Orange || 0) > 0 ? "Orange" : "Green";
@@ -773,58 +782,148 @@ function LiveEventsSection({
                 h.earliest && h.latest && h.earliest !== h.latest
                   ? `${fmtShort(h.earliest)} → ${fmtShort(h.latest)}`
                   : fmtShort(h.earliest);
+              const clusterEvents = events
+                .filter((e) => (e.country || "—") === h.country && e.type === h.type)
+                .sort((a, b) => new Date(b.fromDate).getTime() - new Date(a.fromDate).getTime());
               return (
                 <div
                   key={i}
-                  className={`rounded-xl border p-3 ${ALERT_COLORS[dominantAlert] || "bg-gray-800/30 text-gray-300 border-gray-700"}`}
+                  className={`rounded-xl border ${ALERT_COLORS[dominantAlert] || "bg-gray-800/30 text-gray-300 border-gray-700"}`}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="shrink-0">{EVENT_ICONS[h.type]}</span>
-                      <div className="min-w-0">
-                        <div className="font-semibold text-sm truncate">
-                          {h.count}× {EVENT_LABELS[h.type] || h.type} — {h.country}
-                        </div>
-                        <div className="text-xs opacity-70 mt-0.5">
-                          {dateRange}
-                          {pctOfFeed >= 20 && (
-                            <span className="ml-1.5 opacity-80">
-                              · {pctOfFeed}% of all active alerts
-                            </span>
-                          )}
+                  <button
+                    type="button"
+                    onClick={() => setExpandedCluster(isExpanded ? null : clusterKey)}
+                    className="w-full text-left p-3 hover:bg-gray-900/30 transition-colors rounded-xl"
+                    aria-expanded={isExpanded}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="shrink-0">{EVENT_ICONS[h.type]}</span>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-sm truncate">
+                            {h.count}× {EVENT_LABELS[h.type] || h.type} — {h.country}
+                          </div>
+                          <div className="text-xs opacity-70 mt-0.5">
+                            {dateRange}
+                            {pctOfFeed >= 20 && (
+                              <span className="ml-1.5 opacity-80">· {pctOfFeed}% of all active alerts</span>
+                            )}
+                          </div>
                         </div>
                       </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {(["Red", "Orange", "Green"] as const).map((lvl) =>
+                          h.alerts[lvl] ? (
+                            <span
+                              key={lvl}
+                              className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${ALERT_COLORS[lvl]}`}
+                              title={`${h.alerts[lvl]} ${lvl === "Orange" ? "Amber" : lvl} alert${h.alerts[lvl] === 1 ? "" : "s"}`}
+                            >
+                              {h.alerts[lvl]}
+                            </span>
+                          ) : null,
+                        )}
+                        <span className="text-xs opacity-60 ml-1 font-mono">{isExpanded ? "▾" : "▸"}</span>
+                      </div>
                     </div>
-                    <div className="flex gap-1 shrink-0">
-                      {(["Red", "Orange", "Green"] as const).map((lvl) =>
-                        h.alerts[lvl] ? (
-                          <span
-                            key={lvl}
-                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${ALERT_COLORS[lvl]}`}
-                            title={`${h.alerts[lvl]} ${lvl} alert${h.alerts[lvl] === 1 ? "" : "s"}`}
-                          >
-                            {h.alerts[lvl]}
-                          </span>
-                        ) : null,
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setFilter(h.type)}
-                    className="mt-2 text-xs font-mono underline decoration-dotted underline-offset-2 opacity-80 hover:opacity-100"
-                  >
-                    Filter to {EVENT_LABELS[h.type] || h.type} →
                   </button>
+                  {isExpanded && (
+                    <div className="border-t border-current/10 px-3 pt-2 pb-3 space-y-1.5">
+                      {clusterEvents.map((e, j) => (
+                        <a
+                          key={j}
+                          href={e.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block text-xs hover:underline"
+                        >
+                          <span className="opacity-90">{e.name}</span>
+                          <span className="opacity-60">
+                            {" · "}
+                            {new Date(e.fromDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                          </span>
+                          <ExternalLink className="inline w-3 h-3 ml-1 opacity-40" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
-        </SubSection>
-      )}
+        )}
 
-      {/* Long-term frequency trend per active type (EM-DAT) */}
+        {/* Toggle: show all events */}
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          className="text-xs font-mono text-[#D0A65E] hover:text-amber-300 underline decoration-dotted underline-offset-2"
+        >
+          {showAll ? "▾ Hide full list" : `▸ Show all ${events.length} active events`}
+        </button>
+
+        {showAll && (
+          <div className="mt-4">
+            {/* Filter chips */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              <button
+                onClick={() => setFilter("all")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+                  filter === "all" ? "bg-gray-700 text-white" : "bg-gray-800/50 text-gray-400 hover:text-white"
+                }`}
+              >
+                All ({events.length})
+              </button>
+              {Object.entries(counts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => (
+                  <button
+                    key={type}
+                    onClick={() => setFilter(type)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center gap-1.5 ${
+                      filter === type ? "bg-gray-700 text-white" : "bg-gray-800/50 text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    {EVENT_ICONS[type]} {EVENT_LABELS[type] || type} ({count})
+                  </button>
+                ))}
+            </div>
+
+            {/* Events grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 max-h-[600px] overflow-y-auto pr-1">
+              {sorted.slice(0, 50).map((e, i) => (
+                <a
+                  key={i}
+                  href={e.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`block rounded-xl border p-2.5 transition-colors hover:bg-gray-800/50 ${ALERT_COLORS[e.alertLevel] || "bg-gray-800/30 text-gray-400 border-gray-700"}`}
+                >
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5">{EVENT_ICONS[e.type]}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-sm truncate">{e.name}</div>
+                      <div className="text-xs opacity-70 mt-0.5">
+                        {e.country && <span>{e.country} · </span>}
+                        {new Date(e.fromDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                        {e.toDate !== e.fromDate && (
+                          <> → {new Date(e.toDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</>
+                        )}
+                      </div>
+                      {e.severity && <div className="text-xs opacity-60 mt-0.5 truncate">{e.severity}</div>}
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-40 flex-shrink-0 mt-1" />
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </SubSection>
+
+      {/* 4. Long-term trends (EM-DAT) */}
       {historicalContext.length > 0 && (
-        <SubSection title={`Are these event types getting more common? (EM-DAT, ${historicalContext[0].latestYear - 9}–${historicalContext[0].latestYear} vs ${historicalContext[0].latestYear - 19}–${historicalContext[0].latestYear - 10})`}>
+        <SubSection title="Long-term trends — are these event types getting more common?">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 mb-2">
             {historicalContext.map((h) => {
               const trendUp = h.pctChange != null && h.pctChange >= 15;
@@ -856,73 +955,14 @@ function LiveEventsSection({
               );
             })}
           </div>
-          <p className="text-xs text-gray-500 mb-4">
-            Annual counts of qualifying disasters (≥10 deaths, ≥100 affected, or state of emergency) from{" "}
+          <p className="text-xs text-gray-500 mb-2">
+            Last decade ({historicalContext[0].latestYear - 9}–{historicalContext[0].latestYear}) vs the ten years before, using annual counts of qualifying disasters (≥10 deaths, ≥100 affected, or state of emergency) from{" "}
             <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EM-DAT</a>{" "}
             via{" "}
-            <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>. This is a separate dataset from the GDACS live alerts above — EM-DAT uses a higher severity threshold, so its annual totals are much smaller than GDACS alert counts and the two should not be compared directly.
+            <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>. EM-DAT uses a higher severity threshold than the GDACS live alerts above, so the two should not be compared directly.
           </p>
         </SubSection>
       )}
-
-      {/* Filter buttons */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
-            filter === "all" ? "bg-gray-700 text-white" : "bg-gray-800/50 text-gray-400 hover:text-white"
-          }`}
-        >
-          All ({events.length})
-        </button>
-        {Object.entries(counts)
-          .sort((a, b) => b[1] - a[1])
-          .map(([type, count]) => (
-            <button
-              key={type}
-              onClick={() => setFilter(type)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center gap-1.5 ${
-                filter === type ? "bg-gray-700 text-white" : "bg-gray-800/50 text-gray-400 hover:text-white"
-              }`}
-            >
-              {EVENT_ICONS[type]} {EVENT_LABELS[type] || type} ({count})
-            </button>
-          ))}
-      </div>
-
-      {/* Map */}
-      <div className="mb-4">
-        <EventsMap events={sorted} />
-      </div>
-
-      {/* Events grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 max-h-[600px] overflow-y-auto pr-1">
-        {sorted.slice(0, 50).map((e, i) => (
-          <a
-            key={i}
-            href={e.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`block rounded-xl border p-2.5 transition-colors hover:bg-gray-800/50 ${ALERT_COLORS[e.alertLevel] || "bg-gray-800/30 text-gray-400 border-gray-700"}`}
-          >
-            <div className="flex items-start gap-2">
-              <span className="mt-0.5">{EVENT_ICONS[e.type]}</span>
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm truncate">{e.name}</div>
-                <div className="text-xs opacity-70 mt-0.5">
-                  {e.country && <span>{e.country} · </span>}
-                  {new Date(e.fromDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                  {e.toDate !== e.fromDate && (
-                    <> → {new Date(e.toDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</>
-                  )}
-                </div>
-                {e.severity && <div className="text-xs opacity-60 mt-0.5 truncate">{e.severity}</div>}
-              </div>
-              <ExternalLink className="w-3.5 h-3.5 opacity-40 flex-shrink-0 mt-1" />
-            </div>
-          </a>
-        ))}
-      </div>
     </div>
   );
 }
