@@ -813,16 +813,21 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               <ClimatePeersCard slug={slug} />
 
               {/* ─── Emissions & Energy ─── */}
-              {(region.type === 'country' || region.type === 'us-state') && (
+              {(region.type === 'country' || region.type === 'us-state' || region.type === 'uk-region') && (
                 <>
                   <Divider icon={<Factory className="h-5 w-5 text-rose-400" />} title="Emissions & Energy" />
+                  {region.type === 'uk-region' && (
+                    <div className="rounded-xl border border-[#D0A65E]/40 bg-gray-900/40 px-4 py-2.5 text-xs text-gray-300">
+                      Showing UK-wide figures — {region.name} is part of the United Kingdom. Sub-national emissions and electricity-mix breakdowns are not yet published in a unified format.
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {region.type === 'country' ? (
                       <>
                         <EmissionsCard countryName={region.name} />
                         <EnergyMixCard countryName={region.name} />
                       </>
-                    ) : (
+                    ) : region.type === 'us-state' ? (
                       <>
                         <EmissionsCard
                           usStateCode={region.apiCode.replace('us-', '').toUpperCase()}
@@ -832,6 +837,11 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                           usStateCode={region.apiCode.replace('us-', '').toUpperCase()}
                           usStateName={region.name}
                         />
+                      </>
+                    ) : (
+                      <>
+                        <EmissionsCard countryName="United Kingdom" />
+                        <EnergyMixCard countryName="United Kingdom" />
                       </>
                     )}
                   </div>

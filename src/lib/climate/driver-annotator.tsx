@@ -16,7 +16,7 @@ const termIndex: { id: DriverId; regex: RegExp }[] = (() => {
   flat.sort((a, b) => b.phrase.length - a.phrase.length);
   return flat.map(({ id, phrase }) => ({
     id,
-    regex: new RegExp(`\\b${escapeRegex(phrase)}\\b`, 'i'),
+    regex: new RegExp(`\\b${escapeRegex(phrase)}\\b`, 'gi'),
   }));
 })();
 
@@ -25,22 +25,27 @@ function escapeRegex(s: string): string {
 }
 
 /**
- * Locate the first unlinkified occurrence of each driver (max one per
- * driver per text) and return ranges to wrap in <Term>.
+ * Locate driver mentions and return ranges to wrap in <Term>.
+ * Allows multiple distinct mentions per driver provided each uses a
+ * different surface phrase (e.g. both "El Niño" and "La Niña" in the same
+ * paragraph both get the ENSO tooltip), but avoids repeating the same
+ * phrase and avoids overlapping ranges (longer phrases win).
  */
 function findDriverRanges(text: string): { start: number; end: number; id: DriverId; matched: string }[] {
-  const used = new Set<DriverId>();
   const ranges: { start: number; end: number; id: DriverId; matched: string }[] = [];
+  const seenPhrases = new Set<string>();
   for (const { id, regex } of termIndex) {
-    if (used.has(id)) continue;
-    const m = regex.exec(text);
-    if (!m) continue;
-    // Skip if this range overlaps an already-chosen range.
-    const start = m.index;
-    const end = m.index + m[0].length;
-    if (ranges.some((r) => start < r.end && end > r.start)) continue;
-    ranges.push({ start, end, id, matched: m[0] });
-    used.add(id);
+    regex.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = regex.exec(text)) !== null) {
+      const start = m.index;
+      const end = m.index + m[0].length;
+      const key = `${id}:${m[0].toLowerCase()}`;
+      if (seenPhrases.has(key)) continue;
+      if (ranges.some((r) => start < r.end && end > r.start)) continue;
+      ranges.push({ start, end, id, matched: m[0] });
+      seenPhrases.add(key);
+    }
   }
   ranges.sort((a, b) => a.start - b.start);
   return ranges;
