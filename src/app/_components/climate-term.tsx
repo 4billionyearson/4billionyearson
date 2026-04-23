@@ -102,7 +102,7 @@ export default function Term({ id, className, children }: TermProps) {
             id={tooltipId}
             role="tooltip"
             style={{ position: 'fixed', top: coords.top, left: coords.left, width: 'min(320px, calc(100vw - 16px))', zIndex: 9999 }}
-            className="rounded-lg border border-teal-500/30 bg-gray-950/98 p-3 text-left shadow-xl backdrop-blur-sm text-xs leading-relaxed text-gray-200 normal-case pointer-events-auto"
+            className="rounded-lg border border-teal-500/40 bg-gray-950 p-3 text-left shadow-2xl text-xs leading-relaxed text-gray-200 normal-case pointer-events-auto"
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
           >

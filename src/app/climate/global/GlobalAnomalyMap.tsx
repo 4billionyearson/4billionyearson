@@ -114,7 +114,6 @@ function InvalidateOnMount() {
 /* ─── Sub-national overlays (US states + UK nations) ─────────────────────── */
 
 const US_STATES_ZOOM = 3;
-const UK_REGIONS_ZOOM = 4;
 
 interface RankingRow {
   slug: string;
@@ -133,9 +132,9 @@ function rankingValue(row: RankingRow | undefined, win: AnomalyWindow): number |
   return row.anomaly1m;
 }
 
-// UK-nation slugs that map to polygon features in /data/uk-nations.json
-// (feature `slug` property matches rankings.json `slug`).
-const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
+// UK-nation slugs — kept for potential future re-introduction of the overlay.
+// Currently unused; the map renders UK as a single country polygon.
+// const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
 
 function USStatesOverlay({
   rankings,
@@ -210,79 +209,8 @@ function USStatesOverlay({
   );
 }
 
-function UKRegionsOverlay({
-  rankings,
-  windowSel,
-  onInfo,
-}: {
-  rankings: RankingRow[] | null;
-  windowSel: AnomalyWindow;
-  onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
-}) {
-  const map = useMap();
-  const [visible, setVisible] = useState(map.getZoom() >= UK_REGIONS_ZOOM);
-  const [geo, setGeo] = useState<FeatureCollection | null>(null);
-
-  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= UK_REGIONS_ZOOM) });
-
-  useEffect(() => {
-    if (!visible || geo) return;
-    fetch('/data/uk-nations.json')
-      .then((r) => r.json())
-      .then((g: FeatureCollection) => setGeo(g))
-      .catch(() => {});
-  }, [visible, geo]);
-
-  const bySlug = useMemo(() => {
-    const m = new Map<string, RankingRow>();
-    if (rankings) {
-      for (const r of rankings) {
-        if (r.type === 'uk-region' && UK_NATION_SLUGS.has(r.slug)) m.set(r.slug, r);
-      }
-    }
-    return m;
-  }, [rankings]);
-
-  const style = useCallback(
-    (feature: Feature | undefined): PathOptions => {
-      const slug = ((feature?.properties as any)?.slug as string) ?? '';
-      const row = bySlug.get(slug);
-      const v = rankingValue(row, windowSel);
-      return {
-        fillColor: v != null ? anomalyColor(v) : '#1f2937',
-        fillOpacity: 0.9,
-        weight: 0.8,
-        color: '#0b1220',
-      };
-    },
-    [bySlug, windowSel],
-  );
-
-  const onEachFeature = useCallback(
-    (feature: Feature, layer: Layer) => {
-      const slug = ((feature.properties as any)?.slug as string) ?? '';
-      const name = ((feature.properties as any)?.name as string) ?? '';
-      const row = bySlug.get(slug);
-      const v = rankingValue(row, windowSel);
-      const color = v != null ? anomalyColor(v) : '#1f2937';
-      const show = () => onInfo({ name, anomaly: v, label: row?.latestLabel ?? null, color });
-      layer.on('mouseover', show);
-      layer.on('click', show);
-      layer.on('mouseout', () => onInfo(null));
-    },
-    [bySlug, windowSel, onInfo],
-  );
-
-  if (!visible || !geo) return null;
-  return (
-    <GeoJSON
-      key={`uk-nations-${windowSel}-${bySlug.size}`}
-      data={geo}
-      style={style}
-      onEachFeature={onEachFeature}
-    />
-  );
-}
+// UKRegionsOverlay removed — the map now shows UK as a single country polygon to
+// avoid mismatched sub-polygon coverage. Re-introduce from git history if needed.
 
 export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
@@ -418,17 +346,8 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
               )
             }
           />
-          <UKRegionsOverlay
-            rankings={rankings}
-            windowSel={windowSel}
-            onInfo={(info) =>
-              setSelected(
-                info
-                  ? { name: info.name, anomaly: info.anomaly, monthLabel: info.label ?? undefined, color: info.color }
-                  : null,
-              )
-            }
-          />
+          {/* UK nations overlay disabled — map is country-level; UK renders as a single polygon
+              from world-countries.json to avoid mismatched sub-polygon coverage. */}
         </MapContainer>
 
         {selected && (

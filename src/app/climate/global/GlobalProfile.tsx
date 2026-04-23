@@ -587,6 +587,14 @@ export default function GlobalProfile() {
                 );
               })()}
 
+              {/* World anomaly map — country-level temperature anomalies.
+                  Sits inside At a Glance under the Paris tracker so readers
+                  see where the current warming is concentrated before diving
+                  into longer time-series charts below. */}
+              {data.countryAnomalies && data.countryAnomalies.length > 0 && (
+                <AnomalyMapCard countryAnomalies={data.countryAnomalies} />
+              )}
+
               {/* Spaghetti chart — Land + Ocean (headline global series) */}
               {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (
                 <>
@@ -743,14 +751,6 @@ export default function GlobalProfile() {
                       <ContinentalBar continents={data.continentStats} />
                     </div>
                   ) : null}
-                </>
-              )}
-
-              {/* World anomaly map — country-level temperature anomalies */}
-              {data.countryAnomalies && data.countryAnomalies.length > 0 && (
-                <>
-                  <Divider icon={<Globe2 className="h-5 w-5 text-[#D0A65E]" />} title="World Temperature Anomaly" />
-                  <AnomalyMapCard countryAnomalies={data.countryAnomalies} />
                 </>
               )}
 
