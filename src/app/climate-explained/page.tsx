@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import {
   Thermometer, Wind, Droplets, Mountain, Snowflake, Flame,
-  ArrowUpRight, Globe, TreePine, AlertTriangle, BookOpen, ExternalLink, Waves,
+  ArrowUpRight, Globe, TreePine, AlertTriangle, BookOpen, ExternalLink, Waves, Compass,
 } from "lucide-react";
+import { WARMING_DRIVERS } from "@/lib/climate/warming-drivers";
 
 export const metadata: Metadata = {
   title: "Climate Change Explained | 4 Billion Years On",
@@ -198,6 +199,41 @@ export default function ClimateExplainedPage() {
                 </p>
               </div>
             </div>
+          </section>
+
+          {/* Why some places warm faster than others — regional drivers */}
+          <section id="warming-drivers" className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+            <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-2 flex items-start gap-2">
+              <Compass className="h-5 w-5 shrink-0 text-teal-300 mt-1" />
+              <span className="min-w-0 flex-1">Why Some Places Warm Faster Than Others</span>
+            </h2>
+            <p className="text-sm text-gray-400 mb-5 leading-relaxed">
+              The global average hides huge regional variation. Finland and Sweden are warming at twice the global rate. Svalbard has already warmed nearly 3.5°C. Tropical regions warm slowly in absolute terms but are already close to the limits of human heat tolerance. These are the mechanisms that explain the pattern — the same terms you&apos;ll see highlighted across this site will link back here.
+            </p>
+            <div className="space-y-3">
+              {WARMING_DRIVERS.map((d) => (
+                <div
+                  key={d.id}
+                  id={d.id}
+                  className="rounded-xl border border-gray-700/40 bg-gray-900/60 p-4 scroll-mt-24"
+                >
+                  <h3 className="text-base font-bold text-teal-200 mb-1">{d.term}</h3>
+                  <p className="text-sm text-gray-300 leading-relaxed mb-2">{d.long}</p>
+                  <a
+                    href={d.source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-teal-300 transition-colors"
+                  >
+                    Source: {d.source.name}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-xs text-gray-500 leading-relaxed">
+              <strong className="text-gray-400">The bigger picture:</strong> most regions experience several of these at once. Finland combines Arctic amplification, snow-albedo feedback and seasonal shifts; the Mediterranean combines dry-soil amplification, heat domes and a weakening jet stream; tropical cities combine urban heat islands with the narrow thermal tolerance of life at low latitudes.
+            </p>
           </section>
 
           {/* Glossary */}
