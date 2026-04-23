@@ -57,3 +57,15 @@ export async function setDailyTerm(key: string, value: unknown): Promise<void> {
     console.warn('Redis set failed:', e);
   }
 }
+
+const LIVE_TTL = 30 * 60; // 30 minutes in seconds — for frequently-updated live feeds
+
+export async function setLiveTerm(key: string, value: unknown): Promise<void> {
+  const r = getRedis();
+  if (!r) return;
+  try {
+    await r.set(key, value, { ex: LIVE_TTL });
+  } catch (e) {
+    console.warn('Redis set failed:', e);
+  }
+}

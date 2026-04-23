@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getCached, setShortTerm } from '@/lib/climate/redis';
+import { getCached, setShortTerm, setLiveTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:extreme-weather:v3';
+// Historical EM-DAT data — changes ~annually, safe to cache long.
+const HIST_CACHE_KEY = 'climate:extreme-weather:hist:v1';
+// Live GDACS events — must refresh often so new alerts surface quickly.
+const LIVE_CACHE_KEY = 'climate:extreme-weather:gdacs:v1';
 
 // OWID indicator IDs (EM-DAT data, entities = disaster types)
 const INDICATORS = {
@@ -78,62 +81,76 @@ async function fetchGDACS() {
 }
 
 export async function GET() {
-  const cached = await getCached<any>(CACHE_KEY);
-  if (cached) return NextResponse.json({ ...cached, source: 'cache' });
-
   try {
-    const [disastersRaw, deathsRaw, affectedRaw, damagesRaw, gdacsEvents] = await Promise.all([
-      fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.disasters}.data.json`),
-      fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.deaths}.data.json`),
-      fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.affected}.data.json`),
-      fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.damages}.data.json`),
-      fetchGDACS(),
-    ]);
+    // ── Historical EM-DAT (cache 30 days) ────────────────────────────────
+    let historical = await getCached<any>(HIST_CACHE_KEY);
+    if (!historical) {
+      const [disastersRaw, deathsRaw, affectedRaw, damagesRaw] = await Promise.all([
+        fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.disasters}.data.json`),
+        fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.deaths}.data.json`),
+        fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.affected}.data.json`),
+        fetchJSON(`https://api.ourworldindata.org/v1/indicators/${INDICATORS.damages}.data.json`),
+      ]);
 
-    const disasters = parseOWID(disastersRaw);
-    const deaths = parseOWID(deathsRaw);
-    const affected = parseOWID(affectedRaw);
-    const damages = parseOWID(damagesRaw);
+      const disasters = parseOWID(disastersRaw);
+      const deaths = parseOWID(deathsRaw);
+      const affected = parseOWID(affectedRaw);
+      const damages = parseOWID(damagesRaw);
 
-    // Build yearly breakdown by type
-    function buildByType(rows: { year: number; entityId: number; value: number }[]) {
-      const byYear: Record<number, Record<string, number>> = {};
-      for (const r of rows) {
-        const label = ENTITY_MAP[r.entityId];
-        if (!label) continue;
-        if (!byYear[r.year]) byYear[r.year] = {};
-        byYear[r.year][label] = r.value;
+      // Build yearly breakdown by type
+      function buildByType(rows: { year: number; entityId: number; value: number }[]) {
+        const byYear: Record<number, Record<string, number>> = {};
+        for (const r of rows) {
+          const label = ENTITY_MAP[r.entityId];
+          if (!label) continue;
+          if (!byYear[r.year]) byYear[r.year] = {};
+          byYear[r.year][label] = r.value;
+        }
+        return Object.entries(byYear)
+          .map(([y, types]) => ({ year: Number(y), ...types }))
+          .sort((a, b) => a.year - b.year);
       }
-      return Object.entries(byYear)
-        .map(([y, types]) => ({ year: Number(y), ...types }))
-        .sort((a, b) => a.year - b.year);
+
+      // Build annual totals by summing weather/climate types only
+      function buildTotal(rows: { year: number; entityId: number; value: number }[]) {
+        const byYear: Record<number, number> = {};
+        for (const r of rows) {
+          if (!ENTITY_MAP[r.entityId]) continue;
+          byYear[r.year] = (byYear[r.year] || 0) + r.value;
+        }
+        return Object.entries(byYear)
+          .map(([y, v]) => ({ year: Number(y), value: v }))
+          .sort((a, b) => a.year - b.year);
+      }
+
+      historical = {
+        disastersByType: buildByType(disasters),
+        deathsByType: buildByType(deaths),
+        totalDisasters: buildTotal(disasters),
+        totalDeaths: buildTotal(deaths),
+        totalAffected: buildTotal(affected),
+        totalDamages: buildTotal(damages),
+      };
+
+      await setShortTerm(HIST_CACHE_KEY, historical);
     }
 
-    // Build annual totals by summing weather/climate types only
-    function buildTotal(rows: { year: number; entityId: number; value: number }[]) {
-      const byYear: Record<number, number> = {};
-      for (const r of rows) {
-        if (!ENTITY_MAP[r.entityId]) continue;
-        byYear[r.year] = (byYear[r.year] || 0) + r.value;
+    // ── Live GDACS events (cache 30 minutes) ─────────────────────────────
+    let gdacsEvents = await getCached<any[]>(LIVE_CACHE_KEY);
+    if (!gdacsEvents) {
+      gdacsEvents = await fetchGDACS();
+      // Only cache a successful non-empty fetch — avoid pinning an empty array
+      // for 30 minutes if GDACS had a transient hiccup.
+      if (gdacsEvents && gdacsEvents.length > 0) {
+        await setLiveTerm(LIVE_CACHE_KEY, gdacsEvents);
       }
-      return Object.entries(byYear)
-        .map(([y, v]) => ({ year: Number(y), value: v }))
-        .sort((a, b) => a.year - b.year);
     }
 
-    const result = {
-      disastersByType: buildByType(disasters),
-      deathsByType: buildByType(deaths),
-      totalDisasters: buildTotal(disasters),
-      totalDeaths: buildTotal(deaths),
-      totalAffected: buildTotal(affected),
-      totalDamages: buildTotal(damages),
-      gdacsEvents,
+    return NextResponse.json({
+      ...historical,
+      gdacsEvents: gdacsEvents || [],
       fetchedAt: new Date().toISOString(),
-    };
-
-    await setShortTerm(CACHE_KEY, result);
-    return NextResponse.json(result);
+    });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Failed to fetch extreme weather data' }, { status: 500 });
   }
