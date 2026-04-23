@@ -71,19 +71,84 @@ function filterGDACSEvents(events: any[], region: ClimateRegion): any[] {
   });
 }
 
-function buildGDACSSection(events: any[]): string {
-  if (!events.length) return '';
+const GDACS_TYPE_LABELS: Record<string, string> = {
+  WF: 'wildfire',
+  FL: 'flood',
+  TC: 'tropical cyclone',
+  DR: 'drought',
+  EQ: 'earthquake',
+  VO: 'volcano',
+  TS: 'tsunami',
+};
+
+// Aggregate GDACS events by type so duplicate hotspot entries don't drown the
+// prompt. Also derive a rolling-year baseline for the same region so Gemini
+// can see whether the current month is an unusual concentration.
+function buildGDACSSection(
+  regionEvents: any[],
+  allEventsForRegion: any[],
+  region: ClimateRegion,
+): string {
+  if (!regionEvents.length) return '';
   const lines: string[] = [];
-  lines.push('\n═══ ACTIVE EXTREME WEATHER EVENTS (GDACS) ═══');
-  const sorted = [...events].sort((a, b) => {
-    const order: Record<string, number> = { Red: 0, Orange: 1, Green: 2 };
-    return (order[a.alertLevel] ?? 3) - (order[b.alertLevel] ?? 3);
+  lines.push('\n═══ ACTIVE EXTREME WEATHER EVENTS (GDACS, last ~30 days) ═══');
+  lines.push(`Site tracker: /extreme-weather  — link to this page whenever you mention active events.`);
+  lines.push(`Region page:  /climate/${region.slug}`);
+  lines.push('');
+
+  // Recent window: events whose end date is within the last 30 days of "now"
+  const now = Date.now();
+  const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+  const recent = regionEvents.filter((e) => {
+    const end = e.toDate ? Date.parse(e.toDate) : e.fromDate ? Date.parse(e.fromDate) : NaN;
+    return !Number.isNaN(end) && now - end <= THIRTY_DAYS;
   });
-  for (const e of sorted.slice(0, 5)) {
-    lines.push(`  [${e.alertLevel?.toUpperCase()}] ${e.type}: ${e.name} (${e.country})`);
-    if (e.severity) lines.push(`    Severity: ${e.severity}`);
-    if (e.fromDate) lines.push(`    Period: ${e.fromDate} – ${e.toDate || 'ongoing'}`);
+  const workingSet = recent.length > 0 ? recent : regionEvents;
+
+  // Group by type + alertLevel
+  type Bucket = { type: string; alertLevel: string; count: number; samples: Set<string>; earliest: string | null; latest: string | null };
+  const buckets = new Map<string, Bucket>();
+  for (const e of workingSet) {
+    const key = `${e.type}|${e.alertLevel}`;
+    let b = buckets.get(key);
+    if (!b) {
+      b = { type: e.type, alertLevel: e.alertLevel, count: 0, samples: new Set(), earliest: null, latest: null };
+      buckets.set(key, b);
+    }
+    b.count++;
+    if (e.name && b.samples.size < 3) b.samples.add(e.name);
+    if (e.fromDate && (!b.earliest || e.fromDate < b.earliest)) b.earliest = e.fromDate.slice(0, 10);
+    if (e.toDate && (!b.latest || e.toDate > b.latest)) b.latest = e.toDate.slice(0, 10);
   }
+
+  // 12-month baseline for the same region (same type breakdown)
+  const yearByType = new Map<string, number>();
+  for (const e of allEventsForRegion) yearByType.set(e.type, (yearByType.get(e.type) || 0) + 1);
+
+  // Emit one line per type bucket, with count, alert mix, date span, and baseline ratio
+  const sorted = [...buckets.values()].sort((a, b) => {
+    const order: Record<string, number> = { Red: 0, Orange: 1, Green: 2 };
+    return (order[a.alertLevel] ?? 3) - (order[b.alertLevel] ?? 3) || b.count - a.count;
+  });
+  for (const b of sorted) {
+    const label = GDACS_TYPE_LABELS[b.type] || b.type;
+    const yearTotal = yearByType.get(b.type) || 0;
+    const shareOfYear = yearTotal > 0 ? Math.round((b.count / yearTotal) * 100) : null;
+    const dateSpan = b.earliest ? (b.latest && b.latest !== b.earliest ? `${b.earliest} to ${b.latest}` : b.earliest) : 'ongoing';
+    const baseline = yearTotal > 0
+      ? `${yearTotal} ${label} event${yearTotal === 1 ? '' : 's'} logged for ${region.name} over the past 12 months; the recent ${b.count} represent${b.count === 1 ? 's' : ''} ${shareOfYear}% of that annual total — ${shareOfYear != null && shareOfYear >= 40 ? 'an unusual concentration' : 'within the normal seasonal rate'}.`
+      : '';
+    lines.push(`  • ${b.count}× ${label} [${b.alertLevel}]  (${dateSpan})`);
+    if (b.samples.size > 0) lines.push(`      Sample names: ${[...b.samples].slice(0, 3).join(' · ')}`);
+    if (baseline) lines.push(`      Context: ${baseline}`);
+  }
+
+  lines.push('');
+  lines.push('INSTRUCTION: If any type has ≥3 active events, or if the recent share of the 12-month total is ≥40%, you MUST');
+  lines.push('mention the cluster explicitly in the update (e.g. "34 active wildfire alerts across Australia in the past few weeks").');
+  lines.push('Use the web search to put the scale in context — is this an unusually active wildfire / flood / cyclone season for');
+  lines.push(`${region.name}? Are emergency services reporting it as significant?`);
+  lines.push('Link once to our live tracker by writing the path /extreme-weather (the site converts it to a link).');
   return lines.join('\n');
 }
 
@@ -465,7 +530,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('1. RANKED HIGHLIGHTS (Priority 1): Study the RANKED HIGHLIGHTS section below FIRST. The 3-month rankings are the most SEO-valuable — if sunshine was 3rd highest or frost days were 4th lowest of all time, THAT is your headline. Scan ALL variables for standout rankings (top 5 or bottom 5 of all time).');
   lines.push('2. LATEST MONTH (Priority 2): After the seasonal ranking lead, discuss the most recent single month. What ranked highest/lowest?');
   lines.push('3. ANNUAL / LONG-TERM (Priority 3): Put it all in context — previous full year, warming trend.');
-  lines.push('4. EXTREME WEATHER: If there are active GDACS alerts or recent extreme weather events, weave them in naturally.');
+  lines.push('4. EXTREME WEATHER (MANDATORY when present): If the ACTIVE EXTREME WEATHER EVENTS section below lists any clusters (≥3 of the same type, or ≥40% of the 12-month total), you MUST mention them in the "What’s driving change?" or a dedicated sentence — with the count, type and rough date window. Use Google Search to say whether this is unusually high for the region and season. Include our live tracker link by writing the bare path /extreme-weather in the text; the site turns it into a link.');
   lines.push('5. CLIMATE DRIVERS: If El Niño, La Niña, NAO etc. are relevant, briefly mention them.');
   lines.push('6. CROSS-REGION RANKINGS: If this region is in the top 20 (or bottom 10) of any window in the CROSS-REGION RANKINGS section, mention the rank. If the top 10 shows a striking geographic concentration (e.g. mostly US states), that pattern is worth a single sentence of context.');
   lines.push('');
@@ -541,7 +606,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
 
   // GDACS extreme weather events
   if (gdacsEvents.length > 0) {
-    lines.push(buildGDACSSection(gdacsEvents));
+    lines.push(buildGDACSSection(gdacsEvents, gdacsEvents, region));
   }
 
   // Cross-region rankings
@@ -812,7 +877,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v25`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v26`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {

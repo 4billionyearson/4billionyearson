@@ -165,7 +165,13 @@ function highlightRankings(text: string): string {
   // Pattern 2: "the" + superlative (no "most") — REQUIRES "on record" / "of N years"
   const p2 = `the\\s+(?:${supNoMost})\\b${w}\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?)`;
   const pattern = new RegExp(`\\b(${p1}|${p2})`, 'gi');
-  return escaped.replace(pattern, (m) => `<strong style="color:#fff">${m}</strong>`);
+  let out = escaped.replace(pattern, (m) => `<strong style="color:#fff">${m}</strong>`);
+  // Linkify bare site paths that Gemini may include (e.g. /extreme-weather, /emissions, /climate/global)
+  out = out.replace(
+    /(^|[\s(—–−])(\/(?:extreme-weather|emissions|energy-dashboard|climate\/[a-z0-9-]+|greenhouse-gases|sea-levels-ice|planetary-boundaries|climate-dashboard|climate\/rankings))(?=[\s).,;:—–−]|$)/gi,
+    (_m, lead, path) => `${lead}<a href="${path}" class="text-[#D0A65E] underline decoration-dotted underline-offset-2 hover:text-amber-300">${path}</a>`,
+  );
+  return out;
 }
 
 function getPointValue(point: YearlyPoint | PrecipPoint): number | null {
