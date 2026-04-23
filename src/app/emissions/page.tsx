@@ -233,7 +233,7 @@ export default function EmissionsPage() {
                 Tracking who emits the most CO₂, how emissions have changed over time, and the cumulative burden each country carries.
               </p>
               <div className="h-px bg-[#D0A65E]/30" />
-              <EmissionsCountryPanel embedded />
+              <EmissionsCountryPanel embedded worldAnnual={data?.worldAnnual} />
             </div>
           </div>
 
