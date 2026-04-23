@@ -17,6 +17,7 @@ import {
 import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar, WhatChangedTile } from './ClimateSystemsPanel';
 import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
 import AnomalyMapCard from './AnomalyMapCard';
+import { renderWithDriverTooltips } from '@/lib/climate/driver-annotator';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -328,11 +329,11 @@ export default function GlobalProfile() {
                         return (
                           <div key={i} className="space-y-1.5">
                             <h3 className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#D0A65E]">{heading}</h3>
-                            {body && <p dangerouslySetInnerHTML={{ __html: highlightRankings(body) }} />}
+                            {body && <p>{renderWithDriverTooltips(body, highlightRankings)}</p>}
                           </div>
                         );
                       }
-                      return <p key={i} dangerouslySetInnerHTML={{ __html: highlightRankings(trimmed) }} />;
+                      return <p key={i}>{renderWithDriverTooltips(trimmed, highlightRankings)}</p>;
                     })}
                   </div>
                   {summarySources.length > 0 && (

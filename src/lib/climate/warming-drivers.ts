@@ -27,7 +27,8 @@ export type DriverId =
   | 'altitude-warming'
   | 'deforestation'
   | 'seasonal-shifts'
-  | 'ocean-currents';
+  | 'ocean-currents'
+  | 'monsoon-disruption';
 
 export interface WarmingDriver {
   id: DriverId;
@@ -250,6 +251,24 @@ export const WARMING_DRIVERS: WarmingDriver[] = [
     source: {
       name: 'Met Office — AMOC Explainer',
       url: 'https://www.metoffice.gov.uk/weather/climate-change/what-is-climate-change/amoc',
+    },
+  },
+  {
+    id: 'monsoon-disruption',
+    term: 'Monsoon disruption',
+    aliases: ['weakened monsoon', 'monsoon weakening', 'failed monsoon', 'delayed monsoon'],
+    short:
+      'A warmer atmosphere and ENSO swings are making monsoon rains more erratic — late, weak or intense — which extends dry-season heat.',
+    long:
+      'South and South-East Asia, West Africa and northern Australia depend on the seasonal monsoon to cool the land and deliver most of their annual rainfall. Global warming and El Niño events are making monsoons less reliable: later onsets, longer mid-season dry spells, and more intense bursts of rain. When the monsoon fails or arrives late, cooling rains are absent, soils stay dry, and pre-monsoon heatwaves stretch further into the year — a major driver of the record-breaking 45–48°C temperatures seen across Myanmar, India, Pakistan and the Philippines in recent years.',
+    appliesTo: {
+      latitudeAbove: -15,
+      latitudeBelow: 30,
+      climateHints: ['arid'],
+    },
+    source: {
+      name: 'WMO — State of the Climate in Asia',
+      url: 'https://wmo.int/resources/publications/state-of-climate-asia',
     },
   },
 ];
