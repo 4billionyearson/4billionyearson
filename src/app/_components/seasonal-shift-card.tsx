@@ -21,6 +21,54 @@ interface SeasonalShiftCardProps {
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+// Day-of-year at the middle of each calendar month (non-leap year).
+const MID_MONTH_DOY = [15, 46, 75, 106, 136, 167, 197, 228, 259, 289, 320, 350];
+
+// DOY → "15 Apr"-style label
+function doyToLabel(doy: number): string {
+  const d = Math.max(1, Math.min(365, Math.round(doy)));
+  const date = new Date(2001, 0, d); // 2001 = non-leap
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+// For a 12-month climatology and a threshold, linearly interpolate the day
+// of year when the climatology crosses the threshold on its way up (spring)
+// and on its way down (autumn). Returns null when no crossing exists (always
+// above or always below — e.g. tropical or polar climates).
+function findCrossings(monthly: number[], threshold: number): { spring: number; autumn: number } | null {
+  const above = monthly.map(v => v > threshold);
+  if (above.every(Boolean) || !above.some(Boolean)) return null;
+
+  const firstWarm = above.indexOf(true);
+  const lastWarm = above.lastIndexOf(true);
+
+  // Spring crossing: between firstWarm-1 and firstWarm. If firstWarm is
+  // January, we approximate by clamping to start-of-year.
+  let spring: number;
+  if (firstWarm === 0) {
+    spring = 1;
+  } else {
+    const v0 = monthly[firstWarm - 1];
+    const v1 = monthly[firstWarm];
+    const frac = (threshold - v0) / (v1 - v0);
+    spring = MID_MONTH_DOY[firstWarm - 1] + frac * (MID_MONTH_DOY[firstWarm] - MID_MONTH_DOY[firstWarm - 1]);
+  }
+
+  // Autumn crossing: between lastWarm and lastWarm+1. If lastWarm is
+  // December, clamp to end-of-year.
+  let autumn: number;
+  if (lastWarm === 11) {
+    autumn = 365;
+  } else {
+    const v0 = monthly[lastWarm];
+    const v1 = monthly[lastWarm + 1];
+    const frac = (v0 - threshold) / (v0 - v1);
+    autumn = MID_MONTH_DOY[lastWarm] + frac * (MID_MONTH_DOY[lastWarm + 1] - MID_MONTH_DOY[lastWarm]);
+  }
+
+  return { spring, autumn };
+}
+
 export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }: SeasonalShiftCardProps) {
   const [view, setView] = useState<'length' | 'monthly'>('length');
 
@@ -100,6 +148,21 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
     // Month with biggest warming
     const biggestIdx = monthlyComparison.reduce((bestIdx, row, i, arr) => row.diff > arr[bestIdx].diff ? i : bestIdx, 0);
 
+    // Where along the year does the climatology cross the annual mean?
+    // The threshold is FIXED to the baseline annual mean for both windows,
+    // so any shift cleanly attributes to warming rather than to a moving
+    // target. Returns null for tropical/polar places where there's no
+    // crossing (every month above or every month below the mean).
+    const baselineCrossings = findCrossings(baselineMonthly, baselineAnnualMean);
+    const recentCrossings = findCrossings(recentMonthly, baselineAnnualMean);
+
+    let springShiftDays: number | null = null;
+    let autumnShiftDays: number | null = null;
+    if (baselineCrossings && recentCrossings) {
+      springShiftDays = recentCrossings.spring - baselineCrossings.spring; // negative = earlier
+      autumnShiftDays = recentCrossings.autumn - baselineCrossings.autumn; // positive = later
+    }
+
     return {
       baselineAnnualMean,
       baselineStart, baselineEnd,
@@ -110,6 +173,10 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
       warmMonthsBaseline,
       warmMonthsRecent,
       biggestMonth: monthlyComparison[biggestIdx],
+      baselineCrossings,
+      recentCrossings,
+      springShiftDays,
+      autumnShiftDays,
     };
   }, [monthlyAll]);
 
@@ -177,6 +244,37 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
           <div className="text-[11px] text-gray-400">per year</div>
         </div>
       </div>
+
+      {stats.baselineCrossings && stats.recentCrossings && stats.springShiftDays !== null && stats.autumnShiftDays !== null && (
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-2.5">
+            <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono mb-1">Spring threshold crossed</div>
+            <div className="flex items-baseline justify-between gap-2 flex-wrap">
+              <div className="text-sm text-gray-300">
+                <span className="text-gray-500">{doyToLabel(stats.baselineCrossings.spring)}</span>
+                <span className="mx-1 text-gray-600">→</span>
+                <span className="text-[#FFF5E7] font-mono font-bold">{doyToLabel(stats.recentCrossings.spring)}</span>
+              </div>
+              <div className={`text-sm font-mono font-bold ${stats.springShiftDays < -1 ? 'text-orange-300' : stats.springShiftDays > 1 ? 'text-sky-300' : 'text-gray-300'}`}>
+                {stats.springShiftDays < 0 ? `${Math.abs(stats.springShiftDays).toFixed(0)} d earlier` : stats.springShiftDays > 0 ? `${stats.springShiftDays.toFixed(0)} d later` : 'no change'}
+              </div>
+            </div>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-lg p-2.5">
+            <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono mb-1">Autumn threshold crossed</div>
+            <div className="flex items-baseline justify-between gap-2 flex-wrap">
+              <div className="text-sm text-gray-300">
+                <span className="text-gray-500">{doyToLabel(stats.baselineCrossings.autumn)}</span>
+                <span className="mx-1 text-gray-600">→</span>
+                <span className="text-[#FFF5E7] font-mono font-bold">{doyToLabel(stats.recentCrossings.autumn)}</span>
+              </div>
+              <div className={`text-sm font-mono font-bold ${stats.autumnShiftDays > 1 ? 'text-orange-300' : stats.autumnShiftDays < -1 ? 'text-sky-300' : 'text-gray-300'}`}>
+                {stats.autumnShiftDays > 0 ? `${stats.autumnShiftDays.toFixed(0)} d later` : stats.autumnShiftDays < 0 ? `${Math.abs(stats.autumnShiftDays).toFixed(0)} d earlier` : 'no change'}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {view === 'length' ? (
         <>
