@@ -64,10 +64,10 @@ const SECTIONS: Section[] = [
     color: "#D0A65E",
     icon: <Globe className="h-6 w-6" />,
     links: [
-      { group: "Monitor", href: "/climate-dashboard", label: "Dashboard", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Global & local temperature anomalies" },
       { group: "Monitor", href: "/climate/global", label: "Global Update", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Whole-planet temperature & trend update" },
       { group: "Monitor", href: "/climate", label: "Country, State & Region Updates", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "78 countries · 50 US states · 17 UK regions" },
       { group: "Monitor", href: "/climate/rankings", label: "Rankings", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "League table of 144 regions + monthly trends" },
+      { group: "Monitor", href: "/climate-dashboard", label: "Dashboard", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Global & local temperature anomalies" },
       { group: "Earth Systems", href: "/planetary-boundaries", label: "Planetary Boundaries", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Nine Earth-system thresholds" },
       { group: "Earth Systems", href: "/greenhouse-gases", label: "Greenhouse Gases", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "CO₂, methane & N₂O levels" },
       { group: "Earth Systems", href: "/sea-levels-ice", label: "Sea Levels & Ice", icon: <Waves className="h-4 w-4" />, badge: "monthly", desc: "Sea level rise & Arctic ice extent" },
@@ -190,8 +190,8 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
               <div key={link.href}>
                 {showGroupHeading && (
                   <div
-                    className={`px-3 pt-2 pb-1 text-[10px] font-bold tracking-[0.14em] uppercase ${idx > 0 ? 'mt-1 border-t border-gray-800/60' : ''}`}
-                    style={{ color: `${section.color}B3` }}
+                    className={`px-3 py-1.5 text-[11px] font-bold tracking-[0.18em] uppercase rounded-md ${idx > 0 ? 'mt-2' : ''}`}
+                    style={{ color: section.color, backgroundColor: `${section.color}1A`, borderTop: idx > 0 ? `1px solid ${section.color}33` : 'none', borderBottom: `1px solid ${section.color}33` }}
                   >
                     {link.group}
                   </div>

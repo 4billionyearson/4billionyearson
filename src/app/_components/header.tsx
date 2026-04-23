@@ -173,10 +173,7 @@ const Header = () => {
               <div className="absolute top-full left-0 pt-1 z-50">
                 <div className="bg-gray-950 border border-gray-700 rounded-lg shadow-2xl overflow-hidden min-w-[280px] py-1">
 
-                <div className="px-4 pt-2 pb-1 text-[10px] font-bold tracking-[0.14em] uppercase text-[#D0A65E]/70">Monitor</div>
-                <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
-                  Dashboard<MonthlyBadge />
-                </Link>
+                <div className="px-4 pt-2 pb-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-[#D0A65E] bg-[#D0A65E]/10 border-b border-[#D0A65E]/20">Monitor</div>
                 <Link
                   href="/climate/global"
                   className={desktopDropdownItemClass(pathname === '/climate/global', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
@@ -198,8 +195,11 @@ const Header = () => {
                 >
                   Rankings<MonthlyBadge />
                 </Link>
+                <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
+                  Dashboard<MonthlyBadge />
+                </Link>
 
-                <div className="mt-1 border-t border-gray-700/50 px-4 pt-2 pb-1 text-[10px] font-bold tracking-[0.14em] uppercase text-[#D0A65E]/70">Earth Systems</div>
+                <div className="mt-1 px-4 pt-2 pb-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-[#D0A65E] bg-[#D0A65E]/10 border-y border-[#D0A65E]/20">Earth Systems</div>
                 <Link href="/planetary-boundaries" className={desktopDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   Planetary Boundaries<MonthlyBadge />
                 </Link>
@@ -216,7 +216,7 @@ const Header = () => {
                   CO₂ Emissions<AnnualBadge />
                 </Link>
 
-                <div className="mt-1 border-t border-gray-700/50 px-4 pt-2 pb-1 text-[10px] font-bold tracking-[0.14em] uppercase text-[#D0A65E]/70">Learn</div>
+                <div className="mt-1 px-4 pt-2 pb-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-[#D0A65E] bg-[#D0A65E]/10 border-y border-[#D0A65E]/20">Learn</div>
                 <Link href="/climate-explained" className={desktopDropdownItemClass(pathname === '/climate-explained', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
                   Explained
                 </Link>
@@ -389,10 +389,7 @@ const Header = () => {
             </button>
             {mobileClimateOpen && (
               <div className="bg-gray-950/50">
-                <div className="pl-10 pt-3 pb-1 text-[10px] font-bold tracking-[0.14em] uppercase text-[#D0A65E]/70">Monitor</div>
-                <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
-                  Dashboard<MonthlyBadge />
-                </Link>
+                <div className="pl-6 pr-4 pt-2.5 pb-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-[#D0A65E] bg-[#D0A65E]/10 border-y border-[#D0A65E]/20">Monitor</div>
                 <Link
                   href="/climate/global"
                   className={mobileDropdownItemClass(pathname === '/climate/global', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
@@ -414,8 +411,11 @@ const Header = () => {
                 >
                   Rankings<MonthlyBadge />
                 </Link>
+                <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
+                  Dashboard<MonthlyBadge />
+                </Link>
 
-                <div className="pl-10 pt-3 pb-1 text-[10px] font-bold tracking-[0.14em] uppercase text-[#D0A65E]/70">Earth Systems</div>
+                <div className="pl-6 pr-4 pt-2.5 pb-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-[#D0A65E] bg-[#D0A65E]/10 border-y border-[#D0A65E]/20">Earth Systems</div>
                 <Link href="/planetary-boundaries" className={mobileDropdownItemClass(pathname === '/planetary-boundaries', 'text-red-400', 'hover:text-red-400')} onClick={closeMenu}>
                   Planetary Boundaries<MonthlyBadge />
                 </Link>
@@ -432,7 +432,7 @@ const Header = () => {
                   CO₂ Emissions<AnnualBadge />
                 </Link>
 
-                <div className="pl-10 pt-3 pb-1 text-[10px] font-bold tracking-[0.14em] uppercase text-[#D0A65E]/70">Learn</div>
+                <div className="pl-6 pr-4 pt-2.5 pb-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-[#D0A65E] bg-[#D0A65E]/10 border-y border-[#D0A65E]/20">Learn</div>
                 <Link href="/climate-explained" className={mobileDropdownItemClass(pathname === '/climate-explained', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
                   Explained
                 </Link>

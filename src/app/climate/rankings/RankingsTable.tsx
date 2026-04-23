@@ -28,6 +28,12 @@ const TYPE_LABEL: Record<Exclude<TypeFilter, 'all'>, string> = {
   'uk-region': 'UK Region',
 };
 
+const TYPE_LABEL_PLURAL: Record<Exclude<TypeFilter, 'all'>, string> = {
+  'country': 'Countries',
+  'us-state': 'US States',
+  'uk-region': 'UK Regions',
+};
+
 function tone(diff: number | null | undefined): string {
   if (diff == null) return 'text-gray-500';
   if (diff >= 1.5) return 'text-red-300';
@@ -121,7 +127,7 @@ export default function RankingsTable({ rows, generatedAt }: { rows: RankingRow[
                 : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200'
             }`}
           >
-            {t === 'all' ? `All (${rows.length})` : `${TYPE_LABEL[t]}s (${rows.filter((r) => r.type === t).length})`}
+            {t === 'all' ? `All (${rows.length})` : `${TYPE_LABEL_PLURAL[t]} (${rows.filter((r) => r.type === t).length})`}
           </button>
         ))}
         <input
