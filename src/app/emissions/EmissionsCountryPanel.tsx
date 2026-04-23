@@ -157,14 +157,14 @@ function CountrySearch({ onSelect, loading }: {
     <div className="relative w-full">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-orange-400" />
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#D0A65E]" />
           <input
             type="text"
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
             placeholder="Search for a country…"
-            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-orange-400/50 bg-gray-900/60 text-sm text-white placeholder-orange-300/60 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition-all"
+            className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-[#D0A65E]/60 bg-gray-900/60 text-sm text-white placeholder-[#D0A65E]/70 focus:ring-2 focus:ring-[#D0A65E] focus:border-[#D0A65E] outline-none transition-all"
             autoComplete="off"
           />
         </div>
@@ -172,7 +172,7 @@ function CountrySearch({ onSelect, loading }: {
           type="button"
           disabled={loading || !query.trim()}
           onClick={() => query.trim() && onSelect(query.trim())}
-          className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85 bg-orange-400 text-gray-900 disabled:opacity-40"
+          className="text-sm font-bold px-4 py-1.5 rounded-lg flex items-center justify-center min-w-[100px] transition-opacity hover:opacity-85 bg-[#D0A65E] text-gray-900 disabled:opacity-40"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Search className="h-4 w-4 mr-2" />Search</>}
         </button>
@@ -211,7 +211,7 @@ function StatBlock({ label, value, sub, color = 'text-orange-300' }: {
 
 /* ─── Main Panel ─────────────────────────────────────────────────────────── */
 
-export default function EmissionsCountryPanel() {
+export default function EmissionsCountryPanel({ embedded = false }: { embedded?: boolean } = {}) {
   const [countryName, setCountryName] = useState<string | null>(null);
   const [data, setData] = useState<CountryApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -274,10 +274,14 @@ export default function EmissionsCountryPanel() {
     return `/climate/${country.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
   }, [country]);
 
+  const wrapperClass = embedded
+    ? ''
+    : 'bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl';
+
   return (
-    <div id="emissions-country-panel" className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
+    <div id="emissions-country-panel" className={wrapperClass}>
       <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <Factory className="h-5 w-5 text-orange-400" />
+        <Factory className="h-5 w-5 text-[#D0A65E]" />
         <h2 className="text-lg font-bold font-mono text-white">Country Deep Dive</h2>
         {country && (
           <button
