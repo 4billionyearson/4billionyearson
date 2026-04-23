@@ -697,10 +697,13 @@ function LiveEventsSection({
     }
     const alertRank = (a: Cluster) =>
       (a.alerts.Red || 0) * 100 + (a.alerts.Orange || 0) * 10 + (a.alerts.Green || 0);
+    // Show all clusters of ≥2, plus any singleton that is Red or Amber
+    // (those are meaningful events even when they're one-offs). Green
+    // singletons are dropped to keep the overview focused.
     return [...map.values()]
-      .filter((c) => c.count >= 2) // only clusters worth calling out
+      .filter((c) => c.count >= 2 || (c.alerts.Red || 0) > 0 || (c.alerts.Orange || 0) > 0)
       .sort((a, b) => alertRank(b) - alertRank(a) || b.count - a.count)
-      .slice(0, 8);
+      .slice(0, 12);
   }, [events]);
 
   const fmtShort = (iso: string | null) =>
@@ -752,29 +755,32 @@ function LiveEventsSection({
 
   return (
     <div>
-      {/* 1. Alert-level summary */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
-          <div className="text-2xl font-bold text-red-400">{alertCounts.Red}</div>
-          <div className="text-xs text-red-400/70 uppercase">Red Alert</div>
+      <SubSection title="Live alerts">
+        {/* 1. Alert-level summary */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
+            <div className="text-2xl font-bold text-red-400">{alertCounts.Red}</div>
+            <div className="text-xs text-red-400/70 uppercase">Red Alert</div>
+          </div>
+          <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 text-center">
+            <div className="text-2xl font-bold text-orange-400">{alertCounts.Orange}</div>
+            <div className="text-xs text-orange-400/70 uppercase">Amber Alert</div>
+          </div>
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+            <div className="text-2xl font-bold text-emerald-400">{alertCounts.Green}</div>
+            <div className="text-xs text-emerald-400/70 uppercase">Green Alert</div>
+          </div>
         </div>
-        <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 text-center">
-          <div className="text-2xl font-bold text-orange-400">{alertCounts.Orange}</div>
-          <div className="text-xs text-orange-400/70 uppercase">Amber Alert</div>
-        </div>
-        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
-          <div className="text-2xl font-bold text-emerald-400">{alertCounts.Green}</div>
-          <div className="text-xs text-emerald-400/70 uppercase">Green Alert</div>
-        </div>
-      </div>
 
-      {/* 2. Map */}
-      <div className="mb-6">
-        <EventsMap events={sorted} />
-      </div>
+        {/* 2. Map */}
+        <div className="mb-6">
+          <EventsMap events={sorted} />
+        </div>
 
-      {/* 3. Overview — hotspot clusters + expandable full list */}
-      <SubSection title={hotspots.length > 0 ? "Overview — Active Hotspots" : "Active Events"}>
+        {/* 3. Overview — hotspot clusters + Red/Amber singletons, expandable full list */}
+        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+          {hotspots.length > 0 ? "Overview — active events" : "Active events"}
+        </h4>
         {hotspots.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
             {hotspots.map((h, i) => {
@@ -1143,7 +1149,7 @@ export default function ExtremeWeatherPage() {
                 const hasOrange = data.gdacsEvents.some((e: GDACSEvent) => e.alertLevel === "Orange");
                 const alertColor = hasRed ? "text-red-400" : hasOrange ? "text-orange-400" : "text-emerald-400";
                 return (
-                <SectionCard icon={<Activity className={`${alertColor} animate-pulse`} />} title="Live Extreme Weather Alerts">
+                <SectionCard icon={<Activity className={`${alertColor} animate-pulse`} />} title="Extreme Weather">
                   <LiveEventsSection events={data.gdacsEvents} disastersByType={data.disastersByType} />
                   <p className="text-xs text-gray-400 mt-4">
                     Real-time alerts from{" "}
