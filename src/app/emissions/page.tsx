@@ -222,13 +222,13 @@ export default function EmissionsPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero + Country Deep Dive (combined) ──────────────── */}
-          <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
-            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+          <div className="relative z-20 rounded-2xl border-2 border-[#D0A65E] shadow-xl">
+            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 CO₂ Emissions
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 space-y-4">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 space-y-4 rounded-b-2xl">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
                 Tracking who emits the most CO₂, how emissions have changed over time, and the cumulative burden each country carries.
               </p>
