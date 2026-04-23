@@ -764,10 +764,11 @@ export default function ShiftingSeasonsPage() {
               <SectionCard icon={<Calendar className="text-amber-400" />} title="Coming next">
                 <ul className="text-sm text-gray-300 leading-relaxed space-y-2 list-disc pl-5">
                   <li>
-                    <strong className="text-[#FFF5E7]">Thermal-season bars</strong> for
-                    every country, US state and UK region — first day of sustained
-                    spring/summer/autumn temperatures derived from ERA5, embedded as
-                    a <code>SeasonalShiftCard</code> in every climate profile page.
+                    <strong className="text-[#FFF5E7]">Shifting seasons per region</strong>{' '}
+                    — a new <em>Shifting seasons</em> card now appears on every country,
+                    US state and UK region climate profile, showing warm-season length
+                    and month-by-month warming derived from each location&apos;s own
+                    long-term monthly temperature record.
                   </li>
                   <li>
                     <strong className="text-[#FFF5E7]">NOAA xmACIS modern frost dates</strong>{' '}

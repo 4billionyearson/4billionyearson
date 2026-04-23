@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, Database, BookOpen, MapPin, Factory } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
+import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import ClimatePeersCard from '@/app/_components/climate-peers-card';
 import EmissionsCard from '@/app/_components/emissions-card';
@@ -786,6 +787,10 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                         <TemperatureSpaghettiChart monthlyAll={monthlyAll} regionName={pageTitle} dataSource={chartSource} />
                       </section>
+                    ) : null}
+
+                    {monthlyAll?.length ? (
+                      <SeasonalShiftCard monthlyAll={monthlyAll} regionName={pageTitle} dataSource={chartSource} />
                     ) : null}
 
                     {/* Sunshine */}
