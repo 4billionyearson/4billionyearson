@@ -822,10 +822,10 @@ function LiveEventsSection({
         </SubSection>
       )}
 
-      {/* Is this normal? — historical baseline per active type */}
+      {/* Long-term frequency trend per active type (EM-DAT) */}
       {historicalContext.length > 0 && (
-        <SubSection title={`Frequency trend — last decade (${historicalContext[0].latestYear - 9}–${historicalContext[0].latestYear}) vs prior decade`}>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 mb-4">
+        <SubSection title={`Are these event types getting more common? (EM-DAT, ${historicalContext[0].latestYear - 9}–${historicalContext[0].latestYear} vs ${historicalContext[0].latestYear - 19}–${historicalContext[0].latestYear - 10})`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 mb-2">
             {historicalContext.map((h) => {
               const trendUp = h.pctChange != null && h.pctChange >= 15;
               const trendDown = h.pctChange != null && h.pctChange <= -15;
@@ -834,35 +834,33 @@ function LiveEventsSection({
               const pctText =
                 h.pctChange == null
                   ? "no prior decade data"
-                  : `${h.pctChange >= 0 ? "+" : ""}${Math.round(h.pctChange)}% vs prior decade`;
+                  : `${h.pctChange >= 0 ? "+" : ""}${Math.round(h.pctChange)}%`;
+              const recent = h.recentAvg < 10 ? h.recentAvg.toFixed(1) : Math.round(h.recentAvg);
+              const prior = h.priorAvg < 10 ? h.priorAvg.toFixed(1) : Math.round(h.priorAvg);
               return (
                 <div key={h.gdacsType} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400 uppercase tracking-wider mb-1">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 uppercase tracking-wider mb-2">
                     {EVENT_ICONS[h.gdacsType]}
                     <span>{h.label}</span>
                   </div>
-                  <div className="text-lg font-bold text-white leading-tight">
-                    {h.currentCount} <span className="text-xs text-gray-400 font-normal">active now</span>
-                  </div>
-                  <div className="text-xs text-gray-300 mt-1.5">
-                    Historical avg:{" "}
-                    <span className="font-semibold text-white">
-                      {h.recentAvg < 10 ? h.recentAvg.toFixed(1) : Math.round(h.recentAvg)}
-                    </span>
-                    <span className="text-gray-400"> /year</span>
-                  </div>
-                  <div className={`text-xs mt-0.5 ${trendColor}`}>
+                  <div className={`text-xl font-bold leading-tight ${trendColor}`}>
                     <span className="font-mono">{arrow}</span> {pctText}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">vs prior decade</div>
+                  <div className="text-xs text-gray-300 mt-2 leading-relaxed">
+                    <span className="font-semibold text-white">{recent}</span>/yr now
+                    <span className="text-gray-500 mx-1">·</span>
+                    <span className="text-gray-400">{prior}/yr then</span>
                   </div>
                 </div>
               );
             })}
           </div>
-          <p className="text-xs text-gray-500 -mt-2 mb-4">
-            GDACS live alerts and EM-DAT annual counts use different thresholds, so these are trend indicators rather than a like-for-like comparison. The percentage compares the last 10 recorded years to the 10 years before that, using{" "}
+          <p className="text-xs text-gray-500 mb-4">
+            Annual counts of qualifying disasters (≥10 deaths, ≥100 affected, or state of emergency) from{" "}
             <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EM-DAT</a>{" "}
             via{" "}
-            <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>.
+            <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>. This is a separate dataset from the GDACS live alerts above — EM-DAT uses a higher severity threshold, so its annual totals are much smaller than GDACS alert counts and the two should not be compared directly.
           </p>
         </SubSection>
       )}
