@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Leaf } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  ReferenceLine, Cell,
+  ReferenceLine, Cell, ComposedChart, Line,
 } from 'recharts';
 
 interface MonthlyPoint {
@@ -15,6 +15,8 @@ interface MonthlyPoint {
 
 interface SeasonalShiftCardProps {
   monthlyAll: MonthlyPoint[];
+  rainfallMonthly?: MonthlyPoint[];
+  sunshineMonthly?: MonthlyPoint[];
   regionName: string;
   dataSource?: string;
 }
@@ -69,8 +71,8 @@ function findCrossings(monthly: number[], threshold: number): { spring: number; 
   return { spring, autumn };
 }
 
-export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }: SeasonalShiftCardProps) {
-  const [view, setView] = useState<'length' | 'monthly'>('length');
+export default function SeasonalShiftCard({ monthlyAll, rainfallMonthly, sunshineMonthly, regionName, dataSource }: SeasonalShiftCardProps) {
+  const [view, setView] = useState<'length' | 'monthly' | 'rainfall' | 'sunshine'>('length');
 
   const stats = useMemo(() => {
     if (!monthlyAll?.length) return null;
@@ -163,6 +165,43 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
       autumnShiftDays = recentCrossings.autumn - baselineCrossings.autumn; // positive = later
     }
 
+    // Build a baseline-vs-recent monthly climatology for any secondary series,
+    // aligned to the same year windows as the temperature analysis.
+    function buildSecondaryClimatology(series: MonthlyPoint[] | undefined) {
+      if (!series?.length) return null;
+      const byYear = new Map<number, Map<number, number>>();
+      for (const p of series) {
+        if (!byYear.has(p.year)) byYear.set(p.year, new Map());
+        byYear.get(p.year)!.set(p.month, p.value);
+      }
+      const baseYears = baseline.map(y => byYear.get(y.year)).filter((m): m is Map<number, number> => !!m && m.size === 12);
+      const recYears = recent.map(y => byYear.get(y.year)).filter((m): m is Map<number, number> => !!m && m.size === 12);
+      if (baseYears.length < 20 || recYears.length < 5) return null;
+      const baseMonthly: number[] = [];
+      const recMonthly: number[] = [];
+      for (let m = 1; m <= 12; m++) {
+        let bs = 0, rs = 0;
+        for (const y of baseYears) bs += y.get(m) as number;
+        for (const y of recYears) rs += y.get(m) as number;
+        baseMonthly.push(bs / baseYears.length);
+        recMonthly.push(rs / recYears.length);
+      }
+      const rows = MONTH_LABELS.map((label, i) => ({
+        month: label,
+        baseline: +baseMonthly[i].toFixed(2),
+        recent: +recMonthly[i].toFixed(2),
+        diff: +(recMonthly[i] - baseMonthly[i]).toFixed(2),
+        pctDiff: baseMonthly[i] > 0 ? +(((recMonthly[i] - baseMonthly[i]) / baseMonthly[i]) * 100).toFixed(1) : 0,
+      }));
+      const baselineAnnual = baseMonthly.reduce((a, b) => a + b, 0);
+      const recentAnnual = recMonthly.reduce((a, b) => a + b, 0);
+      const biggestIdx = rows.reduce((bi, r, i, arr) => Math.abs(r.diff) > Math.abs(arr[bi].diff) ? i : bi, 0);
+      return { rows, baselineAnnual, recentAnnual, biggestMonth: rows[biggestIdx] };
+    }
+
+    const rainfallStats = buildSecondaryClimatology(rainfallMonthly);
+    const sunshineStats = buildSecondaryClimatology(sunshineMonthly);
+
     return {
       baselineAnnualMean,
       baselineStart, baselineEnd,
@@ -177,8 +216,10 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
       recentCrossings,
       springShiftDays,
       autumnShiftDays,
+      rainfallStats,
+      sunshineStats,
     };
-  }, [monthlyAll]);
+  }, [monthlyAll, rainfallMonthly, sunshineMonthly]);
 
   if (!stats) {
     return null;
@@ -218,6 +259,32 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
           >
             Month-by-month warming
           </button>
+          {stats.rainfallStats && (
+            <button
+              type="button"
+              onClick={() => setView('rainfall')}
+              className={`px-3 py-1.5 rounded-full font-mono transition ${
+                view === 'rainfall'
+                  ? 'bg-[#D0A65E] text-gray-950 font-bold'
+                  : 'bg-gray-900 text-gray-400 hover:text-[#FFF5E7] border border-gray-700'
+              }`}
+            >
+              Rainfall
+            </button>
+          )}
+          {stats.sunshineStats && (
+            <button
+              type="button"
+              onClick={() => setView('sunshine')}
+              className={`px-3 py-1.5 rounded-full font-mono transition ${
+                view === 'sunshine'
+                  ? 'bg-[#D0A65E] text-gray-950 font-bold'
+                  : 'bg-gray-900 text-gray-400 hover:text-[#FFF5E7] border border-gray-700'
+              }`}
+            >
+              Sunshine
+            </button>
+          )}
         </div>
       </div>
 
@@ -276,7 +343,7 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
         </div>
       )}
 
-      {view === 'length' ? (
+      {view === 'length' && (
         <>
           <div className="h-64 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -307,7 +374,9 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
             blue bars show fewer. The dashed gold line is the baseline average.
           </p>
         </>
-      ) : (
+      )}
+
+      {view === 'monthly' && (
         <>
           <div className="h-64 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -333,6 +402,76 @@ export default function SeasonalShiftCard({ monthlyAll, regionName, dataSource }
             {' '}{stats.recentStart}–{stats.recentEnd} average. The biggest warming this location has seen is in{' '}
             <strong className="text-[#FFF5E7]">{stats.biggestMonth.month}</strong> ({stats.biggestMonth.diff > 0 ? '+' : ''}
             {stats.biggestMonth.diff.toFixed(1)}°C).
+          </p>
+        </>
+      )}
+
+      {view === 'rainfall' && stats.rainfallStats && (
+        <>
+          <div className="h-64 sm:h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={stats.rainfallStats.rows} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                <YAxis
+                  tick={{ fontSize: 10, fill: '#9ca3af' }}
+                  label={{ value: 'mm', angle: -90, position: 'insideLeft', offset: 10, fill: '#9ca3af', fontSize: 10 }}
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
+                  formatter={(v, name) => [`${typeof v === 'number' ? v.toFixed(0) : v} mm`, name]}
+                />
+                <Bar dataKey="baseline" name={`${stats.baselineStart}–${stats.baselineEnd}`} fill="#475569" radius={[2, 2, 0, 0]} />
+                <Bar dataKey="recent" name={`${stats.recentStart}–${stats.recentEnd}`} fill="#38bdf8" radius={[2, 2, 0, 0]} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-xs text-gray-400 mt-3">
+            Monthly rainfall climatology. Annual total has shifted from{' '}
+            <strong className="text-[#FFF5E7]">{stats.rainfallStats.baselineAnnual.toFixed(0)} mm</strong>{' '}
+            ({stats.baselineStart}–{stats.baselineEnd}) to{' '}
+            <strong className="text-[#FFF5E7]">{stats.rainfallStats.recentAnnual.toFixed(0)} mm</strong>{' '}
+            ({stats.recentStart}–{stats.recentEnd}). Biggest single-month shift is{' '}
+            <strong className="text-[#FFF5E7]">{stats.rainfallStats.biggestMonth.month}</strong> (
+            {stats.rainfallStats.biggestMonth.diff > 0 ? '+' : ''}
+            {stats.rainfallStats.biggestMonth.diff.toFixed(0)} mm,{' '}
+            {stats.rainfallStats.biggestMonth.pctDiff > 0 ? '+' : ''}
+            {stats.rainfallStats.biggestMonth.pctDiff.toFixed(0)}%).
+          </p>
+        </>
+      )}
+
+      {view === 'sunshine' && stats.sunshineStats && (
+        <>
+          <div className="h-64 sm:h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={stats.sunshineStats.rows} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
+                <YAxis
+                  tick={{ fontSize: 10, fill: '#9ca3af' }}
+                  label={{ value: 'hours', angle: -90, position: 'insideLeft', offset: 10, fill: '#9ca3af', fontSize: 10 }}
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
+                  formatter={(v, name) => [`${typeof v === 'number' ? v.toFixed(0) : v} h`, name]}
+                />
+                <Bar dataKey="baseline" name={`${stats.baselineStart}–${stats.baselineEnd}`} fill="#475569" radius={[2, 2, 0, 0]} />
+                <Bar dataKey="recent" name={`${stats.recentStart}–${stats.recentEnd}`} fill="#fbbf24" radius={[2, 2, 0, 0]} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-xs text-gray-400 mt-3">
+            Monthly sunshine hours. Annual total has shifted from{' '}
+            <strong className="text-[#FFF5E7]">{stats.sunshineStats.baselineAnnual.toFixed(0)} h</strong>{' '}
+            ({stats.baselineStart}–{stats.baselineEnd}) to{' '}
+            <strong className="text-[#FFF5E7]">{stats.sunshineStats.recentAnnual.toFixed(0)} h</strong>{' '}
+            ({stats.recentStart}–{stats.recentEnd}). Biggest single-month shift is{' '}
+            <strong className="text-[#FFF5E7]">{stats.sunshineStats.biggestMonth.month}</strong> (
+            {stats.sunshineStats.biggestMonth.diff > 0 ? '+' : ''}
+            {stats.sunshineStats.biggestMonth.diff.toFixed(0)} h,{' '}
+            {stats.sunshineStats.biggestMonth.pctDiff > 0 ? '+' : ''}
+            {stats.sunshineStats.biggestMonth.pctDiff.toFixed(0)}%).
           </p>
         </>
       )}

@@ -768,6 +768,12 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   || data.usStateData?.paramData?.tavg?.monthlyAll
                   || data.nationalData?.paramData?.tavg?.monthlyAll
                   || data.countryData?.monthlyAll;
+                const rainfallMonthly = data.ukRegionData?.varData?.Rainfall?.monthlyAll
+                  || data.nationalData?.varData?.Rainfall?.monthlyAll
+                  || data.usStateData?.paramData?.pcp?.monthlyAll
+                  || data.nationalData?.paramData?.pcp?.monthlyAll;
+                const sunshineMonthly = data.ukRegionData?.varData?.Sunshine?.monthlyAll
+                  || data.nationalData?.varData?.Sunshine?.monthlyAll;
                 const chartSource = (data.ukRegionData || data.nationalData?.varData)
                   ? 'Data: Met Office UK Regional Series © Crown copyright'
                   : (data.usStateData || data.nationalData?.paramData)
@@ -790,7 +796,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                     ) : null}
 
                     {monthlyAll?.length ? (
-                      <SeasonalShiftCard monthlyAll={monthlyAll} regionName={pageTitle} dataSource={chartSource} />
+                      <SeasonalShiftCard monthlyAll={monthlyAll} rainfallMonthly={rainfallMonthly} sunshineMonthly={sunshineMonthly} regionName={pageTitle} dataSource={chartSource} />
                     ) : null}
 
                     {/* Sunshine */}

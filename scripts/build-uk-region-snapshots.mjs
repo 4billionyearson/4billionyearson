@@ -132,6 +132,11 @@ async function main() {
         const isSum = ['Rainfall', 'Sunshine', 'AirFrost', 'Raindays1mm'].includes(varName);
         const lowerIsBetter = varName === 'AirFrost';
 
+        // Keep full monthlyAll for variables the SeasonalShiftCard can overlay
+        // (temperature, rainfall, sunshine). Drop for the others to keep the
+        // payload reasonable.
+        const keepMonthlyAll = ['Tmean', 'Rainfall', 'Sunshine'].includes(varName);
+
         varData[varName] = {
           label: VAR_LABELS[varName],
           units: VAR_UNITS[varName],
@@ -139,7 +144,7 @@ async function main() {
           monthlyComparison: buildMonthlyComparison(points),
           latestMonthStats: buildLatestMonthStats(points, { lowerIsBetter }),
           latestThreeMonthStats: buildLatestThreeMonthStats(points, { lowerIsBetter, isSum }),
-          ...(varName === 'Tmean' ? { monthlyAll: points.map((p) => ({ year: p.year, month: p.month, value: p.value })) } : {}),
+          ...(keepMonthlyAll ? { monthlyAll: points.map((p) => ({ year: p.year, month: p.month, value: p.value })) } : {}),
         };
       }
 

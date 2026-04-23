@@ -243,6 +243,10 @@ async function main() {
         const result = paramResults[param];
         if (!result) continue;
         const points = monthlyEntries(result.data);
+        // Keep full monthlyAll for variables the SeasonalShiftCard can overlay
+        // (temperature and precipitation). Drop for tmax/tmin to keep payload small.
+        const keepMonthlyAll = ['tavg', 'pcp'].includes(param);
+
         paramData[param] = {
           label: PARAM_LABELS[param],
           units: result.units,
@@ -250,7 +254,7 @@ async function main() {
           monthlyComparison: buildComparisonFromNoaa(result.data),
           latestMonthStats: buildLatestMonthStats(points),
           latestThreeMonthStats: buildLatestThreeMonthStats(points),
-          ...(param === 'tavg' ? { monthlyAll: points } : {}),
+          ...(keepMonthlyAll ? { monthlyAll: points } : {}),
         };
       }
 
