@@ -26,6 +26,14 @@ const GlobalFuelSection = dynamic(
   }
 );
 
+const GlobalConsumptionSection = dynamic(
+  () => import("./_components/consumption-chart").then(m => ({ default: m.GlobalConsumptionSection })),
+  {
+    ssr: false,
+    loading: () => <div className="h-[420px] w-full rounded-xl bg-gray-900/50 animate-pulse" />,
+  }
+);
+
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
 interface RankEntry { name: string; value: number; year: number }
@@ -325,6 +333,10 @@ export default function EmissionsPage() {
 
               <SectionCard icon={<Factory className="h-5 w-5 text-orange-400" />} title="Global CO₂ by Fuel Source">
                 <GlobalFuelSection />
+              </SectionCard>
+
+              <SectionCard icon={<Link2 className="h-5 w-5 text-sky-400" />} title="Consumption vs Production — Who Emits for Whom?">
+                <GlobalConsumptionSection />
               </SectionCard>
 
               {/* ═══ GLOBAL TRENDS ═══ */}

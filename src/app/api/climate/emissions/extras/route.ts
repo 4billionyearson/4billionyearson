@@ -145,6 +145,8 @@ function buildRankings(index: ExtrasIndex): {
   nitrous_oxide: { name: string; value: number; year: number }[];
   total_ghg: { name: string; value: number; year: number }[];
   co2_per_gdp: { name: string; value: number; year: number }[];
+  netImporters: { name: string; value: number; year: number; production: number; consumption: number }[];
+  netExporters: { name: string; value: number; year: number; production: number; consumption: number }[];
 } {
   const rank = (field: keyof YearlyCompact) => {
     const rows: { name: string; value: number; year: number }[] = [];
@@ -157,12 +159,30 @@ function buildRankings(index: ExtrasIndex): {
     rows.sort((a, b) => b.value - a.value);
     return rows.slice(0, 15);
   };
+
+  // Trade rankings: trade_co2 = consumption - production (positive = net importer)
+  const tradeRows: { name: string; value: number; year: number; production: number; consumption: number }[] = [];
+  for (const [name, c] of Object.entries(index.countries)) {
+    const t = c.latest?.trade_co2;
+    const prod = c.latest?.co2;
+    const cons = c.latest?.consumption_co2;
+    if (typeof t === 'number' && typeof prod === 'number' && typeof cons === 'number' && c.latest) {
+      tradeRows.push({ name, value: t, year: c.latest.year, production: prod, consumption: cons });
+    }
+  }
+  // Filter tiny absolute values to avoid noise (< 5 Mt)
+  const significant = tradeRows.filter(r => Math.abs(r.value) >= 5);
+  const netImporters = [...significant].sort((a, b) => b.value - a.value).slice(0, 10);
+  const netExporters = [...significant].sort((a, b) => a.value - b.value).slice(0, 10);
+
   return {
     consumption: rank('consumption_co2'),
     methane: rank('methane'),
     nitrous_oxide: rank('nitrous_oxide'),
     total_ghg: rank('total_ghg'),
     co2_per_gdp: rank('co2_per_gdp').reverse().slice(-15).reverse(), // descending
+    netImporters,
+    netExporters,
   };
 }
 

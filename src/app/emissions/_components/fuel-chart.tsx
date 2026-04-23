@@ -43,6 +43,8 @@ export interface ExtrasGlobalResponse {
     nitrous_oxide: { name: string; value: number; year: number }[];
     total_ghg: { name: string; value: number; year: number }[];
     co2_per_gdp: { name: string; value: number; year: number }[];
+    netImporters: { name: string; value: number; year: number; production: number; consumption: number }[];
+    netExporters: { name: string; value: number; year: number; production: number; consumption: number }[];
   };
   fetchedAt: string;
 }

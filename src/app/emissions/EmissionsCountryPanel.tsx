@@ -9,6 +9,7 @@ import {
 import { Loader2, MapPin, Factory, Search, Users, TrendingUp, Globe, X } from 'lucide-react';
 import { countryFlag } from '@/lib/climate/locations';
 import { CountryFuelChart } from './_components/fuel-chart';
+import { CountryConsumptionChart } from './_components/consumption-chart';
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -456,6 +457,14 @@ export default function EmissionsCountryPanel() {
               <Factory className="h-4 w-4 text-orange-400" /> CO₂ by Fuel Source
             </h3>
             <CountryFuelChart countryName={country.name} />
+          </div>
+
+          {/* Consumption vs production */}
+          <div>
+            <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
+              <Globe className="h-4 w-4 text-sky-400" /> Consumption vs Production
+            </h3>
+            <CountryConsumptionChart countryName={country.name} />
           </div>
 
           <p className="text-xs text-gray-400 pt-2 border-t border-gray-800/60">
