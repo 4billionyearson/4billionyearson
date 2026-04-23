@@ -28,6 +28,7 @@ interface CountryEnergy {
 interface EnergyApiResponse {
   world: CountryEnergy;
   country?: CountryEnergy | null;
+  usState?: CountryEnergy | null;
   fetchedAt: string;
 }
 
@@ -193,8 +194,10 @@ function MixPanel({ yearly, countryName }: { yearly: YearlyPoint[]; countryName?
   );
 }
 
-export default function EnergyMixCard({ countryName, deepLinkHref }: {
+export default function EnergyMixCard({ countryName, usStateCode, usStateName, deepLinkHref }: {
   countryName?: string;
+  usStateCode?: string;
+  usStateName?: string;
   deepLinkHref?: string;
 }) {
   const [data, setData] = useState<EnergyApiResponse | null>(null);
@@ -202,19 +205,27 @@ export default function EnergyMixCard({ countryName, deepLinkHref }: {
 
   useEffect(() => {
     let cancelled = false;
-    const url = countryName
-      ? `/api/climate/energy?country=${encodeURIComponent(countryName)}`
-      : '/api/climate/energy';
+    let url: string;
+    if (usStateCode) {
+      const sn = usStateName || usStateCode;
+      url = `/api/climate/energy?state=${encodeURIComponent(usStateCode)}&stateName=${encodeURIComponent(sn)}`;
+    } else if (countryName) {
+      url = `/api/climate/energy?country=${encodeURIComponent(countryName)}`;
+    } else {
+      url = '/api/climate/energy';
+    }
     fetch(url)
       .then(r => r.json())
       .then(d => { if (!cancelled) { if (d.error) throw new Error(d.error); setData(d); } })
       .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
     return () => { cancelled = true; };
-  }, [countryName]);
+  }, [countryName, usStateCode, usStateName]);
 
-  const href = deepLinkHref ?? (countryName
-    ? `/energy-dashboard?country=${encodeURIComponent(countryName)}`
-    : '/energy-dashboard');
+  const href = deepLinkHref ?? (usStateCode
+    ? `/energy-dashboard?state=${encodeURIComponent(usStateCode)}`
+    : countryName
+      ? `/energy-dashboard?country=${encodeURIComponent(countryName)}`
+      : '/energy-dashboard');
 
   if (error) {
     return (
@@ -232,24 +243,35 @@ export default function EnergyMixCard({ countryName, deepLinkHref }: {
     );
   }
 
-  // Choose series: country if available, else world
-  const country = data.country;
-  const yearly = countryName && country?.yearly ? country.yearly : data.world.yearly;
+  // Choose series: US state → country → world
+  let yearly: YearlyPoint[];
+  let displayName: string | undefined;
+  if (usStateCode && data.usState?.yearly?.length) {
+    yearly = data.usState.yearly;
+    displayName = data.usState.name;
+  } else if (countryName && data.country?.yearly?.length) {
+    yearly = data.country.yearly;
+    displayName = data.country.name;
+  } else {
+    yearly = data.world.yearly;
+    displayName = undefined;
+  }
   const latestPoint = findLatestMixYear(yearly);
 
   if (!latestPoint) {
+    const label = displayName || countryName || usStateName;
     return (
       <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-5 text-sm text-gray-400">
-        Electricity mix unavailable{countryName ? ` for ${countryName}` : ''}.
+        Electricity mix unavailable{label ? ` for ${label}` : ''}.
       </div>
     );
   }
 
-  const title = countryName && country ? 'Electricity Mix' : 'Electricity Mix';
+  const title = 'Electricity Mix';
 
   return (
     <CardShell title={title} year={latestPoint.year} deepLinkHref={href}>
-      <MixPanel yearly={yearly} countryName={countryName && country ? country.name : undefined} />
+      <MixPanel yearly={yearly} countryName={displayName} />
     </CardShell>
   );
 }

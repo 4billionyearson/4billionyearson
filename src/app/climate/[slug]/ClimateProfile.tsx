@@ -813,12 +813,27 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               <ClimatePeersCard slug={slug} />
 
               {/* ─── Emissions & Energy ─── */}
-              {region.type === 'country' && (
+              {(region.type === 'country' || region.type === 'us-state') && (
                 <>
                   <Divider icon={<Factory className="h-5 w-5 text-rose-400" />} title="Emissions & Energy" />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <EmissionsCard countryName={region.name} />
-                    <EnergyMixCard countryName={region.name} />
+                    {region.type === 'country' ? (
+                      <>
+                        <EmissionsCard countryName={region.name} />
+                        <EnergyMixCard countryName={region.name} />
+                      </>
+                    ) : (
+                      <>
+                        <EmissionsCard
+                          usStateCode={region.apiCode.replace('us-', '').toUpperCase()}
+                          usStateName={region.name}
+                        />
+                        <EnergyMixCard
+                          usStateCode={region.apiCode.replace('us-', '').toUpperCase()}
+                          usStateName={region.name}
+                        />
+                      </>
+                    )}
                   </div>
                 </>
               )}

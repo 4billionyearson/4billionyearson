@@ -38,6 +38,16 @@ interface CountryApiResponse {
   fetchedAt: string;
 }
 
+// ─── US-state energy response shape (subset we need for emissions) ────────
+interface EnergyLatest { year: number; ghgEmissions: number | null; ghgPerCapita: number | null }
+interface EnergyYearly { year: number; ghgEmissions: number | null; ghgPerCapita: number | null }
+interface EnergyApiEntity { name: string; yearly: EnergyYearly[]; latest: EnergyLatest }
+interface StateEnergyApiResponse {
+  country: EnergyApiEntity | null;   // USA totals
+  usState: EnergyApiEntity | null;   // the selected state
+  fetchedAt: string;
+}
+
 function formatTonnes(v: number): string {
   if (v >= 1e12) return `${(v / 1e12).toFixed(2)} Tt`;
   if (v >= 1e9) return `${(v / 1e9).toFixed(2)} Gt`;
@@ -247,14 +257,26 @@ function CountryCard({ data, deepLinkHref }: { data: CountryApiResponse; deepLin
   );
 }
 
-export default function EmissionsCard({ countryName, deepLinkHref }: { countryName?: string; deepLinkHref?: string }) {
+export default function EmissionsCard({ countryName, usStateCode, usStateName, deepLinkHref }: {
+  countryName?: string;
+  usStateCode?: string;
+  usStateName?: string;
+  deepLinkHref?: string;
+}) {
   const [global, setGlobal] = useState<GlobalApiResponse | null>(null);
   const [country, setCountry] = useState<CountryApiResponse | null>(null);
+  const [stateData, setStateData] = useState<StateEnergyApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    if (countryName) {
+    if (usStateCode) {
+      const name = usStateName || usStateCode;
+      fetch(`/api/climate/energy?state=${encodeURIComponent(usStateCode)}&stateName=${encodeURIComponent(name)}`)
+        .then(r => r.json())
+        .then(d => { if (!cancelled) { if (d.error) throw new Error(d.error); setStateData(d); } })
+        .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
+    } else if (countryName) {
       fetch(`/api/climate/emissions/country?name=${encodeURIComponent(countryName)}`)
         .then(r => r.json())
         .then(d => { if (!cancelled) { if (d.error) throw new Error(d.error); setCountry(d); } })
@@ -266,11 +288,13 @@ export default function EmissionsCard({ countryName, deepLinkHref }: { countryNa
         .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
     }
     return () => { cancelled = true; };
-  }, [countryName]);
+  }, [countryName, usStateCode, usStateName]);
 
-  const href = deepLinkHref ?? (countryName
-    ? `/emissions?country=${encodeURIComponent(countryName)}`
-    : '/emissions');
+  const href = deepLinkHref ?? (usStateCode
+    ? `/energy-dashboard?state=${encodeURIComponent(usStateCode)}`
+    : countryName
+      ? `/emissions?country=${encodeURIComponent(countryName)}`
+      : '/emissions');
 
   if (error) {
     return (
@@ -278,6 +302,17 @@ export default function EmissionsCard({ countryName, deepLinkHref }: { countryNa
         Emissions data unavailable.
       </div>
     );
+  }
+
+  if (usStateCode) {
+    if (!stateData) {
+      return (
+        <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-8 flex items-center justify-center">
+          <Loader2 className="h-5 w-5 animate-spin text-rose-400" />
+        </div>
+      );
+    }
+    return <USStateCard data={stateData} stateName={usStateName || usStateCode} deepLinkHref={href} />;
   }
 
   if (countryName) {
@@ -299,4 +334,84 @@ export default function EmissionsCard({ countryName, deepLinkHref }: { countryNa
     );
   }
   return <GlobalCard data={global} deepLinkHref={href} />;
+}
+
+/* ─── US State Card ──────────────────────────────────────────────────────── */
+
+function USStateCard({ data, stateName, deepLinkHref }: {
+  data: StateEnergyApiResponse;
+  stateName: string;
+  deepLinkHref: string;
+}) {
+  const state = data.usState;
+  const usa = data.country;
+
+  if (!state || !state.yearly.length || state.latest.ghgEmissions == null) {
+    return (
+      <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-5 text-sm text-gray-400">
+        Emissions data unavailable for {stateName}.
+      </div>
+    );
+  }
+
+  // Build annual series in tonnes for sparkline + tonne-formatter
+  // ghgEmissions is million metric tonnes → convert to tonnes for formatTonnes()
+  const seriesMt = state.yearly.filter(y => y.ghgEmissions != null) as Array<EnergyYearly & { ghgEmissions: number }>;
+  const sparkData: YearPoint[] = seriesMt.map(y => ({ year: y.year, value: y.ghgEmissions * 1e6 }));
+  const latestMt = state.latest.ghgEmissions;
+  const latestYear = state.latest.year;
+  const tenAgo = seriesMt.find(y => y.year === latestYear - 10) ?? seriesMt[Math.max(0, seriesMt.length - 11)];
+  const delta = latestMt - (tenAgo?.ghgEmissions ?? latestMt);
+  const deltaPct = tenAgo && tenAgo.ghgEmissions > 0 ? (delta / tenAgo.ghgEmissions) * 100 : 0;
+  const isUp = delta >= 0;
+
+  const usLatestMt = usa?.latest.ghgEmissions ?? null;
+  const shareOfUsPct = usLatestMt != null && usLatestMt > 0 ? (latestMt / usLatestMt) * 100 : null;
+
+  const recent = sparkData.slice(-25);
+
+  return (
+    <CardShell year={latestYear} deepLinkHref={deepLinkHref}>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <div className="text-3xl md:text-4xl font-bold font-mono text-white">{formatTonnes(latestMt * 1e6)}</div>
+          <div className="text-xs text-gray-400 mt-0.5">Energy-related CO₂ · {stateName}</div>
+        </div>
+        <div className={`text-right ${isUp ? 'text-orange-300' : 'text-emerald-300'}`}>
+          <div className="text-base font-bold font-mono inline-flex items-center gap-1">
+            {isUp ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+            {isUp ? '+' : ''}{deltaPct.toFixed(1)}%
+          </div>
+          {tenAgo && <div className="text-[11px] text-gray-500">vs {tenAgo.year}</div>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-center">
+        <div className="rounded-lg bg-gray-900/40 border border-gray-800/60 px-2 py-2">
+          <div className="text-[10px] uppercase tracking-wider text-gray-500">Per capita</div>
+          <div className="text-sm font-mono font-semibold text-white mt-0.5">
+            {state.latest.ghgPerCapita != null ? `${state.latest.ghgPerCapita.toFixed(1)} t` : '—'}
+          </div>
+        </div>
+        <div className="rounded-lg bg-gray-900/40 border border-gray-800/60 px-2 py-2">
+          <div className="text-[10px] uppercase tracking-wider text-gray-500">Share of US</div>
+          <div className="text-sm font-mono font-semibold text-white mt-0.5">
+            {shareOfUsPct != null ? `${shareOfUsPct.toFixed(shareOfUsPct < 1 ? 2 : 1)}%` : '—'}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <Sparkline data={recent} color={isUp ? '#fb923c' : '#34d399'} height={48} gradId="emit-state-spark" />
+        <div className="flex justify-between text-[10px] text-gray-500 font-mono mt-0.5">
+          <span>{recent[0]?.year ?? ''}</span>
+          <span>{recent[recent.length - 1]?.year ?? ''}</span>
+        </div>
+      </div>
+
+      <div className="text-[10px] text-gray-500 pt-1 border-t border-gray-800/60">
+        Source: <a href="https://www.eia.gov/state/seds/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white underline">EIA State Energy Data System</a> — fossil-fuel CO₂ only.
+      </div>
+    </CardShell>
+  );
 }
