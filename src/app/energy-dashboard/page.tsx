@@ -1355,6 +1355,23 @@ export default function EnergyPage() {
     }
   }, []);
 
+  // Preselect from ?country= or ?state= URL param (once)
+  const didAutoSelectRef = useRef(false);
+  useEffect(() => {
+    if (didAutoSelectRef.current) return;
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const qCountry = params.get('country');
+    const qState = params.get('state');
+    if (!qCountry && !qState) return;
+    didAutoSelectRef.current = true;
+    if (qState) {
+      handleLocationSelect({ label: qState, type: 'us-state', value: qState.toUpperCase(), stateName: qState });
+    } else if (qCountry) {
+      handleLocationSelect({ label: qCountry, type: 'country', value: qCountry });
+    }
+  }, [handleLocationSelect]);
+
   if (loading) {
     return (
       <main>

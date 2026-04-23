@@ -13,6 +13,11 @@ const EmissionsChoroplethMap = dynamic(() => import("@/app/_components/emissions
   loading: () => <div className="h-[400px] md:h-[500px] w-full rounded-xl bg-gray-900/50 animate-pulse" />,
 });
 
+const EmissionsCountryPanel = dynamic(() => import("./EmissionsCountryPanel"), {
+  ssr: false,
+  loading: () => <div className="h-48 w-full rounded-2xl bg-gray-900/50 border-2 border-[#D0A65E]/40 animate-pulse" />,
+});
+
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
 interface RankEntry { name: string; value: number; year: number }
@@ -211,6 +216,9 @@ export default function EmissionsPage() {
               {error}
             </div>
           )}
+
+          {/* ─── Country Deep Dive (URL ?country= or user search) ── */}
+          <EmissionsCountryPanel />
 
           {data && (
             <>
