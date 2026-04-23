@@ -812,7 +812,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v23`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v24`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {
