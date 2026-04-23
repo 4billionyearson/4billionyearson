@@ -52,7 +52,6 @@ export default function ClimateProfilesIndex() {
                   icon={<Globe2 className="h-6 w-6" />}
                   regions={countries}
                   mode="country"
-                  intro="Climate profiles for every country we publish, grouped by continent. Data from Our World in Data and OWID-aggregated national sources."
                   headless
                 />
               ),
@@ -62,7 +61,6 @@ export default function ClimateProfilesIndex() {
                   icon={<Flag className="h-6 w-6" />}
                   regions={usStates}
                   mode="us-state"
-                  intro="NOAA Climate at a Glance temperature and precipitation data for every US state, grouped by Census Bureau region."
                   headless
                 />
               ),
@@ -74,9 +72,8 @@ export default function ClimateProfilesIndex() {
               rankings: <ClimateRankingsPanel />,
             }}
           >
-            {/* Unified hero + tab bar — one gold-bordered panel so the navigation
-                reads as a sub-section of the Climate Updates header, not floating
-                between cards. The tab row stays sticky as you scroll the panel. */}
+            {/* Single unified card: gold header → description → tab bar → divider → active panel.
+                One container, no floating gap, so the tab menu reads as the section's sub-nav. */}
             <section
               className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
               style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}
@@ -89,17 +86,18 @@ export default function ClimateProfilesIndex() {
                   Climate Updates
                 </h1>
               </div>
-              <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
+              <div className="bg-gray-950 px-4 py-3 md:px-6 md:py-4">
                 <p className="text-sm md:text-base text-gray-300 leading-relaxed">
                   Monthly climate updates for every country, US state and UK region we track — 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news.
                 </p>
               </div>
-              <div className="sticky top-0 z-30 bg-gray-950/92 backdrop-blur-md border-t border-[#D0A65E]/30 px-4 py-2.5 md:px-6">
+              <div className="sticky top-0 z-30 bg-gray-950 px-4 py-2.5 md:px-6">
                 <ClimateTabsBar />
               </div>
+              <div className="border-t border-[#D0A65E]/25 bg-gray-950">
+                <ClimateTabsPanels />
+              </div>
             </section>
-
-            <ClimateTabsPanels />
           </ClimateTabsProvider>
         </div>
       </div>

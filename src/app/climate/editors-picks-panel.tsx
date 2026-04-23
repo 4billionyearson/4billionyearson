@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
-import { Sparkles, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { EDITORS_PICKS } from '@/lib/climate/editorial';
 
@@ -47,20 +47,12 @@ export default function EditorsPicksPanel({ regions }: { regions: ClimateRegion[
   }, [regions]);
 
   return (
-    <section className="rounded-2xl border-2 border-[#D0A65E]/80 bg-gray-950/90 backdrop-blur-md px-4 py-5 md:px-6 md:py-6 space-y-4 shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#FFF5E7]">
-          <Sparkles className="h-4 w-4 text-[#D0A65E]" />
-          Editor&apos;s picks
-        </span>
-        <span className="text-[11px] text-gray-500 ml-auto">Curated starting points</span>
-      </div>
-
+    <div className="px-4 py-5 md:px-6 md:py-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         {pickedRegions.map((region) => (
           <PickCard key={region.slug} region={region} />
         ))}
       </div>
-    </section>
+    </div>
   );
 }

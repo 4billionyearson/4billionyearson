@@ -177,7 +177,7 @@ export default function UKRegionsBrowser({ regions, headless = false }: { region
 
   if (headless) {
     return (
-      <section className="relative rounded-2xl border-2 border-[#D0A65E]/80 bg-gray-950/90 backdrop-blur-md overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+      <section className="relative">
         <div className="px-4 py-5 md:px-6 md:py-6 space-y-5">
           <div className="space-y-4">
             <div className="relative max-w-2xl">
