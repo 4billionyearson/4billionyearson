@@ -193,13 +193,16 @@ function featureCentroid(feature: Feature): [number, number] | null {
 }
 
 const US_STATE_LABEL_ZOOM = 4;
+const UK_NATION_LABEL_ZOOM = 4;
 
 function MapLabels({
   countriesGeo,
   statesGeo,
+  ukGeo,
 }: {
   countriesGeo: FeatureCollection | null;
   statesGeo: FeatureCollection | null;
+  ukGeo: FeatureCollection | null;
 }) {
   const map = useMap();
   const [ready, setReady] = useState(false);
@@ -224,6 +227,7 @@ function MapLabels({
     for (const f of countriesGeo.features) {
       const name = (f.properties as any)?.name as string | undefined;
       if (!name) continue;
+      // Skip UK at high zoom — sub-nation labels take over
       const pos = LABEL_OVERRIDES[name] ?? featureCentroid(f);
       if (pos) result.push({ name, pos });
     }
@@ -242,6 +246,18 @@ function MapLabels({
     return result;
   }, [statesGeo]);
 
+  const ukLabels = useMemo(() => {
+    if (!ukGeo) return [] as { name: string; pos: [number, number] }[];
+    const result: { name: string; pos: [number, number] }[] = [];
+    for (const f of ukGeo.features) {
+      const name = (f.properties as any)?.name as string | undefined;
+      if (!name) continue;
+      const pos = featureCentroid(f);
+      if (pos) result.push({ name, pos });
+    }
+    return result;
+  }, [ukGeo]);
+
   if (!ready) return null;
 
   const visibleCountries =
@@ -249,10 +265,10 @@ function MapLabels({
       ? CONTINENT_LABELS
       : zoom <= 3
         ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
-        : countryLabels;
+        : countryLabels.filter(({ name }) => name !== 'United Kingdom');
 
   const fontSize = zoom <= 2 ? 13 : 10;
-  const cls = zoom <= 2 ? 'continent-label-dark' : 'country-label-dark';
+  const cls = zoom <= 2 ? 'continent-label' : 'country-label';
 
   return (
     <>
@@ -277,8 +293,22 @@ function MapLabels({
           pane="labels"
           interactive={false}
           icon={L.divIcon({
-            className: 'country-label-dark',
-            html: `<span style="font-size:9px;opacity:0.85">${name}</span>`,
+            className: 'country-label',
+            html: `<span style="font-size:9px;opacity:0.9">${name}</span>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0],
+          })}
+        />
+      ))}
+      {zoom >= UK_NATION_LABEL_ZOOM && ukLabels.map(({ name, pos }) => (
+        <Marker
+          key={`uk-${name}`}
+          position={pos}
+          pane="labels"
+          interactive={false}
+          icon={L.divIcon({
+            className: 'country-label',
+            html: `<span style="font-size:9px;opacity:0.9">${name}</span>`,
             iconSize: [0, 0],
             iconAnchor: [0, 0],
           })}
@@ -290,7 +320,7 @@ function MapLabels({
 
 /* ─── Sub-national overlays (US states + UK nations) ─────────────────────── */
 
-const US_STATES_ZOOM = 3;
+const US_STATES_ZOOM = 4;
 const UK_NATIONS_ZOOM = 4;
 const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
 
@@ -608,7 +638,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
               )
             }
           />
-          <MapLabels countriesGeo={geo} statesGeo={statesGeo} />
+          <MapLabels countriesGeo={geo} statesGeo={statesGeo} ukGeo={ukGeo} />
           {/* UK nations overlay disabled — map is country-level; UK renders as a single polygon
               from world-countries.json to avoid mismatched sub-polygon coverage. */}
         </MapContainer>

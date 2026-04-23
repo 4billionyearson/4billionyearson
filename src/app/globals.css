@@ -62,9 +62,12 @@ html {
 .continent-label span {
   display: block;
   white-space: nowrap;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.92);
   font-weight: 600;
-  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  text-shadow:
+    0 0 2px rgba(0, 0, 0, 0.95),
+    0 0 4px rgba(0, 0, 0, 0.85),
+    1px 1px 2px rgba(0, 0, 0, 0.9);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   pointer-events: none;
@@ -73,7 +76,7 @@ html {
 .continent-label span {
   font-weight: 700;
   letter-spacing: 2px;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.92);
 }
 
 /* Hover tooltips for UK/Ireland region map */
