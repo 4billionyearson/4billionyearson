@@ -458,7 +458,7 @@ export default function GlobalProfile() {
                     </div>
 
                     <p className="text-sm text-gray-300 mt-3">
-                      Earth&apos;s surface is currently <span className="font-semibold text-white">{vsPreIndustrial.toFixed(2)}°C</span> warmer than the pre-industrial (1850–1900) average, based on the 10-year mean for <span className="font-semibold text-white">{decadeStart}–{decadeEnd}</span>. Climate scientists use a decade average, not a single year, to smooth out natural variability (El Niño, volcanoes) and define long-term warming, in line with <a href="https://wmo.int/news/media-centre/wmo-confirms-2024-warmest-year-record-about-155degc-above-pre-industrial-level" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">WMO</a> and <a href="https://www.ipcc.ch/sr15/chapter/spm/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A]">IPCC AR6</a> methodology. A single year can cross 1.5°C and then fall back; the Paris limit is considered breached only once the 10-year mean stays above it.
+                      Earth&apos;s surface is currently <span className="font-semibold text-white">{vsPreIndustrial.toFixed(2)}°C</span> warmer than the pre-industrial (1850–1900) average, based on the 10-year mean for <span className="font-semibold text-white">{decadeStart}–{decadeEnd}</span>. Climate scientists use a decade average, not a single year, to smooth out natural variability (El Niño, volcanoes) and define long-term warming, in line with <a href="https://wmo.int/news/media-centre/wmo-confirms-2024-warmest-year-record-about-155degc-above-pre-industrial-level" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">WMO</a> and <a href="https://www.ipcc.ch/sr15/chapter/spm/" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">IPCC AR6</a> methodology. A single year can cross 1.5°C and then fall back; the Paris limit is considered breached only once the 10-year mean stays above it.
                     </p>
 
                     {/* Progress bars */}
@@ -760,7 +760,7 @@ export default function GlobalProfile() {
               {data.countryAnomalies && data.countryAnomalies.length > 0 && (() => {
                 const windowTitle = anomalyWindow === '12m' ? '12-Month Rolling' : anomalyWindow === '3m' ? '3-Month' : 'Latest Month';
                 const dividerTitle = `World — ${windowTitle}`;
-                const cardTitle = `Country-by-Country Temperature Anomaly — ${windowTitle}`;
+                const cardTitle = `Temperature Anomaly — ${windowTitle}`;
                 const windowOpts = [
                   { key: '1m', label: '1 month' },
                   { key: '3m', label: '3 months' },
@@ -792,7 +792,7 @@ export default function GlobalProfile() {
                       </div>
                       <GlobalAnomalyMap countryAnomalies={data.countryAnomalies} window={anomalyWindow} />
                       <p className="text-xs text-gray-400 mt-3">
-                        Each country is coloured by its {anomalyWindow === '12m' ? '12-month rolling' : anomalyWindow === '3m' ? '3-month' : 'latest monthly'} land-surface temperature anomaly against its own 1961–1990 baseline — the same figures shown on each country&rsquo;s climate page on this site. Countries without a dedicated page are shown in grey.
+                        Each country is coloured by its {anomalyWindow === '12m' ? '12-month rolling' : anomalyWindow === '3m' ? '3-month' : 'latest monthly'} land-surface temperature anomaly against its own 1961&ndash;1990 baseline. Zoom in over the US or UK to see state- and nation-level data from the same rankings. Countries without a dedicated page are shown in grey.
                       </p>
                       <p className="text-xs text-gray-400 mt-2">
                         Data source: NOAA Climate at a Glance (country-level monthly averages), pre-computed nightly. Each country is independently ranked against its own 77-year (or longer) record, so the colour scale reflects <em>relative</em> warming for each place, not absolute temperature.
@@ -804,41 +804,49 @@ export default function GlobalProfile() {
 
               {/* Context + Sources */}
               <Divider icon={<Database className="h-5 w-5 text-[#D0A65E]" />} title="Context & Sources" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                  <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
-                    <Info className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-                    <span className="min-w-0 flex-1">Baselines &amp; Methodology</span>
-                  </h3>
-                  <ul className="text-sm text-gray-300 space-y-2">
-                    <li><strong className="text-[#FFF5E7]">1961–1990 baseline</strong> — the WMO standard reference period used for the monthly and quarterly anomalies shown in the table above and on every country/state/region page.</li>
-                    <li><strong className="text-[#FFF5E7]">Pre-industrial (1850–1900)</strong> ≈ {data.preIndustrialBaseline.toFixed(1)}°C absolute — used only for the Paris Agreement 1.5°C and 2.0°C limits. The Paris tracker uses a 10-year mean so single El Niño years don&rsquo;t falsely trigger it.</li>
-                    <li><strong className="text-[#FFF5E7]">20th-century mean</strong> {data.globalBaseline}°C — NOAA&rsquo;s reference for reporting individual monthly and yearly anomalies (converted into absolute °C values on this page).</li>
-                  </ul>
+              <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] space-y-4">
+                {/* Baseline chips */}
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#D0A65E] mb-2">Baselines used on this page</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div className="rounded-lg border border-gray-800 bg-gray-900/50 px-3 py-2">
+                      <p className="text-[13px] font-semibold text-[#FFF5E7]">1961–1990</p>
+                      <p className="text-xs text-gray-400">WMO standard — used for the monthly and quarterly anomalies above.</p>
+                    </div>
+                    <div className="rounded-lg border border-gray-800 bg-gray-900/50 px-3 py-2">
+                      <p className="text-[13px] font-semibold text-[#FFF5E7]">Pre-industrial ≈ {data.preIndustrialBaseline.toFixed(1)}°C</p>
+                      <p className="text-xs text-gray-400">1850–1900. Used only for the Paris 1.5°C / 2.0°C limits (10-year mean).</p>
+                    </div>
+                    <div className="rounded-lg border border-gray-800 bg-gray-900/50 px-3 py-2">
+                      <p className="text-[13px] font-semibold text-[#FFF5E7]">20th-century mean {data.globalBaseline}°C</p>
+                      <p className="text-xs text-gray-400">NOAA&rsquo;s reference for individual monthly and yearly anomalies.</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                  <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
-                    <BookOpen className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-                    <span className="min-w-0 flex-1">Sources</span>
+
+                {/* Sources row */}
+                <div className="pt-3 border-t border-gray-800/70">
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#D0A65E] mb-2 flex items-center gap-1.5">
+                    <BookOpen className="h-3.5 w-3.5" /> Data sources
                   </h3>
-                  <ul className="text-sm text-gray-300 space-y-2">
+                  <ul className="text-sm text-gray-300 grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-1.5">
                     <li>
-                      <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
-                        NOAA Climate at a Glance — Global Land+Ocean <ExternalLink className="h-3 w-3" />
+                      <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
+                        NOAA Climate at a Glance <ExternalLink className="h-3 w-3" />
                       </a>
-                      <p className="text-xs text-gray-400 mt-0.5">Monthly and yearly anomalies vs the 20th-century mean, 1850–present.</p>
+                      <span className="text-xs text-gray-500"> — Land+Ocean anomalies</span>
                     </li>
                     <li>
-                      <a href="https://ourworldindata.org/grapher/temperature-anomaly" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
-                        Our World in Data — Global temperature anomaly <ExternalLink className="h-3 w-3" />
+                      <a href="https://ourworldindata.org/grapher/temperature-anomaly" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
+                        Our World in Data <ExternalLink className="h-3 w-3" />
                       </a>
-                      <p className="text-xs text-gray-400 mt-0.5">ERA5 reanalysis land surface temperature used for the land-only series.</p>
+                      <span className="text-xs text-gray-500"> — ERA5 land-only series</span>
                     </li>
                     <li>
-                      <a href="https://www.ipcc.ch/report/ar6/syr/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
-                        IPCC AR6 Synthesis Report <ExternalLink className="h-3 w-3" />
+                      <a href="https://www.ipcc.ch/report/ar6/syr/" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
+                        IPCC AR6 Synthesis <ExternalLink className="h-3 w-3" />
                       </a>
-                      <p className="text-xs text-gray-400 mt-0.5">The scientific basis for the 1.5°C and 2.0°C warming thresholds referenced above.</p>
+                      <span className="text-xs text-gray-500"> — 1.5°C / 2.0°C basis</span>
                     </li>
                   </ul>
                 </div>
@@ -898,15 +906,12 @@ export default function GlobalProfile() {
             </h2>
             <div className="text-sm text-gray-400 space-y-3 max-w-3xl">
               <p>
-                {region.description}
-              </p>
-              <p>
                 For local context covering a specific country, US state or UK region, see the full
                 {' '}
-                <Link href="/climate" className="text-[#D0A65E] hover:text-[#E8C97A]">Climate Updates index</Link>
+                <Link href="/climate" className="text-teal-300 hover:text-teal-200">Climate Updates index</Link>
                 . For the real-time interactive dashboard with every chart, visit the
                 {' '}
-                <Link href="/climate-dashboard" className="text-[#D0A65E] hover:text-[#E8C97A]">Climate Dashboard</Link>
+                <Link href="/climate-dashboard" className="text-teal-300 hover:text-teal-200">Climate Dashboard</Link>
                 .
               </p>
             </div>

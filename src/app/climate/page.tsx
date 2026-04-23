@@ -89,9 +89,9 @@ export default function ClimateProfilesIndex() {
             <div className="text-sm text-gray-400 space-y-3 max-w-3xl">
               <p>
                 Each climate update provides a data-driven snapshot of how climate change is affecting a specific region. Data is sourced from{' '}
-                <a href="https://ourworldindata.org" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Our World in Data</a>,{' '}
-                <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">NOAA Climate at a Glance</a>, and the{' '}
-                <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data" className="text-[#D0A65E] hover:text-[#E8C97A]" target="_blank" rel="noopener noreferrer">Met Office HadUK-Grid</a>.
+                <a href="https://ourworldindata.org" className="text-teal-300 hover:text-teal-200" target="_blank" rel="noopener noreferrer">Our World in Data</a>,{' '}
+                <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/" className="text-teal-300 hover:text-teal-200" target="_blank" rel="noopener noreferrer">NOAA Climate at a Glance</a>, and the{' '}
+                <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data" className="text-teal-300 hover:text-teal-200" target="_blank" rel="noopener noreferrer">Met Office HadUK-Grid</a>.
               </p>
               <p>
                 Profiles include annual temperature trends, monthly comparisons against historic baselines (1961–1990), precipitation data, and where available, CO₂ emissions trajectories. Data is refreshed monthly after source agencies publish their updates.

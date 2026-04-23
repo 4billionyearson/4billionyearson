@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import Link from 'next/link';
-import { Trophy, TrendingUp, TrendingDown, Globe2, ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
+import { Trophy, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
 import RankingsTable from './RankingsTable';
 import RankingsAnalysis from './RankingsAnalysis';
+import RollupsSection from './RollupsSection';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 
@@ -122,8 +123,6 @@ function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-type Window = 'anomaly1m' | 'anomaly3m' | 'anomaly12m';
-
 interface RollupGroup {
   label: string;
   count: number;
@@ -175,12 +174,8 @@ function buildRollups(rows: RankingRow[]): {
     },
   });
 
-  const continents = Object.entries(continentBuckets)
-    .map(([k, v]) => toGroup(k, v))
-    .sort((a, b) => (b.means.anomaly1m ?? -99) - (a.means.anomaly1m ?? -99));
-  const usRegions = Object.entries(usBuckets)
-    .map(([k, v]) => toGroup(k, v))
-    .sort((a, b) => (b.means.anomaly1m ?? -99) - (a.means.anomaly1m ?? -99));
+  const continents = Object.entries(continentBuckets).map(([k, v]) => toGroup(k, v));
+  const usRegions = Object.entries(usBuckets).map(([k, v]) => toGroup(k, v));
   const types = [
     toGroup('Countries', typeBuckets.country),
     toGroup('US states', typeBuckets['us-state']),
@@ -188,55 +183,6 @@ function buildRollups(rows: RankingRow[]): {
   ].filter((g) => g.count > 0);
 
   return { continents, usRegions, types };
-}
-
-function fmtSigned(v: number | null): string {
-  if (v == null) return '—';
-  return `${v > 0 ? '+' : ''}${v.toFixed(2)}°C`;
-}
-
-function toneBar(v: number | null): string {
-  if (v == null) return 'bg-gray-700';
-  if (v >= 1.5) return 'bg-red-400';
-  if (v >= 0.8) return 'bg-orange-400';
-  if (v >= 0.2) return 'bg-amber-400';
-  if (v <= -0.2) return 'bg-sky-400';
-  return 'bg-gray-500';
-}
-
-function RollupCard({ title, groups, windowKey }: { title: string; groups: RollupGroup[]; windowKey: Window }) {
-  if (!groups.length) return null;
-  const maxAbs = Math.max(...groups.map((g) => Math.abs(g.means[windowKey] ?? 0)), 0.5);
-  return (
-    <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-4">
-      <h3 className="text-sm font-semibold text-white mb-3">{title}</h3>
-      <div className="space-y-2">
-        {groups.map((g) => {
-          const v = g.means[windowKey];
-          const pct = v == null ? 0 : Math.min(100, (Math.abs(v) / maxAbs) * 100);
-          const positive = (v ?? 0) >= 0;
-          return (
-            <div key={g.label} className="text-xs">
-              <div className="flex items-baseline justify-between mb-1">
-                <span className="font-semibold text-gray-200">{g.label} <span className="text-gray-500 font-normal">({g.count})</span></span>
-                <span className="font-mono text-gray-200">{fmtSigned(v)}</span>
-              </div>
-              <div className="relative h-2 rounded-full bg-gray-800 overflow-hidden">
-                <div
-                  className={`absolute top-0 h-full ${toneBar(v)}`}
-                  style={{
-                    left: positive ? '50%' : `${50 - pct / 2}%`,
-                    width: `${pct / 2}%`,
-                  }}
-                />
-                <div className="absolute top-0 left-1/2 h-full w-px bg-gray-600" />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
 }
 
 export default async function RankingsPage() {
@@ -273,12 +219,12 @@ export default async function RankingsPage() {
           >
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-                Climate Rankings & Monthly Trends{latestLabel ? ` — ${latestLabel}` : ''}
+                Climate Rankings{latestLabel ? ` — ${latestLabel}` : ''}
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5 space-y-4">
               <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                How <strong className="text-white">144 regions</strong> compare this month — every country, US state and UK region we track, ranked by how far the <strong className="text-white">most recent month</strong> sat above or below its 1961–1990 climatological baseline. Sort, filter or search the league table; see which regions <strong className="text-white">climbed or dropped</strong> the most since last month; and read the continent-level roll-ups below.
+                <strong className="text-white">144 regions</strong> ranked by this month’s temperature anomaly vs their 1961–1990 baseline — every country, US state and UK region we track.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -379,20 +325,11 @@ export default async function RankingsPage() {
           ) : null}
 
           {/* Continent & region roll-ups */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl font-bold font-mono text-white mb-2 flex items-start gap-2">
-              <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-              <span className="min-w-0 flex-1">Roll-ups — average 1-month anomaly by group</span>
-            </h2>
-            <p className="text-xs text-gray-400 mb-4">
-              Mean monthly anomaly across each grouping. Useful for seeing whether the latest warmth is global or concentrated in particular regions.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <RollupCard title="By continent" groups={rollups.continents} windowKey="anomaly1m" />
-              <RollupCard title="By US Census region" groups={rollups.usRegions} windowKey="anomaly1m" />
-              <RollupCard title="By region type" groups={rollups.types} windowKey="anomaly1m" />
-            </div>
-          </section>
+          <RollupsSection
+            continents={rollups.continents}
+            usRegions={rollups.usRegions}
+            types={rollups.types}
+          />
 
           {/* Table */}
           <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">

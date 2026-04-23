@@ -89,7 +89,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
       </p>
       <p className="text-[11px] text-gray-400 mt-1">
         <span style={{ color }} /> Source:&nbsp;
-        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
+        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
           NOAA CPC ONI <ExternalLink className="h-2.5 w-2.5" />
         </a>
       </p>
@@ -159,16 +159,16 @@ export function GhgTile({ ghgStats }: { ghgStats: { co2: GhgStat | null; ch4: Gh
         Sparklines: last 10 years of monthly values. Pre-industrial reference values: CO₂ 280 ppm, CH₄ 722 ppb, N₂O 270 ppb.
       </p>
       <div className="mt-auto pt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
-        <Link href="/greenhouse-gases" className="inline-flex items-center gap-1 text-[#D0A65E] hover:text-[#E8C97A] font-semibold">
+        <Link href="/greenhouse-gases" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
           Greenhouse gases dashboard <ArrowUpRight className="h-3 w-3" />
         </Link>
-        <Link href="/emissions" className="inline-flex items-center gap-1 text-[#D0A65E] hover:text-[#E8C97A] font-semibold">
+        <Link href="/emissions" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
           Emissions by country <ArrowUpRight className="h-3 w-3" />
         </Link>
       </div>
       <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
-        <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
+        <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
           NOAA GML Trends <ExternalLink className="h-2.5 w-2.5" />
         </a>
       </p>
@@ -248,13 +248,13 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
       </div>
       <p className="text-[11px] text-gray-400 mt-1">Last 60 months. Long-term trend is down — Arctic loss exceeds Antarctic variability.</p>
       <div className="mt-auto pt-2 text-[11px]">
-        <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-[#D0A65E] hover:text-[#E8C97A] font-semibold">
+        <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
           Sea levels &amp; ice dashboard <ArrowUpRight className="h-3 w-3" />
         </Link>
       </div>
       <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
-        <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
+        <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
           NSIDC via global-warming.org <ExternalLink className="h-2.5 w-2.5" />
         </a>
       </p>
@@ -309,7 +309,7 @@ export function ContinentalBar({ continents }: { continents: ContinentStat[] | n
       </p>
       <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
-        <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline text-[#D0A65E] hover:text-[#E8C97A] inline-flex items-center gap-1">
+        <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
           NOAA Climate at a Glance <ExternalLink className="h-2.5 w-2.5" />
         </a>
       </p>

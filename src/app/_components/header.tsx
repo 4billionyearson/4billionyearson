@@ -176,8 +176,15 @@ const Header = () => {
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link
+                  href="/climate/global"
+                  className={desktopDropdownItemClass(pathname === '/climate/global', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
+                  onClick={closeMenu}
+                >
+                  Global Climate Update<MonthlyBadge />
+                </Link>
+                <Link
                   href="/climate"
-                  className={desktopDropdownItemClass(isClimateUpdatesPage && pathname !== '/climate/rankings', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
+                  className={desktopDropdownItemClass(isClimateUpdatesPage && pathname !== '/climate/rankings' && pathname !== '/climate/global', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
                   onClick={closeMenu}
                 >
                   Climate Updates<MonthlyBadge />
@@ -382,8 +389,15 @@ const Header = () => {
                   Local & Global Climate Change<MonthlyBadge />
                 </Link>
                 <Link
+                  href="/climate/global"
+                  className={mobileDropdownItemClass(pathname === '/climate/global', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
+                  onClick={closeMenu}
+                >
+                  Global Climate Update<MonthlyBadge />
+                </Link>
+                <Link
                   href="/climate"
-                  className={mobileDropdownItemClass(isClimateUpdatesPage && pathname !== '/climate/rankings', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
+                  className={mobileDropdownItemClass(isClimateUpdatesPage && pathname !== '/climate/rankings' && pathname !== '/climate/global', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
                   onClick={closeMenu}
                 >
                   Climate Updates<MonthlyBadge />

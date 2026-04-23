@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
+import { CircleMarker, MapContainer, TileLayer, GeoJSON, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import type { FeatureCollection, Feature } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -111,9 +111,171 @@ function InvalidateOnMount() {
   return null;
 }
 
+/* ─── Sub-national overlays (US states + UK nations) ─────────────────────── */
+
+const US_STATES_ZOOM = 4;
+const UK_REGIONS_ZOOM = 5;
+
+interface RankingRow {
+  slug: string;
+  name: string;
+  type: 'country' | 'us-state' | 'uk-region';
+  anomaly1m: number | null;
+  anomaly3m: number | null;
+  anomaly12m: number | null;
+  latestLabel: string | null;
+}
+
+function rankingValue(row: RankingRow | undefined, win: AnomalyWindow): number | null {
+  if (!row) return null;
+  if (win === '3m') return row.anomaly3m;
+  if (win === '12m') return row.anomaly12m;
+  return row.anomaly1m;
+}
+
+// UK nation centroids (approximate) for circle-marker overlay.
+const UK_NATIONS: { slug: string; name: string; lat: number; lng: number }[] = [
+  { slug: 'england',          name: 'England',          lat: 52.9, lng: -1.2 },
+  { slug: 'scotland',         name: 'Scotland',         lat: 56.8, lng: -4.2 },
+  { slug: 'wales',            name: 'Wales',            lat: 52.3, lng: -3.7 },
+  { slug: 'northern-ireland', name: 'Northern Ireland', lat: 54.7, lng: -6.7 },
+];
+
+function USStatesOverlay({
+  rankings,
+  windowSel,
+  onInfo,
+}: {
+  rankings: RankingRow[] | null;
+  windowSel: AnomalyWindow;
+  onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
+}) {
+  const map = useMap();
+  const [visible, setVisible] = useState(map.getZoom() >= US_STATES_ZOOM);
+  const [geo, setGeo] = useState<FeatureCollection | null>(null);
+
+  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= US_STATES_ZOOM) });
+
+  useEffect(() => {
+    if (!visible || geo) return;
+    fetch('/data/us-states.json')
+      .then((r) => r.json())
+      .then((g: FeatureCollection) => setGeo(g))
+      .catch(() => {});
+  }, [visible, geo]);
+
+  const byName = useMemo(() => {
+    const m = new Map<string, RankingRow>();
+    if (rankings) {
+      for (const r of rankings) {
+        if (r.type === 'us-state') m.set(r.name.toLowerCase(), r);
+      }
+    }
+    return m;
+  }, [rankings]);
+
+  const style = useCallback(
+    (feature: Feature | undefined): PathOptions => {
+      const name = ((feature?.properties as any)?.name as string) ?? '';
+      const row = byName.get(name.toLowerCase());
+      const v = rankingValue(row, windowSel);
+      return {
+        fillColor: v != null ? anomalyColor(v) : '#1f2937',
+        fillOpacity: 0.9,
+        weight: 0.6,
+        color: '#0b1220',
+      };
+    },
+    [byName, windowSel],
+  );
+
+  const onEachFeature = useCallback(
+    (feature: Feature, layer: Layer) => {
+      const name = ((feature.properties as any)?.name as string) ?? '';
+      const row = byName.get(name.toLowerCase());
+      const v = rankingValue(row, windowSel);
+      const color = v != null ? anomalyColor(v) : '#1f2937';
+      const show = () => onInfo({ name, anomaly: v, label: row?.latestLabel ?? null, color });
+      layer.on('mouseover', show);
+      layer.on('click', show);
+      layer.on('mouseout', () => onInfo(null));
+    },
+    [byName, windowSel, onInfo],
+  );
+
+  if (!visible || !geo) return null;
+  return (
+    <GeoJSON
+      key={`us-states-${windowSel}-${byName.size}`}
+      data={geo}
+      style={style}
+      onEachFeature={onEachFeature}
+    />
+  );
+}
+
+function UKRegionsOverlay({
+  rankings,
+  windowSel,
+  onInfo,
+}: {
+  rankings: RankingRow[] | null;
+  windowSel: AnomalyWindow;
+  onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
+}) {
+  const map = useMap();
+  const [visible, setVisible] = useState(map.getZoom() >= UK_REGIONS_ZOOM);
+  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= UK_REGIONS_ZOOM) });
+
+  const bySlug = useMemo(() => {
+    const m = new Map<string, RankingRow>();
+    if (rankings) {
+      for (const r of rankings) {
+        if (r.type === 'uk-region') m.set(r.slug, r);
+      }
+    }
+    return m;
+  }, [rankings]);
+
+  if (!visible) return null;
+
+  return (
+    <>
+      {UK_NATIONS.map((n) => {
+        const row = bySlug.get(n.slug);
+        const v = rankingValue(row, windowSel);
+        const color = v != null ? anomalyColor(v) : '#1f2937';
+        return (
+          <CircleMarker
+            key={`uk-${n.slug}`}
+            center={[n.lat, n.lng]}
+            radius={10}
+            pathOptions={{
+              fillColor: color,
+              fillOpacity: 0.9,
+              color: '#0b1220',
+              weight: 1,
+            }}
+            eventHandlers={{
+              mouseover: () => onInfo({ name: n.name, anomaly: v, label: row?.latestLabel ?? null, color }),
+              click: () => onInfo({ name: n.name, anomaly: v, label: row?.latestLabel ?? null, color }),
+              mouseout: () => onInfo(null),
+            }}
+          >
+            <Tooltip direction="top" offset={[0, -6]} opacity={0.9} permanent={false}>
+              <span style={{ fontSize: 11, fontWeight: 600 }}>{n.name}</span>
+            </Tooltip>
+          </CircleMarker>
+        );
+      })}
+    </>
+  );
+}
+
 export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [rankings, setRankings] = useState<RankingRow[] | null>(null);
   const [selected, setSelected] = useState<{
     name: string;
     anomaly: number | null;
@@ -130,6 +292,10 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
       .then((r) => r.json())
       .then((j) => { if (!cancelled) setGeo(fixAntimeridian(j)); })
       .catch((e) => { if (!cancelled) setLoadError(String(e?.message ?? e)); });
+    fetch('/data/climate/rankings.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && d?.rows) setRankings(d.rows as RankingRow[]); })
+      .catch(() => {});
     return () => { cancelled = true; };
   }, []);
 
@@ -228,6 +394,28 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
             data={geo}
             style={style}
             onEachFeature={onEachFeature}
+          />
+          <USStatesOverlay
+            rankings={rankings}
+            windowSel={windowSel}
+            onInfo={(info) =>
+              setSelected(
+                info
+                  ? { name: info.name, anomaly: info.anomaly, monthLabel: info.label ?? undefined, color: info.color }
+                  : null,
+              )
+            }
+          />
+          <UKRegionsOverlay
+            rankings={rankings}
+            windowSel={windowSel}
+            onInfo={(info) =>
+              setSelected(
+                info
+                  ? { name: info.name, anomaly: info.anomaly, monthLabel: info.label ?? undefined, color: info.color }
+                  : null,
+              )
+            }
           />
         </MapContainer>
 

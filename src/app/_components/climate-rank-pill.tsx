@@ -58,8 +58,6 @@ export default function ClimateRankPill({ slug }: { slug: string }) {
   const windowKey: 'anomaly1m' | 'anomaly3m' | 'anomaly12m' | null =
     me.anomaly1m != null ? 'anomaly1m' : me.anomaly3m != null ? 'anomaly3m' : me.anomaly12m != null ? 'anomaly12m' : null;
   if (!windowKey) return null;
-  const windowLabel =
-    windowKey === 'anomaly1m' ? '1-month' : windowKey === 'anomaly3m' ? '3-month' : '12-month';
 
   const valid = rows.filter((r) => typeof r[windowKey] === 'number');
   const sorted = [...valid].sort((a, b) => (b[windowKey] as number) - (a[windowKey] as number));
@@ -86,24 +84,23 @@ export default function ClimateRankPill({ slug }: { slug: string }) {
   return (
     <Link
       href="/climate/rankings"
-      className="mt-3 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5 px-3 py-2 text-xs md:text-sm text-gray-300 hover:border-[#D0A65E]/55 hover:bg-[#D0A65E]/10 transition-colors"
+      className="mt-3 inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5 px-3 py-2 text-xs md:text-sm text-gray-300 hover:border-[#D0A65E]/55 hover:bg-[#D0A65E]/10 transition-colors"
     >
       <span className="inline-flex items-center gap-1.5 font-semibold text-[#D0A65E]">
         <TrendingUp className="h-3.5 w-3.5" />
         Ranking
       </span>
       <span>
-        <span className={`font-mono font-semibold ${tone}`}>{sign}{myAnom.toFixed(2)}°C</span>{' '}
-        <span className="text-gray-400">({windowLabel} anomaly)</span>
+        <span className={`font-mono font-semibold ${tone}`}>{sign}{myAnom.toFixed(2)}°C</span>
       </span>
-      <span className="text-gray-400">·</span>
+      <span className="text-gray-500">·</span>
       <span>
         <span className="font-semibold text-white">{ordinal(globalRank)}</span>{' '}
         <span className="text-gray-400">of {globalTotal} regions</span>
       </span>
       {peerTotal > 1 && (
         <>
-          <span className="text-gray-400">·</span>
+          <span className="text-gray-500">·</span>
           <span>
             <span className="font-semibold text-white">{ordinal(peerRank)}</span>{' '}
             <span className="text-gray-400">of {peerTotal} {peerLabel}</span>

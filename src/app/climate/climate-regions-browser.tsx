@@ -45,34 +45,31 @@ const US_REGION_ORDER: USRegion[] = ['Northeast', 'Midwest', 'South', 'West'];
 
 // ─── Region card ─────────────────────────────────────────────────────────────
 
-function TypeBadge({ type }: { type: ClimateRegion['type'] }) {
-  const { label, cls } =
-    type === 'country'
-      ? { label: 'Country', cls: 'border-sky-500/40 bg-sky-500/10 text-sky-300' }
-      : type === 'us-state'
-        ? { label: 'US State', cls: 'border-orange-500/40 bg-orange-500/10 text-orange-300' }
-        : type === 'uk-region'
-          ? { label: 'UK Region', cls: 'border-[#D0A65E]/45 bg-[#D0A65E]/10 text-[#D0A65E]' }
-          : { label: 'Global', cls: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' };
-  return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${cls}`}>
-      {label}
-    </span>
-  );
+function typeAccent(type: ClimateRegion['type']): { card: string; hover: string } {
+  switch (type) {
+    case 'country':
+      return { card: 'border-sky-500/40 bg-sky-950/20', hover: 'hover:border-sky-400/70 hover:bg-sky-950/35' };
+    case 'us-state':
+      return { card: 'border-orange-500/40 bg-orange-950/15', hover: 'hover:border-orange-400/70 hover:bg-orange-950/30' };
+    case 'uk-region':
+      return { card: 'border-[#D0A65E]/45 bg-[#3a2a12]/30', hover: 'hover:border-[#D0A65E]/75 hover:bg-[#3a2a12]/45' };
+    default:
+      return { card: 'border-emerald-500/40 bg-emerald-950/20', hover: 'hover:border-emerald-400/70 hover:bg-emerald-950/35' };
+  }
 }
 
 function RegionCard({ region }: { region: ClimateRegion }) {
+  const accent = typeAccent(region.type);
   return (
     <Link
       href={`/climate/${region.slug}`}
-      className="group flex flex-col rounded-xl border border-[#D0A65E]/30 bg-gray-900/85 p-3.5 transition-all duration-200 hover:border-[#D0A65E]/60 hover:bg-gray-800"
+      className={`group flex flex-col rounded-xl border p-3.5 transition-all duration-200 ${accent.card} ${accent.hover}`}
     >
       <div className="flex items-center gap-2 mb-1.5">
         <span className="text-xl leading-none shrink-0" aria-hidden>{region.emoji}</span>
         <h4 className="flex-1 min-w-0 text-sm font-semibold text-[#FFF5E7] group-hover:text-white leading-tight truncate">
           {region.name}
         </h4>
-        <TypeBadge type={region.type} />
       </div>
       <p className="text-[12px] text-gray-400 line-clamp-2 flex-1">{region.tagline}</p>
       <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[#D0A65E]/80 group-hover:text-[#D0A65E]">
