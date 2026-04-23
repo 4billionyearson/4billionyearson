@@ -19,19 +19,15 @@ interface YearlyPoint {
   fossilShareElec: number | null;
 }
 
-interface LatestStats {
-  year: number;
-  fossilShare: number | null;
-  renewablesShare: number | null;
-  nuclearShare: number | null;
-  solarShareElec: number | null;
-  windShareElec: number | null;
-  carbonIntensity: number | null;
-  electricityGeneration: number | null;
+interface CountryEnergy {
+  name: string;
+  yearly: YearlyPoint[];
+  latest: unknown;
 }
 
 interface EnergyApiResponse {
-  world: { name: string; yearly: YearlyPoint[]; latest: LatestStats | null };
+  world: CountryEnergy;
+  country?: CountryEnergy | null;
   fetchedAt: string;
 }
 
@@ -89,16 +85,136 @@ function MiniSparkline({ data, color, height = 28 }: { data: number[]; color: st
   );
 }
 
-export default function EnergyMixCard({ deepLinkHref = '/energy-dashboard' }: { deepLinkHref?: string }) {
+function findLatestMixYear(yearly: YearlyPoint[]): YearlyPoint | null {
+  for (let i = yearly.length - 1; i >= 0; i--) {
+    const y = yearly[i];
+    if (y.coalShareElec != null || y.gasShareElec != null || y.solarShareElec != null || y.renewablesShareElec != null) {
+      return y;
+    }
+  }
+  return null;
+}
+
+function CardShell({ title, year, deepLinkHref, children }: {
+  title: string; year: number; deepLinkHref: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
+      <div className="px-4 pt-3 pb-2 border-b border-gray-800/60 flex items-center gap-2">
+        <Wind className="h-4 w-4 text-[#D1E368]" />
+        <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#D1E368]">{title}</h3>
+        <span className="ml-auto text-[11px] text-gray-500 font-mono">{year}</span>
+      </div>
+      <div className="p-4 md:p-5 space-y-4">{children}</div>
+      <Link
+        href={deepLinkHref}
+        className="flex items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-800/60 bg-gray-900/40 text-xs text-[#D1E368] hover:text-[#E4F088] hover:bg-[#D1E368]/5 transition-colors"
+      >
+        <span>See full energy data</span>
+        <ExternalLink className="h-3.5 w-3.5" />
+      </Link>
+    </div>
+  );
+}
+
+function MixPanel({ yearly, countryName }: { yearly: YearlyPoint[]; countryName?: string }) {
+  const latestPoint = findLatestMixYear(yearly);
+  if (!latestPoint) return null;
+
+  const slices = buildMix(latestPoint);
+  const renewLatest = latestPoint.renewablesShareElec ?? 0;
+  const tenAgo = yearly.find(y => y.year === latestPoint.year - 10);
+  const renewTenAgo = tenAgo?.renewablesShareElec ?? null;
+  const renewDelta = renewTenAgo != null ? renewLatest - renewTenAgo : null;
+
+  const recent = yearly.slice(-25);
+  const windSeries = recent.map(y => y.windShareElec ?? 0);
+  const solarSeries = recent.map(y => y.solarShareElec ?? 0);
+
+  return (
+    <>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <div className="text-3xl md:text-4xl font-bold font-mono text-white">
+            {renewLatest.toFixed(0)}<span className="text-2xl text-gray-400">%</span>
+          </div>
+          <div className="text-xs text-gray-400 mt-0.5">
+            Renewables share{countryName ? ` · ${countryName}` : ' of electricity'}
+          </div>
+        </div>
+        {renewDelta != null && tenAgo && (
+          <div className={`text-right ${renewDelta >= 0 ? 'text-emerald-300' : 'text-orange-300'}`}>
+            <div className="text-base font-bold font-mono inline-flex items-center gap-1">
+              {renewDelta >= 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+              {renewDelta >= 0 ? '+' : ''}{renewDelta.toFixed(1)}pp
+            </div>
+            <div className="text-[11px] text-gray-500">vs {tenAgo.year}</div>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <div className="text-[11px] text-gray-400 uppercase tracking-wider mb-1.5">Generation mix</div>
+        <div className="flex h-3 w-full rounded-full overflow-hidden bg-gray-800/60">
+          {slices.map((s) => (
+            <div key={s.key} className="h-full" title={`${s.label}: ${s.share.toFixed(1)}%`}
+              style={{ width: `${s.share}%`, backgroundColor: s.color }} />
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[11px]">
+          {slices.map((s) => (
+            <span key={s.key} className="inline-flex items-center gap-1 text-gray-300">
+              <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: s.color }} />
+              {s.label} <span className="text-gray-500">{s.share.toFixed(1)}%</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 pt-1">
+        <div className="rounded-lg border border-gray-800/60 bg-gray-900/40 p-2.5">
+          <div className="flex items-center justify-between text-[11px] mb-1">
+            <span className="text-gray-400">Wind</span>
+            <span className="font-mono font-semibold text-cyan-300">{(latestPoint.windShareElec ?? 0).toFixed(1)}%</span>
+          </div>
+          <MiniSparkline data={windSeries} color="#22d3ee" />
+          <div className="text-[10px] text-gray-500 font-mono mt-0.5">{recent[0].year} → {latestPoint.year}</div>
+        </div>
+        <div className="rounded-lg border border-gray-800/60 bg-gray-900/40 p-2.5">
+          <div className="flex items-center justify-between text-[11px] mb-1">
+            <span className="text-gray-400">Solar</span>
+            <span className="font-mono font-semibold text-amber-300">{(latestPoint.solarShareElec ?? 0).toFixed(1)}%</span>
+          </div>
+          <MiniSparkline data={solarSeries} color="#fbbf24" />
+          <div className="text-[10px] text-gray-500 font-mono mt-0.5">{recent[0].year} → {latestPoint.year}</div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default function EnergyMixCard({ countryName, deepLinkHref }: {
+  countryName?: string;
+  deepLinkHref?: string;
+}) {
   const [data, setData] = useState<EnergyApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/climate/energy')
+    let cancelled = false;
+    const url = countryName
+      ? `/api/climate/energy?country=${encodeURIComponent(countryName)}`
+      : '/api/climate/energy';
+    fetch(url)
       .then(r => r.json())
-      .then(d => { if (d.error) throw new Error(d.error); setData(d); })
-      .catch(e => setError(e.message || 'Failed to load'));
-  }, []);
+      .then(d => { if (!cancelled) { if (d.error) throw new Error(d.error); setData(d); } })
+      .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
+    return () => { cancelled = true; };
+  }, [countryName]);
+
+  const href = deepLinkHref ?? (countryName
+    ? `/energy-dashboard?country=${encodeURIComponent(countryName)}`
+    : '/energy-dashboard');
 
   if (error) {
     return (
@@ -108,7 +224,7 @@ export default function EnergyMixCard({ deepLinkHref = '/energy-dashboard' }: { 
     );
   }
 
-  if (!data?.world.latest) {
+  if (!data) {
     return (
       <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-8 flex items-center justify-center">
         <Loader2 className="h-5 w-5 animate-spin text-[#D1E368]" />
@@ -116,108 +232,24 @@ export default function EnergyMixCard({ deepLinkHref = '/energy-dashboard' }: { 
     );
   }
 
-  const yearly = data.world.yearly;
-  const latestYearPoint = [...yearly].reverse().find(y =>
-    y.coalShareElec != null || y.gasShareElec != null || y.solarShareElec != null
-  );
-  if (!latestYearPoint) {
-    return null;
+  // Choose series: country if available, else world
+  const country = data.country;
+  const yearly = countryName && country?.yearly ? country.yearly : data.world.yearly;
+  const latestPoint = findLatestMixYear(yearly);
+
+  if (!latestPoint) {
+    return (
+      <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-5 text-sm text-gray-400">
+        Electricity mix unavailable{countryName ? ` for ${countryName}` : ''}.
+      </div>
+    );
   }
 
-  const slices = buildMix(latestYearPoint);
-
-  // 10-year delta on renewable share
-  const renewLatest = latestYearPoint.renewablesShareElec ?? 0;
-  const tenAgo = yearly.find(y => y.year === latestYearPoint.year - 10);
-  const renewTenAgo = tenAgo?.renewablesShareElec ?? null;
-  const renewDelta = renewTenAgo != null ? renewLatest - renewTenAgo : null;
-
-  // Wind + solar sparkline series (last 25 years)
-  const recent = yearly.slice(-25);
-  const windSeries = recent.map(y => y.windShareElec ?? 0);
-  const solarSeries = recent.map(y => y.solarShareElec ?? 0);
+  const title = countryName && country ? 'Electricity Mix' : 'Electricity Mix';
 
   return (
-    <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
-      <div className="px-4 pt-3 pb-2 border-b border-gray-800/60 flex items-center gap-2">
-        <Wind className="h-4 w-4 text-[#D1E368]" />
-        <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#D1E368]">Electricity Mix</h3>
-        <span className="ml-auto text-[11px] text-gray-500 font-mono">{latestYearPoint.year}</span>
-      </div>
-
-      <div className="p-4 md:p-5 space-y-4">
-        {/* Headline: renewable share */}
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <div className="text-3xl md:text-4xl font-bold font-mono text-white">
-              {renewLatest.toFixed(0)}<span className="text-2xl text-gray-400">%</span>
-            </div>
-            <div className="text-xs text-gray-400 mt-0.5">Renewables share of electricity</div>
-          </div>
-          {renewDelta != null && (
-            <div className={`text-right ${renewDelta >= 0 ? 'text-emerald-300' : 'text-orange-300'}`}>
-              <div className="text-base font-bold font-mono inline-flex items-center gap-1">
-                {renewDelta >= 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-                {renewDelta >= 0 ? '+' : ''}{renewDelta.toFixed(1)}pp
-              </div>
-              <div className="text-[11px] text-gray-500">vs {(tenAgo as YearlyPoint).year}</div>
-            </div>
-          )}
-        </div>
-
-        {/* Mix stacked bar */}
-        <div>
-          <div className="text-[11px] text-gray-400 uppercase tracking-wider mb-1.5">
-            Generation mix
-          </div>
-          <div className="flex h-3 w-full rounded-full overflow-hidden bg-gray-800/60">
-            {slices.map((s) => (
-              <div
-                key={s.key}
-                className="h-full"
-                title={`${s.label}: ${s.share.toFixed(1)}%`}
-                style={{ width: `${s.share}%`, backgroundColor: s.color }}
-              />
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[11px]">
-            {slices.map((s) => (
-              <span key={s.key} className="inline-flex items-center gap-1 text-gray-300">
-                <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: s.color }} />
-                {s.label} <span className="text-gray-500">{s.share.toFixed(1)}%</span>
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Wind + solar mini sparklines */}
-        <div className="grid grid-cols-2 gap-3 pt-1">
-          <div className="rounded-lg border border-gray-800/60 bg-gray-900/40 p-2.5">
-            <div className="flex items-center justify-between text-[11px] mb-1">
-              <span className="text-gray-400">Wind</span>
-              <span className="font-mono font-semibold text-cyan-300">{(latestYearPoint.windShareElec ?? 0).toFixed(1)}%</span>
-            </div>
-            <MiniSparkline data={windSeries} color="#22d3ee" />
-            <div className="text-[10px] text-gray-500 font-mono mt-0.5">{recent[0].year} → {latestYearPoint.year}</div>
-          </div>
-          <div className="rounded-lg border border-gray-800/60 bg-gray-900/40 p-2.5">
-            <div className="flex items-center justify-between text-[11px] mb-1">
-              <span className="text-gray-400">Solar</span>
-              <span className="font-mono font-semibold text-amber-300">{(latestYearPoint.solarShareElec ?? 0).toFixed(1)}%</span>
-            </div>
-            <MiniSparkline data={solarSeries} color="#fbbf24" />
-            <div className="text-[10px] text-gray-500 font-mono mt-0.5">{recent[0].year} → {latestYearPoint.year}</div>
-          </div>
-        </div>
-      </div>
-
-      <Link
-        href={deepLinkHref}
-        className="flex items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-800/60 bg-gray-900/40 text-xs text-[#D1E368] hover:text-[#E4F088] hover:bg-[#D1E368]/5 transition-colors"
-      >
-        <span>See full energy data</span>
-        <ExternalLink className="h-3.5 w-3.5" />
-      </Link>
-    </div>
+    <CardShell title={title} year={latestPoint.year} deepLinkHref={href}>
+      <MixPanel yearly={yearly} countryName={countryName && country ? country.name : undefined} />
+    </CardShell>
   );
 }

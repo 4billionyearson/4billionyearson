@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, Database, BookOpen, MapPin } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, Database, BookOpen, MapPin, Factory } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import ClimatePeersCard from '@/app/_components/climate-peers-card';
+import EmissionsCard from '@/app/_components/emissions-card';
+import EnergyMixCard from '@/app/_components/energy-mix-card';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
@@ -809,6 +811,17 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
               {/* ─── Explore & Sources ─── */}
               <ClimatePeersCard slug={slug} />
+
+              {/* ─── Emissions & Energy ─── */}
+              {region.type === 'country' && (
+                <>
+                  <Divider icon={<Factory className="h-5 w-5 text-rose-400" />} title="Emissions & Energy" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <EmissionsCard countryName={region.name} />
+                    <EnergyMixCard countryName={region.name} />
+                  </div>
+                </>
+              )}
 
               <Divider icon={<BookOpen className="h-5 w-5 text-[#D0A65E]" />} title="Explore & Sources" />
 
