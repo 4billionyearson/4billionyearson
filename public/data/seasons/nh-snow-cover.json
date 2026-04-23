@@ -1,0 +1,4884 @@
+{
+  "source": "Rutgers University Global Snow Lab — Northern Hemisphere monthly snow-covered area (land)",
+  "sourceUrl": "https://climate.rutgers.edu/snowcover/",
+  "description": "Total area of Northern Hemisphere land covered by snow each month, from weekly NOAA NESDIS satellite analyses. Anomalies are expressed as % difference from the 1981–2010 monthly climatology.",
+  "climatologyBaseline": "1981–2010",
+  "latest": {
+    "year": 2026,
+    "month": 3,
+    "areaKm2": 37803348
+  },
+  "monthly": [
+    {
+      "year": 1966,
+      "month": 11,
+      "areaKm2": 34943905,
+      "anomPct": 2.9
+    },
+    {
+      "year": 1966,
+      "month": 12,
+      "areaKm2": 43004840,
+      "anomPct": -2.22
+    },
+    {
+      "year": 1967,
+      "month": 1,
+      "areaKm2": 48517313,
+      "anomPct": 3.52
+    },
+    {
+      "year": 1967,
+      "month": 2,
+      "areaKm2": 47431583,
+      "anomPct": 4.03
+    },
+    {
+      "year": 1967,
+      "month": 3,
+      "areaKm2": 42977055,
+      "anomPct": 7.1
+    },
+    {
+      "year": 1967,
+      "month": 4,
+      "areaKm2": 33111782,
+      "anomPct": 9.59
+    },
+    {
+      "year": 1967,
+      "month": 5,
+      "areaKm2": 22794380,
+      "anomPct": 19.85
+    },
+    {
+      "year": 1967,
+      "month": 6,
+      "areaKm2": 14367907,
+      "anomPct": 52.57
+    },
+    {
+      "year": 1967,
+      "month": 7,
+      "areaKm2": 8209985,
+      "anomPct": 123.99
+    },
+    {
+      "year": 1967,
+      "month": 8,
+      "areaKm2": 5308387,
+      "anomPct": 89.82
+    },
+    {
+      "year": 1967,
+      "month": 9,
+      "areaKm2": 5868905,
+      "anomPct": 12.12
+    },
+    {
+      "year": 1967,
+      "month": 10,
+      "areaKm2": 17572431,
+      "anomPct": 0.16
+    },
+    {
+      "year": 1967,
+      "month": 11,
+      "areaKm2": 34512366,
+      "anomPct": 1.63
+    },
+    {
+      "year": 1967,
+      "month": 12,
+      "areaKm2": 44067181,
+      "anomPct": 0.2
+    },
+    {
+      "year": 1968,
+      "month": 1,
+      "areaKm2": 46289100,
+      "anomPct": -1.23
+    },
+    {
+      "year": 1968,
+      "month": 2,
+      "areaKm2": 43739611,
+      "anomPct": -4.07
+    },
+    {
+      "year": 1968,
+      "month": 3,
+      "areaKm2": 37626842,
+      "anomPct": -6.24
+    },
+    {
+      "year": 1968,
+      "month": 4,
+      "areaKm2": 28000884,
+      "anomPct": -7.33
+    },
+    {
+      "year": 1968,
+      "month": 5,
+      "areaKm2": 16393466,
+      "anomPct": -13.8
+    },
+    {
+      "year": 1968,
+      "month": 6,
+      "areaKm2": 7952961,
+      "anomPct": -15.55
+    },
+    {
+      "year": 1968,
+      "month": 8,
+      "areaKm2": 2088745,
+      "anomPct": -25.31
+    },
+    {
+      "year": 1968,
+      "month": 9,
+      "areaKm2": 3940154,
+      "anomPct": -24.73
+    },
+    {
+      "year": 1968,
+      "month": 10,
+      "areaKm2": 19773553,
+      "anomPct": 12.71
+    },
+    {
+      "year": 1968,
+      "month": 11,
+      "areaKm2": 35484245,
+      "anomPct": 4.49
+    },
+    {
+      "year": 1968,
+      "month": 12,
+      "areaKm2": 43768925,
+      "anomPct": -0.48
+    },
+    {
+      "year": 1969,
+      "month": 1,
+      "areaKm2": 47725084,
+      "anomPct": 1.83
+    },
+    {
+      "year": 1969,
+      "month": 2,
+      "areaKm2": 48232062,
+      "anomPct": 5.79
+    },
+    {
+      "year": 1969,
+      "month": 3,
+      "areaKm2": 41880619,
+      "anomPct": 4.36
+    },
+    {
+      "year": 1969,
+      "month": 4,
+      "areaKm2": 30448763,
+      "anomPct": 0.77
+    },
+    {
+      "year": 1969,
+      "month": 5,
+      "areaKm2": 18905911,
+      "anomPct": -0.59
+    },
+    {
+      "year": 1969,
+      "month": 11,
+      "areaKm2": 34168824,
+      "anomPct": 0.62
+    },
+    {
+      "year": 1969,
+      "month": 12,
+      "areaKm2": 43345810,
+      "anomPct": -1.44
+    },
+    {
+      "year": 1970,
+      "month": 1,
+      "areaKm2": 48258882,
+      "anomPct": 2.97
+    },
+    {
+      "year": 1970,
+      "month": 2,
+      "areaKm2": 44909506,
+      "anomPct": -1.5
+    },
+    {
+      "year": 1970,
+      "month": 3,
+      "areaKm2": 41999112,
+      "anomPct": 4.66
+    },
+    {
+      "year": 1970,
+      "month": 4,
+      "areaKm2": 33810900,
+      "anomPct": 11.9
+    },
+    {
+      "year": 1970,
+      "month": 5,
+      "areaKm2": 21327170,
+      "anomPct": 12.14
+    },
+    {
+      "year": 1970,
+      "month": 6,
+      "areaKm2": 12511446,
+      "anomPct": 32.85
+    },
+    {
+      "year": 1970,
+      "month": 7,
+      "areaKm2": 4937760,
+      "anomPct": 34.71
+    },
+    {
+      "year": 1970,
+      "month": 8,
+      "areaKm2": 2999106,
+      "anomPct": 7.24
+    },
+    {
+      "year": 1970,
+      "month": 9,
+      "areaKm2": 4790419,
+      "anomPct": -8.49
+    },
+    {
+      "year": 1970,
+      "month": 10,
+      "areaKm2": 21838525,
+      "anomPct": 24.48
+    },
+    {
+      "year": 1970,
+      "month": 11,
+      "areaKm2": 35509706,
+      "anomPct": 4.57
+    },
+    {
+      "year": 1970,
+      "month": 12,
+      "areaKm2": 46117929,
+      "anomPct": 4.86
+    },
+    {
+      "year": 1971,
+      "month": 1,
+      "areaKm2": 47410782,
+      "anomPct": 1.16
+    },
+    {
+      "year": 1971,
+      "month": 2,
+      "areaKm2": 46236616,
+      "anomPct": 1.41
+    },
+    {
+      "year": 1971,
+      "month": 3,
+      "areaKm2": 44066124,
+      "anomPct": 9.81
+    },
+    {
+      "year": 1971,
+      "month": 4,
+      "areaKm2": 31246246,
+      "anomPct": 3.41
+    },
+    {
+      "year": 1971,
+      "month": 5,
+      "areaKm2": 19961577,
+      "anomPct": 4.96
+    },
+    {
+      "year": 1971,
+      "month": 6,
+      "areaKm2": 9975345,
+      "anomPct": 5.92
+    },
+    {
+      "year": 1971,
+      "month": 10,
+      "areaKm2": 21529810,
+      "anomPct": 22.72
+    },
+    {
+      "year": 1971,
+      "month": 11,
+      "areaKm2": 34165956,
+      "anomPct": 0.61
+    },
+    {
+      "year": 1971,
+      "month": 12,
+      "areaKm2": 44124200,
+      "anomPct": 0.33
+    },
+    {
+      "year": 1972,
+      "month": 1,
+      "areaKm2": 47309234,
+      "anomPct": 0.95
+    },
+    {
+      "year": 1972,
+      "month": 2,
+      "areaKm2": 48885932,
+      "anomPct": 7.22
+    },
+    {
+      "year": 1972,
+      "month": 3,
+      "areaKm2": 40888616,
+      "anomPct": 1.89
+    },
+    {
+      "year": 1972,
+      "month": 4,
+      "areaKm2": 31543531,
+      "anomPct": 4.4
+    },
+    {
+      "year": 1972,
+      "month": 5,
+      "areaKm2": 19758867,
+      "anomPct": 3.89
+    },
+    {
+      "year": 1972,
+      "month": 6,
+      "areaKm2": 11174867,
+      "anomPct": 18.66
+    },
+    {
+      "year": 1972,
+      "month": 7,
+      "areaKm2": 5022533,
+      "anomPct": 37.03
+    },
+    {
+      "year": 1972,
+      "month": 8,
+      "areaKm2": 4435922,
+      "anomPct": 58.62
+    },
+    {
+      "year": 1972,
+      "month": 9,
+      "areaKm2": 7762019,
+      "anomPct": 48.28
+    },
+    {
+      "year": 1972,
+      "month": 10,
+      "areaKm2": 21523013,
+      "anomPct": 22.68
+    },
+    {
+      "year": 1972,
+      "month": 11,
+      "areaKm2": 35873773,
+      "anomPct": 5.64
+    },
+    {
+      "year": 1972,
+      "month": 12,
+      "areaKm2": 44802621,
+      "anomPct": 1.87
+    },
+    {
+      "year": 1973,
+      "month": 1,
+      "areaKm2": 46248327,
+      "anomPct": -1.32
+    },
+    {
+      "year": 1973,
+      "month": 2,
+      "areaKm2": 46615419,
+      "anomPct": 2.24
+    },
+    {
+      "year": 1973,
+      "month": 3,
+      "areaKm2": 40306435,
+      "anomPct": 0.44
+    },
+    {
+      "year": 1973,
+      "month": 4,
+      "areaKm2": 31386037,
+      "anomPct": 3.88
+    },
+    {
+      "year": 1973,
+      "month": 5,
+      "areaKm2": 21181442,
+      "anomPct": 11.37
+    },
+    {
+      "year": 1973,
+      "month": 6,
+      "areaKm2": 12105521,
+      "anomPct": 28.54
+    },
+    {
+      "year": 1973,
+      "month": 7,
+      "areaKm2": 5287337,
+      "anomPct": 44.25
+    },
+    {
+      "year": 1973,
+      "month": 8,
+      "areaKm2": 3694707,
+      "anomPct": 32.11
+    },
+    {
+      "year": 1973,
+      "month": 9,
+      "areaKm2": 5681795,
+      "anomPct": 8.54
+    },
+    {
+      "year": 1973,
+      "month": 10,
+      "areaKm2": 17957272,
+      "anomPct": 2.35
+    },
+    {
+      "year": 1973,
+      "month": 11,
+      "areaKm2": 37323442,
+      "anomPct": 9.91
+    },
+    {
+      "year": 1973,
+      "month": 12,
+      "areaKm2": 44285897,
+      "anomPct": 0.69
+    },
+    {
+      "year": 1974,
+      "month": 1,
+      "areaKm2": 46053717,
+      "anomPct": -1.73
+    },
+    {
+      "year": 1974,
+      "month": 2,
+      "areaKm2": 45333606,
+      "anomPct": -0.57
+    },
+    {
+      "year": 1974,
+      "month": 3,
+      "areaKm2": 39465491,
+      "anomPct": -1.66
+    },
+    {
+      "year": 1974,
+      "month": 4,
+      "areaKm2": 30926141,
+      "anomPct": 2.35
+    },
+    {
+      "year": 1974,
+      "month": 5,
+      "areaKm2": 23093156,
+      "anomPct": 21.42
+    },
+    {
+      "year": 1974,
+      "month": 6,
+      "areaKm2": 11637293,
+      "anomPct": 23.57
+    },
+    {
+      "year": 1974,
+      "month": 7,
+      "areaKm2": 4713370,
+      "anomPct": 28.59
+    },
+    {
+      "year": 1974,
+      "month": 8,
+      "areaKm2": 3479608,
+      "anomPct": 24.42
+    },
+    {
+      "year": 1974,
+      "month": 9,
+      "areaKm2": 4011574,
+      "anomPct": -23.37
+    },
+    {
+      "year": 1974,
+      "month": 10,
+      "areaKm2": 19005517,
+      "anomPct": 8.33
+    },
+    {
+      "year": 1974,
+      "month": 11,
+      "areaKm2": 30491381,
+      "anomPct": -10.21
+    },
+    {
+      "year": 1974,
+      "month": 12,
+      "areaKm2": 39493228,
+      "anomPct": -10.2
+    },
+    {
+      "year": 1975,
+      "month": 1,
+      "areaKm2": 44948833,
+      "anomPct": -4.09
+    },
+    {
+      "year": 1975,
+      "month": 2,
+      "areaKm2": 44944562,
+      "anomPct": -1.42
+    },
+    {
+      "year": 1975,
+      "month": 3,
+      "areaKm2": 41269190,
+      "anomPct": 2.84
+    },
+    {
+      "year": 1975,
+      "month": 4,
+      "areaKm2": 31674417,
+      "anomPct": 4.83
+    },
+    {
+      "year": 1975,
+      "month": 5,
+      "areaKm2": 19897687,
+      "anomPct": 4.62
+    },
+    {
+      "year": 1975,
+      "month": 6,
+      "areaKm2": 11079061,
+      "anomPct": 17.64
+    },
+    {
+      "year": 1975,
+      "month": 7,
+      "areaKm2": 4599335,
+      "anomPct": 25.48
+    },
+    {
+      "year": 1975,
+      "month": 8,
+      "areaKm2": 3086043,
+      "anomPct": 10.35
+    },
+    {
+      "year": 1975,
+      "month": 9,
+      "areaKm2": 5270238,
+      "anomPct": 0.68
+    },
+    {
+      "year": 1975,
+      "month": 10,
+      "areaKm2": 16781140,
+      "anomPct": -4.35
+    },
+    {
+      "year": 1975,
+      "month": 11,
+      "areaKm2": 30807035,
+      "anomPct": -9.28
+    },
+    {
+      "year": 1975,
+      "month": 12,
+      "areaKm2": 42452481,
+      "anomPct": -3.48
+    },
+    {
+      "year": 1976,
+      "month": 1,
+      "areaKm2": 45675463,
+      "anomPct": -2.54
+    },
+    {
+      "year": 1976,
+      "month": 2,
+      "areaKm2": 45234435,
+      "anomPct": -0.79
+    },
+    {
+      "year": 1976,
+      "month": 3,
+      "areaKm2": 41445021,
+      "anomPct": 3.28
+    },
+    {
+      "year": 1976,
+      "month": 4,
+      "areaKm2": 30057899,
+      "anomPct": -0.52
+    },
+    {
+      "year": 1976,
+      "month": 5,
+      "areaKm2": 22475148,
+      "anomPct": 18.17
+    },
+    {
+      "year": 1976,
+      "month": 6,
+      "areaKm2": 13893683,
+      "anomPct": 47.53
+    },
+    {
+      "year": 1976,
+      "month": 7,
+      "areaKm2": 5709484,
+      "anomPct": 55.77
+    },
+    {
+      "year": 1976,
+      "month": 8,
+      "areaKm2": 3347234,
+      "anomPct": 19.69
+    },
+    {
+      "year": 1976,
+      "month": 9,
+      "areaKm2": 5179984,
+      "anomPct": -1.04
+    },
+    {
+      "year": 1976,
+      "month": 10,
+      "areaKm2": 25724453,
+      "anomPct": 46.63
+    },
+    {
+      "year": 1976,
+      "month": 11,
+      "areaKm2": 34636193,
+      "anomPct": 2
+    },
+    {
+      "year": 1976,
+      "month": 12,
+      "areaKm2": 42267907,
+      "anomPct": -3.89
+    },
+    {
+      "year": 1977,
+      "month": 1,
+      "areaKm2": 48997486,
+      "anomPct": 4.55
+    },
+    {
+      "year": 1977,
+      "month": 2,
+      "areaKm2": 44391418,
+      "anomPct": -2.64
+    },
+    {
+      "year": 1977,
+      "month": 3,
+      "areaKm2": 40054669,
+      "anomPct": -0.19
+    },
+    {
+      "year": 1977,
+      "month": 4,
+      "areaKm2": 30939797,
+      "anomPct": 2.4
+    },
+    {
+      "year": 1977,
+      "month": 5,
+      "areaKm2": 20143783,
+      "anomPct": 5.91
+    },
+    {
+      "year": 1977,
+      "month": 6,
+      "areaKm2": 11760006,
+      "anomPct": 24.87
+    },
+    {
+      "year": 1977,
+      "month": 7,
+      "areaKm2": 5434611,
+      "anomPct": 48.27
+    },
+    {
+      "year": 1977,
+      "month": 8,
+      "areaKm2": 3496096,
+      "anomPct": 25.01
+    },
+    {
+      "year": 1977,
+      "month": 9,
+      "areaKm2": 7385035,
+      "anomPct": 41.08
+    },
+    {
+      "year": 1977,
+      "month": 10,
+      "areaKm2": 19056533,
+      "anomPct": 8.62
+    },
+    {
+      "year": 1977,
+      "month": 11,
+      "areaKm2": 31588443,
+      "anomPct": -6.98
+    },
+    {
+      "year": 1977,
+      "month": 12,
+      "areaKm2": 44974193,
+      "anomPct": 2.26
+    },
+    {
+      "year": 1978,
+      "month": 1,
+      "areaKm2": 49721869,
+      "anomPct": 6.09
+    },
+    {
+      "year": 1978,
+      "month": 2,
+      "areaKm2": 51320433,
+      "anomPct": 12.56
+    },
+    {
+      "year": 1978,
+      "month": 3,
+      "areaKm2": 43757993,
+      "anomPct": 9.04
+    },
+    {
+      "year": 1978,
+      "month": 4,
+      "areaKm2": 30198404,
+      "anomPct": -0.06
+    },
+    {
+      "year": 1978,
+      "month": 5,
+      "areaKm2": 22092903,
+      "anomPct": 16.16
+    },
+    {
+      "year": 1978,
+      "month": 6,
+      "areaKm2": 14971615,
+      "anomPct": 58.98
+    },
+    {
+      "year": 1978,
+      "month": 7,
+      "areaKm2": 6883573,
+      "anomPct": 87.8
+    },
+    {
+      "year": 1978,
+      "month": 8,
+      "areaKm2": 4770379,
+      "anomPct": 70.58
+    },
+    {
+      "year": 1978,
+      "month": 9,
+      "areaKm2": 6116437,
+      "anomPct": 16.85
+    },
+    {
+      "year": 1978,
+      "month": 10,
+      "areaKm2": 17955494,
+      "anomPct": 2.34
+    },
+    {
+      "year": 1978,
+      "month": 11,
+      "areaKm2": 31581854,
+      "anomPct": -7
+    },
+    {
+      "year": 1978,
+      "month": 12,
+      "areaKm2": 43912093,
+      "anomPct": -0.16
+    },
+    {
+      "year": 1979,
+      "month": 1,
+      "areaKm2": 49414773,
+      "anomPct": 5.44
+    },
+    {
+      "year": 1979,
+      "month": 2,
+      "areaKm2": 47677543,
+      "anomPct": 4.57
+    },
+    {
+      "year": 1979,
+      "month": 3,
+      "areaKm2": 43722687,
+      "anomPct": 8.95
+    },
+    {
+      "year": 1979,
+      "month": 4,
+      "areaKm2": 34605651,
+      "anomPct": 14.53
+    },
+    {
+      "year": 1979,
+      "month": 5,
+      "areaKm2": 22822699,
+      "anomPct": 20
+    },
+    {
+      "year": 1979,
+      "month": 6,
+      "areaKm2": 12152007,
+      "anomPct": 29.04
+    },
+    {
+      "year": 1979,
+      "month": 7,
+      "areaKm2": 5931380,
+      "anomPct": 61.82
+    },
+    {
+      "year": 1979,
+      "month": 8,
+      "areaKm2": 4150055,
+      "anomPct": 48.4
+    },
+    {
+      "year": 1979,
+      "month": 9,
+      "areaKm2": 5449468,
+      "anomPct": 4.1
+    },
+    {
+      "year": 1979,
+      "month": 10,
+      "areaKm2": 14680893,
+      "anomPct": -16.32
+    },
+    {
+      "year": 1979,
+      "month": 11,
+      "areaKm2": 28279235,
+      "anomPct": -16.72
+    },
+    {
+      "year": 1979,
+      "month": 12,
+      "areaKm2": 37868518,
+      "anomPct": -13.9
+    },
+    {
+      "year": 1980,
+      "month": 1,
+      "areaKm2": 45906098,
+      "anomPct": -2.05
+    },
+    {
+      "year": 1980,
+      "month": 2,
+      "areaKm2": 48503076,
+      "anomPct": 6.38
+    },
+    {
+      "year": 1980,
+      "month": 3,
+      "areaKm2": 42769441,
+      "anomPct": 6.58
+    },
+    {
+      "year": 1980,
+      "month": 4,
+      "areaKm2": 33566498,
+      "anomPct": 11.09
+    },
+    {
+      "year": 1980,
+      "month": 5,
+      "areaKm2": 20569385,
+      "anomPct": 8.15
+    },
+    {
+      "year": 1980,
+      "month": 6,
+      "areaKm2": 10900308,
+      "anomPct": 15.74
+    },
+    {
+      "year": 1980,
+      "month": 7,
+      "areaKm2": 5404360,
+      "anomPct": 47.44
+    },
+    {
+      "year": 1980,
+      "month": 8,
+      "areaKm2": 4233282,
+      "anomPct": 51.37
+    },
+    {
+      "year": 1980,
+      "month": 9,
+      "areaKm2": 4919381,
+      "anomPct": -6.02
+    },
+    {
+      "year": 1980,
+      "month": 10,
+      "areaKm2": 13609863,
+      "anomPct": -22.43
+    },
+    {
+      "year": 1980,
+      "month": 11,
+      "areaKm2": 31278962,
+      "anomPct": -7.89
+    },
+    {
+      "year": 1980,
+      "month": 12,
+      "areaKm2": 37440756,
+      "anomPct": -14.87
+    },
+    {
+      "year": 1981,
+      "month": 1,
+      "areaKm2": 41890246,
+      "anomPct": -10.62
+    },
+    {
+      "year": 1981,
+      "month": 2,
+      "areaKm2": 43716147,
+      "anomPct": -4.12
+    },
+    {
+      "year": 1981,
+      "month": 3,
+      "areaKm2": 42654517,
+      "anomPct": 6.29
+    },
+    {
+      "year": 1981,
+      "month": 4,
+      "areaKm2": 33618227,
+      "anomPct": 11.26
+    },
+    {
+      "year": 1981,
+      "month": 5,
+      "areaKm2": 22482076,
+      "anomPct": 18.21
+    },
+    {
+      "year": 1981,
+      "month": 6,
+      "areaKm2": 13419998,
+      "anomPct": 42.5
+    },
+    {
+      "year": 1981,
+      "month": 7,
+      "areaKm2": 5797739,
+      "anomPct": 58.17
+    },
+    {
+      "year": 1981,
+      "month": 8,
+      "areaKm2": 4560544,
+      "anomPct": 63.07
+    },
+    {
+      "year": 1981,
+      "month": 9,
+      "areaKm2": 4540126,
+      "anomPct": -13.27
+    },
+    {
+      "year": 1981,
+      "month": 10,
+      "areaKm2": 16751894,
+      "anomPct": -4.52
+    },
+    {
+      "year": 1981,
+      "month": 11,
+      "areaKm2": 33575352,
+      "anomPct": -1.13
+    },
+    {
+      "year": 1981,
+      "month": 12,
+      "areaKm2": 43738194,
+      "anomPct": -0.55
+    },
+    {
+      "year": 1982,
+      "month": 1,
+      "areaKm2": 48248582,
+      "anomPct": 2.95
+    },
+    {
+      "year": 1982,
+      "month": 2,
+      "areaKm2": 46269839,
+      "anomPct": 1.48
+    },
+    {
+      "year": 1982,
+      "month": 3,
+      "areaKm2": 40688446,
+      "anomPct": 1.39
+    },
+    {
+      "year": 1982,
+      "month": 4,
+      "areaKm2": 31763875,
+      "anomPct": 5.13
+    },
+    {
+      "year": 1982,
+      "month": 5,
+      "areaKm2": 18913061,
+      "anomPct": -0.56
+    },
+    {
+      "year": 1982,
+      "month": 6,
+      "areaKm2": 9080008,
+      "anomPct": -3.58
+    },
+    {
+      "year": 1982,
+      "month": 7,
+      "areaKm2": 3290677,
+      "anomPct": -10.22
+    },
+    {
+      "year": 1982,
+      "month": 8,
+      "areaKm2": 3048586,
+      "anomPct": 9.01
+    },
+    {
+      "year": 1982,
+      "month": 9,
+      "areaKm2": 5390048,
+      "anomPct": 2.97
+    },
+    {
+      "year": 1982,
+      "month": 10,
+      "areaKm2": 17426368,
+      "anomPct": -0.67
+    },
+    {
+      "year": 1982,
+      "month": 11,
+      "areaKm2": 33705434,
+      "anomPct": -0.74
+    },
+    {
+      "year": 1982,
+      "month": 12,
+      "areaKm2": 42986952,
+      "anomPct": -2.26
+    },
+    {
+      "year": 1983,
+      "month": 1,
+      "areaKm2": 46509928,
+      "anomPct": -0.76
+    },
+    {
+      "year": 1983,
+      "month": 2,
+      "areaKm2": 46808602,
+      "anomPct": 2.66
+    },
+    {
+      "year": 1983,
+      "month": 3,
+      "areaKm2": 40410453,
+      "anomPct": 0.7
+    },
+    {
+      "year": 1983,
+      "month": 4,
+      "areaKm2": 30119103,
+      "anomPct": -0.32
+    },
+    {
+      "year": 1983,
+      "month": 5,
+      "areaKm2": 20972793,
+      "anomPct": 10.27
+    },
+    {
+      "year": 1983,
+      "month": 6,
+      "areaKm2": 10352359,
+      "anomPct": 9.93
+    },
+    {
+      "year": 1983,
+      "month": 7,
+      "areaKm2": 4267052,
+      "anomPct": 16.41
+    },
+    {
+      "year": 1983,
+      "month": 8,
+      "areaKm2": 3142210,
+      "anomPct": 12.36
+    },
+    {
+      "year": 1983,
+      "month": 9,
+      "areaKm2": 5110738,
+      "anomPct": -2.37
+    },
+    {
+      "year": 1983,
+      "month": 10,
+      "areaKm2": 17169357,
+      "anomPct": -2.14
+    },
+    {
+      "year": 1983,
+      "month": 11,
+      "areaKm2": 32631910,
+      "anomPct": -3.91
+    },
+    {
+      "year": 1983,
+      "month": 12,
+      "areaKm2": 44404643,
+      "anomPct": 0.96
+    },
+    {
+      "year": 1984,
+      "month": 1,
+      "areaKm2": 46519879,
+      "anomPct": -0.74
+    },
+    {
+      "year": 1984,
+      "month": 2,
+      "areaKm2": 45121621,
+      "anomPct": -1.04
+    },
+    {
+      "year": 1984,
+      "month": 3,
+      "areaKm2": 41123339,
+      "anomPct": 2.48
+    },
+    {
+      "year": 1984,
+      "month": 4,
+      "areaKm2": 30618434,
+      "anomPct": 1.33
+    },
+    {
+      "year": 1984,
+      "month": 5,
+      "areaKm2": 18508663,
+      "anomPct": -2.68
+    },
+    {
+      "year": 1984,
+      "month": 6,
+      "areaKm2": 8452138,
+      "anomPct": -10.25
+    },
+    {
+      "year": 1984,
+      "month": 7,
+      "areaKm2": 3390309,
+      "anomPct": -7.51
+    },
+    {
+      "year": 1984,
+      "month": 8,
+      "areaKm2": 2517644,
+      "anomPct": -9.97
+    },
+    {
+      "year": 1984,
+      "month": 9,
+      "areaKm2": 3920014,
+      "anomPct": -25.11
+    },
+    {
+      "year": 1984,
+      "month": 10,
+      "areaKm2": 17440179,
+      "anomPct": -0.59
+    },
+    {
+      "year": 1984,
+      "month": 11,
+      "areaKm2": 33398513,
+      "anomPct": -1.65
+    },
+    {
+      "year": 1984,
+      "month": 12,
+      "areaKm2": 42326315,
+      "anomPct": -3.76
+    },
+    {
+      "year": 1985,
+      "month": 1,
+      "areaKm2": 50177375,
+      "anomPct": 7.07
+    },
+    {
+      "year": 1985,
+      "month": 2,
+      "areaKm2": 48520071,
+      "anomPct": 6.42
+    },
+    {
+      "year": 1985,
+      "month": 3,
+      "areaKm2": 44282014,
+      "anomPct": 10.35
+    },
+    {
+      "year": 1985,
+      "month": 4,
+      "areaKm2": 32683448,
+      "anomPct": 8.17
+    },
+    {
+      "year": 1985,
+      "month": 5,
+      "areaKm2": 22511832,
+      "anomPct": 18.37
+    },
+    {
+      "year": 1985,
+      "month": 6,
+      "areaKm2": 13409966,
+      "anomPct": 42.39
+    },
+    {
+      "year": 1985,
+      "month": 7,
+      "areaKm2": 4944182,
+      "anomPct": 34.89
+    },
+    {
+      "year": 1985,
+      "month": 8,
+      "areaKm2": 2989913,
+      "anomPct": 6.91
+    },
+    {
+      "year": 1985,
+      "month": 9,
+      "areaKm2": 4545997,
+      "anomPct": -13.16
+    },
+    {
+      "year": 1985,
+      "month": 10,
+      "areaKm2": 17450742,
+      "anomPct": -0.53
+    },
+    {
+      "year": 1985,
+      "month": 11,
+      "areaKm2": 37903069,
+      "anomPct": 11.62
+    },
+    {
+      "year": 1985,
+      "month": 12,
+      "areaKm2": 46247301,
+      "anomPct": 5.15
+    },
+    {
+      "year": 1986,
+      "month": 1,
+      "areaKm2": 46377047,
+      "anomPct": -1.04
+    },
+    {
+      "year": 1986,
+      "month": 2,
+      "areaKm2": 47921750,
+      "anomPct": 5.11
+    },
+    {
+      "year": 1986,
+      "month": 3,
+      "areaKm2": 39930729,
+      "anomPct": -0.5
+    },
+    {
+      "year": 1986,
+      "month": 4,
+      "areaKm2": 30372456,
+      "anomPct": 0.52
+    },
+    {
+      "year": 1986,
+      "month": 5,
+      "areaKm2": 20493007,
+      "anomPct": 7.75
+    },
+    {
+      "year": 1986,
+      "month": 6,
+      "areaKm2": 11029939,
+      "anomPct": 17.12
+    },
+    {
+      "year": 1986,
+      "month": 7,
+      "areaKm2": 4274998,
+      "anomPct": 16.63
+    },
+    {
+      "year": 1986,
+      "month": 8,
+      "areaKm2": 2999969,
+      "anomPct": 7.27
+    },
+    {
+      "year": 1986,
+      "month": 9,
+      "areaKm2": 6507621,
+      "anomPct": 24.32
+    },
+    {
+      "year": 1986,
+      "month": 10,
+      "areaKm2": 17436103,
+      "anomPct": -0.62
+    },
+    {
+      "year": 1986,
+      "month": 11,
+      "areaKm2": 33915919,
+      "anomPct": -0.12
+    },
+    {
+      "year": 1986,
+      "month": 12,
+      "areaKm2": 41892096,
+      "anomPct": -4.75
+    },
+    {
+      "year": 1987,
+      "month": 1,
+      "areaKm2": 47774666,
+      "anomPct": 1.94
+    },
+    {
+      "year": 1987,
+      "month": 2,
+      "areaKm2": 45743013,
+      "anomPct": 0.33
+    },
+    {
+      "year": 1987,
+      "month": 3,
+      "areaKm2": 43626938,
+      "anomPct": 8.71
+    },
+    {
+      "year": 1987,
+      "month": 4,
+      "areaKm2": 31030792,
+      "anomPct": 2.7
+    },
+    {
+      "year": 1987,
+      "month": 5,
+      "areaKm2": 18569114,
+      "anomPct": -2.37
+    },
+    {
+      "year": 1987,
+      "month": 6,
+      "areaKm2": 12155353,
+      "anomPct": 29.07
+    },
+    {
+      "year": 1987,
+      "month": 7,
+      "areaKm2": 5181565,
+      "anomPct": 41.36
+    },
+    {
+      "year": 1987,
+      "month": 8,
+      "areaKm2": 2736091,
+      "anomPct": -2.16
+    },
+    {
+      "year": 1987,
+      "month": 9,
+      "areaKm2": 5184292,
+      "anomPct": -0.96
+    },
+    {
+      "year": 1987,
+      "month": 10,
+      "areaKm2": 13347004,
+      "anomPct": -23.92
+    },
+    {
+      "year": 1987,
+      "month": 11,
+      "areaKm2": 32138212,
+      "anomPct": -5.36
+    },
+    {
+      "year": 1987,
+      "month": 12,
+      "areaKm2": 42510317,
+      "anomPct": -3.34
+    },
+    {
+      "year": 1988,
+      "month": 1,
+      "areaKm2": 47394294,
+      "anomPct": 1.13
+    },
+    {
+      "year": 1988,
+      "month": 2,
+      "areaKm2": 45418324,
+      "anomPct": -0.39
+    },
+    {
+      "year": 1988,
+      "month": 3,
+      "areaKm2": 39872664,
+      "anomPct": -0.64
+    },
+    {
+      "year": 1988,
+      "month": 4,
+      "areaKm2": 29041036,
+      "anomPct": -3.89
+    },
+    {
+      "year": 1988,
+      "month": 5,
+      "areaKm2": 18824880,
+      "anomPct": -1.02
+    },
+    {
+      "year": 1988,
+      "month": 6,
+      "areaKm2": 8057937,
+      "anomPct": -14.44
+    },
+    {
+      "year": 1988,
+      "month": 7,
+      "areaKm2": 3348678,
+      "anomPct": -8.64
+    },
+    {
+      "year": 1988,
+      "month": 8,
+      "areaKm2": 2314353,
+      "anomPct": -17.24
+    },
+    {
+      "year": 1988,
+      "month": 9,
+      "areaKm2": 4053684,
+      "anomPct": -22.56
+    },
+    {
+      "year": 1988,
+      "month": 10,
+      "areaKm2": 12780834,
+      "anomPct": -27.15
+    },
+    {
+      "year": 1988,
+      "month": 11,
+      "areaKm2": 31589381,
+      "anomPct": -6.98
+    },
+    {
+      "year": 1988,
+      "month": 12,
+      "areaKm2": 41313038,
+      "anomPct": -6.07
+    },
+    {
+      "year": 1989,
+      "month": 1,
+      "areaKm2": 45885856,
+      "anomPct": -2.09
+    },
+    {
+      "year": 1989,
+      "month": 2,
+      "areaKm2": 44230167,
+      "anomPct": -2.99
+    },
+    {
+      "year": 1989,
+      "month": 3,
+      "areaKm2": 38572869,
+      "anomPct": -3.88
+    },
+    {
+      "year": 1989,
+      "month": 4,
+      "areaKm2": 30042422,
+      "anomPct": -0.57
+    },
+    {
+      "year": 1989,
+      "month": 5,
+      "areaKm2": 18055332,
+      "anomPct": -5.07
+    },
+    {
+      "year": 1989,
+      "month": 6,
+      "areaKm2": 9185922,
+      "anomPct": -2.46
+    },
+    {
+      "year": 1989,
+      "month": 7,
+      "areaKm2": 4011740,
+      "anomPct": 9.45
+    },
+    {
+      "year": 1989,
+      "month": 8,
+      "areaKm2": 2413212,
+      "anomPct": -13.71
+    },
+    {
+      "year": 1989,
+      "month": 9,
+      "areaKm2": 5740413,
+      "anomPct": 9.66
+    },
+    {
+      "year": 1989,
+      "month": 10,
+      "areaKm2": 16684927,
+      "anomPct": -4.9
+    },
+    {
+      "year": 1989,
+      "month": 11,
+      "areaKm2": 32817690,
+      "anomPct": -3.36
+    },
+    {
+      "year": 1989,
+      "month": 12,
+      "areaKm2": 44959756,
+      "anomPct": 2.23
+    },
+    {
+      "year": 1990,
+      "month": 1,
+      "areaKm2": 45672660,
+      "anomPct": -2.55
+    },
+    {
+      "year": 1990,
+      "month": 2,
+      "areaKm2": 43510820,
+      "anomPct": -4.57
+    },
+    {
+      "year": 1990,
+      "month": 3,
+      "areaKm2": 37122145,
+      "anomPct": -7.49
+    },
+    {
+      "year": 1990,
+      "month": 4,
+      "areaKm2": 28120319,
+      "anomPct": -6.93
+    },
+    {
+      "year": 1990,
+      "month": 5,
+      "areaKm2": 17040199,
+      "anomPct": -10.4
+    },
+    {
+      "year": 1990,
+      "month": 6,
+      "areaKm2": 7170601,
+      "anomPct": -23.86
+    },
+    {
+      "year": 1990,
+      "month": 7,
+      "areaKm2": 2973446,
+      "anomPct": -18.88
+    },
+    {
+      "year": 1990,
+      "month": 8,
+      "areaKm2": 2382717,
+      "anomPct": -14.8
+    },
+    {
+      "year": 1990,
+      "month": 9,
+      "areaKm2": 3838303,
+      "anomPct": -26.68
+    },
+    {
+      "year": 1990,
+      "month": 10,
+      "areaKm2": 15248507,
+      "anomPct": -13.09
+    },
+    {
+      "year": 1990,
+      "month": 11,
+      "areaKm2": 30210775,
+      "anomPct": -11.04
+    },
+    {
+      "year": 1990,
+      "month": 12,
+      "areaKm2": 44214439,
+      "anomPct": 0.53
+    },
+    {
+      "year": 1991,
+      "month": 1,
+      "areaKm2": 46244867,
+      "anomPct": -1.32
+    },
+    {
+      "year": 1991,
+      "month": 2,
+      "areaKm2": 45587194,
+      "anomPct": -0.01
+    },
+    {
+      "year": 1991,
+      "month": 3,
+      "areaKm2": 39452672,
+      "anomPct": -1.69
+    },
+    {
+      "year": 1991,
+      "month": 4,
+      "areaKm2": 28572965,
+      "anomPct": -5.43
+    },
+    {
+      "year": 1991,
+      "month": 5,
+      "areaKm2": 18878492,
+      "anomPct": -0.74
+    },
+    {
+      "year": 1991,
+      "month": 6,
+      "areaKm2": 10640317,
+      "anomPct": 12.98
+    },
+    {
+      "year": 1991,
+      "month": 7,
+      "areaKm2": 3394022,
+      "anomPct": -7.4
+    },
+    {
+      "year": 1991,
+      "month": 8,
+      "areaKm2": 3017041,
+      "anomPct": 7.88
+    },
+    {
+      "year": 1991,
+      "month": 9,
+      "areaKm2": 4206690,
+      "anomPct": -19.64
+    },
+    {
+      "year": 1991,
+      "month": 10,
+      "areaKm2": 15579561,
+      "anomPct": -11.2
+    },
+    {
+      "year": 1991,
+      "month": 11,
+      "areaKm2": 34351636,
+      "anomPct": 1.16
+    },
+    {
+      "year": 1991,
+      "month": 12,
+      "areaKm2": 43025456,
+      "anomPct": -2.17
+    },
+    {
+      "year": 1992,
+      "month": 1,
+      "areaKm2": 46218447,
+      "anomPct": -1.38
+    },
+    {
+      "year": 1992,
+      "month": 2,
+      "areaKm2": 43534184,
+      "anomPct": -4.52
+    },
+    {
+      "year": 1992,
+      "month": 3,
+      "areaKm2": 38535901,
+      "anomPct": -3.97
+    },
+    {
+      "year": 1992,
+      "month": 4,
+      "areaKm2": 28817687,
+      "anomPct": -4.63
+    },
+    {
+      "year": 1992,
+      "month": 5,
+      "areaKm2": 18910025,
+      "anomPct": -0.57
+    },
+    {
+      "year": 1992,
+      "month": 6,
+      "areaKm2": 10261077,
+      "anomPct": 8.96
+    },
+    {
+      "year": 1992,
+      "month": 7,
+      "areaKm2": 3594345,
+      "anomPct": -1.94
+    },
+    {
+      "year": 1992,
+      "month": 8,
+      "areaKm2": 2437486,
+      "anomPct": -12.84
+    },
+    {
+      "year": 1992,
+      "month": 9,
+      "areaKm2": 5792103,
+      "anomPct": 10.65
+    },
+    {
+      "year": 1992,
+      "month": 10,
+      "areaKm2": 16775895,
+      "anomPct": -4.38
+    },
+    {
+      "year": 1992,
+      "month": 11,
+      "areaKm2": 34051455,
+      "anomPct": 0.27
+    },
+    {
+      "year": 1992,
+      "month": 12,
+      "areaKm2": 45726228,
+      "anomPct": 3.97
+    },
+    {
+      "year": 1993,
+      "month": 1,
+      "areaKm2": 46878884,
+      "anomPct": 0.03
+    },
+    {
+      "year": 1993,
+      "month": 2,
+      "areaKm2": 45272962,
+      "anomPct": -0.7
+    },
+    {
+      "year": 1993,
+      "month": 3,
+      "areaKm2": 39777053,
+      "anomPct": -0.88
+    },
+    {
+      "year": 1993,
+      "month": 4,
+      "areaKm2": 28379107,
+      "anomPct": -6.08
+    },
+    {
+      "year": 1993,
+      "month": 5,
+      "areaKm2": 18622355,
+      "anomPct": -2.09
+    },
+    {
+      "year": 1993,
+      "month": 6,
+      "areaKm2": 7913212,
+      "anomPct": -15.97
+    },
+    {
+      "year": 1993,
+      "month": 7,
+      "areaKm2": 3332444,
+      "anomPct": -9.08
+    },
+    {
+      "year": 1993,
+      "month": 8,
+      "areaKm2": 2629501,
+      "anomPct": -5.98
+    },
+    {
+      "year": 1993,
+      "month": 9,
+      "areaKm2": 5376730,
+      "anomPct": 2.71
+    },
+    {
+      "year": 1993,
+      "month": 10,
+      "areaKm2": 18219143,
+      "anomPct": 3.85
+    },
+    {
+      "year": 1993,
+      "month": 11,
+      "areaKm2": 38596997,
+      "anomPct": 13.66
+    },
+    {
+      "year": 1993,
+      "month": 12,
+      "areaKm2": 44033476,
+      "anomPct": 0.12
+    },
+    {
+      "year": 1994,
+      "month": 1,
+      "areaKm2": 45269132,
+      "anomPct": -3.41
+    },
+    {
+      "year": 1994,
+      "month": 2,
+      "areaKm2": 45922760,
+      "anomPct": 0.72
+    },
+    {
+      "year": 1994,
+      "month": 3,
+      "areaKm2": 39403453,
+      "anomPct": -1.81
+    },
+    {
+      "year": 1994,
+      "month": 4,
+      "areaKm2": 29754790,
+      "anomPct": -1.52
+    },
+    {
+      "year": 1994,
+      "month": 5,
+      "areaKm2": 18680435,
+      "anomPct": -1.78
+    },
+    {
+      "year": 1994,
+      "month": 6,
+      "areaKm2": 8996950,
+      "anomPct": -4.47
+    },
+    {
+      "year": 1994,
+      "month": 7,
+      "areaKm2": 3276684,
+      "anomPct": -10.61
+    },
+    {
+      "year": 1994,
+      "month": 8,
+      "areaKm2": 2713704,
+      "anomPct": -2.96
+    },
+    {
+      "year": 1994,
+      "month": 9,
+      "areaKm2": 4868449,
+      "anomPct": -7
+    },
+    {
+      "year": 1994,
+      "month": 10,
+      "areaKm2": 14231831,
+      "anomPct": -18.88
+    },
+    {
+      "year": 1994,
+      "month": 11,
+      "areaKm2": 33607826,
+      "anomPct": -1.03
+    },
+    {
+      "year": 1994,
+      "month": 12,
+      "areaKm2": 43581964,
+      "anomPct": -0.91
+    },
+    {
+      "year": 1995,
+      "month": 1,
+      "areaKm2": 46127759,
+      "anomPct": -1.57
+    },
+    {
+      "year": 1995,
+      "month": 2,
+      "areaKm2": 42667292,
+      "anomPct": -6.42
+    },
+    {
+      "year": 1995,
+      "month": 3,
+      "areaKm2": 38249182,
+      "anomPct": -4.69
+    },
+    {
+      "year": 1995,
+      "month": 4,
+      "areaKm2": 32947428,
+      "anomPct": 9.04
+    },
+    {
+      "year": 1995,
+      "month": 5,
+      "areaKm2": 19300981,
+      "anomPct": 1.48
+    },
+    {
+      "year": 1995,
+      "month": 6,
+      "areaKm2": 9481469,
+      "anomPct": 0.68
+    },
+    {
+      "year": 1995,
+      "month": 7,
+      "areaKm2": 3970573,
+      "anomPct": 8.33
+    },
+    {
+      "year": 1995,
+      "month": 8,
+      "areaKm2": 3534687,
+      "anomPct": 26.39
+    },
+    {
+      "year": 1995,
+      "month": 9,
+      "areaKm2": 6256272,
+      "anomPct": 19.52
+    },
+    {
+      "year": 1995,
+      "month": 10,
+      "areaKm2": 17535070,
+      "anomPct": -0.05
+    },
+    {
+      "year": 1995,
+      "month": 11,
+      "areaKm2": 35040938,
+      "anomPct": 3.19
+    },
+    {
+      "year": 1995,
+      "month": 12,
+      "areaKm2": 44112927,
+      "anomPct": 0.3
+    },
+    {
+      "year": 1996,
+      "month": 1,
+      "areaKm2": 46925730,
+      "anomPct": 0.13
+    },
+    {
+      "year": 1996,
+      "month": 2,
+      "areaKm2": 45029815,
+      "anomPct": -1.24
+    },
+    {
+      "year": 1996,
+      "month": 3,
+      "areaKm2": 41855000,
+      "anomPct": 4.3
+    },
+    {
+      "year": 1996,
+      "month": 4,
+      "areaKm2": 33117955,
+      "anomPct": 9.61
+    },
+    {
+      "year": 1996,
+      "month": 5,
+      "areaKm2": 20735760,
+      "anomPct": 9.03
+    },
+    {
+      "year": 1996,
+      "month": 6,
+      "areaKm2": 11254858,
+      "anomPct": 19.51
+    },
+    {
+      "year": 1996,
+      "month": 7,
+      "areaKm2": 3962738,
+      "anomPct": 8.11
+    },
+    {
+      "year": 1996,
+      "month": 8,
+      "areaKm2": 2599440,
+      "anomPct": -7.05
+    },
+    {
+      "year": 1996,
+      "month": 9,
+      "areaKm2": 6591240,
+      "anomPct": 25.92
+    },
+    {
+      "year": 1996,
+      "month": 10,
+      "areaKm2": 19142141,
+      "anomPct": 9.11
+    },
+    {
+      "year": 1996,
+      "month": 11,
+      "areaKm2": 35246953,
+      "anomPct": 3.79
+    },
+    {
+      "year": 1996,
+      "month": 12,
+      "areaKm2": 41955060,
+      "anomPct": -4.61
+    },
+    {
+      "year": 1997,
+      "month": 1,
+      "areaKm2": 46755855,
+      "anomPct": -0.23
+    },
+    {
+      "year": 1997,
+      "month": 2,
+      "areaKm2": 45581751,
+      "anomPct": -0.03
+    },
+    {
+      "year": 1997,
+      "month": 3,
+      "areaKm2": 39022784,
+      "anomPct": -2.76
+    },
+    {
+      "year": 1997,
+      "month": 4,
+      "areaKm2": 30990489,
+      "anomPct": 2.57
+    },
+    {
+      "year": 1997,
+      "month": 5,
+      "areaKm2": 19969956,
+      "anomPct": 5
+    },
+    {
+      "year": 1997,
+      "month": 6,
+      "areaKm2": 10106406,
+      "anomPct": 7.31
+    },
+    {
+      "year": 1997,
+      "month": 7,
+      "areaKm2": 4344839,
+      "anomPct": 18.54
+    },
+    {
+      "year": 1997,
+      "month": 8,
+      "areaKm2": 3633900,
+      "anomPct": 29.94
+    },
+    {
+      "year": 1997,
+      "month": 9,
+      "areaKm2": 6861245,
+      "anomPct": 31.07
+    },
+    {
+      "year": 1997,
+      "month": 10,
+      "areaKm2": 17541816,
+      "anomPct": -0.01
+    },
+    {
+      "year": 1997,
+      "month": 11,
+      "areaKm2": 34454258,
+      "anomPct": 1.46
+    },
+    {
+      "year": 1997,
+      "month": 12,
+      "areaKm2": 44285750,
+      "anomPct": 0.69
+    },
+    {
+      "year": 1998,
+      "month": 1,
+      "areaKm2": 46084579,
+      "anomPct": -1.67
+    },
+    {
+      "year": 1998,
+      "month": 2,
+      "areaKm2": 44771166,
+      "anomPct": -1.8
+    },
+    {
+      "year": 1998,
+      "month": 3,
+      "areaKm2": 41345561,
+      "anomPct": 3.03
+    },
+    {
+      "year": 1998,
+      "month": 4,
+      "areaKm2": 30877317,
+      "anomPct": 2.19
+    },
+    {
+      "year": 1998,
+      "month": 5,
+      "areaKm2": 18827111,
+      "anomPct": -1.01
+    },
+    {
+      "year": 1998,
+      "month": 6,
+      "areaKm2": 9481227,
+      "anomPct": 0.68
+    },
+    {
+      "year": 1998,
+      "month": 7,
+      "areaKm2": 3930605,
+      "anomPct": 7.24
+    },
+    {
+      "year": 1998,
+      "month": 8,
+      "areaKm2": 3140550,
+      "anomPct": 12.3
+    },
+    {
+      "year": 1998,
+      "month": 9,
+      "areaKm2": 5959671,
+      "anomPct": 13.85
+    },
+    {
+      "year": 1998,
+      "month": 10,
+      "areaKm2": 19375661,
+      "anomPct": 10.44
+    },
+    {
+      "year": 1998,
+      "month": 11,
+      "areaKm2": 33975331,
+      "anomPct": 0.05
+    },
+    {
+      "year": 1998,
+      "month": 12,
+      "areaKm2": 43727399,
+      "anomPct": -0.58
+    },
+    {
+      "year": 1999,
+      "month": 1,
+      "areaKm2": 44692425,
+      "anomPct": -4.64
+    },
+    {
+      "year": 1999,
+      "month": 2,
+      "areaKm2": 43849528,
+      "anomPct": -3.83
+    },
+    {
+      "year": 1999,
+      "month": 3,
+      "areaKm2": 39669116,
+      "anomPct": -1.15
+    },
+    {
+      "year": 1999,
+      "month": 4,
+      "areaKm2": 29676116,
+      "anomPct": -1.78
+    },
+    {
+      "year": 1999,
+      "month": 5,
+      "areaKm2": 18919422,
+      "anomPct": -0.52
+    },
+    {
+      "year": 1999,
+      "month": 6,
+      "areaKm2": 8698273,
+      "anomPct": -7.64
+    },
+    {
+      "year": 1999,
+      "month": 7,
+      "areaKm2": 3429649,
+      "anomPct": -6.43
+    },
+    {
+      "year": 1999,
+      "month": 8,
+      "areaKm2": 2612153,
+      "anomPct": -6.6
+    },
+    {
+      "year": 1999,
+      "month": 9,
+      "areaKm2": 5010451,
+      "anomPct": -4.28
+    },
+    {
+      "year": 1999,
+      "month": 10,
+      "areaKm2": 17553498,
+      "anomPct": 0.05
+    },
+    {
+      "year": 1999,
+      "month": 11,
+      "areaKm2": 34054247,
+      "anomPct": 0.28
+    },
+    {
+      "year": 1999,
+      "month": 12,
+      "areaKm2": 42991531,
+      "anomPct": -2.25
+    },
+    {
+      "year": 2000,
+      "month": 1,
+      "areaKm2": 47611637,
+      "anomPct": 1.59
+    },
+    {
+      "year": 2000,
+      "month": 2,
+      "areaKm2": 45538636,
+      "anomPct": -0.12
+    },
+    {
+      "year": 2000,
+      "month": 3,
+      "areaKm2": 39592935,
+      "anomPct": -1.34
+    },
+    {
+      "year": 2000,
+      "month": 4,
+      "areaKm2": 29445984,
+      "anomPct": -2.55
+    },
+    {
+      "year": 2000,
+      "month": 5,
+      "areaKm2": 19346028,
+      "anomPct": 1.72
+    },
+    {
+      "year": 2000,
+      "month": 6,
+      "areaKm2": 9719045,
+      "anomPct": 3.2
+    },
+    {
+      "year": 2000,
+      "month": 7,
+      "areaKm2": 3554280,
+      "anomPct": -3.03
+    },
+    {
+      "year": 2000,
+      "month": 8,
+      "areaKm2": 2857861,
+      "anomPct": 2.19
+    },
+    {
+      "year": 2000,
+      "month": 9,
+      "areaKm2": 6445269,
+      "anomPct": 23.13
+    },
+    {
+      "year": 2000,
+      "month": 10,
+      "areaKm2": 18502574,
+      "anomPct": 5.46
+    },
+    {
+      "year": 2000,
+      "month": 11,
+      "areaKm2": 35106448,
+      "anomPct": 3.38
+    },
+    {
+      "year": 2000,
+      "month": 12,
+      "areaKm2": 44373768,
+      "anomPct": 0.89
+    },
+    {
+      "year": 2001,
+      "month": 1,
+      "areaKm2": 47045962,
+      "anomPct": 0.39
+    },
+    {
+      "year": 2001,
+      "month": 2,
+      "areaKm2": 45495994,
+      "anomPct": -0.21
+    },
+    {
+      "year": 2001,
+      "month": 3,
+      "areaKm2": 40520322,
+      "anomPct": 0.97
+    },
+    {
+      "year": 2001,
+      "month": 4,
+      "areaKm2": 29618081,
+      "anomPct": -1.98
+    },
+    {
+      "year": 2001,
+      "month": 5,
+      "areaKm2": 17774821,
+      "anomPct": -6.54
+    },
+    {
+      "year": 2001,
+      "month": 6,
+      "areaKm2": 8746299,
+      "anomPct": -7.13
+    },
+    {
+      "year": 2001,
+      "month": 7,
+      "areaKm2": 3510127,
+      "anomPct": -4.24
+    },
+    {
+      "year": 2001,
+      "month": 8,
+      "areaKm2": 2652456,
+      "anomPct": -5.15
+    },
+    {
+      "year": 2001,
+      "month": 9,
+      "areaKm2": 5904491,
+      "anomPct": 12.8
+    },
+    {
+      "year": 2001,
+      "month": 10,
+      "areaKm2": 19060357,
+      "anomPct": 8.64
+    },
+    {
+      "year": 2001,
+      "month": 11,
+      "areaKm2": 31863524,
+      "anomPct": -6.17
+    },
+    {
+      "year": 2001,
+      "month": 12,
+      "areaKm2": 45227527,
+      "anomPct": 2.83
+    },
+    {
+      "year": 2002,
+      "month": 1,
+      "areaKm2": 46925881,
+      "anomPct": 0.13
+    },
+    {
+      "year": 2002,
+      "month": 2,
+      "areaKm2": 42928068,
+      "anomPct": -5.85
+    },
+    {
+      "year": 2002,
+      "month": 3,
+      "areaKm2": 37619367,
+      "anomPct": -6.26
+    },
+    {
+      "year": 2002,
+      "month": 4,
+      "areaKm2": 30537329,
+      "anomPct": 1.07
+    },
+    {
+      "year": 2002,
+      "month": 5,
+      "areaKm2": 19492407,
+      "anomPct": 2.49
+    },
+    {
+      "year": 2002,
+      "month": 6,
+      "areaKm2": 9225007,
+      "anomPct": -2.04
+    },
+    {
+      "year": 2002,
+      "month": 7,
+      "areaKm2": 3406817,
+      "anomPct": -7.05
+    },
+    {
+      "year": 2002,
+      "month": 8,
+      "areaKm2": 2858810,
+      "anomPct": 2.22
+    },
+    {
+      "year": 2002,
+      "month": 9,
+      "areaKm2": 5915532,
+      "anomPct": 13.01
+    },
+    {
+      "year": 2002,
+      "month": 10,
+      "areaKm2": 23236577,
+      "anomPct": 32.45
+    },
+    {
+      "year": 2002,
+      "month": 11,
+      "areaKm2": 35596931,
+      "anomPct": 4.83
+    },
+    {
+      "year": 2002,
+      "month": 12,
+      "areaKm2": 45868299,
+      "anomPct": 4.29
+    },
+    {
+      "year": 2003,
+      "month": 1,
+      "areaKm2": 48006789,
+      "anomPct": 2.44
+    },
+    {
+      "year": 2003,
+      "month": 2,
+      "areaKm2": 48541344,
+      "anomPct": 6.46
+    },
+    {
+      "year": 2003,
+      "month": 3,
+      "areaKm2": 41680982,
+      "anomPct": 3.87
+    },
+    {
+      "year": 2003,
+      "month": 4,
+      "areaKm2": 31431482,
+      "anomPct": 4.03
+    },
+    {
+      "year": 2003,
+      "month": 5,
+      "areaKm2": 20130156,
+      "anomPct": 5.84
+    },
+    {
+      "year": 2003,
+      "month": 6,
+      "areaKm2": 10250228,
+      "anomPct": 8.84
+    },
+    {
+      "year": 2003,
+      "month": 7,
+      "areaKm2": 3381184,
+      "anomPct": -7.75
+    },
+    {
+      "year": 2003,
+      "month": 8,
+      "areaKm2": 2764717,
+      "anomPct": -1.14
+    },
+    {
+      "year": 2003,
+      "month": 9,
+      "areaKm2": 5108965,
+      "anomPct": -2.4
+    },
+    {
+      "year": 2003,
+      "month": 10,
+      "areaKm2": 18211978,
+      "anomPct": 3.81
+    },
+    {
+      "year": 2003,
+      "month": 11,
+      "areaKm2": 35618298,
+      "anomPct": 4.89
+    },
+    {
+      "year": 2003,
+      "month": 12,
+      "areaKm2": 43261669,
+      "anomPct": -1.64
+    },
+    {
+      "year": 2004,
+      "month": 1,
+      "areaKm2": 48080812,
+      "anomPct": 2.59
+    },
+    {
+      "year": 2004,
+      "month": 2,
+      "areaKm2": 45482944,
+      "anomPct": -0.24
+    },
+    {
+      "year": 2004,
+      "month": 3,
+      "areaKm2": 38699972,
+      "anomPct": -3.56
+    },
+    {
+      "year": 2004,
+      "month": 4,
+      "areaKm2": 29449673,
+      "anomPct": -2.53
+    },
+    {
+      "year": 2004,
+      "month": 5,
+      "areaKm2": 20267474,
+      "anomPct": 6.56
+    },
+    {
+      "year": 2004,
+      "month": 6,
+      "areaKm2": 9755416,
+      "anomPct": 3.59
+    },
+    {
+      "year": 2004,
+      "month": 7,
+      "areaKm2": 3688738,
+      "anomPct": 0.64
+    },
+    {
+      "year": 2004,
+      "month": 8,
+      "areaKm2": 2540369,
+      "anomPct": -9.16
+    },
+    {
+      "year": 2004,
+      "month": 9,
+      "areaKm2": 5182424,
+      "anomPct": -1
+    },
+    {
+      "year": 2004,
+      "month": 10,
+      "areaKm2": 19689788,
+      "anomPct": 12.23
+    },
+    {
+      "year": 2004,
+      "month": 11,
+      "areaKm2": 34120380,
+      "anomPct": 0.48
+    },
+    {
+      "year": 2004,
+      "month": 12,
+      "areaKm2": 44366509,
+      "anomPct": 0.88
+    },
+    {
+      "year": 2005,
+      "month": 1,
+      "areaKm2": 46560475,
+      "anomPct": -0.65
+    },
+    {
+      "year": 2005,
+      "month": 2,
+      "areaKm2": 47636512,
+      "anomPct": 4.48
+    },
+    {
+      "year": 2005,
+      "month": 3,
+      "areaKm2": 41078403,
+      "anomPct": 2.36
+    },
+    {
+      "year": 2005,
+      "month": 4,
+      "areaKm2": 29512748,
+      "anomPct": -2.32
+    },
+    {
+      "year": 2005,
+      "month": 5,
+      "areaKm2": 17432838,
+      "anomPct": -8.34
+    },
+    {
+      "year": 2005,
+      "month": 6,
+      "areaKm2": 9065550,
+      "anomPct": -3.74
+    },
+    {
+      "year": 2005,
+      "month": 7,
+      "areaKm2": 3551235,
+      "anomPct": -3.11
+    },
+    {
+      "year": 2005,
+      "month": 8,
+      "areaKm2": 2609795,
+      "anomPct": -6.68
+    },
+    {
+      "year": 2005,
+      "month": 9,
+      "areaKm2": 4939175,
+      "anomPct": -5.64
+    },
+    {
+      "year": 2005,
+      "month": 10,
+      "areaKm2": 16768192,
+      "anomPct": -4.42
+    },
+    {
+      "year": 2005,
+      "month": 11,
+      "areaKm2": 32035037,
+      "anomPct": -5.66
+    },
+    {
+      "year": 2005,
+      "month": 12,
+      "areaKm2": 44516464,
+      "anomPct": 1.22
+    },
+    {
+      "year": 2006,
+      "month": 1,
+      "areaKm2": 48006523,
+      "anomPct": 2.43
+    },
+    {
+      "year": 2006,
+      "month": 2,
+      "areaKm2": 46033473,
+      "anomPct": 0.96
+    },
+    {
+      "year": 2006,
+      "month": 3,
+      "areaKm2": 40977259,
+      "anomPct": 2.11
+    },
+    {
+      "year": 2006,
+      "month": 4,
+      "areaKm2": 30133356,
+      "anomPct": -0.27
+    },
+    {
+      "year": 2006,
+      "month": 5,
+      "areaKm2": 18547156,
+      "anomPct": -2.48
+    },
+    {
+      "year": 2006,
+      "month": 6,
+      "areaKm2": 8406152,
+      "anomPct": -10.74
+    },
+    {
+      "year": 2006,
+      "month": 7,
+      "areaKm2": 3484955,
+      "anomPct": -4.92
+    },
+    {
+      "year": 2006,
+      "month": 8,
+      "areaKm2": 2587056,
+      "anomPct": -7.49
+    },
+    {
+      "year": 2006,
+      "month": 9,
+      "areaKm2": 4443901,
+      "anomPct": -15.11
+    },
+    {
+      "year": 2006,
+      "month": 10,
+      "areaKm2": 20354807,
+      "anomPct": 16.02
+    },
+    {
+      "year": 2006,
+      "month": 11,
+      "areaKm2": 34213562,
+      "anomPct": 0.75
+    },
+    {
+      "year": 2006,
+      "month": 12,
+      "areaKm2": 42274306,
+      "anomPct": -3.88
+    },
+    {
+      "year": 2007,
+      "month": 1,
+      "areaKm2": 45365619,
+      "anomPct": -3.2
+    },
+    {
+      "year": 2007,
+      "month": 2,
+      "areaKm2": 45295308,
+      "anomPct": -0.65
+    },
+    {
+      "year": 2007,
+      "month": 3,
+      "areaKm2": 39418587,
+      "anomPct": -1.77
+    },
+    {
+      "year": 2007,
+      "month": 4,
+      "areaKm2": 28324244,
+      "anomPct": -6.26
+    },
+    {
+      "year": 2007,
+      "month": 5,
+      "areaKm2": 17302117,
+      "anomPct": -9.03
+    },
+    {
+      "year": 2007,
+      "month": 6,
+      "areaKm2": 8377422,
+      "anomPct": -11.04
+    },
+    {
+      "year": 2007,
+      "month": 7,
+      "areaKm2": 3000064,
+      "anomPct": -18.15
+    },
+    {
+      "year": 2007,
+      "month": 8,
+      "areaKm2": 2345819,
+      "anomPct": -16.12
+    },
+    {
+      "year": 2007,
+      "month": 9,
+      "areaKm2": 4298819,
+      "anomPct": -17.88
+    },
+    {
+      "year": 2007,
+      "month": 10,
+      "areaKm2": 16204278,
+      "anomPct": -7.64
+    },
+    {
+      "year": 2007,
+      "month": 11,
+      "areaKm2": 33218580,
+      "anomPct": -2.18
+    },
+    {
+      "year": 2007,
+      "month": 12,
+      "areaKm2": 44589422,
+      "anomPct": 1.38
+    },
+    {
+      "year": 2008,
+      "month": 1,
+      "areaKm2": 50275400,
+      "anomPct": 7.28
+    },
+    {
+      "year": 2008,
+      "month": 2,
+      "areaKm2": 47412530,
+      "anomPct": 3.99
+    },
+    {
+      "year": 2008,
+      "month": 3,
+      "areaKm2": 37853426,
+      "anomPct": -5.67
+    },
+    {
+      "year": 2008,
+      "month": 4,
+      "areaKm2": 29293541,
+      "anomPct": -3.05
+    },
+    {
+      "year": 2008,
+      "month": 5,
+      "areaKm2": 17460010,
+      "anomPct": -8.2
+    },
+    {
+      "year": 2008,
+      "month": 6,
+      "areaKm2": 6688057,
+      "anomPct": -28.98
+    },
+    {
+      "year": 2008,
+      "month": 7,
+      "areaKm2": 2485836,
+      "anomPct": -32.18
+    },
+    {
+      "year": 2008,
+      "month": 8,
+      "areaKm2": 2574690,
+      "anomPct": -7.93
+    },
+    {
+      "year": 2008,
+      "month": 9,
+      "areaKm2": 5318258,
+      "anomPct": 1.6
+    },
+    {
+      "year": 2008,
+      "month": 10,
+      "areaKm2": 16629579,
+      "anomPct": -5.21
+    },
+    {
+      "year": 2008,
+      "month": 11,
+      "areaKm2": 32528552,
+      "anomPct": -4.21
+    },
+    {
+      "year": 2008,
+      "month": 12,
+      "areaKm2": 43988300,
+      "anomPct": 0.02
+    },
+    {
+      "year": 2009,
+      "month": 1,
+      "areaKm2": 47601480,
+      "anomPct": 1.57
+    },
+    {
+      "year": 2009,
+      "month": 2,
+      "areaKm2": 44928653,
+      "anomPct": -1.46
+    },
+    {
+      "year": 2009,
+      "month": 3,
+      "areaKm2": 39713994,
+      "anomPct": -1.04
+    },
+    {
+      "year": 2009,
+      "month": 4,
+      "areaKm2": 29524924,
+      "anomPct": -2.28
+    },
+    {
+      "year": 2009,
+      "month": 5,
+      "areaKm2": 18223937,
+      "anomPct": -4.18
+    },
+    {
+      "year": 2009,
+      "month": 6,
+      "areaKm2": 7126072,
+      "anomPct": -24.33
+    },
+    {
+      "year": 2009,
+      "month": 7,
+      "areaKm2": 2673031,
+      "anomPct": -27.07
+    },
+    {
+      "year": 2009,
+      "month": 8,
+      "areaKm2": 2323542,
+      "anomPct": -16.92
+    },
+    {
+      "year": 2009,
+      "month": 9,
+      "areaKm2": 4322548,
+      "anomPct": -17.42
+    },
+    {
+      "year": 2009,
+      "month": 10,
+      "areaKm2": 21010794,
+      "anomPct": 19.76
+    },
+    {
+      "year": 2009,
+      "month": 11,
+      "areaKm2": 34774217,
+      "anomPct": 2.4
+    },
+    {
+      "year": 2009,
+      "month": 12,
+      "areaKm2": 46452083,
+      "anomPct": 5.62
+    },
+    {
+      "year": 2010,
+      "month": 1,
+      "areaKm2": 48836749,
+      "anomPct": 4.21
+    },
+    {
+      "year": 2010,
+      "month": 2,
+      "areaKm2": 49046518,
+      "anomPct": 7.57
+    },
+    {
+      "year": 2010,
+      "month": 3,
+      "areaKm2": 41139173,
+      "anomPct": 2.52
+    },
+    {
+      "year": 2010,
+      "month": 4,
+      "areaKm2": 28639365,
+      "anomPct": -5.22
+    },
+    {
+      "year": 2010,
+      "month": 5,
+      "areaKm2": 15377217,
+      "anomPct": -19.15
+    },
+    {
+      "year": 2010,
+      "month": 6,
+      "areaKm2": 6018675,
+      "anomPct": -36.09
+    },
+    {
+      "year": 2010,
+      "month": 7,
+      "areaKm2": 2509554,
+      "anomPct": -31.53
+    },
+    {
+      "year": 2010,
+      "month": 8,
+      "areaKm2": 2359174,
+      "anomPct": -15.64
+    },
+    {
+      "year": 2010,
+      "month": 9,
+      "areaKm2": 5406257,
+      "anomPct": 3.28
+    },
+    {
+      "year": 2010,
+      "month": 10,
+      "areaKm2": 18970088,
+      "anomPct": 8.13
+    },
+    {
+      "year": 2010,
+      "month": 11,
+      "areaKm2": 34406125,
+      "anomPct": 1.32
+    },
+    {
+      "year": 2010,
+      "month": 12,
+      "areaKm2": 46474799,
+      "anomPct": 5.67
+    },
+    {
+      "year": 2011,
+      "month": 1,
+      "areaKm2": 49103823,
+      "anomPct": 4.78
+    },
+    {
+      "year": 2011,
+      "month": 2,
+      "areaKm2": 48084914,
+      "anomPct": 5.46
+    },
+    {
+      "year": 2011,
+      "month": 3,
+      "areaKm2": 42626340,
+      "anomPct": 6.22
+    },
+    {
+      "year": 2011,
+      "month": 4,
+      "areaKm2": 29929541,
+      "anomPct": -0.95
+    },
+    {
+      "year": 2011,
+      "month": 5,
+      "areaKm2": 16796016,
+      "anomPct": -11.69
+    },
+    {
+      "year": 2011,
+      "month": 6,
+      "areaKm2": 6045325,
+      "anomPct": -35.81
+    },
+    {
+      "year": 2011,
+      "month": 7,
+      "areaKm2": 2467234,
+      "anomPct": -32.69
+    },
+    {
+      "year": 2011,
+      "month": 8,
+      "areaKm2": 2241236,
+      "anomPct": -19.86
+    },
+    {
+      "year": 2011,
+      "month": 9,
+      "areaKm2": 5205906,
+      "anomPct": -0.55
+    },
+    {
+      "year": 2011,
+      "month": 10,
+      "areaKm2": 17341420,
+      "anomPct": -1.16
+    },
+    {
+      "year": 2011,
+      "month": 11,
+      "areaKm2": 36931644,
+      "anomPct": 8.76
+    },
+    {
+      "year": 2011,
+      "month": 12,
+      "areaKm2": 43299145,
+      "anomPct": -1.55
+    },
+    {
+      "year": 2012,
+      "month": 1,
+      "areaKm2": 47469920,
+      "anomPct": 1.29
+    },
+    {
+      "year": 2012,
+      "month": 2,
+      "areaKm2": 48331249,
+      "anomPct": 6
+    },
+    {
+      "year": 2012,
+      "month": 3,
+      "areaKm2": 40740745,
+      "anomPct": 1.52
+    },
+    {
+      "year": 2012,
+      "month": 4,
+      "areaKm2": 28267649,
+      "anomPct": -6.45
+    },
+    {
+      "year": 2012,
+      "month": 5,
+      "areaKm2": 16136096,
+      "anomPct": -15.16
+    },
+    {
+      "year": 2012,
+      "month": 6,
+      "areaKm2": 4921652,
+      "anomPct": -47.74
+    },
+    {
+      "year": 2012,
+      "month": 7,
+      "areaKm2": 2325009,
+      "anomPct": -36.57
+    },
+    {
+      "year": 2012,
+      "month": 8,
+      "areaKm2": 2315425,
+      "anomPct": -17.21
+    },
+    {
+      "year": 2012,
+      "month": 9,
+      "areaKm2": 4312972,
+      "anomPct": -17.61
+    },
+    {
+      "year": 2012,
+      "month": 10,
+      "areaKm2": 20137612,
+      "anomPct": 14.78
+    },
+    {
+      "year": 2012,
+      "month": 11,
+      "areaKm2": 36535258,
+      "anomPct": 7.59
+    },
+    {
+      "year": 2012,
+      "month": 12,
+      "areaKm2": 46846123,
+      "anomPct": 6.51
+    },
+    {
+      "year": 2013,
+      "month": 1,
+      "areaKm2": 49215341,
+      "anomPct": 5.01
+    },
+    {
+      "year": 2013,
+      "month": 2,
+      "areaKm2": 46997753,
+      "anomPct": 3.08
+    },
+    {
+      "year": 2013,
+      "month": 3,
+      "areaKm2": 41677311,
+      "anomPct": 3.86
+    },
+    {
+      "year": 2013,
+      "month": 4,
+      "areaKm2": 32589547,
+      "anomPct": 7.86
+    },
+    {
+      "year": 2013,
+      "month": 5,
+      "areaKm2": 16281543,
+      "anomPct": -14.39
+    },
+    {
+      "year": 2013,
+      "month": 6,
+      "areaKm2": 6013748,
+      "anomPct": -36.14
+    },
+    {
+      "year": 2013,
+      "month": 7,
+      "areaKm2": 3017773,
+      "anomPct": -17.67
+    },
+    {
+      "year": 2013,
+      "month": 8,
+      "areaKm2": 2877020,
+      "anomPct": 2.88
+    },
+    {
+      "year": 2013,
+      "month": 9,
+      "areaKm2": 6492084,
+      "anomPct": 24.02
+    },
+    {
+      "year": 2013,
+      "month": 10,
+      "areaKm2": 21008520,
+      "anomPct": 19.75
+    },
+    {
+      "year": 2013,
+      "month": 11,
+      "areaKm2": 34764635,
+      "anomPct": 2.37
+    },
+    {
+      "year": 2013,
+      "month": 12,
+      "areaKm2": 45274044,
+      "anomPct": 2.94
+    },
+    {
+      "year": 2014,
+      "month": 1,
+      "areaKm2": 46033313,
+      "anomPct": -1.78
+    },
+    {
+      "year": 2014,
+      "month": 2,
+      "areaKm2": 46806073,
+      "anomPct": 2.66
+    },
+    {
+      "year": 2014,
+      "month": 3,
+      "areaKm2": 38413171,
+      "anomPct": -4.28
+    },
+    {
+      "year": 2014,
+      "month": 4,
+      "areaKm2": 28554790,
+      "anomPct": -5.5
+    },
+    {
+      "year": 2014,
+      "month": 5,
+      "areaKm2": 17011099,
+      "anomPct": -10.56
+    },
+    {
+      "year": 2014,
+      "month": 6,
+      "areaKm2": 6798451,
+      "anomPct": -27.81
+    },
+    {
+      "year": 2014,
+      "month": 7,
+      "areaKm2": 2873294,
+      "anomPct": -21.61
+    },
+    {
+      "year": 2014,
+      "month": 8,
+      "areaKm2": 2587699,
+      "anomPct": -7.47
+    },
+    {
+      "year": 2014,
+      "month": 9,
+      "areaKm2": 7241419,
+      "anomPct": 38.34
+    },
+    {
+      "year": 2014,
+      "month": 10,
+      "areaKm2": 22876152,
+      "anomPct": 30.39
+    },
+    {
+      "year": 2014,
+      "month": 11,
+      "areaKm2": 36568639,
+      "anomPct": 7.69
+    },
+    {
+      "year": 2014,
+      "month": 12,
+      "areaKm2": 43648137,
+      "anomPct": -0.76
+    },
+    {
+      "year": 2015,
+      "month": 1,
+      "areaKm2": 47324806,
+      "anomPct": 0.98
+    },
+    {
+      "year": 2015,
+      "month": 2,
+      "areaKm2": 44987829,
+      "anomPct": -1.33
+    },
+    {
+      "year": 2015,
+      "month": 3,
+      "areaKm2": 38460122,
+      "anomPct": -4.16
+    },
+    {
+      "year": 2015,
+      "month": 4,
+      "areaKm2": 30089762,
+      "anomPct": -0.42
+    },
+    {
+      "year": 2015,
+      "month": 5,
+      "areaKm2": 17002073,
+      "anomPct": -10.6
+    },
+    {
+      "year": 2015,
+      "month": 6,
+      "areaKm2": 5430431,
+      "anomPct": -42.34
+    },
+    {
+      "year": 2015,
+      "month": 7,
+      "areaKm2": 2519625,
+      "anomPct": -31.26
+    },
+    {
+      "year": 2015,
+      "month": 8,
+      "areaKm2": 2575967,
+      "anomPct": -7.89
+    },
+    {
+      "year": 2015,
+      "month": 9,
+      "areaKm2": 5871088,
+      "anomPct": 12.16
+    },
+    {
+      "year": 2015,
+      "month": 10,
+      "areaKm2": 21399868,
+      "anomPct": 21.98
+    },
+    {
+      "year": 2015,
+      "month": 11,
+      "areaKm2": 36245524,
+      "anomPct": 6.74
+    },
+    {
+      "year": 2015,
+      "month": 12,
+      "areaKm2": 43480240,
+      "anomPct": -1.14
+    },
+    {
+      "year": 2016,
+      "month": 1,
+      "areaKm2": 48799894,
+      "anomPct": 4.13
+    },
+    {
+      "year": 2016,
+      "month": 2,
+      "areaKm2": 43509032,
+      "anomPct": -4.57
+    },
+    {
+      "year": 2016,
+      "month": 3,
+      "areaKm2": 37164511,
+      "anomPct": -7.39
+    },
+    {
+      "year": 2016,
+      "month": 4,
+      "areaKm2": 27914089,
+      "anomPct": -7.62
+    },
+    {
+      "year": 2016,
+      "month": 5,
+      "areaKm2": 16342912,
+      "anomPct": -14.07
+    },
+    {
+      "year": 2016,
+      "month": 6,
+      "areaKm2": 5579962,
+      "anomPct": -40.75
+    },
+    {
+      "year": 2016,
+      "month": 7,
+      "areaKm2": 2553512,
+      "anomPct": -30.33
+    },
+    {
+      "year": 2016,
+      "month": 8,
+      "areaKm2": 2625503,
+      "anomPct": -6.12
+    },
+    {
+      "year": 2016,
+      "month": 9,
+      "areaKm2": 5727939,
+      "anomPct": 9.42
+    },
+    {
+      "year": 2016,
+      "month": 10,
+      "areaKm2": 22954517,
+      "anomPct": 30.84
+    },
+    {
+      "year": 2016,
+      "month": 11,
+      "areaKm2": 36927070,
+      "anomPct": 8.74
+    },
+    {
+      "year": 2016,
+      "month": 12,
+      "areaKm2": 45396105,
+      "anomPct": 3.22
+    },
+    {
+      "year": 2017,
+      "month": 1,
+      "areaKm2": 49184164,
+      "anomPct": 4.95
+    },
+    {
+      "year": 2017,
+      "month": 2,
+      "areaKm2": 45964078,
+      "anomPct": 0.81
+    },
+    {
+      "year": 2017,
+      "month": 3,
+      "areaKm2": 40067235,
+      "anomPct": -0.16
+    },
+    {
+      "year": 2017,
+      "month": 4,
+      "areaKm2": 31168964,
+      "anomPct": 3.16
+    },
+    {
+      "year": 2017,
+      "month": 5,
+      "areaKm2": 20734379,
+      "anomPct": 9.02
+    },
+    {
+      "year": 2017,
+      "month": 6,
+      "areaKm2": 9273804,
+      "anomPct": -1.53
+    },
+    {
+      "year": 2017,
+      "month": 7,
+      "areaKm2": 3453640,
+      "anomPct": -5.78
+    },
+    {
+      "year": 2017,
+      "month": 8,
+      "areaKm2": 2914898,
+      "anomPct": 4.23
+    },
+    {
+      "year": 2017,
+      "month": 9,
+      "areaKm2": 6151067,
+      "anomPct": 17.51
+    },
+    {
+      "year": 2017,
+      "month": 10,
+      "areaKm2": 21166942,
+      "anomPct": 20.65
+    },
+    {
+      "year": 2017,
+      "month": 11,
+      "areaKm2": 35974810,
+      "anomPct": 5.94
+    },
+    {
+      "year": 2017,
+      "month": 12,
+      "areaKm2": 43569404,
+      "anomPct": -0.94
+    },
+    {
+      "year": 2018,
+      "month": 1,
+      "areaKm2": 46930123,
+      "anomPct": 0.14
+    },
+    {
+      "year": 2018,
+      "month": 2,
+      "areaKm2": 46293160,
+      "anomPct": 1.53
+    },
+    {
+      "year": 2018,
+      "month": 3,
+      "areaKm2": 41825151,
+      "anomPct": 4.23
+    },
+    {
+      "year": 2018,
+      "month": 4,
+      "areaKm2": 32059447,
+      "anomPct": 6.1
+    },
+    {
+      "year": 2018,
+      "month": 5,
+      "areaKm2": 18258591,
+      "anomPct": -4
+    },
+    {
+      "year": 2018,
+      "month": 6,
+      "areaKm2": 7837764,
+      "anomPct": -16.77
+    },
+    {
+      "year": 2018,
+      "month": 7,
+      "areaKm2": 3007503,
+      "anomPct": -17.95
+    },
+    {
+      "year": 2018,
+      "month": 8,
+      "areaKm2": 2732578,
+      "anomPct": -2.29
+    },
+    {
+      "year": 2018,
+      "month": 9,
+      "areaKm2": 6365338,
+      "anomPct": 21.6
+    },
+    {
+      "year": 2018,
+      "month": 10,
+      "areaKm2": 20057853,
+      "anomPct": 14.33
+    },
+    {
+      "year": 2018,
+      "month": 11,
+      "areaKm2": 37773625,
+      "anomPct": 11.24
+    },
+    {
+      "year": 2018,
+      "month": 12,
+      "areaKm2": 44546889,
+      "anomPct": 1.29
+    },
+    {
+      "year": 2019,
+      "month": 1,
+      "areaKm2": 47239378,
+      "anomPct": 0.8
+    },
+    {
+      "year": 2019,
+      "month": 2,
+      "areaKm2": 46025445,
+      "anomPct": 0.95
+    },
+    {
+      "year": 2019,
+      "month": 3,
+      "areaKm2": 39479635,
+      "anomPct": -1.62
+    },
+    {
+      "year": 2019,
+      "month": 4,
+      "areaKm2": 29059873,
+      "anomPct": -3.82
+    },
+    {
+      "year": 2019,
+      "month": 5,
+      "areaKm2": 17063208,
+      "anomPct": -10.28
+    },
+    {
+      "year": 2019,
+      "month": 6,
+      "areaKm2": 5936217,
+      "anomPct": -36.97
+    },
+    {
+      "year": 2019,
+      "month": 7,
+      "areaKm2": 2612904,
+      "anomPct": -28.71
+    },
+    {
+      "year": 2019,
+      "month": 8,
+      "areaKm2": 2507846,
+      "anomPct": -10.33
+    },
+    {
+      "year": 2019,
+      "month": 9,
+      "areaKm2": 5144589,
+      "anomPct": -1.72
+    },
+    {
+      "year": 2019,
+      "month": 10,
+      "areaKm2": 22255876,
+      "anomPct": 26.86
+    },
+    {
+      "year": 2019,
+      "month": 11,
+      "areaKm2": 37060191,
+      "anomPct": 9.13
+    },
+    {
+      "year": 2019,
+      "month": 12,
+      "areaKm2": 43468543,
+      "anomPct": -1.16
+    },
+    {
+      "year": 2020,
+      "month": 1,
+      "areaKm2": 46375240,
+      "anomPct": -1.05
+    },
+    {
+      "year": 2020,
+      "month": 2,
+      "areaKm2": 43476597,
+      "anomPct": -4.64
+    },
+    {
+      "year": 2020,
+      "month": 3,
+      "areaKm2": 37713763,
+      "anomPct": -6.02
+    },
+    {
+      "year": 2020,
+      "month": 4,
+      "areaKm2": 29136752,
+      "anomPct": -3.57
+    },
+    {
+      "year": 2020,
+      "month": 5,
+      "areaKm2": 16658616,
+      "anomPct": -12.41
+    },
+    {
+      "year": 2020,
+      "month": 6,
+      "areaKm2": 5960960,
+      "anomPct": -36.7
+    },
+    {
+      "year": 2020,
+      "month": 7,
+      "areaKm2": 2405914,
+      "anomPct": -34.36
+    },
+    {
+      "year": 2020,
+      "month": 8,
+      "areaKm2": 2291764,
+      "anomPct": -18.05
+    },
+    {
+      "year": 2020,
+      "month": 9,
+      "areaKm2": 4504502,
+      "anomPct": -13.95
+    },
+    {
+      "year": 2020,
+      "month": 10,
+      "areaKm2": 21219850,
+      "anomPct": 20.95
+    },
+    {
+      "year": 2020,
+      "month": 11,
+      "areaKm2": 35972698,
+      "anomPct": 5.93
+    },
+    {
+      "year": 2020,
+      "month": 12,
+      "areaKm2": 43698825,
+      "anomPct": -0.64
+    },
+    {
+      "year": 2021,
+      "month": 1,
+      "areaKm2": 46769299,
+      "anomPct": -0.21
+    },
+    {
+      "year": 2021,
+      "month": 2,
+      "areaKm2": 46089514,
+      "anomPct": 1.09
+    },
+    {
+      "year": 2021,
+      "month": 3,
+      "areaKm2": 38609181,
+      "anomPct": -3.79
+    },
+    {
+      "year": 2021,
+      "month": 4,
+      "areaKm2": 28840525,
+      "anomPct": -4.55
+    },
+    {
+      "year": 2021,
+      "month": 5,
+      "areaKm2": 16208538,
+      "anomPct": -14.78
+    },
+    {
+      "year": 2021,
+      "month": 6,
+      "areaKm2": 6172474,
+      "anomPct": -34.46
+    },
+    {
+      "year": 2021,
+      "month": 7,
+      "areaKm2": 2812160,
+      "anomPct": -23.28
+    },
+    {
+      "year": 2021,
+      "month": 8,
+      "areaKm2": 2540033,
+      "anomPct": -9.17
+    },
+    {
+      "year": 2021,
+      "month": 9,
+      "areaKm2": 5585195,
+      "anomPct": 6.7
+    },
+    {
+      "year": 2021,
+      "month": 10,
+      "areaKm2": 18137454,
+      "anomPct": 3.38
+    },
+    {
+      "year": 2021,
+      "month": 11,
+      "areaKm2": 35448095,
+      "anomPct": 4.39
+    },
+    {
+      "year": 2021,
+      "month": 12,
+      "areaKm2": 44512782,
+      "anomPct": 1.21
+    },
+    {
+      "year": 2022,
+      "month": 1,
+      "areaKm2": 47287711,
+      "anomPct": 0.9
+    },
+    {
+      "year": 2022,
+      "month": 2,
+      "areaKm2": 45776850,
+      "anomPct": 0.4
+    },
+    {
+      "year": 2022,
+      "month": 3,
+      "areaKm2": 40037364,
+      "anomPct": -0.23
+    },
+    {
+      "year": 2022,
+      "month": 4,
+      "areaKm2": 30856243,
+      "anomPct": 2.12
+    },
+    {
+      "year": 2022,
+      "month": 5,
+      "areaKm2": 17955027,
+      "anomPct": -5.59
+    },
+    {
+      "year": 2022,
+      "month": 6,
+      "areaKm2": 5509466,
+      "anomPct": -41.5
+    },
+    {
+      "year": 2022,
+      "month": 7,
+      "areaKm2": 2669503,
+      "anomPct": -27.17
+    },
+    {
+      "year": 2022,
+      "month": 8,
+      "areaKm2": 2445212,
+      "anomPct": -12.56
+    },
+    {
+      "year": 2022,
+      "month": 9,
+      "areaKm2": 5930433,
+      "anomPct": 13.29
+    },
+    {
+      "year": 2022,
+      "month": 10,
+      "areaKm2": 18660476,
+      "anomPct": 6.36
+    },
+    {
+      "year": 2022,
+      "month": 11,
+      "areaKm2": 37745422,
+      "anomPct": 11.15
+    },
+    {
+      "year": 2022,
+      "month": 12,
+      "areaKm2": 43559834,
+      "anomPct": -0.96
+    },
+    {
+      "year": 2023,
+      "month": 1,
+      "areaKm2": 46265979,
+      "anomPct": -1.28
+    },
+    {
+      "year": 2023,
+      "month": 2,
+      "areaKm2": 45526308,
+      "anomPct": -0.15
+    },
+    {
+      "year": 2023,
+      "month": 3,
+      "areaKm2": 39255995,
+      "anomPct": -2.18
+    },
+    {
+      "year": 2023,
+      "month": 4,
+      "areaKm2": 30266066,
+      "anomPct": 0.17
+    },
+    {
+      "year": 2023,
+      "month": 5,
+      "areaKm2": 16742029,
+      "anomPct": -11.97
+    },
+    {
+      "year": 2023,
+      "month": 6,
+      "areaKm2": 5962226,
+      "anomPct": -36.69
+    },
+    {
+      "year": 2023,
+      "month": 7,
+      "areaKm2": 2806415,
+      "anomPct": -23.44
+    },
+    {
+      "year": 2023,
+      "month": 8,
+      "areaKm2": 2567368,
+      "anomPct": -8.2
+    },
+    {
+      "year": 2023,
+      "month": 9,
+      "areaKm2": 5353861,
+      "anomPct": 2.28
+    },
+    {
+      "year": 2023,
+      "month": 10,
+      "areaKm2": 18732519,
+      "anomPct": 6.77
+    },
+    {
+      "year": 2023,
+      "month": 11,
+      "areaKm2": 35586043,
+      "anomPct": 4.79
+    },
+    {
+      "year": 2023,
+      "month": 12,
+      "areaKm2": 42472548,
+      "anomPct": -3.43
+    },
+    {
+      "year": 2024,
+      "month": 1,
+      "areaKm2": 46886400,
+      "anomPct": 0.04
+    },
+    {
+      "year": 2024,
+      "month": 2,
+      "areaKm2": 43838833,
+      "anomPct": -3.85
+    },
+    {
+      "year": 2024,
+      "month": 3,
+      "areaKm2": 38369222,
+      "anomPct": -4.39
+    },
+    {
+      "year": 2024,
+      "month": 4,
+      "areaKm2": 27814485,
+      "anomPct": -7.95
+    },
+    {
+      "year": 2024,
+      "month": 5,
+      "areaKm2": 17133563,
+      "anomPct": -9.91
+    },
+    {
+      "year": 2024,
+      "month": 6,
+      "areaKm2": 6585560,
+      "anomPct": -30.07
+    },
+    {
+      "year": 2024,
+      "month": 7,
+      "areaKm2": 2754783,
+      "anomPct": -24.84
+    },
+    {
+      "year": 2024,
+      "month": 8,
+      "areaKm2": 2609918,
+      "anomPct": -6.68
+    },
+    {
+      "year": 2024,
+      "month": 9,
+      "areaKm2": 4938211,
+      "anomPct": -5.66
+    },
+    {
+      "year": 2024,
+      "month": 10,
+      "areaKm2": 18883733,
+      "anomPct": 7.63
+    },
+    {
+      "year": 2024,
+      "month": 11,
+      "areaKm2": 34319511,
+      "anomPct": 1.06
+    },
+    {
+      "year": 2024,
+      "month": 12,
+      "areaKm2": 42735811,
+      "anomPct": -2.83
+    },
+    {
+      "year": 2025,
+      "month": 1,
+      "areaKm2": 45017589,
+      "anomPct": -3.94
+    },
+    {
+      "year": 2025,
+      "month": 2,
+      "areaKm2": 45476874,
+      "anomPct": -0.26
+    },
+    {
+      "year": 2025,
+      "month": 3,
+      "areaKm2": 37929774,
+      "anomPct": -5.48
+    },
+    {
+      "year": 2025,
+      "month": 4,
+      "areaKm2": 27808856,
+      "anomPct": -7.96
+    },
+    {
+      "year": 2025,
+      "month": 5,
+      "areaKm2": 17256029,
+      "anomPct": -9.27
+    },
+    {
+      "year": 2025,
+      "month": 6,
+      "areaKm2": 6563500,
+      "anomPct": -30.31
+    },
+    {
+      "year": 2025,
+      "month": 7,
+      "areaKm2": 2892993,
+      "anomPct": -21.07
+    },
+    {
+      "year": 2025,
+      "month": 8,
+      "areaKm2": 2907142,
+      "anomPct": 3.95
+    },
+    {
+      "year": 2025,
+      "month": 9,
+      "areaKm2": 5737535,
+      "anomPct": 9.61
+    },
+    {
+      "year": 2025,
+      "month": 10,
+      "areaKm2": 17997424,
+      "anomPct": 2.58
+    },
+    {
+      "year": 2025,
+      "month": 11,
+      "areaKm2": 33119288,
+      "anomPct": -2.47
+    },
+    {
+      "year": 2025,
+      "month": 12,
+      "areaKm2": 41875221,
+      "anomPct": -4.79
+    },
+    {
+      "year": 2026,
+      "month": 1,
+      "areaKm2": 46924814,
+      "anomPct": 0.13
+    },
+    {
+      "year": 2026,
+      "month": 2,
+      "areaKm2": 43312242,
+      "anomPct": -5
+    },
+    {
+      "year": 2026,
+      "month": 3,
+      "areaKm2": 37803348,
+      "anomPct": -5.8
+    }
+  ],
+  "climatology": [
+    {
+      "month": 1,
+      "meanKm2": 46865518
+    },
+    {
+      "month": 2,
+      "meanKm2": 45593900
+    },
+    {
+      "month": 3,
+      "meanKm2": 40129642
+    },
+    {
+      "month": 4,
+      "meanKm2": 30215156
+    },
+    {
+      "month": 5,
+      "meanKm2": 19018989
+    },
+    {
+      "month": 6,
+      "meanKm2": 9417531
+    },
+    {
+      "month": 7,
+      "meanKm2": 3665404
+    },
+    {
+      "month": 8,
+      "meanKm2": 2796600
+    },
+    {
+      "month": 9,
+      "meanKm2": 5234658
+    },
+    {
+      "month": 10,
+      "meanKm2": 17544318
+    },
+    {
+      "month": 11,
+      "meanKm2": 33958252
+    },
+    {
+      "month": 12,
+      "meanKm2": 43980866
+    }
+  ],
+  "seasonalAnomaly": [
+    {
+      "year": 1967,
+      "season": "winter",
+      "anomPct": 1.78
+    },
+    {
+      "year": 1967,
+      "season": "spring",
+      "anomPct": 12.18
+    },
+    {
+      "year": 1968,
+      "season": "winter",
+      "anomPct": -1.7
+    },
+    {
+      "year": 1968,
+      "season": "spring",
+      "anomPct": -9.12
+    },
+    {
+      "year": 1969,
+      "season": "winter",
+      "anomPct": 2.38
+    },
+    {
+      "year": 1969,
+      "season": "spring",
+      "anomPct": 1.51
+    },
+    {
+      "year": 1970,
+      "season": "winter",
+      "anomPct": 0.01
+    },
+    {
+      "year": 1970,
+      "season": "spring",
+      "anomPct": 9.57
+    },
+    {
+      "year": 1971,
+      "season": "winter",
+      "anomPct": 2.48
+    },
+    {
+      "year": 1971,
+      "season": "spring",
+      "anomPct": 6.06
+    },
+    {
+      "year": 1972,
+      "season": "winter",
+      "anomPct": 2.83
+    },
+    {
+      "year": 1972,
+      "season": "spring",
+      "anomPct": 3.39
+    },
+    {
+      "year": 1973,
+      "season": "winter",
+      "anomPct": 0.93
+    },
+    {
+      "year": 1973,
+      "season": "spring",
+      "anomPct": 5.23
+    },
+    {
+      "year": 1974,
+      "season": "winter",
+      "anomPct": -0.54
+    },
+    {
+      "year": 1974,
+      "season": "spring",
+      "anomPct": 7.37
+    },
+    {
+      "year": 1975,
+      "season": "winter",
+      "anomPct": -5.24
+    },
+    {
+      "year": 1975,
+      "season": "spring",
+      "anomPct": 4.1
+    },
+    {
+      "year": 1976,
+      "season": "winter",
+      "anomPct": -2.27
+    },
+    {
+      "year": 1976,
+      "season": "spring",
+      "anomPct": 6.98
+    },
+    {
+      "year": 1977,
+      "season": "winter",
+      "anomPct": -0.66
+    },
+    {
+      "year": 1977,
+      "season": "spring",
+      "anomPct": 2.71
+    },
+    {
+      "year": 1978,
+      "season": "winter",
+      "anomPct": 6.97
+    },
+    {
+      "year": 1978,
+      "season": "spring",
+      "anomPct": 8.38
+    },
+    {
+      "year": 1979,
+      "season": "winter",
+      "anomPct": 3.28
+    },
+    {
+      "year": 1979,
+      "season": "spring",
+      "anomPct": 14.49
+    },
+    {
+      "year": 1980,
+      "season": "winter",
+      "anomPct": -3.19
+    },
+    {
+      "year": 1980,
+      "season": "spring",
+      "anomPct": 8.61
+    },
+    {
+      "year": 1981,
+      "season": "winter",
+      "anomPct": -9.87
+    },
+    {
+      "year": 1981,
+      "season": "spring",
+      "anomPct": 11.92
+    },
+    {
+      "year": 1982,
+      "season": "winter",
+      "anomPct": 1.29
+    },
+    {
+      "year": 1982,
+      "season": "spring",
+      "anomPct": 1.99
+    },
+    {
+      "year": 1983,
+      "season": "winter",
+      "anomPct": -0.12
+    },
+    {
+      "year": 1983,
+      "season": "spring",
+      "anomPct": 3.55
+    },
+    {
+      "year": 1984,
+      "season": "winter",
+      "anomPct": -0.27
+    },
+    {
+      "year": 1984,
+      "season": "spring",
+      "anomPct": 0.38
+    },
+    {
+      "year": 1985,
+      "season": "winter",
+      "anomPct": 3.24
+    },
+    {
+      "year": 1985,
+      "season": "spring",
+      "anomPct": 12.29
+    },
+    {
+      "year": 1986,
+      "season": "winter",
+      "anomPct": 3.07
+    },
+    {
+      "year": 1986,
+      "season": "spring",
+      "anomPct": 2.59
+    },
+    {
+      "year": 1987,
+      "season": "winter",
+      "anomPct": -0.83
+    },
+    {
+      "year": 1987,
+      "season": "spring",
+      "anomPct": 3.02
+    },
+    {
+      "year": 1988,
+      "season": "winter",
+      "anomPct": -0.87
+    },
+    {
+      "year": 1988,
+      "season": "spring",
+      "anomPct": -1.85
+    },
+    {
+      "year": 1989,
+      "season": "winter",
+      "anomPct": -3.72
+    },
+    {
+      "year": 1989,
+      "season": "spring",
+      "anomPct": -3.17
+    },
+    {
+      "year": 1990,
+      "season": "winter",
+      "anomPct": -1.63
+    },
+    {
+      "year": 1990,
+      "season": "spring",
+      "anomPct": -8.28
+    },
+    {
+      "year": 1991,
+      "season": "winter",
+      "anomPct": -0.27
+    },
+    {
+      "year": 1991,
+      "season": "spring",
+      "anomPct": -2.62
+    },
+    {
+      "year": 1992,
+      "season": "winter",
+      "anomPct": -2.69
+    },
+    {
+      "year": 1992,
+      "season": "spring",
+      "anomPct": -3.06
+    },
+    {
+      "year": 1993,
+      "season": "winter",
+      "anomPct": 1.1
+    },
+    {
+      "year": 1993,
+      "season": "spring",
+      "anomPct": -3.01
+    },
+    {
+      "year": 1994,
+      "season": "winter",
+      "anomPct": -0.86
+    },
+    {
+      "year": 1994,
+      "season": "spring",
+      "anomPct": -1.7
+    },
+    {
+      "year": 1995,
+      "season": "winter",
+      "anomPct": -2.97
+    },
+    {
+      "year": 1995,
+      "season": "spring",
+      "anomPct": 1.95
+    },
+    {
+      "year": 1996,
+      "season": "winter",
+      "anomPct": -0.27
+    },
+    {
+      "year": 1996,
+      "season": "spring",
+      "anomPct": 7.64
+    },
+    {
+      "year": 1997,
+      "season": "winter",
+      "anomPct": -1.62
+    },
+    {
+      "year": 1997,
+      "season": "spring",
+      "anomPct": 1.6
+    },
+    {
+      "year": 1998,
+      "season": "winter",
+      "anomPct": -0.93
+    },
+    {
+      "year": 1998,
+      "season": "spring",
+      "anomPct": 1.4
+    },
+    {
+      "year": 1999,
+      "season": "winter",
+      "anomPct": -3.01
+    },
+    {
+      "year": 1999,
+      "season": "spring",
+      "anomPct": -1.15
+    },
+    {
+      "year": 2000,
+      "season": "winter",
+      "anomPct": -0.26
+    },
+    {
+      "year": 2000,
+      "season": "spring",
+      "anomPct": -0.72
+    },
+    {
+      "year": 2001,
+      "season": "winter",
+      "anomPct": 0.35
+    },
+    {
+      "year": 2001,
+      "season": "spring",
+      "anomPct": -2.51
+    },
+    {
+      "year": 2002,
+      "season": "winter",
+      "anomPct": -0.96
+    },
+    {
+      "year": 2002,
+      "season": "spring",
+      "anomPct": -0.9
+    },
+    {
+      "year": 2003,
+      "season": "winter",
+      "anomPct": 4.4
+    },
+    {
+      "year": 2003,
+      "season": "spring",
+      "anomPct": 4.58
+    },
+    {
+      "year": 2004,
+      "season": "winter",
+      "anomPct": 0.24
+    },
+    {
+      "year": 2004,
+      "season": "spring",
+      "anomPct": 0.16
+    },
+    {
+      "year": 2005,
+      "season": "winter",
+      "anomPct": 1.57
+    },
+    {
+      "year": 2005,
+      "season": "spring",
+      "anomPct": -2.77
+    },
+    {
+      "year": 2006,
+      "season": "winter",
+      "anomPct": 1.54
+    },
+    {
+      "year": 2006,
+      "season": "spring",
+      "anomPct": -0.21
+    },
+    {
+      "year": 2007,
+      "season": "winter",
+      "anomPct": -2.58
+    },
+    {
+      "year": 2007,
+      "season": "spring",
+      "anomPct": -5.69
+    },
+    {
+      "year": 2008,
+      "season": "winter",
+      "anomPct": 4.22
+    },
+    {
+      "year": 2008,
+      "season": "spring",
+      "anomPct": -5.64
+    },
+    {
+      "year": 2009,
+      "season": "winter",
+      "anomPct": 0.04
+    },
+    {
+      "year": 2009,
+      "season": "spring",
+      "anomPct": -2.5
+    },
+    {
+      "year": 2010,
+      "season": "winter",
+      "anomPct": 5.8
+    },
+    {
+      "year": 2010,
+      "season": "spring",
+      "anomPct": -7.28
+    },
+    {
+      "year": 2011,
+      "season": "winter",
+      "anomPct": 5.3
+    },
+    {
+      "year": 2011,
+      "season": "spring",
+      "anomPct": -2.14
+    },
+    {
+      "year": 2012,
+      "season": "winter",
+      "anomPct": 1.91
+    },
+    {
+      "year": 2012,
+      "season": "spring",
+      "anomPct": -6.69
+    },
+    {
+      "year": 2013,
+      "season": "winter",
+      "anomPct": 4.87
+    },
+    {
+      "year": 2013,
+      "season": "spring",
+      "anomPct": -0.89
+    },
+    {
+      "year": 2014,
+      "season": "winter",
+      "anomPct": 1.27
+    },
+    {
+      "year": 2014,
+      "season": "spring",
+      "anomPct": -6.78
+    },
+    {
+      "year": 2015,
+      "season": "winter",
+      "anomPct": -0.37
+    },
+    {
+      "year": 2015,
+      "season": "spring",
+      "anomPct": -5.06
+    },
+    {
+      "year": 2016,
+      "season": "winter",
+      "anomPct": -0.53
+    },
+    {
+      "year": 2016,
+      "season": "spring",
+      "anomPct": -9.69
+    },
+    {
+      "year": 2017,
+      "season": "winter",
+      "anomPct": 2.99
+    },
+    {
+      "year": 2017,
+      "season": "spring",
+      "anomPct": 4.01
+    },
+    {
+      "year": 2018,
+      "season": "winter",
+      "anomPct": 0.25
+    },
+    {
+      "year": 2018,
+      "season": "spring",
+      "anomPct": 2.11
+    },
+    {
+      "year": 2019,
+      "season": "winter",
+      "anomPct": 1.01
+    },
+    {
+      "year": 2019,
+      "season": "spring",
+      "anomPct": -5.24
+    },
+    {
+      "year": 2020,
+      "season": "winter",
+      "anomPct": -2.28
+    },
+    {
+      "year": 2020,
+      "season": "spring",
+      "anomPct": -7.33
+    },
+    {
+      "year": 2021,
+      "season": "winter",
+      "anomPct": 0.08
+    },
+    {
+      "year": 2021,
+      "season": "spring",
+      "anomPct": -7.71
+    },
+    {
+      "year": 2022,
+      "season": "winter",
+      "anomPct": 0.84
+    },
+    {
+      "year": 2022,
+      "season": "spring",
+      "anomPct": -1.23
+    },
+    {
+      "year": 2023,
+      "season": "winter",
+      "anomPct": -0.79
+    },
+    {
+      "year": 2023,
+      "season": "spring",
+      "anomPct": -4.66
+    },
+    {
+      "year": 2024,
+      "season": "winter",
+      "anomPct": -2.41
+    },
+    {
+      "year": 2024,
+      "season": "spring",
+      "anomPct": -7.42
+    },
+    {
+      "year": 2025,
+      "season": "winter",
+      "anomPct": -2.34
+    },
+    {
+      "year": 2025,
+      "season": "spring",
+      "anomPct": -7.57
+    },
+    {
+      "year": 2026,
+      "season": "winter",
+      "anomPct": -3.22
+    }
+  ]
+}

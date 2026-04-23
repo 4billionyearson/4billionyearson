@@ -1,0 +1,15 @@
+{
+  "updatedAt": "2026-04-23T16:37:00.441Z",
+  "datasets": [
+    {
+      "id": "kyoto-cherry-blossom",
+      "title": "Kyoto cherry-blossom full-bloom dates (812–present)",
+      "file": "kyoto-cherry-blossom.json"
+    },
+    {
+      "id": "nh-snow-cover",
+      "title": "Northern Hemisphere snow cover (1966–present)",
+      "file": "nh-snow-cover.json"
+    }
+  ]
+}

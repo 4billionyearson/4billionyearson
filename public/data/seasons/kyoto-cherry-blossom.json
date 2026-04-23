@@ -1,0 +1,4015 @@
+{
+  "source": "Aono & Kazui (2008); Aono & Saito (2010); extended to 2015 via NOAA NCEI; 2016–2025 from JMA Kyoto station records.",
+  "sourceUrl": "https://www.ncei.noaa.gov/access/paleo-search/study/26430",
+  "description": "Day of year of full-flowering (満開) of Prunus jamasakura at Kyoto, Japan. One of the longest continuous biological records of climate in the world.",
+  "climatologyPre1850Mean": 105.3,
+  "recent30YearMean": 94.6,
+  "shiftDays": -10.7,
+  "earliestYear": 2021,
+  "earliestDoy": 85,
+  "firstYear": 812,
+  "lastYear": 2025,
+  "count": 800,
+  "points": [
+    {
+      "year": 812,
+      "doy": 92,
+      "label": "Apr 2"
+    },
+    {
+      "year": 815,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 831,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 851,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 853,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 864,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 866,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 869,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 889,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 891,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 892,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 894,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 895,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 896,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 902,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 908,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 912,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 913,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 917,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 923,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 926,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 930,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 933,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 941,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 949,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 950,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 955,
+      "doy": 89,
+      "label": "Mar 30"
+    },
+    {
+      "year": 957,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 958,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 959,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 960,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 961,
+      "doy": 87,
+      "label": "Mar 28"
+    },
+    {
+      "year": 963,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 965,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 966,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 967,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 969,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 972,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 974,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 975,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 977,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 979,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 985,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 989,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1000,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1004,
+      "doy": 117,
+      "label": "Apr 27"
+    },
+    {
+      "year": 1006,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1007,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1014,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1016,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1017,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1018,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1019,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1029,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1031,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1032,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1033,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1034,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1036,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1041,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1060,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1066,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1080,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1083,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1084,
+      "doy": 120,
+      "label": "Apr 30"
+    },
+    {
+      "year": 1088,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1090,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1093,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1095,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1096,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1098,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1099,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1102,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1104,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1105,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1107,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1111,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1112,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1114,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1117,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1118,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1120,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1123,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1124,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1125,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1126,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1127,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1128,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1129,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1130,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1131,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1134,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1139,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1140,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1141,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1143,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1145,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1154,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1156,
+      "doy": 90,
+      "label": "Mar 31"
+    },
+    {
+      "year": 1159,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1161,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1163,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1164,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1165,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1166,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1167,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1169,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1170,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1172,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1173,
+      "doy": 117,
+      "label": "Apr 27"
+    },
+    {
+      "year": 1174,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1175,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1176,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1179,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1180,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1183,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1184,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1185,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1187,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1188,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1190,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1191,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1194,
+      "doy": 119,
+      "label": "Apr 29"
+    },
+    {
+      "year": 1199,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1200,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1201,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1202,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1203,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1204,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1205,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1207,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1210,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1212,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1213,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1214,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1215,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1216,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1219,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1221,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1223,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1225,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1226,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1227,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1229,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1230,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1231,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1232,
+      "doy": 92,
+      "label": "Apr 2"
+    },
+    {
+      "year": 1233,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1235,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1240,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1244,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1245,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1246,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1247,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1249,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1250,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1251,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1254,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1257,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 1259,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1263,
+      "doy": 120,
+      "label": "Apr 30"
+    },
+    {
+      "year": 1264,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1267,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1269,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1271,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1278,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1279,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1280,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1283,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1284,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1285,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1286,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1287,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1288,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1289,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1292,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1294,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1295,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1301,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1302,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1307,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1311,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 1312,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1314,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1315,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1316,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1317,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1319,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1321,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1322,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1323,
+      "doy": 124,
+      "label": "May 4"
+    },
+    {
+      "year": 1324,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1326,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1331,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1332,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1342,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1344,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1346,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1347,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1349,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1350,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1351,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1356,
+      "doy": 117,
+      "label": "Apr 27"
+    },
+    {
+      "year": 1357,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1358,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1359,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1360,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1361,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1363,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1364,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1366,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1367,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1368,
+      "doy": 88,
+      "label": "Mar 29"
+    },
+    {
+      "year": 1369,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 1370,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1373,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1375,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1376,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1377,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1378,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1379,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1381,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1382,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1383,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1384,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1385,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1386,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1387,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1388,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1398,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1401,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1402,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1403,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1406,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1407,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1408,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1409,
+      "doy": 86,
+      "label": "Mar 27"
+    },
+    {
+      "year": 1410,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1412,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1413,
+      "doy": 91,
+      "label": "Apr 1"
+    },
+    {
+      "year": 1415,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1416,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1417,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1418,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1419,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1420,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1421,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1422,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1423,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1424,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1425,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1426,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1427,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1429,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1430,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1431,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1432,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1433,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1434,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1435,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1436,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1437,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1438,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1439,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1440,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1441,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1443,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1444,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1446,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1447,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1448,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1449,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1450,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1451,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1452,
+      "doy": 92,
+      "label": "Apr 2"
+    },
+    {
+      "year": 1453,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1454,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1455,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1456,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1457,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1458,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1459,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1460,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1461,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1462,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1463,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1464,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1465,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1466,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1468,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1472,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1474,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1476,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1477,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1478,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1479,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1480,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1481,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1482,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1483,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1484,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1485,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 1486,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1487,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1488,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1489,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1490,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1491,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1492,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1493,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1494,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1495,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 1496,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1497,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1498,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1499,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1500,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1501,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1502,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1503,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1504,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1505,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1506,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1507,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1508,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1509,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1510,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1511,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1512,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1513,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1514,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1515,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1516,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1517,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1518,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1519,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1520,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1521,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1522,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1523,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1524,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1525,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1526,
+      "doy": 128,
+      "label": "May 8"
+    },
+    {
+      "year": 1527,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1528,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1529,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1530,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1531,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1532,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1533,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1534,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1535,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1536,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1537,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1538,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1539,
+      "doy": 120,
+      "label": "Apr 30"
+    },
+    {
+      "year": 1540,
+      "doy": 122,
+      "label": "May 2"
+    },
+    {
+      "year": 1541,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1542,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1543,
+      "doy": 119,
+      "label": "Apr 29"
+    },
+    {
+      "year": 1544,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1545,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1546,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1547,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1548,
+      "doy": 118,
+      "label": "Apr 28"
+    },
+    {
+      "year": 1549,
+      "doy": 117,
+      "label": "Apr 27"
+    },
+    {
+      "year": 1550,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1551,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1552,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1553,
+      "doy": 119,
+      "label": "Apr 29"
+    },
+    {
+      "year": 1555,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1556,
+      "doy": 120,
+      "label": "Apr 30"
+    },
+    {
+      "year": 1557,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1558,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1559,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1560,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1561,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1562,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1563,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1564,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1565,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1566,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1567,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1568,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1570,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1571,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1572,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1576,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1577,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1579,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1580,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1581,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1583,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1584,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1585,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1586,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1587,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1588,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1589,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1590,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1591,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 1592,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1593,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1594,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1595,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1596,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1597,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1598,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1599,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1600,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1601,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1602,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1603,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1604,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1605,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1606,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1607,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1609,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1610,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1612,
+      "doy": 87,
+      "label": "Mar 28"
+    },
+    {
+      "year": 1613,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1614,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1615,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1616,
+      "doy": 122,
+      "label": "May 2"
+    },
+    {
+      "year": 1617,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1618,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1619,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1621,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1622,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1623,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1624,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1625,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1626,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1628,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1629,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1632,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1633,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1634,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1635,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1637,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1638,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1639,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1640,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1641,
+      "doy": 117,
+      "label": "Apr 27"
+    },
+    {
+      "year": 1642,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1643,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1644,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1645,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1646,
+      "doy": 87,
+      "label": "Mar 28"
+    },
+    {
+      "year": 1647,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1649,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1650,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1651,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1652,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1653,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1654,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1655,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1656,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1658,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1660,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1662,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1663,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1664,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1665,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1666,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1668,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1670,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1671,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1672,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1674,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1675,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1676,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1677,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1678,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1679,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1680,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1681,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1682,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1683,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1684,
+      "doy": 118,
+      "label": "Apr 28"
+    },
+    {
+      "year": 1685,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1686,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1687,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1688,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1689,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1690,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1691,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1692,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1693,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1694,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1695,
+      "doy": 120,
+      "label": "Apr 30"
+    },
+    {
+      "year": 1696,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1697,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1698,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1699,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1700,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1701,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1702,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1703,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1704,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1705,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1706,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1707,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1708,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1709,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1713,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1714,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1715,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1716,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1717,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1718,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1719,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1720,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1721,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1722,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1723,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1724,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1725,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1726,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1727,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1728,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1729,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1731,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1732,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1733,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1734,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1735,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1736,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1737,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1738,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1739,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1740,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1741,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1742,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1743,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1744,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1745,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1746,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1747,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1748,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1749,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1750,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1751,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1752,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1753,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1754,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1755,
+      "doy": 120,
+      "label": "Apr 30"
+    },
+    {
+      "year": 1756,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1757,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1758,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1759,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1760,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1761,
+      "doy": 89,
+      "label": "Mar 30"
+    },
+    {
+      "year": 1762,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1763,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1764,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1765,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1766,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1767,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1768,
+      "doy": 117,
+      "label": "Apr 27"
+    },
+    {
+      "year": 1770,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1771,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1772,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1773,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1774,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1775,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1776,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1777,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1778,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1779,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1780,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1781,
+      "doy": 91,
+      "label": "Apr 1"
+    },
+    {
+      "year": 1782,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1783,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1784,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1785,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1786,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1787,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1788,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1789,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1790,
+      "doy": 119,
+      "label": "Apr 29"
+    },
+    {
+      "year": 1791,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1792,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1793,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1794,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1795,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1796,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1797,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1798,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1799,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1800,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1801,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1802,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1803,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1804,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1805,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1806,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1807,
+      "doy": 116,
+      "label": "Apr 26"
+    },
+    {
+      "year": 1808,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1809,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1810,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1811,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1812,
+      "doy": 120,
+      "label": "Apr 30"
+    },
+    {
+      "year": 1813,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1814,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1815,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1816,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1817,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1818,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1819,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1820,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1821,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1822,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1823,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1824,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1825,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1826,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1827,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1828,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1829,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1830,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1831,
+      "doy": 114,
+      "label": "Apr 24"
+    },
+    {
+      "year": 1832,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1833,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1834,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1835,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1836,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1837,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1838,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1839,
+      "doy": 120,
+      "label": "Apr 30"
+    },
+    {
+      "year": 1840,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1841,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1842,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1843,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1844,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1845,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1846,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1847,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1848,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1849,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1850,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1851,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1852,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1853,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1854,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1855,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1856,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1857,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1859,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1860,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1861,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1862,
+      "doy": 117,
+      "label": "Apr 27"
+    },
+    {
+      "year": 1863,
+      "doy": 118,
+      "label": "Apr 28"
+    },
+    {
+      "year": 1864,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1865,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 1866,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1867,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1869,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1870,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1877,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1879,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1880,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1881,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1882,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1883,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1884,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1885,
+      "doy": 113,
+      "label": "Apr 23"
+    },
+    {
+      "year": 1886,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1887,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1888,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1889,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1890,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1891,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1892,
+      "doy": 115,
+      "label": "Apr 25"
+    },
+    {
+      "year": 1893,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1894,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1896,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1897,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1898,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1899,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1900,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1901,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1902,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1903,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1904,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1905,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1906,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1907,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1908,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1909,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1910,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1911,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1912,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1913,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1914,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1915,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1916,
+      "doy": 112,
+      "label": "Apr 22"
+    },
+    {
+      "year": 1917,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1918,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1920,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1922,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1923,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1924,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1925,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1926,
+      "doy": 108,
+      "label": "Apr 18"
+    },
+    {
+      "year": 1927,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1928,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1929,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1930,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1931,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1932,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1933,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1934,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1935,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1936,
+      "doy": 111,
+      "label": "Apr 21"
+    },
+    {
+      "year": 1937,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1938,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1939,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1940,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1941,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1946,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1947,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1948,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1949,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1950,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1951,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1952,
+      "doy": 105,
+      "label": "Apr 15"
+    },
+    {
+      "year": 1953,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1954,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1955,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1956,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1957,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1958,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1959,
+      "doy": 92,
+      "label": "Apr 2"
+    },
+    {
+      "year": 1960,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1961,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1962,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1963,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1964,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1965,
+      "doy": 110,
+      "label": "Apr 20"
+    },
+    {
+      "year": 1966,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1967,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1968,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1969,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 1970,
+      "doy": 107,
+      "label": "Apr 17"
+    },
+    {
+      "year": 1971,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 1972,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1973,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1974,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1975,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 1976,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1977,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1978,
+      "doy": 104,
+      "label": "Apr 14"
+    },
+    {
+      "year": 1979,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1980,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1981,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1982,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1983,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1984,
+      "doy": 109,
+      "label": "Apr 19"
+    },
+    {
+      "year": 1985,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1986,
+      "doy": 102,
+      "label": "Apr 12"
+    },
+    {
+      "year": 1987,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 1988,
+      "doy": 106,
+      "label": "Apr 16"
+    },
+    {
+      "year": 1989,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 1990,
+      "doy": 88,
+      "label": "Mar 29"
+    },
+    {
+      "year": 1991,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1992,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 1993,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1994,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1995,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 1996,
+      "doy": 103,
+      "label": "Apr 13"
+    },
+    {
+      "year": 1997,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 1998,
+      "doy": 91,
+      "label": "Apr 1"
+    },
+    {
+      "year": 1999,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 2000,
+      "doy": 100,
+      "label": "Apr 10"
+    },
+    {
+      "year": 2001,
+      "doy": 96,
+      "label": "Apr 6"
+    },
+    {
+      "year": 2002,
+      "doy": 91,
+      "label": "Apr 1"
+    },
+    {
+      "year": 2003,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 2004,
+      "doy": 92,
+      "label": "Apr 2"
+    },
+    {
+      "year": 2005,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 2006,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 2007,
+      "doy": 97,
+      "label": "Apr 7"
+    },
+    {
+      "year": 2008,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 2009,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 2010,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 2011,
+      "doy": 99,
+      "label": "Apr 9"
+    },
+    {
+      "year": 2012,
+      "doy": 101,
+      "label": "Apr 11"
+    },
+    {
+      "year": 2013,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 2014,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 2015,
+      "doy": 93,
+      "label": "Apr 3"
+    },
+    {
+      "year": 2016,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 2017,
+      "doy": 98,
+      "label": "Apr 8"
+    },
+    {
+      "year": 2018,
+      "doy": 89,
+      "label": "Mar 30"
+    },
+    {
+      "year": 2019,
+      "doy": 94,
+      "label": "Apr 4"
+    },
+    {
+      "year": 2020,
+      "doy": 91,
+      "label": "Apr 1"
+    },
+    {
+      "year": 2021,
+      "doy": 85,
+      "label": "Mar 26"
+    },
+    {
+      "year": 2022,
+      "doy": 91,
+      "label": "Apr 1"
+    },
+    {
+      "year": 2023,
+      "doy": 86,
+      "label": "Mar 27"
+    },
+    {
+      "year": 2024,
+      "doy": 95,
+      "label": "Apr 5"
+    },
+    {
+      "year": 2025,
+      "doy": 93,
+      "label": "Apr 3"
+    }
+  ]
+}

@@ -165,7 +165,7 @@ const Header = () => {
           {/* Climate Change Dropdown */}
           <div className="relative" onMouseEnter={() => setIsClimateChangeOpen(true)} onMouseLeave={() => setIsClimateChangeOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/climate-dashboard' || pathname === '/climate' || pathname?.startsWith('/climate/') || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/extreme-weather' || pathname === '/emissions' || pathname === '/climate-explained' || pathname === '/climate-books' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/climate-dashboard' || pathname === '/climate' || pathname?.startsWith('/climate/') || pathname === '/planetary-boundaries' || pathname === '/greenhouse-gases' || pathname === '/sea-levels-ice' || pathname === '/extreme-weather' || pathname === '/emissions' || pathname === '/climate/shifting-seasons' || pathname === '/climate-explained' || pathname === '/climate-books' || pathname === '/category/climate-change' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Climate Change ▾
             </button>
@@ -208,6 +208,9 @@ const Header = () => {
                 </Link>
                 <Link href="/sea-levels-ice" className={desktopDropdownItemClass(pathname === '/sea-levels-ice', 'text-teal-400', 'hover:text-teal-400')} onClick={closeMenu}>
                   Sea Levels & Ice<MonthlyBadge />
+                </Link>
+                <Link href="/climate/shifting-seasons" className={desktopDropdownItemClass(pathname === '/climate/shifting-seasons', 'text-pink-400', 'hover:text-pink-400')} onClick={closeMenu}>
+                  Shifting Seasons<MonthlyBadge />
                 </Link>
                 <Link href="/extreme-weather" className={desktopDropdownItemClass(pathname === '/extreme-weather', 'text-orange-400', 'hover:text-orange-400')} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
@@ -424,6 +427,9 @@ const Header = () => {
                 </Link>
                 <Link href="/sea-levels-ice" className={mobileDropdownItemClass(pathname === '/sea-levels-ice', 'text-teal-400', 'hover:text-teal-400')} onClick={closeMenu}>
                   Sea Levels & Ice<MonthlyBadge />
+                </Link>
+                <Link href="/climate/shifting-seasons" className={mobileDropdownItemClass(pathname === '/climate/shifting-seasons', 'text-pink-400', 'hover:text-pink-400')} onClick={closeMenu}>
+                  Shifting Seasons<MonthlyBadge />
                 </Link>
                 <Link href="/extreme-weather" className={mobileDropdownItemClass(pathname === '/extreme-weather', 'text-orange-400', 'hover:text-orange-400')} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
