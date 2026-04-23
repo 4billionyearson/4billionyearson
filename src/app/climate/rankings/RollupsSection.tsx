@@ -29,6 +29,10 @@ function RollupCard({ title, groups, windowKey }: { title: string; groups: Rollu
   if (!groups.length) return null;
   const sorted = [...groups].sort((a, b) => (b.means[windowKey] ?? -99) - (a.means[windowKey] ?? -99));
   const maxAbs = Math.max(...sorted.map((g) => Math.abs(g.means[windowKey] ?? 0)), 0.5);
+  // When every group is positive (the common case for anomaly rollups),
+  // render left-anchored bars that scale 0 → max. Only fall back to a
+  // diverging 0-centred bar when the group actually contains negatives.
+  const hasNegative = sorted.some((g) => (g.means[windowKey] ?? 0) < 0);
   return (
     <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-4">
       <h3 className="text-sm font-semibold text-white mb-3">{title}</h3>
@@ -37,6 +41,12 @@ function RollupCard({ title, groups, windowKey }: { title: string; groups: Rollu
           const v = g.means[windowKey];
           const pct = v == null ? 0 : Math.min(100, (Math.abs(v) / maxAbs) * 100);
           const positive = (v ?? 0) >= 0;
+          const barStyle: React.CSSProperties = hasNegative
+            ? {
+                left: positive ? '50%' : `${50 - pct / 2}%`,
+                width: `${pct / 2}%`,
+              }
+            : { left: 0, width: `${pct}%` };
           return (
             <div key={g.label} className="text-xs">
               <div className="flex items-baseline justify-between mb-1">
@@ -46,14 +56,8 @@ function RollupCard({ title, groups, windowKey }: { title: string; groups: Rollu
                 <span className="font-mono text-gray-200">{fmtSigned(v)}</span>
               </div>
               <div className="relative h-2 rounded-full bg-gray-800 overflow-hidden">
-                <div
-                  className={`absolute top-0 h-full ${toneBar(v)}`}
-                  style={{
-                    left: positive ? '50%' : `${50 - pct / 2}%`,
-                    width: `${pct / 2}%`,
-                  }}
-                />
-                <div className="absolute top-0 left-1/2 h-full w-px bg-gray-600" />
+                <div className={`absolute top-0 h-full ${toneBar(v)}`} style={barStyle} />
+                {hasNegative && <div className="absolute top-0 left-1/2 h-full w-px bg-gray-600" />}
               </div>
             </div>
           );

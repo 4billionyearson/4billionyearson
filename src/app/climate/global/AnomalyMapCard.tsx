@@ -54,7 +54,7 @@ export default function AnomalyMapCard({
 
   if (!countryAnomalies || countryAnomalies.length === 0) return null;
 
-  const cardTitle = 'Temperature Anomaly';
+  const cardTitle = 'Temperature Anomaly Map';
 
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
