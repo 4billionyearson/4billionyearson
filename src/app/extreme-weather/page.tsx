@@ -755,32 +755,31 @@ function LiveEventsSection({
 
   return (
     <div>
-      <SubSection title="Live alerts">
-        {/* 1. Alert-level summary */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-red-400">{alertCounts.Red}</div>
-            <div className="text-xs text-red-400/70 uppercase">Red Alert</div>
-          </div>
-          <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-orange-400">{alertCounts.Orange}</div>
-            <div className="text-xs text-orange-400/70 uppercase">Amber Alert</div>
-          </div>
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-emerald-400">{alertCounts.Green}</div>
-            <div className="text-xs text-emerald-400/70 uppercase">Green Alert</div>
-          </div>
+      {/* 1. Alert-level summary */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-red-400">{alertCounts.Red}</div>
+          <div className="text-xs text-red-400/70 uppercase">Red Alert</div>
         </div>
-
-        {/* 2. Map */}
-        <div className="mb-6">
-          <EventsMap events={sorted} />
+        <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-orange-400">{alertCounts.Orange}</div>
+          <div className="text-xs text-orange-400/70 uppercase">Amber Alert</div>
         </div>
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-emerald-400">{alertCounts.Green}</div>
+          <div className="text-xs text-emerald-400/70 uppercase">Green Alert</div>
+        </div>
+      </div>
 
-        {/* 3. Overview — hotspot clusters + Red/Amber singletons, expandable full list */}
-        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-          {hotspots.length > 0 ? "Overview — active events" : "Active events"}
-        </h4>
+      {/* 2. Map */}
+      <div className="mb-6">
+        <EventsMap events={sorted} />
+      </div>
+
+      {/* 3. Overview — hotspot clusters + Red/Amber singletons, expandable full list */}
+      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        {hotspots.length > 0 ? "Overview — active events" : "Active events"}
+      </h4>
         {hotspots.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
             {hotspots.map((h, i) => {
@@ -930,90 +929,142 @@ function LiveEventsSection({
             </div>
           </div>
         )}
-      </SubSection>
+    </div>
+  );
+}
 
-      {/* 4. Long-term trends (EM-DAT) */}
-      {historicalContext.length > 0 && (
-        <SubSection title="Long-term trends — are these event types getting more common?">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 mb-2">
-            {historicalContext.map((h) => {
-              const trendUp = h.pctChange != null && h.pctChange >= 15;
-              const trendDown = h.pctChange != null && h.pctChange <= -15;
-              const trendColor = trendUp ? "text-red-400" : trendDown ? "text-emerald-400" : "text-gray-400";
-              const sparkStroke = trendUp ? "#f87171" : trendDown ? "#34d399" : "#9ca3af";
-              const sparkFill = trendUp ? "#7f1d1d" : trendDown ? "#064e3b" : "#374151";
-              const arrow = trendUp ? "↑" : trendDown ? "↓" : "→";
-              const pctText =
-                h.pctChange == null
-                  ? "no prior decade data"
-                  : `${h.pctChange >= 0 ? "+" : ""}${Math.round(h.pctChange)}%`;
-              const recent = h.recentAvg < 10 ? h.recentAvg.toFixed(1) : Math.round(h.recentAvg);
-              const prior = h.priorAvg < 10 ? h.priorAvg.toFixed(1) : Math.round(h.priorAvg);
-              const startYear = h.series[0]?.year;
-              const endYear = h.series[h.series.length - 1]?.year;
-              return (
-                <div key={h.gdacsType} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400 uppercase tracking-wider mb-2">
-                    {EVENT_ICONS[h.gdacsType]}
-                    <span>{h.label}</span>
+/* ─── Long-term trends (EM-DAT, decade-vs-decade per active type) ────────── */
+
+function LongTermTrendsSection({
+  events,
+  disastersByType,
+}: {
+  events: GDACSEvent[];
+  disastersByType: YearlyByType[];
+}) {
+  const counts = useMemo(() => {
+    const c: Record<string, number> = {};
+    for (const e of events) c[e.type] = (c[e.type] || 0) + 1;
+    return c;
+  }, [events]);
+
+  const historicalContext = useMemo(() => {
+    if (!disastersByType?.length) return [];
+    const years = disastersByType.map((d) => d.year);
+    const latestYear = Math.max(...years);
+    const recentWindow = disastersByType.filter((d) => d.year >= latestYear - 9 && d.year <= latestYear);
+    const priorWindow = disastersByType.filter((d) => d.year >= latestYear - 19 && d.year <= latestYear - 10);
+    const avg = (rows: YearlyByType[], key: string) => {
+      const vals = rows.map((r) => (typeof r[key] === "number" ? (r[key] as number) : 0));
+      return vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : 0;
+    };
+    const active = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return active
+      .map(([gdacsType]) => {
+        const emdatLabel = GDACS_TO_EMDAT[gdacsType];
+        if (!emdatLabel) return null;
+        const recentAvg = avg(recentWindow, emdatLabel);
+        const priorAvg = avg(priorWindow, emdatLabel);
+        if (recentAvg === 0 && priorAvg === 0) return null;
+        const pctChange = priorAvg > 0 ? ((recentAvg - priorAvg) / priorAvg) * 100 : null;
+        const series = disastersByType
+          .filter((d) => d.year >= 1990 && d.year <= latestYear)
+          .map((d) => ({ year: d.year, value: typeof d[emdatLabel] === "number" ? (d[emdatLabel] as number) : 0 }));
+        return {
+          gdacsType,
+          label: EVENT_LABELS[gdacsType] || emdatLabel,
+          emdatLabel,
+          recentAvg,
+          priorAvg,
+          pctChange,
+          latestYear,
+          series,
+        };
+      })
+      .filter((x): x is NonNullable<typeof x> => x != null);
+  }, [disastersByType, counts]);
+
+  if (historicalContext.length === 0) return null;
+
+  return (
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 mb-2">
+        {historicalContext.map((h) => {
+          const trendUp = h.pctChange != null && h.pctChange >= 15;
+          const trendDown = h.pctChange != null && h.pctChange <= -15;
+          const trendColor = trendUp ? "text-red-400" : trendDown ? "text-emerald-400" : "text-gray-400";
+          const sparkStroke = trendUp ? "#f87171" : trendDown ? "#34d399" : "#9ca3af";
+          const sparkFill = trendUp ? "#7f1d1d" : trendDown ? "#064e3b" : "#374151";
+          const arrow = trendUp ? "↑" : trendDown ? "↓" : "→";
+          const pctText =
+            h.pctChange == null
+              ? "no prior decade data"
+              : `${h.pctChange >= 0 ? "+" : ""}${Math.round(h.pctChange)}%`;
+          const recent = h.recentAvg < 10 ? h.recentAvg.toFixed(1) : Math.round(h.recentAvg);
+          const prior = h.priorAvg < 10 ? h.priorAvg.toFixed(1) : Math.round(h.priorAvg);
+          const startYear = h.series[0]?.year;
+          const endYear = h.series[h.series.length - 1]?.year;
+          return (
+            <div key={h.gdacsType} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 text-xs text-gray-400 uppercase tracking-wider mb-2">
+                {EVENT_ICONS[h.gdacsType]}
+                <span>{h.label}</span>
+              </div>
+              <div className={`text-xl font-bold leading-tight ${trendColor}`}>
+                <span className="font-mono">{arrow}</span> {pctText}
+              </div>
+              <div className="text-xs text-gray-400 mt-1">vs prior decade</div>
+              <div className="text-xs text-gray-300 mt-2 leading-relaxed">
+                <span className="font-semibold text-white">{recent}</span>/yr now
+                <span className="text-gray-500 mx-1">·</span>
+                <span className="text-gray-400">{prior}/yr then</span>
+              </div>
+              {h.series.length > 0 && (
+                <div className="mt-2">
+                  <div className="h-[48px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={h.series} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
+                        <defs>
+                          <linearGradient id={`spark-${h.gdacsType}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={sparkStroke} stopOpacity={0.5} />
+                            <stop offset="100%" stopColor={sparkFill} stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <Tooltip
+                          cursor={{ stroke: "#4b5563", strokeWidth: 1 }}
+                          contentStyle={{ background: "#030712", border: "1px solid #374151", borderRadius: 6, fontSize: 11, padding: "4px 8px" }}
+                          labelStyle={{ color: "#e5e7eb" }}
+                          itemStyle={{ color: sparkStroke }}
+                          formatter={(v: any) => [`${v} events`, h.label]}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="value"
+                          stroke={sparkStroke}
+                          strokeWidth={1.5}
+                          fill={`url(#spark-${h.gdacsType})`}
+                          isAnimationActive={false}
+                          dot={false}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
                   </div>
-                  <div className={`text-xl font-bold leading-tight ${trendColor}`}>
-                    <span className="font-mono">{arrow}</span> {pctText}
+                  <div className="flex justify-between text-[10px] text-gray-500 font-mono mt-0.5">
+                    <span>{startYear}</span>
+                    <span>{endYear}</span>
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">vs prior decade</div>
-                  <div className="text-xs text-gray-300 mt-2 leading-relaxed">
-                    <span className="font-semibold text-white">{recent}</span>/yr now
-                    <span className="text-gray-500 mx-1">·</span>
-                    <span className="text-gray-400">{prior}/yr then</span>
-                  </div>
-                  {h.series.length > 0 && (
-                    <div className="mt-2">
-                      <div className="h-[48px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={h.series} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
-                            <defs>
-                              <linearGradient id={`spark-${h.gdacsType}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={sparkStroke} stopOpacity={0.5} />
-                                <stop offset="100%" stopColor={sparkFill} stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <Tooltip
-                              cursor={{ stroke: "#4b5563", strokeWidth: 1 }}
-                              contentStyle={{ background: "#030712", border: "1px solid #374151", borderRadius: 6, fontSize: 11, padding: "4px 8px" }}
-                              labelStyle={{ color: "#e5e7eb" }}
-                              itemStyle={{ color: sparkStroke }}
-                              formatter={(v: any) => [`${v} events`, h.label]}
-                            />
-                            <Area
-                              type="monotone"
-                              dataKey="value"
-                              stroke={sparkStroke}
-                              strokeWidth={1.5}
-                              fill={`url(#spark-${h.gdacsType})`}
-                              isAnimationActive={false}
-                              dot={false}
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </div>
-                      <div className="flex justify-between text-[10px] text-gray-500 font-mono mt-0.5">
-                        <span>{startYear}</span>
-                        <span>{endYear}</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              );
-            })}
-          </div>
-          <p className="text-xs text-gray-500 mb-2">
-            Last decade ({historicalContext[0].latestYear - 9}–{historicalContext[0].latestYear}) vs the ten years before, using annual counts of qualifying disasters (≥10 deaths, ≥100 affected, or state of emergency) from{" "}
-            <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EM-DAT</a>{" "}
-            via{" "}
-            <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>. EM-DAT uses a higher severity threshold than the GDACS live alerts above, so the two should not be compared directly.
-          </p>
-        </SubSection>
-      )}
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-xs text-gray-500 mb-2">
+        Comparing the last decade ({historicalContext[0].latestYear - 9}–{historicalContext[0].latestYear}) with the ten years before, using annual counts of qualifying disasters (≥10 deaths, ≥100 affected, or state of emergency) from{" "}
+        <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EM-DAT</a>{" "}
+        via{" "}
+        <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>. EM-DAT uses a higher severity threshold than the GDACS live alerts, so the two datasets should not be compared directly.
+      </p>
     </div>
   );
 }
@@ -1149,7 +1200,8 @@ export default function ExtremeWeatherPage() {
                 const hasOrange = data.gdacsEvents.some((e: GDACSEvent) => e.alertLevel === "Orange");
                 const alertColor = hasRed ? "text-red-400" : hasOrange ? "text-orange-400" : "text-emerald-400";
                 return (
-                <SectionCard icon={<Activity className={`${alertColor} animate-pulse`} />} title="Extreme Weather">
+                <>
+                <SectionCard icon={<Activity className={`${alertColor} animate-pulse`} />} title="Extreme Weather – Live Events">
                   <LiveEventsSection events={data.gdacsEvents} disastersByType={data.disastersByType} />
                   <p className="text-xs text-gray-400 mt-4">
                     Real-time alerts from{" "}
@@ -1159,6 +1211,10 @@ export default function ExtremeWeatherPage() {
                     (EU/JRC) – last 12 months.
                   </p>
                 </SectionCard>
+                <SectionCard icon={<CloudLightning />} title="Extreme Weather – Long-Term Trends">
+                  <LongTermTrendsSection events={data.gdacsEvents} disastersByType={data.disastersByType} />
+                </SectionCard>
+                </>
                 );
               })()}
 
