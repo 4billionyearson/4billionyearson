@@ -17,7 +17,7 @@ import {
 import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar, WhatChangedTile } from './ClimateSystemsPanel';
 import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
 import AnomalyMapCard from './AnomalyMapCard';
-import { renderWithDriverTooltips } from '@/lib/climate/driver-annotator';
+import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -324,7 +324,7 @@ export default function GlobalProfile() {
                       const trimmed = para.trim();
                       const headingMatch = trimmed.match(/^##\s+(.+?)(?:\n([\s\S]*))?$/);
                       if (headingMatch) {
-                        const heading = headingMatch[1].trim();
+                        const heading = relabelSummaryHeading(headingMatch[1].trim());
                         const body = (headingMatch[2] || '').trim();
                         return (
                           <div key={i} className="space-y-1.5">

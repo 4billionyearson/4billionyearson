@@ -457,7 +457,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('STRUCTURE — organise the update using these short sub-headings, each on its own line prefixed with "## " exactly (two hashes and a space). Omit a section if you have nothing specific to say about it.');
   lines.push('  ## This month in numbers   — lead with the latest-month anomaly, ranking, and the 1 or 2 most newsworthy RANKED HIGHLIGHTS.');
   lines.push('  ## What changed          — 3-month/seasonal trend, how this region compares to the national/global picture, and (if relevant) its CROSS-REGION rank or cluster.');
-  lines.push('  ## Context               — explain WHY this region is warming/cooling the way it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below (using the exact canonical term — e.g. "Arctic amplification", "urban heat island effect", "jet stream shifts"). Also weave in ENSO/NAO state and any active GDACS or recent notable weather events.');
+  lines.push('  ## What’s driving change? — explain WHY this region is warming/cooling the way it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below (using the exact canonical term — e.g. "Arctic amplification", "urban heat island effect", "jet stream shifts"). Also weave in ENSO/NAO state and any active GDACS or recent notable weather events.');
   lines.push('  ## Looking ahead         — ONE carefully hedged forward-looking sentence (e.g. what forecasters or outlooks suggest). Only include if there is a concrete source to cite; otherwise omit.');
   lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
   lines.push('');
@@ -487,7 +487,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('');
   lines.push('RULES:');
   lines.push('- British English spelling throughout.');
-  lines.push('- Plain text only — no markdown, bullet points, or other headings, EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line.');
+  lines.push('- Plain text only — no markdown emphasis (no **bold**, no *italics*), no bullet points, no headings EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line. Never surround driver terms or any other phrase with asterisks — the site styles them automatically.');
   lines.push('- Be specific with numbers but weave them into natural prose.');
   lines.push('- You MUST reference data from the tables below. Do NOT invent statistics.');
   lines.push('- Use the EXACT values and rankings from the RANKED HIGHLIGHTS and DATA TABLE provided — do NOT substitute with values from web searches, as these may differ due to rounding or methodology.');
@@ -655,7 +655,7 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
   lines.push('  ## This month in numbers  — lead with the latest-month NOAA land+ocean anomaly, its ranking, and the 10-year mean vs pre-industrial (Paris thresholds).');
   lines.push('  ## Land vs ocean          — contrast land-only and ocean-only figures; note that land is warming faster.');
   lines.push('  ## Cross-region picture   — one striking pattern from the CROSS-REGION RANKINGS section (e.g. "8 of the 10 hottest were US states") with 2–3 named regions.');
-  lines.push('  ## Context               — ENSO state, major climate events, key announcements from Copernicus / WMO / NOAA / IPCC / COP, and WHY the planet-scale trend is what it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "land-ocean warming contrast", "Arctic amplification", "aerosol reduction").');
+  lines.push('  ## What’s driving change? — ENSO state, major climate events, key announcements from Copernicus / WMO / NOAA / IPCC / COP, and WHY the planet-scale trend is what it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "land-ocean warming contrast", "Arctic amplification", "aerosol reduction").');
   lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
   lines.push('');
   lines.push('CONTENT PRIORITY:');
@@ -673,7 +673,7 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
   lines.push('');
   lines.push('RULES:');
   lines.push('- British English spelling throughout.');
-  lines.push('- Plain text only — no markdown, bullet points, or other headings, EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line.');
+  lines.push('- Plain text only — no markdown emphasis (no **bold**, no *italics*), no bullet points, no headings EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line. Never surround driver terms or any other phrase with asterisks — the site styles them automatically.');
   lines.push('- Be specific with numbers but weave them into natural prose.');
   lines.push('- Use the EXACT values from the DATA section below. Do NOT invent figures.');
   lines.push('- Use numeric ordinals (1st, 2nd, 3rd) rather than written-out words.');
@@ -812,7 +812,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v24`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v25`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {

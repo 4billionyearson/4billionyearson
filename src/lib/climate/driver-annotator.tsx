@@ -47,6 +47,28 @@ function findDriverRanges(text: string): { start: number; end: number; id: Drive
 }
 
 /**
+ * Strip markdown-style **bold** markers from text. Gemini sometimes returns
+ * them around phrases it wants to emphasise (including driver names), but we
+ * already style ranking highlights and driver tooltips ourselves, so the
+ * asterisks just look like noise.
+ */
+function stripMarkdownBold(s: string): string {
+  return s.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*\*/g, '');
+}
+
+/**
+ * Rename the legacy `## Context` sub-heading to the friendlier
+ * "What's driving change?" label. Safe to apply to cached summaries.
+ */
+export function relabelSummaryHeading(heading: string): string {
+  const h = heading.trim().toLowerCase();
+  if (h === 'context' || h === 'context from the news') {
+    return "What's driving change?";
+  }
+  return heading;
+}
+
+/**
  * Render summary-paragraph text as React nodes:
  *   - wraps the first occurrence of each driver term/alias in a <Term>
  *   - applies the provided HTML formatter (e.g. `highlightRankings`) to the
@@ -55,9 +77,10 @@ function findDriverRanges(text: string): { start: number; end: number; id: Drive
  * The formatter MUST return already-escaped HTML.
  */
 export function renderWithDriverTooltips(
-  text: string,
+  rawText: string,
   formatHtml: (s: string) => string,
 ): React.ReactNode[] {
+  const text = stripMarkdownBold(rawText);
   const ranges = findDriverRanges(text);
   if (!ranges.length) {
     return [<span key="p" dangerouslySetInnerHTML={{ __html: formatHtml(text) }} />];

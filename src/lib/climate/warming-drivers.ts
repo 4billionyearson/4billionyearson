@@ -28,7 +28,11 @@ export type DriverId =
   | 'deforestation'
   | 'seasonal-shifts'
   | 'ocean-currents'
-  | 'monsoon-disruption';
+  | 'monsoon-disruption'
+  | 'enso'
+  | 'nao'
+  | 'arctic-oscillation'
+  | 'indian-ocean-dipole';
 
 export interface WarmingDriver {
   id: DriverId;
@@ -269,6 +273,72 @@ export const WARMING_DRIVERS: WarmingDriver[] = [
     source: {
       name: 'WMO — State of the Climate in Asia',
       url: 'https://wmo.int/resources/publications/state-of-climate-asia',
+    },
+  },
+  {
+    id: 'enso',
+    term: 'ENSO',
+    aliases: ['El Niño', 'El Nino', 'La Niña', 'La Nina', 'El Niño–Southern Oscillation', 'ENSO-neutral', 'ENSO neutral'],
+    short:
+      'The Pacific’s El Niño–Southern Oscillation flips between warm (El Niño) and cool (La Niña) phases, nudging global temperatures up or down by ~0.1–0.3°C for a year or two.',
+    long:
+      'ENSO is the single biggest source of year-to-year variability in global temperature. During an El Niño, unusually warm water piles up in the eastern tropical Pacific, releasing heat to the atmosphere and lifting global mean temperature by ~0.1–0.3°C for 6–12 months. La Niña does the opposite. ENSO also shifts rainfall and storm tracks worldwide — driving drought in Australia, flooding in Peru, wetter Californias and milder UK winters. Record-warm years almost always coincide with El Niño stacked on top of the long-term warming trend.',
+    appliesTo: {
+      regionTypes: ['country', 'us-state', 'uk-region'],
+    },
+    source: {
+      name: 'NOAA Climate.gov — ENSO',
+      url: 'https://www.climate.gov/enso',
+    },
+  },
+  {
+    id: 'nao',
+    term: 'North Atlantic Oscillation',
+    aliases: ['NAO', 'positive NAO', 'negative NAO', 'NAO-positive', 'NAO-negative'],
+    short:
+      'A see-saw in North Atlantic air pressure that steers winter storms — a positive NAO brings mild, wet westerlies to northern Europe; a negative NAO brings cold, blocked conditions.',
+    long:
+      'The NAO measures the pressure difference between the Icelandic Low and the Azores High. When it is positive, the jet stream is strong and steers mild, wet Atlantic air into the UK and Scandinavia while the Mediterranean stays dry. When it is negative, the jet weakens and buckles, allowing cold Arctic air to flood south into Europe and the eastern US — often bringing Britain its coldest winters. A persistently positive NAO has been a major driver of recent mild UK/Irish winters.',
+    appliesTo: {
+      latitudeAbove: 30,
+      regionTypes: ['country', 'uk-region', 'us-state'],
+    },
+    source: {
+      name: 'Met Office — NAO Explainer',
+      url: 'https://www.metoffice.gov.uk/weather/learn-about/weather/atmosphere/north-atlantic-oscillation',
+    },
+  },
+  {
+    id: 'arctic-oscillation',
+    term: 'Arctic Oscillation',
+    aliases: ['AO', 'polar vortex', 'stratospheric polar vortex'],
+    short:
+      'The strength of the ring of winds around the Arctic — when it weakens, the polar vortex wobbles and cold Arctic air spills south into Europe and North America.',
+    long:
+      'The Arctic Oscillation describes the strength of the polar vortex — a ring of winds high in the stratosphere that keeps cold air locked over the Arctic. In its positive phase, the vortex is strong and cold air stays north. In its negative phase, the vortex weakens or splits, allowing frigid Arctic air to pour south — responsible for the US “polar vortex” cold snaps and many of Europe’s coldest winter outbreaks. Climate change may be weakening the vortex more often by warming the Arctic.',
+    appliesTo: {
+      latitudeAbove: 30,
+    },
+    source: {
+      name: 'NOAA Climate.gov — Arctic Oscillation',
+      url: 'https://www.climate.gov/news-features/understanding-climate/climate-variability-arctic-oscillation',
+    },
+  },
+  {
+    id: 'indian-ocean-dipole',
+    term: 'Indian Ocean Dipole',
+    aliases: ['IOD', 'positive IOD', 'negative IOD'],
+    short:
+      'A temperature see-saw across the tropical Indian Ocean — a positive IOD brings drought to Australia/Indonesia and heavy rain to East Africa; a negative IOD does the opposite.',
+    long:
+      'The IOD is to the Indian Ocean what ENSO is to the Pacific. When the western Indian Ocean is unusually warm and the east is cool (positive IOD), Australia and Indonesia turn dry and fire-prone while East Africa faces heavy rains and flooding. Negative phases flip these patterns. A strong positive IOD combined with El Niño drove Australia’s catastrophic 2019–2020 Black Summer bushfires.',
+    appliesTo: {
+      latitudeAbove: -30,
+      latitudeBelow: 15,
+    },
+    source: {
+      name: 'Bureau of Meteorology — IOD',
+      url: 'http://www.bom.gov.au/climate/iod/',
     },
   },
 ];

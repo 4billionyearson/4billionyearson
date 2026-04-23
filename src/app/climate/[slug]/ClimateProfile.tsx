@@ -7,7 +7,7 @@ import type { ClimateRegion } from '@/lib/climate/regions';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import ClimatePeersCard from '@/app/_components/climate-peers-card';
-import { renderWithDriverTooltips } from '@/lib/climate/driver-annotator';
+import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
 
@@ -663,7 +663,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       const trimmed = para.trim();
                       const headingMatch = trimmed.match(/^##\s+(.+?)(?:\n([\s\S]*))?$/);
                       if (headingMatch) {
-                        const heading = headingMatch[1].trim();
+                        const heading = relabelSummaryHeading(headingMatch[1].trim());
                         const body = (headingMatch[2] || '').trim();
                         return (
                           <div key={i} className="space-y-1.5">

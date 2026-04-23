@@ -146,7 +146,7 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   lines.push('  ## Who led this month     — the single biggest anomaly and the top 3 named regions for the latest month, with their figures and what unites them (same continent? same climate zone?). 2–3 sentences.');
   lines.push('  ## Biggest shifts         — which regions climbed or fell furthest since last month, and why that matters (e.g. a sudden cold snap in one, lingering heatwave in another). Cite 2–3 specific climbers/fallers by name with their rank change. 2–3 sentences.');
   lines.push('  ## Regional patterns      — continent roll-ups and US Census region roll-ups: which groups averaged warmest this month? Is the warmth concentrated or global? 2–3 sentences.');
-  lines.push('  ## Context from the news  — use Google Search to find what might explain the standouts: ENSO state, a named heatwave, an atmospheric river, a monsoon anomaly, a polar vortex event. When it applies, also name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "Arctic amplification", "heat dome", "jet stream shifts"). Cite specific events verified against reputable sources (NOAA, WMO, Copernicus, national met services, major newspapers). 2–3 sentences.');
+  lines.push('  ## What’s driving change?  — use Google Search to find what might explain the standouts: ENSO state, a named heatwave, an atmospheric river, a monsoon anomaly, a polar vortex event. When it applies, also name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "Arctic amplification", "heat dome", "jet stream shifts"). Cite specific events verified against reputable sources (NOAA, WMO, Copernicus, national met services, major newspapers). 2–3 sentences.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
   lines.push('- LEAD WITH THE PATTERN, NOT JUST NUMBERS: "Eight of the ten hottest regions this month were US states" is more compelling than listing each state.');
@@ -156,7 +156,7 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   lines.push('');
   lines.push('RULES:');
   lines.push('- British English spelling throughout.');
-  lines.push('- Plain text only — no markdown, bullet points, or other headings, EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line.');
+  lines.push('- Plain text only — no markdown emphasis (no **bold**, no *italics*), no bullet points, no headings EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line. Never surround driver terms or any other phrase with asterisks — the site styles them automatically.');
   lines.push('- Use the EXACT values and rankings from the DATA section — do NOT substitute with web-search figures.');
   lines.push('- Use numeric ordinals (1st, 2nd, 3rd).');
   lines.push('- No policy recommendations.');
@@ -334,7 +334,7 @@ export async function GET(request: Request) {
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:rankings-analysis:${cacheMonth}-v2`;
+  const cacheKey = `climate:rankings-analysis:${cacheMonth}-v3`;
 
   if (!skipCache) {
     const cached = await getCached<{ summary: string; sources?: GroundingSource[]; generatedAt: string }>(cacheKey);

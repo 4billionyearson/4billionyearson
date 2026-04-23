@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
-import { renderWithDriverTooltips } from '@/lib/climate/driver-annotator';
+import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 
 interface AnalysisResponse {
   summary: string | null;
@@ -74,7 +74,7 @@ export default function RankingsAnalysis() {
               const trimmed = para.trim();
               const headingMatch = trimmed.match(/^##\s+(.+?)(?:\n([\s\S]*))?$/);
               if (headingMatch) {
-                const heading = headingMatch[1].trim();
+                const heading = relabelSummaryHeading(headingMatch[1].trim());
                 const body = (headingMatch[2] || '').trim();
                 return (
                   <div key={i} className="space-y-1.5">
