@@ -6,6 +6,7 @@ import { Trophy, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Info } 
 import RankingsTable from './RankingsTable';
 import RankingsAnalysis from './RankingsAnalysis';
 import RollupsSection from './RollupsSection';
+import AnomalyMapCard, { type CountryAnomalyRow } from '../global/AnomalyMapCard';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 
@@ -68,6 +69,18 @@ async function loadPreviousRankings(): Promise<RankingsResponse | null> {
     const p = resolve(process.cwd(), 'public', 'data', 'climate', 'rankings-previous.json');
     const raw = await readFile(p, 'utf8');
     return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+async function loadCountryAnomalies(): Promise<CountryAnomalyRow[] | null> {
+  try {
+    const p = resolve(process.cwd(), 'public', 'data', 'climate', 'global-history.json');
+    const raw = await readFile(p, 'utf8');
+    const parsed = JSON.parse(raw);
+    const rows = parsed?.countryAnomalies;
+    return Array.isArray(rows) && rows.length ? rows : null;
   } catch {
     return null;
   }
@@ -186,7 +199,11 @@ function buildRollups(rows: RankingRow[]): {
 }
 
 export default async function RankingsPage() {
-  const [data, previous] = await Promise.all([loadRankings(), loadPreviousRankings()]);
+  const [data, previous, countryAnomalies] = await Promise.all([
+    loadRankings(),
+    loadPreviousRankings(),
+    loadCountryAnomalies(),
+  ]);
 
   if (!data?.rows?.length) {
     return (
@@ -330,6 +347,9 @@ export default async function RankingsPage() {
             usRegions={rollups.usRegions}
             types={rollups.types}
           />
+
+          {/* Temperature anomaly map — geographic view of the same rankings */}
+          {countryAnomalies && <AnomalyMapCard countryAnomalies={countryAnomalies} />}
 
           {/* Table */}
           <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
