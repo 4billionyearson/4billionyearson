@@ -91,6 +91,17 @@ function computeShift(monthlyAll) {
     let s = 0; for (const y of recent) s += y.months[m]; return s / recent.length;
   });
 
+  // Baseline seasonal amplitude — the swing between the warmest and coldest
+  // month of the baseline climatology. Regions where this is very small are
+  // effectively tropical (Ethiopia, Indonesia, Colombia…) or dominated by
+  // wet/dry rather than warm/cold cycles; the warm-season-length and
+  // threshold-crossing metrics become meaningless / unstable there because
+  // a tiny uniform warming can flip many months across the annual-mean line
+  // or send the crossing date flying to the edges of the calendar.
+  const baselineAmplitude = Math.max(...baselineMonthly) - Math.min(...baselineMonthly);
+  const WEAK_SEASONALITY_THRESHOLD_C = 5; // °C peak-to-peak; below this we treat as aseasonal
+  const weaklySeasonal = baselineAmplitude < WEAK_SEASONALITY_THRESHOLD_C;
+
   const lengthSeries = completeYears.map(y => y.months.filter(v => v > baselineAnnualMean).length);
   const baselineLen = lengthSeries.slice(0, 30).reduce((a, b) => a + b, 0) / 30;
   const recentLen = lengthSeries.slice(-10).reduce((a, b) => a + b, 0) / 10;
@@ -99,7 +110,7 @@ function computeShift(monthlyAll) {
   const recentCrossings = findCrossings(recentMonthly, baselineAnnualMean);
 
   let springShiftDays = null, autumnShiftDays = null;
-  if (baselineCrossings && recentCrossings) {
+  if (!weaklySeasonal && baselineCrossings && recentCrossings) {
     springShiftDays = recentCrossings.spring - baselineCrossings.spring;
     autumnShiftDays = recentCrossings.autumn - baselineCrossings.autumn;
   }
@@ -114,9 +125,14 @@ function computeShift(monthlyAll) {
     recentStart: recent[0].year,
     recentEnd: recent[recent.length - 1].year,
     baselineAnnualMean: +baselineAnnualMean.toFixed(2),
+    baselineAmplitude: +baselineAmplitude.toFixed(2),
+    weaklySeasonal,
     baselineLen: +baselineLen.toFixed(2),
     recentLen: +recentLen.toFixed(2),
-    netShiftMonths: +(recentLen - baselineLen).toFixed(2),
+    // Hide warm-season length shift for weakly-seasonal regions: a 6-month
+    // jump in Ethiopia just reflects a near-flat climatology crossing a
+    // flat threshold, not a real expansion of a warm season.
+    netShiftMonths: weaklySeasonal ? null : +(recentLen - baselineLen).toFixed(2),
     springShiftDays: springShiftDays === null ? null : +springShiftDays.toFixed(1),
     autumnShiftDays: autumnShiftDays === null ? null : +autumnShiftDays.toFixed(1),
     biggestMonth: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][biggestIdx],
@@ -182,9 +198,11 @@ async function main() {
   // ── Aggregate headline stats ──────────────────────────────────────────
   const all = [...countries, ...usStates, ...ukRegions];
   const withCrossings = all.filter(r => r.springShiftDays !== null && r.autumnShiftDays !== null);
+  const withWarmSeason = all.filter(r => r.netShiftMonths !== null);
   const earlierSprings = withCrossings.filter(r => r.springShiftDays < 0).length;
   const laterAutumns = withCrossings.filter(r => r.autumnShiftDays > 0).length;
-  const longerWarmSeasons = all.filter(r => r.netShiftMonths > 0).length;
+  const longerWarmSeasons = withWarmSeason.filter(r => r.netShiftMonths > 0).length;
+  const weaklySeasonal = all.filter(r => r.weaklySeasonal).length;
 
   const meanSpringShift = withCrossings.length
     ? withCrossings.reduce((a, b) => a + b.springShiftDays, 0) / withCrossings.length
@@ -192,7 +210,9 @@ async function main() {
   const meanAutumnShift = withCrossings.length
     ? withCrossings.reduce((a, b) => a + b.autumnShiftDays, 0) / withCrossings.length
     : null;
-  const meanNetShift = all.length ? all.reduce((a, b) => a + b.netShiftMonths, 0) / all.length : null;
+  const meanNetShift = withWarmSeason.length
+    ? withWarmSeason.reduce((a, b) => a + b.netShiftMonths, 0) / withWarmSeason.length
+    : null;
 
   const output = {
     generatedAt: new Date().toISOString(),
@@ -202,6 +222,8 @@ async function main() {
       usStatesAnalysed: usStates.length,
       ukRegionsAnalysed: ukRegions.length,
       withSeasonalCrossings: withCrossings.length,
+      withWarmSeason: withWarmSeason.length,
+      weaklySeasonalExcluded: weaklySeasonal,
       earlierSprings,
       laterAutumns,
       longerWarmSeasons,
@@ -218,8 +240,9 @@ async function main() {
   await fs.writeFile(OUT, JSON.stringify(output));
   console.log(`✓ Wrote ${OUT}`);
   console.log(`  ${all.length} regions analysed (${countries.length} countries, ${usStates.length} US states, ${ukRegions.length} UK regions)`);
-  console.log(`  ${earlierSprings}/${withCrossings.length} now have earlier springs`);
-  console.log(`  ${laterAutumns}/${withCrossings.length} now have later autumns`);
+  console.log(`  ${weaklySeasonal} weakly-seasonal regions (baseline amplitude < 5°C) excluded from spring/autumn/warm-season metrics`);
+  console.log(`  ${earlierSprings}/${withCrossings.length} with clear seasons now have earlier springs`);
+  console.log(`  ${laterAutumns}/${withCrossings.length} with clear seasons now have later autumns`);
   console.log(`  Mean spring shift: ${meanSpringShift?.toFixed(1)} d, mean autumn: ${meanAutumnShift?.toFixed(1)} d`);
 }
 

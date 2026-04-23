@@ -21,9 +21,11 @@ export type GlobalShiftRecord = {
   recentStart: number;
   recentEnd: number;
   baselineAnnualMean: number;
+  baselineAmplitude?: number;
+  weaklySeasonal?: boolean;
   baselineLen: number;
   recentLen: number;
-  netShiftMonths: number;
+  netShiftMonths: number | null;
   springShiftDays: number | null;
   autumnShiftDays: number | null;
   biggestMonth: string;
@@ -213,7 +215,10 @@ export default function GlobalShiftMap() {
     const net = rec.netShiftMonths;
     const springTxt = spring === null ? "—" : `${spring > 0 ? "+" : ""}${spring.toFixed(1)} d`;
     const autumnTxt = autumn === null ? "—" : `${autumn > 0 ? "+" : ""}${autumn.toFixed(1)} d`;
-    const netTxt = `${net > 0 ? "+" : ""}${net.toFixed(2)} mo/yr`;
+    const netTxt = net === null ? "—" : `${net > 0 ? "+" : ""}${net.toFixed(2)} mo/yr`;
+    const aseasonalLine = rec.weaklySeasonal
+      ? `<div style="color:#9ca3af;margin-top:3px;font-size:10px;font-style:italic">Weakly seasonal (${(rec.baselineAmplitude ?? 0).toFixed(1)}°C annual swing) — seasonal-crossing metrics are not meaningful here.</div>`
+      : "";
     layer.bindTooltip(
       `
       <div style="font-size:12px;line-height:1.4">
@@ -222,6 +227,7 @@ export default function GlobalShiftMap() {
         <div style="color:#d1d5db">Autumn: <strong style="color:#FFF5E7">${autumnTxt}</strong></div>
         <div style="color:#d1d5db">Warm season: <strong style="color:#FFF5E7">${netTxt}</strong></div>
         <div style="color:#9ca3af;margin-top:3px;font-size:10px">${rec.baselineStart}–${rec.baselineEnd} → ${rec.recentStart}–${rec.recentEnd}</div>
+        ${aseasonalLine}
       </div>`,
       { sticky: true, className: "global-shift-tooltip" },
     );

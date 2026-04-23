@@ -117,6 +117,8 @@ type GlobalShiftData = {
     usStatesAnalysed: number;
     ukRegionsAnalysed: number;
     withSeasonalCrossings: number;
+    withWarmSeason: number;
+    weaklySeasonalExcluded: number;
     earlierSprings: number;
     laterAutumns: number;
     longerWarmSeasons: number;
@@ -282,7 +284,10 @@ export default function ShiftingSeasonsPage() {
     const autumn = [...withCross]
       .sort((a, b) => (b.autumnShiftDays ?? 0) - (a.autumnShiftDays ?? 0))
       .slice(0, 8);
-    const net = [...all].sort((a, b) => b.netShiftMonths - a.netShiftMonths).slice(0, 8);
+    const net = [...all]
+      .filter((r) => r.netShiftMonths !== null)
+      .sort((a, b) => (b.netShiftMonths ?? 0) - (a.netShiftMonths ?? 0))
+      .slice(0, 8);
     return { spring, autumn, net };
   }, [globalShift]);
 
@@ -658,7 +663,7 @@ export default function ShiftingSeasonsPage() {
                     />
                     <StatBlock
                       label="Longer warm seasons"
-                      value={`${globalShift.globalStats.longerWarmSeasons} / ${globalShift.globalStats.totalAnalysed}`}
+                      value={`${globalShift.globalStats.longerWarmSeasons} / ${globalShift.globalStats.withWarmSeason}`}
                       sub={
                         globalShift.globalStats.meanNetShiftMonths !== null
                           ? `mean ${globalShift.globalStats.meanNetShiftMonths > 0 ? '+' : ''}${globalShift.globalStats.meanNetShiftMonths.toFixed(2)} mo/yr`
@@ -696,7 +701,7 @@ export default function ShiftingSeasonsPage() {
                         title="Warm season gaining most months"
                         accent="text-emerald-300"
                         rows={leaderboards.net}
-                        format={(r) => `${r.netShiftMonths > 0 ? '+' : ''}${r.netShiftMonths.toFixed(2)} mo`}
+                        format={(r) => `${(r.netShiftMonths ?? 0) > 0 ? '+' : ''}${(r.netShiftMonths ?? 0).toFixed(2)} mo`}
                       />
                     </div>
                   </SubSection>
@@ -708,10 +713,24 @@ export default function ShiftingSeasonsPage() {
                     the number of months per year whose mean exceeds the region&apos;s
                     own baseline annual mean; spring/autumn crossings are the
                     interpolated day-of-year where the monthly climatology crosses that
-                    threshold. Tropical / polar regions with no clear crossing are
-                    excluded from the spring and autumn totals but still appear on the
-                    warm-season totals when their mean months-above-baseline has
-                    shifted.
+                    threshold.{' '}
+                    {globalShift.globalStats.weaklySeasonalExcluded > 0 && (
+                      <>
+                        We exclude{' '}
+                        <strong className="text-gray-400">
+                          {globalShift.globalStats.weaklySeasonalExcluded} weakly-seasonal regions
+                        </strong>{' '}
+                        (peak-to-peak monthly swing &lt; 5 °C, mostly equatorial
+                        countries like Ethiopia, Colombia, Indonesia) from the spring /
+                        autumn / warm-season numbers: when the annual temperature cycle
+                        is nearly flat, a small uniform warming can flip half the
+                        calendar across the baseline mean or push the crossing date to
+                        the edge of the year, so the metric stops being meaningful.
+                        Those regions still warm — but the right lens for them is a
+                        rainy-season or extreme-heat metric, not a boreal-style
+                        four-seasons shift.
+                      </>
+                    )}
                   </div>
                 </SectionCard>
               )}
