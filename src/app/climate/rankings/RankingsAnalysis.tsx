@@ -15,8 +15,9 @@ interface AnalysisResponse {
 
 function highlightAnomalies(text: string): string {
   const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  // Highlight signed anomalies like +2.34°C or -1.12°C
-  return escaped.replace(/([+\-]\d+(?:\.\d+)?°C)/g, '<strong style="color:#fff">$1</strong>');
+  // Highlight signed anomalies like +2.34°C or -1.12°C. The negative lookbehind
+  // ensures we don't match the hyphen inside a range like "11-17°C" as a minus sign.
+  return escaped.replace(/(?<![\d.])([+\-]\d+(?:\.\d+)?°C)/g, '<strong style="color:#fff">$1</strong>');
 }
 
 export default function RankingsAnalysis() {

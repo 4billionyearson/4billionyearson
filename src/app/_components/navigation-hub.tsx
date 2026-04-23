@@ -17,6 +17,7 @@ interface SubLink {
   badge?: "live" | "monthly" | "annual";
   blogCategory?: string;   // slug for article-badge lookup
   desc: string;
+  group?: string;          // optional sub-group heading (e.g. "Monitor", "Earth Systems", "Learn")
 }
 
 interface Section {
@@ -63,18 +64,18 @@ const SECTIONS: Section[] = [
     color: "#D0A65E",
     icon: <Globe className="h-6 w-6" />,
     links: [
-      { href: "/climate-dashboard", label: "Global Climate Data", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Temperature anomalies & CO₂ trends" },
-      { href: "/climate/global", label: "Global Climate Update", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Whole-planet temperature & trend update" },
-      { href: "/climate", label: "Climate Updates", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Country, state & region updates" },
-      { href: "/climate/rankings", label: "Climate Rankings", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "League table of 144 regions + monthly trends" },
-      { href: "/planetary-boundaries", label: "Planetary Boundaries", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Nine Earth-system thresholds" },
-      { href: "/greenhouse-gases", label: "Greenhouse Gases", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "CO₂, methane & N₂O levels" },
-      { href: "/sea-levels-ice", label: "Sea Levels & Ice", icon: <Waves className="h-4 w-4" />, badge: "monthly", desc: "Sea level rise & Arctic ice extent" },
-      { href: "/extreme-weather", label: "Extreme Weather", icon: <CloudLightning className="h-4 w-4" />, badge: "live", desc: "Active disasters worldwide" },
-      { href: "/emissions", label: "CO₂ Emissions", icon: <Factory className="h-4 w-4" />, badge: "annual", desc: "Country rankings & trends" },
-      { href: "/climate-explained", label: "Climate Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
-      { href: "/climate-books", label: "Books on Climate", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on climate" },
-      { href: "/category/climate-change", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "climate-change", desc: "Latest articles" },
+      { group: "Monitor", href: "/climate-dashboard", label: "Dashboard", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Global & local temperature anomalies" },
+      { group: "Monitor", href: "/climate/global", label: "Global Update", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Whole-planet temperature & trend update" },
+      { group: "Monitor", href: "/climate", label: "Country, State & Region Updates", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "78 countries · 50 US states · 17 UK regions" },
+      { group: "Monitor", href: "/climate/rankings", label: "Rankings", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "League table of 144 regions + monthly trends" },
+      { group: "Earth Systems", href: "/planetary-boundaries", label: "Planetary Boundaries", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Nine Earth-system thresholds" },
+      { group: "Earth Systems", href: "/greenhouse-gases", label: "Greenhouse Gases", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "CO₂, methane & N₂O levels" },
+      { group: "Earth Systems", href: "/sea-levels-ice", label: "Sea Levels & Ice", icon: <Waves className="h-4 w-4" />, badge: "monthly", desc: "Sea level rise & Arctic ice extent" },
+      { group: "Earth Systems", href: "/extreme-weather", label: "Extreme Weather", icon: <CloudLightning className="h-4 w-4" />, badge: "live", desc: "Active disasters worldwide" },
+      { group: "Earth Systems", href: "/emissions", label: "CO₂ Emissions", icon: <Factory className="h-4 w-4" />, badge: "annual", desc: "Country rankings & trends" },
+      { group: "Learn", href: "/climate-explained", label: "Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
+      { group: "Learn", href: "/climate-books", label: "Books", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on climate" },
+      { group: "Learn", href: "/category/climate-change", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "climate-change", desc: "Latest articles" },
     ],
   },
   {
@@ -182,9 +183,20 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
       >
         <div className="overflow-hidden">
           <div className="bg-gray-950/95 px-4 pb-4 md:px-5 md:pb-5 space-y-1">
-            {section.links.map((link) => (
+            {section.links.map((link, idx) => {
+              const prevGroup = idx > 0 ? section.links[idx - 1].group : undefined;
+              const showGroupHeading = link.group && link.group !== prevGroup;
+              return (
+              <div key={link.href}>
+                {showGroupHeading && (
+                  <div
+                    className={`px-3 pt-2 pb-1 text-[10px] font-bold tracking-[0.14em] uppercase ${idx > 0 ? 'mt-1 border-t border-gray-800/60' : ''}`}
+                    style={{ color: `${section.color}B3` }}
+                  >
+                    {link.group}
+                  </div>
+                )}
               <Link
-                key={link.href}
                 href={link.href}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors group/link"
               >
@@ -204,7 +216,9 @@ function SectionCard({ section, isExpanded, onToggle, recentCategories }: { sect
                   <ArticleBadge status={recentCategories[link.blogCategory]} />
                 )}
               </Link>
-            ))}
+              </div>
+              );
+            })}
           </div>
         </div>
       </div>
