@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
-const CACHE_KEY = 'climate:extreme-weather:v2';
+const CACHE_KEY = 'climate:extreme-weather:v3';
 
 // OWID indicator IDs (EM-DAT data, entities = disaster types)
 const INDICATORS = {
@@ -18,9 +18,9 @@ const ENTITY_MAP: Record<number, string> = {
   34697: 'Extreme temperature',
   34698: 'Extreme weather',
   34695: 'Flood',
-  352876: 'Wildfire',
-  369453: 'Wet mass movement',
-  369454: 'Glacial lake outburst flood',
+  34690: 'Wildfire',
+  369360: 'Wet mass movement',
+  369361: 'Glacial lake outburst flood',
 };
 
 async function fetchJSON(url: string, timeout = 15000) {
@@ -59,7 +59,11 @@ async function fetchGDACS() {
     const p = f.properties;
     return {
       type: p.eventtype,
-      name: (p.name || '').replace(/\s*\[GDACS\]\s*/g, ' ').trim(),
+      name: (p.name || '')
+        .replace(/\s*\[GDACS\]\s*/g, ' ')
+        // Normalise terminology: GDACS sometimes says 'Forest fires' — we use 'Wildfires' everywhere else.
+        .replace(/\bForest fires?\b/gi, 'Wildfires')
+        .trim(),
       alertLevel: p.alertlevel,
       country: p.country || '',
       fromDate: p.fromdate,

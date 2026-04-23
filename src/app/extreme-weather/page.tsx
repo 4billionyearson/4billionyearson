@@ -824,7 +824,7 @@ function LiveEventsSection({
 
       {/* Is this normal? — historical baseline per active type */}
       {historicalContext.length > 0 && (
-        <SubSection title={`Is this normal? (vs ${historicalContext[0].latestYear - 9}–${historicalContext[0].latestYear} average)`}>
+        <SubSection title={`Frequency trend — last decade (${historicalContext[0].latestYear - 9}–${historicalContext[0].latestYear}) vs prior decade`}>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 mb-4">
             {historicalContext.map((h) => {
               const trendUp = h.pctChange != null && h.pctChange >= 15;
