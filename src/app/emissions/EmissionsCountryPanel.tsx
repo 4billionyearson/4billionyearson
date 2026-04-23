@@ -10,6 +10,7 @@ import { Loader2, MapPin, Factory, Search, Users, TrendingUp, Globe, X } from 'l
 import { countryFlag } from '@/lib/climate/locations';
 import { CountryFuelChart } from './_components/fuel-chart';
 import { CountryConsumptionChart } from './_components/consumption-chart';
+import { CountryGhgPanel } from './_components/ghg-budget';
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -465,6 +466,14 @@ export default function EmissionsCountryPanel() {
               <Globe className="h-4 w-4 text-sky-400" /> Consumption vs Production
             </h3>
             <CountryConsumptionChart countryName={country.name} />
+          </div>
+
+          {/* Other GHGs */}
+          <div>
+            <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
+              <Factory className="h-4 w-4 text-[#D0A65E]" /> All Greenhouse Gases
+            </h3>
+            <CountryGhgPanel countryName={country.name} />
           </div>
 
           <p className="text-xs text-gray-400 pt-2 border-t border-gray-800/60">

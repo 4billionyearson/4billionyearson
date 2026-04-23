@@ -34,6 +34,22 @@ const GlobalConsumptionSection = dynamic(
   }
 );
 
+const GlobalGhgSection = dynamic(
+  () => import("./_components/ghg-budget").then(m => ({ default: m.GlobalGhgSection })),
+  {
+    ssr: false,
+    loading: () => <div className="h-[420px] w-full rounded-xl bg-gray-900/50 animate-pulse" />,
+  }
+);
+
+const CarbonBudgetSection = dynamic(
+  () => import("./_components/ghg-budget").then(m => ({ default: m.CarbonBudgetSection })),
+  {
+    ssr: false,
+    loading: () => <div className="h-[300px] w-full rounded-xl bg-gray-900/50 animate-pulse" />,
+  }
+);
+
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
 interface RankEntry { name: string; value: number; year: number }
@@ -337,6 +353,17 @@ export default function EmissionsPage() {
 
               <SectionCard icon={<Link2 className="h-5 w-5 text-sky-400" />} title="Consumption vs Production — Who Emits for Whom?">
                 <GlobalConsumptionSection />
+              </SectionCard>
+
+              {/* ═══ BEYOND CO₂ ═══ */}
+              <Divider icon={<Activity className="h-5 w-5" />} title="Beyond CO₂" />
+
+              <SectionCard icon={<Activity className="h-5 w-5 text-orange-400" />} title="All Greenhouse Gases — Methane & N₂O">
+                <GlobalGhgSection />
+              </SectionCard>
+
+              <SectionCard icon={<Activity className="h-5 w-5 text-[#D0A65E]" />} title="Carbon Budget Countdown">
+                <CarbonBudgetSection />
               </SectionCard>
 
               {/* ═══ GLOBAL TRENDS ═══ */}
