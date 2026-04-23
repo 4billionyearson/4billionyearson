@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { getRegionBySlug, type ClimateRegion } from '@/lib/climate/regions';
+import { buildDriverVocabularySection } from '@/lib/climate/warming-drivers';
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -456,7 +457,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('STRUCTURE — organise the update using these short sub-headings, each on its own line prefixed with "## " exactly (two hashes and a space). Omit a section if you have nothing specific to say about it.');
   lines.push('  ## This month in numbers   — lead with the latest-month anomaly, ranking, and the 1 or 2 most newsworthy RANKED HIGHLIGHTS.');
   lines.push('  ## What changed          — 3-month/seasonal trend, how this region compares to the national/global picture, and (if relevant) its CROSS-REGION rank or cluster.');
-  lines.push('  ## Context               — climate drivers (ENSO, NAO, jet stream) and any active GDACS or recent notable weather events woven in.');
+  lines.push('  ## Context               — explain WHY this region is warming/cooling the way it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below (using the exact canonical term — e.g. "Arctic amplification", "urban heat island effect", "jet stream shifts"). Also weave in ENSO/NAO state and any active GDACS or recent notable weather events.');
   lines.push('  ## Looking ahead         — ONE carefully hedged forward-looking sentence (e.g. what forecasters or outlooks suggest). Only include if there is a concrete source to cite; otherwise omit.');
   lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
   lines.push('');
@@ -496,6 +497,10 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('- For web search findings about weather events, summarise in your own words. Do not copy text verbatim.');
   lines.push('- No policy recommendations.');
   lines.push('- CRITICAL: Ensure you complete your final sentence. Do not abruptly truncate the text.');
+  lines.push('');
+
+  // Warming drivers vocabulary (for the "Context" paragraph)
+  lines.push(buildDriverVocabularySection());
   lines.push('');
 
   // Ranked highlights (priority data)
@@ -650,7 +655,7 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
   lines.push('  ## This month in numbers  — lead with the latest-month NOAA land+ocean anomaly, its ranking, and the 10-year mean vs pre-industrial (Paris thresholds).');
   lines.push('  ## Land vs ocean          — contrast land-only and ocean-only figures; note that land is warming faster.');
   lines.push('  ## Cross-region picture   — one striking pattern from the CROSS-REGION RANKINGS section (e.g. "8 of the 10 hottest were US states") with 2–3 named regions.');
-  lines.push('  ## Context               — ENSO state, any major climate events, key announcements from Copernicus / WMO / NOAA / IPCC / COP, or notable record-setting events verified by web search.');
+  lines.push('  ## Context               — ENSO state, major climate events, key announcements from Copernicus / WMO / NOAA / IPCC / COP, and WHY the planet-scale trend is what it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "land-ocean warming contrast", "Arctic amplification", "aerosol reduction").');
   lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
   lines.push('');
   lines.push('CONTENT PRIORITY:');
@@ -674,6 +679,8 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
   lines.push('- Use numeric ordinals (1st, 2nd, 3rd) rather than written-out words.');
   lines.push('- No policy recommendations.');
   lines.push('- CRITICAL: Ensure you complete your final sentence. Do not abruptly truncate.');
+  lines.push('');
+  lines.push(buildDriverVocabularySection());
   lines.push('');
   lines.push('═══ GLOBAL CLIMATE DATA ═══');
   lines.push(`Baseline (WMO standard): 1961–1990`);

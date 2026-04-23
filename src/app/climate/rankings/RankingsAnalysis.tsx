@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
+import { renderWithDriverTooltips } from '@/lib/climate/driver-annotator';
 
 interface AnalysisResponse {
   summary: string | null;
@@ -81,12 +82,12 @@ export default function RankingsAnalysis() {
                       {heading}
                     </h3>
                     {body && (
-                      <p dangerouslySetInnerHTML={{ __html: highlightAnomalies(body) }} />
+                      <p>{renderWithDriverTooltips(body, highlightAnomalies)}</p>
                     )}
                   </div>
                 );
               }
-              return <p key={i} dangerouslySetInnerHTML={{ __html: highlightAnomalies(trimmed) }} />;
+              return <p key={i}>{renderWithDriverTooltips(trimmed, highlightAnomalies)}</p>;
             })}
           </div>
           {sources.length > 0 && (

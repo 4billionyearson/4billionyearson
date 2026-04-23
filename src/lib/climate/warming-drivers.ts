@@ -283,3 +283,21 @@ export function findDriverByTerm(term: string): WarmingDriver | undefined {
     (d) => d.term.toLowerCase() === t || d.aliases.some((a) => a.toLowerCase() === t),
   );
 }
+
+/**
+ * Formatted driver vocabulary for injection into the Gemini prompt. Lists the
+ * canonical term + a compact "why" for every driver so the model can pick the
+ * 1–3 most relevant ones and name them using the exact canonical spelling
+ * (which the client-side annotator then wraps in <Term> tooltips).
+ */
+export function buildDriverVocabularySection(): string {
+  const lines: string[] = [];
+  lines.push('═══ WARMING DRIVERS VOCABULARY ═══');
+  lines.push('Below is the site-wide glossary of named warming drivers. When the data or web sources suggest one or more of these mechanisms is driving what you see for this region, NAME 1–3 of them in the "Context" paragraph using the EXACT canonical term shown in bold below (e.g. write "Arctic amplification" or "urban heat island effect" verbatim — do not paraphrase). Tooltips and explainer links are wired up automatically when you use the canonical spelling. Only cite drivers that genuinely apply — do not shoehorn.');
+  lines.push('');
+  for (const d of WARMING_DRIVERS) {
+    lines.push(`• ${d.term} — ${d.short}`);
+  }
+  return lines.join('\n');
+}
+

@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
+import { buildDriverVocabularySection } from '@/lib/climate/warming-drivers';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -145,7 +146,7 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   lines.push('  ## Who led this month     — the single biggest anomaly and the top 3 named regions for the latest month, with their figures and what unites them (same continent? same climate zone?). 2–3 sentences.');
   lines.push('  ## Biggest shifts         — which regions climbed or fell furthest since last month, and why that matters (e.g. a sudden cold snap in one, lingering heatwave in another). Cite 2–3 specific climbers/fallers by name with their rank change. 2–3 sentences.');
   lines.push('  ## Regional patterns      — continent roll-ups and US Census region roll-ups: which groups averaged warmest this month? Is the warmth concentrated or global? 2–3 sentences.');
-  lines.push('  ## Context from the news  — use Google Search to find what might explain the standouts: ENSO state, a named heatwave, an atmospheric river, a monsoon anomaly, a polar vortex event. Cite specific events verified against reputable sources (NOAA, WMO, Copernicus, national met services, major newspapers). 2–3 sentences.');
+  lines.push('  ## Context from the news  — use Google Search to find what might explain the standouts: ENSO state, a named heatwave, an atmospheric river, a monsoon anomaly, a polar vortex event. When it applies, also name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "Arctic amplification", "heat dome", "jet stream shifts"). Cite specific events verified against reputable sources (NOAA, WMO, Copernicus, national met services, major newspapers). 2–3 sentences.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
   lines.push('- LEAD WITH THE PATTERN, NOT JUST NUMBERS: "Eight of the ten hottest regions this month were US states" is more compelling than listing each state.');
@@ -162,8 +163,8 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   lines.push('- CRITICAL: Ensure you complete your final sentence.');
   lines.push('');
 
-  // ── DATA ─────────────────────────────────────────────────────────────────
-  lines.push('═══ CROSS-REGION DATA ═══');
+  // ── DATA ─────────────────────────────────────────────────────────────────  lines.push(buildDriverVocabularySection());
+  lines.push('');  lines.push('═══ CROSS-REGION DATA ═══');
   lines.push(`Latest month: ${latestLabel}`);
   lines.push(`Snapshot month: ${current.cacheMonth}`);
   if (previous) lines.push(`Previous snapshot: ${previous.cacheMonth}`);
