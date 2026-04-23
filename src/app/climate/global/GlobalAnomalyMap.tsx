@@ -291,6 +291,8 @@ function MapLabels({
 /* ─── Sub-national overlays (US states + UK nations) ─────────────────────── */
 
 const US_STATES_ZOOM = 3;
+const UK_NATIONS_ZOOM = 4;
+const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
 
 interface RankingRow {
   slug: string;
@@ -312,6 +314,73 @@ function rankingValue(row: RankingRow | undefined, win: AnomalyWindow): number |
 // UK-nation slugs — kept for potential future re-introduction of the overlay.
 // Currently unused; the map renders UK as a single country polygon.
 // const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
+
+function UKNationsOverlay({
+  rankings,
+  windowSel,
+  onInfo,
+  ukGeo,
+}: {
+  rankings: RankingRow[] | null;
+  windowSel: AnomalyWindow;
+  onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
+  ukGeo: FeatureCollection | null;
+}) {
+  const map = useMap();
+  const [visible, setVisible] = useState(map.getZoom() >= UK_NATIONS_ZOOM);
+
+  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= UK_NATIONS_ZOOM) });
+
+  const bySlug = useMemo(() => {
+    const m = new Map<string, RankingRow>();
+    if (rankings) {
+      for (const r of rankings) {
+        if (r.type === 'uk-region' && UK_NATION_SLUGS.has(r.slug)) m.set(r.slug, r);
+      }
+    }
+    return m;
+  }, [rankings]);
+
+  const style = useCallback(
+    (feature: Feature | undefined): PathOptions => {
+      const slug = ((feature?.properties as any)?.slug as string) ?? '';
+      const row = bySlug.get(slug);
+      const v = rankingValue(row, windowSel);
+      return {
+        fillColor: v != null ? anomalyColor(v) : '#1f2937',
+        fillOpacity: 0.9,
+        weight: 0.8,
+        color: '#0b1220',
+      };
+    },
+    [bySlug, windowSel],
+  );
+
+  const onEachFeature = useCallback(
+    (feature: Feature, layer: Layer) => {
+      const slug = ((feature.properties as any)?.slug as string) ?? '';
+      const name = ((feature.properties as any)?.name as string) ?? slug;
+      const row = bySlug.get(slug);
+      const v = rankingValue(row, windowSel);
+      const color = v != null ? anomalyColor(v) : '#1f2937';
+      const show = () => onInfo({ name, anomaly: v, label: row?.latestLabel ?? null, color });
+      layer.on('mouseover', show);
+      layer.on('click', show);
+      layer.on('mouseout', () => onInfo(null));
+    },
+    [bySlug, windowSel, onInfo],
+  );
+
+  if (!visible || !ukGeo) return null;
+  return (
+    <GeoJSON
+      key={`uk-nations-${windowSel}-${bySlug.size}`}
+      data={ukGeo}
+      style={style}
+      onEachFeature={onEachFeature}
+    />
+  );
+}
 
 function USStatesOverlay({
   rankings,
@@ -385,6 +454,7 @@ function USStatesOverlay({
 export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
+  const [ukGeo, setUkGeo] = useState<FeatureCollection | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [rankings, setRankings] = useState<RankingRow[] | null>(null);
   const [selected, setSelected] = useState<{
@@ -406,6 +476,10 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
     fetch('/data/us-states.json')
       .then((r) => (r.ok ? r.json() : null))
       .then((g) => { if (!cancelled && g) setStatesGeo(g as FeatureCollection); })
+      .catch(() => {});
+    fetch('/data/uk-nations.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((g) => { if (!cancelled && g) setUkGeo(g as FeatureCollection); })
       .catch(() => {});
     fetch('/data/climate/rankings.json')
       .then((r) => (r.ok ? r.json() : null))
@@ -514,6 +588,18 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
             rankings={rankings}
             windowSel={windowSel}
             statesGeo={statesGeo}
+            onInfo={(info) =>
+              setSelected(
+                info
+                  ? { name: info.name, anomaly: info.anomaly, monthLabel: info.label ?? undefined, color: info.color }
+                  : null,
+              )
+            }
+          />
+          <UKNationsOverlay
+            rankings={rankings}
+            windowSel={windowSel}
+            ukGeo={ukGeo}
             onInfo={(info) =>
               setSelected(
                 info
