@@ -731,6 +731,10 @@ function LiveEventsSection({
         const priorAvg = avg(priorWindow, emdatLabel);
         if (recentAvg === 0 && priorAvg === 0) return null;
         const pctChange = priorAvg > 0 ? ((recentAvg - priorAvg) / priorAvg) * 100 : null;
+        // Annual series from 1990 for the sparkline
+        const series = disastersByType
+          .filter((d) => d.year >= 1990 && d.year <= latestYear)
+          .map((d) => ({ year: d.year, value: typeof d[emdatLabel] === "number" ? (d[emdatLabel] as number) : 0 }));
         return {
           gdacsType,
           label: EVENT_LABELS[gdacsType] || emdatLabel,
@@ -740,6 +744,7 @@ function LiveEventsSection({
           priorAvg,
           pctChange,
           latestYear,
+          series,
         };
       })
       .filter((x): x is NonNullable<typeof x> => x != null);
@@ -929,6 +934,8 @@ function LiveEventsSection({
               const trendUp = h.pctChange != null && h.pctChange >= 15;
               const trendDown = h.pctChange != null && h.pctChange <= -15;
               const trendColor = trendUp ? "text-red-400" : trendDown ? "text-emerald-400" : "text-gray-400";
+              const sparkStroke = trendUp ? "#f87171" : trendDown ? "#34d399" : "#9ca3af";
+              const sparkFill = trendUp ? "#7f1d1d" : trendDown ? "#064e3b" : "#374151";
               const arrow = trendUp ? "↑" : trendDown ? "↓" : "→";
               const pctText =
                 h.pctChange == null
@@ -936,6 +943,8 @@ function LiveEventsSection({
                   : `${h.pctChange >= 0 ? "+" : ""}${Math.round(h.pctChange)}%`;
               const recent = h.recentAvg < 10 ? h.recentAvg.toFixed(1) : Math.round(h.recentAvg);
               const prior = h.priorAvg < 10 ? h.priorAvg.toFixed(1) : Math.round(h.priorAvg);
+              const startYear = h.series[0]?.year;
+              const endYear = h.series[h.series.length - 1]?.year;
               return (
                 <div key={h.gdacsType} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
                   <div className="flex items-center gap-1.5 text-xs text-gray-400 uppercase tracking-wider mb-2">
@@ -951,6 +960,42 @@ function LiveEventsSection({
                     <span className="text-gray-500 mx-1">·</span>
                     <span className="text-gray-400">{prior}/yr then</span>
                   </div>
+                  {h.series.length > 0 && (
+                    <div className="mt-2">
+                      <div className="h-[48px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={h.series} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
+                            <defs>
+                              <linearGradient id={`spark-${h.gdacsType}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={sparkStroke} stopOpacity={0.5} />
+                                <stop offset="100%" stopColor={sparkFill} stopOpacity={0} />
+                              </linearGradient>
+                            </defs>
+                            <Tooltip
+                              cursor={{ stroke: "#4b5563", strokeWidth: 1 }}
+                              contentStyle={{ background: "#030712", border: "1px solid #374151", borderRadius: 6, fontSize: 11, padding: "4px 8px" }}
+                              labelStyle={{ color: "#e5e7eb" }}
+                              itemStyle={{ color: sparkStroke }}
+                              formatter={(v: any) => [`${v} events`, h.label]}
+                            />
+                            <Area
+                              type="monotone"
+                              dataKey="value"
+                              stroke={sparkStroke}
+                              strokeWidth={1.5}
+                              fill={`url(#spark-${h.gdacsType})`}
+                              isAnimationActive={false}
+                              dot={false}
+                            />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex justify-between text-[10px] text-gray-500 font-mono mt-0.5">
+                        <span>{startYear}</span>
+                        <span>{endYear}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
