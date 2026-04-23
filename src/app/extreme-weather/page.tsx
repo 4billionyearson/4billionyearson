@@ -627,7 +627,21 @@ const EventsMap = dynamic(
 
 /* ─── GDACS Live Events ──────────────────────────────────────────────────── */
 
-function LiveEventsSection({ events }: { events: GDACSEvent[] }) {
+// GDACS event type → EM-DAT disaster-type label (for historical baseline lookup)
+const GDACS_TO_EMDAT: Record<string, string> = {
+  WF: "Wildfire",
+  FL: "Flood",
+  DR: "Drought",
+  TC: "Extreme weather",
+};
+
+function LiveEventsSection({
+  events,
+  disastersByType,
+}: {
+  events: GDACSEvent[];
+  disastersByType: YearlyByType[];
+}) {
   const [filter, setFilter] = useState<string>("all");
 
   const sorted = useMemo(() => {
@@ -691,6 +705,43 @@ function LiveEventsSection({ events }: { events: GDACSEvent[] }) {
     iso
       ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
       : "";
+
+  // Historical context: for each GDACS type currently in the feed, compare
+  // EM-DAT's recent-decade annual average to the prior decade so the user can
+  // see whether this type of event is trending up or down globally.
+  const historicalContext = useMemo(() => {
+    if (!disastersByType?.length) return [];
+    const years = disastersByType.map((d) => d.year);
+    const latestYear = Math.max(...years);
+    const recentWindow = disastersByType.filter((d) => d.year >= latestYear - 9 && d.year <= latestYear);
+    const priorWindow = disastersByType.filter((d) => d.year >= latestYear - 19 && d.year <= latestYear - 10);
+    const avg = (rows: YearlyByType[], key: string) => {
+      const vals = rows.map((r) => (typeof r[key] === "number" ? (r[key] as number) : 0));
+      return vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : 0;
+    };
+    // Types currently in the GDACS feed, ordered by count
+    const active = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return active
+      .map(([gdacsType, currentCount]) => {
+        const emdatLabel = GDACS_TO_EMDAT[gdacsType];
+        if (!emdatLabel) return null;
+        const recentAvg = avg(recentWindow, emdatLabel);
+        const priorAvg = avg(priorWindow, emdatLabel);
+        if (recentAvg === 0 && priorAvg === 0) return null;
+        const pctChange = priorAvg > 0 ? ((recentAvg - priorAvg) / priorAvg) * 100 : null;
+        return {
+          gdacsType,
+          label: EVENT_LABELS[gdacsType] || emdatLabel,
+          emdatLabel,
+          currentCount,
+          recentAvg,
+          priorAvg,
+          pctChange,
+          latestYear,
+        };
+      })
+      .filter((x): x is NonNullable<typeof x> => x != null);
+  }, [disastersByType, counts]);
 
   return (
     <div>
@@ -768,6 +819,51 @@ function LiveEventsSection({ events }: { events: GDACSEvent[] }) {
               );
             })}
           </div>
+        </SubSection>
+      )}
+
+      {/* Is this normal? — historical baseline per active type */}
+      {historicalContext.length > 0 && (
+        <SubSection title={`Is this normal? (vs ${historicalContext[0].latestYear - 9}–${historicalContext[0].latestYear} average)`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 mb-4">
+            {historicalContext.map((h) => {
+              const trendUp = h.pctChange != null && h.pctChange >= 15;
+              const trendDown = h.pctChange != null && h.pctChange <= -15;
+              const trendColor = trendUp ? "text-red-400" : trendDown ? "text-emerald-400" : "text-gray-400";
+              const arrow = trendUp ? "↑" : trendDown ? "↓" : "→";
+              const pctText =
+                h.pctChange == null
+                  ? "no prior decade data"
+                  : `${h.pctChange >= 0 ? "+" : ""}${Math.round(h.pctChange)}% vs prior decade`;
+              return (
+                <div key={h.gdacsType} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 uppercase tracking-wider mb-1">
+                    {EVENT_ICONS[h.gdacsType]}
+                    <span>{h.label}</span>
+                  </div>
+                  <div className="text-lg font-bold text-white leading-tight">
+                    {h.currentCount} <span className="text-xs text-gray-400 font-normal">active now</span>
+                  </div>
+                  <div className="text-xs text-gray-300 mt-1.5">
+                    Historical avg:{" "}
+                    <span className="font-semibold text-white">
+                      {h.recentAvg < 10 ? h.recentAvg.toFixed(1) : Math.round(h.recentAvg)}
+                    </span>
+                    <span className="text-gray-400"> /year</span>
+                  </div>
+                  <div className={`text-xs mt-0.5 ${trendColor}`}>
+                    <span className="font-mono">{arrow}</span> {pctText}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-gray-500 -mt-2 mb-4">
+            GDACS live alerts and EM-DAT annual counts use different thresholds, so these are trend indicators rather than a like-for-like comparison. The percentage compares the last 10 recorded years to the 10 years before that, using{" "}
+            <a href="https://www.emdat.be/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EM-DAT</a>{" "}
+            via{" "}
+            <a href="https://ourworldindata.org/natural-disasters" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>.
+          </p>
         </SubSection>
       )}
 
@@ -965,7 +1061,7 @@ export default function ExtremeWeatherPage() {
                 const alertColor = hasRed ? "text-red-400" : hasOrange ? "text-orange-400" : "text-emerald-400";
                 return (
                 <SectionCard icon={<Activity className={`${alertColor} animate-pulse`} />} title="Live Extreme Weather Alerts">
-                  <LiveEventsSection events={data.gdacsEvents} />
+                  <LiveEventsSection events={data.gdacsEvents} disastersByType={data.disastersByType} />
                   <p className="text-xs text-gray-400 mt-4">
                     Real-time alerts from{" "}
                     <a href="https://www.gdacs.org/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">
