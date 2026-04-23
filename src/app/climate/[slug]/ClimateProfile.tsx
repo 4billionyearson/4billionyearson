@@ -817,7 +817,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 <>
                   <Divider icon={<Factory className="h-5 w-5 text-rose-400" />} title="Emissions & Energy" />
                   {region.type === 'uk-region' && (
-                    <div className="rounded-xl border border-[#D0A65E]/40 bg-gray-900/40 px-4 py-2.5 text-xs text-gray-300">
+                    <div className="rounded-xl border border-[#D0A65E]/60 bg-gray-950/95 backdrop-blur-sm px-4 py-2.5 text-xs text-gray-200 shadow-lg">
                       Showing UK-wide figures — {region.name} is part of the United Kingdom. Sub-national emissions and electricity-mix breakdowns are not yet published in a unified format.
                     </div>
                   )}

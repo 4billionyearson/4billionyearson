@@ -18,6 +18,14 @@ const EmissionsCountryPanel = dynamic(() => import("./EmissionsCountryPanel"), {
   loading: () => <div className="h-48 w-full rounded-2xl bg-gray-900/50 border-2 border-[#D0A65E]/40 animate-pulse" />,
 });
 
+const GlobalFuelSection = dynamic(
+  () => import("./_components/fuel-chart").then(m => ({ default: m.GlobalFuelSection })),
+  {
+    ssr: false,
+    loading: () => <div className="h-[420px] w-full rounded-xl bg-gray-900/50 animate-pulse" />,
+  }
+);
+
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
 interface RankEntry { name: string; value: number; year: number }
@@ -310,6 +318,13 @@ export default function EmissionsPage() {
                   CO₂ persists for centuries, so early-industrialised nations carry a disproportionate share of the total warming burden. Source:{" "}
                   <a href="https://ourworldindata.org/contributed-most-global-co2" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
+              </SectionCard>
+
+              {/* ═══ BY FUEL SOURCE ═══ */}
+              <Divider icon={<Factory className="h-5 w-5" />} title="How Are We Emitting?" />
+
+              <SectionCard icon={<Factory className="h-5 w-5 text-orange-400" />} title="Global CO₂ by Fuel Source">
+                <GlobalFuelSection />
               </SectionCard>
 
               {/* ═══ GLOBAL TRENDS ═══ */}
