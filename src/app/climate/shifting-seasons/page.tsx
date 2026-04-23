@@ -30,13 +30,24 @@ import {
   MapPin,
   Leaf,
   Thermometer,
+  Globe,
 } from 'lucide-react';
+import type { GlobalShiftRecord } from '@/app/_components/global-shift-map';
 
 const SpringIndexMap = dynamic(() => import('@/app/_components/spring-index-map'), {
   ssr: false,
   loading: () => (
     <div className="h-[460px] rounded-xl border border-gray-800/60 bg-gray-900/50 flex items-center justify-center text-gray-400 text-sm">
       <Loader2 className="h-5 w-5 animate-spin mr-2 text-pink-400" /> Loading map…
+    </div>
+  ),
+});
+
+const GlobalShiftMap = dynamic(() => import('@/app/_components/global-shift-map'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[500px] rounded-xl border border-gray-800/60 bg-gray-900/50 flex items-center justify-center text-gray-400 text-sm">
+      <Loader2 className="h-5 w-5 animate-spin mr-2 text-[#D0A65E]" /> Loading global map…
     </div>
   ),
 });
@@ -96,6 +107,26 @@ type EpaData = {
   westEast: EpaWestEast[];
   byState: EpaByState[];
   frost: EpaFrost[];
+};
+
+type GlobalShiftData = {
+  generatedAt: string;
+  globalStats: {
+    totalAnalysed: number;
+    countriesAnalysed: number;
+    usStatesAnalysed: number;
+    ukRegionsAnalysed: number;
+    withSeasonalCrossings: number;
+    earlierSprings: number;
+    laterAutumns: number;
+    longerWarmSeasons: number;
+    meanSpringShift: number | null;
+    meanAutumnShift: number | null;
+    meanNetShiftMonths: number | null;
+  };
+  countries: GlobalShiftRecord[];
+  usStates: GlobalShiftRecord[];
+  ukRegions: GlobalShiftRecord[];
 };
 
 type ApiResponse = {
@@ -213,6 +244,7 @@ function StatBlock({ label, value, sub, color = 'text-orange-300' }: {
 
 export default function ShiftingSeasonsPage() {
   const [data, setData] = useState<ApiResponse | null>(null);
+  const [globalShift, setGlobalShift] = useState<GlobalShiftData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -226,6 +258,33 @@ export default function ShiftingSeasonsPage() {
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetch('/data/seasons/shift-global.json')
+      .then((r) => (r.ok ? (r.json() as Promise<GlobalShiftData>) : null))
+      .then((d) => setGlobalShift(d))
+      .catch(() => {});
+  }, []);
+
+  /* Top-N leaderboards across all region types combined. */
+  const leaderboards = useMemo(() => {
+    if (!globalShift) return null;
+    type Row = GlobalShiftRecord & { kind: 'country' | 'us-state' | 'uk-region' };
+    const all: Row[] = [
+      ...globalShift.countries.map((r) => ({ ...r, kind: 'country' as const })),
+      ...globalShift.usStates.map((r) => ({ ...r, kind: 'us-state' as const })),
+      ...globalShift.ukRegions.map((r) => ({ ...r, kind: 'uk-region' as const })),
+    ];
+    const withCross = all.filter((r) => r.springShiftDays !== null && r.autumnShiftDays !== null);
+    const spring = [...withCross]
+      .sort((a, b) => (a.springShiftDays ?? 0) - (b.springShiftDays ?? 0))
+      .slice(0, 8);
+    const autumn = [...withCross]
+      .sort((a, b) => (b.autumnShiftDays ?? 0) - (a.autumnShiftDays ?? 0))
+      .slice(0, 8);
+    const net = [...all].sort((a, b) => b.netShiftMonths - a.netShiftMonths).slice(0, 8);
+    return { spring, autumn, net };
+  }, [globalShift]);
 
   /* Kyoto derived series */
   const kyotoChartData = useMemo(() => {
@@ -554,6 +613,109 @@ export default function ShiftingSeasonsPage() {
                 <SpringIndexMap />
               </SectionCard>
 
+              {/* ─── Global picture (146 regions) ─────────────────────────── */}
+              {globalShift && leaderboards && (
+                <SectionCard
+                  icon={<Globe className="text-[#D0A65E]" />}
+                  title={`The global picture: how seasons have shifted across ${globalShift.globalStats.totalAnalysed} regions`}
+                >
+                  <p className="text-sm text-gray-300 leading-relaxed mb-4">
+                    We&apos;ve applied the same month-crossing analysis used on every
+                    country, US state and UK region profile to their long-term monthly
+                    temperature records — Berkeley Earth / OWID for countries, NOAA for
+                    US states, Met Office for UK regions. For each region we compare
+                    the first 30 complete years on record with the most recent 10,
+                    asking when the monthly average crosses the region&apos;s own
+                    baseline annual mean in spring and autumn.
+                  </p>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                    <StatBlock
+                      label="Regions analysed"
+                      value={`${globalShift.globalStats.totalAnalysed}`}
+                      sub={`${globalShift.globalStats.countriesAnalysed} countries · ${globalShift.globalStats.usStatesAnalysed} US states · ${globalShift.globalStats.ukRegionsAnalysed} UK regions`}
+                      color="text-[#D0A65E]"
+                    />
+                    <StatBlock
+                      label="Earlier springs"
+                      value={`${globalShift.globalStats.earlierSprings} / ${globalShift.globalStats.withSeasonalCrossings}`}
+                      sub={
+                        globalShift.globalStats.meanSpringShift !== null
+                          ? `mean ${globalShift.globalStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.meanSpringShift.toFixed(1)} d`
+                          : undefined
+                      }
+                      color="text-rose-300"
+                    />
+                    <StatBlock
+                      label="Later autumns"
+                      value={`${globalShift.globalStats.laterAutumns} / ${globalShift.globalStats.withSeasonalCrossings}`}
+                      sub={
+                        globalShift.globalStats.meanAutumnShift !== null
+                          ? `mean ${globalShift.globalStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.meanAutumnShift.toFixed(1)} d`
+                          : undefined
+                      }
+                      color="text-amber-300"
+                    />
+                    <StatBlock
+                      label="Longer warm seasons"
+                      value={`${globalShift.globalStats.longerWarmSeasons} / ${globalShift.globalStats.totalAnalysed}`}
+                      sub={
+                        globalShift.globalStats.meanNetShiftMonths !== null
+                          ? `mean ${globalShift.globalStats.meanNetShiftMonths > 0 ? '+' : ''}${globalShift.globalStats.meanNetShiftMonths.toFixed(2)} mo/yr`
+                          : undefined
+                      }
+                      color="text-emerald-300"
+                    />
+                  </div>
+
+                  <SubSection title="World map — pick a metric">
+                    <GlobalShiftMap />
+                    <p className="text-[11px] text-gray-500 mt-2">
+                      Hover any country for its own spring / autumn / warm-season
+                      shift. Grey countries either don&apos;t have 30+ years of
+                      continuous monthly data in our dataset, or sit in tropical /
+                      polar zones where monthly means never cross the annual mean.
+                    </p>
+                  </SubSection>
+
+                  <SubSection title="Where the shift is biggest">
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <Leaderboard
+                        title="Spring advancing fastest"
+                        accent="text-rose-300"
+                        rows={leaderboards.spring}
+                        format={(r) => `${r.springShiftDays! > 0 ? '+' : ''}${r.springShiftDays!.toFixed(1)} d`}
+                      />
+                      <Leaderboard
+                        title="Autumn extending latest"
+                        accent="text-amber-300"
+                        rows={leaderboards.autumn}
+                        format={(r) => `${r.autumnShiftDays! > 0 ? '+' : ''}${r.autumnShiftDays!.toFixed(1)} d`}
+                      />
+                      <Leaderboard
+                        title="Warm season gaining most months"
+                        accent="text-emerald-300"
+                        rows={leaderboards.net}
+                        format={(r) => `${r.netShiftMonths > 0 ? '+' : ''}${r.netShiftMonths.toFixed(2)} mo`}
+                      />
+                    </div>
+                  </SubSection>
+
+                  <div className="mt-4 text-xs text-gray-500 leading-relaxed">
+                    Method: for every region we build a baseline monthly climatology
+                    from the first 30 complete years of record and a recent climatology
+                    from the last 10 complete years. &quot;Warm-season length&quot; is
+                    the number of months per year whose mean exceeds the region&apos;s
+                    own baseline annual mean; spring/autumn crossings are the
+                    interpolated day-of-year where the monthly climatology crosses that
+                    threshold. Tropical / polar regions with no clear crossing are
+                    excluded from the spring and autumn totals but still appear on the
+                    warm-season totals when their mean months-above-baseline has
+                    shifted.
+                  </div>
+                </SectionCard>
+              )}
+
               {/* ─── EPA growing season (US historical) ─────────────────── */}
               <SectionCard
                 icon={<Leaf className="text-emerald-400" />}
@@ -824,6 +986,50 @@ function SubSection({ title, children }: { title: string; children: React.ReactN
         {title}
       </h3>
       {children}
+    </div>
+  );
+}
+
+const KIND_BADGE: Record<'country' | 'us-state' | 'uk-region', { label: string; className: string }> = {
+  country: { label: '🌍', className: 'bg-gray-800 text-gray-300' },
+  'us-state': { label: '🇺🇸', className: 'bg-gray-800 text-gray-300' },
+  'uk-region': { label: '🇬🇧', className: 'bg-gray-800 text-gray-300' },
+};
+
+function Leaderboard({
+  title,
+  accent,
+  rows,
+  format,
+}: {
+  title: string;
+  accent: string;
+  rows: Array<GlobalShiftRecord & { kind: 'country' | 'us-state' | 'uk-region' }>;
+  format: (r: GlobalShiftRecord) => string;
+}) {
+  return (
+    <div className="rounded-xl border border-gray-800/60 bg-gray-900/50 p-3">
+      <div className="text-[11px] text-gray-400 uppercase tracking-wider mb-2">{title}</div>
+      <ol className="space-y-1.5">
+        {rows.map((r, i) => {
+          const badge = KIND_BADGE[r.kind];
+          return (
+            <li key={`${r.kind}-${r.code ?? r.id ?? r.name}`} className="flex items-center gap-2 text-sm">
+              <span className="w-4 text-[11px] text-gray-500 text-right tabular-nums">{i + 1}</span>
+              <span
+                className={`inline-flex h-5 min-w-[22px] items-center justify-center rounded text-[11px] ${badge.className}`}
+                aria-hidden
+              >
+                {badge.label}
+              </span>
+              <span className="flex-1 truncate text-gray-200">{r.name}</span>
+              <span className={`font-mono tabular-nums text-[13px] font-semibold ${accent}`}>
+                {format(r)}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
