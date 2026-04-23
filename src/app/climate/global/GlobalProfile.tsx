@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell,
 } from 'recharts';
-import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale } from 'lucide-react';
+import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale, Factory } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import { getRegionBySlug } from '@/lib/climate/regions';
 import {
@@ -17,6 +17,8 @@ import {
 import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar, WhatChangedTile } from './ClimateSystemsPanel';
 import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
 import AnomalyMapCard from './AnomalyMapCard';
+import EmissionsCard from '@/app/_components/emissions-card';
+import EnergyMixCard from '@/app/_components/energy-mix-card';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -753,6 +755,13 @@ export default function GlobalProfile() {
                   ) : null}
                 </>
               )}
+
+              {/* Emissions & Energy */}
+              <Divider icon={<Factory className="h-5 w-5 text-rose-400" />} title="Emissions & Energy" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <EmissionsCard />
+                <EnergyMixCard />
+              </div>
 
               {/* Context + Sources */}
               <Divider icon={<Database className="h-5 w-5 text-[#D0A65E]" />} title="Context & Sources" />
