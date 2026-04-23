@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import {
   ResponsiveContainer,
   ScatterChart,
@@ -26,7 +27,19 @@ import {
   Activity,
   TrendingDown,
   Info,
+  MapPin,
+  Leaf,
+  Thermometer,
 } from 'lucide-react';
+
+const SpringIndexMap = dynamic(() => import('@/app/_components/spring-index-map'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[460px] rounded-xl border border-gray-800/60 bg-gray-900/50 flex items-center justify-center text-gray-400 text-sm">
+      <Loader2 className="h-5 w-5 animate-spin mr-2 text-pink-400" /> Loading map…
+    </div>
+  ),
+});
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 
@@ -62,9 +75,33 @@ type SnowData = {
   seasonalAnomaly: SnowSeasonal[];
 };
 
+type EpaNational = { year: number; deviationDays: number };
+type EpaWestEast = { year: number; east: number; west: number };
+type EpaByState = { state: string; changeDays: number };
+type EpaFrost = { year: number; lastSpringFrost: number; firstFallFrost: number };
+
+type EpaData = {
+  source: string;
+  sourceUrl: string;
+  description: string;
+  coverage: string;
+  headline: {
+    first30YearMean: number;
+    last10YearMean: number;
+    shiftDays: number;
+    first30YearWindow: string;
+    last10YearWindow: string;
+  };
+  national: EpaNational[];
+  westEast: EpaWestEast[];
+  byState: EpaByState[];
+  frost: EpaFrost[];
+};
+
 type ApiResponse = {
   kyoto: KyotoData;
   snow: SnowData;
+  epa: EpaData;
   manifest: { updatedAt: string };
 };
 
@@ -502,21 +539,243 @@ export default function ShiftingSeasonsPage() {
                 </div>
               </SectionCard>
 
+              {/* ─── USA-NPN live spring map ─────────────────────────────── */}
+              <SectionCard
+                icon={<MapPin className="text-pink-400" />}
+                title="Live: how early is spring arriving across the US?"
+              >
+                <p className="text-sm text-gray-300 leading-relaxed mb-4">
+                  The USA National Phenology Network runs a daily-updated model that
+                  tracks how many days early or late spring is arriving compared to
+                  the 1991–2020 average, based on the thermal thresholds that trigger
+                  leaf-out and first-bloom in temperate woody plants. During Feb–May
+                  each year, the map below updates every day.
+                </p>
+                <SpringIndexMap />
+              </SectionCard>
+
+              {/* ─── EPA growing season (US historical) ─────────────────── */}
+              <SectionCard
+                icon={<Leaf className="text-emerald-400" />}
+                title="The US growing season is 17 days longer than a century ago"
+              >
+                <p className="text-sm text-gray-300 leading-relaxed mb-4">
+                  Since 1895 the contiguous-US growing season — the stretch between the
+                  last spring frost and the first autumn frost — has lengthened
+                  dramatically. The shift is largest in the West, where earlier springs
+                  and later autumns compound.
+                </p>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+                  <StatBlock
+                    label="Recent 10-yr avg"
+                    value={`${data.epa.headline.last10YearMean >= 0 ? '+' : ''}${data.epa.headline.last10YearMean.toFixed(1)} d`}
+                    sub={`vs 1895–2020 mean (${data.epa.headline.last10YearWindow})`}
+                    color="text-emerald-300"
+                  />
+                  <StatBlock
+                    label="First 30-yr avg"
+                    value={`${data.epa.headline.first30YearMean >= 0 ? '+' : ''}${data.epa.headline.first30YearMean.toFixed(1)} d`}
+                    sub={`${data.epa.headline.first30YearWindow}`}
+                    color="text-amber-300"
+                  />
+                  <StatBlock
+                    label="Net lengthening"
+                    value={`${data.epa.headline.shiftDays >= 0 ? '+' : ''}${data.epa.headline.shiftDays.toFixed(1)} days`}
+                    sub="recent 10y minus first 30y"
+                    color="text-orange-300"
+                  />
+                </div>
+
+                <SubSection title="CONUS growing-season length, 1895 – 2020">
+                  <div className="h-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={data.epa.national}
+                        margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
+                      >
+                        <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
+                        <XAxis dataKey="year" stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                        <YAxis
+                          stroke="#9ca3af"
+                          tick={{ fontSize: 11 }}
+                          tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}d`}
+                          label={{ value: 'Deviation (days)', angle: -90, position: 'insideLeft', offset: 0, fill: '#9ca3af', fontSize: 11 }}
+                        />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
+                          formatter={(v) => [`${typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(1) : v} days`, 'Deviation']}
+                        />
+                        <ReferenceLine y={0} stroke="#6b7280" />
+                        <Bar dataKey="deviationDays" name="Deviation">
+                          {data.epa.national.map((p, i) => (
+                            <Cell key={i} fill={p.deviationDays >= 0 ? '#10b981' : '#fb923c'} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-2">
+                    Green = longer than the 1895–2020 mean, orange = shorter. The
+                    direction of change is unambiguous from around the 1980s onward.
+                  </p>
+                </SubSection>
+
+                <SubSection title="West vs East">
+                  <div className="h-[260px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={data.epa.westEast}
+                        margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
+                      >
+                        <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
+                        <XAxis dataKey="year" stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                        <YAxis
+                          stroke="#9ca3af"
+                          tick={{ fontSize: 11 }}
+                          tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}d`}
+                        />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
+                          formatter={(v) => [`${typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(1) : v} d`, '']}
+                        />
+                        <ReferenceLine y={0} stroke="#6b7280" />
+                        <Line
+                          dataKey="west"
+                          name="Western US"
+                          stroke="#fb923c"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                        <Line
+                          dataKey="east"
+                          name="Eastern US"
+                          stroke="#38bdf8"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                        <Legend wrapperStyle={{ fontSize: 12 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </SubSection>
+
+                <SubSection title="Frost dates are moving apart">
+                  <div className="h-[260px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={data.epa.frost}
+                        margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
+                      >
+                        <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
+                        <XAxis dataKey="year" stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                        <YAxis
+                          stroke="#9ca3af"
+                          tick={{ fontSize: 11 }}
+                          tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}d`}
+                          label={{ value: 'Days vs 1895–2020 mean', angle: -90, position: 'insideLeft', offset: 0, fill: '#9ca3af', fontSize: 10 }}
+                        />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
+                          formatter={(v) => [`${typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(1) : v} d`, '']}
+                        />
+                        <ReferenceLine y={0} stroke="#6b7280" />
+                        <Line
+                          dataKey="lastSpringFrost"
+                          name="Last spring frost"
+                          stroke="#a78bfa"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                        <Line
+                          dataKey="firstFallFrost"
+                          name="First fall frost"
+                          stroke="#fbbf24"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                        <Legend wrapperStyle={{ fontSize: 12 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-2">
+                    A negative last-spring-frost value means frost ends earlier in the year; a positive
+                    first-fall-frost value means it arrives later. Both trends — earlier springs, later
+                    autumns — widen the frost-free window.
+                  </p>
+                </SubSection>
+
+                <SubSection title="Change by state, 1895 – 2020">
+                  <div className="h-[640px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={data.epa.byState}
+                        layout="vertical"
+                        margin={{ top: 4, right: 20, left: 10, bottom: 0 }}
+                      >
+                        <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
+                        <XAxis
+                          type="number"
+                          stroke="#9ca3af"
+                          tick={{ fontSize: 11 }}
+                          tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}d`}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="state"
+                          stroke="#9ca3af"
+                          width={100}
+                          tick={{ fontSize: 10 }}
+                          interval={0}
+                        />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
+                          formatter={(v) => [`${typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(1) : v} days`, 'Change']}
+                        />
+                        <ReferenceLine x={0} stroke="#6b7280" />
+                        <Bar dataKey="changeDays" name="Days change">
+                          {data.epa.byState.map((p, i) => (
+                            <Cell key={i} fill={p.changeDays >= 0 ? '#10b981' : '#fb923c'} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <p className="text-[11px] text-gray-500 mt-2">
+                    States in the West (Arizona, Nevada, California, Oregon) have gained the most days;
+                    the South-east has seen mixed trends, with a few states showing slight shortening.
+                  </p>
+                </SubSection>
+
+                <div className="mt-4 text-xs text-gray-500 leading-relaxed">
+                  Source:{' '}
+                  <a href={data.epa.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">
+                    EPA Climate Change Indicators — Length of Growing Season
+                  </a>
+                  . Underlying data: Kunkel (2021). Coverage: {data.epa.coverage}.
+                  The EPA suspended updates to this indicator after April 2021, so the
+                  series is authoritative historically but ends in 2020 — we will
+                  supplement with current-year figures from NOAA&apos;s xmACIS in a
+                  follow-up.
+                </div>
+              </SectionCard>
+
               {/* ─── What's next ────────────────────────────────────────── */}
               <SectionCard icon={<Calendar className="text-amber-400" />} title="Coming next">
                 <ul className="text-sm text-gray-300 leading-relaxed space-y-2 list-disc pl-5">
                   <li>
-                    <strong className="text-[#FFF5E7]">Live US spring map</strong> — daily
-                    USA-NPN Spring Leaf Index anomaly during Feb–May.
-                  </li>
-                  <li>
-                    <strong className="text-[#FFF5E7]">Growing-season length per US state</strong>{' '}
-                    from the EPA climate indicators series, 1895–present.
-                  </li>
-                  <li>
                     <strong className="text-[#FFF5E7]">Thermal-season bars</strong> for
                     every country, US state and UK region — first day of sustained
-                    spring/summer/autumn temperatures derived from ERA5.
+                    spring/summer/autumn temperatures derived from ERA5, embedded as
+                    a <code>SeasonalShiftCard</code> in every climate profile page.
+                  </li>
+                  <li>
+                    <strong className="text-[#FFF5E7]">NOAA xmACIS modern frost dates</strong>{' '}
+                    to extend the EPA series past 2020 with live year-to-date data.
+                  </li>
+                  <li>
+                    <strong className="text-[#FFF5E7]">UK phenology</strong> from the
+                    Woodland Trust Nature&apos;s Calendar, if licensing allows.
                   </li>
                 </ul>
               </SectionCard>

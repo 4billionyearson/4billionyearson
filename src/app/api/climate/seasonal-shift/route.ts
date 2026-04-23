@@ -14,13 +14,14 @@ async function readJson(relFile: string) {
 
 export async function GET() {
   try {
-    const [kyoto, snow, manifest] = await Promise.all([
+    const [kyoto, snow, epa, manifest] = await Promise.all([
       readJson('kyoto-cherry-blossom.json'),
       readJson('nh-snow-cover.json'),
+      readJson('us-growing-season.json'),
       readJson('manifest.json'),
     ]);
     return NextResponse.json(
-      { kyoto, snow, manifest },
+      { kyoto, snow, epa, manifest },
       { headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' } },
     );
   } catch (err) {

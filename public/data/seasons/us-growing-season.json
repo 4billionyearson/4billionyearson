@@ -1,0 +1,1977 @@
+{
+  "source": "EPA Climate Change Indicators in the United States — \"Length of Growing Season\". Data: Kunkel (2021).",
+  "sourceUrl": "https://www.epa.gov/climate-indicators",
+  "description": "Length of the contiguous-US growing season (days between last spring frost and first fall frost), expressed as deviation from the 1895–2020 mean. Last EPA refresh: April 2021.",
+  "coverage": "1895–2020 (Contiguous 48 states)",
+  "headline": {
+    "first30YearMean": -5.45,
+    "last10YearMean": 11.74,
+    "shiftDays": 17.19,
+    "first30YearWindow": "1895–1924",
+    "last10YearWindow": "2011–2020"
+  },
+  "national": [
+    {
+      "year": 1895,
+      "deviationDays": -3.883333333
+    },
+    {
+      "year": 1896,
+      "deviationDays": -4.256666667
+    },
+    {
+      "year": 1897,
+      "deviationDays": -4.352727273
+    },
+    {
+      "year": 1898,
+      "deviationDays": -4.798787879
+    },
+    {
+      "year": 1899,
+      "deviationDays": -4.838484848
+    },
+    {
+      "year": 1900,
+      "deviationDays": -4.338181818
+    },
+    {
+      "year": 1901,
+      "deviationDays": -3.981818182
+    },
+    {
+      "year": 1902,
+      "deviationDays": -5.185454545
+    },
+    {
+      "year": 1903,
+      "deviationDays": -5.94
+    },
+    {
+      "year": 1904,
+      "deviationDays": -6.468181818
+    },
+    {
+      "year": 1905,
+      "deviationDays": -6.367272727
+    },
+    {
+      "year": 1906,
+      "deviationDays": -6.734545455
+    },
+    {
+      "year": 1907,
+      "deviationDays": -6.420909091
+    },
+    {
+      "year": 1908,
+      "deviationDays": -6.948181818
+    },
+    {
+      "year": 1909,
+      "deviationDays": -6.216363636
+    },
+    {
+      "year": 1910,
+      "deviationDays": -6.400909091
+    },
+    {
+      "year": 1911,
+      "deviationDays": -7.7
+    },
+    {
+      "year": 1912,
+      "deviationDays": -8.36
+    },
+    {
+      "year": 1913,
+      "deviationDays": -7.386363636
+    },
+    {
+      "year": 1914,
+      "deviationDays": -6.317272727
+    },
+    {
+      "year": 1915,
+      "deviationDays": -6.2
+    },
+    {
+      "year": 1916,
+      "deviationDays": -5.76
+    },
+    {
+      "year": 1917,
+      "deviationDays": -4.870909091
+    },
+    {
+      "year": 1918,
+      "deviationDays": -5.07
+    },
+    {
+      "year": 1919,
+      "deviationDays": -4.787272727
+    },
+    {
+      "year": 1920,
+      "deviationDays": -5.263636364
+    },
+    {
+      "year": 1921,
+      "deviationDays": -5.150909091
+    },
+    {
+      "year": 1922,
+      "deviationDays": -3.819090909
+    },
+    {
+      "year": 1923,
+      "deviationDays": -2.781818182
+    },
+    {
+      "year": 1924,
+      "deviationDays": -2.8
+    },
+    {
+      "year": 1925,
+      "deviationDays": -3.411818182
+    },
+    {
+      "year": 1926,
+      "deviationDays": -2.169090909
+    },
+    {
+      "year": 1927,
+      "deviationDays": -2.354545455
+    },
+    {
+      "year": 1928,
+      "deviationDays": -2.476363636
+    },
+    {
+      "year": 1929,
+      "deviationDays": -1.825454545
+    },
+    {
+      "year": 1930,
+      "deviationDays": -1.468181818
+    },
+    {
+      "year": 1931,
+      "deviationDays": -0.743636364
+    },
+    {
+      "year": 1932,
+      "deviationDays": -0.413636364
+    },
+    {
+      "year": 1933,
+      "deviationDays": -0.347272727
+    },
+    {
+      "year": 1934,
+      "deviationDays": 0.188181818
+    },
+    {
+      "year": 1935,
+      "deviationDays": 0.474545455
+    },
+    {
+      "year": 1936,
+      "deviationDays": 1.656363636
+    },
+    {
+      "year": 1937,
+      "deviationDays": 0.619090909
+    },
+    {
+      "year": 1938,
+      "deviationDays": 0.279090909
+    },
+    {
+      "year": 1939,
+      "deviationDays": -0.071818182
+    },
+    {
+      "year": 1940,
+      "deviationDays": -0.556363636
+    },
+    {
+      "year": 1941,
+      "deviationDays": 0.111818182
+    },
+    {
+      "year": 1942,
+      "deviationDays": -0.254545455
+    },
+    {
+      "year": 1943,
+      "deviationDays": 0.234545455
+    },
+    {
+      "year": 1944,
+      "deviationDays": -0.007272727
+    },
+    {
+      "year": 1945,
+      "deviationDays": -0.481818182
+    },
+    {
+      "year": 1946,
+      "deviationDays": -0.874545455
+    },
+    {
+      "year": 1947,
+      "deviationDays": -1.933636364
+    },
+    {
+      "year": 1948,
+      "deviationDays": -1.666363636
+    },
+    {
+      "year": 1949,
+      "deviationDays": -1.444545455
+    },
+    {
+      "year": 1950,
+      "deviationDays": -1.67
+    },
+    {
+      "year": 1951,
+      "deviationDays": -1.731818182
+    },
+    {
+      "year": 1952,
+      "deviationDays": -2.086363636
+    },
+    {
+      "year": 1953,
+      "deviationDays": -1.657272727
+    },
+    {
+      "year": 1954,
+      "deviationDays": -2.098181818
+    },
+    {
+      "year": 1955,
+      "deviationDays": -2.213636364
+    },
+    {
+      "year": 1956,
+      "deviationDays": -1.996363636
+    },
+    {
+      "year": 1957,
+      "deviationDays": -1.559090909
+    },
+    {
+      "year": 1958,
+      "deviationDays": -1.134545455
+    },
+    {
+      "year": 1959,
+      "deviationDays": -1.630909091
+    },
+    {
+      "year": 1960,
+      "deviationDays": -1.483636364
+    },
+    {
+      "year": 1961,
+      "deviationDays": -2.302727273
+    },
+    {
+      "year": 1962,
+      "deviationDays": -2.067272727
+    },
+    {
+      "year": 1963,
+      "deviationDays": -2.390909091
+    },
+    {
+      "year": 1964,
+      "deviationDays": -2.746363636
+    },
+    {
+      "year": 1965,
+      "deviationDays": -2.779090909
+    },
+    {
+      "year": 1966,
+      "deviationDays": -2.77
+    },
+    {
+      "year": 1967,
+      "deviationDays": -2.604545455
+    },
+    {
+      "year": 1968,
+      "deviationDays": -2.391818182
+    },
+    {
+      "year": 1969,
+      "deviationDays": -3.372727273
+    },
+    {
+      "year": 1970,
+      "deviationDays": -2.85
+    },
+    {
+      "year": 1971,
+      "deviationDays": -3.314545455
+    },
+    {
+      "year": 1972,
+      "deviationDays": -2.053636364
+    },
+    {
+      "year": 1973,
+      "deviationDays": -1.698181818
+    },
+    {
+      "year": 1974,
+      "deviationDays": -1.313636364
+    },
+    {
+      "year": 1975,
+      "deviationDays": -1.283636364
+    },
+    {
+      "year": 1976,
+      "deviationDays": -1.100909091
+    },
+    {
+      "year": 1977,
+      "deviationDays": -1.009090909
+    },
+    {
+      "year": 1978,
+      "deviationDays": -1.397272727
+    },
+    {
+      "year": 1979,
+      "deviationDays": -1.615454545
+    },
+    {
+      "year": 1980,
+      "deviationDays": -0.303636364
+    },
+    {
+      "year": 1981,
+      "deviationDays": 0.194545455
+    },
+    {
+      "year": 1982,
+      "deviationDays": 1.259090909
+    },
+    {
+      "year": 1983,
+      "deviationDays": 1.148181818
+    },
+    {
+      "year": 1984,
+      "deviationDays": 0.385454545
+    },
+    {
+      "year": 1985,
+      "deviationDays": 0.966363636
+    },
+    {
+      "year": 1986,
+      "deviationDays": 1.419090909
+    },
+    {
+      "year": 1987,
+      "deviationDays": 1.517272727
+    },
+    {
+      "year": 1988,
+      "deviationDays": 1.392727273
+    },
+    {
+      "year": 1989,
+      "deviationDays": 3.050909091
+    },
+    {
+      "year": 1990,
+      "deviationDays": 3.305454545
+    },
+    {
+      "year": 1991,
+      "deviationDays": 2.884545455
+    },
+    {
+      "year": 1992,
+      "deviationDays": 3.090909091
+    },
+    {
+      "year": 1993,
+      "deviationDays": 4.577272727
+    },
+    {
+      "year": 1994,
+      "deviationDays": 4.951818182
+    },
+    {
+      "year": 1995,
+      "deviationDays": 5.866363636
+    },
+    {
+      "year": 1996,
+      "deviationDays": 5.861818182
+    },
+    {
+      "year": 1997,
+      "deviationDays": 5.725454545
+    },
+    {
+      "year": 1998,
+      "deviationDays": 6.25
+    },
+    {
+      "year": 1999,
+      "deviationDays": 7.51
+    },
+    {
+      "year": 2000,
+      "deviationDays": 7.311818182
+    },
+    {
+      "year": 2001,
+      "deviationDays": 7.547272727
+    },
+    {
+      "year": 2002,
+      "deviationDays": 8.375454545
+    },
+    {
+      "year": 2003,
+      "deviationDays": 8.057272727
+    },
+    {
+      "year": 2004,
+      "deviationDays": 7.066363636
+    },
+    {
+      "year": 2005,
+      "deviationDays": 7.44
+    },
+    {
+      "year": 2006,
+      "deviationDays": 7.890909091
+    },
+    {
+      "year": 2007,
+      "deviationDays": 8.574545455
+    },
+    {
+      "year": 2008,
+      "deviationDays": 8.626363636
+    },
+    {
+      "year": 2009,
+      "deviationDays": 8.62
+    },
+    {
+      "year": 2010,
+      "deviationDays": 9.191818182
+    },
+    {
+      "year": 2011,
+      "deviationDays": 10.23
+    },
+    {
+      "year": 2012,
+      "deviationDays": 11.40727273
+    },
+    {
+      "year": 2013,
+      "deviationDays": 11.33363636
+    },
+    {
+      "year": 2014,
+      "deviationDays": 11.84363636
+    },
+    {
+      "year": 2015,
+      "deviationDays": 11.27181818
+    },
+    {
+      "year": 2016,
+      "deviationDays": 11.42621212
+    },
+    {
+      "year": 2017,
+      "deviationDays": 11.95060606
+    },
+    {
+      "year": 2018,
+      "deviationDays": 11.86318182
+    },
+    {
+      "year": 2019,
+      "deviationDays": 12.78757576
+    },
+    {
+      "year": 2020,
+      "deviationDays": 13.31833333
+    }
+  ],
+  "westEast": [
+    {
+      "year": 1895,
+      "east": -1.491666667,
+      "west": -12.18333333
+    },
+    {
+      "year": 1896,
+      "east": -2.047878788,
+      "west": -11.91121212
+    },
+    {
+      "year": 1897,
+      "east": -1.977727273,
+      "west": -12.43
+    },
+    {
+      "year": 1898,
+      "east": -2.328484848,
+      "west": -13.08424242
+    },
+    {
+      "year": 1899,
+      "east": -2.408333333,
+      "west": -12.94121212
+    },
+    {
+      "year": 1900,
+      "east": -1.830909091,
+      "west": -12.57090909
+    },
+    {
+      "year": 1901,
+      "east": -1.581818182,
+      "west": -11.84181818
+    },
+    {
+      "year": 1902,
+      "east": -3.299090909,
+      "west": -11.31727273
+    },
+    {
+      "year": 1903,
+      "east": -3.836363636,
+      "west": -12.66545455
+    },
+    {
+      "year": 1904,
+      "east": -4.604545455,
+      "west": -12.30454545
+    },
+    {
+      "year": 1905,
+      "east": -4.802727273,
+      "west": -11.18363636
+    },
+    {
+      "year": 1906,
+      "east": -4.779090909,
+      "west": -12.61545455
+    },
+    {
+      "year": 1907,
+      "east": -4.198181818,
+      "west": -13.01272727
+    },
+    {
+      "year": 1908,
+      "east": -4.975454545,
+      "west": -12.74090909
+    },
+    {
+      "year": 1909,
+      "east": -4.524545455,
+      "west": -11.13636364
+    },
+    {
+      "year": 1910,
+      "east": -4.835454545,
+      "west": -10.89545455
+    },
+    {
+      "year": 1911,
+      "east": -6.059090909,
+      "west": -12.35909091
+    },
+    {
+      "year": 1912,
+      "east": -6.708181818,
+      "west": -13.05181818
+    },
+    {
+      "year": 1913,
+      "east": -5.397272727,
+      "west": -13.04545455
+    },
+    {
+      "year": 1914,
+      "east": -4.230909091,
+      "west": -12.13636364
+    },
+    {
+      "year": 1915,
+      "east": -3.94,
+      "west": -12.48363636
+    },
+    {
+      "year": 1916,
+      "east": -3.141818182,
+      "west": -13.00272727
+    },
+    {
+      "year": 1917,
+      "east": -2.323636364,
+      "west": -11.9
+    },
+    {
+      "year": 1918,
+      "east": -3.006363636,
+      "west": -10.78090909
+    },
+    {
+      "year": 1919,
+      "east": -2.591818182,
+      "west": -10.82545455
+    },
+    {
+      "year": 1920,
+      "east": -3.403636364,
+      "west": -10.36181818
+    },
+    {
+      "year": 1921,
+      "east": -3.701818182,
+      "west": -9.125454545
+    },
+    {
+      "year": 1922,
+      "east": -2.523636364,
+      "west": -7.327272727
+    },
+    {
+      "year": 1923,
+      "east": -1.676363636,
+      "west": -5.783636364
+    },
+    {
+      "year": 1924,
+      "east": -1.533636364,
+      "west": -6.251818182
+    },
+    {
+      "year": 1925,
+      "east": -2.527272727,
+      "west": -5.834545455
+    },
+    {
+      "year": 1926,
+      "east": -1.311818182,
+      "west": -4.509090909
+    },
+    {
+      "year": 1927,
+      "east": -1.724545455,
+      "west": -4.101818182
+    },
+    {
+      "year": 1928,
+      "east": -1.919090909,
+      "west": -3.971818182
+    },
+    {
+      "year": 1929,
+      "east": -1.296363636,
+      "west": -3.226363636
+    },
+    {
+      "year": 1930,
+      "east": -1.058181818,
+      "west": -2.567272727
+    },
+    {
+      "year": 1931,
+      "east": -0.070909091,
+      "west": -2.581818182
+    },
+    {
+      "year": 1932,
+      "east": 0.298181818,
+      "west": -2.358181818
+    },
+    {
+      "year": 1933,
+      "east": 0.197272727,
+      "west": -1.835454545
+    },
+    {
+      "year": 1934,
+      "east": 0.813636364,
+      "west": -1.511818182
+    },
+    {
+      "year": 1935,
+      "east": 0.141818182,
+      "west": 1.464545455
+    },
+    {
+      "year": 1936,
+      "east": 1.265454545,
+      "west": 2.803636364
+    },
+    {
+      "year": 1937,
+      "east": -0.008181818,
+      "west": 2.409090909
+    },
+    {
+      "year": 1938,
+      "east": -0.61,
+      "west": 2.772727273
+    },
+    {
+      "year": 1939,
+      "east": -1.364545455,
+      "west": 3.520909091
+    },
+    {
+      "year": 1940,
+      "east": -1.315454545,
+      "west": 1.553636364
+    },
+    {
+      "year": 1941,
+      "east": -0.43,
+      "west": 1.667272727
+    },
+    {
+      "year": 1942,
+      "east": -0.945454545,
+      "west": 1.730909091
+    },
+    {
+      "year": 1943,
+      "east": 0.200909091,
+      "west": 0.446363636
+    },
+    {
+      "year": 1944,
+      "east": 0.072727273,
+      "west": -0.103636364
+    },
+    {
+      "year": 1945,
+      "east": -0.150909091,
+      "west": -1.254545455
+    },
+    {
+      "year": 1946,
+      "east": 0.157272727,
+      "west": -3.618181818
+    },
+    {
+      "year": 1947,
+      "east": -0.972727273,
+      "west": -4.483636364
+    },
+    {
+      "year": 1948,
+      "east": -0.49,
+      "west": -4.789090909
+    },
+    {
+      "year": 1949,
+      "east": -0.054545455,
+      "west": -5.144545455
+    },
+    {
+      "year": 1950,
+      "east": 0.024545455,
+      "west": -6.202727273
+    },
+    {
+      "year": 1951,
+      "east": -0.454545455,
+      "west": -5.115454545
+    },
+    {
+      "year": 1952,
+      "east": -1.370909091,
+      "west": -3.967272727
+    },
+    {
+      "year": 1953,
+      "east": -0.912727273,
+      "west": -3.635454545
+    },
+    {
+      "year": 1954,
+      "east": -1.744545455,
+      "west": -3.027272727
+    },
+    {
+      "year": 1955,
+      "east": -1.952727273,
+      "west": -2.891818182
+    },
+    {
+      "year": 1956,
+      "east": -2.028181818,
+      "west": -1.875454545
+    },
+    {
+      "year": 1957,
+      "east": -1.695454545,
+      "west": -1.156363636
+    },
+    {
+      "year": 1958,
+      "east": -1.660909091,
+      "west": 0.358181818
+    },
+    {
+      "year": 1959,
+      "east": -2.191818182,
+      "west": -0.060909091
+    },
+    {
+      "year": 1960,
+      "east": -1.99,
+      "west": -0.064545455
+    },
+    {
+      "year": 1961,
+      "east": -3.426363636,
+      "west": 0.794545455
+    },
+    {
+      "year": 1962,
+      "east": -3.328181818,
+      "west": 1.397272727
+    },
+    {
+      "year": 1963,
+      "east": -3.471818182,
+      "west": 0.58
+    },
+    {
+      "year": 1964,
+      "east": -3.682727273,
+      "west": -0.173636364
+    },
+    {
+      "year": 1965,
+      "east": -3.531818182,
+      "west": -0.710909091
+    },
+    {
+      "year": 1966,
+      "east": -3.207272727,
+      "west": -1.553636364
+    },
+    {
+      "year": 1967,
+      "east": -2.869090909,
+      "west": -1.864545455
+    },
+    {
+      "year": 1968,
+      "east": -2.56,
+      "west": -1.902727273
+    },
+    {
+      "year": 1969,
+      "east": -3.361818182,
+      "west": -3.407272727
+    },
+    {
+      "year": 1970,
+      "east": -2.793636364,
+      "west": -3.003636364
+    },
+    {
+      "year": 1971,
+      "east": -3.449090909,
+      "west": -2.941818182
+    },
+    {
+      "year": 1972,
+      "east": -1.885454545,
+      "west": -2.494545455
+    },
+    {
+      "year": 1973,
+      "east": -1.209090909,
+      "west": -3.017272727
+    },
+    {
+      "year": 1974,
+      "east": -1.114545455,
+      "west": -1.812727273
+    },
+    {
+      "year": 1975,
+      "east": -1.376363636,
+      "west": -0.895454545
+    },
+    {
+      "year": 1976,
+      "east": -1.577272727,
+      "west": 0.364545455
+    },
+    {
+      "year": 1977,
+      "east": -1.926363636,
+      "west": 1.640909091
+    },
+    {
+      "year": 1978,
+      "east": -2.646363636,
+      "west": 2.146363636
+    },
+    {
+      "year": 1979,
+      "east": -3.086363636,
+      "west": 2.523636364
+    },
+    {
+      "year": 1980,
+      "east": -1.044545455,
+      "west": 1.847272727
+    },
+    {
+      "year": 1981,
+      "east": -0.837272727,
+      "west": 3.133636364
+    },
+    {
+      "year": 1982,
+      "east": 0.052727273,
+      "west": 4.716363636
+    },
+    {
+      "year": 1983,
+      "east": -0.376363636,
+      "west": 5.478181818
+    },
+    {
+      "year": 1984,
+      "east": -1.730909091,
+      "west": 6.368181818
+    },
+    {
+      "year": 1985,
+      "east": -0.958181818,
+      "west": 6.389090909
+    },
+    {
+      "year": 1986,
+      "east": -0.289090909,
+      "west": 6.17
+    },
+    {
+      "year": 1987,
+      "east": -0.194545455,
+      "west": 6.3
+    },
+    {
+      "year": 1988,
+      "east": -0.622727273,
+      "west": 7.011818182
+    },
+    {
+      "year": 1989,
+      "east": 1.29,
+      "west": 7.988181818
+    },
+    {
+      "year": 1990,
+      "east": 1.577272727,
+      "west": 8.169090909
+    },
+    {
+      "year": 1991,
+      "east": 0.470909091,
+      "west": 9.633636364
+    },
+    {
+      "year": 1992,
+      "east": 0.404545455,
+      "west": 10.61818182
+    },
+    {
+      "year": 1993,
+      "east": 2.341818182,
+      "west": 10.82181818
+    },
+    {
+      "year": 1994,
+      "east": 3.28,
+      "west": 9.648181818
+    },
+    {
+      "year": 1995,
+      "east": 4.539090909,
+      "west": 9.576363636
+    },
+    {
+      "year": 1996,
+      "east": 4.510909091,
+      "west": 9.635454545
+    },
+    {
+      "year": 1997,
+      "east": 4.383636364,
+      "west": 9.475454545
+    },
+    {
+      "year": 1998,
+      "east": 5.130909091,
+      "west": 9.35
+    },
+    {
+      "year": 1999,
+      "east": 6.551818182,
+      "west": 10.19272727
+    },
+    {
+      "year": 2000,
+      "east": 6.204545455,
+      "west": 10.45363636
+    },
+    {
+      "year": 2001,
+      "east": 6.412727273,
+      "west": 10.76818182
+    },
+    {
+      "year": 2002,
+      "east": 7.563636364,
+      "west": 10.71
+    },
+    {
+      "year": 2003,
+      "east": 7.610909091,
+      "west": 9.368181818
+    },
+    {
+      "year": 2004,
+      "east": 6.438181818,
+      "west": 8.879090909
+    },
+    {
+      "year": 2005,
+      "east": 6.675454545,
+      "west": 9.614545455
+    },
+    {
+      "year": 2006,
+      "east": 7.38,
+      "west": 9.373636364
+    },
+    {
+      "year": 2007,
+      "east": 8.27,
+      "west": 9.495454545
+    },
+    {
+      "year": 2008,
+      "east": 8.166363636,
+      "west": 9.984545455
+    },
+    {
+      "year": 2009,
+      "east": 7.807272727,
+      "west": 10.93636364
+    },
+    {
+      "year": 2010,
+      "east": 8.236363636,
+      "west": 11.89636364
+    },
+    {
+      "year": 2011,
+      "east": 9.304545455,
+      "west": 12.82454545
+    },
+    {
+      "year": 2012,
+      "east": 10.70090909,
+      "west": 13.35909091
+    },
+    {
+      "year": 2013,
+      "east": 10.20454545,
+      "west": 14.42272727
+    },
+    {
+      "year": 2014,
+      "east": 10.76545455,
+      "west": 14.78727273
+    },
+    {
+      "year": 2015,
+      "east": 9.96,
+      "west": 14.94
+    },
+    {
+      "year": 2016,
+      "east": 9.888181818,
+      "west": 15.73924242
+    },
+    {
+      "year": 2017,
+      "east": 10.16272727,
+      "west": 16.97575758
+    },
+    {
+      "year": 2018,
+      "east": 9.855454545,
+      "west": 17.51045455
+    },
+    {
+      "year": 2019,
+      "east": 10.86454545,
+      "west": 18.19515152
+    },
+    {
+      "year": 2020,
+      "east": 11.63,
+      "west": 18.10166667
+    }
+  ],
+  "byState": [
+    {
+      "state": "California",
+      "changeDays": 50.92
+    },
+    {
+      "state": "Arizona",
+      "changeDays": 49.81
+    },
+    {
+      "state": "Washington",
+      "changeDays": 35
+    },
+    {
+      "state": "Wyoming",
+      "changeDays": 34.36
+    },
+    {
+      "state": "Utah",
+      "changeDays": 33.03
+    },
+    {
+      "state": "North Dakota",
+      "changeDays": 31.03
+    },
+    {
+      "state": "Connecticut",
+      "changeDays": 27.7
+    },
+    {
+      "state": "Delaware",
+      "changeDays": 27.55
+    },
+    {
+      "state": "Oregon",
+      "changeDays": 26.62
+    },
+    {
+      "state": "Idaho",
+      "changeDays": 25.85
+    },
+    {
+      "state": "Florida",
+      "changeDays": 25.57
+    },
+    {
+      "state": "Maryland",
+      "changeDays": 23.31
+    },
+    {
+      "state": "New Hampshire",
+      "changeDays": 21.81
+    },
+    {
+      "state": "Louisiana",
+      "changeDays": 20.16
+    },
+    {
+      "state": "Minnesota",
+      "changeDays": 19.62
+    },
+    {
+      "state": "Pennsylvania",
+      "changeDays": 19.56
+    },
+    {
+      "state": "South Dakota",
+      "changeDays": 17.53
+    },
+    {
+      "state": "New Jersey",
+      "changeDays": 16.81
+    },
+    {
+      "state": "Ohio",
+      "changeDays": 16.3
+    },
+    {
+      "state": "Wisconsin",
+      "changeDays": 15.68
+    },
+    {
+      "state": "Maine",
+      "changeDays": 15.09
+    },
+    {
+      "state": "Kansas",
+      "changeDays": 14.77
+    },
+    {
+      "state": "Arkansas",
+      "changeDays": 14.36
+    },
+    {
+      "state": "Michigan",
+      "changeDays": 13.56
+    },
+    {
+      "state": "Virginia",
+      "changeDays": 13.55
+    },
+    {
+      "state": "New Mexico",
+      "changeDays": 13.27
+    },
+    {
+      "state": "Indiana",
+      "changeDays": 12.7
+    },
+    {
+      "state": "Montana",
+      "changeDays": 12.7
+    },
+    {
+      "state": "Nevada",
+      "changeDays": 12
+    },
+    {
+      "state": "Vermont",
+      "changeDays": 11.94
+    },
+    {
+      "state": "Massachusetts",
+      "changeDays": 11.54
+    },
+    {
+      "state": "New York",
+      "changeDays": 11.53
+    },
+    {
+      "state": "Rhode Island",
+      "changeDays": 11.38
+    },
+    {
+      "state": "Colorado",
+      "changeDays": 11.23
+    },
+    {
+      "state": "Iowa",
+      "changeDays": 11.12
+    },
+    {
+      "state": "Missouri",
+      "changeDays": 10.98
+    },
+    {
+      "state": "Nebraska",
+      "changeDays": 9.41
+    },
+    {
+      "state": "Illinois",
+      "changeDays": 8.64
+    },
+    {
+      "state": "Texas",
+      "changeDays": 8.25
+    },
+    {
+      "state": "Kentucky",
+      "changeDays": 6.83
+    },
+    {
+      "state": "West Virginia",
+      "changeDays": 6.63
+    },
+    {
+      "state": "North Carolina",
+      "changeDays": 6.42
+    },
+    {
+      "state": "South Carolina",
+      "changeDays": 5.04
+    },
+    {
+      "state": "Oklahoma",
+      "changeDays": 4.89
+    },
+    {
+      "state": "Tennesee",
+      "changeDays": 3.89
+    },
+    {
+      "state": "Mississippi",
+      "changeDays": 0.75
+    },
+    {
+      "state": "Alabama",
+      "changeDays": -1.93
+    },
+    {
+      "state": "Georgia",
+      "changeDays": -10.93
+    }
+  ],
+  "frost": [
+    {
+      "year": 1895,
+      "lastSpringFrost": 0.263333333,
+      "firstFallFrost": -3.618333333
+    },
+    {
+      "year": 1896,
+      "lastSpringFrost": 0.587575758,
+      "firstFallFrost": -3.667575758
+    },
+    {
+      "year": 1897,
+      "lastSpringFrost": 0.749090909,
+      "firstFallFrost": -3.602272727
+    },
+    {
+      "year": 1898,
+      "lastSpringFrost": 1.122424242,
+      "firstFallFrost": -3.675151515
+    },
+    {
+      "year": 1899,
+      "lastSpringFrost": 1.333030303,
+      "firstFallFrost": -3.504393939
+    },
+    {
+      "year": 1900,
+      "lastSpringFrost": 1.232727273,
+      "firstFallFrost": -3.104545455
+    },
+    {
+      "year": 1901,
+      "lastSpringFrost": 1.267272727,
+      "firstFallFrost": -2.713636364
+    },
+    {
+      "year": 1902,
+      "lastSpringFrost": 2.715454545,
+      "firstFallFrost": -2.469090909
+    },
+    {
+      "year": 1903,
+      "lastSpringFrost": 2.781818182,
+      "firstFallFrost": -3.157272727
+    },
+    {
+      "year": 1904,
+      "lastSpringFrost": 3.255454545,
+      "firstFallFrost": -3.211818182
+    },
+    {
+      "year": 1905,
+      "lastSpringFrost": 3.781818182,
+      "firstFallFrost": -2.583636364
+    },
+    {
+      "year": 1906,
+      "lastSpringFrost": 3.779090909,
+      "firstFallFrost": -2.953636364
+    },
+    {
+      "year": 1907,
+      "lastSpringFrost": 3.454545455,
+      "firstFallFrost": -2.964545455
+    },
+    {
+      "year": 1908,
+      "lastSpringFrost": 3.631818182,
+      "firstFallFrost": -3.313636364
+    },
+    {
+      "year": 1909,
+      "lastSpringFrost": 3.48,
+      "firstFallFrost": -2.733636364
+    },
+    {
+      "year": 1910,
+      "lastSpringFrost": 3.61,
+      "firstFallFrost": -2.788181818
+    },
+    {
+      "year": 1911,
+      "lastSpringFrost": 4.01,
+      "firstFallFrost": -3.686363636
+    },
+    {
+      "year": 1912,
+      "lastSpringFrost": 4.289090909,
+      "firstFallFrost": -4.067272727
+    },
+    {
+      "year": 1913,
+      "lastSpringFrost": 3.494545455,
+      "firstFallFrost": -3.887272727
+    },
+    {
+      "year": 1914,
+      "lastSpringFrost": 3.285454545,
+      "firstFallFrost": -3.027272727
+    },
+    {
+      "year": 1915,
+      "lastSpringFrost": 3.527272727,
+      "firstFallFrost": -2.668181818
+    },
+    {
+      "year": 1916,
+      "lastSpringFrost": 3.158181818,
+      "firstFallFrost": -2.598181818
+    },
+    {
+      "year": 1917,
+      "lastSpringFrost": 2.757272727,
+      "firstFallFrost": -2.110909091
+    },
+    {
+      "year": 1918,
+      "lastSpringFrost": 3.275454545,
+      "firstFallFrost": -1.790909091
+    },
+    {
+      "year": 1919,
+      "lastSpringFrost": 3.472727273,
+      "firstFallFrost": -1.311818182
+    },
+    {
+      "year": 1920,
+      "lastSpringFrost": 3.408181818,
+      "firstFallFrost": -1.852727273
+    },
+    {
+      "year": 1921,
+      "lastSpringFrost": 3.257272727,
+      "firstFallFrost": -1.890909091
+    },
+    {
+      "year": 1922,
+      "lastSpringFrost": 2.977272727,
+      "firstFallFrost": -0.839090909
+    },
+    {
+      "year": 1923,
+      "lastSpringFrost": 2.540909091,
+      "firstFallFrost": -0.238181818
+    },
+    {
+      "year": 1924,
+      "lastSpringFrost": 2.409090909,
+      "firstFallFrost": -0.389090909
+    },
+    {
+      "year": 1925,
+      "lastSpringFrost": 2.598181818,
+      "firstFallFrost": -0.810909091
+    },
+    {
+      "year": 1926,
+      "lastSpringFrost": 2.247272727,
+      "firstFallFrost": 0.081818182
+    },
+    {
+      "year": 1927,
+      "lastSpringFrost": 2.274545455,
+      "firstFallFrost": -0.076363636
+    },
+    {
+      "year": 1928,
+      "lastSpringFrost": 2.336363636,
+      "firstFallFrost": -0.136363636
+    },
+    {
+      "year": 1929,
+      "lastSpringFrost": 1.710909091,
+      "firstFallFrost": -0.111818182
+    },
+    {
+      "year": 1930,
+      "lastSpringFrost": 1.037272727,
+      "firstFallFrost": -0.428181818
+    },
+    {
+      "year": 1931,
+      "lastSpringFrost": 0.784545455,
+      "firstFallFrost": 0.042727273
+    },
+    {
+      "year": 1932,
+      "lastSpringFrost": 0.453636364,
+      "firstFallFrost": 0.041818182
+    },
+    {
+      "year": 1933,
+      "lastSpringFrost": 0.376363636,
+      "firstFallFrost": 0.030909091
+    },
+    {
+      "year": 1934,
+      "lastSpringFrost": -0.019090909,
+      "firstFallFrost": 0.170909091
+    },
+    {
+      "year": 1935,
+      "lastSpringFrost": 0.154545455,
+      "firstFallFrost": 0.630909091
+    },
+    {
+      "year": 1936,
+      "lastSpringFrost": -0.595454545,
+      "firstFallFrost": 1.061818182
+    },
+    {
+      "year": 1937,
+      "lastSpringFrost": -0.924545455,
+      "firstFallFrost": -0.305454545
+    },
+    {
+      "year": 1938,
+      "lastSpringFrost": -0.811818182,
+      "firstFallFrost": -0.532727273
+    },
+    {
+      "year": 1939,
+      "lastSpringFrost": -0.318181818,
+      "firstFallFrost": -0.39
+    },
+    {
+      "year": 1940,
+      "lastSpringFrost": -0.141818182,
+      "firstFallFrost": -0.698181818
+    },
+    {
+      "year": 1941,
+      "lastSpringFrost": -0.225454545,
+      "firstFallFrost": -0.113636364
+    },
+    {
+      "year": 1942,
+      "lastSpringFrost": 0.368181818,
+      "firstFallFrost": 0.115454545
+    },
+    {
+      "year": 1943,
+      "lastSpringFrost": 0.18,
+      "firstFallFrost": 0.416363636
+    },
+    {
+      "year": 1944,
+      "lastSpringFrost": 0.029090909,
+      "firstFallFrost": 0.022727273
+    },
+    {
+      "year": 1945,
+      "lastSpringFrost": 0.683636364,
+      "firstFallFrost": 0.201818182
+    },
+    {
+      "year": 1946,
+      "lastSpringFrost": 0.578181818,
+      "firstFallFrost": -0.295454545
+    },
+    {
+      "year": 1947,
+      "lastSpringFrost": 0.907272727,
+      "firstFallFrost": -1.025454545
+    },
+    {
+      "year": 1948,
+      "lastSpringFrost": 1.173636364,
+      "firstFallFrost": -0.490909091
+    },
+    {
+      "year": 1949,
+      "lastSpringFrost": 1.307272727,
+      "firstFallFrost": -0.136363636
+    },
+    {
+      "year": 1950,
+      "lastSpringFrost": 0.946363636,
+      "firstFallFrost": -0.722727273
+    },
+    {
+      "year": 1951,
+      "lastSpringFrost": 1.230909091,
+      "firstFallFrost": -0.5
+    },
+    {
+      "year": 1952,
+      "lastSpringFrost": 1.257272727,
+      "firstFallFrost": -0.827272727
+    },
+    {
+      "year": 1953,
+      "lastSpringFrost": 0.563636364,
+      "firstFallFrost": -1.093636364
+    },
+    {
+      "year": 1954,
+      "lastSpringFrost": 0.741818182,
+      "firstFallFrost": -1.356363636
+    },
+    {
+      "year": 1955,
+      "lastSpringFrost": 1.193636364,
+      "firstFallFrost": -1.02
+    },
+    {
+      "year": 1956,
+      "lastSpringFrost": 0.685454545,
+      "firstFallFrost": -1.31
+    },
+    {
+      "year": 1957,
+      "lastSpringFrost": 0.517272727,
+      "firstFallFrost": -1.040909091
+    },
+    {
+      "year": 1958,
+      "lastSpringFrost": 1.090909091,
+      "firstFallFrost": -0.043636364
+    },
+    {
+      "year": 1959,
+      "lastSpringFrost": 0.98,
+      "firstFallFrost": -0.650909091
+    },
+    {
+      "year": 1960,
+      "lastSpringFrost": 0.637272727,
+      "firstFallFrost": -0.845454545
+    },
+    {
+      "year": 1961,
+      "lastSpringFrost": 1.376363636,
+      "firstFallFrost": -0.925454545
+    },
+    {
+      "year": 1962,
+      "lastSpringFrost": 1.188181818,
+      "firstFallFrost": -0.878181818
+    },
+    {
+      "year": 1963,
+      "lastSpringFrost": 1.686363636,
+      "firstFallFrost": -0.705454545
+    },
+    {
+      "year": 1964,
+      "lastSpringFrost": 1.984545455,
+      "firstFallFrost": -0.761818182
+    },
+    {
+      "year": 1965,
+      "lastSpringFrost": 2.045454545,
+      "firstFallFrost": -0.733636364
+    },
+    {
+      "year": 1966,
+      "lastSpringFrost": 2.232727273,
+      "firstFallFrost": -0.537272727
+    },
+    {
+      "year": 1967,
+      "lastSpringFrost": 2.278181818,
+      "firstFallFrost": -0.326363636
+    },
+    {
+      "year": 1968,
+      "lastSpringFrost": 2.544545455,
+      "firstFallFrost": 0.151818182
+    },
+    {
+      "year": 1969,
+      "lastSpringFrost": 2.188181818,
+      "firstFallFrost": -1.184545455
+    },
+    {
+      "year": 1970,
+      "lastSpringFrost": 2.046363636,
+      "firstFallFrost": -0.804545455
+    },
+    {
+      "year": 1971,
+      "lastSpringFrost": 2.287272727,
+      "firstFallFrost": -1.029090909
+    },
+    {
+      "year": 1972,
+      "lastSpringFrost": 1.231818182,
+      "firstFallFrost": -0.824545455
+    },
+    {
+      "year": 1973,
+      "lastSpringFrost": 0.960909091,
+      "firstFallFrost": -0.739090909
+    },
+    {
+      "year": 1974,
+      "lastSpringFrost": 0.560909091,
+      "firstFallFrost": -0.752727273
+    },
+    {
+      "year": 1975,
+      "lastSpringFrost": 0.401818182,
+      "firstFallFrost": -0.881818182
+    },
+    {
+      "year": 1976,
+      "lastSpringFrost": 0.319090909,
+      "firstFallFrost": -0.781818182
+    },
+    {
+      "year": 1977,
+      "lastSpringFrost": -0.248181818,
+      "firstFallFrost": -1.256363636
+    },
+    {
+      "year": 1978,
+      "lastSpringFrost": 0.110909091,
+      "firstFallFrost": -1.285454545
+    },
+    {
+      "year": 1979,
+      "lastSpringFrost": -0.214545455,
+      "firstFallFrost": -1.829090909
+    },
+    {
+      "year": 1980,
+      "lastSpringFrost": -0.787272727,
+      "firstFallFrost": -1.09
+    },
+    {
+      "year": 1981,
+      "lastSpringFrost": -0.765454545,
+      "firstFallFrost": -0.57
+    },
+    {
+      "year": 1982,
+      "lastSpringFrost": -1.595454545,
+      "firstFallFrost": -0.334545455
+    },
+    {
+      "year": 1983,
+      "lastSpringFrost": -1.224545455,
+      "firstFallFrost": -0.073636364
+    },
+    {
+      "year": 1984,
+      "lastSpringFrost": -1.021818182,
+      "firstFallFrost": -0.634545455
+    },
+    {
+      "year": 1985,
+      "lastSpringFrost": -1.227272727,
+      "firstFallFrost": -0.26
+    },
+    {
+      "year": 1986,
+      "lastSpringFrost": -2.019090909,
+      "firstFallFrost": -0.599090909
+    },
+    {
+      "year": 1987,
+      "lastSpringFrost": -2.019090909,
+      "firstFallFrost": -0.500909091
+    },
+    {
+      "year": 1988,
+      "lastSpringFrost": -2.262727273,
+      "firstFallFrost": -0.87
+    },
+    {
+      "year": 1989,
+      "lastSpringFrost": -3.092727273,
+      "firstFallFrost": -0.041818182
+    },
+    {
+      "year": 1990,
+      "lastSpringFrost": -3.453636364,
+      "firstFallFrost": -0.148181818
+    },
+    {
+      "year": 1991,
+      "lastSpringFrost": -2.7,
+      "firstFallFrost": 0.184545455
+    },
+    {
+      "year": 1992,
+      "lastSpringFrost": -2.795454545,
+      "firstFallFrost": 0.295454545
+    },
+    {
+      "year": 1993,
+      "lastSpringFrost": -3.005454545,
+      "firstFallFrost": 1.571818182
+    },
+    {
+      "year": 1994,
+      "lastSpringFrost": -3.671818182,
+      "firstFallFrost": 1.279090909
+    },
+    {
+      "year": 1995,
+      "lastSpringFrost": -4.362727273,
+      "firstFallFrost": 1.502727273
+    },
+    {
+      "year": 1996,
+      "lastSpringFrost": -4.498181818,
+      "firstFallFrost": 1.362727273
+    },
+    {
+      "year": 1997,
+      "lastSpringFrost": -3.401818182,
+      "firstFallFrost": 2.322727273
+    },
+    {
+      "year": 1998,
+      "lastSpringFrost": -3.728181818,
+      "firstFallFrost": 2.520909091
+    },
+    {
+      "year": 1999,
+      "lastSpringFrost": -3.845454545,
+      "firstFallFrost": 3.663636364
+    },
+    {
+      "year": 2000,
+      "lastSpringFrost": -3.832727273,
+      "firstFallFrost": 3.478181818
+    },
+    {
+      "year": 2001,
+      "lastSpringFrost": -3.920909091,
+      "firstFallFrost": 3.624545455
+    },
+    {
+      "year": 2002,
+      "lastSpringFrost": -4.536363636,
+      "firstFallFrost": 3.837272727
+    },
+    {
+      "year": 2003,
+      "lastSpringFrost": -4.279090909,
+      "firstFallFrost": 3.777272727
+    },
+    {
+      "year": 2004,
+      "lastSpringFrost": -3.974545455,
+      "firstFallFrost": 3.090909091
+    },
+    {
+      "year": 2005,
+      "lastSpringFrost": -3.756363636,
+      "firstFallFrost": 3.683636364
+    },
+    {
+      "year": 2006,
+      "lastSpringFrost": -3.603636364,
+      "firstFallFrost": 4.286363636
+    },
+    {
+      "year": 2007,
+      "lastSpringFrost": -4.295454545,
+      "firstFallFrost": 4.277272727
+    },
+    {
+      "year": 2008,
+      "lastSpringFrost": -4.342727273,
+      "firstFallFrost": 4.281818182
+    },
+    {
+      "year": 2009,
+      "lastSpringFrost": -4.005454545,
+      "firstFallFrost": 4.612727273
+    },
+    {
+      "year": 2010,
+      "lastSpringFrost": -4.202727273,
+      "firstFallFrost": 4.987272727
+    },
+    {
+      "year": 2011,
+      "lastSpringFrost": -4.623636364,
+      "firstFallFrost": 5.604545455
+    },
+    {
+      "year": 2012,
+      "lastSpringFrost": -5.045454545,
+      "firstFallFrost": 6.36
+    },
+    {
+      "year": 2013,
+      "lastSpringFrost": -5.09,
+      "firstFallFrost": 6.241818182
+    },
+    {
+      "year": 2014,
+      "lastSpringFrost": -5.698181818,
+      "firstFallFrost": 6.142727273
+    },
+    {
+      "year": 2015,
+      "lastSpringFrost": -5.301818182,
+      "firstFallFrost": 5.967272727
+    },
+    {
+      "year": 2016,
+      "lastSpringFrost": -5.385,
+      "firstFallFrost": 6.038333333
+    },
+    {
+      "year": 2017,
+      "lastSpringFrost": -5.531818182,
+      "firstFallFrost": 6.416666667
+    },
+    {
+      "year": 2018,
+      "lastSpringFrost": -4.990454545,
+      "firstFallFrost": 6.871363636
+    },
+    {
+      "year": 2019,
+      "lastSpringFrost": -5.779090909,
+      "firstFallFrost": 7.006969697
+    },
+    {
+      "year": 2020,
+      "lastSpringFrost": -6.205,
+      "firstFallFrost": 7.111666667
+    }
+  ]
+}

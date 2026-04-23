@@ -9,6 +9,7 @@
  * Sources:
  *   - Kyoto full-flowering dates 812–2015 CE (Aono, published via NOAA NCEI Paleoclimatology)
  *   - Northern Hemisphere monthly snow cover 1966–present (Rutgers Global Snow Lab)
+ *   - US growing-season length 1895–2020 (EPA Climate Change Indicators, fig 1/2/3/4)
  *
  * Usage: node scripts/fetch-shifting-seasons.mjs
  * Safe to re-run; overwrites output JSON.
@@ -51,6 +52,17 @@ const KYOTO_RECENT = {
 
 const RUTGERS_URL =
   'https://climate.rutgers.edu/snowcover/files/moncov.nhland.txt';
+
+// EPA Climate Change Indicators — "Length of Growing Season"
+// Last EPA update: April 2021 (data through 2020). EPA hasn't refreshed the
+// indicator since, but the underlying analysis (Kunkel) remains the standard
+// reference for the long historical view of US growing-season change.
+const EPA_GS_URLS = {
+  national: 'https://www.epa.gov/sites/production/files/2021-04/growing-season_fig-1.csv',
+  westEast: 'https://www.epa.gov/sites/production/files/2021-04/growing-season_fig-2.csv',
+  byState: 'https://www.epa.gov/sites/production/files/2021-04/growing-season_fig-3.csv',
+  frostDates: 'https://www.epa.gov/sites/production/files/2021-04/growing-season_fig-4.csv',
+};
 
 const CLIMATOLOGY_START = 1981;
 const CLIMATOLOGY_END = 2010;
@@ -186,6 +198,73 @@ function buildSnowSeries(rows) {
   };
 }
 
+/* ─── EPA growing-season ─────────────────────────────────────────────────── */
+
+// EPA CSVs use a few preamble lines, then a header row, then year,value(s).
+function parseEpaCsv(raw) {
+  const lines = raw.split(/\r?\n/);
+  const headerIdx = lines.findIndex((l) => /^Year[,\s]/i.test(l));
+  if (headerIdx === -1) return { header: [], rows: [] };
+  const header = lines[headerIdx].split(',').map((s) => s.trim().replace(/^"|"$/g, ''));
+  const rows = [];
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const parts = line.split(',').map((s) => s.trim().replace(/^"|"$/g, ''));
+    const year = Number(parts[0]);
+    if (!Number.isFinite(year)) continue;
+    rows.push(parts);
+  }
+  return { header, rows };
+}
+
+function parseEpaNational(raw) {
+  const { rows } = parseEpaCsv(raw);
+  return rows
+    .map((r) => ({ year: Number(r[0]), deviationDays: Number(r[1]) }))
+    .filter((p) => Number.isFinite(p.year) && Number.isFinite(p.deviationDays));
+}
+
+function parseEpaWestEast(raw) {
+  const { rows } = parseEpaCsv(raw);
+  return rows
+    .map((r) => ({
+      year: Number(r[0]),
+      east: Number(r[1]),
+      west: Number(r[2]),
+    }))
+    .filter((p) => Number.isFinite(p.year));
+}
+
+function parseEpaFrost(raw) {
+  const { rows } = parseEpaCsv(raw);
+  return rows
+    .map((r) => ({
+      year: Number(r[0]),
+      lastSpringFrost: Number(r[1]),
+      firstFallFrost: Number(r[2]),
+    }))
+    .filter((p) => Number.isFinite(p.year));
+}
+
+// Figure 3 has a different layout: state-name rows, two columns.
+function parseEpaByState(raw) {
+  const lines = raw.split(/\r?\n/);
+  const headerIdx = lines.findIndex((l) => /^State,/i.test(l));
+  if (headerIdx === -1) return [];
+  const out = [];
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const parts = line.split(',').map((s) => s.trim().replace(/^"|"$/g, ''));
+    const state = parts[0];
+    const change = Number(parts[1]);
+    if (!state || !Number.isFinite(change)) continue;
+    out.push({ state, changeDays: Number(change.toFixed(2)) });
+  }
+  return out;
+}
+
 /* ─── Main ────────────────────────────────────────────────────────────────── */
 
 async function main() {
@@ -254,6 +333,50 @@ async function main() {
     `  → ${snowRows.length} monthly records, through ${latestMonth?.year}-${String(latestMonth?.month).padStart(2, '0')}`,
   );
 
+  console.log('Fetching EPA growing-season indicators…');
+  const [epaNatRaw, epaWERaw, epaStateRaw, epaFrostRaw] = await Promise.all([
+    fetchText(EPA_GS_URLS.national),
+    fetchText(EPA_GS_URLS.westEast),
+    fetchText(EPA_GS_URLS.byState),
+    fetchText(EPA_GS_URLS.frostDates),
+  ]);
+  const epaNational = parseEpaNational(epaNatRaw);
+  const epaWestEast = parseEpaWestEast(epaWERaw);
+  const epaByState = parseEpaByState(epaStateRaw);
+  const epaFrost = parseEpaFrost(epaFrostRaw);
+
+  // Headline: average of last 10 years vs first 30 years
+  const natFirst30 = epaNational.filter((p) => p.year < epaNational[0].year + 30);
+  const natLast10 = epaNational.slice(-10);
+  const firstMean = natFirst30.reduce((s, p) => s + p.deviationDays, 0) / natFirst30.length;
+  const lastMean = natLast10.reduce((s, p) => s + p.deviationDays, 0) / natLast10.length;
+
+  const epaOut = {
+    source: 'EPA Climate Change Indicators in the United States — "Length of Growing Season". Data: Kunkel (2021).',
+    sourceUrl: 'https://www.epa.gov/climate-indicators',
+    description:
+      'Length of the contiguous-US growing season (days between last spring frost and first fall frost), expressed as deviation from the 1895–2020 mean. Last EPA refresh: April 2021.',
+    coverage: '1895–2020 (Contiguous 48 states)',
+    headline: {
+      first30YearMean: Number(firstMean.toFixed(2)),
+      last10YearMean: Number(lastMean.toFixed(2)),
+      shiftDays: Number((lastMean - firstMean).toFixed(2)),
+      first30YearWindow: `${natFirst30[0].year}–${natFirst30[natFirst30.length - 1].year}`,
+      last10YearWindow: `${natLast10[0].year}–${natLast10[natLast10.length - 1].year}`,
+    },
+    national: epaNational,
+    westEast: epaWestEast,
+    byState: epaByState.sort((a, b) => b.changeDays - a.changeDays),
+    frost: epaFrost,
+  };
+  await fs.writeFile(
+    path.join(OUT_DIR, 'us-growing-season.json'),
+    JSON.stringify(epaOut, null, 2),
+  );
+  console.log(
+    `  → ${epaNational.length} national, ${epaByState.length} states; recent 10y is ${(lastMean - firstMean).toFixed(1)} days longer than first 30y on record.`,
+  );
+
   // Manifest for the API route
   const manifest = {
     updatedAt: new Date().toISOString(),
@@ -267,6 +390,11 @@ async function main() {
         id: 'nh-snow-cover',
         title: 'Northern Hemisphere snow cover (1966–present)',
         file: 'nh-snow-cover.json',
+      },
+      {
+        id: 'us-growing-season',
+        title: 'US growing-season length (EPA, 1895–2020)',
+        file: 'us-growing-season.json',
       },
     ],
   };

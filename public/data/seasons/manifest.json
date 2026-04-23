@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-23T16:37:00.441Z",
+  "updatedAt": "2026-04-23T19:55:08.400Z",
   "datasets": [
     {
       "id": "kyoto-cherry-blossom",
@@ -10,6 +10,11 @@
       "id": "nh-snow-cover",
       "title": "Northern Hemisphere snow cover (1966–present)",
       "file": "nh-snow-cover.json"
+    },
+    {
+      "id": "us-growing-season",
+      "title": "US growing-season length (EPA, 1895–2020)",
+      "file": "us-growing-season.json"
     }
   ]
 }
