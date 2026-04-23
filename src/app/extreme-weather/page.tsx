@@ -652,6 +652,46 @@ function LiveEventsSection({ events }: { events: GDACSEvent[] }) {
     return c;
   }, [events]);
 
+  // Hotspot clusters: group by country + event type, then surface the ones that
+  // dominate the current feed so duplicate hotspot entries (e.g. 34 identical
+  // "Forest fires in Australia" alerts) collapse into a single actionable row.
+  const hotspots = useMemo(() => {
+    type Cluster = {
+      country: string;
+      type: string;
+      count: number;
+      alerts: Record<string, number>;
+      earliest: string | null;
+      latest: string | null;
+      sampleUrl: string;
+    };
+    const map = new Map<string, Cluster>();
+    for (const e of events) {
+      const country = e.country || "—";
+      const key = `${country}|${e.type}`;
+      let c = map.get(key);
+      if (!c) {
+        c = { country, type: e.type, count: 0, alerts: {}, earliest: null, latest: null, sampleUrl: e.url };
+        map.set(key, c);
+      }
+      c.count++;
+      c.alerts[e.alertLevel] = (c.alerts[e.alertLevel] || 0) + 1;
+      if (e.fromDate && (!c.earliest || e.fromDate < c.earliest)) c.earliest = e.fromDate;
+      if (e.toDate && (!c.latest || e.toDate > c.latest)) c.latest = e.toDate;
+    }
+    const alertRank = (a: Cluster) =>
+      (a.alerts.Red || 0) * 100 + (a.alerts.Orange || 0) * 10 + (a.alerts.Green || 0);
+    return [...map.values()]
+      .filter((c) => c.count >= 2) // only clusters worth calling out
+      .sort((a, b) => alertRank(b) - alertRank(a) || b.count - a.count)
+      .slice(0, 8);
+  }, [events]);
+
+  const fmtShort = (iso: string | null) =>
+    iso
+      ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+      : "";
+
   return (
     <div>
       {/* Summary stats */}
@@ -669,6 +709,67 @@ function LiveEventsSection({ events }: { events: GDACSEvent[] }) {
           <div className="text-xs text-emerald-400/70 uppercase">Green Alert</div>
         </div>
       </div>
+
+      {/* Hotspot clusters */}
+      {hotspots.length > 0 && (
+        <SubSection title="Hotspot Clusters (multiple active alerts)">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+            {hotspots.map((h, i) => {
+              const pctOfFeed = Math.round((h.count / events.length) * 100);
+              const dominantAlert =
+                (h.alerts.Red || 0) > 0 ? "Red" : (h.alerts.Orange || 0) > 0 ? "Orange" : "Green";
+              const dateRange =
+                h.earliest && h.latest && h.earliest !== h.latest
+                  ? `${fmtShort(h.earliest)} → ${fmtShort(h.latest)}`
+                  : fmtShort(h.earliest);
+              return (
+                <div
+                  key={i}
+                  className={`rounded-xl border p-3 ${ALERT_COLORS[dominantAlert] || "bg-gray-800/30 text-gray-300 border-gray-700"}`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="shrink-0">{EVENT_ICONS[h.type]}</span>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-sm truncate">
+                          {h.count}× {EVENT_LABELS[h.type] || h.type} — {h.country}
+                        </div>
+                        <div className="text-xs opacity-70 mt-0.5">
+                          {dateRange}
+                          {pctOfFeed >= 20 && (
+                            <span className="ml-1.5 opacity-80">
+                              · {pctOfFeed}% of all active alerts
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      {(["Red", "Orange", "Green"] as const).map((lvl) =>
+                        h.alerts[lvl] ? (
+                          <span
+                            key={lvl}
+                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${ALERT_COLORS[lvl]}`}
+                            title={`${h.alerts[lvl]} ${lvl} alert${h.alerts[lvl] === 1 ? "" : "s"}`}
+                          >
+                            {h.alerts[lvl]}
+                          </span>
+                        ) : null,
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setFilter(h.type)}
+                    className="mt-2 text-xs font-mono underline decoration-dotted underline-offset-2 opacity-80 hover:opacity-100"
+                  >
+                    Filter to {EVENT_LABELS[h.type] || h.type} →
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </SubSection>
+      )}
 
       {/* Filter buttons */}
       <div className="flex flex-wrap gap-2 mb-4">
