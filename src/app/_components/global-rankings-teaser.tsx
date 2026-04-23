@@ -56,7 +56,7 @@ export default function GlobalRankingsTeaser() {
           </span>
         </span>
       ))}
-      <span className="ml-auto text-[11px] text-teal-300">Rankings, movers & monthly analysis →</span>
+      <span className="ml-auto pl-3 pl-3 text-[11px] text-teal-300">Rankings, movers & monthly analysis →</span>
     </Link>
   );
 }

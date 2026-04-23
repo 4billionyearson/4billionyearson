@@ -114,11 +114,11 @@ function getMatchedCities(region: UKRegionCardData, query: string): string[] {
   return region.searchableCities.filter((city) => city.toLowerCase().includes(query)).slice(0, 3);
 }
 
-export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[] }) {
+export default function UKRegionsBrowser({ regions, headless = false }: { regions: ClimateRegion[]; headless?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(headless);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<RegionGroupFilter>('all');
 
@@ -175,6 +175,87 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
     }
   }, [query, filter, pathname, router, searchParams]);
 
+  if (headless) {
+    return (
+      <section className="relative rounded-2xl border-2 border-[#D0A65E]/80 bg-gray-950/90 backdrop-blur-md overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+        <div className="px-4 py-5 md:px-6 md:py-6 space-y-5">
+          <div className="space-y-4">
+            <div className="relative max-w-2xl">
+              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'rgba(208, 166, 94, 0.8)' }} />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by city, region or nation"
+                className="w-full rounded-xl border border-[#D0A65E]/35 bg-gray-900/50 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#FFF5E7]/35 outline-none transition-all focus:border-[#D0A65E]/55 focus:ring-2 focus:ring-[#D0A65E]/20"
+                autoComplete="off"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-700 hover:text-white"
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            <div className="border-t border-gray-800/80 pt-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {(Object.keys(FILTER_LABELS) as RegionGroupFilter[]).map((option) => {
+                  const active = filter === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setFilter(option)}
+                      className={`${FILTER_BUTTON_BASE} ${active ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE}`}
+                    >
+                      {FILTER_LABELS[option]}
+                    </button>
+                  );
+                })}
+                <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
+                  {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
+                  {normalizedQuery ? ` matching "${query.trim()}"` : ''}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {GROUP_ORDER.map((group) => {
+              const items = groupedRegions.get(group) ?? [];
+              if (!items.length) return null;
+              return (
+                <div key={group} className="space-y-3">
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">{GROUP_TITLES[group]}</h3>
+                    <span className="flex-1 h-px bg-[#D0A65E]/15" />
+                    <span className="text-[11px] text-gray-500">{items.length}</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {items.map((item) => (
+                      <UKRegionCard
+                        key={item.region.slug}
+                        region={item.region}
+                        representativeCities={item.representativeCities}
+                        matchedCities={getMatchedCities(item, normalizedQuery)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {!filteredRegions.length && <EmptyState />}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       className="relative rounded-2xl border-2 transition-all duration-500 ease-out overflow-hidden"
@@ -190,7 +271,7 @@ export default function UKRegionsBrowser({ regions }: { regions: ClimateRegion[]
             <MapIcon className="h-6 w-6" />
           </div>
           <h2 className="flex-1 min-w-0 font-mono font-bold text-base md:text-lg tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-            UK Regions &amp; Ireland
+            UK Regions
           </h2>
           <span className="hidden sm:inline text-[11px] font-medium uppercase tracking-[0.14em]" style={{ color: 'rgba(255,245,231,0.7)' }}>
             {regions.length} region{regions.length === 1 ? '' : 's'}

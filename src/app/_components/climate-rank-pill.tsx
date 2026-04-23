@@ -109,7 +109,7 @@ export default function ClimateRankPill({ slug }: { slug: string }) {
           </span>
         </span>
       )}
-      <span className="ml-auto text-[11px] text-teal-300">See all 144 regions →</span>
+      <span className="ml-auto pl-3 text-[11px] text-teal-300">See all 144 regions →</span>
     </Link>
   );
 }
