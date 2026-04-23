@@ -4,7 +4,7 @@ import { Globe2, Flag } from 'lucide-react';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import UKRegionsBrowser from './uk-regions-browser';
 import ClimateRegionsBrowser from './climate-regions-browser';
-import ClimateHubTabs from './climate-hub-tabs';
+import { ClimateTabsProvider, ClimateTabsBar, ClimateTabsPanels } from './climate-hub-tabs';
 import EditorsPicksPanel from './editors-picks-panel';
 import ClimateRankingsPanel from './climate-rankings-panel';
 
@@ -38,28 +38,7 @@ export default function ClimateProfilesIndex() {
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
 
-          {/* Compact hero */}
-          <section
-            className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
-            style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}
-          >
-            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-              <h1
-                className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight"
-                style={{ color: '#FFF5E7' }}
-              >
-                Climate Updates
-              </h1>
-            </div>
-            <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
-              <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                Monthly climate updates for every country, US state and UK region we track — 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news.
-              </p>
-            </div>
-          </section>
-
-          {/* Sticky tabs */}
-          <ClimateHubTabs
+          <ClimateTabsProvider
             counts={{
               countries: countries.length,
               usStates: usStates.length,
@@ -94,7 +73,34 @@ export default function ClimateProfilesIndex() {
               ),
               rankings: <ClimateRankingsPanel />,
             }}
-          />
+          >
+            {/* Unified hero + tab bar — one gold-bordered panel so the navigation
+                reads as a sub-section of the Climate Updates header, not floating
+                between cards. The tab row stays sticky as you scroll the panel. */}
+            <section
+              className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
+              style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}
+            >
+              <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+                <h1
+                  className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight"
+                  style={{ color: '#FFF5E7' }}
+                >
+                  Climate Updates
+                </h1>
+              </div>
+              <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
+                <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+                  Monthly climate updates for every country, US state and UK region we track — 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news.
+                </p>
+              </div>
+              <div className="sticky top-0 z-30 bg-gray-950/92 backdrop-blur-md border-t border-[#D0A65E]/30 px-4 py-2.5 md:px-6">
+                <ClimateTabsBar />
+              </div>
+            </section>
+
+            <ClimateTabsPanels />
+          </ClimateTabsProvider>
         </div>
       </div>
     </main>

@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { Sparkles, Globe2, Flag, MapPin, Trophy, type LucideIcon } from 'lucide-react';
 
-type TabId = 'editors-picks' | 'countries' | 'us-states' | 'uk-regions' | 'rankings';
+export type ClimateTabId = 'editors-picks' | 'countries' | 'us-states' | 'uk-regions' | 'rankings';
 
 type TabDef = {
-  id: TabId;
+  id: ClimateTabId;
   label: string;
   icon: LucideIcon;
   countKey?: 'countries' | 'usStates' | 'ukRegions';
@@ -21,17 +21,38 @@ const TABS: TabDef[] = [
 ];
 
 type Counts = { countries: number; usStates: number; ukRegions: number };
+type Panels = Record<ClimateTabId, ReactNode>;
 
-type Panels = Record<TabId, ReactNode>;
-
-function isTabId(value: string): value is TabId {
+function isTabId(value: string): value is ClimateTabId {
   return TABS.some((t) => t.id === value);
 }
 
-export default function ClimateHubTabs({ counts, panels }: { counts: Counts; panels: Panels }) {
-  const [active, setActive] = useState<TabId>('editors-picks');
+type Ctx = {
+  active: ClimateTabId;
+  setActive: (id: ClimateTabId) => void;
+  counts: Counts;
+  panels: Panels;
+};
 
-  // Sync with URL hash on mount + on back/forward
+const ClimateTabsCtx = createContext<Ctx | null>(null);
+
+function useClimateTabs(): Ctx {
+  const v = useContext(ClimateTabsCtx);
+  if (!v) throw new Error('ClimateTabsProvider missing');
+  return v;
+}
+
+export function ClimateTabsProvider({
+  counts,
+  panels,
+  children,
+}: {
+  counts: Counts;
+  panels: Panels;
+  children: ReactNode;
+}) {
+  const [active, setActive] = useState<ClimateTabId>('editors-picks');
+
   useEffect(() => {
     const sync = () => {
       const hash = window.location.hash.replace('#', '');
@@ -42,58 +63,70 @@ export default function ClimateHubTabs({ counts, panels }: { counts: Counts; pan
     return () => window.removeEventListener('hashchange', sync);
   }, []);
 
-  const handleSelect = (id: TabId) => {
+  const handleSetActive = (id: ClimateTabId) => {
     setActive(id);
-    if (history.replaceState) history.replaceState(null, '', `#${id}`);
+    if (typeof history !== 'undefined' && history.replaceState) {
+      history.replaceState(null, '', `#${id}`);
+    }
   };
 
   return (
-    <>
-      <div
-        role="tablist"
-        aria-label="Climate hub sections"
-        className="sticky top-0 z-30 -mx-3 md:-mx-4 border-b border-[#D0A65E]/30 bg-gray-950/92 px-3 md:px-4 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.35)]"
-      >
-        <nav
-          className="flex gap-2 overflow-x-auto py-2 md:py-2.5"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const count = tab.countKey ? counts[tab.countKey] : null;
-            const isActive = active === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={`panel-${tab.id}`}
-                id={`tab-${tab.id}`}
-                onClick={() => handleSelect(tab.id)}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
-                  isActive
-                    ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
-                    : 'border-gray-800 bg-gray-900/60 text-gray-300 hover:border-[#D0A65E]/45 hover:bg-gray-900 hover:text-[#FFF5E7]'
+    <ClimateTabsCtx.Provider value={{ active, setActive: handleSetActive, counts, panels }}>
+      {children}
+    </ClimateTabsCtx.Provider>
+  );
+}
+
+export function ClimateTabsBar() {
+  const { active, setActive, counts } = useClimateTabs();
+  return (
+    <div
+      role="tablist"
+      aria-label="Climate hub sections"
+      className="flex gap-2 overflow-x-auto"
+      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    >
+      {TABS.map((tab) => {
+        const Icon = tab.icon;
+        const count = tab.countKey ? counts[tab.countKey] : null;
+        const isActive = active === tab.id;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            aria-controls={`panel-${tab.id}`}
+            id={`tab-${tab.id}`}
+            onClick={() => setActive(tab.id)}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
+              isActive
+                ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
+                : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:bg-gray-900 hover:text-[#FFF5E7]'
+            }`}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            <span>{tab.label}</span>
+            {count != null && (
+              <span
+                className={`rounded-full px-1.5 text-[10px] font-semibold ${
+                  isActive ? 'bg-[#1A0E00]/15 text-[#1A0E00]' : 'bg-gray-800 text-gray-400'
                 }`}
               >
-                <Icon className="h-3.5 w-3.5" />
-                <span>{tab.label}</span>
-                {count != null && (
-                  <span
-                    className={`rounded-full px-1.5 text-[10px] font-semibold ${
-                      isActive ? 'bg-[#1A0E00]/15 text-[#1A0E00]' : 'bg-gray-800 text-gray-400'
-                    }`}
-                  >
-                    {count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
+                {count}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
+export function ClimateTabsPanels() {
+  const { active, panels } = useClimateTabs();
+  return (
+    <>
       {TABS.map((tab) => (
         <div
           key={tab.id}

@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON, Marker, useMap, useMapEvents } from 'react-leaflet';
 import type { FeatureCollection, Feature } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -111,6 +112,182 @@ function InvalidateOnMount() {
   return null;
 }
 
+/* ─── Zoom-aware labels (continent → country → US state) ─────────────── */
+
+const LABEL_OVERRIDES: Record<string, [number, number]> = {
+  'United States of America': [40, -98],
+  'Canada': [56, -96],
+  'Russia': [62, 95],
+  'France': [47, 2.5],
+  'Norway': [65, 13],
+  'Indonesia': [-2, 118],
+  'Malaysia': [4, 109],
+  'Chile': [-35, -71],
+  'New Zealand': [-42, 174],
+  'Japan': [36, 138],
+  'Antarctica': [-82, 0],
+};
+
+const CONTINENT_LABELS: { name: string; pos: [number, number] }[] = [
+  { name: 'North America', pos: [45, -100] },
+  { name: 'South America', pos: [-15, -58] },
+  { name: 'Europe', pos: [52, 15] },
+  { name: 'Africa', pos: [5, 20] },
+  { name: 'Asia', pos: [42, 85] },
+  { name: 'Oceania', pos: [-25, 135] },
+];
+
+const MAJOR_COUNTRIES = new Set([
+  'United States of America', 'Canada', 'Mexico', 'Brazil', 'Argentina',
+  'Colombia', 'Peru', 'Chile', 'Venezuela',
+  'Russia', 'China', 'India', 'Japan', 'Australia',
+  'Indonesia', 'Saudi Arabia', 'Iran', 'Kazakhstan',
+  'United Kingdom', 'France', 'Germany', 'Spain', 'Italy',
+  'Turkey', 'Ukraine', 'Poland', 'Sweden', 'Norway', 'Finland',
+  'Egypt', 'South Africa', 'Nigeria', 'Algeria', 'Libya',
+  'Dem. Rep. Congo', 'Sudan', 'Ethiopia', 'Tanzania', 'Kenya',
+  'Mongolia', 'Pakistan', 'Afghanistan', 'Thailand', 'Myanmar',
+  'Greenland', 'Iceland', 'New Zealand',
+]);
+
+const DISPLAY_NAME: Record<string, string> = {
+  'United States of America': 'United States',
+  'Dem. Rep. Congo': 'DR Congo',
+  'Dominican Rep.': 'Dominican Republic',
+  'Central African Rep.': 'Central African Republic',
+  'S. Sudan': 'South Sudan',
+  'Bosnia and Herz.': 'Bosnia & Herz.',
+  'Czech Rep.': 'Czechia',
+  'W. Sahara': 'Western Sahara',
+  'Eq. Guinea': 'Equatorial Guinea',
+  'Solomon Is.': 'Solomon Is.',
+};
+
+function ringArea(ring: number[][]): number {
+  let a = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    a += (ring[j][0] - ring[i][0]) * (ring[j][1] + ring[i][1]);
+  }
+  return a / 2;
+}
+function ringCentroid(ring: number[][]): [number, number] {
+  let x = 0, y = 0;
+  for (const c of ring) { x += c[0]; y += c[1]; }
+  return [y / ring.length, x / ring.length];
+}
+function featureCentroid(feature: Feature): [number, number] | null {
+  const g: any = feature.geometry;
+  if (!g) return null;
+  if (g.type === 'Polygon') return ringCentroid(g.coordinates[0]);
+  if (g.type === 'MultiPolygon') {
+    let best: number[][] = [];
+    let bestArea = 0;
+    for (const poly of g.coordinates as number[][][][]) {
+      const ring = poly[0];
+      const a = Math.abs(ringArea(ring));
+      if (a > bestArea) { bestArea = a; best = ring; }
+    }
+    return best.length ? ringCentroid(best) : null;
+  }
+  return null;
+}
+
+const US_STATE_LABEL_ZOOM = 4;
+
+function MapLabels({
+  countriesGeo,
+  statesGeo,
+}: {
+  countriesGeo: FeatureCollection | null;
+  statesGeo: FeatureCollection | null;
+}) {
+  const map = useMap();
+  const [ready, setReady] = useState(false);
+  const [zoom, setZoom] = useState(map.getZoom());
+
+  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+
+  useEffect(() => {
+    if (!map.getPane('labels')) {
+      const pane = map.createPane('labels');
+      pane.style.zIndex = '450';
+      pane.style.pointerEvents = 'none';
+    }
+    const tooltipPane = map.getPane('tooltipPane');
+    if (tooltipPane) tooltipPane.style.zIndex = '700';
+    setReady(true);
+  }, [map]);
+
+  const countryLabels = useMemo(() => {
+    if (!countriesGeo) return [] as { name: string; pos: [number, number] }[];
+    const result: { name: string; pos: [number, number] }[] = [];
+    for (const f of countriesGeo.features) {
+      const name = (f.properties as any)?.name as string | undefined;
+      if (!name) continue;
+      const pos = LABEL_OVERRIDES[name] ?? featureCentroid(f);
+      if (pos) result.push({ name, pos });
+    }
+    return result;
+  }, [countriesGeo]);
+
+  const stateLabels = useMemo(() => {
+    if (!statesGeo) return [] as { name: string; pos: [number, number] }[];
+    const result: { name: string; pos: [number, number] }[] = [];
+    for (const f of statesGeo.features) {
+      const name = (f.properties as any)?.name as string | undefined;
+      if (!name) continue;
+      const pos = featureCentroid(f);
+      if (pos) result.push({ name, pos });
+    }
+    return result;
+  }, [statesGeo]);
+
+  if (!ready) return null;
+
+  const visibleCountries =
+    zoom <= 2
+      ? CONTINENT_LABELS
+      : zoom <= 3
+        ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
+        : countryLabels;
+
+  const fontSize = zoom <= 2 ? 13 : 10;
+  const cls = zoom <= 2 ? 'continent-label-dark' : 'country-label-dark';
+
+  return (
+    <>
+      {visibleCountries.map(({ name, pos }) => (
+        <Marker
+          key={`c-${name}`}
+          position={pos}
+          pane="labels"
+          interactive={false}
+          icon={L.divIcon({
+            className: cls,
+            html: `<span style="font-size:${fontSize}px">${DISPLAY_NAME[name] ?? name}</span>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0],
+          })}
+        />
+      ))}
+      {zoom >= US_STATE_LABEL_ZOOM && stateLabels.map(({ name, pos }) => (
+        <Marker
+          key={`s-${name}`}
+          position={pos}
+          pane="labels"
+          interactive={false}
+          icon={L.divIcon({
+            className: 'country-label-dark',
+            html: `<span style="font-size:9px;opacity:0.85">${name}</span>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0],
+          })}
+        />
+      ))}
+    </>
+  );
+}
+
 /* ─── Sub-national overlays (US states + UK nations) ─────────────────────── */
 
 const US_STATES_ZOOM = 3;
@@ -140,24 +317,17 @@ function USStatesOverlay({
   rankings,
   windowSel,
   onInfo,
+  statesGeo,
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
   onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
+  statesGeo: FeatureCollection | null;
 }) {
   const map = useMap();
   const [visible, setVisible] = useState(map.getZoom() >= US_STATES_ZOOM);
-  const [geo, setGeo] = useState<FeatureCollection | null>(null);
 
   useMapEvents({ zoomend: () => setVisible(map.getZoom() >= US_STATES_ZOOM) });
-
-  useEffect(() => {
-    if (!visible || geo) return;
-    fetch('/data/us-states.json')
-      .then((r) => r.json())
-      .then((g: FeatureCollection) => setGeo(g))
-      .catch(() => {});
-  }, [visible, geo]);
 
   const byName = useMemo(() => {
     const m = new Map<string, RankingRow>();
@@ -198,11 +368,11 @@ function USStatesOverlay({
     [byName, windowSel, onInfo],
   );
 
-  if (!visible || !geo) return null;
+  if (!visible || !statesGeo) return null;
   return (
     <GeoJSON
       key={`us-states-${windowSel}-${byName.size}`}
-      data={geo}
+      data={statesGeo}
       style={style}
       onEachFeature={onEachFeature}
     />
@@ -214,6 +384,7 @@ function USStatesOverlay({
 
 export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
+  const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [rankings, setRankings] = useState<RankingRow[] | null>(null);
   const [selected, setSelected] = useState<{
@@ -232,6 +403,10 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
       .then((r) => r.json())
       .then((j) => { if (!cancelled) setGeo(fixAntimeridian(j)); })
       .catch((e) => { if (!cancelled) setLoadError(String(e?.message ?? e)); });
+    fetch('/data/us-states.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((g) => { if (!cancelled && g) setStatesGeo(g as FeatureCollection); })
+      .catch(() => {});
     fetch('/data/climate/rankings.json')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (!cancelled && d?.rows) setRankings(d.rows as RankingRow[]); })
@@ -338,6 +513,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
           <USStatesOverlay
             rankings={rankings}
             windowSel={windowSel}
+            statesGeo={statesGeo}
             onInfo={(info) =>
               setSelected(
                 info
@@ -346,6 +522,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
               )
             }
           />
+          <MapLabels countriesGeo={geo} statesGeo={statesGeo} />
           {/* UK nations overlay disabled — map is country-level; UK renders as a single polygon
               from world-countries.json to avoid mismatched sub-polygon coverage. */}
         </MapContainer>
