@@ -47,7 +47,7 @@ export default function EditorsPicksPanel({ regions }: { regions: ClimateRegion[
   }, [regions]);
 
   return (
-    <div className="px-4 py-5 md:px-6 md:py-6">
+    <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         {pickedRegions.map((region) => (
           <PickCard key={region.slug} region={region} />

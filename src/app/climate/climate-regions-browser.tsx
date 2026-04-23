@@ -147,7 +147,7 @@ export default function ClimateRegionsBrowser({
   if (headless) {
     return (
       <section className="relative">
-        <div className="px-4 py-5 md:px-6 md:py-6 space-y-5">
+        <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6 space-y-5">
           {intro ? (
             <p className="text-sm text-gray-400 max-w-3xl">{intro}</p>
           ) : null}

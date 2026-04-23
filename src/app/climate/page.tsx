@@ -91,10 +91,10 @@ export default function ClimateProfilesIndex() {
                   Monthly climate updates for every country, US state and UK region we track — 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news.
                 </p>
               </div>
-              <div className="sticky top-0 z-30 bg-gray-950 px-4 py-2.5 md:px-6">
+              <div className="sticky top-0 z-30 bg-gray-950 px-4 pt-2 pb-1 md:px-6">
                 <ClimateTabsBar />
               </div>
-              <div className="border-t border-[#D0A65E]/25 bg-gray-950">
+              <div className="bg-gray-950">
                 <ClimateTabsPanels />
               </div>
             </section>

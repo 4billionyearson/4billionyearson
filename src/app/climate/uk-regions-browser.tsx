@@ -178,7 +178,7 @@ export default function UKRegionsBrowser({ regions, headless = false }: { region
   if (headless) {
     return (
       <section className="relative">
-        <div className="px-4 py-5 md:px-6 md:py-6 space-y-5">
+        <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6 space-y-5">
           <div className="space-y-4">
             <div className="relative max-w-2xl">
               <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'rgba(208, 166, 94, 0.8)' }} />

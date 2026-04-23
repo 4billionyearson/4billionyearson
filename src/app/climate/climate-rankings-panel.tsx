@@ -5,7 +5,7 @@ import { Trophy, TrendingUp, Map, BarChart3, ChevronRight } from 'lucide-react';
 
 export default function ClimateRankingsPanel() {
   return (
-    <section className="px-4 py-5 md:px-6 md:py-6 space-y-5">
+    <section className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6 space-y-5">
       <div className="flex items-start gap-3">
         <Trophy className="h-6 w-6 shrink-0 text-[#D0A65E]" />
         <div className="flex-1">
