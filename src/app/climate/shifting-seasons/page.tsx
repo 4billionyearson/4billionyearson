@@ -294,7 +294,13 @@ export default function ShiftingSeasonsPage() {
       ...globalShift.usStates.map((r) => ({ ...r, kind: 'us-state' as const })),
       ...globalShift.ukRegions.map((r) => ({ ...r, kind: 'uk-region' as const })),
     ];
-    const withCross = all.filter(
+    // Warm-season metrics only apply to temperate (C), continental (D) and
+    // polar (E) Köppen groups. A (tropical) and B (arid) are monitored via
+    // the wet/dry leaderboards below.
+    const tempSeasonal = all.filter(
+      (r) => r.koppen && (r.koppen.group === 'C' || r.koppen.group === 'D' || r.koppen.group === 'E'),
+    );
+    const withCross = tempSeasonal.filter(
       (r) => r.temp.springShiftDays !== null && r.temp.autumnShiftDays !== null,
     );
     const spring = [...withCross]
@@ -303,13 +309,14 @@ export default function ShiftingSeasonsPage() {
     const autumn = [...withCross]
       .sort((a, b) => (b.temp.autumnShiftDays ?? 0) - (a.temp.autumnShiftDays ?? 0))
       .slice(0, 8);
-    const net = [...all]
-      .filter((r) => r.seasonality === 'warm-cold' || r.seasonality === 'mixed')
+    const net = [...tempSeasonal]
       .sort((a, b) => (b.temp.netShiftMonths ?? 0) - (a.temp.netShiftMonths ?? 0))
       .slice(0, 8);
 
+    // Wet/dry metrics apply to the whole A + B universe plus any C/D region
+    // whose rainfall seasonality passed the 2× peak/trough test.
     const wetRegions = all.filter(
-      (r) => (r.seasonality === 'wet-dry' || r.seasonality === 'mixed') && r.rain,
+      (r) => r.rain && (r.koppen?.group === 'A' || r.koppen?.group === 'B' || r.seasonality === 'wet-dry' || r.seasonality === 'mixed'),
     );
     const annualRainUp = [...wetRegions]
       .sort((a, b) => (b.rain?.annualTotalShiftPct ?? 0) - (a.rain?.annualTotalShiftPct ?? 0))
@@ -710,47 +717,52 @@ export default function ShiftingSeasonsPage() {
                     />
                   </div>
 
-                  <SubSection title="Seasonality at different latitudes">
+                  <SubSection title="Seasonality by Köppen–Geiger group">
                     <p className="text-sm text-gray-300 leading-relaxed mb-3">
-                      Not every part of the world has the four-seasons rhythm mid-latitude
-                      readers are used to. Between the Tropic of Cancer (23.4°N) and
-                      Tropic of Capricorn (23.4°S), the dominant annual cycle is usually
-                      <strong className="text-sky-300"> wet vs dry</strong>, not warm vs
-                      cold — monsoons in India, the long/short rains in East Africa, the
-                      Sahel rainy season. So we classify every region:
+                      Not every part of the world has the four-seasons rhythm
+                      mid-latitude readers are used to. We follow the
+                      Köppen–Geiger classification (Peel, Finlayson & McMahon
+                      2007) — the gold-standard climate typology — to decide
+                      which metrics apply to each region.
                     </p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
                       <KindStat
-                        color="#f97316"
-                        label="Warm / cold"
-                        count={globalShift.globalStats.seasonalityCounts.warmCold}
-                        sub="Classic four seasons (UK, Canada, Russia)"
+                        color="#1b7837"
+                        label="A · Tropical"
+                        count={globalShift.globalStats.koppenGroupCounts?.A ?? 0}
+                        sub="No winter; wet/dry rhythm dominates"
                       />
                       <KindStat
-                        color="#10b981"
-                        label="Warm/cold + wet/dry"
-                        count={globalShift.globalStats.seasonalityCounts.mixed}
-                        sub="Both cycles clear (USA, China, Mediterranean)"
+                        color="#e6a23c"
+                        label="B · Arid"
+                        count={globalShift.globalStats.koppenGroupCounts?.B ?? 0}
+                        sub="Deserts & steppes; defined by rainfall"
                       />
                       <KindStat
-                        color="#38bdf8"
-                        label="Wet / dry"
-                        count={globalShift.globalStats.seasonalityCounts.wetDry}
-                        sub="Monsoon / savanna (Ethiopia, Kenya, Colombia)"
+                        color="#7fbc41"
+                        label="C · Temperate"
+                        count={globalShift.globalStats.koppenGroupCounts?.C ?? 0}
+                        sub="Mild winters; classic 4 seasons (UK, Italy)"
                       />
                       <KindStat
-                        color="#6b7280"
-                        label="Weakly seasonal"
-                        count={globalShift.globalStats.seasonalityCounts.aseasonal}
-                        sub="Equatorial (Indonesia, Singapore)"
+                        color="#6a5acd"
+                        label="D · Continental"
+                        count={globalShift.globalStats.koppenGroupCounts?.D ?? 0}
+                        sub="Cold winters (Canada, Russia, mid-US)"
+                      />
+                      <KindStat
+                        color="#b0bec5"
+                        label="E · Polar"
+                        count={globalShift.globalStats.koppenGroupCounts?.E ?? 0}
+                        sub="Tundra / ice-cap (Iceland, Greenland)"
                       />
                     </div>
                     <p className="text-[11px] text-gray-500 mt-3">
-                      Rule: if the baseline monthly temperature swings ≥ 5 °C peak-to-peak
-                      it counts as warm/cold. If the wettest month gets ≥ 2× the rain of
-                      the driest, it counts as wet/dry. Regions meeting both qualify as
-                      <em> mixed</em>. Switch the map below between warm/cold metrics and
-                      wet/dry metrics to see each side of the story.
+                      Spring / autumn / warm-season-length metrics only apply
+                      to C, D and E groups. A and B groups are reported via
+                      wet-season-onset and annual-rainfall change. Switch the
+                      map below between metric families to see each side of
+                      the story.
                     </p>
                   </SubSection>
 
@@ -764,7 +776,13 @@ export default function ShiftingSeasonsPage() {
                     </p>
                   </SubSection>
 
-                  <SubSection title="Where the shift is biggest">
+                  <SubSection title="Where the shift is biggest — temperate & continental regions (Köppen C + D)">
+                    <p className="text-[11px] text-gray-500 mb-2">
+                      Spring / autumn crossings are only meaningful where the
+                      climate has a genuine winter, i.e. Köppen temperate (C),
+                      continental (D) or polar (E) groups. Tropical (A) and arid
+                      (B) regions use the wet/dry metrics below.
+                    </p>
                     <div className="grid md:grid-cols-3 gap-4">
                       <Leaderboard
                         title="Spring advancing fastest"
@@ -788,7 +806,12 @@ export default function ShiftingSeasonsPage() {
                   </SubSection>
 
                   {(leaderboards.annualRainUp.length > 0 || leaderboards.onsetShift.length > 0) && (
-                    <SubSection title="Where the wet/dry rhythm is shifting most">
+                    <SubSection title="Where the wet/dry rhythm is shifting most — tropical & arid regions (Köppen A + B)">
+                      <p className="text-[11px] text-gray-500 mb-2">
+                        For A (tropical) and B (arid) climates, annual temperature
+                        swing is tiny; the rains define the year. Onset and annual
+                        total are the signals that matter for agriculture.
+                      </p>
                       <div className="grid md:grid-cols-3 gap-4">
                         <Leaderboard
                           title="Biggest wet-season onset shift"

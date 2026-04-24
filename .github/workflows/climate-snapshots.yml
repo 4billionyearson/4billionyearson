@@ -26,6 +26,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
 
       # ── Global (world-level NOAA + OWID) ────────────────────────────
       - name: Rebuild global snapshot
@@ -34,6 +38,10 @@ jobs:
       # ── Per-country (OWID land temperature + precipitation) ─────────
       - name: Rebuild country snapshots
         run: node scripts/build-country-snapshots.mjs
+
+      # ── Per-country monthly precipitation (World Bank CCKP) ─────────
+      - name: Rebuild country precipitation
+        run: node scripts/build-country-precip.mjs
 
       # ── US national (NOAA national time series) ─────────────────────
       - name: Rebuild US national snapshot
@@ -47,14 +55,21 @@ jobs:
       - name: Rebuild UK region snapshots
         run: node scripts/build-uk-region-snapshots.mjs
 
+      # ── Derived: global shifting-seasons + Köppen classifications ──
+      - name: Rebuild shifting-seasons global snapshot
+        run: npm run build:climate-shift-global
+
+      - name: Rebuild climate rankings
+        run: npm run build:climate-rankings
+
       - name: Commit updated snapshots
         run: |
-          if git diff --quiet -- public/data/climate/; then
+          if git diff --quiet -- public/data/climate/ public/data/seasons/; then
             echo "No changes to commit."
             exit 0
           fi
           git config user.name "climate-snapshot-bot"
           git config user.email "climate-snapshot-bot@users.noreply.github.com"
-          git add public/data/climate/
+          git add public/data/climate/ public/data/seasons/
           git commit -m "chore(climate): refresh snapshots ($(date -u +%Y-%m-%d))"
           git push

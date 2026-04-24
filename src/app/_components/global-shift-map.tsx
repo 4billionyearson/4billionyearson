@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import type { GeoJSON as LeafletGeoJSON, Layer, LatLngExpression } from "leaflet";
+import { useMap, useMapEvents } from "react-leaflet";
+import type { GeoJSON as LeafletGeoJSON, Layer, LatLngExpression, PathOptions } from "leaflet";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import type {
@@ -17,6 +18,10 @@ const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapCont
 const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
 const GeoJSON = dynamic(() => import("react-leaflet").then((m) => m.GeoJSON), { ssr: false });
 const Polyline = dynamic(() => import("react-leaflet").then((m) => m.Polyline), { ssr: false });
+
+/** Zoom thresholds at which subregional layers appear over their host country. */
+const US_STATES_ZOOM = 4;
+const UK_NATIONS_ZOOM = 5;
 
 export type GlobalShiftRecord = {
   kind: "country" | "us-state" | "uk-region";
@@ -295,8 +300,111 @@ function stripOverseasTerritories(fc: FeatureCollection): FeatureCollection {
   return { ...fc, features };
 }
 
+/**
+ * Subregional overlay for US states. Visible only when the map is zoomed to
+ * `US_STATES_ZOOM` or closer; below that threshold the country polygon from
+ * the world layer does the work.
+ */
+function USStatesOverlay({
+  statesGeo,
+  byName,
+  styleForRecord,
+  bindRecordTooltip,
+}: {
+  statesGeo: FeatureCollection | null;
+  byName: Map<string, GlobalShiftRecord>;
+  styleForRecord: (rec: GlobalShiftRecord | undefined, subregion?: boolean) => PathOptions;
+  bindRecordTooltip: (rec: GlobalShiftRecord, layer: Layer) => void;
+}) {
+  const map = useMap();
+  const [visible, setVisible] = useState(map.getZoom() >= US_STATES_ZOOM);
+  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= US_STATES_ZOOM) });
+
+  const style = useCallback(
+    (feature?: Feature<Geometry, { name: string }>): PathOptions => {
+      const name = feature?.properties?.name ?? "";
+      return styleForRecord(byName.get(name.toLowerCase()), true);
+    },
+    [byName, styleForRecord],
+  );
+
+  const onEach = useCallback(
+    (feature: Feature<Geometry, { name: string }>, layer: Layer) => {
+      const name = feature.properties?.name ?? "";
+      const rec = byName.get(name.toLowerCase());
+      if (rec) bindRecordTooltip(rec, layer);
+      else
+        layer.bindTooltip(
+          `<strong>${name}</strong><br/><span style="color:#9ca3af">no state-level data</span>`,
+          { sticky: true, className: "global-shift-tooltip" },
+        );
+    },
+    [byName, bindRecordTooltip],
+  );
+
+  if (!visible || !statesGeo) return null;
+  return (
+    <GeoJSON
+      data={statesGeo}
+      style={style as unknown as LeafletGeoJSON["options"]["style"]}
+      onEachFeature={onEach as never}
+    />
+  );
+}
+
+/** Subregional overlay for the four UK nations. Visible at `UK_NATIONS_ZOOM` or closer. */
+function UKNationsOverlay({
+  ukGeo,
+  bySlug,
+  styleForRecord,
+  bindRecordTooltip,
+}: {
+  ukGeo: FeatureCollection | null;
+  bySlug: Map<string, GlobalShiftRecord>;
+  styleForRecord: (rec: GlobalShiftRecord | undefined, subregion?: boolean) => PathOptions;
+  bindRecordTooltip: (rec: GlobalShiftRecord, layer: Layer) => void;
+}) {
+  const map = useMap();
+  const [visible, setVisible] = useState(map.getZoom() >= UK_NATIONS_ZOOM);
+  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= UK_NATIONS_ZOOM) });
+
+  const style = useCallback(
+    (feature?: Feature<Geometry, { slug?: string; name?: string }>): PathOptions => {
+      const slug = feature?.properties?.slug ?? "";
+      return styleForRecord(bySlug.get(slug), true);
+    },
+    [bySlug, styleForRecord],
+  );
+
+  const onEach = useCallback(
+    (feature: Feature<Geometry, { slug?: string; name?: string }>, layer: Layer) => {
+      const slug = feature.properties?.slug ?? "";
+      const name = feature.properties?.name ?? slug;
+      const rec = bySlug.get(slug);
+      if (rec) bindRecordTooltip(rec, layer);
+      else
+        layer.bindTooltip(
+          `<strong>${name}</strong><br/><span style="color:#9ca3af">no UK-nation data</span>`,
+          { sticky: true, className: "global-shift-tooltip" },
+        );
+    },
+    [bySlug, bindRecordTooltip],
+  );
+
+  if (!visible || !ukGeo) return null;
+  return (
+    <GeoJSON
+      data={ukGeo}
+      style={style as unknown as LeafletGeoJSON["options"]["style"]}
+      onEachFeature={onEach as never}
+    />
+  );
+}
+
 export default function GlobalShiftMap() {
   const [world, setWorld] = useState<FeatureCollection | null>(null);
+  const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
+  const [ukGeo, setUkGeo] = useState<FeatureCollection | null>(null);
   const [shifts, setShifts] = useState<GlobalShiftData | null>(null);
   const [metric, setMetric] = useState<MetricId>("koppen");
   const [error, setError] = useState<string | null>(null);
@@ -317,6 +425,20 @@ export default function GlobalShiftMap() {
       .catch(() => {
         if (!cancelled) setError("Could not load global shift data");
       });
+    // Subregional layers load in parallel and independently — failures here
+    // don't disable the main map.
+    fetch("/data/us-states.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((g) => {
+        if (!cancelled && g) setStatesGeo(g as FeatureCollection);
+      })
+      .catch(() => {});
+    fetch("/data/uk-nations.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((g) => {
+        if (!cancelled && g) setUkGeo(g as FeatureCollection);
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
@@ -331,47 +453,68 @@ export default function GlobalShiftMap() {
     return m;
   }, [shifts]);
 
+  /** US state name (lowercased) → record. */
+  const usStatesByName = useMemo(() => {
+    const m = new Map<string, GlobalShiftRecord>();
+    if (!shifts) return m;
+    for (const r of shifts.usStates) {
+      m.set(r.name.toLowerCase(), r);
+    }
+    return m;
+  }, [shifts]);
+
+  /** UK nation slug → record. Only the four primary nations get their own polygons. */
+  const ukNationsBySlug = useMemo(() => {
+    const m = new Map<string, GlobalShiftRecord>();
+    if (!shifts) return m;
+    const nationNames: Record<string, string> = {
+      england: "England",
+      scotland: "Scotland",
+      wales: "Wales",
+      "northern-ireland": "Northern Ireland",
+    };
+    for (const r of shifts.ukRegions) {
+      for (const [slug, name] of Object.entries(nationNames)) {
+        if (r.name === name) m.set(slug, r);
+      }
+    }
+    return m;
+  }, [shifts]);
+
   const meta = METRIC_META[metric];
 
-  const styleForFeature = (feature?: Feature<Geometry, { name: string }>) => {
-    if (!feature) return {};
-    const rec = byName.get(feature.properties?.name || "");
-    const none = {
-      color: "#4b5563",
-      weight: 0.4,
-      fillColor: "#1f2937",
-      fillOpacity: 0.45,
-    };
-    if (!rec) return none;
+  /** Compute a leaflet path style for any record (country, US state, UK nation). */
+  const styleForRecord = useCallback(
+    (rec: GlobalShiftRecord | undefined, subregion = false): PathOptions => {
+      const baseWeight = subregion ? 0.6 : 0.4;
+      const none: PathOptions = {
+        color: subregion ? "#0b1220" : "#4b5563",
+        weight: baseWeight,
+        fillColor: "#1f2937",
+        fillOpacity: 0.45,
+      };
+      if (!rec) return none;
+      if (meta.customColor) {
+        const c = meta.customColor(rec);
+        if (!c) return none;
+        return { color: "#111827", weight: baseWeight, fillColor: c, fillOpacity: 0.75 };
+      }
+      const v = meta.accessor(rec);
+      if (v === null || Number.isNaN(v)) return none;
+      const dom = meta.domain ?? [-1, 1];
+      const t = v / Math.max(Math.abs(dom[0]), Math.abs(dom[1]));
+      return {
+        color: "#111827",
+        weight: baseWeight,
+        fillColor: divergingColor(t, !!meta.invertForWarmer),
+        fillOpacity: 0.85,
+      };
+    },
+    [meta],
+  );
 
-    if (meta.customColor) {
-      const c = meta.customColor(rec);
-      if (!c) return none;
-      return { color: "#111827", weight: 0.4, fillColor: c, fillOpacity: 0.75 };
-    }
-
-    const v = meta.accessor(rec);
-    if (v === null || Number.isNaN(v)) return none;
-    const dom = meta.domain ?? [-1, 1];
-    const t = v / Math.max(Math.abs(dom[0]), Math.abs(dom[1]));
-    return {
-      color: "#111827",
-      weight: 0.4,
-      fillColor: divergingColor(t, !!meta.invertForWarmer),
-      fillOpacity: 0.85,
-    };
-  };
-
-  const onEachFeature = (feature: Feature<Geometry, { name: string }>, layer: Layer) => {
-    const name = feature.properties?.name || "Unknown";
-    const rec = byName.get(name);
-    if (!rec) {
-      layer.bindTooltip(
-        `<strong>${name}</strong><br/><span style="color:#9ca3af">no long-term monthly data</span>`,
-        { sticky: true, className: "global-shift-tooltip" },
-      );
-      return;
-    }
+  /** Bind a rich tooltip to a leaflet layer for a given record. */
+  const bindRecordTooltip = useCallback((rec: GlobalShiftRecord, layer: Layer) => {
     const spring = rec.temp.springShiftDays;
     const autumn = rec.temp.autumnShiftDays;
     const net = rec.temp.netShiftMonths;
@@ -415,6 +558,24 @@ export default function GlobalShiftMap() {
       </div>`,
       { sticky: true, className: "global-shift-tooltip" },
     );
+  }, []);
+
+  const styleForFeature = (feature?: Feature<Geometry, { name: string }>) => {
+    if (!feature) return {};
+    return styleForRecord(byName.get(feature.properties?.name || ""));
+  };
+
+  const onEachFeature = (feature: Feature<Geometry, { name: string }>, layer: Layer) => {
+    const name = feature.properties?.name || "Unknown";
+    const rec = byName.get(name);
+    if (!rec) {
+      layer.bindTooltip(
+        `<strong>${name}</strong><br/><span style="color:#9ca3af">no long-term monthly data</span>`,
+        { sticky: true, className: "global-shift-tooltip" },
+      );
+      return;
+    }
+    bindRecordTooltip(rec, layer);
   };
 
   if (error) {
@@ -475,8 +636,10 @@ export default function GlobalShiftMap() {
         })}
         {shifts && (
           <div className="text-[11px] text-gray-400 pt-1">
-            {shifts.globalStats.countriesAnalysed} countries · baseline first 30 complete years vs
-            recent 10 · rainfall data: World Bank CCKP (CRU TS 4.08, 1901–2023)
+            {shifts.globalStats.countriesAnalysed} countries · {shifts.globalStats.usStatesAnalysed}{" "}
+            US states · {shifts.globalStats.ukRegionsAnalysed} UK regions · zoom in on the USA or UK
+            for sub-national detail · baseline first 30 complete years vs recent 10 · rainfall
+            data: World Bank CCKP (CRU TS 4.08, 1901–2023)
           </div>
         )}
       </div>
@@ -488,7 +651,7 @@ export default function GlobalShiftMap() {
             center={[20, 10]}
             zoom={2}
             minZoom={2}
-            maxZoom={5}
+            maxZoom={7}
             scrollWheelZoom={false}
             worldCopyJump
             className="h-full w-full"
@@ -503,6 +666,21 @@ export default function GlobalShiftMap() {
               data={world as FeatureCollection}
               style={styleForFeature as unknown as LeafletGeoJSON["options"]["style"]}
               onEachFeature={onEachFeature as never}
+            />
+            {/* Subregional overlays — visible only when zoomed in. */}
+            <USStatesOverlay
+              key={`us-${metric}`}
+              statesGeo={statesGeo}
+              byName={usStatesByName}
+              styleForRecord={styleForRecord}
+              bindRecordTooltip={bindRecordTooltip}
+            />
+            <UKNationsOverlay
+              key={`uk-${metric}`}
+              ukGeo={ukGeo}
+              bySlug={ukNationsBySlug}
+              styleForRecord={styleForRecord}
+              bindRecordTooltip={bindRecordTooltip}
             />
             {/* Tropic reference lines */}
             <Polyline

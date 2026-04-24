@@ -92,6 +92,27 @@ async function analyseRegion(
   const seasonality = classifySeasonality(res.temp, rain);
   const koppen = classifyKoppen(res.temp.baselineMonthly, rain?.baselineMonthly ?? null);
 
+  // Suppress warm-season crossings for tropical (A) and arid (B) Köppen groups.
+  // These climates have no genuine winter: the monthly mean barely crosses the
+  // annual mean, so tiny warming produces wildly-amplified "days later" figures
+  // (e.g. Benin +199 d autumn). Peel 2007 treats any A/B climate as non-
+  // seasonal-in-temperature by construction, so zeroing these is the correct
+  // framing for the Shifting-Seasons UI.
+  let temp = res.temp;
+  if (koppen && (koppen.group === 'A' || koppen.group === 'B')) {
+    temp = {
+      ...temp,
+      springShiftDays: null,
+      autumnShiftDays: null,
+      baselineSpringDoy: null,
+      baselineAutumnDoy: null,
+      recentSpringDoy: null,
+      recentAutumnDoy: null,
+      // netShiftMonths (months above annual mean) is equally misleading for A/B
+      netShiftMonths: 0,
+    };
+  }
+
   return {
     kind,
     name,
@@ -99,7 +120,7 @@ async function analyseRegion(
     koppen,
     windows: res.windows,
     yearsCoverage: res.yearsCoverage,
-    temp: res.temp,
+    temp,
     rain,
     ...extras,
   };
