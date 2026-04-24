@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell, ComposedChart,
 } from 'recharts';
 import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale, Factory, Leaf, ArrowRight } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
@@ -316,6 +316,23 @@ export default function GlobalProfile() {
 
   const yearMin = yearlyChartData.length ? yearlyChartData[0].year : 1950;
   const yearMax = yearlyChartData.length ? yearlyChartData[yearlyChartData.length - 1].year : 2026;
+
+  // Combined last-12-months anomaly chart: bars for land+ocean, overlaid
+  // line for land-only — so the user can directly see that land warms
+  // faster than the combined series, using a single vs-1961-1990 axis.
+  const monthlyAnomalyCombined = useMemo(() => {
+    const lo = data?.monthlyComparison ?? [];
+    if (!lo.length) return [];
+    const landByLabel = new Map<string, number | null>();
+    for (const p of data?.landMonthlyComparison ?? []) {
+      landByLabel.set(p.monthLabel, p.diff ?? null);
+    }
+    return lo.map((p) => ({
+      monthLabel: p.monthLabel,
+      landOcean: p.diff ?? null,
+      land: landByLabel.get(p.monthLabel) ?? null,
+    }));
+  }, [data]);
 
   // Build the overview panel (month / 3-month / year) - three NOAA rows so
   // rankings match what NOAA and Copernicus publish in press releases.
@@ -706,12 +723,13 @@ export default function GlobalProfile() {
                 </div>
               </section>
 
-              {/* Long-view charts: yearly trend, last 12 months, land vs ocean */}
+              {/* Long-view charts: yearly trend + last-12-months anomaly comparison */}
               <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Global Temperature - Long View" />
 
-              {/* Yearly trend chart */}
-              {yearlyChartData.length > 0 && (
-                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Yearly trend chart */}
+                {yearlyChartData.length > 0 && (
+                  <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
                       <Globe2 className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
                       <span className="min-w-0 flex-1">Global Land + Ocean Absolute Temperature, {yearMin}–{yearMax}</span>
@@ -745,22 +763,22 @@ export default function GlobalProfile() {
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
-                </div>
-              )}
+                  </div>
+                )}
 
-              {/* Monthly comparison - last 12 months (land+ocean) */}
-              {data.monthlyComparison?.length > 0 && (
-                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                {/* Combined last-12-months anomaly: land+ocean bars + land line */}
+                {monthlyAnomalyCombined.length > 0 && (
+                  <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
                       <Thermometer className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
-                      <span className="min-w-0 flex-1">Last 12 Months vs 1961–1990 (Global Land + Ocean)</span>
+                      <span className="min-w-0 flex-1">Last 12 Months vs 1961–1990 · Land vs Land + Ocean</span>
                     </h3>
                     <p className="text-xs text-gray-400 mb-4">
-                      Each bar is the difference between that month&rsquo;s global land + ocean temperature and the 1961–1990 average for the same month. Red bars are warmer than baseline, blue are cooler.
+                      Bars show each month&rsquo;s global <strong>land + ocean</strong> anomaly versus the 1961–1990 average (NOAA). The orange line shows the <strong>land-only</strong> anomaly (ERA5 via Our World in Data). Land warms roughly twice as fast as the ocean, so the line runs well above the bars.
                     </p>
-                    <div className="h-72">
+                    <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data.monthlyComparison} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
+                        <ComposedChart data={monthlyAnomalyCombined} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="monthLabel" stroke="#9CA3AF" fontSize={10} interval={0} angle={-30} textAnchor="end" height={60} />
                           <YAxis
@@ -773,46 +791,20 @@ export default function GlobalProfile() {
                             contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8 }}
                             formatter={(v: any) => typeof v === 'number' ? `${formatSigned(v)}°C` : '—'}
                           />
+                          <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 12 }} />
                           <ReferenceLine y={0} stroke="#6B7280" />
-                          <Bar dataKey="diff" name="Anomaly vs 1961–1990">
-                            {data.monthlyComparison.map((p, i) => (
-                              <Cell key={i} fill={p.diff == null ? '#4b5563' : p.diff > 0 ? '#fb923c' : '#60a5fa'} />
+                          <Bar dataKey="landOcean" name="Land + Ocean (NOAA)">
+                            {monthlyAnomalyCombined.map((p, i) => (
+                              <Cell key={i} fill={p.landOcean == null ? '#4b5563' : p.landOcean > 0 ? '#fb923c' : '#60a5fa'} />
                             ))}
                           </Bar>
-                        </BarChart>
+                          <Line type="monotone" dataKey="land" name="Land only (ERA5)" stroke="#f97316" strokeWidth={2.5} dot={{ r: 3, fill: '#f97316' }} connectNulls isAnimationActive={false} />
+                        </ComposedChart>
                       </ResponsiveContainer>
                     </div>
-                </div>
-              )}
-
-              {/* Land vs Ocean */}
-              {data.landVsOceanMonthly && data.landVsOceanMonthly.length > 0 && (
-                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
-                      <Globe2 className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
-                      <span className="min-w-0 flex-1">Land vs Land + Ocean - Last 12 Months</span>
-                    </h3>
-                    <p className="text-xs text-gray-400 mb-4">
-                      Land surfaces warm roughly twice as fast as the ocean. This chart compares the global land-only temperature (ERA5, via Our World in Data) against the combined land+ocean series (NOAA) for each of the last 12 months.
-                    </p>
-                    <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={data.landVsOceanMonthly} margin={{ top: 10, right: 8, left: 0, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="monthLabel" stroke="#9CA3AF" fontSize={10} angle={-30} textAnchor="end" height={60} />
-                          <YAxis stroke="#9CA3AF" fontSize={11} width={36} domain={[10, 20]} ticks={[10, 12, 14, 16, 18, 20]} tickFormatter={(v) => `${v.toFixed(0)}°C`} />
-                          <Tooltip
-                            contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8 }}
-                            formatter={(v: any) => typeof v === 'number' ? `${v.toFixed(2)}°C` : '—'}
-                          />
-                          <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 12 }} />
-                          <Line type="monotone" dataKey="landTemp" name="Land only (ERA5)" stroke="#f97316" strokeWidth={2} dot={{ r: 3 }} connectNulls />
-                          <Line type="monotone" dataKey="landOceanTemp" name="Land + Ocean (NOAA)" stroke="#38bdf8" strokeWidth={2} dot={{ r: 3 }} connectNulls />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
 
               {/* Climate systems - ENSO, GHG, sea ice, continents */}
               {(data.enso || data.ghgStats || data.seaIceStats || data.continentStats?.length || data.previousLatestMonthStats) && (
