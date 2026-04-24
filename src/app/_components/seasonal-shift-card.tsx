@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Leaf, CloudRain, Thermometer, Sun, ArrowRight } from 'lucide-react';
+import InfoTooltip from '@/app/_components/info-tooltip';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ReferenceLine, Cell,
@@ -144,20 +145,35 @@ export default function SeasonalShiftCard({
         <div className="flex items-center gap-2 flex-wrap">
           <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
           <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons</h3>
-          <span
-            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider ${seasonalityBadge[seasonality].className}`}
-            title={seasonalityBadge[seasonality].tooltip}
+          <InfoTooltip
+            title={seasonalityBadge[seasonality].label}
+            body={seasonalityBadge[seasonality].tooltip}
           >
-            {seasonalityBadge[seasonality].icon}
-            {seasonalityBadge[seasonality].label}
-          </span>
-          {koppen && (
             <span
-              className="inline-flex items-center gap-1 rounded-full border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[#D0A65E]"
-              title={`Köppen-Geiger climate classification (Peel, Finlayson & McMahon 2007). ${koppen.code}: ${koppen.label}. The first letter is the main climate group (A tropical, B arid, C temperate, D continental, E polar); the following letters describe precipitation and temperature sub-types.`}
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider ${seasonalityBadge[seasonality].className}`}
             >
-              Köppen {koppen.code} · {koppen.groupLabel}
+              {seasonalityBadge[seasonality].icon}
+              {seasonalityBadge[seasonality].label}
             </span>
+          </InfoTooltip>
+          {koppen && (
+            <InfoTooltip
+              title={`Köppen ${koppen.code}: ${koppen.label}`}
+              body={
+                <>
+                  The Köppen-Geiger climate classification (Peel, Finlayson & McMahon 2007) groups climates by temperature and precipitation. The first letter is the main group:
+                  {' '}<strong className="text-[#FFF5E7]">A</strong> tropical,
+                  {' '}<strong className="text-[#FFF5E7]">B</strong> arid,
+                  {' '}<strong className="text-[#FFF5E7]">C</strong> temperate,
+                  {' '}<strong className="text-[#FFF5E7]">D</strong> continental,
+                  {' '}<strong className="text-[#FFF5E7]">E</strong> polar. Later letters describe precipitation and temperature sub-types.
+                </>
+              }
+            >
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[#D0A65E]">
+                Köppen {koppen.code} · {koppen.groupLabel}
+              </span>
+            </InfoTooltip>
           )}
         </div>
         <div className="flex gap-2 text-xs flex-wrap">
