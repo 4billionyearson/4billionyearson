@@ -302,15 +302,18 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
 
   return (
     <div className="space-y-4">
-      {panels.map((panel) => (
+      {panels.map((panel) => {
+        const isNarrow = panel.sections.length === 1 && (panel.sections[0]?.rows.length ?? 0) === 1;
+        return (
         <div key={panel.title} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
           <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
             {panel.icon}
             <span className="min-w-0 flex-1">{panel.title}</span>
           </h2>
           <div className={`rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden ${
-            panel.sections.length === 1 && (panel.sections[0]?.rows.length ?? 0) === 1 ? 'lg:max-w-xl' : ''
+            isNarrow ? 'lg:flex lg:items-stretch' : ''
           }`}>
+            <div className={isNarrow ? 'lg:w-[28rem] lg:shrink-0' : ''}>
             <div className={panel.sections.length > 1 ? 'lg:grid lg:grid-cols-2' : ''}>
             {panel.sections.map((section, sIdx) => (
               <div
@@ -400,11 +403,31 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
               </div>
             ))}
             </div>
+            </div>
 
-            <div className="px-3 py-2 text-[10px] text-gray-500 border-t border-gray-700/40">Baseline: 1961–1990 mean · Anomaly = difference from baseline · Record = highest (or lowest) value on record</div>
+            <div className={`text-gray-500 ${
+              isNarrow
+                ? 'px-3 py-2 text-[10px] border-t border-gray-700/40 lg:flex-1 lg:border-t-0 lg:border-l lg:border-gray-700/40 lg:px-5 lg:py-4 lg:text-xs lg:leading-relaxed lg:flex lg:items-center'
+                : 'px-3 py-2 text-[10px] border-t border-gray-700/40'
+            }`}>
+              {isNarrow ? (
+                <div>
+                  <div className="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1 hidden lg:block">About these numbers</div>
+                  <p className="m-0">
+                    <span className="text-gray-400">Baseline:</span> 1961–1990 mean.{' '}
+                    <span className="text-gray-400">Anomaly:</span> difference from that baseline.{' '}
+                    <span className="text-gray-400">Rank:</span> position in the full record (1st = highest ever{panel.accentBorder?.includes('sky') || panel.accentBorder?.includes('purple') ? ', n↓ = lowest' : ''}).{' '}
+                    <span className="text-gray-400">Record:</span> highest (or lowest) value on record with its year.
+                  </p>
+                </div>
+              ) : (
+                'Baseline: 1961–1990 mean · Anomaly = difference from baseline · Record = highest (or lowest) value on record'
+              )}
+            </div>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
