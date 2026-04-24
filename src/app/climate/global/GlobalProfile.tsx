@@ -157,10 +157,27 @@ type SummaryResponse = {
   retryable?: boolean;
 };
 
+function pathLabel(path: string): string {
+  const p = path.toLowerCase();
+  if (p === '/extreme-weather') return 'Extreme Weather tracker';
+  if (p === '/emissions') return 'Emissions dashboard';
+  if (p === '/energy-dashboard') return 'Energy dashboard';
+  if (p === '/greenhouse-gases') return 'Greenhouse Gases';
+  if (p === '/sea-levels-ice') return 'Sea Levels & Ice';
+  if (p === '/planetary-boundaries') return 'Planetary Boundaries';
+  if (p === '/climate-dashboard') return 'Climate dashboard';
+  if (p === '/climate/rankings') return 'climate rankings';
+  if (p === '/climate/global') return 'Global climate page';
+  if (p === '/climate/shifting-seasons') return 'Shifting Seasons';
+  if (p.startsWith('/climate/')) return 'climate page';
+  return path;
+}
+
 function linkifyPaths(html: string): string {
   return html.replace(
     /(^|[\s(—–−])(\/(?:extreme-weather|emissions|energy-dashboard|climate\/[a-z0-9-]+|greenhouse-gases|sea-levels-ice|planetary-boundaries|climate-dashboard|climate\/rankings))(?=[\s).,;:—–−]|$)/gi,
-    (_m, lead, path) => `${lead}<a href="${path}" class="text-[#D0A65E] underline decoration-dotted underline-offset-2 hover:text-amber-300">${path}</a>`,
+    (_m, lead, path) =>
+      `${lead}<a href="${path}" class="border-b border-dotted border-teal-300/60 text-teal-300 hover:text-teal-200 hover:border-teal-200 transition-colors">${pathLabel(path)}</a>`,
   );
 }
 
