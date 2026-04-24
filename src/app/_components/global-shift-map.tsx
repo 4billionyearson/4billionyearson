@@ -78,7 +78,7 @@ type GlobalShiftData = {
   ukRegions: GlobalShiftRecord[];
 };
 
-type MetricId = "spring" | "autumn" | "net" | "wet-onset" | "wet-peak" | "wet-length" | "annual-rain" | "kind" | "koppen";
+type MetricId = "spring" | "autumn" | "net" | "wet-onset" | "wet-peak" | "wet-length" | "annual-rain" | "koppen";
 
 type MetricMeta = {
   label: string;
@@ -90,7 +90,7 @@ type MetricMeta = {
   rightLabel?: string;
   accessor: (r: GlobalShiftRecord) => number | null;
   format: (v: number) => string;
-  /** If returns a color string, bypasses the diverging scale (used for "kind"). */
+  /** If returns a color string, bypasses the diverging scale (used for Köppen). */
   customColor?: (r: GlobalShiftRecord) => string | null;
   invertForWarmer?: boolean;
 };
@@ -206,15 +206,6 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
     rightLabel: "Wetter",
     accessor: (r) => r.rain?.annualTotalShiftPct ?? null,
     format: (v) => `${v > 0 ? "+" : ""}${v.toFixed(1)}%`,
-  },
-  kind: {
-    label: "Seasonality type",
-    short: "Seasonality type",
-    group: "classification",
-    unit: "",
-    accessor: () => 1, // placeholder
-    format: () => "",
-    customColor: (r) => KIND_COLOR[r.seasonality],
   },
   koppen: {
     label: "Köppen–Geiger climate class",

@@ -409,7 +409,37 @@ export default function ShiftingSeasonsPage() {
             <>
               {/* ─── Headline numbers ───────────────────────────────────── */}
               <SectionCard icon={<Activity className="text-emerald-400" />} title="At a glance">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {globalShift && (
+                    <>
+                      <StatBlock
+                        label="Regions analysed"
+                        value={`${globalShift.globalStats.totalAnalysed}`}
+                        sub={`${globalShift.globalStats.countriesAnalysed} countries · ${globalShift.globalStats.usStatesAnalysed} US · ${globalShift.globalStats.ukRegionsAnalysed} UK`}
+                        color="text-[#D0A65E]"
+                      />
+                      <StatBlock
+                        label="Earlier springs"
+                        value={`${globalShift.globalStats.warmColdStats.earlierSprings} / ${globalShift.globalStats.warmColdStats.withCrossings}`}
+                        sub={
+                          globalShift.globalStats.warmColdStats.meanSpringShift !== null
+                            ? `mean ${globalShift.globalStats.warmColdStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanSpringShift.toFixed(1)} d`
+                            : 'vs baseline'
+                        }
+                        color="text-rose-300"
+                      />
+                      <StatBlock
+                        label="Later autumns"
+                        value={`${globalShift.globalStats.warmColdStats.laterAutumns} / ${globalShift.globalStats.warmColdStats.withCrossings}`}
+                        sub={
+                          globalShift.globalStats.warmColdStats.meanAutumnShift !== null
+                            ? `mean ${globalShift.globalStats.warmColdStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanAutumnShift.toFixed(1)} d`
+                            : 'vs baseline'
+                        }
+                        color="text-amber-300"
+                      />
+                    </>
+                  )}
                   <StatBlock
                     label="Kyoto cherry blossom"
                     value={`${data.kyoto.shiftDays > 0 ? '−' : '+'}${Math.abs(data.kyoto.shiftDays).toFixed(1)} days`}
@@ -417,21 +447,15 @@ export default function ShiftingSeasonsPage() {
                     color="text-pink-300"
                   />
                   <StatBlock
-                    label="Earliest bloom on record"
-                    value={`${data.kyoto.earliestYear}`}
-                    sub={`DOY ${data.kyoto.earliestDoy} (${doyToLabel(data.kyoto.earliestDoy)})`}
-                    color="text-pink-300"
-                  />
-                  <StatBlock
-                    label="NH snow, latest month"
+                    label="NH snow, latest"
                     value={data.snow.latest ? `${(data.snow.latest.areaKm2 / 1e6).toFixed(2)} M km²` : '—'}
                     sub={data.snow.latest ? `${MONTHS_SHORT[data.snow.latest.month - 1]} ${data.snow.latest.year}` : ''}
                     color="text-cyan-300"
                   />
                   <StatBlock
-                    label="vs 1981–2010 normal"
+                    label="Snow vs 1981–2010"
                     value={snowLatestAnomPct != null ? `${snowLatestAnomPct > 0 ? '+' : ''}${snowLatestAnomPct.toFixed(1)}%` : '—'}
-                    sub="for the same calendar month"
+                    sub="same calendar month"
                     color={snowLatestAnomPct != null && snowLatestAnomPct < 0 ? 'text-orange-300' : 'text-blue-300'}
                   />
                 </div>
@@ -439,6 +463,114 @@ export default function ShiftingSeasonsPage() {
                   Updated {new Date(data.manifest.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}.
                 </p>
               </SectionCard>
+
+              {/* ─── Global picture (moved to top — headline analysis) ─── */}
+              {globalShift && leaderboards && (
+                <SectionCard
+                  icon={<Globe className="text-[#D0A65E]" />}
+                  title={`The global picture: how seasons have shifted across ${globalShift.globalStats.totalAnalysed} regions`}
+                >
+                  <p className="text-sm text-gray-300 leading-relaxed mb-4">
+                    We&apos;ve applied the same month-crossing analysis used on every
+                    country, US state and UK region profile to their long-term monthly
+                    temperature records — Berkeley Earth / OWID for countries, NOAA for
+                    US states, Met Office for UK regions. For each region we compare
+                    the first 30 complete years on record with the most recent 10,
+                    asking when the monthly average crosses the region&apos;s own
+                    baseline annual mean in spring and autumn.
+                  </p>
+
+                  <SubSection title="World map — pick a metric">
+                    <GlobalShiftMap />
+                    <p className="text-[11px] text-gray-500 mt-2">
+                      Hover any country for its own Köppen classification, spring /
+                      autumn / warm-season or wet-season shift. Grey countries
+                      either don&apos;t have 30+ years of continuous monthly data,
+                      or the selected metric doesn&apos;t apply to their
+                      climate zone (e.g. spring/autumn crossings in the tropics).
+                      Zoom into the USA or UK for sub-national detail.
+                    </p>
+                  </SubSection>
+
+                  <SubSection title="Where the warm-season shift is biggest — Köppen C + D regions">
+                    <p className="text-[11px] text-gray-500 mb-2">
+                      Spring / autumn crossings are only meaningful where the
+                      climate has a genuine winter, i.e. Köppen temperate (C) or
+                      continental (D) groups. Tropical (A) and arid (B) regions
+                      are ranked by wet-season metrics below.
+                    </p>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <Leaderboard
+                        title="Spring advancing fastest"
+                        accent="text-rose-300"
+                        rows={leaderboards.spring}
+                        format={(r) => `${r.temp.springShiftDays! > 0 ? '+' : ''}${r.temp.springShiftDays!.toFixed(1)} d`}
+                      />
+                      <Leaderboard
+                        title="Autumn extending latest"
+                        accent="text-amber-300"
+                        rows={leaderboards.autumn}
+                        format={(r) => `${r.temp.autumnShiftDays! > 0 ? '+' : ''}${r.temp.autumnShiftDays!.toFixed(1)} d`}
+                      />
+                      <Leaderboard
+                        title="Warm season gaining most months"
+                        accent="text-emerald-300"
+                        rows={leaderboards.net}
+                        format={(r) => `${(r.temp.netShiftMonths ?? 0) > 0 ? '+' : ''}${(r.temp.netShiftMonths ?? 0).toFixed(2)} mo`}
+                      />
+                    </div>
+                  </SubSection>
+
+                  {(leaderboards.onsetShift.length > 0 || leaderboards.annualRainUp.length > 0) && (
+                    <SubSection title="Where the wet/dry rhythm is shifting most — Köppen A + B regions">
+                      <p className="text-[11px] text-gray-500 mb-2">
+                        For tropical (A) and arid (B) climates the rains define
+                        the year. Onset shift (when the wet season now starts
+                        vs baseline) and annual-total change are the signals
+                        that matter most for agriculture.
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Leaderboard
+                          title="Biggest wet-season onset shift"
+                          accent="text-sky-300"
+                          rows={leaderboards.onsetShift}
+                          format={(r) => {
+                            const d = r.rain?.wetSeasonOnsetShiftDays ?? 0;
+                            return `${d > 0 ? '+' : ''}${d.toFixed(0)} d`;
+                          }}
+                        />
+                        <Leaderboard
+                          title="Biggest annual-rainfall change"
+                          accent="text-sky-300"
+                          rows={[...leaderboards.annualRainUp, ...leaderboards.annualRainDown]
+                            .sort(
+                              (a, b) =>
+                                Math.abs(b.rain?.annualTotalShiftPct ?? 0) -
+                                Math.abs(a.rain?.annualTotalShiftPct ?? 0),
+                            )
+                            .slice(0, 8)}
+                          format={(r) => {
+                            const v = r.rain?.annualTotalShiftPct ?? 0;
+                            return `${v > 0 ? '+' : ''}${v.toFixed(1)}%`;
+                          }}
+                        />
+                      </div>
+                    </SubSection>
+                  )}
+
+                  <div className="mt-4 text-xs text-gray-500 leading-relaxed">
+                    Method: baseline = first 30 complete years of record;
+                    recent = last 10 complete years. Warm-season length = months
+                    per year whose mean exceeds the baseline annual mean;
+                    spring/autumn crossings = interpolated day-of-year where
+                    the monthly climatology crosses that threshold. Wet-season
+                    onset = day of year where cumulative rainfall from 1 Jan
+                    first passes 25 % of baseline annual total. Rainfall data:
+                    World Bank CCKP (CRU TS 4.08, 1901–2023). Köppen codes
+                    follow Peel, Finlayson &amp; McMahon 2007.
+                  </div>
+                </SectionCard>
+              )}
 
               {/* ─── Kyoto cherry-blossom record ─────────────────────────── */}
               <SectionCard
@@ -662,199 +794,6 @@ export default function ShiftingSeasonsPage() {
                 <SpringIndexMap />
               </SectionCard>
 
-              {/* ─── Global picture (146 regions) ─────────────────────────── */}
-              {globalShift && leaderboards && (
-                <SectionCard
-                  icon={<Globe className="text-[#D0A65E]" />}
-                  title={`The global picture: how seasons have shifted across ${globalShift.globalStats.totalAnalysed} regions`}
-                >
-                  <p className="text-sm text-gray-300 leading-relaxed mb-4">
-                    We&apos;ve applied the same month-crossing analysis used on every
-                    country, US state and UK region profile to their long-term monthly
-                    temperature records — Berkeley Earth / OWID for countries, NOAA for
-                    US states, Met Office for UK regions. For each region we compare
-                    the first 30 complete years on record with the most recent 10,
-                    asking when the monthly average crosses the region&apos;s own
-                    baseline annual mean in spring and autumn.
-                  </p>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-                    <StatBlock
-                      label="Regions analysed"
-                      value={`${globalShift.globalStats.totalAnalysed}`}
-                      sub={`${globalShift.globalStats.countriesAnalysed} countries · ${globalShift.globalStats.usStatesAnalysed} US states · ${globalShift.globalStats.ukRegionsAnalysed} UK regions`}
-                      color="text-[#D0A65E]"
-                    />
-                    <StatBlock
-                      label="Earlier springs"
-                      value={`${globalShift.globalStats.warmColdStats.earlierSprings} / ${globalShift.globalStats.warmColdStats.withCrossings}`}
-                      sub={
-                        globalShift.globalStats.warmColdStats.meanSpringShift !== null
-                          ? `mean ${globalShift.globalStats.warmColdStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanSpringShift.toFixed(1)} d`
-                          : undefined
-                      }
-                      color="text-rose-300"
-                    />
-                    <StatBlock
-                      label="Later autumns"
-                      value={`${globalShift.globalStats.warmColdStats.laterAutumns} / ${globalShift.globalStats.warmColdStats.withCrossings}`}
-                      sub={
-                        globalShift.globalStats.warmColdStats.meanAutumnShift !== null
-                          ? `mean ${globalShift.globalStats.warmColdStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanAutumnShift.toFixed(1)} d`
-                          : undefined
-                      }
-                      color="text-amber-300"
-                    />
-                    <StatBlock
-                      label="Wet-season shifting"
-                      value={`${globalShift.globalStats.wetDryStats.wetSeasonsLonger + globalShift.globalStats.wetDryStats.wetSeasonsShorter} / ${globalShift.globalStats.wetDryStats.withRainData}`}
-                      sub={
-                        globalShift.globalStats.wetDryStats.meanAnnualRainfallShiftPct !== null
-                          ? `mean annual rain ${globalShift.globalStats.wetDryStats.meanAnnualRainfallShiftPct > 0 ? '+' : ''}${globalShift.globalStats.wetDryStats.meanAnnualRainfallShiftPct.toFixed(1)}%`
-                          : undefined
-                      }
-                      color="text-sky-300"
-                    />
-                  </div>
-
-                  <SubSection title="Seasonality by Köppen–Geiger group">
-                    <p className="text-sm text-gray-300 leading-relaxed mb-3">
-                      Not every part of the world has the four-seasons rhythm
-                      mid-latitude readers are used to. We follow the
-                      Köppen–Geiger classification (Peel, Finlayson & McMahon
-                      2007) — the gold-standard climate typology — to decide
-                      which metrics apply to each region.
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
-                      <KindStat
-                        color="#1b7837"
-                        label="A · Tropical"
-                        count={globalShift.globalStats.koppenGroupCounts?.A ?? 0}
-                        sub="No winter; wet/dry rhythm dominates"
-                      />
-                      <KindStat
-                        color="#e6a23c"
-                        label="B · Arid"
-                        count={globalShift.globalStats.koppenGroupCounts?.B ?? 0}
-                        sub="Deserts & steppes; defined by rainfall"
-                      />
-                      <KindStat
-                        color="#7fbc41"
-                        label="C · Temperate"
-                        count={globalShift.globalStats.koppenGroupCounts?.C ?? 0}
-                        sub="Mild winters; classic 4 seasons (UK, Italy)"
-                      />
-                      <KindStat
-                        color="#6a5acd"
-                        label="D · Continental"
-                        count={globalShift.globalStats.koppenGroupCounts?.D ?? 0}
-                        sub="Cold winters (Canada, Russia, mid-US)"
-                      />
-                      <KindStat
-                        color="#b0bec5"
-                        label="E · Polar"
-                        count={globalShift.globalStats.koppenGroupCounts?.E ?? 0}
-                        sub="Tundra / ice-cap (Iceland, Greenland)"
-                      />
-                    </div>
-                    <p className="text-[11px] text-gray-500 mt-3">
-                      Spring / autumn / warm-season-length metrics only apply
-                      to C, D and E groups. A and B groups are reported via
-                      wet-season-onset and annual-rainfall change. Switch the
-                      map below between metric families to see each side of
-                      the story.
-                    </p>
-                  </SubSection>
-
-                  <SubSection title="World map — pick a metric">
-                    <GlobalShiftMap />
-                    <p className="text-[11px] text-gray-500 mt-2">
-                      Hover any country for its own spring / autumn / warm-season
-                      shift. Grey countries either don&apos;t have 30+ years of
-                      continuous monthly data in our dataset, or sit in tropical /
-                      polar zones where monthly means never cross the annual mean.
-                    </p>
-                  </SubSection>
-
-                  <SubSection title="Where the shift is biggest — temperate & continental regions (Köppen C + D)">
-                    <p className="text-[11px] text-gray-500 mb-2">
-                      Spring / autumn crossings are only meaningful where the
-                      climate has a genuine winter, i.e. Köppen temperate (C),
-                      continental (D) or polar (E) groups. Tropical (A) and arid
-                      (B) regions use the wet/dry metrics below.
-                    </p>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <Leaderboard
-                        title="Spring advancing fastest"
-                        accent="text-rose-300"
-                        rows={leaderboards.spring}
-                        format={(r) => `${r.temp.springShiftDays! > 0 ? '+' : ''}${r.temp.springShiftDays!.toFixed(1)} d`}
-                      />
-                      <Leaderboard
-                        title="Autumn extending latest"
-                        accent="text-amber-300"
-                        rows={leaderboards.autumn}
-                        format={(r) => `${r.temp.autumnShiftDays! > 0 ? '+' : ''}${r.temp.autumnShiftDays!.toFixed(1)} d`}
-                      />
-                      <Leaderboard
-                        title="Warm season gaining most months"
-                        accent="text-emerald-300"
-                        rows={leaderboards.net}
-                        format={(r) => `${(r.temp.netShiftMonths ?? 0) > 0 ? '+' : ''}${(r.temp.netShiftMonths ?? 0).toFixed(2)} mo`}
-                      />
-                    </div>
-                  </SubSection>
-
-                  {(leaderboards.annualRainUp.length > 0 || leaderboards.onsetShift.length > 0) && (
-                    <SubSection title="Where the wet/dry rhythm is shifting most — tropical & arid regions (Köppen A + B)">
-                      <p className="text-[11px] text-gray-500 mb-2">
-                        For A (tropical) and B (arid) climates, annual temperature
-                        swing is tiny; the rains define the year. Onset and annual
-                        total are the signals that matter for agriculture.
-                      </p>
-                      <div className="grid md:grid-cols-3 gap-4">
-                        <Leaderboard
-                          title="Biggest wet-season onset shift"
-                          accent="text-sky-300"
-                          rows={leaderboards.onsetShift}
-                          format={(r) => {
-                            const d = r.rain?.wetSeasonOnsetShiftDays ?? 0;
-                            return `${d > 0 ? '+' : ''}${d.toFixed(0)} d`;
-                          }}
-                        />
-                        <Leaderboard
-                          title="Getting wetter"
-                          accent="text-sky-300"
-                          rows={leaderboards.annualRainUp}
-                          format={(r) => `${(r.rain?.annualTotalShiftPct ?? 0) > 0 ? '+' : ''}${(r.rain?.annualTotalShiftPct ?? 0).toFixed(1)}%`}
-                        />
-                        <Leaderboard
-                          title="Getting drier"
-                          accent="text-amber-300"
-                          rows={leaderboards.annualRainDown}
-                          format={(r) => `${(r.rain?.annualTotalShiftPct ?? 0) > 0 ? '+' : ''}${(r.rain?.annualTotalShiftPct ?? 0).toFixed(1)}%`}
-                        />
-                      </div>
-                    </SubSection>
-                  )}
-
-                  <div className="mt-4 text-xs text-gray-500 leading-relaxed">
-                    Method: for every region we build a baseline monthly climatology
-                    from the first 30 complete years of record and a recent climatology
-                    from the last 10 complete years. For warm/cold regions,
-                    &quot;warm-season length&quot; is the number of months per year
-                    whose mean exceeds the region&apos;s own baseline annual mean;
-                    spring/autumn crossings are the interpolated day-of-year where the
-                    monthly climatology crosses that threshold. For wet/dry regions,
-                    the &quot;wet-season onset&quot; is the day of year where cumulative
-                    rainfall from 1 Jan first passes 25% of the baseline annual total
-                    (a standard agro-climate definition). Rainfall data comes from the
-                    World Bank Climate Change Knowledge Portal (CRU TS 4.08 gridded
-                    observations, 1901–2023).
-                  </div>
-                </SectionCard>
-              )}
-
               {/* ─── EPA growing season (US historical) ─────────────────── */}
               <SectionCard
                 icon={<Leaf className="text-emerald-400" />}
@@ -919,132 +858,6 @@ export default function ShiftingSeasonsPage() {
                   <p className="text-[11px] text-gray-500 mt-2">
                     Green = longer than the 1895–2020 mean, orange = shorter. The
                     direction of change is unambiguous from around the 1980s onward.
-                  </p>
-                </SubSection>
-
-                <SubSection title="West vs East">
-                  <div className="h-[260px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={data.epa.westEast}
-                        margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
-                      >
-                        <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
-                        <XAxis dataKey="year" stroke="#9ca3af" tick={{ fontSize: 11 }} />
-                        <YAxis
-                          stroke="#9ca3af"
-                          tick={{ fontSize: 11 }}
-                          tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}d`}
-                        />
-                        <Tooltip
-                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
-                          formatter={(v) => [`${typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(1) : v} d`, '']}
-                        />
-                        <ReferenceLine y={0} stroke="#6b7280" />
-                        <Line
-                          dataKey="west"
-                          name="Western US"
-                          stroke="#fb923c"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                        <Line
-                          dataKey="east"
-                          name="Eastern US"
-                          stroke="#38bdf8"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                        <Legend wrapperStyle={{ fontSize: 12 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </SubSection>
-
-                <SubSection title="Frost dates are moving apart">
-                  <div className="h-[260px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={data.epa.frost}
-                        margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
-                      >
-                        <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
-                        <XAxis dataKey="year" stroke="#9ca3af" tick={{ fontSize: 11 }} />
-                        <YAxis
-                          stroke="#9ca3af"
-                          tick={{ fontSize: 11 }}
-                          tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}d`}
-                          label={{ value: 'Days vs 1895–2020 mean', angle: -90, position: 'insideLeft', offset: 0, fill: '#9ca3af', fontSize: 10 }}
-                        />
-                        <Tooltip
-                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
-                          formatter={(v) => [`${typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(1) : v} d`, '']}
-                        />
-                        <ReferenceLine y={0} stroke="#6b7280" />
-                        <Line
-                          dataKey="lastSpringFrost"
-                          name="Last spring frost"
-                          stroke="#a78bfa"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                        <Line
-                          dataKey="firstFallFrost"
-                          name="First fall frost"
-                          stroke="#fbbf24"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                        <Legend wrapperStyle={{ fontSize: 12 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <p className="text-[11px] text-gray-500 mt-2">
-                    A negative last-spring-frost value means frost ends earlier in the year; a positive
-                    first-fall-frost value means it arrives later. Both trends — earlier springs, later
-                    autumns — widen the frost-free window.
-                  </p>
-                </SubSection>
-
-                <SubSection title="Change by state, 1895 – 2020">
-                  <div className="h-[640px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={data.epa.byState}
-                        layout="vertical"
-                        margin={{ top: 4, right: 20, left: 10, bottom: 0 }}
-                      >
-                        <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
-                        <XAxis
-                          type="number"
-                          stroke="#9ca3af"
-                          tick={{ fontSize: 11 }}
-                          tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}d`}
-                        />
-                        <YAxis
-                          type="category"
-                          dataKey="state"
-                          stroke="#9ca3af"
-                          width={100}
-                          tick={{ fontSize: 10 }}
-                          interval={0}
-                        />
-                        <Tooltip
-                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
-                          formatter={(v) => [`${typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(1) : v} days`, 'Change']}
-                        />
-                        <ReferenceLine x={0} stroke="#6b7280" />
-                        <Bar dataKey="changeDays" name="Days change">
-                          {data.epa.byState.map((p, i) => (
-                            <Cell key={i} fill={p.changeDays >= 0 ? '#10b981' : '#fb923c'} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <p className="text-[11px] text-gray-500 mt-2">
-                    States in the West (Arizona, Nevada, California, Oregon) have gained the most days;
-                    the South-east has seen mixed trends, with a few states showing slight shortening.
                   </p>
                 </SubSection>
 
@@ -1134,19 +947,6 @@ const KIND_BADGE: Record<'country' | 'us-state' | 'uk-region', { label: string; 
   'us-state': { label: '🇺🇸', className: 'bg-gray-800 text-gray-300' },
   'uk-region': { label: '🇬🇧', className: 'bg-gray-800 text-gray-300' },
 };
-
-function KindStat({ color, label, count, sub }: { color: string; label: string; count: number; sub: string }) {
-  return (
-    <div className="rounded-lg border border-gray-800/60 bg-gray-900/50 p-2.5">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: color }} />
-        <span className="text-[11px] uppercase tracking-wider text-gray-400 font-mono">{label}</span>
-      </div>
-      <div className="text-lg font-bold font-mono text-[#FFF5E7]">{count}</div>
-      <div className="text-[11px] text-gray-500 leading-tight">{sub}</div>
-    </div>
-  );
-}
 
 function Leaderboard({
   title,
