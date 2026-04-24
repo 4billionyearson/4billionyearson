@@ -576,7 +576,7 @@ function WarmSeasonShiftBar({
   springShiftDays: number;
   autumnShiftDays: number;
 }) {
-  const X0 = 60;
+  const X0 = 170;
   const X1 = 960;
   const x = (doy: number) => X0 + (doy / 365) * (X1 - X0);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -584,25 +584,32 @@ function WarmSeasonShiftBar({
   const recentLen = recentAutumnDoy - recentSpringDoy;
   const deltaDays = Math.round(recentLen - baselineLen);
   const shiftColor = deltaDays > 0 ? '#fb923c' : deltaDays < 0 ? '#38bdf8' : '#9CA3AF';
-  const TOTAL_H = 130;
+  const TOTAL_H = 110;
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4">
-      <div className="flex items-baseline justify-between gap-2 flex-wrap mb-2">
-        <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono">
+      <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
+        <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider">
           Warm-season length shift
         </div>
-        <div className={`text-sm font-mono font-bold`} style={{ color: shiftColor }}>
+        <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
           {deltaDays > 0 ? `+${deltaDays} days longer` : deltaDays < 0 ? `${deltaDays} days shorter` : 'no change'}
         </div>
       </div>
       <svg viewBox={`0 0 1000 ${TOTAL_H}`} className="w-full h-auto" role="img">
         {/* Baseline row */}
-        <text x={X0} y={16} fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text
+          x={X0 - 10}
+          y={20}
+          textAnchor="end"
+          fontSize={11}
+          fill="#9CA3AF"
+          fontFamily="ui-monospace, monospace"
+        >
           {baselineLabel} baseline
         </text>
         <rect
           x={x(baselineSpringDoy)}
-          y={22}
+          y={14}
           width={x(baselineAutumnDoy) - x(baselineSpringDoy)}
           height={10}
           rx={5}
@@ -610,49 +617,56 @@ function WarmSeasonShiftBar({
           stroke="#9CA3AF"
           strokeDasharray="4 3"
         />
-        <text x={x(baselineSpringDoy) - 4} y={30} textAnchor="end" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text x={x(baselineSpringDoy) - 4} y={22} textAnchor="end" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
           {doyToLabel(baselineSpringDoy)}
         </text>
-        <text x={x(baselineAutumnDoy) + 4} y={30} fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text x={x(baselineAutumnDoy) + 4} y={22} fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
           {doyToLabel(baselineAutumnDoy)}
         </text>
 
         {/* Recent row */}
-        <text x={X0} y={54} fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
+        <text
+          x={X0 - 10}
+          y={54}
+          textAnchor="end"
+          fontSize={11}
+          fill="#FDE68A"
+          fontFamily="ui-monospace, monospace"
+        >
           {recentLabel} now
         </text>
         <rect
           x={x(recentSpringDoy)}
-          y={60}
+          y={48}
           width={x(recentAutumnDoy) - x(recentSpringDoy)}
           height={10}
           rx={5}
           fill="#F59E0B"
           fillOpacity={0.85}
         />
-        <text x={x(recentSpringDoy) - 4} y={68} textAnchor="end" fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
+        <text x={x(recentSpringDoy) - 4} y={56} textAnchor="end" fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
           {doyToLabel(recentSpringDoy)}
         </text>
-        <text x={x(recentAutumnDoy) + 4} y={68} fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
+        <text x={x(recentAutumnDoy) + 4} y={56} fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
           {doyToLabel(recentAutumnDoy)}
         </text>
 
         {/* Shift annotations */}
-        <text x={x((baselineSpringDoy + recentSpringDoy) / 2)} y={92} textAnchor="middle" fontSize={10} fill={shiftColor} fontFamily="ui-monospace, monospace">
+        <text x={x((baselineSpringDoy + recentSpringDoy) / 2)} y={76} textAnchor="middle" fontSize={10} fill={shiftColor} fontFamily="ui-monospace, monospace">
           {springShiftDays < 0 ? `${Math.abs(Math.round(springShiftDays))}d earlier` : springShiftDays > 0 ? `${Math.round(springShiftDays)}d later` : ''}
         </text>
-        <text x={x((baselineAutumnDoy + recentAutumnDoy) / 2)} y={92} textAnchor="middle" fontSize={10} fill={shiftColor} fontFamily="ui-monospace, monospace">
+        <text x={x((baselineAutumnDoy + recentAutumnDoy) / 2)} y={76} textAnchor="middle" fontSize={10} fill={shiftColor} fontFamily="ui-monospace, monospace">
           {autumnShiftDays > 0 ? `${Math.round(autumnShiftDays)}d later` : autumnShiftDays < 0 ? `${Math.abs(Math.round(autumnShiftDays))}d earlier` : ''}
         </text>
 
         {/* Month axis */}
-        <line x1={X0} y1={104} x2={X1} y2={104} stroke="#4B5563" strokeWidth={1} />
+        <line x1={X0} y1={86} x2={X1} y2={86} stroke="#4B5563" strokeWidth={1} />
         {months.map((m, i) => {
           const cx = X0 + ((i + 0.5) / 12) * (X1 - X0);
           return (
             <g key={m}>
-              <line x1={cx} y1={100} x2={cx} y2={108} stroke="#6B7280" strokeWidth={1} />
-              <text x={cx} y={122} textAnchor="middle" fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+              <line x1={cx} y1={82} x2={cx} y2={90} stroke="#6B7280" strokeWidth={1} />
+              <text x={cx} y={104} textAnchor="middle" fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
                 {m}
               </text>
             </g>
