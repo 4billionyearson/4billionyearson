@@ -176,7 +176,7 @@ export default function SeasonalShiftCard({
         <div className="flex gap-2 text-xs flex-wrap">
           {hasTempSeasons && (
             <TabButton active={effectiveView === 'length'} onClick={() => setView('length')}>
-              Warm-season length
+              Spring &amp; autumn
             </TabButton>
           )}
           <TabButton active={effectiveView === 'monthly'} onClick={() => setView('monthly')}>
@@ -212,8 +212,8 @@ export default function SeasonalShiftCard({
 
       {hasTempSeasons ? (
         <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
-          <StatTile label={`${baselineStart}–${baselineEnd}`} value={temp.baselineLen.toFixed(1)} sub="warm months / yr" />
-          <StatTile label={`${recentStart}–${recentEnd}`} value={temp.recentLen.toFixed(1)} sub="warm months / yr" />
+          <StatTile label={`${baselineStart}–${baselineEnd}`} value={temp.baselineLen.toFixed(1)} sub="months above annual mean" />
+          <StatTile label={`${recentStart}–${recentEnd}`} value={temp.recentLen.toFixed(1)} sub="months above annual mean" />
         </div>
       ) : hasWetDry && rain ? (
         <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
@@ -343,7 +343,7 @@ export default function SeasonalShiftCard({
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
-                  formatter={(v) => [`${v} months`, 'Warm season']}
+                  formatter={(v) => [`${v} months`, 'Months above annual mean']}
                 />
                 <ReferenceLine
                   y={temp.baselineLen}
@@ -369,8 +369,10 @@ export default function SeasonalShiftCard({
             </ResponsiveContainer>
           </div>
           <p className="text-xs text-gray-400 mt-3">
-            Orange bars = years with more warm months than the {baselineStart}–{baselineEnd} baseline;
-            blue = fewer. The dashed gold line is the baseline average.
+            Each bar is the number of months in that year whose mean temperature was above
+            the {baselineStart}–{baselineEnd} annual mean - a proxy for warm-season length.
+            Orange = more months above baseline, blue = fewer; the dashed gold line is the
+            baseline average.
           </p>
         </>
       )}
@@ -585,7 +587,7 @@ function WarmSeasonShiftBar({
     <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4">
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
         <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider">
-          Warm-season length shift
+          Spring &amp; autumn shift
         </div>
         <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
           {deltaDays > 0 ? `+${deltaDays} days longer` : deltaDays < 0 ? `${deltaDays} days shorter` : 'no change'}
@@ -693,10 +695,13 @@ function ShiftExplanation({
   if (seasonality === 'warm-cold') {
     return (
       <p className="text-sm text-gray-300 mb-4">
-        How the <strong className="text-[#FFF5E7]">{regionName}</strong> warm season has shifted. A
-        month counts as &ldquo;warm&rdquo; when its mean temperature exceeds the long-term annual
-        mean ({baselineMean.toFixed(1)}°C, from {baselineStart}–{baselineEnd}). Temperature swings{' '}
-        {amplitudeC.toFixed(1)}°C peak-to-peak across the year - a classic four-seasons rhythm.
+        How <strong className="text-[#FFF5E7]">spring</strong> and{' '}
+        <strong className="text-[#FFF5E7]">autumn</strong> have shifted in{' '}
+        <strong className="text-[#FFF5E7]">{regionName}</strong>. Spring is defined as the date
+        monthly temperatures first rise above the long-term annual mean
+        ({baselineMean.toFixed(1)}°C, from {baselineStart}–{baselineEnd}); autumn is the date they
+        fall back below it. Temperature swings {amplitudeC.toFixed(1)}°C peak-to-peak across the
+        year - a classic four-seasons rhythm.
       </p>
     );
   }
