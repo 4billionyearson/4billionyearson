@@ -165,8 +165,16 @@ export function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
             <span className="min-w-0 flex-1">{panel.title}</span>
           </h2>
           <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden">
+            <div className={panel.sections.length > 1 ? 'lg:grid lg:grid-cols-2' : ''}>
             {panel.sections.map((section, sIdx) => (
-              <div key={sIdx} className={`${sIdx > 0 ? 'border-t-2 border-gray-600/50' : ''}`}>
+              <div
+                key={sIdx}
+                className={
+                  panel.sections.length > 1
+                    ? `${sIdx > 0 ? 'border-t-2 border-gray-600/50 lg:border-t-0 lg:border-l-2' : ''}`
+                    : `${sIdx > 0 ? 'border-t-2 border-gray-600/50' : ''}`
+                }
+              >
                 {section.title && (
                   <div className="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">{section.title}</div>
                 )}
@@ -245,6 +253,7 @@ export function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
                 </div>
               </div>
             ))}
+            </div>
             <div className="px-3 py-2 text-[10px] text-gray-500 border-t border-gray-700/40">Baseline: 1961–1990 mean · Anomaly = difference from baseline · Record = highest (or lowest) value on record</div>
           </div>
         </div>
