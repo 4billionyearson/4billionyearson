@@ -102,7 +102,8 @@ const KIND_COLOR: Record<SeasonalityKind, string> = {
   aseasonal: "#6b7280",
 };
 
-// Standard-ish Köppen map palette (close to the Peel 2007 Wikipedia colours).
+// Fallback colours for the five main Köppen letter groups (used when a
+// sub-code is missing or not in the sub-code palette below).
 const KOPPEN_COLOR: Record<KoppenGroup, string> = {
   A: "#1b7837", // tropical — deep green
   B: "#e6a23c", // arid — sand/amber
@@ -110,6 +111,54 @@ const KOPPEN_COLOR: Record<KoppenGroup, string> = {
   D: "#6a5acd", // continental — indigo
   E: "#b0bec5", // polar — pale blue-grey
 };
+
+// Per-sub-code palette matching the Peel, Finlayson & McMahon (2007) /
+// Wikipedia Köppen–Geiger atlas. Each climate sub-code gets its own distinct
+// shade, so e.g. Cwb (subtropical highland) is visibly separated from Cfb
+// (oceanic). Falls back to the group colour above when a code isn't listed.
+const KOPPEN_SUBCODE_COLOR: Record<string, string> = {
+  // A — Tropical
+  Af: "#0000FE",
+  Am: "#0078FF",
+  Aw: "#46A9FA",
+  As: "#46A9FA",
+  // B — Arid
+  BWh: "#FE0000",
+  BWk: "#FE9695",
+  BSh: "#F5A301",
+  BSk: "#FFDC64",
+  // C — Temperate
+  Csa: "#FFFF00",
+  Csb: "#C8C800",
+  Csc: "#969600",
+  Cwa: "#96FF96",
+  Cwb: "#64C864",
+  Cwc: "#329632",
+  Cfa: "#C8FF50",
+  Cfb: "#64FF50",
+  Cfc: "#33C800",
+  // D — Continental
+  Dsa: "#FF00FF",
+  Dsb: "#C800C8",
+  Dsc: "#963296",
+  Dsd: "#966496",
+  Dwa: "#ABB1FF",
+  Dwb: "#5A77DB",
+  Dwc: "#4C51B5",
+  Dwd: "#320087",
+  Dfa: "#00FFFF",
+  Dfb: "#38C6FF",
+  Dfc: "#007E7D",
+  Dfd: "#00465F",
+  // E — Polar
+  ET: "#B2B2B2",
+  EF: "#686868",
+};
+
+function koppenColor(k: KoppenResult | null): string | null {
+  if (!k) return null;
+  return KOPPEN_SUBCODE_COLOR[k.code] ?? KOPPEN_COLOR[k.group];
+}
 
 const KOPPEN_GROUP_LABEL: Record<KoppenGroup, string> = {
   A: "Tropical",
@@ -223,7 +272,7 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
     unit: "",
     accessor: () => 1,
     format: () => "",
-    customColor: (r) => (r.koppen ? KOPPEN_COLOR[r.koppen.group] : null),
+    customColor: (r) => koppenColor(r.koppen),
   },
 };
 
@@ -542,7 +591,7 @@ export default function GlobalShiftMap() {
       aseasonal: "Weakly seasonal",
     };
     const koppenBlock = rec.koppen
-      ? `<div style="color:${KOPPEN_COLOR[rec.koppen.group]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px">Köppen ${rec.koppen.code} — ${rec.koppen.label}</div>`
+      ? `<div style="color:${koppenColor(rec.koppen) ?? KOPPEN_COLOR[rec.koppen.group]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px">Köppen ${rec.koppen.code} — ${rec.koppen.label}</div>`
       : "";
     layer.bindTooltip(
       `
@@ -733,26 +782,66 @@ export default function GlobalShiftMap() {
           <>
             {metric === "koppen" ? (
               <>
-                <div className="flex items-center gap-4 flex-wrap">
-                  {(["A", "B", "C", "D", "E"] as KoppenGroup[]).map((g) => (
-                    <span key={g} className="inline-flex items-center gap-1.5">
-                      <span
-                        className="inline-block w-3 h-3 rounded"
-                        style={{ backgroundColor: KOPPEN_COLOR[g] }}
-                      />
-                      <span className="text-[11px]">
-                        <strong className="text-gray-200">{g}</strong> · {KOPPEN_GROUP_LABEL[g]}
-                      </span>
-                    </span>
-                  ))}
-                </div>
+                {(() => {
+                  const byGroup: Record<KoppenGroup, { code: string; label: string; color: string }[]> = {
+                    A: [], B: [], C: [], D: [], E: [],
+                  };
+                  const seen = new Set<string>();
+                  const all: GlobalShiftRecord[] = [
+                    ...(shifts?.countries ?? []),
+                    ...(shifts?.usStates ?? []),
+                    ...(shifts?.ukRegions ?? []),
+                  ];
+                  for (const r of all) {
+                    if (!r.koppen) continue;
+                    const key = r.koppen.code;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    byGroup[r.koppen.group].push({
+                      code: key,
+                      label: r.koppen.label,
+                      color: koppenColor(r.koppen) ?? KOPPEN_COLOR[r.koppen.group],
+                    });
+                  }
+                  for (const g of Object.keys(byGroup) as KoppenGroup[]) {
+                    byGroup[g].sort((a, b) => a.code.localeCompare(b.code));
+                  }
+                  return (
+                    <div className="space-y-1.5">
+                      {(["A", "B", "C", "D", "E"] as KoppenGroup[]).map((g) =>
+                        byGroup[g].length ? (
+                          <div key={g} className="flex items-start gap-2 flex-wrap text-[11px]">
+                            <span className="shrink-0 text-gray-400 w-20">
+                              <strong className="text-gray-200">{g}</strong> · {KOPPEN_GROUP_LABEL[g]}
+                            </span>
+                            <span className="flex items-center gap-2 flex-wrap">
+                              {byGroup[g].map((sc) => (
+                                <span key={sc.code} className="inline-flex items-center gap-1">
+                                  <span
+                                    className="inline-block w-3 h-3 rounded"
+                                    style={{ backgroundColor: sc.color }}
+                                  />
+                                  <span>
+                                    <strong className="text-gray-200">{sc.code}</strong>
+                                    <span className="text-gray-500"> {sc.label}</span>
+                                  </span>
+                                </span>
+                              ))}
+                            </span>
+                          </div>
+                        ) : null,
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className="text-[11px] text-gray-500">
                   The Köppen–Geiger classification (Peel, Finlayson &amp; McMahon 2007) is the most
                   widely used climate grouping in atlases and peer-reviewed climate science. Five
-                  main groups: <strong>A</strong> tropical, <strong>B</strong> arid,{" "}
+                  main groups — <strong>A</strong> tropical, <strong>B</strong> arid,{" "}
                   <strong>C</strong> temperate, <strong>D</strong> continental,{" "}
-                  <strong>E</strong> polar. Hover any country for its full 2- or 3-letter code (e.g.
-                  Cfb = oceanic temperate, Aw = tropical savanna, BWh = hot desert).
+                  <strong>E</strong> polar — each split into sub-codes by temperature & rainfall
+                  seasonality (e.g. Cfb = oceanic temperate, Cwb = subtropical highland, BWh = hot
+                  desert). Colours follow the standard Peel 2007 atlas palette.
                 </div>
               </>
             ) : (
