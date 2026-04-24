@@ -845,17 +845,32 @@ function ClimateDashboard() {
                     <SubSection title="Annual total precipitation (mm)">
                       <YearlyChart data={countryData.precipYearly} dataKey="value" rollingKey="rollingAvg" label="Precipitation" units="mm" color="#60a5fa" rollingColor="#2563eb" />
                     </SubSection>
-                    {countryData.precipMonthly?.monthlyComparison?.length > 0 && (
-                      <SubSection title={`${countryLabel} – Last 12 months vs 1961–1990 average`}>
-                        <ComparisonChart
-                          data={countryData.precipMonthly.monthlyComparison}
-                          recentKey="recent"
-                          label="Precipitation"
-                          units="mm"
-                          barColor="#3b82f6"
-                        />
-                      </SubSection>
-                    )}
+                    {countryData.precipMonthly?.monthlyComparison?.length > 0 && (() => {
+                      const mc = countryData.precipMonthly.monthlyComparison;
+                      const first = mc[0];
+                      const last = mc[mc.length - 1];
+                      const endYear = countryData.precipMonthly.yearRange?.[1];
+                      const isStale = typeof endYear === 'number' && endYear < new Date().getFullYear();
+                      return (
+                        <SubSection
+                          title={`${countryLabel} – ${first?.monthLabel} → ${last?.monthLabel} vs 1961–1990 average`}
+                        >
+                          {isStale && (
+                            <p className="text-xs text-amber-300/80 mb-2">
+                              Latest 12 months of released CRU TS 4.08 data (ends {last?.monthLabel}).
+                              World Bank CKP has not yet released months beyond {endYear}.
+                            </p>
+                          )}
+                          <ComparisonChart
+                            data={mc}
+                            recentKey="recent"
+                            label="Precipitation"
+                            units="mm"
+                            barColor="#3b82f6"
+                          />
+                        </SubSection>
+                      );
+                    })()}
                     <p className="text-xs text-gray-400 mt-4">
                       Annual series: Our World in Data / Copernicus ERA5 (CC-BY).
                       {countryData.precipMonthly && (
