@@ -9,12 +9,23 @@ import 'leaflet/dist/leaflet.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// Country-name aliases: snapshot name → geojson name (lowercased match)
+// Country-name aliases: snapshot name → geojson name (lowercased match).
+// The geojson uses Natural Earth short-form names (e.g. "Dem. Rep. Congo"),
+// while our country snapshots use ISO-style long names. Keep this in sync
+// with public/data/world-countries.json.
 const NAME_ALIAS: Record<string, string> = {
   'united states': 'united states of america',
-  'dr congo': 'democratic republic of the congo',
-  'singapore': 'singapore', // geojson omits it (tiny country)
-  'south sudan': 'south sudan',
+  'dr congo': 'dem. rep. congo',
+  'south sudan': 's. sudan',
+  'bosnia and herzegovina': 'bosnia and herz.',
+  'central african republic': 'central african rep.',
+  "cote d'ivoire": "côte d'ivoire",
+  'dominican republic': 'dominican rep.',
+  'equatorial guinea': 'eq. guinea',
+  'solomon islands': 'solomon is.',
+  'east timor': 'timor-leste',
+  'western sahara': 'w. sahara',
+  'eswatini': 'eswatini',
 };
 
 interface CountryAnomaly {

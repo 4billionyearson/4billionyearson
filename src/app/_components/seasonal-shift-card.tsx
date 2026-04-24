@@ -256,22 +256,16 @@ export default function SeasonalShiftCard({
         temp.recentSpringDoy !== null &&
         temp.baselineAutumnDoy !== null &&
         temp.recentAutumnDoy !== null && (
-          <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
-            <CrossingTile
-              title="Spring threshold crossed"
-              baselineDoy={temp.baselineSpringDoy}
-              recentDoy={temp.recentSpringDoy}
-              shiftDays={temp.springShiftDays ?? 0}
-              direction="spring"
-            />
-            <CrossingTile
-              title="Autumn threshold crossed"
-              baselineDoy={temp.baselineAutumnDoy}
-              recentDoy={temp.recentAutumnDoy}
-              shiftDays={temp.autumnShiftDays ?? 0}
-              direction="autumn"
-            />
-          </div>
+          <WarmSeasonShiftBar
+            baselineSpringDoy={temp.baselineSpringDoy}
+            recentSpringDoy={temp.recentSpringDoy}
+            baselineAutumnDoy={temp.baselineAutumnDoy}
+            recentAutumnDoy={temp.recentAutumnDoy}
+            baselineLabel={`${baselineStart}–${baselineEnd}`}
+            recentLabel={`${recentStart}–${recentEnd}`}
+            springShiftDays={temp.springShiftDays ?? 0}
+            autumnShiftDays={temp.autumnShiftDays ?? 0}
+          />
         )}
 
       {hasWetDry && rain && effectiveView === 'wet-season' && (
@@ -563,40 +557,108 @@ function StatTile({
   );
 }
 
-function CrossingTile({
-  title,
-  baselineDoy,
-  recentDoy,
-  shiftDays,
-  direction,
+function WarmSeasonShiftBar({
+  baselineSpringDoy,
+  recentSpringDoy,
+  baselineAutumnDoy,
+  recentAutumnDoy,
+  baselineLabel,
+  recentLabel,
+  springShiftDays,
+  autumnShiftDays,
 }: {
-  title: string;
-  baselineDoy: number;
-  recentDoy: number;
-  shiftDays: number;
-  direction: 'spring' | 'autumn';
+  baselineSpringDoy: number;
+  recentSpringDoy: number;
+  baselineAutumnDoy: number;
+  recentAutumnDoy: number;
+  baselineLabel: string;
+  recentLabel: string;
+  springShiftDays: number;
+  autumnShiftDays: number;
 }) {
-  const earlierColor = direction === 'spring' ? 'text-orange-300' : 'text-sky-300';
-  const laterColor = direction === 'spring' ? 'text-sky-300' : 'text-orange-300';
-  const shiftClass =
-    Math.abs(shiftDays) < 1 ? 'text-gray-300' : shiftDays < 0 ? earlierColor : laterColor;
+  const X0 = 60;
+  const X1 = 960;
+  const x = (doy: number) => X0 + (doy / 365) * (X1 - X0);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const baselineLen = baselineAutumnDoy - baselineSpringDoy;
+  const recentLen = recentAutumnDoy - recentSpringDoy;
+  const deltaDays = Math.round(recentLen - baselineLen);
+  const shiftColor = deltaDays > 0 ? '#fb923c' : deltaDays < 0 ? '#38bdf8' : '#9CA3AF';
+  const TOTAL_H = 130;
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-2.5">
-      <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono mb-1">{title}</div>
-      <div className="flex items-baseline justify-between gap-2 flex-wrap">
-        <div className="text-sm text-gray-300">
-          <span className="text-gray-500">{doyToLabel(baselineDoy)}</span>
-          <span className="mx-1 text-gray-600">→</span>
-          <span className="text-[#FFF5E7] font-mono font-bold">{doyToLabel(recentDoy)}</span>
+    <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4">
+      <div className="flex items-baseline justify-between gap-2 flex-wrap mb-2">
+        <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono">
+          Warm-season length shift
         </div>
-        <div className={`text-sm font-mono font-bold ${shiftClass}`}>
-          {shiftDays < 0
-            ? `${Math.abs(shiftDays).toFixed(0)} days earlier`
-            : shiftDays > 0
-            ? `${shiftDays.toFixed(0)} days later`
-            : 'no change'}
+        <div className={`text-sm font-mono font-bold`} style={{ color: shiftColor }}>
+          {deltaDays > 0 ? `+${deltaDays} days longer` : deltaDays < 0 ? `${deltaDays} days shorter` : 'no change'}
         </div>
       </div>
+      <svg viewBox={`0 0 1000 ${TOTAL_H}`} className="w-full h-auto" role="img">
+        {/* Baseline row */}
+        <text x={X0} y={16} fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+          {baselineLabel} baseline
+        </text>
+        <rect
+          x={x(baselineSpringDoy)}
+          y={22}
+          width={x(baselineAutumnDoy) - x(baselineSpringDoy)}
+          height={10}
+          rx={5}
+          fill="none"
+          stroke="#9CA3AF"
+          strokeDasharray="4 3"
+        />
+        <text x={x(baselineSpringDoy) - 4} y={30} textAnchor="end" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+          {doyToLabel(baselineSpringDoy)}
+        </text>
+        <text x={x(baselineAutumnDoy) + 4} y={30} fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+          {doyToLabel(baselineAutumnDoy)}
+        </text>
+
+        {/* Recent row */}
+        <text x={X0} y={54} fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
+          {recentLabel} now
+        </text>
+        <rect
+          x={x(recentSpringDoy)}
+          y={60}
+          width={x(recentAutumnDoy) - x(recentSpringDoy)}
+          height={10}
+          rx={5}
+          fill="#F59E0B"
+          fillOpacity={0.85}
+        />
+        <text x={x(recentSpringDoy) - 4} y={68} textAnchor="end" fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
+          {doyToLabel(recentSpringDoy)}
+        </text>
+        <text x={x(recentAutumnDoy) + 4} y={68} fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
+          {doyToLabel(recentAutumnDoy)}
+        </text>
+
+        {/* Shift annotations */}
+        <text x={x((baselineSpringDoy + recentSpringDoy) / 2)} y={92} textAnchor="middle" fontSize={10} fill={shiftColor} fontFamily="ui-monospace, monospace">
+          {springShiftDays < 0 ? `${Math.abs(Math.round(springShiftDays))}d earlier` : springShiftDays > 0 ? `${Math.round(springShiftDays)}d later` : ''}
+        </text>
+        <text x={x((baselineAutumnDoy + recentAutumnDoy) / 2)} y={92} textAnchor="middle" fontSize={10} fill={shiftColor} fontFamily="ui-monospace, monospace">
+          {autumnShiftDays > 0 ? `${Math.round(autumnShiftDays)}d later` : autumnShiftDays < 0 ? `${Math.abs(Math.round(autumnShiftDays))}d earlier` : ''}
+        </text>
+
+        {/* Month axis */}
+        <line x1={X0} y1={104} x2={X1} y2={104} stroke="#4B5563" strokeWidth={1} />
+        {months.map((m, i) => {
+          const cx = X0 + ((i + 0.5) / 12) * (X1 - X0);
+          return (
+            <g key={m}>
+              <line x1={cx} y1={100} x2={cx} y2={108} stroke="#6B7280" strokeWidth={1} />
+              <text x={cx} y={122} textAnchor="middle" fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+                {m}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }

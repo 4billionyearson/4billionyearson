@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import type { GlobalShiftRecord } from '@/app/_components/global-shift-map';
 import { countryFlag } from '@/lib/climate/locations';
+import SeasonTimelineGraphic from '@/app/_components/season-timeline-graphic';
 
 const SpringIndexMap = dynamic(() => import('@/app/_components/spring-index-map'), {
   ssr: false,
@@ -498,6 +499,16 @@ export default function ShiftingSeasonsPage() {
                 </div>
                 <p className="text-xs text-gray-500 mt-3">
                   Updated {new Date(data.manifest.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}.
+                </p>
+              </SectionCard>
+
+              {/* Visual summary of the three headline shifts */}
+              <SectionCard icon={<Leaf className="text-emerald-400" />} title="Seasons at a Glance">
+                <SeasonTimelineGraphic />
+                <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
+                  Sources: U.S. growing season (EPA / NOAA NCEI); Kyoto cherry blossom full-flowering
+                  dates (Osaka Prefecture University, Aono &amp; Saito); NH snow-free season derived
+                  from Rutgers Global Snow Lab weekly extent.
                 </p>
               </SectionCard>
 

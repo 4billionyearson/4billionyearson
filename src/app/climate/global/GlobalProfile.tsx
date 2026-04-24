@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale, Factory, Leaf, ArrowRight } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
+import SeasonTimelineGraphic from '@/app/_components/season-timeline-graphic';
 import { getRegionBySlug } from '@/lib/climate/regions';
 import {
   OverviewGrid,
@@ -150,100 +151,9 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
 
 /**
  * Calendar-year timeline showing two concrete Northern-Hemisphere shifts:
- *   - Kyoto cherry-blossom peak-bloom date has moved about 11 days earlier
- *     (Apr 17 → Apr 6) relative to the pre-1850 average.
- *   - US frost-free growing season has lengthened by about 15 days since 1895
- *     (May 4 → Apr 26 at the start; Oct 7 → Oct 15 at the end).
- * SVG is drawn on a viewBox of 0..1000 wide × 120 tall and scaled to the
- * parent width; month ticks sit on a horizontal axis at y=70.
+ * see `season-timeline-graphic.tsx` (shared with the country/state/region
+ * seasonal-shift card and the main /climate/shifting-seasons page).
  */
-function SeasonTimelineGraphic() {
-  // fraction-of-year → x-coordinate on a 40..960 track (leaves margin for labels)
-  const x = (frac: number) => 40 + frac * 920;
-  const dayOfYear = (m: number, d: number) => {
-    const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    let sum = 0;
-    for (let i = 0; i < m - 1; i++) sum += days[i];
-    return sum + d;
-  };
-  const toFrac = (m: number, d: number) => dayOfYear(m, d) / 365;
-
-  const kyotoOld = toFrac(4, 17);
-  const kyotoNew = toFrac(4, 6);
-  const growOldStart = toFrac(5, 4);
-  const growOldEnd = toFrac(10, 7);
-  const growNewStart = toFrac(4, 26);
-  const growNewEnd = toFrac(10, 15);
-
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  return (
-    <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 p-4">
-      <div className="text-xs text-gray-400 uppercase tracking-wider mb-3">Calendar-year view - Northern Hemisphere</div>
-      <svg viewBox="0 0 1000 150" className="w-full h-auto" role="img" aria-label="Shifts in the calendar year for Kyoto cherry blossom peak bloom and US growing season length">
-        {/* US growing season - historical (dashed outline) */}
-        <rect x={x(growOldStart)} y={40} width={x(growOldEnd) - x(growOldStart)} height={14} rx={7} fill="none" stroke="#6B7280" strokeDasharray="4 3" />
-        {/* US growing season - current (solid emerald) */}
-        <rect x={x(growNewStart)} y={40} width={x(growNewEnd) - x(growNewStart)} height={14} rx={7} fill="#10B981" fillOpacity={0.85} />
-
-        {/* Month axis line */}
-        <line x1={40} y1={80} x2={960} y2={80} stroke="#4B5563" strokeWidth={1} />
-        {months.map((m, i) => {
-          const cx = x((i + 0.5) / 12);
-          return (
-            <g key={m}>
-              <line x1={cx} y1={76} x2={cx} y2={84} stroke="#6B7280" strokeWidth={1} />
-              <text x={cx} y={100} textAnchor="middle" fontSize={12} fill="#9CA3AF" fontFamily="ui-monospace, monospace">{m}</text>
-            </g>
-          );
-        })}
-
-        {/* Kyoto blossom markers */}
-        {/* historical (hollow) */}
-        <circle cx={x(kyotoOld)} cy={115} r={6} fill="none" stroke="#F9A8D4" strokeWidth={2} />
-        {/* current (filled) */}
-        <circle cx={x(kyotoNew)} cy={115} r={6} fill="#F472B6" />
-        {/* arrow between old and new */}
-        <line x1={x(kyotoOld) - 6} y1={115} x2={x(kyotoNew) + 8} y2={115} stroke="#F472B6" strokeWidth={1.5} markerEnd="url(#arrowPink)" />
-        <defs>
-          <marker id="arrowPink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#F472B6" />
-          </marker>
-        </defs>
-
-        {/* Top labels */}
-        <text x={x((growNewStart + growNewEnd) / 2)} y={32} textAnchor="middle" fontSize={11} fill="#6EE7B7" fontFamily="ui-monospace, monospace">
-          US growing season (now) - {Math.round((growNewEnd - growNewStart) * 365)} days
-        </text>
-        <text x={x((growOldStart + growOldEnd) / 2)} y={19} textAnchor="middle" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
-          1895 baseline - {Math.round((growOldEnd - growOldStart) * 365)} days
-        </text>
-
-        {/* Bottom label for Kyoto */}
-        <text x={x(kyotoNew) - 10} y={138} textAnchor="end" fontSize={11} fill="#F472B6" fontFamily="ui-monospace, monospace">
-          Kyoto peak bloom - now Apr 6
-        </text>
-        <text x={x(kyotoOld) + 10} y={138} textAnchor="start" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
-          historic Apr 17
-        </text>
-      </svg>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-gray-400">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-3 h-2 rounded-sm" style={{ background: '#10B981', opacity: 0.85 }} />
-          Growing season (current)
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-3 h-2 rounded-sm border border-dashed border-gray-500" />
-          Growing season (1895 baseline)
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-2.5 rounded-full bg-pink-400" />
-          Kyoto peak bloom
-        </span>
-      </div>
-    </div>
-  );
-}
 
 function RelatedLink({ href, label, desc }: { href: string; label: string; desc: string }) {
   return (
@@ -731,47 +641,48 @@ export default function GlobalProfile() {
                 <AnomalyMapCard countryAnomalies={data.countryAnomalies} />
               )}
 
-              {/* Spaghetti chart - Land + Ocean (headline global series) */}
-              {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (
+              {/* Spaghetti charts - Land+Ocean headline and Land-only comparison.
+                  Side-by-side at lg screens so they can be read in parallel. */}
+              {(data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0) || data.landMonthlyAll?.length > 0 ? (
                 <>
                   <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Temperature" />
-                  <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <TemperatureSpaghettiChart
-                      monthlyAll={data.landOceanMonthlyAll}
-                      regionName="Global Land + Ocean"
-                      dataSource="NOAA Climate at a Glance - Global Land+Ocean"
-                    />
-                    <p className="text-xs text-gray-400 mt-3">
-                      Each line is a single year; the current year is highlighted. This is the headline global surface-temperature series - the same land + ocean dataset used by Copernicus, WMO and NOAA - and the one to cite when comparing the planet as a whole against a single country, state or region (shown on the individual climate pages).
-                    </p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (
+                      <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                        <TemperatureSpaghettiChart
+                          monthlyAll={data.landOceanMonthlyAll}
+                          regionName="Global Land + Ocean"
+                          dataSource="NOAA Climate at a Glance - Global Land+Ocean"
+                        />
+                        <p className="text-xs text-gray-400 mt-3">
+                          The headline global surface-temperature series - the same land + ocean dataset used by Copernicus, WMO and NOAA - and the one to cite when comparing the planet as a whole against a single country, state or region.
+                        </p>
+                      </div>
+                    )}
+                    {data.landMonthlyAll?.length > 0 && (
+                      <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                        <TemperatureSpaghettiChart
+                          monthlyAll={data.landMonthlyAll}
+                          regionName="Global Land"
+                          dataSource="Our World in Data / ERA5"
+                        />
+                        <p className="text-xs text-gray-400 mt-3">
+                          The same chart style as the individual country, state and region climate pages - which use land-only temperatures because there&rsquo;s no ocean inside their borders. This land-only global version is included so you can compare any specific place on those pages against the global land average on equal terms.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </>
-              )}
-
-              {/* Spaghetti chart - Land only (for direct comparison with country/state/region pages) */}
-              {data.landMonthlyAll?.length > 0 && (
-                <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                  <TemperatureSpaghettiChart
-                    monthlyAll={data.landMonthlyAll}
-                    regionName="Global Land"
-                    dataSource="Our World in Data / ERA5"
-                  />
-                  <p className="text-xs text-gray-400 mt-3">
-                    The same chart style as the individual country, state and region climate pages - which use land-only temperatures because there&rsquo;s no ocean inside their borders. This land-only global version is included so you can compare any specific place on those pages against the global land average on equal terms.
-                  </p>
-                </div>
-              )}
+              ) : null}
 
               {/* Shifting Seasons teaser - global temperature is too flat to run
                   the standard warm/cold analysis, so we link out to the full
                   worldwide treatment instead. */}
               <Divider icon={<Leaf className="h-5 w-5 text-emerald-400" />} title="Shifting Seasons" />
               <section className="bg-gray-950/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
-                    <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons Worldwide</h3>
-                  </div>
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
+                  <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons Worldwide</h3>
                 </div>
                 <p className="text-sm text-gray-300 mb-4">
                   Global averages smooth out the seasonal cycle, but climate change shows up most clearly in the <em>timing</em> of the year. Spring is arriving earlier across the Northern Hemisphere, snow seasons are shrinking, and growing seasons are stretching at both ends. Because global land+ocean temperatures barely vary across a single year, the warm-season analysis below only makes sense region by region.
@@ -780,31 +691,11 @@ export default function GlobalProfile() {
                 {/* Calendar-year timeline graphic */}
                 <SeasonTimelineGraphic />
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 mt-4">
-                  <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
-                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Kyoto cherry blossoms</div>
-                    <div className="flex items-baseline gap-1 flex-wrap">
-                      <span className="text-2xl font-bold font-mono text-emerald-300">11 days</span>
-                      <span className="text-sm text-gray-400">earlier</span>
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">vs pre-1850 average, 1,200-year record</div>
-                  </div>
-                  <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
-                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">US growing season</div>
-                    <div className="flex items-baseline gap-1 flex-wrap">
-                      <span className="text-2xl font-bold font-mono text-emerald-300">+15 days</span>
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">frost-free season since 1895 (EPA)</div>
-                  </div>
-                  <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
-                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">NH spring snow</div>
-                    <div className="flex items-baseline gap-1 flex-wrap">
-                      <span className="text-2xl font-bold font-mono text-cyan-300">shrinking</span>
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">spring snow cover losing area each decade</div>
-                  </div>
-                </div>
-                <div className="flex justify-end">
+                <p className="text-xs text-gray-500 mt-3">
+                  Sources: EPA (US frost-free growing season since 1895) · Aono &amp; Kazui 2008 (Kyoto peak-bloom 1,200-year record) · NOAA Rutgers Global Snow Lab (NH snow cover).
+                </p>
+
+                <div className="mt-4 flex justify-end">
                   <Link
                     href="/climate/shifting-seasons"
                     className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
@@ -814,6 +705,9 @@ export default function GlobalProfile() {
                   </Link>
                 </div>
               </section>
+
+              {/* Long-view charts: yearly trend, last 12 months, land vs ocean */}
+              <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Global Temperature - Long View" />
 
               {/* Yearly trend chart */}
               {yearlyChartData.length > 0 && (
