@@ -308,7 +308,9 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
             {panel.icon}
             <span className="min-w-0 flex-1">{panel.title}</span>
           </h2>
-          <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden">
+          <div className={`rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden ${
+            panel.sections.length === 1 && (panel.sections[0]?.rows.length ?? 0) === 1 ? 'lg:max-w-xl' : ''
+          }`}>
             <div className={panel.sections.length > 1 ? 'lg:grid lg:grid-cols-2' : ''}>
             {panel.sections.map((section, sIdx) => (
               <div
