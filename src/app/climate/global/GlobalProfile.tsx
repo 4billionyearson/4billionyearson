@@ -148,6 +148,116 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
+/**
+ * Calendar-year timeline showing two concrete Northern-Hemisphere shifts:
+ *   - Kyoto cherry-blossom peak-bloom date has moved about 11 days earlier
+ *     (Apr 17 → Apr 6) relative to the pre-1850 average.
+ *   - US frost-free growing season has lengthened by about 15 days since 1895
+ *     (May 4 → Apr 26 at the start; Oct 7 → Oct 15 at the end).
+ * SVG is drawn on a viewBox of 0..1000 wide × 120 tall and scaled to the
+ * parent width; month ticks sit on a horizontal axis at y=70.
+ */
+function SeasonTimelineGraphic() {
+  // fraction-of-year → x-coordinate on a 40..960 track (leaves margin for labels)
+  const x = (frac: number) => 40 + frac * 920;
+  const dayOfYear = (m: number, d: number) => {
+    const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let sum = 0;
+    for (let i = 0; i < m - 1; i++) sum += days[i];
+    return sum + d;
+  };
+  const toFrac = (m: number, d: number) => dayOfYear(m, d) / 365;
+
+  const kyotoOld = toFrac(4, 17);
+  const kyotoNew = toFrac(4, 6);
+  const growOldStart = toFrac(5, 4);
+  const growOldEnd = toFrac(10, 7);
+  const growNewStart = toFrac(4, 26);
+  const growNewEnd = toFrac(10, 15);
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  return (
+    <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 p-4">
+      <div className="text-xs text-gray-400 uppercase tracking-wider mb-3">Calendar-year view - Northern Hemisphere</div>
+      <svg viewBox="0 0 1000 150" className="w-full h-auto" role="img" aria-label="Shifts in the calendar year for Kyoto cherry blossom peak bloom and US growing season length">
+        {/* US growing season - historical (dashed outline) */}
+        <rect x={x(growOldStart)} y={40} width={x(growOldEnd) - x(growOldStart)} height={14} rx={7} fill="none" stroke="#6B7280" strokeDasharray="4 3" />
+        {/* US growing season - current (solid emerald) */}
+        <rect x={x(growNewStart)} y={40} width={x(growNewEnd) - x(growNewStart)} height={14} rx={7} fill="#10B981" fillOpacity={0.85} />
+
+        {/* Month axis line */}
+        <line x1={40} y1={80} x2={960} y2={80} stroke="#4B5563" strokeWidth={1} />
+        {months.map((m, i) => {
+          const cx = x((i + 0.5) / 12);
+          return (
+            <g key={m}>
+              <line x1={cx} y1={76} x2={cx} y2={84} stroke="#6B7280" strokeWidth={1} />
+              <text x={cx} y={100} textAnchor="middle" fontSize={12} fill="#9CA3AF" fontFamily="ui-monospace, monospace">{m}</text>
+            </g>
+          );
+        })}
+
+        {/* Kyoto blossom markers */}
+        {/* historical (hollow) */}
+        <circle cx={x(kyotoOld)} cy={115} r={6} fill="none" stroke="#F9A8D4" strokeWidth={2} />
+        {/* current (filled) */}
+        <circle cx={x(kyotoNew)} cy={115} r={6} fill="#F472B6" />
+        {/* arrow between old and new */}
+        <line x1={x(kyotoOld) - 6} y1={115} x2={x(kyotoNew) + 8} y2={115} stroke="#F472B6" strokeWidth={1.5} markerEnd="url(#arrowPink)" />
+        <defs>
+          <marker id="arrowPink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#F472B6" />
+          </marker>
+        </defs>
+
+        {/* Top labels */}
+        <text x={x((growNewStart + growNewEnd) / 2)} y={32} textAnchor="middle" fontSize={11} fill="#6EE7B7" fontFamily="ui-monospace, monospace">
+          US growing season (now) - {Math.round((growNewEnd - growNewStart) * 365)} days
+        </text>
+        <text x={x((growOldStart + growOldEnd) / 2)} y={19} textAnchor="middle" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+          1895 baseline - {Math.round((growOldEnd - growOldStart) * 365)} days
+        </text>
+
+        {/* Bottom label for Kyoto */}
+        <text x={x(kyotoNew) - 10} y={138} textAnchor="end" fontSize={11} fill="#F472B6" fontFamily="ui-monospace, monospace">
+          Kyoto peak bloom - now Apr 6
+        </text>
+        <text x={x(kyotoOld) + 10} y={138} textAnchor="start" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+          historic Apr 17
+        </text>
+      </svg>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-gray-400">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-3 h-2 rounded-sm" style={{ background: '#10B981', opacity: 0.85 }} />
+          Growing season (current)
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-3 h-2 rounded-sm border border-dashed border-gray-500" />
+          Growing season (1895 baseline)
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-pink-400" />
+          Kyoto peak bloom
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function RelatedLink({ href, label, desc }: { href: string; label: string; desc: string }) {
+  return (
+    <Link
+      href={href}
+      className="relative block rounded-xl border border-gray-700/50 bg-gray-900 hover:bg-gray-800 hover:border-gray-600 p-4 transition-all shadow-md"
+    >
+      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-cyan-400" />
+      <div className="font-semibold text-white text-sm pr-5">{label}</div>
+      <div className="text-xs text-gray-300 mt-1">{desc}</div>
+    </Link>
+  );
+}
+
 type SummaryResponse = {
   summary: string | null;
   sources?: { title: string; uri: string }[];
@@ -666,7 +776,11 @@ export default function GlobalProfile() {
                 <p className="text-sm text-gray-300 mb-4">
                   Global averages smooth out the seasonal cycle, but climate change shows up most clearly in the <em>timing</em> of the year. Spring is arriving earlier across the Northern Hemisphere, snow seasons are shrinking, and growing seasons are stretching at both ends. Because global land+ocean temperatures barely vary across a single year, the warm-season analysis below only makes sense region by region.
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+
+                {/* Calendar-year timeline graphic */}
+                <SeasonTimelineGraphic />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 mt-4">
                   <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
                     <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Kyoto cherry blossoms</div>
                     <div className="flex items-baseline gap-1 flex-wrap">
@@ -693,7 +807,7 @@ export default function GlobalProfile() {
                 <div className="flex justify-end">
                   <Link
                     href="/climate/shifting-seasons"
-                    className="inline-flex items-center gap-1 text-sm text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
+                    className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
                   >
                     Explore Shifting Seasons worldwide
                     <ArrowRight className="h-4 w-4" />
@@ -921,35 +1035,26 @@ export default function GlobalProfile() {
                   >
                     Browse all regions →
                   </Link>
-                  <Link
-                    href="/climate/rankings"
-                    className="inline-flex items-center h-8 rounded-full border border-[#D0A65E]/55 bg-[#D0A65E]/10 px-3 text-[13px] font-semibold text-[#FFF5E7] transition-colors hover:bg-[#D0A65E]/20"
-                  >
-                    Rankings & trends →
-                  </Link>
+                </div>
+              </div>
+
+              {/* Explore Climate Data - matches the country/state/region pages */}
+              <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+                  <BookOpen className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+                  <span className="min-w-0 flex-1">Explore Climate Data</span>
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <RelatedLink href="/climate/shifting-seasons" label="Shifting Seasons" desc="How the timing of the seasons is moving worldwide" />
+                  <RelatedLink href="/climate/rankings" label="Climate Rankings" desc="League table of anomalies across 144 regions" />
+                  <RelatedLink href="/climate-dashboard" label="Climate Dashboard" desc="Headline global climate indicators in one view" />
+                  <RelatedLink href="/emissions" label="CO₂ Emissions" desc="Global and per-country emissions" />
+                  <RelatedLink href="/extreme-weather" label="Extreme Weather" desc="Live disaster and weather alerts" />
+                  <RelatedLink href="/climate-explained" label="Climate Explained" desc="ENSO, greenhouse effect, glossary" />
                 </div>
               </div>
             </>
           )}
-
-          {/* SEO footer */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
-              <Info className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-              <span className="min-w-0 flex-1">About This Page</span>
-            </h2>
-            <div className="text-sm text-gray-400 space-y-3 max-w-3xl">
-              <p>
-                For local context covering a specific country, US state or UK region, see the full
-                {' '}
-                <Link href="/climate" className="text-teal-300 hover:text-teal-200">Climate Updates index</Link>
-                . For the real-time interactive dashboard with every chart, visit the
-                {' '}
-                <Link href="/climate-dashboard" className="text-teal-300 hover:text-teal-200">Climate Dashboard</Link>
-                .
-              </p>
-            </div>
-          </section>
         </div>
       </div>
     </main>
