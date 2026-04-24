@@ -792,11 +792,7 @@ export default function GlobalProfile() {
                           />
                           <Legend wrapperStyle={{ color: '#D1D5DB', fontSize: 12 }} />
                           <ReferenceLine y={0} stroke="#6B7280" />
-                          <Bar dataKey="landOcean" name="Land + Ocean (NOAA)">
-                            {monthlyAnomalyCombined.map((p, i) => (
-                              <Cell key={i} fill={p.landOcean == null ? '#4b5563' : p.landOcean > 0 ? '#fb923c' : '#60a5fa'} />
-                            ))}
-                          </Bar>
+                          <Bar dataKey="landOcean" name="Land + Ocean (NOAA)" fill="#38bdf8" />
                           <Line type="monotone" dataKey="land" name="Land only (ERA5)" stroke="#f97316" strokeWidth={2.5} dot={{ r: 3, fill: '#f97316' }} connectNulls isAnimationActive={false} />
                         </ComposedChart>
                       </ResponsiveContainer>
