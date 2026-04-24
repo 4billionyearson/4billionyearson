@@ -101,6 +101,22 @@ html {
   border: none !important;
   box-shadow: none !important;
 }
+
+/* Hover tooltips for the Global Shift map (Shifting Seasons page) */
+.global-shift-tooltip.leaflet-tooltip {
+  background: rgba(9, 13, 21, 0.94) !important;
+  border: 1px solid rgba(208, 166, 94, 0.28) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  color: #fff5e7 !important;
+  white-space: normal !important;
+  max-width: 260px;
+}
+.global-shift-tooltip.leaflet-tooltip::before {
+  border-top-color: rgba(9, 13, 21, 0.94) !important;
+  border-bottom-color: rgba(9, 13, 21, 0.94) !important;
+}
 .uk-map-selected-label span {
   display: block;
   white-space: nowrap;

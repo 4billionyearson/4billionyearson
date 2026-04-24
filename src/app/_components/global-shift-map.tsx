@@ -18,6 +18,7 @@ const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapCont
 const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
 const GeoJSON = dynamic(() => import("react-leaflet").then((m) => m.GeoJSON), { ssr: false });
 const Polyline = dynamic(() => import("react-leaflet").then((m) => m.Polyline), { ssr: false });
+const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), { ssr: false });
 
 /** Zoom thresholds at which subregional layers appear over their host country. */
 const US_STATES_ZOOM = 4;
@@ -289,6 +290,225 @@ function stripOverseasTerritories(fc: FeatureCollection): FeatureCollection {
     };
   });
   return { ...fc, features };
+}
+
+/* ─── Zoom-aware place labels ────────────────────────────────────────── */
+
+const LABEL_OVERRIDES: Record<string, [number, number]> = {
+  "United States of America": [40, -98],
+  Canada: [56, -96],
+  Russia: [62, 95],
+  France: [47, 2.5],
+  Norway: [65, 13],
+  Indonesia: [-2, 118],
+  Malaysia: [4, 109],
+  Chile: [-35, -71],
+  "New Zealand": [-42, 174],
+  Japan: [36, 138],
+  Antarctica: [-82, 0],
+};
+
+const CONTINENT_LABELS: { name: string; pos: [number, number] }[] = [
+  { name: "North America", pos: [45, -100] },
+  { name: "South America", pos: [-15, -58] },
+  { name: "Europe", pos: [52, 15] },
+  { name: "Africa", pos: [5, 20] },
+  { name: "Asia", pos: [42, 85] },
+  { name: "Oceania", pos: [-25, 135] },
+];
+
+const MAJOR_COUNTRIES = new Set([
+  "United States of America", "Canada", "Mexico", "Brazil", "Argentina",
+  "Russia", "China", "India", "Japan", "Australia",
+  "Indonesia", "Saudi Arabia", "Iran", "Kazakhstan",
+  "United Kingdom", "France", "Germany", "Spain", "Italy",
+  "Turkey", "Ukraine", "Poland", "Sweden", "Norway", "Finland",
+  "Egypt", "South Africa", "Nigeria", "Algeria", "Libya",
+  "Dem. Rep. Congo", "Sudan", "Ethiopia", "Kenya",
+  "Mongolia", "Pakistan", "Thailand",
+  "Greenland", "Iceland", "New Zealand",
+]);
+
+const LABEL_DISPLAY_NAME: Record<string, string> = {
+  "United States of America": "United States",
+  "Dem. Rep. Congo": "DR Congo",
+  "Dominican Rep.": "Dominican Rep.",
+  "Central African Rep.": "Central African Rep.",
+  "S. Sudan": "South Sudan",
+  "Bosnia and Herz.": "Bosnia & Herz.",
+  "Czech Rep.": "Czechia",
+  "W. Sahara": "Western Sahara",
+  "Eq. Guinea": "Equatorial Guinea",
+};
+
+function ringArea(ring: number[][]): number {
+  let a = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    a += (ring[j][0] - ring[i][0]) * (ring[j][1] + ring[i][1]);
+  }
+  return a / 2;
+}
+function ringCentroid(ring: number[][]): [number, number] {
+  let x = 0, y = 0;
+  for (const c of ring) { x += c[0]; y += c[1]; }
+  return [y / ring.length, x / ring.length];
+}
+function featureCentroid(feature: Feature): [number, number] | null {
+  const g = feature.geometry as unknown as { type: string; coordinates: unknown };
+  if (!g) return null;
+  if (g.type === "Polygon") return ringCentroid((g.coordinates as number[][][])[0]);
+  if (g.type === "MultiPolygon") {
+    let best: number[][] = [];
+    let bestArea = 0;
+    for (const poly of g.coordinates as number[][][][]) {
+      const ring = poly[0];
+      const a = Math.abs(ringArea(ring));
+      if (a > bestArea) { bestArea = a; best = ring; }
+    }
+    return best.length ? ringCentroid(best) : null;
+  }
+  return null;
+}
+
+type LeafletMod = typeof import("leaflet");
+
+function MapLabels({
+  world,
+  statesGeo,
+  ukGeo,
+}: {
+  world: FeatureCollection | null;
+  statesGeo: FeatureCollection | null;
+  ukGeo: FeatureCollection | null;
+}) {
+  const map = useMap();
+  const [zoom, setZoom] = useState(map.getZoom());
+  const [L, setL] = useState<LeafletMod | null>(null);
+
+  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+
+  useEffect(() => {
+    let cancelled = false;
+    import("leaflet").then((mod) => {
+      if (!cancelled) setL((mod.default ?? mod) as LeafletMod);
+    });
+    if (!map.getPane("labels")) {
+      const pane = map.createPane("labels");
+      pane.style.zIndex = "450";
+      pane.style.pointerEvents = "none";
+    }
+    const tp = map.getPane("tooltipPane");
+    if (tp) tp.style.zIndex = "700";
+    return () => {
+      cancelled = true;
+    };
+  }, [map]);
+
+  const countryLabels = useMemo(() => {
+    if (!world) return [] as { name: string; pos: [number, number] }[];
+    const out: { name: string; pos: [number, number] }[] = [];
+    for (const f of world.features) {
+      const name = (f.properties as { name?: string } | null)?.name;
+      if (!name) continue;
+      const pos = LABEL_OVERRIDES[name] ?? featureCentroid(f);
+      if (pos) out.push({ name, pos });
+    }
+    return out;
+  }, [world]);
+
+  const stateLabels = useMemo(() => {
+    if (!statesGeo) return [] as { name: string; pos: [number, number] }[];
+    const out: { name: string; pos: [number, number] }[] = [];
+    for (const f of statesGeo.features) {
+      const name = (f.properties as { name?: string } | null)?.name;
+      if (!name) continue;
+      const pos = featureCentroid(f);
+      if (pos) out.push({ name, pos });
+    }
+    return out;
+  }, [statesGeo]);
+
+  const ukLabels = useMemo(() => {
+    if (!ukGeo) return [] as { name: string; pos: [number, number] }[];
+    const out: { name: string; pos: [number, number] }[] = [];
+    for (const f of ukGeo.features) {
+      const name = (f.properties as { name?: string } | null)?.name;
+      if (!name) continue;
+      const pos = featureCentroid(f);
+      if (pos) out.push({ name, pos });
+    }
+    return out;
+  }, [ukGeo]);
+
+  if (!L) return null;
+
+  const visibleCountry =
+    zoom <= 2
+      ? CONTINENT_LABELS
+      : zoom <= 3
+        ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
+        : countryLabels;
+
+  const countryFont = zoom <= 2 ? 13 : 10;
+  const countryCls = zoom <= 2 ? "continent-label" : "country-label";
+
+  const showStates = zoom >= US_STATES_ZOOM;
+  const showUk = zoom >= UK_NATIONS_ZOOM;
+
+  return (
+    <>
+      {visibleCountry.map(({ name, pos }) => {
+        const display = LABEL_DISPLAY_NAME[name] ?? name;
+        // Hide the country label for US / UK when their sub-region labels take over
+        if (showStates && name === "United States of America") return null;
+        if (showUk && name === "United Kingdom") return null;
+        return (
+          <Marker
+            key={`c-${name}`}
+            position={pos}
+            pane="labels"
+            interactive={false}
+            icon={L.divIcon({
+              className: countryCls,
+              html: `<span style="font-size:${countryFont}px">${display}</span>`,
+              iconSize: [0, 0],
+              iconAnchor: [0, 0],
+            })}
+          />
+        );
+      })}
+      {showStates &&
+        stateLabels.map(({ name, pos }) => (
+          <Marker
+            key={`s-${name}`}
+            position={pos}
+            pane="labels"
+            interactive={false}
+            icon={L.divIcon({
+              className: "country-label",
+              html: `<span style="font-size:9px;opacity:0.85">${name}</span>`,
+              iconSize: [0, 0],
+              iconAnchor: [0, 0],
+            })}
+          />
+        ))}
+      {showUk &&
+        ukLabels.map(({ name, pos }) => (
+          <Marker
+            key={`u-${name}`}
+            position={pos}
+            pane="labels"
+            interactive={false}
+            icon={L.divIcon({
+              className: "country-label",
+              html: `<span style="font-size:9px;opacity:0.9">${name}</span>`,
+              iconSize: [0, 0],
+              iconAnchor: [0, 0],
+            })}
+          />
+        ))}
+    </>
+  );
 }
 
 /**
@@ -686,6 +906,7 @@ export default function GlobalShiftMap() {
               positions={tropicCapricorn}
               pathOptions={{ color: "#D0A65E", weight: 1, opacity: 0.45, dashArray: "4 6" }}
             />
+            <MapLabels world={world} statesGeo={statesGeo} ukGeo={ukGeo} />
           </MapContainer>
         )}
       </div>
