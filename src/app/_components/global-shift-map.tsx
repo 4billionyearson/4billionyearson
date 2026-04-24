@@ -372,6 +372,53 @@ function featureCentroid(feature: Feature): [number, number] | null {
 
 type LeafletMod = typeof import("leaflet");
 
+/**
+ * Reparents the leaflet tooltip pane to the outer `.global-shift-map` wrapper so
+ * tooltips can render outside the clipped map container. The map-pane's CSS
+ * transform (pan offset) is mirrored onto the relocated tooltip pane on every
+ * move/zoom so tooltip positions stay correct.
+ */
+function TooltipPaneEscape() {
+  const map = useMap();
+  useEffect(() => {
+    const tp = map.getPane("tooltipPane");
+    const mapPane = map.getPane("mapPane");
+    const container = map.getContainer();
+    const host = container.closest(".global-shift-map") as HTMLElement | null;
+    if (!tp || !mapPane || !host) return;
+    const originalParent = tp.parentElement;
+    host.appendChild(tp);
+    tp.style.position = "absolute";
+    tp.style.left = "0";
+    tp.style.top = "0";
+    tp.style.pointerEvents = "none";
+    tp.style.zIndex = "650";
+    // Offset the relocated pane by the leaflet container's offset within .global-shift-map
+    const sync = () => {
+      const hostRect = host.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const dx = containerRect.left - hostRect.left;
+      const dy = containerRect.top - hostRect.top;
+      const mapTransform = mapPane.style.transform || "";
+      tp.style.transform = `translate3d(${dx}px, ${dy}px, 0) ${mapTransform}`;
+    };
+    sync();
+    map.on("move", sync);
+    map.on("zoom", sync);
+    map.on("viewreset", sync);
+    map.on("resize", sync);
+    return () => {
+      map.off("move", sync);
+      map.off("zoom", sync);
+      map.off("viewreset", sync);
+      map.off("resize", sync);
+      if (originalParent) originalParent.appendChild(tp);
+      tp.style.transform = "";
+    };
+  }, [map]);
+  return null;
+}
+
 function MapLabels({
   world,
   statesGeo,
@@ -809,7 +856,7 @@ export default function GlobalShiftMap() {
   ];
 
   return (
-    <div className="global-shift-map rounded-xl border border-gray-800/60 bg-gray-900/50 overflow-hidden">
+    <div className="global-shift-map relative rounded-xl border border-gray-800/60 bg-gray-900/50">
       {/* Controls */}
       <div className="p-3 border-b border-gray-800/60 space-y-2">
         {metricGroups.map((group) => {
@@ -856,7 +903,7 @@ export default function GlobalShiftMap() {
       </div>
 
       {/* Map */}
-      <div className="h-[500px] w-full relative z-0">
+      <div className="h-[500px] w-full relative z-0 overflow-hidden rounded-b-xl">
         {world && shifts && (
           <MapContainer
             center={[20, 10]}
@@ -907,6 +954,7 @@ export default function GlobalShiftMap() {
               pathOptions={{ color: "#D0A65E", weight: 1, opacity: 0.45, dashArray: "4 6" }}
             />
             <MapLabels world={world} statesGeo={statesGeo} ukGeo={ukGeo} />
+            <TooltipPaneEscape />
           </MapContainer>
         )}
       </div>
