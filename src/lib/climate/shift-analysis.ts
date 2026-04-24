@@ -475,9 +475,19 @@ export function classifyKoppen(
   //   s (dry summer): Ps_min < 40 mm AND Ps_min < Pw_max / 3
   //   w (dry winter): Pw_min < Ps_max / 10
   //   f: neither
+  //
+  // Classical Köppen uses the strict Pw_min < Ps_max/10 ratio, but that
+  // cutoff is fragile when working with country-averaged CRU TS data:
+  // highland subtropical countries like Lesotho (Pw_min=13, Ps_max=126)
+  // and Rwanda (Pw_min=14, Ps_max=131) miss the 1/10 bar by ~3 % despite
+  // having an obvious dry winter. We therefore add an absolute "at least
+  // one near-dry winter month below 30 mm AND well below the summer peak"
+  // fallback (consistent with Köppen–Trewartha practice) so these cases
+  // resolve to the Cwb/Cwa codes reference maps report.
   let second: 's' | 'w' | 'f';
   const isDrySummer = Ps_min < 40 && Ps_min < Pw_max / 3;
-  const isDryWinter = Pw_min < Ps_max / 10;
+  const isDryWinter =
+    Pw_min < Ps_max / 10 || (Pw_min < 30 && Pw_min < Ps_max / 5);
   if (isDrySummer && !isDryWinter) second = 's';
   else if (isDryWinter && !isDrySummer) second = 'w';
   else if (isDrySummer && isDryWinter) {

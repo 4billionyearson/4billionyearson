@@ -140,10 +140,23 @@ export function buildYearlyFromMonthly(points, { isSum = false } = {}) {
   return yearly;
 }
 
-export function buildMonthlyComparison(points) {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
+export function buildMonthlyComparison(points, { anchor = 'now' } = {}) {
+  let currentYear;
+  let currentMonth;
+  if (anchor === 'latest' && points.length) {
+    // Anchor on the latest data point + 1 month, so the comparison shows
+    // the most-recent 12 months of available data. Useful for series that
+    // lag behind real time (e.g. CRU TS precipitation, currently ending
+    // in Dec 2023 even though we're well into 2026).
+    const latest = [...points].sort((a, b) => (a.year - b.year) || (a.month - b.month)).at(-1);
+    currentYear = latest.year;
+    currentMonth = latest.month + 1;
+    if (currentMonth > 12) { currentMonth = 1; currentYear += 1; }
+  } else {
+    const now = new Date();
+    currentYear = now.getFullYear();
+    currentMonth = now.getMonth() + 1;
+  }
   const historicByMonth = {};
   for (const p of points) {
     if (p.year >= 1961 && p.year <= 1990) {

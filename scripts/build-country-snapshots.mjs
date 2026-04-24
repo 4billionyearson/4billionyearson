@@ -328,7 +328,7 @@ async function main() {
             units: 'mm',
             yearRange: cckp.yearRange || [pts[0].year, pts[pts.length - 1].year],
             yearly: buildYearlyFromMonthly(pts, { isSum: true }),
-            monthlyComparison: buildMonthlyComparison(pts),
+            monthlyComparison: buildMonthlyComparison(pts, { anchor: 'latest' }),
             latestMonthStats: buildLatestMonthStats(pts),
             latestThreeMonthStats: buildLatestThreeMonthStats(pts),
           };
