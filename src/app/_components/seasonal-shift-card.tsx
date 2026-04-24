@@ -61,9 +61,6 @@ export default function SeasonalShiftCard({
   const { temp, rain, sunshine, windows, seasonality } = stats;
   const koppen = stats.koppen;
   const { baselineStart, baselineEnd, recentStart, recentEnd } = windows;
-  const shift = temp.recentLen - temp.baselineLen;
-  const shiftLabel = shift >= 0 ? `+${shift.toFixed(1)} months` : `${shift.toFixed(1)} months`;
-  const shiftColor = shift > 0.2 ? 'text-orange-300' : shift < -0.2 ? 'text-sky-300' : 'text-gray-300';
 
   const hasTempSeasons = seasonality === 'warm-cold' || seasonality === 'mixed';
   const hasWetDry = (seasonality === 'wet-dry' || seasonality === 'mixed') && !!rain;
@@ -214,10 +211,9 @@ export default function SeasonalShiftCard({
       />
 
       {hasTempSeasons ? (
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
           <StatTile label={`${baselineStart}–${baselineEnd}`} value={temp.baselineLen.toFixed(1)} sub="warm months / yr" />
           <StatTile label={`${recentStart}–${recentEnd}`} value={temp.recentLen.toFixed(1)} sub="warm months / yr" />
-          <StatTile label="Net shift" value={shiftLabel} sub="per year" valueClassName={shiftColor} bordered />
         </div>
       ) : hasWetDry && rain ? (
         <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
