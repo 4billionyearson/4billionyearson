@@ -830,22 +830,14 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       <SeasonalShiftCard monthlyAll={monthlyAll} rainfallMonthly={rainfallMonthly} sunshineMonthly={sunshineMonthly} regionName={pageTitle} dataSource={chartSource} />
                     ) : null}
 
-                    {/* Sunshine */}
-                    {sunshinePanels.length > 0 && (
+                    {/* Sunshine + Frost - paired side-by-side on lg (both single-column) */}
+                    {(sunshinePanels.length > 0 || frostPanels.length > 0) && (
                       <>
-                        <Divider icon={<Sun className="h-5 w-5 text-amber-300" />} title="Sunshine" />
-                        <OverviewGrid panels={sunshinePanels} />
-                      </>
-                    )}
-
-                    {/* Rainfall & Frost - paired side-by-side on lg */}
-                    {(rainfallPanels.length > 0 || frostPanels.length > 0) && (
-                      <>
-                        <Divider icon={<Droplets className="h-5 w-5 text-sky-300" />} title="Rainfall & Frost" />
+                        <Divider icon={<Sun className="h-5 w-5 text-amber-300" />} title="Sunshine & Frost" />
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-                          {rainfallPanels.length > 0 && (
+                          {sunshinePanels.length > 0 && (
                             <div>
-                              <OverviewGrid panels={rainfallPanels} />
+                              <OverviewGrid panels={sunshinePanels} />
                             </div>
                           )}
                           {frostPanels.length > 0 && (
@@ -854,6 +846,14 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                             </div>
                           )}
                         </div>
+                      </>
+                    )}
+
+                    {/* Rainfall - full width; inner Rainfall + Rain Days sections already pair at lg */}
+                    {rainfallPanels.length > 0 && (
+                      <>
+                        <Divider icon={<Droplets className="h-5 w-5 text-sky-300" />} title="Rainfall & Precipitation" />
+                        <OverviewGrid panels={rainfallPanels} />
                       </>
                     )}
                   </>
