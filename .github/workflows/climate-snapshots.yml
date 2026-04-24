@@ -45,6 +45,16 @@ jobs:
       - name: Rebuild country snapshots
         run: node scripts/build-country-snapshots.mjs
 
+      # ── Resync countryAnomalies on the global snapshot ──────────────
+      # build-global-snapshot runs first (to produce monthlyAll etc.) but
+      # its countryAnomalies field is built from whatever country files
+      # were on disk at that moment. Re-run the patch now that the per-
+      # country snapshots have just been rebuilt, so the world map on the
+      # Global update page always reflects the latest month for every
+      # country.
+      - name: Resync country anomalies on global snapshot
+        run: node scripts/patch-country-anomalies.mjs
+
       # ── US national (NOAA national time series) ─────────────────────
       - name: Rebuild US national snapshot
         run: node scripts/build-us-national-snapshot.mjs
