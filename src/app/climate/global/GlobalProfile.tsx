@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell, ComposedChart,
 } from 'recharts';
-import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale, Factory, Leaf, ArrowRight } from 'lucide-react';
+import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale, Factory, Leaf, ArrowRight, Ruler } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import SeasonTimelineGraphic from '@/app/_components/season-timeline-graphic';
 import { getRegionBySlug } from '@/lib/climate/regions';
@@ -836,7 +836,10 @@ export default function GlobalProfile() {
               <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] space-y-4">
                 {/* Baseline chips */}
                 <div>
-                  <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#D0A65E] mb-2">Baselines used on this page</h3>
+                  <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+                    <Ruler className="text-[#D0A65E]" />
+                    <span className="min-w-0 flex-1">Baselines used on this page</span>
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                     <div className="rounded-lg border border-gray-800 bg-gray-900/50 px-3 py-2">
                       <p className="text-[13px] font-semibold text-[#FFF5E7]">1961–1990</p>

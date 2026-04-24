@@ -100,11 +100,13 @@ function CardShell({ title, year, deepLinkHref, children }: {
   title: string; year: number; deepLinkHref: string; children: React.ReactNode;
 }) {
   return (
-    <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
-      <div className="px-4 pt-3 pb-2 border-b border-gray-800/60 flex items-center gap-2">
-        <Wind className="h-4 w-4 text-[#D1E368]" />
-        <h3 className="text-sm font-bold font-mono uppercase tracking-wider text-[#D1E368]">{title}</h3>
-        <span className="ml-auto text-[11px] text-gray-500 font-mono">{year}</span>
+    <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
+      <div className="p-4 pb-0">
+        <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
+          <Wind className="text-[#D1E368]" />
+          <span className="min-w-0 flex-1">{title}</span>
+          <span className="text-[11px] text-gray-500 font-mono font-normal mt-1.5">{year}</span>
+        </h2>
       </div>
       <div className="p-4 md:p-5 space-y-4">{children}</div>
       <Link
