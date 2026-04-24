@@ -35,13 +35,15 @@ jobs:
       - name: Rebuild global snapshot
         run: node scripts/build-global-snapshot.mjs
 
+      # ── Per-country monthly precipitation (World Bank CCKP) ─────────
+      # Must run BEFORE build-country-snapshots so the country profiles can
+      # enrich themselves with the monthly-comparison chart data.
+      - name: Rebuild country precipitation
+        run: node scripts/build-country-precip.mjs
+
       # ── Per-country (OWID land temperature + precipitation) ─────────
       - name: Rebuild country snapshots
         run: node scripts/build-country-snapshots.mjs
-
-      # ── Per-country monthly precipitation (World Bank CCKP) ─────────
-      - name: Rebuild country precipitation
-        run: node scripts/build-country-precip.mjs
 
       # ── US national (NOAA national time series) ─────────────────────
       - name: Rebuild US national snapshot

@@ -18,6 +18,7 @@
  */
 
 import { writeFile, mkdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -32,6 +33,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = resolve(__dirname, '..', 'public', 'data', 'climate', 'country');
+const CCKP_PRECIP_DIR = resolve(__dirname, '..', 'public', 'data', 'climate', 'country-precip');
 
 const OWID_TEMP_URL = 'https://api.ourworldindata.org/v1/indicators/1005195.data.json';
 const OWID_PRECIP_URL = 'https://api.ourworldindata.org/v1/indicators/1005182.data.json';
@@ -307,6 +309,35 @@ async function main() {
         });
       }
 
+      // ── Monthly precipitation (from World Bank CCKP / CRU TS) ────────
+      // The aggregated CCKP file at public/data/climate/country-precip/<CODE>.json
+      // carries ~123 years × 12 months of precip. When present, derive the
+      // same pre-computed structure US states use (yearly / monthlyComparison /
+      // latestMonthStats / latestThreeMonthStats) so the dashboard and profile
+      // pages can render a recent-vs-historic monthly comparison chart for
+      // countries — previously only US states / UK regions had this.
+      let precipMonthly = null;
+      try {
+        const raw = await readFile(resolve(CCKP_PRECIP_DIR, `${country.owidCode}.json`), 'utf8');
+        const cckp = JSON.parse(raw);
+        const pts = Array.isArray(cckp?.monthlyAll) ? cckp.monthlyAll : [];
+        if (pts.length >= 24) {
+          precipMonthly = {
+            source: cckp.source || 'World Bank CKP (CRU TS 4.08)',
+            sourceUrl: cckp.sourceUrl || 'https://climateknowledgeportal.worldbank.org/',
+            units: 'mm',
+            yearRange: cckp.yearRange || [pts[0].year, pts[pts.length - 1].year],
+            yearly: buildYearlyFromMonthly(pts, { isSum: true }),
+            monthlyComparison: buildMonthlyComparison(pts),
+            latestMonthStats: buildLatestMonthStats(pts),
+            latestThreeMonthStats: buildLatestThreeMonthStats(pts),
+          };
+        }
+      } catch {
+        // Country missing from CCKP cache — leave precipMonthly null. The
+        // dashboard still renders the OWID precipYearly chart below.
+      }
+
       const result = {
         country: country.name,
         code: country.owidCode,
@@ -316,6 +347,7 @@ async function main() {
         latestThreeMonthStats: buildLatestThreeMonthStats(statsPoints),
         monthlyAll: monthly.map((p) => ({ year: p.year, month: p.month, value: p.value })),
         precipYearly,
+        precipMonthly,
         dataPoints: monthly.length,
         dateRange: `${monthly[0].date} to ${monthly[monthly.length - 1].date}`,
         lastUpdated: cacheKey,

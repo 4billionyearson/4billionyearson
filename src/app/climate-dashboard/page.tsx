@@ -833,7 +833,7 @@ function ClimateDashboard() {
             )}
 
             {/* ═══ RAINFALL & PRECIPITATION ═══ */}
-            {(usStateData?.paramData?.pcp || ukRegionData?.varData?.Rainfall || countryData?.precipYearly) && (
+            {(usStateData?.paramData?.pcp || ukRegionData?.varData?.Rainfall || countryData?.precipYearly || countryData?.precipMonthly) && (
               <>
                 <Divider icon={<Droplets className="h-5 w-5" />} title="Rainfall & Precipitation" />
 
@@ -845,10 +845,33 @@ function ClimateDashboard() {
                     <SubSection title="Annual total precipitation (mm)">
                       <YearlyChart data={countryData.precipYearly} dataKey="value" rollingKey="rollingAvg" label="Precipitation" units="mm" color="#60a5fa" rollingColor="#2563eb" />
                     </SubSection>
+                    {countryData.precipMonthly?.monthlyComparison?.length > 0 && (
+                      <SubSection title={`${countryLabel} – Last 12 months vs 1961–1990 average`}>
+                        <ComparisonChart
+                          data={countryData.precipMonthly.monthlyComparison}
+                          recentKey="recent"
+                          label="Precipitation"
+                          units="mm"
+                          barColor="#3b82f6"
+                        />
+                      </SubSection>
+                    )}
                     <p className="text-xs text-gray-400 mt-4">
-                      Source:{" "}
-                      <a href="https://ourworldindata.org/explorers/climate-change" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a>{" "}
-                      / <a href="https://climate.copernicus.eu/climate-reanalysis" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Copernicus ERA5</a> (CC-BY).
+                      Annual series: Our World in Data / Copernicus ERA5 (CC-BY).
+                      {countryData.precipMonthly && (
+                        <>
+                          {" "}Monthly comparison:{" "}
+                          <a
+                            href={countryData.precipMonthly.sourceUrl || 'https://climateknowledgeportal.worldbank.org/'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#D0A65E] hover:underline"
+                          >
+                            {countryData.precipMonthly.source || 'World Bank CKP (CRU TS 4.08)'}
+                          </a>
+                          {" "}({countryData.precipMonthly.yearRange?.[0]}–{countryData.precipMonthly.yearRange?.[1]}).
+                        </>
+                      )}
                     </p>
                   </SectionCard>
                 )}
