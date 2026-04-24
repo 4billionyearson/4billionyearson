@@ -494,13 +494,12 @@ export default function GlobalProfile() {
                 return (
                   <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <div className="flex items-start justify-between gap-3 flex-wrap">
-                      <div>
-                        <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold flex items-center gap-1.5">
-                          <Scale className="h-3.5 w-3.5 text-[#D0A65E]" />
-                          Paris Agreement Tracker
-                        </p>
-                        <h3 className="text-lg md:text-xl font-bold text-white mt-1">How close are we to 1.5°C and 2°C?</h3>
-                        <p className="text-[11px] text-gray-400 mt-1">Global land + ocean surface temperature (NOAA) - the series used by Copernicus, WMO and the IPCC.</p>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
+                          <Scale className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
+                          <span className="min-w-0 flex-1">Paris Agreement Tracker - How close are we to 1.5°C and 2°C?</span>
+                        </h3>
+                        <p className="text-xs text-gray-400">Global land + ocean surface temperature (NOAA) - the series used by Copernicus, WMO and the IPCC.</p>
                       </div>
                       <div className="text-right">
                         <p className={`text-4xl md:text-5xl font-bold font-mono ${atOrPast15 ? 'text-red-300' : 'text-orange-300'}`}>
