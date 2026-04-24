@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell,
 } from 'recharts';
-import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale, Factory } from 'lucide-react';
+import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale, Factory, Leaf, ArrowRight } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import { getRegionBySlug } from '@/lib/climate/regions';
 import {
@@ -651,6 +651,55 @@ export default function GlobalProfile() {
                   </p>
                 </div>
               )}
+
+              {/* Shifting Seasons teaser - global temperature is too flat to run
+                  the standard warm/cold analysis, so we link out to the full
+                  worldwide treatment instead. */}
+              <Divider icon={<Leaf className="h-5 w-5 text-emerald-400" />} title="Shifting Seasons" />
+              <section className="bg-gray-950/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+                <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
+                    <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons Worldwide</h3>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-300 mb-4">
+                  Global averages smooth out the seasonal cycle, but climate change shows up most clearly in the <em>timing</em> of the year. Spring is arriving earlier across the Northern Hemisphere, snow seasons are shrinking, and growing seasons are stretching at both ends. Because global land+ocean temperatures barely vary across a single year, the warm-season analysis below only makes sense region by region.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                  <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
+                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Kyoto cherry blossoms</div>
+                    <div className="flex items-baseline gap-1 flex-wrap">
+                      <span className="text-2xl font-bold font-mono text-emerald-300">11 days</span>
+                      <span className="text-sm text-gray-400">earlier</span>
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">vs pre-1850 average, 1,200-year record</div>
+                  </div>
+                  <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
+                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">US growing season</div>
+                    <div className="flex items-baseline gap-1 flex-wrap">
+                      <span className="text-2xl font-bold font-mono text-emerald-300">+15 days</span>
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">frost-free season since 1895 (EPA)</div>
+                  </div>
+                  <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
+                    <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">NH spring snow</div>
+                    <div className="flex items-baseline gap-1 flex-wrap">
+                      <span className="text-2xl font-bold font-mono text-cyan-300">shrinking</span>
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">spring snow cover losing area each decade</div>
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <Link
+                    href="/climate/shifting-seasons"
+                    className="inline-flex items-center gap-1 text-sm text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
+                  >
+                    Explore Shifting Seasons worldwide
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </section>
 
               {/* Yearly trend chart */}
               {yearlyChartData.length > 0 && (

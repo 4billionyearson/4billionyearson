@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, Database, BookOpen, MapPin, Factory } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
-import ClimatePeersCard from '@/app/_components/climate-peers-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
@@ -849,9 +848,6 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 );
               })()}
 
-              {/* ─── Explore & Sources ─── */}
-              <ClimatePeersCard slug={slug} />
-
               {/* ─── Emissions & Energy ─── */}
               {(region.type === 'country' || region.type === 'us-state' || region.type === 'uk-region') && (
                 <>
@@ -888,7 +884,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 </>
               )}
 
-              <Divider icon={<BookOpen className="h-5 w-5 text-[#D0A65E]" />} title="Explore & Sources" />
+              <Divider icon={<BookOpen className="h-5 w-5 text-[#D0A65E]" />} title="Explore" />
 
               {/* ─── Explore More ─── */}
               <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
@@ -897,31 +893,12 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   <span className="min-w-0 flex-1">Explore Climate Data</span>
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  <RelatedLink href="/climate-dashboard" label="Climate Dashboard" desc="Interactive global climate data" />
+                  <RelatedLink href="/climate/shifting-seasons" label="Shifting Seasons" desc="How the timing of the seasons is moving worldwide" />
+                  <RelatedLink href="/climate/rankings" label="Climate Rankings" desc="League table of anomalies across 144 regions" />
+                  <RelatedLink href="/climate-dashboard" label="Climate Dashboard" desc="Headline global climate indicators in one view" />
                   <RelatedLink href="/emissions" label="CO₂ Emissions" desc="Global and per-country emissions" />
-                  <RelatedLink href="/greenhouse-gases" label="Greenhouse Gases" desc="CO₂, methane, and N₂O levels" />
-                  <RelatedLink href="/sea-levels-ice" label="Sea Levels & Ice" desc="Arctic ice and sea-level rise" />
                   <RelatedLink href="/extreme-weather" label="Extreme Weather" desc="Live disaster and weather alerts" />
                   <RelatedLink href="/climate-explained" label="Climate Explained" desc="ENSO, greenhouse effect, glossary" />
-                </div>
-              </section>
-
-              {/* ─── Attribution ─── */}
-              <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
-                  <Database className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-                  <span className="min-w-0 flex-1">Data Sources</span>
-                </h2>
-                <div className="text-xs text-gray-400 space-y-1.5">
-                  <p>Last updated: <span className="text-gray-300">{data.lastUpdated}</span> · Source: <span className="text-gray-300">{data.source === 'cache' ? 'cached' : 'live'}</span></p>
-                  {data.ukRegionData?.attribution && <p>{data.ukRegionData.attribution}</p>}
-                  <p>
-                    Temperature, rainfall, sunshine and frost data from the{' '}
-                    <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-and-regional-series" className="text-teal-300 hover:text-teal-200" target="_blank" rel="noopener noreferrer">Met Office UK Regional Series <ExternalLink className="inline w-3 h-3" /></a>.
-                    Global temperature data via{' '}
-                    <a href="https://ourworldindata.org" className="text-teal-300 hover:text-teal-200" target="_blank" rel="noopener noreferrer">Our World in Data <ExternalLink className="inline w-3 h-3" /></a>{' '}
-                    ({' '}<a href="https://www.ncei.noaa.gov" className="text-teal-300 hover:text-teal-200" target="_blank" rel="noopener noreferrer">NOAA <ExternalLink className="inline w-3 h-3" /></a>).
-                  </p>
                 </div>
               </section>
             </>
@@ -938,9 +915,9 @@ function RelatedLink({ href, label, desc }: { href: string; label: string; desc:
   return (
     <Link
       href={href}
-      className="relative block rounded-xl border border-[#D0A65E]/40 bg-gray-900 hover:bg-gray-800 hover:border-[#D0A65E]/70 p-4 transition-all shadow-md"
+      className="relative block rounded-xl border border-cyan-500/40 bg-gray-900 hover:bg-gray-800 hover:border-cyan-400/70 p-4 transition-all shadow-md"
     >
-      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-[#D0A65E]/70" />
+      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-cyan-400/70" />
       <div className="font-semibold text-white text-sm pr-5">{label}</div>
       <div className="text-xs text-gray-300 mt-1">{desc}</div>
     </Link>

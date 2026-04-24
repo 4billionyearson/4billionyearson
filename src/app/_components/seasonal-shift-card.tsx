@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useMemo, useState } from 'react';
-import { Leaf, CloudRain, Thermometer, Sun } from 'lucide-react';
+import Link from 'next/link';
+import { Leaf, CloudRain, Thermometer, Sun, ArrowRight } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ReferenceLine, Cell,
@@ -106,37 +107,46 @@ export default function SeasonalShiftCard({
       }))
     : [];
 
-  const seasonalityBadge: Record<SeasonalityKind, { label: string; className: string; icon: React.ReactNode }> = {
+  const seasonalityBadge: Record<SeasonalityKind, { label: string; className: string; icon: React.ReactNode; tooltip: string }> = {
     'warm-cold': {
       label: 'Warm / cold seasons',
       className: 'bg-orange-500/15 text-orange-300 border-orange-500/30',
       icon: <Thermometer className="h-3 w-3" />,
+      tooltip:
+        'A clear annual temperature cycle: summers are noticeably warmer than winters. Shown when the peak-to-peak monthly range is large enough to drive a distinct growing season.',
     },
     'wet-dry': {
       label: 'Wet / dry seasons',
       className: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
       icon: <CloudRain className="h-3 w-3" />,
+      tooltip:
+        'Temperature is fairly flat year-round but rainfall swings dramatically between a distinct wet season and a dry season.',
     },
     mixed: {
       label: 'Warm/cold + wet/dry',
       className: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
       icon: <Leaf className="h-3 w-3" />,
+      tooltip:
+        'Both a warm/cold cycle and a wet/dry cycle. Common in monsoon-influenced temperate and subtropical regions.',
     },
     aseasonal: {
       label: 'Weakly seasonal',
       className: 'bg-gray-700/40 text-gray-300 border-gray-600/50',
       icon: <Sun className="h-3 w-3" />,
+      tooltip:
+        'Temperature and rainfall vary only a little across the year. Typical of equatorial and marine tropical climates.',
     },
   };
 
   return (
     <section className="bg-gray-950/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-      <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
+      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
-          <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting seasons</h3>
+          <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons</h3>
           <span
             className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider ${seasonalityBadge[seasonality].className}`}
+            title={seasonalityBadge[seasonality].tooltip}
           >
             {seasonalityBadge[seasonality].icon}
             {seasonalityBadge[seasonality].label}
@@ -144,13 +154,13 @@ export default function SeasonalShiftCard({
           {koppen && (
             <span
               className="inline-flex items-center gap-1 rounded-full border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[#D0A65E]"
-              title={`Köppen–Geiger climate classification (Peel, Finlayson & McMahon 2007): ${koppen.code} - ${koppen.label}`}
+              title={`Köppen-Geiger climate classification (Peel, Finlayson & McMahon 2007). ${koppen.code}: ${koppen.label}. The first letter is the main climate group (A tropical, B arid, C temperate, D continental, E polar); the following letters describe precipitation and temperature sub-types.`}
             >
               Köppen {koppen.code} · {koppen.groupLabel}
             </span>
           )}
         </div>
-        <div className="flex gap-1 text-xs flex-wrap">
+        <div className="flex gap-2 text-xs flex-wrap">
           {hasTempSeasons && (
             <TabButton active={effectiveView === 'length'} onClick={() => setView('length')}>
               Warm-season length
@@ -277,9 +287,9 @@ export default function SeasonalShiftCard({
                   }`}
                 >
                   {rain.wetSeasonOnsetShiftDays > 0
-                    ? `${rain.wetSeasonOnsetShiftDays.toFixed(0)} d later`
+                    ? `${rain.wetSeasonOnsetShiftDays.toFixed(0)} days later`
                     : rain.wetSeasonOnsetShiftDays < 0
-                    ? `${Math.abs(rain.wetSeasonOnsetShiftDays).toFixed(0)} d earlier`
+                    ? `${Math.abs(rain.wetSeasonOnsetShiftDays).toFixed(0)} days earlier`
                     : 'no change'}
                 </div>
               )}
@@ -315,14 +325,15 @@ export default function SeasonalShiftCard({
         <>
           <div className="h-64 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={lengthSeries} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
+              <BarChart data={lengthSeries} margin={{ top: 10, right: 70, left: 5, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                 <XAxis dataKey="year" tick={{ fontSize: 10, fill: '#9ca3af' }} />
                 <YAxis
                   tick={{ fontSize: 10, fill: '#9ca3af' }}
                   domain={[0, 12]}
                   ticks={[0, 3, 6, 9, 12]}
-                  label={{ value: 'Months', angle: -90, position: 'insideLeft', offset: 10, fill: '#9ca3af', fontSize: 10 }}
+                  width={44}
+                  label={{ value: 'Months', angle: -90, position: 'insideLeft', offset: 12, fill: '#9ca3af', fontSize: 10 }}
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
@@ -332,7 +343,7 @@ export default function SeasonalShiftCard({
                   y={temp.baselineLen}
                   stroke="#D0A65E"
                   strokeDasharray="4 4"
-                  label={{ value: `Baseline ${temp.baselineLen.toFixed(1)}`, fill: '#D0A65E', fontSize: 10, position: 'insideTopLeft' }}
+                  label={{ value: `Baseline ${temp.baselineLen.toFixed(1)}`, fill: '#D0A65E', fontSize: 10, position: 'right', offset: 6 }}
                 />
                 <Bar dataKey="length" radius={[2, 2, 0, 0]}>
                   {lengthSeries.map((d) => (
@@ -362,10 +373,10 @@ export default function SeasonalShiftCard({
         <>
           <div className="h-64 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyComparison} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
+              <BarChart data={monthlyComparison} margin={{ top: 10, right: 70, left: 5, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} label={{ value: '°C', angle: -90, position: 'insideLeft', offset: 10, fill: '#9ca3af', fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} width={44} label={{ value: '°C', angle: -90, position: 'insideLeft', offset: 12, fill: '#9ca3af', fontSize: 10 }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
                   formatter={(v, name) => [`${typeof v === 'number' ? v.toFixed(1) : v}°C`, name]}
@@ -375,7 +386,7 @@ export default function SeasonalShiftCard({
                     y={temp.baselineAnnualMean}
                     stroke="#D0A65E"
                     strokeDasharray="4 4"
-                    label={{ value: `Annual mean ${temp.baselineAnnualMean.toFixed(1)}°C`, fill: '#D0A65E', fontSize: 10, position: 'insideTopRight' }}
+                    label={{ value: `Annual mean ${temp.baselineAnnualMean.toFixed(1)}°C`, fill: '#D0A65E', fontSize: 10, position: 'right', offset: 6 }}
                   />
                 )}
                 <Bar dataKey="baseline" name={`${baselineStart}–${baselineEnd}`} fill="#64748b" radius={[2, 2, 0, 0]} />
@@ -402,10 +413,10 @@ export default function SeasonalShiftCard({
         <>
           <div className="h-64 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={rainRows} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
+              <BarChart data={rainRows} margin={{ top: 10, right: 70, left: 5, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} label={{ value: 'mm', angle: -90, position: 'insideLeft', offset: 10, fill: '#9ca3af', fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} width={44} label={{ value: 'mm', angle: -90, position: 'insideLeft', offset: 12, fill: '#9ca3af', fontSize: 10 }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
                   formatter={(v, name) => [`${typeof v === 'number' ? v.toFixed(0) : v} mm`, name]}
@@ -414,7 +425,7 @@ export default function SeasonalShiftCard({
                   y={rain.baselineAnnualMm / 12}
                   stroke="#D0A65E"
                   strokeDasharray="4 4"
-                  label={{ value: `Threshold ${(rain.baselineAnnualMm / 12).toFixed(0)} mm`, fill: '#D0A65E', fontSize: 10, position: 'insideTopRight' }}
+                  label={{ value: `Threshold ${(rain.baselineAnnualMm / 12).toFixed(0)} mm`, fill: '#D0A65E', fontSize: 10, position: 'right', offset: 6 }}
                 />
                 <Bar dataKey="baseline" name={`${baselineStart}–${baselineEnd}`} fill="#475569" radius={[2, 2, 0, 0]} />
                 <Bar dataKey="recent" name={`${recentStart}–${recentEnd}`} fill="#38bdf8" radius={[2, 2, 0, 0]} />
@@ -435,10 +446,10 @@ export default function SeasonalShiftCard({
         <>
           <div className="h-64 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={rainRows} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
+              <BarChart data={rainRows} margin={{ top: 10, right: 8, left: 5, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} label={{ value: 'mm', angle: -90, position: 'insideLeft', offset: 10, fill: '#9ca3af', fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} width={44} label={{ value: 'mm', angle: -90, position: 'insideLeft', offset: 12, fill: '#9ca3af', fontSize: 10 }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
                   formatter={(v, name) => [`${typeof v === 'number' ? v.toFixed(0) : v} mm`, name]}
@@ -461,10 +472,10 @@ export default function SeasonalShiftCard({
         <>
           <div className="h-64 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={sunshineRows} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
+              <BarChart data={sunshineRows} margin={{ top: 10, right: 8, left: 5, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9ca3af' }} />
-                <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} label={{ value: 'hours', angle: -90, position: 'insideLeft', offset: 10, fill: '#9ca3af', fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} width={44} label={{ value: 'hours', angle: -90, position: 'insideLeft', offset: 12, fill: '#9ca3af', fontSize: 10 }} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
                   formatter={(v, name) => [`${typeof v === 'number' ? v.toFixed(0) : v} h`, name]}
@@ -484,6 +495,16 @@ export default function SeasonalShiftCard({
       )}
 
       {dataSource && <p className="text-[11px] text-gray-500 mt-3 font-mono">{dataSource}</p>}
+
+      <div className="mt-3 flex justify-end">
+        <Link
+          href="/climate/shifting-seasons"
+          className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
+        >
+          Explore Shifting Seasons worldwide
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
     </section>
   );
 }
@@ -493,10 +514,10 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-full font-mono transition ${
+      className={`inline-flex items-center rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
         active
-          ? 'bg-[#D0A65E] text-gray-950 font-bold'
-          : 'bg-gray-900 text-gray-400 hover:text-[#FFF5E7] border border-gray-700'
+          ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
+          : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]'
       }`}
     >
       {children}
@@ -554,9 +575,9 @@ function CrossingTile({
         </div>
         <div className={`text-sm font-mono font-bold ${shiftClass}`}>
           {shiftDays < 0
-            ? `${Math.abs(shiftDays).toFixed(0)} d earlier`
+            ? `${Math.abs(shiftDays).toFixed(0)} days earlier`
             : shiftDays > 0
-            ? `${shiftDays.toFixed(0)} d later`
+            ? `${shiftDays.toFixed(0)} days later`
             : 'no change'}
         </div>
       </div>
