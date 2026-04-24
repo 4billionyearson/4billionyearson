@@ -35,6 +35,14 @@ const COUNTRY_NAME_ALIASES: Record<string, string> = {
   'DR Congo': 'Dem. Rep. Congo',
   'South Sudan': 'S. Sudan',
   'United States': 'United States of America',
+  'Bosnia and Herzegovina': 'Bosnia and Herz.',
+  'Central African Republic': 'Central African Rep.',
+  "Cote d'Ivoire": "Côte d'Ivoire",
+  'Dominican Republic': 'Dominican Rep.',
+  'Equatorial Guinea': 'Eq. Guinea',
+  'Solomon Islands': 'Solomon Is.',
+  'East Timor': 'Timor-Leste',
+  'Eswatini': 'eSwatini',
 };
 
 type ShiftRecord = {

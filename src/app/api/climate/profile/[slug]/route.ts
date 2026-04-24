@@ -38,7 +38,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v17`;
+  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v18`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
