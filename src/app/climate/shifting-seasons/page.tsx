@@ -259,13 +259,16 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
-function StatBlock({ label, value, sub, color = 'text-orange-300' }: {
-  label: string; value: string; sub?: string; color?: string;
+function StatBlock({ label, value, unit, sub, color = 'text-orange-300' }: {
+  label: string; value: string; unit?: string; sub?: string; color?: string;
 }) {
   return (
     <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
-      <div className={`text-2xl font-bold font-mono ${color}`}>{value}</div>
+      <div className="flex items-baseline gap-1 flex-wrap">
+        <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
+        {unit && <span className="text-sm text-gray-400">{unit}</span>}
+      </div>
       {sub && <div className="text-xs text-gray-400 mt-1">{sub}</div>}
     </div>
   );
@@ -442,9 +445,10 @@ export default function ShiftingSeasonsPage() {
                         label="Earlier Springs"
                         value={
                           globalShift.globalStats.warmColdStats.meanSpringShift !== null
-                            ? `${globalShift.globalStats.warmColdStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanSpringShift.toFixed(1)} d`
+                            ? `${globalShift.globalStats.warmColdStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanSpringShift.toFixed(1)}`
                             : '-'
                         }
+                        unit={globalShift.globalStats.warmColdStats.meanSpringShift !== null ? 'days' : undefined}
                         sub={`mean across ${globalShift.globalStats.warmColdStats.withCrossings} temperate regions (${globalShift.globalStats.warmColdStats.earlierSprings} earlier)`}
                         color="text-rose-300"
                       />
@@ -452,9 +456,10 @@ export default function ShiftingSeasonsPage() {
                         label="Later Autumns"
                         value={
                           globalShift.globalStats.warmColdStats.meanAutumnShift !== null
-                            ? `${globalShift.globalStats.warmColdStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanAutumnShift.toFixed(1)} d`
+                            ? `${globalShift.globalStats.warmColdStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanAutumnShift.toFixed(1)}`
                             : '-'
                         }
+                        unit={globalShift.globalStats.warmColdStats.meanAutumnShift !== null ? 'days' : undefined}
                         sub={`mean across ${globalShift.globalStats.warmColdStats.withCrossings} temperate regions (${globalShift.globalStats.warmColdStats.laterAutumns} later)`}
                         color="text-amber-300"
                       />
@@ -462,7 +467,8 @@ export default function ShiftingSeasonsPage() {
                   )}
                   <StatBlock
                     label="Kyoto Cherry Blossom"
-                    value={`${data.kyoto.shiftDays > 0 ? '−' : '+'}${Math.abs(data.kyoto.shiftDays).toFixed(1)} days`}
+                    value={`${data.kyoto.shiftDays > 0 ? '−' : '+'}${Math.abs(data.kyoto.shiftDays).toFixed(1)}`}
+                    unit="days"
                     sub="recent 30-yr mean vs pre-1850"
                     color="text-pink-300"
                   />
@@ -470,10 +476,17 @@ export default function ShiftingSeasonsPage() {
                     label="NH Spring Snow"
                     value={
                       snowHeadline
-                        ? `${snowHeadline.springChange > 0 ? '+' : ''}${snowHeadline.springChange.toFixed(1)} pp`
+                        ? `${snowHeadline.springChange > 0 ? '+' : ''}${snowHeadline.springChange.toFixed(1)}`
                         : snowLatestAnomPct != null
-                          ? `${snowLatestAnomPct > 0 ? '+' : ''}${snowLatestAnomPct.toFixed(1)}%`
+                          ? `${snowLatestAnomPct > 0 ? '+' : ''}${snowLatestAnomPct.toFixed(1)}`
                           : '-'
+                    }
+                    unit={
+                      snowHeadline
+                        ? 'pp'
+                        : snowLatestAnomPct != null
+                          ? '%'
+                          : undefined
                     }
                     sub={
                       snowHeadline && snowLatestAnomPct != null && data.snow.latest
@@ -706,20 +719,23 @@ export default function ShiftingSeasonsPage() {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
                     <StatBlock
                       label="Spring (MAM) Anomaly"
-                      value={`${snowHeadline.springRecent.toFixed(1)}%`}
-                      sub={`recent 10-yr mean vs 1981–2010`}
+                      value={snowHeadline.springRecent.toFixed(1)}
+                      unit="%"
+                      sub={`recent 10-yr mean vs 1981-2010`}
                       color="text-orange-300"
                     />
                     <StatBlock
                       label="Winter (DJF) Anomaly"
-                      value={`${snowHeadline.winterRecent >= 0 ? '+' : ''}${snowHeadline.winterRecent.toFixed(1)}%`}
-                      sub={`recent 10-yr mean vs 1981–2010`}
+                      value={`${snowHeadline.winterRecent >= 0 ? '+' : ''}${snowHeadline.winterRecent.toFixed(1)}`}
+                      unit="%"
+                      sub={`recent 10-yr mean vs 1981-2010`}
                       color={snowHeadline.winterRecent < 0 ? 'text-orange-300' : 'text-blue-300'}
                     />
                     <StatBlock
                       label="Spring Snow Lost"
-                      value={`${snowHeadline.springChange.toFixed(1)} pp`}
-                      sub={`vs first 10 years on record (1967–1976)`}
+                      value={snowHeadline.springChange.toFixed(1)}
+                      unit="pp"
+                      sub={`vs first 10 years on record (1967-1976)`}
                       color="text-rose-300"
                     />
                   </div>
@@ -857,19 +873,22 @@ export default function ShiftingSeasonsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
                   <StatBlock
                     label="Recent 10-yr Avg"
-                    value={`${data.epa.headline.last10YearMean >= 0 ? '+' : ''}${data.epa.headline.last10YearMean.toFixed(1)} d`}
-                    sub={`vs 1895–2020 mean (${data.epa.headline.last10YearWindow})`}
+                    value={`${data.epa.headline.last10YearMean >= 0 ? '+' : ''}${data.epa.headline.last10YearMean.toFixed(1)}`}
+                    unit="days"
+                    sub={`vs 1895-2020 mean (${data.epa.headline.last10YearWindow})`}
                     color="text-emerald-300"
                   />
                   <StatBlock
                     label="First 30-yr Avg"
-                    value={`${data.epa.headline.first30YearMean >= 0 ? '+' : ''}${data.epa.headline.first30YearMean.toFixed(1)} d`}
+                    value={`${data.epa.headline.first30YearMean >= 0 ? '+' : ''}${data.epa.headline.first30YearMean.toFixed(1)}`}
+                    unit="days"
                     sub={`${data.epa.headline.first30YearWindow}`}
                     color="text-amber-300"
                   />
                   <StatBlock
                     label="Net Lengthening"
-                    value={`${data.epa.headline.shiftDays >= 0 ? '+' : ''}${data.epa.headline.shiftDays.toFixed(1)} days`}
+                    value={`${data.epa.headline.shiftDays >= 0 ? '+' : ''}${data.epa.headline.shiftDays.toFixed(1)}`}
+                    unit="days"
                     sub="recent 10y minus first 30y"
                     color="text-orange-300"
                   />

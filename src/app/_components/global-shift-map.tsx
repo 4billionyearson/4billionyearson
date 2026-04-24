@@ -809,9 +809,9 @@ export default function GlobalShiftMap() {
   ];
 
   return (
-    <div className="rounded-xl border border-gray-800/60 bg-gray-900/50 overflow-hidden">
+    <div className="global-shift-map rounded-xl border border-gray-800/60 bg-gray-900/50 relative">
       {/* Controls */}
-      <div className="p-3 border-b border-gray-800/60 space-y-2">
+      <div className="p-3 border-b border-gray-800/60 space-y-2 rounded-t-xl overflow-hidden">
         {metricGroups.map((group) => {
           const metrics = (Object.keys(METRIC_META) as MetricId[]).filter(
             (id) => METRIC_META[id].group === group.id,
