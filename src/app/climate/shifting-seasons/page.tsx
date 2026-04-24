@@ -408,12 +408,12 @@ export default function ShiftingSeasonsPage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4 space-y-3">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                The most personal way climate change shows up isn&apos;t in headlines. It&apos;s in
-                the timing of the year. Spring arrives earlier. Snow leaves sooner. The
-                growing season stretches. This page pulls together the longest, cleanest
-                records of that shift: a global analysis of hundreds of regions, Kyoto&apos;s
-                1,200-year cherry-blossom archive, the Northern Hemisphere snow record,
-                a live US spring tracker, and the US growing-season trend since 1895.
+                Climate change shows up in the timing of the year. Spring arrives
+                earlier, snow leaves sooner, and the growing season stretches. This
+                page pulls together the longest, cleanest records of that shift:
+                a global analysis of hundreds of regions, Kyoto&apos;s 1,200-year
+                cherry-blossom archive, the Northern Hemisphere snow record,
+                a live US spring tracker, and the US growing season since 1895.
               </p>
             </div>
           </div>
