@@ -220,6 +220,52 @@ function divergingColor(t: number, invert: boolean): string {
   return `rgb(${stops[stops.length - 1][1].join(",")})`;
 }
 
+/**
+ * Our climate analysis covers METROPOLITAN France / European Netherlands only,
+ * but the default world geojson bundles overseas territories into the same
+ * feature. That causes French Guiana (equatorial) and the Dutch Caribbean
+ * islands to be coloured with the European country's classification, which is
+ * misleading. We strip those polygons at load time using metropolitan bboxes.
+ */
+const METROPOLITAN_BBOX: Record<
+  string,
+  { lonMin: number; lonMax: number; latMin: number; latMax: number }
+> = {
+  France: { lonMin: -5.5, lonMax: 10, latMin: 41, latMax: 52 },
+  Netherlands: { lonMin: 3, lonMax: 7.5, latMin: 50, latMax: 54 },
+};
+
+function polygonInBbox(
+  poly: number[][][],
+  bb: { lonMin: number; lonMax: number; latMin: number; latMax: number },
+): boolean {
+  for (const ring of poly) {
+    for (const [lon, lat] of ring) {
+      if (lon >= bb.lonMin && lon <= bb.lonMax && lat >= bb.latMin && lat <= bb.latMax) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function stripOverseasTerritories(fc: FeatureCollection): FeatureCollection {
+  const features = fc.features.map((f) => {
+    const name = (f.properties as { name?: string } | null)?.name ?? "";
+    const bb = METROPOLITAN_BBOX[name];
+    if (!bb) return f;
+    const g = f.geometry;
+    if (g.type !== "MultiPolygon") return f;
+    const kept = g.coordinates.filter((poly) => polygonInBbox(poly, bb));
+    if (kept.length === g.coordinates.length) return f;
+    return {
+      ...f,
+      geometry: { type: "MultiPolygon" as const, coordinates: kept },
+    };
+  });
+  return { ...fc, features };
+}
+
 export default function GlobalShiftMap() {
   const [world, setWorld] = useState<FeatureCollection | null>(null);
   const [shifts, setShifts] = useState<GlobalShiftData | null>(null);
@@ -236,7 +282,7 @@ export default function GlobalShiftMap() {
     ])
       .then(([w, s]) => {
         if (cancelled) return;
-        setWorld(w);
+        setWorld(stripOverseasTerritories(w as FeatureCollection));
         setShifts(s);
       })
       .catch(() => {
