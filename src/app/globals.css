@@ -113,23 +113,12 @@ html {
   white-space: nowrap !important;
   width: auto !important;
   max-width: none !important;
-  z-index: 1000 !important;
 }
 .global-shift-tooltip.leaflet-tooltip::before {
   border-top-color: rgba(9, 13, 21, 0.94) !important;
   border-bottom-color: rgba(9, 13, 21, 0.94) !important;
   border-left-color: rgba(9, 13, 21, 0.94) !important;
   border-right-color: rgba(9, 13, 21, 0.94) !important;
-}
-/* Allow tooltips on the shifting-seasons map to escape the map container
-   (otherwise they get clipped at the bottom by leaflet's overflow:hidden). */
-.global-shift-map .leaflet-container,
-.global-shift-map .leaflet-pane,
-.global-shift-map .leaflet-tooltip-pane {
-  overflow: visible !important;
-}
-.global-shift-map .leaflet-tooltip-pane {
-  z-index: 1000 !important;
 }
 .uk-map-selected-label span {
   display: block;

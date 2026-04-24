@@ -138,26 +138,26 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   const lines: string[] = [];
   lines.push('You are a climate data journalist writing the monthly Cross-Region Analysis for 4 Billion Years On.');
   lines.push(`This update compares every country, US state and UK region we track (${rows.length} regions in total) for ${latestLabel}.`);
-  lines.push('It is a site-exclusive, cross-region view — no other publication produces a monthly league table at this scope.');
+  lines.push('It is a site-exclusive, cross-region view - no other publication produces a monthly league table at this scope.');
   lines.push('');
   lines.push('TASK: Write 4 short paragraphs (total 220–300 words) telling a compelling, data-driven narrative.');
   lines.push('');
-  lines.push('STRUCTURE — use these four sub-headings, each on its own line prefixed with "## " exactly (two hashes + space). Paragraph immediately follows on the next line. Separate paragraphs with a blank line.');
-  lines.push('  ## Who led this month     — the single biggest anomaly and the top 3 named regions for the latest month, with their figures and what unites them (same continent? same climate zone?). 2–3 sentences.');
-  lines.push('  ## Biggest shifts         — which regions climbed or fell furthest since last month, and why that matters (e.g. a sudden cold snap in one, lingering heatwave in another). Cite 2–3 specific climbers/fallers by name with their rank change. 2–3 sentences.');
-  lines.push('  ## Regional patterns      — continent roll-ups and US Census region roll-ups: which groups averaged warmest this month? Is the warmth concentrated or global? 2–3 sentences.');
-  lines.push('  ## What’s driving change?  — use Google Search to find what might explain the standouts: ENSO state, a named heatwave, an atmospheric river, a monsoon anomaly, a polar vortex event. When it applies, also name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "Arctic amplification", "heat dome", "jet stream shifts"). Cite specific events verified against reputable sources (NOAA, WMO, Copernicus, national met services, major newspapers). 2–3 sentences.');
+  lines.push('STRUCTURE - use these four sub-headings, each on its own line prefixed with "## " exactly (two hashes + space). Paragraph immediately follows on the next line. Separate paragraphs with a blank line.');
+  lines.push('  ## Who led this month     - the single biggest anomaly and the top 3 named regions for the latest month, with their figures and what unites them (same continent? same climate zone?). 2–3 sentences.');
+  lines.push('  ## Biggest shifts         - which regions climbed or fell furthest since last month, and why that matters (e.g. a sudden cold snap in one, lingering heatwave in another). Cite 2–3 specific climbers/fallers by name with their rank change. 2–3 sentences.');
+  lines.push('  ## Regional patterns      - continent roll-ups and US Census region roll-ups: which groups averaged warmest this month? Is the warmth concentrated or global? 2–3 sentences.');
+  lines.push('  ## What’s driving change?  - use Google Search to find what might explain the standouts: ENSO state, a named heatwave, an atmospheric river, a monsoon anomaly, a polar vortex event. When it applies, also name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "Arctic amplification", "heat dome", "jet stream shifts"). Cite specific events verified against reputable sources (NOAA, WMO, Copernicus, national met services, major newspapers). 2–3 sentences.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
   lines.push('- LEAD WITH THE PATTERN, NOT JUST NUMBERS: "Eight of the ten hottest regions this month were US states" is more compelling than listing each state.');
-  lines.push('- NAMING MATTERS: Mention specific regions — readers want to see whether their country is in the list.');
+  lines.push('- NAMING MATTERS: Mention specific regions - readers want to see whether their country is in the list.');
   lines.push('- CONNECT TO DRIVERS: If the ENSO state, NAO phase or a specific heatwave explains the pattern, say so. Anchor the pattern in a real-world cause.');
   lines.push('- CITE EVENTS, NOT OPINIONS: For the final paragraph, cite concrete events/announcements (named heatwaves, cyclones, Copernicus bulletins) from the last 4–8 weeks. Do not manufacture detail.');
   lines.push('');
   lines.push('RULES:');
   lines.push('- British English spelling throughout.');
-  lines.push('- Plain text only — no markdown emphasis (no **bold**, no *italics*), no bullet points, no headings EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line. Never surround driver terms or any other phrase with asterisks — the site styles them automatically.');
-  lines.push('- Use the EXACT values and rankings from the DATA section — do NOT substitute with web-search figures.');
+  lines.push('- Plain text only - no markdown emphasis (no **bold**, no *italics*), no bullet points, no headings EXCEPT the sub-headings specified in STRUCTURE which MUST use exactly "## Heading" on their own line. Never surround driver terms or any other phrase with asterisks - the site styles them automatically.');
+  lines.push('- Use the EXACT values and rankings from the DATA section - do NOT substitute with web-search figures.');
   lines.push('- Use numeric ordinals (1st, 2nd, 3rd).');
   lines.push('- No policy recommendations.');
   lines.push('- CRITICAL: Ensure you complete your final sentence.');
@@ -170,24 +170,24 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   if (previous) lines.push(`Previous snapshot: ${previous.cacheMonth}`);
   lines.push('');
 
-  lines.push('── Top 10 warmest — 1-month anomaly ──');
+  lines.push('── Top 10 warmest - 1-month anomaly ──');
   top10.forEach((r, i) => {
     lines.push(`  ${i + 1}. ${r.name} (${typeLabel(r.type)}): ${fmtSigned(r.anomaly1m)}`);
   });
   const topTypeEntries = Object.entries(top10Types).sort((a, b) => b[1] - a[1]);
   if (topTypeEntries.length && topTypeEntries[0][1] >= 5) {
-    lines.push(`  PATTERN: ${topTypeEntries[0][1]} of the top 10 are ${typeLabel(topTypeEntries[0][0])}s — worth leading with.`);
+    lines.push(`  PATTERN: ${topTypeEntries[0][1]} of the top 10 are ${typeLabel(topTypeEntries[0][0])}s - worth leading with.`);
   }
   lines.push('');
 
-  lines.push('── 5 coolest — 1-month anomaly ──');
+  lines.push('── 5 coolest - 1-month anomaly ──');
   bottom5.forEach((r, i) => {
     lines.push(`  ${ordinal(rows.length - i)}. ${r.name} (${typeLabel(r.type)}): ${fmtSigned(r.anomaly1m)}`);
   });
   lines.push('');
 
   if (sorted3m.length) {
-    lines.push('── Top 5 warmest — 3-month anomaly (seasonal signal) ──');
+    lines.push('── Top 5 warmest - 3-month anomaly (seasonal signal) ──');
     sorted3m.slice(0, 5).forEach((r, i) => {
       lines.push(`  ${i + 1}. ${r.name} (${typeLabel(r.type)}): ${fmtSigned(r.anomaly3m)}`);
     });
@@ -195,7 +195,7 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   }
 
   if (sorted12m.length) {
-    lines.push('── Top 5 warmest — 12-month rolling anomaly (longer-term signal) ──');
+    lines.push('── Top 5 warmest - 12-month rolling anomaly (longer-term signal) ──');
     sorted12m.slice(0, 5).forEach((r, i) => {
       lines.push(`  ${i + 1}. ${r.name} (${typeLabel(r.type)}): ${fmtSigned(r.anomaly12m)}`);
     });
@@ -220,7 +220,7 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   }
 
   if (rollups.continents.length) {
-    lines.push('── Continent roll-ups — mean 1-month anomaly ──');
+    lines.push('── Continent roll-ups - mean 1-month anomaly ──');
     rollups.continents.forEach((c) => {
       lines.push(`  ${c.label} (${c.count} countries): ${fmtSigned(c.mean)}`);
     });
@@ -228,7 +228,7 @@ function buildAnalysisPrompt(current: RankingsFile, previous: RankingsFile | nul
   }
 
   if (rollups.usRegions.length) {
-    lines.push('── US Census region roll-ups — mean 1-month anomaly ──');
+    lines.push('── US Census region roll-ups - mean 1-month anomaly ──');
     rollups.usRegions.forEach((u) => {
       lines.push(`  ${u.label} (${u.count} states): ${fmtSigned(u.mean)}`);
     });

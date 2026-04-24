@@ -170,7 +170,7 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
             </span>
           </div>
 
-          {/* Stats panel — opaque backdrop so values stay legible
+          {/* Stats panel - opaque backdrop so values stay legible
               over any central colour bars in the background image. */}
           {(one || three) && (
             <div

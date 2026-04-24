@@ -9,7 +9,7 @@ import EditorsPicksPanel from './editors-picks-panel';
 import ClimateRankingsPanel from './climate-rankings-panel';
 
 export const metadata: Metadata = {
-  title: 'Climate Updates — Country, State & Region Climate Data',
+  title: 'Climate Updates - Country, State & Region Climate Data',
   description:
     'Explore climate data profiles for countries, US states, and UK regions. Temperature trends, precipitation, emissions, and monthly summaries with data from OWID, NOAA, and the Met Office.',
   keywords: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'country emissions data',
   ],
   openGraph: {
-    title: 'Climate Updates — Country, State & Region Climate Data',
+    title: 'Climate Updates - Country, State & Region Climate Data',
     description:
       'Explore climate data profiles for countries, US states, and UK regions. Temperature trends, precipitation, emissions, and monthly summaries.',
     type: 'website',
@@ -88,7 +88,7 @@ export default function ClimateProfilesIndex() {
               </div>
               <div className="bg-gray-950 px-4 py-3 md:px-6 md:py-4">
                 <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                  Monthly climate updates for every country, US state and UK region we track — 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news.
+                  Monthly climate updates for every country, US state and UK region we track - 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news.
                 </p>
               </div>
               <div className="sticky top-0 z-30 bg-gray-950 px-4 pt-2 pb-1 md:px-6">

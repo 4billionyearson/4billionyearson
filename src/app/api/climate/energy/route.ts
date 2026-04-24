@@ -150,7 +150,7 @@ function extractLatest(yearly: EnergyYearlyPoint[]): LatestStats | null {
   for (let i = yearly.length - 1; i >= 0; i--) {
     const y = yearly[i];
     if (y.fossilShareEnergy != null || y.renewablesShareEnergy != null) {
-      // Solar/wind share may lag behind fossil/renewables — search backwards
+      // Solar/wind share may lag behind fossil/renewables - search backwards
       let solar = y.solarShareElec;
       let wind = y.windShareElec;
       if (solar == null || wind == null) {

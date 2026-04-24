@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm, setLiveTerm } from '@/lib/climate/redis';
 
-// Historical EM-DAT data — changes ~annually, safe to cache long.
+// Historical EM-DAT data - changes ~annually, safe to cache long.
 const HIST_CACHE_KEY = 'climate:extreme-weather:hist:v1';
-// Live GDACS events — must refresh often so new alerts surface quickly.
+// Live GDACS events - must refresh often so new alerts surface quickly.
 const LIVE_CACHE_KEY = 'climate:extreme-weather:gdacs:v1';
 
 // OWID indicator IDs (EM-DAT data, entities = disaster types)
@@ -64,7 +64,7 @@ async function fetchGDACS() {
       type: p.eventtype,
       name: (p.name || '')
         .replace(/\s*\[GDACS\]\s*/g, ' ')
-        // Normalise terminology: GDACS sometimes says 'Forest fires' — we use 'Wildfires' everywhere else.
+        // Normalise terminology: GDACS sometimes says 'Forest fires' - we use 'Wildfires' everywhere else.
         .replace(/\bForest fires?\b/gi, 'Wildfires')
         .trim(),
       alertLevel: p.alertlevel,
@@ -139,7 +139,7 @@ export async function GET() {
     let gdacsEvents = await getCached<any[]>(LIVE_CACHE_KEY);
     if (!gdacsEvents) {
       gdacsEvents = await fetchGDACS();
-      // Only cache a successful non-empty fetch — avoid pinning an empty array
+      // Only cache a successful non-empty fetch - avoid pinning an empty array
       // for 30 minutes if GDACS had a transient hiccup.
       if (gdacsEvents && gdacsEvents.length > 0) {
         await setLiveTerm(LIVE_CACHE_KEY, gdacsEvents);

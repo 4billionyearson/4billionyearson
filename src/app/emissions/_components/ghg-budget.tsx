@@ -87,7 +87,7 @@ export function GlobalGhgSection() {
     <div className="space-y-8">
       <p className="text-sm text-gray-300 leading-relaxed">
         CO₂ gets the headlines, but two shorter-lived gases do disproportionate damage:{' '}
-        <span className="text-orange-300 font-medium">methane (CH₄)</span>, from cattle, rice paddies, landfills and fossil-fuel leaks — around 80× more warming than CO₂ over 20 years —
+        <span className="text-orange-300 font-medium">methane (CH₄)</span>, from cattle, rice paddies, landfills and fossil-fuel leaks - around 80× more warming than CO₂ over 20 years —
         and <span className="text-sky-300 font-medium">nitrous oxide (N₂O)</span>, largely from nitrogen fertiliser, with ~270× the warming power and a century-long lifetime.
       </p>
 
@@ -111,7 +111,7 @@ export function GlobalGhgSection() {
         {totalGhgLatest != null && (
           <p className="text-xs text-gray-400 mt-3">
             In {latestYear}, humanity released the equivalent of <span className="text-white font-semibold">{fmtMt(totalGhgLatest)}</span> of CO₂
-            — of which methane contributed {fmtMt(ch4Latest)} and nitrous oxide {fmtMt(n2oLatest)}.
+            - of which methane contributed {fmtMt(ch4Latest)} and nitrous oxide {fmtMt(n2oLatest)}.
           </p>
         )}
       </div>
@@ -217,7 +217,7 @@ export function CarbonBudgetSection() {
     <div className="space-y-6">
       <p className="text-sm text-gray-300 leading-relaxed">
         The IPCC&apos;s Sixth Assessment Report (AR6) gave humanity a fixed <span className="text-[#D0A65E] font-medium">carbon budget</span> from the start of 2020
-        — the total tonnes of CO₂ we can still emit while keeping warming below a given threshold with a given probability. Since 2020, the world has emitted
+        - the total tonnes of CO₂ we can still emit while keeping warming below a given threshold with a given probability. Since 2020, the world has emitted
         roughly <span className="text-white font-semibold">{fmtGt(emittedSince)}</span> of CO₂ (through {latestYear}), burning through each budget at today&apos;s pace of{' '}
         <span className="text-white font-semibold">~{latestAnnualGt.toFixed(1)} Gt/yr</span>.
       </p>
@@ -276,7 +276,7 @@ export function CarbonBudgetSection() {
       </div>
 
       <p className="text-xs text-gray-400">
-        Budgets from <a href="https://www.ipcc.ch/report/ar6/wg1/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">IPCC AR6 WG1 Table SPM.2</a> (p. TS-37), given from 1 January 2020 for the stated probability of staying below the temperature target. Emissions since 2020 include land-use change. &quot;Years at current rate&quot; is a mechanical projection, not a prediction — real-world trajectories bend with policy and technology.
+        Budgets from <a href="https://www.ipcc.ch/report/ar6/wg1/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">IPCC AR6 WG1 Table SPM.2</a> (p. TS-37), given from 1 January 2020 for the stated probability of staying below the temperature target. Emissions since 2020 include land-use change. &quot;Years at current rate&quot; is a mechanical projection, not a prediction - real-world trajectories bend with policy and technology.
       </p>
     </div>
   );

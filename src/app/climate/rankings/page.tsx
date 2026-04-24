@@ -11,9 +11,9 @@ import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 
 export const metadata: Metadata = {
-  title: 'Climate Rankings & Monthly Trends — 144 Regions Compared',
+  title: 'Climate Rankings & Monthly Trends - 144 Regions Compared',
   description:
-    'Sortable league table and monthly trend analysis for every country, US state and UK region we track. See who is warmest this month, the biggest rank movers since last month, continent-level roll-ups, and how your region compares against its climate peers — all against the 1961–1990 baseline.',
+    'Sortable league table and monthly trend analysis for every country, US state and UK region we track. See who is warmest this month, the biggest rank movers since last month, continent-level roll-ups, and how your region compares against its climate peers - all against the 1961–1990 baseline.',
   alternates: { canonical: 'https://4billionyearson.org/climate/rankings' },
   keywords: [
     'climate rankings',
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     'continent temperature anomaly',
   ],
   openGraph: {
-    title: 'Climate Rankings & Monthly Trends — Who is warmest this month?',
+    title: 'Climate Rankings & Monthly Trends - Who is warmest this month?',
     description:
-      'Live league table and trend analysis across 144 countries, US states and UK regions — anomalies, movers, peers and continent roll-ups, updated monthly.',
+      'Live league table and trend analysis across 144 countries, US states and UK regions - anomalies, movers, peers and continent roll-ups, updated monthly.',
     url: 'https://4billionyearson.org/climate/rankings',
     type: 'website',
   },
@@ -236,12 +236,12 @@ export default async function RankingsPage() {
           >
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-                Climate Rankings{latestLabel ? ` — ${latestLabel}` : ''}
+                Climate Rankings{latestLabel ? ` - ${latestLabel}` : ''}
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5 space-y-4">
               <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                <strong className="text-white">144 regions</strong> ranked by this month’s temperature anomaly vs their 1961–1990 baseline — every country, US state and UK region we track.
+                <strong className="text-white">144 regions</strong> ranked by this month’s temperature anomaly vs their 1961–1990 baseline - every country, US state and UK region we track.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -348,7 +348,7 @@ export default async function RankingsPage() {
             types={rollups.types}
           />
 
-          {/* Temperature anomaly map — geographic view of the same rankings */}
+          {/* Temperature anomaly map - geographic view of the same rankings */}
           {countryAnomalies && <AnomalyMapCard countryAnomalies={countryAnomalies} />}
 
           {/* Table */}

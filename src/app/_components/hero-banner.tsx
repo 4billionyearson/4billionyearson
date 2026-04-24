@@ -53,7 +53,7 @@ export default function HeroBanner() {
           <span className="font-semibold" style={{ color: "#D2E369" }}>Renewable Energy</span>
           {" & "}
           <span className="font-semibold" style={{ color: "#FFF5E7" }}>Biotechnology</span>
-          {" — interactive data, plain-English explainers & sourced articles."}
+          {" - interactive data, plain-English explainers & sourced articles."}
         </p>
 
         {/* Stat pills */}

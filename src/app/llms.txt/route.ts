@@ -21,7 +21,7 @@ export async function GET() {
 
   const body = `# 4 Billion Years On
 
-> A living dashboard for the forces reshaping the world — tracking climate change, renewable energy, artificial intelligence and biotechnology with interactive data visualisations, plain-English explainers, and sourced articles, updated monthly.
+> A living dashboard for the forces reshaping the world - tracking climate change, renewable energy, artificial intelligence and biotechnology with interactive data visualisations, plain-English explainers, and sourced articles, updated monthly.
 
 ## About
 

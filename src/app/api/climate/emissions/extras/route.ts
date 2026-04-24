@@ -208,7 +208,7 @@ export async function GET(req: Request) {
     });
   }
 
-  // view=global — return world series + rankings of extras
+  // view=global - return world series + rankings of extras
   const world = index.aggregates['World'];
   if (!world) return NextResponse.json({ error: 'World aggregate missing' }, { status: 500 });
 

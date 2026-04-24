@@ -201,14 +201,14 @@ export default function ClimateExplainedPage() {
             </div>
           </section>
 
-          {/* Why some places warm faster than others — regional drivers */}
+          {/* Why some places warm faster than others - regional drivers */}
           <section id="warming-drivers" className="bg-gray-950/90 backdrop-blur-md p-5 md:p-8 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-2 flex items-start gap-2">
               <Compass className="h-5 w-5 shrink-0 text-teal-300 mt-1" />
               <span className="min-w-0 flex-1">Why Some Places Warm Faster Than Others</span>
             </h2>
             <p className="text-sm text-gray-400 mb-5 leading-relaxed">
-              The global average hides huge regional variation. Finland and Sweden are warming at twice the global rate. Svalbard has already warmed nearly 3.5°C. Tropical regions warm slowly in absolute terms but are already close to the limits of human heat tolerance. These are the mechanisms that explain the pattern — the same terms you&apos;ll see highlighted across this site will link back here.
+              The global average hides huge regional variation. Finland and Sweden are warming at twice the global rate. Svalbard has already warmed nearly 3.5°C. Tropical regions warm slowly in absolute terms but are already close to the limits of human heat tolerance. These are the mechanisms that explain the pattern - the same terms you&apos;ll see highlighted across this site will link back here.
             </p>
             <div className="space-y-3">
               {WARMING_DRIVERS.map((d) => (

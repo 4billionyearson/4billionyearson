@@ -76,7 +76,7 @@ export default function ClimatePeersCard({ slug }: { slug: string }) {
         <span className="min-w-0 flex-1">Climate Peers</span>
       </h2>
       <p className="text-xs text-gray-400 mb-3">
-        The five regions with the most similar {keyLabel} temperature anomaly right now ({fmt(myVal)}). Similar anomalies suggest comparable exposure to the recent climate regime — useful for benchmarking policy responses and impacts.
+        The five regions with the most similar {keyLabel} temperature anomaly right now ({fmt(myVal)}). Similar anomalies suggest comparable exposure to the recent climate regime - useful for benchmarking policy responses and impacts.
       </p>
       <div className="rounded-xl border border-gray-800 bg-gray-950/60 divide-y divide-gray-800">
         {peers.map(({ row, dist }) => (

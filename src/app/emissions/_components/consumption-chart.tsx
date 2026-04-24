@@ -63,7 +63,7 @@ export function GlobalConsumptionSection() {
       <p className="text-sm text-gray-300 leading-relaxed">
         <span className="text-[#D0A65E] font-medium">Production-based</span> accounting (what the standard CO₂ figures measure) counts emissions where the
         smokestack is. <span className="text-[#D0A65E] font-medium">Consumption-based</span> accounting reassigns those emissions to the country that
-        ultimately <em>buys</em> the product. The gap — <span className="font-mono">trade CO₂</span> — reveals where climate responsibility shifts under globalised supply chains.
+        ultimately <em>buys</em> the product. The gap - <span className="font-mono">trade CO₂</span> - reveals where climate responsibility shifts under globalised supply chains.
       </p>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -73,7 +73,7 @@ export function GlobalConsumptionSection() {
             <TrendingUp className="h-4 w-4 text-red-400" /> Net CO₂ Importers ({year})
           </h3>
           <p className="text-xs text-gray-400 mb-3">
-            Consume more CO₂ than they produce — outsource emissions.
+            Consume more CO₂ than they produce - outsource emissions.
           </p>
           <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -94,7 +94,7 @@ export function GlobalConsumptionSection() {
             <TrendingDown className="h-4 w-4 text-emerald-400" /> Net CO₂ Exporters ({year})
           </h3>
           <p className="text-xs text-gray-400 mb-3">
-            Produce more CO₂ than they consume — factories of the world.
+            Produce more CO₂ than they consume - factories of the world.
           </p>
           <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">

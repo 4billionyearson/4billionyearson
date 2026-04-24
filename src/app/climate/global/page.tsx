@@ -58,8 +58,8 @@ function DatasetSchema() {
       url: 'https://4billionyearson.org',
     },
     distribution: [
-      { '@type': 'DataDownload', name: 'NOAA Climate at a Glance — Global Land+Ocean' },
-      { '@type': 'DataDownload', name: 'Our World in Data / ERA5 — Global Land Surface Temperature' },
+      { '@type': 'DataDownload', name: 'NOAA Climate at a Glance - Global Land+Ocean' },
+      { '@type': 'DataDownload', name: 'Our World in Data / ERA5 - Global Land Surface Temperature' },
     ],
     isAccessibleForFree: true,
     license: 'https://creativecommons.org/licenses/by/4.0/',

@@ -30,7 +30,7 @@ export async function GET() {
   <channel>
     <title>4 Billion Years On</title>
     <link>${baseUrl}</link>
-    <description>A living dashboard for the forces reshaping the world — climate change, renewable energy, AI and biotechnology. Interactive data visualisations, plain-English explainers, and sourced articles.</description>
+    <description>A living dashboard for the forces reshaping the world - climate change, renewable energy, AI and biotechnology. Interactive data visualisations, plain-English explainers, and sourced articles.</description>
     <language>en</language>
     <atom:link href="${baseUrl}/feed.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>

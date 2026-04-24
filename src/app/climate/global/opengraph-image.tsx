@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 export const runtime = 'nodejs';
 
-export const alt = 'Global Climate Update — 4 Billion Years On';
+export const alt = 'Global Climate Update - 4 Billion Years On';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

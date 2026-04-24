@@ -20,11 +20,11 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://4billionyearson.org"),
   title: {
-    default: "4 Billion Years On — Climate, Energy, AI & Biotech Data",
+    default: "4 Billion Years On - Climate, Energy, AI & Biotech Data",
     template: "%s | 4 Billion Years On",
   },
   description:
-    "A living dashboard for the forces reshaping the world. Track climate change, renewable energy, artificial intelligence and biotechnology with interactive data visualisations, plain-English explainers, and sourced articles — updated monthly.",
+    "A living dashboard for the forces reshaping the world. Track climate change, renewable energy, artificial intelligence and biotechnology with interactive data visualisations, plain-English explainers, and sourced articles - updated monthly.",
   keywords: [
     "climate change data",
     "renewable energy dashboard",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "4 Billion Years On",
-    title: "4 Billion Years On — Climate, Energy, AI & Biotech Data",
+    title: "4 Billion Years On - Climate, Energy, AI & Biotech Data",
     description:
       "Interactive dashboards and data-driven articles covering climate change, renewable energy, artificial intelligence and biotechnology.",
     images: [HOME_OG_IMAGE_URL],
@@ -91,7 +91,7 @@ export default function RootLayout({
                   url: "https://4billionyearson.org",
                   name: "4 Billion Years On",
                   description:
-                    "A living dashboard for the forces reshaping the world — tracking climate change, renewable energy, AI and biotechnology with interactive data visualisations and plain-English explainers.",
+                    "A living dashboard for the forces reshaping the world - tracking climate change, renewable energy, AI and biotechnology with interactive data visualisations and plain-English explainers.",
                   publisher: { "@id": "https://4billionyearson.org/#organization" },
                   potentialAction: {
                     "@type": "SearchAction",
@@ -106,7 +106,7 @@ export default function RootLayout({
                   url: "https://4billionyearson.org",
                   logo: "https://4billionyearson.org/logo.png",
                   description:
-                    "A living dashboard for the forces reshaping the world. 4 Billion Years On provides interactive data dashboards, plain-English explainers and sourced articles on climate change, renewable energy, artificial intelligence and biotechnology — for students, researchers, journalists, educators and policymakers.",
+                    "A living dashboard for the forces reshaping the world. 4 Billion Years On provides interactive data dashboards, plain-English explainers and sourced articles on climate change, renewable energy, artificial intelligence and biotechnology - for students, researchers, journalists, educators and policymakers.",
                   sameAs: [],
                   knowsAbout: [
                     "Climate Change",

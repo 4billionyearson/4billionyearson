@@ -46,7 +46,7 @@ function FocusSelectedMarker({ marker }: { marker: UKMapMarker | null }) {
   useEffect(() => {
     const newSlug = marker?.slug ?? null;
     if (prevSlug.current === undefined) {
-      // First render after mount — record current state, don't fly
+      // First render after mount - record current state, don't fly
       prevSlug.current = newSlug;
       return;
     }

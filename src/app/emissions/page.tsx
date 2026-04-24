@@ -165,9 +165,9 @@ function StatCard({ label, value, unit, subtext, color }: {
   return (
     <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
-      <div className="flex items-baseline gap-1">
-        <span className={`text-2xl font-bold ${color}`}>{value}</span>
-        <span className="text-sm text-gray-400">{unit}</span>
+      <div className="flex items-baseline gap-1 flex-wrap">
+        <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
+        {unit && <span className="text-sm text-gray-400">{unit}</span>}
       </div>
       {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>
@@ -329,7 +329,7 @@ export default function EmissionsPage() {
               <SectionCard icon={<Users className="h-5 w-5 text-amber-400" />} title="Top 10 Emitters Per Capita">
                 <Top10BarChart data={data.top10PerCapita} dataKey="perCapita" tooltip={PerCapTooltip} />
                 <p className="text-xs text-gray-400 mt-4">
-                  Per-capita figures highlight small, fossil-fuel-rich nations — the biggest absolute emitters often rank lower here. Source:{" "}
+                  Per-capita figures highlight small, fossil-fuel-rich nations - the biggest absolute emitters often rank lower here. Source:{" "}
                   <a href="https://ourworldindata.org/per-capita-co2" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Our World in Data</a>{" "}– Global Carbon Project.
                 </p>
               </SectionCard>
@@ -350,14 +350,14 @@ export default function EmissionsPage() {
                 <GlobalFuelSection />
               </SectionCard>
 
-              <SectionCard icon={<Link2 className="h-5 w-5 text-sky-400" />} title="Consumption vs Production — Who Emits for Whom?">
+              <SectionCard icon={<Link2 className="h-5 w-5 text-sky-400" />} title="Consumption vs Production - Who Emits for Whom?">
                 <GlobalConsumptionSection />
               </SectionCard>
 
               {/* ═══ BEYOND CO₂ ═══ */}
               <Divider icon={<Activity className="h-5 w-5" />} title="Beyond CO₂" />
 
-              <SectionCard icon={<Activity className="h-5 w-5 text-orange-400" />} title="All Greenhouse Gases — Methane & N₂O">
+              <SectionCard icon={<Activity className="h-5 w-5 text-orange-400" />} title="All Greenhouse Gases - Methane & N₂O">
                 <GlobalGhgSection />
               </SectionCard>
 

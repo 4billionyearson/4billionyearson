@@ -23,7 +23,7 @@ ${p.excerpt ?? ''}`;
     })
     .join('\n\n');
 
-  const body = `# 4 Billion Years On — Full Content Index
+  const body = `# 4 Billion Years On - Full Content Index
 
 > A living dashboard for the forces reshaping the world. 4 Billion Years On tracks climate change, renewable energy, artificial intelligence and biotechnology with interactive data dashboards, plain-English explainers, and sourced editorial articles.
 
@@ -61,22 +61,22 @@ A plain-English guide to biotechnology covering: DNA, RNA, genes, genomes, gene 
 
 ## About 4 Billion Years On
 URL: ${baseUrl}/about
-4 Billion Years On is a platform dedicated to exploring the biggest civilisation-scale shifts reshaping our world. It makes complex topics — AI, biotechnology, climate change and renewable energy — accessible, engaging, and thought-provoking for curious non-experts.
+4 Billion Years On is a platform dedicated to exploring the biggest civilisation-scale shifts reshaping our world. It makes complex topics - AI, biotechnology, climate change and renewable energy - accessible, engaging, and thought-provoking for curious non-experts.
 
 ---
 
 # Data dashboards (interactive, updated regularly)
 
-- Climate Dashboard (monthly): ${baseUrl}/climate-dashboard — global and local temperature data, anomalies, historical trends
-- CO₂ Emissions (annual): ${baseUrl}/emissions — country-by-country CO₂ data, per-capita comparisons, sector breakdowns
-- Energy Dashboard (annual): ${baseUrl}/energy-dashboard — energy mix by country, renewable capacity, generation data
-- Energy Rankings (monthly): ${baseUrl}/energy-rankings — global rankings for renewable energy, solar, wind, fossil-fuel dependency
-- Greenhouse Gases (monthly): ${baseUrl}/greenhouse-gases — atmospheric CO₂, methane, N₂O, 800,000-year ice core records
-- Sea Levels & Ice (monthly): ${baseUrl}/sea-levels-ice — global sea level rise, Arctic and Antarctic ice extent
-- Extreme Weather (live): ${baseUrl}/extreme-weather — GDACS alerts, floods, wildfires, droughts, cyclones since 1960
-- Planetary Boundaries (monthly): ${baseUrl}/planetary-boundaries — nine Earth-system limits including biodiversity, ocean acidification
-- AI Dashboard (monthly): ${baseUrl}/ai-dashboard — AI investment, compute, adoption, model capabilities, energy use
-- Biotech Dashboard (annual): ${baseUrl}/biotech-dashboard — genome sequencing costs, CRISPR research, clinical trials, publications
+- Climate Dashboard (monthly): ${baseUrl}/climate-dashboard - global and local temperature data, anomalies, historical trends
+- CO₂ Emissions (annual): ${baseUrl}/emissions - country-by-country CO₂ data, per-capita comparisons, sector breakdowns
+- Energy Dashboard (annual): ${baseUrl}/energy-dashboard - energy mix by country, renewable capacity, generation data
+- Energy Rankings (monthly): ${baseUrl}/energy-rankings - global rankings for renewable energy, solar, wind, fossil-fuel dependency
+- Greenhouse Gases (monthly): ${baseUrl}/greenhouse-gases - atmospheric CO₂, methane, N₂O, 800,000-year ice core records
+- Sea Levels & Ice (monthly): ${baseUrl}/sea-levels-ice - global sea level rise, Arctic and Antarctic ice extent
+- Extreme Weather (live): ${baseUrl}/extreme-weather - GDACS alerts, floods, wildfires, droughts, cyclones since 1960
+- Planetary Boundaries (monthly): ${baseUrl}/planetary-boundaries - nine Earth-system limits including biodiversity, ocean acidification
+- AI Dashboard (monthly): ${baseUrl}/ai-dashboard - AI investment, compute, adoption, model capabilities, energy use
+- Biotech Dashboard (annual): ${baseUrl}/biotech-dashboard - genome sequencing costs, CRISPR research, clinical trials, publications
 `;
 
   return new NextResponse(body, {

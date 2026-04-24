@@ -1,12 +1,12 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "CO₂ Emissions by Country — Rankings & Trends | 4 Billion Years On",
+  title: "CO₂ Emissions by Country - Rankings & Trends | 4 Billion Years On",
   alternates: { canonical: 'https://4billionyearson.org/emissions' },
   description:
     "Country-by-country CO₂ emissions data updated annually. Compare total and per-capita emissions, track historical trends, and explore sector breakdowns.",
   openGraph: {
-    title: "CO₂ Emissions by Country — Rankings & Trends",
+    title: "CO₂ Emissions by Country - Rankings & Trends",
     description:
       "Annual CO₂ emissions data by country. Compare total and per-capita emissions, track trends, and explore sector breakdowns.",
     images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],

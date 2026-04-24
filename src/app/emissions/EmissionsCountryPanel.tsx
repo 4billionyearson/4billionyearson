@@ -244,14 +244,17 @@ function RegionSearch({ mode, onSelect, loading }: {
 
 /* ─── Stat mini-card ─────────────────────────────────────────────────────── */
 
-function StatBlock({ label, value, sub, color = 'text-orange-300' }: {
-  label: string; value: string; sub?: string; color?: string;
+function StatBlock({ label, value, unit, sub, color = 'text-orange-300' }: {
+  label: string; value: string; unit?: string; sub?: string; color?: string;
 }) {
   return (
-    <div className="rounded-xl border border-gray-800/60 bg-gray-900/50 p-3">
-      <div className="text-[11px] text-gray-400 uppercase tracking-wider mb-1">{label}</div>
-      <div className={`text-xl font-bold font-mono ${color}`}>{value}</div>
-      {sub && <div className="text-[11px] text-gray-500 mt-0.5">{sub}</div>}
+    <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
+      <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
+      <div className="flex items-baseline gap-1 flex-wrap">
+        <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
+        {unit && <span className="text-sm text-gray-400">{unit}</span>}
+      </div>
+      {sub && <div className="text-xs text-gray-400 mt-1">{sub}</div>}
     </div>
   );
 }
@@ -527,7 +530,7 @@ export default function EmissionsCountryPanel({
           {country.annual.length > 0 && (
             <div>
               <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
-                <Factory className="h-4 w-4 text-red-400" /> Annual CO₂ emissions — {country.name}
+                <Factory className="h-4 w-4 text-red-400" /> Annual CO₂ emissions - {country.name}
               </h3>
               <div className="h-[320px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -690,7 +693,7 @@ function USStateDeepDive({
     ? (latestMt / worldLatestMt) * 100
     : null;
 
-  // Build indexed trajectory (base = 1990 or earliest common year) — state vs USA vs World
+  // Build indexed trajectory (base = 1990 or earliest common year) - state vs USA vs World
   const indexedData = (() => {
     const baseYear = 1990;
     const stateByYear = new Map(stateSeriesMt.map(y => [y.year, y.ghgEmissions]));
@@ -786,7 +789,7 @@ function USStateDeepDive({
       {/* Absolute emissions over time */}
       <div>
         <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
-          <Factory className="h-4 w-4 text-red-400" /> Annual CO₂ emissions — {state.name}
+          <Factory className="h-4 w-4 text-red-400" /> Annual CO₂ emissions - {state.name}
         </h3>
         <div className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -837,7 +840,7 @@ function USStateDeepDive({
 
       {/* Source / caveat */}
       <p className="text-xs text-gray-400 pt-2 border-t border-gray-800/60">
-        State &amp; US totals: <a href="https://www.eia.gov/state/seds/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EIA State Energy Data System</a> (energy-related CO₂ only — excludes land-use change and industrial process emissions).{' '}
+        State &amp; US totals: <a href="https://www.eia.gov/state/seds/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">EIA State Energy Data System</a> (energy-related CO₂ only - excludes land-use change and industrial process emissions).{' '}
         World totals: <a href="https://ourworldindata.org/co2-emissions" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Our World in Data</a> / <a href="https://globalcarbonproject.org/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Global Carbon Project</a>.
       </p>
     </div>

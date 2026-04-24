@@ -154,9 +154,9 @@ function StatCard({
   return (
     <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
-      <div className="flex items-baseline gap-1">
-        <span className={`text-2xl font-bold ${color}`}>{value}</span>
-        <span className="text-sm text-gray-400">{unit}</span>
+      <div className="flex items-baseline gap-1 flex-wrap">
+        <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
+        {unit && <span className="text-sm text-gray-400">{unit}</span>}
       </div>
       {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>
@@ -776,9 +776,9 @@ function LiveEventsSection({
         <EventsMap events={sorted} />
       </div>
 
-      {/* 3. Overview — hotspot clusters + Red/Amber singletons, expandable full list */}
+      {/* 3. Overview - hotspot clusters + Red/Amber singletons, expandable full list */}
       <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-        {hotspots.length > 0 ? "Overview — active events" : "Active events"}
+        {hotspots.length > 0 ? "Overview - active events" : "Active events"}
       </h4>
         {hotspots.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
@@ -811,7 +811,7 @@ function LiveEventsSection({
                         <span className="shrink-0">{EVENT_ICONS[h.type]}</span>
                         <div className="min-w-0">
                           <div className="font-semibold text-sm truncate">
-                            {h.count}× {EVENT_LABELS[h.type] || h.type} — {h.country}
+                            {h.count}× {EVENT_LABELS[h.type] || h.type} - {h.country}
                           </div>
                           <div className="text-xs opacity-70 mt-0.5">
                             {dateRange}

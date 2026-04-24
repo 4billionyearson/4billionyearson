@@ -154,20 +154,20 @@ function ordinal(value: number): string {
 function highlightRankings(text: string): string {
   // Escape HTML entities first to prevent XSS, then apply bold formatting
   const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  // Bold ranking phrases — supports numeric ordinals ("3rd warmest") and
+  // Bold ranking phrases - supports numeric ordinals ("3rd warmest") and
   // word ordinals ("the warmest", "fourth driest")
   // Stops before value citations (numbers, "at X°C", "of X.X mm") so bold
   // doesn't bleed into the rest of the sentence.
   const sup = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|most|least';
   const supNoMost = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|least';
   const wordOrd = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth';
-  // Words that don't introduce a value — letters only or hyphenated numbers like "12-month"
+  // Words that don't introduce a value - letters only or hyphenated numbers like "12-month"
   const w = `(?:\\s+(?!on\\s+record|in\\s+\\d|of\\s+\\d+\\s*year|of\\s+\\d+[.,°]|at\\s+\\d|with\\s+\\d|averaging\\s)(?:[a-zA-Z][a-zA-Z'\\u2019-]*|\\d+[-\\u2013]\\w+))*`;
   // Optional "on record" / "in N years of records" / "of N years on record"
   const rec = '(?:\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?))?';
   // Pattern 1: ordinal + superlative + descriptor words + optional "on record"
   const p1 = `(?:\\d+(?:st|nd|rd|th)|${wordOrd})\\s+(?:${sup})\\b${w}${rec}`;
-  // Pattern 2: "the" + superlative (no "most") — REQUIRES "on record" / "of N years"
+  // Pattern 2: "the" + superlative (no "most") - REQUIRES "on record" / "of N years"
   const p2 = `the\\s+(?:${supNoMost})\\b${w}\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?)`;
   const pattern = new RegExp(`\\b(${p1}|${p2})`, 'gi');
   let out = escaped.replace(pattern, (m) => `<strong style="color:#fff">${m}</strong>`);
@@ -656,7 +656,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
     region.type === 'us-state' ? 'Top 5 Cities:' :
     'City Coverage:';
 
-  // Responsive font sizes — shrink when the title is long
+  // Responsive font sizes - shrink when the title is long
   // Combine title and subtitle for header
   const combinedTitle = `${pageTitle} Climate${latestMonthYearLabel ? ` – ${latestMonthYearLabel} Update` : ''}`;
   const h1SizeClass =
@@ -858,7 +858,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   <Divider icon={<Factory className="h-5 w-5 text-rose-400" />} title="Emissions & Energy" />
                   {region.type === 'uk-region' && (
                     <div className="rounded-xl border border-[#D0A65E]/60 bg-gray-950/95 backdrop-blur-sm px-4 py-2.5 text-xs text-gray-200 shadow-lg">
-                      Showing UK-wide figures — {region.name} is part of the United Kingdom. Sub-national emissions and electricity-mix breakdowns are not yet published in a unified format.
+                      Showing UK-wide figures - {region.name} is part of the United Kingdom. Sub-national emissions and electricity-mix breakdowns are not yet published in a unified format.
                     </div>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

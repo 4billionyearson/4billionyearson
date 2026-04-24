@@ -11,7 +11,7 @@ export default function ClimateRankingsPanel() {
         <div className="flex-1">
           <h2 className="text-lg font-bold font-mono text-[#FFF5E7]">Climate Rankings &amp; Monthly Trends</h2>
           <p className="mt-1 text-sm text-gray-400 max-w-3xl">
-            Full league table across all 144 regions — warmest this month, biggest rank movers, continent &amp; US-region roll-ups, and an AI-drafted monthly analysis.
+            Full league table across all 144 regions - warmest this month, biggest rank movers, continent &amp; US-region roll-ups, and an AI-drafted monthly analysis.
           </p>
         </div>
       </div>

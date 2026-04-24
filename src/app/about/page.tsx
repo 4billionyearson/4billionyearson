@@ -2,10 +2,10 @@ import Container from "@/app/_components/container";
 
 export const metadata = {
   title: "About | 4 Billion Years On",
-  description: "4 Billion Years On is a data journalism platform tracking four civilisation-scale shifts — AI, climate change, renewable energy, and biotechnology — in one place. Real-time dashboards, plain-English explainers, curated books, and sourced articles for curious non-experts.",
+  description: "4 Billion Years On is a data journalism platform tracking four civilisation-scale shifts - AI, climate change, renewable energy, and biotechnology - in one place. Real-time dashboards, plain-English explainers, curated books, and sourced articles for curious non-experts.",
   openGraph: {
     title: "About | 4 Billion Years On",
-    description: "4 Billion Years On is a data journalism platform tracking four civilisation-scale shifts — AI, climate change, renewable energy, and biotechnology — in one place.",
+    description: "4 Billion Years On is a data journalism platform tracking four civilisation-scale shifts - AI, climate change, renewable energy, and biotechnology - in one place.",
     images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
   twitter: {

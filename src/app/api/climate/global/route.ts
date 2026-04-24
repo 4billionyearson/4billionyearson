@@ -10,7 +10,7 @@ import { resolve } from 'node:path';
  * committed to `public/data/climate/global-history.json`. That file is
  * updated monthly by a GitHub Action.
  *
- * This route now simply reads the static snapshot from disk — zero
+ * This route now simply reads the static snapshot from disk - zero
  * upstream fetches at request time, so there's no cold-start spinner
  * and no dependence on NOAA / OWID being available when a user hits
  * the page.

@@ -29,7 +29,7 @@ interface RankingRow {
   anomaly1m: number | null;
   anomaly3m: number | null;
   anomaly12m: number | null;
-  latestLabel: string | null; // e.g. "Mar 2026" — label of the most recent month
+  latestLabel: string | null; // e.g. "Mar 2026" - label of the most recent month
   dataAsOf: string | null;     // YYYY-MM of latest month available
 }
 
@@ -49,7 +49,7 @@ const SNAPSHOT_ROOT = resolve(process.cwd(), 'public', 'data', 'climate');
 /**
  * Load a region's snapshot directly from disk. Snapshots are bundled
  * into the serverless function via `outputFileTracingIncludes` in
- * next.config.ts, so this is purely a local file read — no HTTP hop.
+ * next.config.ts, so this is purely a local file read - no HTTP hop.
  */
 async function loadSnapshot(region: ClimateRegion): Promise<any | null> {
   let relativePath: string | null = null;

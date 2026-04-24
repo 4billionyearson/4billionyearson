@@ -135,7 +135,7 @@ async function fetchPubmedYearSeries(term: string, startYear: number, endYear: n
   const results: { year: number; count: number }[] = [];
   const encoded = encodeURIComponent(term);
   const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
-  // Fully sequential — one request at a time with 400ms gap to stay under NCBI 3 req/sec
+  // Fully sequential - one request at a time with 400ms gap to stay under NCBI 3 req/sec
   for (const yr of years) {
     await new Promise(r => setTimeout(r, 400));
     const data = await fetchJSON(
@@ -169,7 +169,7 @@ async function fetchBiotechDashboardData() {
     fetchTrialCount('immunotherapy'),
   ]);
 
-  // PubMed total counts — sequential with delays to respect NCBI 3 req/sec limit
+  // PubMed total counts - sequential with delays to respect NCBI 3 req/sec limit
   const crisprPubs = await fetchPubmedCount('CRISPR');
   await new Promise(r => setTimeout(r, 400));
   const geneTherapyPubs = await fetchPubmedCount('"gene therapy"');

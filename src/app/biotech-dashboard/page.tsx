@@ -425,7 +425,7 @@ export default function BiotechDashboardPage() {
                   </ResponsiveContainer>
                 </div>
                 <p className="text-xs text-gray-400 mt-4">
-                  Cost of sequencing a complete human genome, from $100M in 2001 to under $1,000 today — outpacing Moore&rsquo;s Law. Logarithmic scale. Source:{" "}
+                  Cost of sequencing a complete human genome, from $100M in 2001 to under $1,000 today - outpacing Moore&rsquo;s Law. Logarithmic scale. Source:{" "}
                   <a href="https://ourworldindata.org/grapher/cost-of-sequencing-a-full-human-genome" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
                     NHGRI via Our World in Data
                   </a>.

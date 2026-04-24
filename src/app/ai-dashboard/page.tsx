@@ -390,7 +390,7 @@ export default function AIDashboardPage() {
                 <p className="text-xs text-gray-400 mt-4">
                   {data.stats.frontierCount} frontier AI data centers tracked globally ({data.frontierDataCenters.filter(dc => dc.country === 'United States').length} in the US). Pin size indicates power capacity. Source:{" "}
                   <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Epoch AI — Frontier Data Centers
+                    Epoch AI - Frontier Data Centers
                   </a>{" "}(CC-BY).
                 </p>
               </SectionCard>
@@ -463,7 +463,7 @@ export default function AIDashboardPage() {
                 <p className="text-xs text-gray-400 mt-4">
                   The world&apos;s largest known AI data centers tracked via satellite imagery, construction permits and public disclosures. Source:{" "}
                   <a href="https://epoch.ai/data/data-centers" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
-                    Epoch AI — Frontier Data Centers
+                    Epoch AI - Frontier Data Centers
                   </a>{" "}(CC-BY). Updated {new Date(data.fetchedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}.
                 </p>
               </SectionCard>
@@ -631,7 +631,7 @@ export default function AIDashboardPage() {
                         const maxTWh = Math.max(...allRows.map(r => r.twh));
                         return (
                           <div>
-                            <h3 className="text-sm font-semibold text-gray-300 mb-3">For comparison — country electricity generation (TWh)</h3>
+                            <h3 className="text-sm font-semibold text-gray-300 mb-3">For comparison - country electricity generation (TWh)</h3>
                             <div className="space-y-2">
                               {allRows.map(r => (
                                 <div key={r.name} className="flex items-center gap-3">
@@ -737,7 +737,7 @@ export default function AIDashboardPage() {
               <SectionCard icon={<BarChart3 className="h-5 w-5 text-rose-400" />} title="FrontierMath Benchmark">
                 <Top10BarChart data={data.frontierMath.slice(0, 10).map(d => ({ name: d.name, value: d.score }))} dataKey="score" formatter={(v) => `${Math.round(v)}%`} />
                 <p className="text-xs text-gray-400 mt-4">
-                  Latest AI model performance on FrontierMath — a challenging mathematics benchmark. Source:{" "}
+                  Latest AI model performance on FrontierMath - a challenging mathematics benchmark. Source:{" "}
                   <a href="https://epoch.ai/data/notable-ai-models" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
                     Epoch AI
                   </a>. Updated monthly.

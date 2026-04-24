@@ -227,7 +227,7 @@ function MapLabels({
     for (const f of countriesGeo.features) {
       const name = (f.properties as any)?.name as string | undefined;
       if (!name) continue;
-      // Skip UK at high zoom — sub-nation labels take over
+      // Skip UK at high zoom - sub-nation labels take over
       const pos = LABEL_OVERRIDES[name] ?? featureCentroid(f);
       if (pos) result.push({ name, pos });
     }
@@ -341,7 +341,7 @@ function rankingValue(row: RankingRow | undefined, win: AnomalyWindow): number |
   return row.anomaly1m;
 }
 
-// UK-nation slugs — kept for potential future re-introduction of the overlay.
+// UK-nation slugs - kept for potential future re-introduction of the overlay.
 // Currently unused; the map renders UK as a single country polygon.
 // const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
 
@@ -478,7 +478,7 @@ function USStatesOverlay({
   );
 }
 
-// UKRegionsOverlay removed — the map now shows UK as a single country polygon to
+// UKRegionsOverlay removed - the map now shows UK as a single country polygon to
 // avoid mismatched sub-polygon coverage. Re-introduce from git history if needed.
 
 export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow }) {
@@ -639,7 +639,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
             }
           />
           <MapLabels countriesGeo={geo} statesGeo={statesGeo} ukGeo={ukGeo} />
-          {/* UK nations overlay disabled — map is country-level; UK renders as a single polygon
+          {/* UK nations overlay disabled - map is country-level; UK renders as a single polygon
               from world-countries.json to avoid mismatched sub-polygon coverage. */}
         </MapContainer>
 

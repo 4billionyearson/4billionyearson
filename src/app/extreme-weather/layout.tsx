@@ -23,7 +23,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Dataset",
   name: "Global Extreme Weather Events Data",
-  description: "Live GDACS extreme weather alerts plus historical data from 1960 on floods, wildfires, droughts, cyclones, heatwaves — including deaths and economic damage.",
+  description: "Live GDACS extreme weather alerts plus historical data from 1960 on floods, wildfires, droughts, cyclones, heatwaves - including deaths and economic damage.",
   url: "https://4billionyearson.org/extreme-weather",
   creator: { "@type": "Organization", name: "4 Billion Years On", url: "https://4billionyearson.org" },
   variableMeasured: ["Flood Events", "Wildfire Events", "Drought Events", "Cyclone Events", "Deaths from Extreme Weather", "Economic Damage"],

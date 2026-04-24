@@ -126,7 +126,7 @@ function buildTimeSeries(
   return Array.from(byYear.values()).sort((a, b) => a["year"] - b["year"]);
 }
 
-/* ─── Epoch AI CSV — live notable model data ──────────────────────────────── */
+/* ─── Epoch AI CSV - live notable model data ──────────────────────────────── */
 
 const EPOCH_CSV_URL = 'https://epoch.ai/data/epochdb/notable_ai_models.csv';
 
@@ -356,7 +356,7 @@ async function fetchFrontierDataCenters(): Promise<{
     // Sort by power descending
     sites.sort((a, b) => b.powerMW - a.powerMW);
 
-    // Parse timeline CSV — aggregate total power/compute over time
+    // Parse timeline CSV - aggregate total power/compute over time
     let timeline: { date: string; totalPowerMW: number; totalH100e: number; totalCostB: number }[] = [];
     if (tlRes.ok) {
       const tlText = await tlRes.text();

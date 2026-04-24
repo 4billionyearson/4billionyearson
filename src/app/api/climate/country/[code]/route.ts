@@ -30,7 +30,7 @@ export async function GET(
   const { code } = await params;
   const upperCode = code.toUpperCase();
 
-  // Guard against path traversal — only allow A-Z codes.
+  // Guard against path traversal - only allow A-Z codes.
   if (!/^[A-Z]{2,4}$/.test(upperCode)) {
     return NextResponse.json({ error: 'Invalid country code' }, { status: 400 });
   }

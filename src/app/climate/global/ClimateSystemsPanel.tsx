@@ -42,14 +42,14 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
   const color = state === 'El Niño' ? '#fb7185' : state === 'La Niña' ? '#60a5fa' : '#a3a3a3';
   const accent = state === 'El Niño' ? 'text-rose-300' : state === 'La Niña' ? 'text-sky-300' : 'text-gray-300';
 
-  // Chart data — last 36 seasons with indexed x to keep spacing even
+  // Chart data - last 36 seasons with indexed x to keep spacing even
   const chart = enso.history.map((p, i) => ({ i, label: p.season, anom: p.anom, year: p.year }));
 
   return (
     <Tile>
       <TileHeader
         icon={<Wind className="h-5 w-5 text-sky-300" />}
-        title="ENSO — El Niño / La Niña State"
+        title="ENSO - El Niño / La Niña State"
         subtitle={`NOAA CPC Oceanic Niño Index (3-month running mean of Niño 3.4 SST)`}
       />
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
@@ -149,7 +149,7 @@ export function GhgTile({ ghgStats }: { ghgStats: { co2: GhgStat | null; ch4: Gh
     <Tile>
       <TileHeader
         icon={<Flame className="h-5 w-5 text-amber-400" />}
-        title="Greenhouse Gases — Latest Monthly Mean"
+        title="Greenhouse Gases - Latest Monthly Mean"
         subtitle="NOAA Global Monitoring Laboratory · globally-averaged marine surface sites"
       />
       {co2 && <GhgRow stat={co2} color="#fb923c" />}
@@ -246,7 +246,7 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-[11px] text-gray-400 mt-1">Last 60 months. Long-term trend is down — Arctic loss exceeds Antarctic variability.</p>
+      <p className="text-[11px] text-gray-400 mt-1">Last 60 months. Long-term trend is down - Arctic loss exceeds Antarctic variability.</p>
       <div className="mt-auto pt-2 text-[11px]">
         <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
           Sea levels &amp; ice dashboard <ArrowUpRight className="h-3 w-3" />
@@ -282,7 +282,7 @@ export function ContinentalBar({ continents }: { continents: ContinentStat[] | n
     <Tile>
       <TileHeader
         icon={<Waves className="h-5 w-5 text-orange-300" />}
-        title="Continental Land Anomalies — Latest Month"
+        title="Continental Land Anomalies - Latest Month"
         subtitle={`${MONTH_NAMES[latest.month]} ${latest.year} vs 1901–2000 average (NOAA, land only)`}
       />
       <div className="h-56">

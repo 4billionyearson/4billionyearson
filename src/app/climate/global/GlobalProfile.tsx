@@ -297,7 +297,7 @@ export default function GlobalProfile() {
   const yearMin = yearlyChartData.length ? yearlyChartData[0].year : 1950;
   const yearMax = yearlyChartData.length ? yearlyChartData[yearlyChartData.length - 1].year : 2026;
 
-  // Build the overview panel (month / 3-month / year) — three NOAA rows so
+  // Build the overview panel (month / 3-month / year) - three NOAA rows so
   // rankings match what NOAA and Copernicus publish in press releases.
   const overviewPanels = useMemo<OverviewPanel[]>(() => {
     if (!data?.noaaStats) return [];
@@ -311,7 +311,7 @@ export default function GlobalProfile() {
     if (landOceanRow) rows.push(landOceanRow);
     if (!rows.length) return [];
     return [{
-      title: 'Temperature — Average (NOAA)',
+      title: 'Temperature - Average (NOAA)',
       icon: <Thermometer className="text-orange-400" />,
       accentClass: 'bg-orange-600',
       accentBg: 'bg-orange-600/50',
@@ -336,7 +336,7 @@ export default function GlobalProfile() {
               <div className="inline-flex items-start gap-2 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
                 <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
                 <p className="text-xs md:text-sm font-medium text-[#D0A65E]">
-                  <span className="font-semibold">Coverage:</span> Whole Earth — land and ocean surface temperature
+                  <span className="font-semibold">Coverage:</span> Whole Earth - land and ocean surface temperature
                 </p>
               </div>
               <div className="mb-3">
@@ -423,7 +423,7 @@ export default function GlobalProfile() {
 
           {data && !loading && !error && (
             <>
-              {/* Overview table: month / 3-month / year — matches country & region pages */}
+              {/* Overview table: month / 3-month / year - matches country & region pages */}
               {overviewPanels.length > 0 && (
                 <>
                   <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="At a Glance" />
@@ -431,7 +431,7 @@ export default function GlobalProfile() {
                 </>
               )}
 
-              {/* Paris Agreement tracker — 10-year mean vs pre-industrial (WMO/IPCC methodology) */}
+              {/* Paris Agreement tracker - 10-year mean vs pre-industrial (WMO/IPCC methodology) */}
               {rolling10yr != null && vsPreIndustrial != null && (() => {
                 const pct15 = Math.min(100, Math.max(0, (vsPreIndustrial / 1.5) * 100));
                 const pct20 = Math.min(100, Math.max(0, (vsPreIndustrial / 2.0) * 100));
@@ -463,7 +463,7 @@ export default function GlobalProfile() {
                           Paris Agreement Tracker
                         </p>
                         <h3 className="text-lg md:text-xl font-bold text-white mt-1">How close are we to 1.5°C and 2°C?</h3>
-                        <p className="text-[11px] text-gray-400 mt-1">Global land + ocean surface temperature (NOAA) — the series used by Copernicus, WMO and the IPCC.</p>
+                        <p className="text-[11px] text-gray-400 mt-1">Global land + ocean surface temperature (NOAA) - the series used by Copernicus, WMO and the IPCC.</p>
                       </div>
                       <div className="text-right">
                         <p className={`text-4xl md:text-5xl font-bold font-mono ${atOrPast15 ? 'text-red-300' : 'text-orange-300'}`}>
@@ -596,12 +596,12 @@ export default function GlobalProfile() {
                           {firstAnnualBreach15 ? firstAnnualBreach15.year : 'not yet'}
                         </p>
                         <p className="text-[11px] text-gray-400">
-                          {firstAnnualBreach15 ? `${formatSigned(firstAnnualBreach15.annualAnomaly)}°C — a single-year breach, not yet the 10-yr mean` : 'annual basis, NOAA'}
+                          {firstAnnualBreach15 ? `${formatSigned(firstAnnualBreach15.annualAnomaly)}°C - a single-year breach, not yet the 10-yr mean` : 'annual basis, NOAA'}
                         </p>
                       </div>
                     </div>
 
-                    {/* Baselines explainer — moved up so readers can see what each number means */}
+                    {/* Baselines explainer - moved up so readers can see what each number means */}
                     <div className="mt-5 pt-4 border-t border-gray-800">
                       <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Two baselines, two purposes</p>
                       <ul className="text-xs text-gray-400 space-y-1.5">
@@ -613,7 +613,7 @@ export default function GlobalProfile() {
                 );
               })()}
 
-              {/* World anomaly map — country-level temperature anomalies.
+              {/* World anomaly map - country-level temperature anomalies.
                   Sits inside At a Glance under the Paris tracker so readers
                   see where the current warming is concentrated before diving
                   into longer time-series charts below. */}
@@ -621,7 +621,7 @@ export default function GlobalProfile() {
                 <AnomalyMapCard countryAnomalies={data.countryAnomalies} />
               )}
 
-              {/* Spaghetti chart — Land + Ocean (headline global series) */}
+              {/* Spaghetti chart - Land + Ocean (headline global series) */}
               {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (
                 <>
                   <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Temperature" />
@@ -629,16 +629,16 @@ export default function GlobalProfile() {
                     <TemperatureSpaghettiChart
                       monthlyAll={data.landOceanMonthlyAll}
                       regionName="Global Land + Ocean"
-                      dataSource="NOAA Climate at a Glance — Global Land+Ocean"
+                      dataSource="NOAA Climate at a Glance - Global Land+Ocean"
                     />
                     <p className="text-xs text-gray-400 mt-3">
-                      Each line is a single year; the current year is highlighted. This is the headline global surface-temperature series — the same land + ocean dataset used by Copernicus, WMO and NOAA — and the one to cite when comparing the planet as a whole against a single country, state or region (shown on the individual climate pages).
+                      Each line is a single year; the current year is highlighted. This is the headline global surface-temperature series - the same land + ocean dataset used by Copernicus, WMO and NOAA - and the one to cite when comparing the planet as a whole against a single country, state or region (shown on the individual climate pages).
                     </p>
                   </div>
                 </>
               )}
 
-              {/* Spaghetti chart — Land only (for direct comparison with country/state/region pages) */}
+              {/* Spaghetti chart - Land only (for direct comparison with country/state/region pages) */}
               {data.landMonthlyAll?.length > 0 && (
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                   <TemperatureSpaghettiChart
@@ -647,7 +647,7 @@ export default function GlobalProfile() {
                     dataSource="Our World in Data / ERA5"
                   />
                   <p className="text-xs text-gray-400 mt-3">
-                    The same chart style as the individual country, state and region climate pages — which use land-only temperatures because there&rsquo;s no ocean inside their borders. This land-only global version is included so you can compare any specific place on those pages against the global land average on equal terms.
+                    The same chart style as the individual country, state and region climate pages - which use land-only temperatures because there&rsquo;s no ocean inside their borders. This land-only global version is included so you can compare any specific place on those pages against the global land average on equal terms.
                   </p>
                 </div>
               )}
@@ -691,7 +691,7 @@ export default function GlobalProfile() {
                 </div>
               )}
 
-              {/* Monthly comparison — last 12 months (land+ocean) */}
+              {/* Monthly comparison - last 12 months (land+ocean) */}
               {data.monthlyComparison?.length > 0 && (
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
@@ -733,7 +733,7 @@ export default function GlobalProfile() {
                 <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                     <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
                       <Globe2 className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
-                      <span className="min-w-0 flex-1">Land vs Land + Ocean — Last 12 Months</span>
+                      <span className="min-w-0 flex-1">Land vs Land + Ocean - Last 12 Months</span>
                     </h3>
                     <p className="text-xs text-gray-400 mb-4">
                       Land surfaces warm roughly twice as fast as the ocean. This chart compares the global land-only temperature (ERA5, via Our World in Data) against the combined land+ocean series (NOAA) for each of the last 12 months.
@@ -757,7 +757,7 @@ export default function GlobalProfile() {
                 </div>
               )}
 
-              {/* Climate systems — ENSO, GHG, sea ice, continents */}
+              {/* Climate systems - ENSO, GHG, sea ice, continents */}
               {(data.enso || data.ghgStats || data.seaIceStats || data.continentStats?.length || data.previousLatestMonthStats) && (
                 <>
                   <Divider icon={<Wind className="h-5 w-5 text-sky-300" />} title="Climate Systems" />
@@ -796,7 +796,7 @@ export default function GlobalProfile() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                     <div className="rounded-lg border border-gray-800 bg-gray-900/50 px-3 py-2">
                       <p className="text-[13px] font-semibold text-[#FFF5E7]">1961–1990</p>
-                      <p className="text-xs text-gray-400">WMO standard — used for the monthly and quarterly anomalies above.</p>
+                      <p className="text-xs text-gray-400">WMO standard - used for the monthly and quarterly anomalies above.</p>
                     </div>
                     <div className="rounded-lg border border-gray-800 bg-gray-900/50 px-3 py-2">
                       <p className="text-[13px] font-semibold text-[#FFF5E7]">Pre-industrial ≈ {data.preIndustrialBaseline.toFixed(1)}°C</p>
@@ -819,19 +819,19 @@ export default function GlobalProfile() {
                       <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
                         NOAA Climate at a Glance <ExternalLink className="h-3 w-3" />
                       </a>
-                      <span className="text-xs text-gray-500"> — Land+Ocean anomalies</span>
+                      <span className="text-xs text-gray-500"> - Land+Ocean anomalies</span>
                     </li>
                     <li>
                       <a href="https://ourworldindata.org/grapher/temperature-anomaly" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
                         Our World in Data <ExternalLink className="h-3 w-3" />
                       </a>
-                      <span className="text-xs text-gray-500"> — ERA5 land-only series</span>
+                      <span className="text-xs text-gray-500"> - ERA5 land-only series</span>
                     </li>
                     <li>
                       <a href="https://www.ipcc.ch/report/ar6/syr/" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
                         IPCC AR6 Synthesis <ExternalLink className="h-3 w-3" />
                       </a>
-                      <span className="text-xs text-gray-500"> — 1.5°C / 2.0°C basis</span>
+                      <span className="text-xs text-gray-500"> - 1.5°C / 2.0°C basis</span>
                     </li>
                   </ul>
                 </div>
@@ -841,7 +841,7 @@ export default function GlobalProfile() {
               <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                 <h2 className="text-xl font-bold font-mono text-white mb-2 flex items-start gap-2">
                   <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-                  <span className="min-w-0 flex-1">Zoom In — Country &amp; Regional Updates</span>
+                  <span className="min-w-0 flex-1">Zoom In - Country &amp; Regional Updates</span>
                 </h2>
                 <p className="text-sm text-gray-400 mb-4 max-w-3xl">
                   Global figures hide huge regional variation: the Arctic is warming about four times faster than the global mean, and heat extremes are outpacing rainfall change across much of the tropics and mid-latitudes. Dive into individual profiles:

@@ -87,11 +87,11 @@ function StatCard({ label, value, unit, subtext, color }: {
   label: string; value: string; unit: string; subtext?: string; color: string;
 }) {
   return (
-    <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
+    <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
-      <div className="flex items-baseline gap-1">
-        <span className={`text-2xl font-bold ${color}`}>{value}</span>
-        <span className="text-sm text-gray-400">{unit}</span>
+      <div className="flex items-baseline gap-1 flex-wrap">
+        <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
+        {unit && <span className="text-sm text-gray-400">{unit}</span>}
       </div>
       {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>
@@ -213,7 +213,7 @@ function HemisphereSeaIceCard({ data, accent }: { data: HemisphereSeaIce; accent
     <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2">
         <Snowflake className={`h-5 w-5 shrink-0 mt-1 ${accent === 'cyan' ? 'text-cyan-300' : 'text-sky-300'}`} />
-        <span className="min-w-0 flex-1">{data.label.replace(/sea ice/i, 'Sea Ice')} — {years[0]}–{latestYear}</span>
+        <span className="min-w-0 flex-1">{data.label.replace(/sea ice/i, 'Sea Ice')} - {years[0]}–{latestYear}</span>
       </h2>
       <p className="text-xs text-gray-400 mt-1 mb-3">
         One line per year since satellite records began. <span style={{ color: currentColor }}>{latestYear}</span> is highlighted;
@@ -286,7 +286,7 @@ export default function SeaLevelsIcePage() {
   const handleIceYearChange = useCallback((y: string) => setActiveIceYear(y), []);
 
   // Global sea-ice headline (Arctic + Antarctic combined) and per-hemisphere
-  // spaghetti-chart payloads — sourced from the same global-climate snapshot
+  // spaghetti-chart payloads - sourced from the same global-climate snapshot
   // used on /climate/global.
   const [globalSeaIce, setGlobalSeaIce] = useState<any>(null);
   const [arcticSeaIce, setArcticSeaIce] = useState<HemisphereSeaIce | null>(null);

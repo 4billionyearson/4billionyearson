@@ -29,10 +29,10 @@ function getPinRadius(powerMW: number): number {
 }
 
 function getPinColor(powerMW: number): string {
-  if (powerMW <= 0) return "#f59e0b"; // amber — planned
+  if (powerMW <= 0) return "#f59e0b"; // amber - planned
   if (powerMW <= 200) return "#06b6d4"; // cyan
   if (powerMW <= 500) return "#3b82f6"; // blue
-  return "#8b5cf6"; // violet — largest
+  return "#8b5cf6"; // violet - largest
 }
 
 /* ─── Label constants (shared with climate events map) ─────────────────── */

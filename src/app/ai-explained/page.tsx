@@ -66,7 +66,7 @@ const RESOURCES: { name: string; url: string; desc: string }[] = [
   { name: "NIST AI Risk Management", url: "https://www.nist.gov/artificial-intelligence", desc: "The US National Institute of Standards and Technology's framework for managing AI risks." },
   { name: "Anthropic Research", url: "https://www.anthropic.com/research", desc: "Safety-focused AI research from the makers of Claude, including work on alignment and interpretability." },
   { name: "DeepMind Research", url: "https://deepmind.google/research/", desc: "Cutting-edge AI research from Google DeepMind, spanning science, reasoning, and safety." },
-  { name: "Data Center Map", url: "https://www.datacentermap.com/", desc: "Global directory and map of 11,000+ data centers across 174 countries — colocation, cloud, and edge facilities." },
+  { name: "Data Center Map", url: "https://www.datacentermap.com/", desc: "Global directory and map of 11,000+ data centers across 174 countries - colocation, cloud, and edge facilities." },
 ];
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */

@@ -96,11 +96,11 @@ function StatCard({ label, value, unit, subtext, color }: {
   label: string; value: string; unit: string; subtext?: string; color: string;
 }) {
   return (
-    <div className="bg-gray-800/60 rounded-xl p-4 border border-gray-700/50">
+    <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
-      <div className="flex items-baseline gap-1">
-        <span className={`text-2xl font-bold ${color}`}>{value}</span>
-        <span className="text-sm text-gray-400">{unit}</span>
+      <div className="flex items-baseline gap-1 flex-wrap">
+        <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
+        {unit && <span className="text-sm text-gray-400">{unit}</span>}
       </div>
       {subtext && <div className="text-xs text-gray-400 mt-1">{subtext}</div>}
     </div>

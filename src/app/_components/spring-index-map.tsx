@@ -19,7 +19,7 @@ const LAYER_META: Record<LayerId, { title: string; desc: string }> = {
   },
   bloom_anomaly: {
     title: "Spring Bloom anomaly",
-    desc: "Days earlier (red) or later (blue) than the 1991–2020 average — first flowering stage.",
+    desc: "Days earlier (red) or later (blue) than the 1991–2020 average - first flowering stage.",
   },
 };
 
@@ -27,7 +27,7 @@ const LAYER_META: Record<LayerId, { title: string; desc: string }> = {
  * Maps the USA-NPN daily Spring Index Leaf/Bloom anomaly rasters as a WMS
  * layer over a dark basemap, with US state outlines on top.
  *
- * Data source: USA-NPN / U.S. Geological Survey — refreshed daily during the
+ * Data source: USA-NPN / U.S. Geological Survey - refreshed daily during the
  * spring season. https://www.usanpn.org/data/maps
  */
 export default function SpringIndexMap() {
@@ -35,7 +35,7 @@ export default function SpringIndexMap() {
   const [layerId, setLayerId] = useState<LayerId>("leaf_anomaly");
   const [states, setStates] = useState<GeoJSON.FeatureCollection | null>(null);
 
-  // Default to yesterday (UTC) — NPN publishes the previous day's anomaly.
+  // Default to yesterday (UTC) - NPN publishes the previous day's anomaly.
   useEffect(() => {
     const d = new Date();
     d.setUTCDate(d.getUTCDate() - 1);

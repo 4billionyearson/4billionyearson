@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 export const runtime = 'nodejs';
 
-export const alt = 'Climate Rankings & Monthly Trends — league table of temperature anomalies';
+export const alt = 'Climate Rankings & Monthly Trends - league table of temperature anomalies';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

@@ -410,7 +410,7 @@ function USStateCard({ data, stateName, deepLinkHref }: {
       </div>
 
       <div className="text-[10px] text-gray-500 pt-1 border-t border-gray-800/60">
-        Source: <a href="https://www.eia.gov/state/seds/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white underline">EIA State Energy Data System</a> — fossil-fuel CO₂ only.
+        Source: <a href="https://www.eia.gov/state/seds/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white underline">EIA State Energy Data System</a> - fossil-fuel CO₂ only.
       </div>
     </CardShell>
   );

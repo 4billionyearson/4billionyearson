@@ -144,7 +144,7 @@ export default function SeasonalShiftCard({
           {koppen && (
             <span
               className="inline-flex items-center gap-1 rounded-full border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[#D0A65E]"
-              title={`Köppen–Geiger climate classification (Peel, Finlayson & McMahon 2007): ${koppen.code} — ${koppen.label}`}
+              title={`Köppen–Geiger climate classification (Peel, Finlayson & McMahon 2007): ${koppen.code} - ${koppen.label}`}
             >
               Köppen {koppen.code} · {koppen.groupLabel}
             </span>
@@ -587,7 +587,7 @@ function ShiftExplanation({
         How the <strong className="text-[#FFF5E7]">{regionName}</strong> warm season has shifted. A
         month counts as &ldquo;warm&rdquo; when its mean temperature exceeds the long-term annual
         mean ({baselineMean.toFixed(1)}°C, from {baselineStart}–{baselineEnd}). Temperature swings{' '}
-        {amplitudeC.toFixed(1)}°C peak-to-peak across the year — a classic four-seasons rhythm.
+        {amplitudeC.toFixed(1)}°C peak-to-peak across the year - a classic four-seasons rhythm.
       </p>
     );
   }
@@ -595,7 +595,7 @@ function ShiftExplanation({
     return (
       <p className="text-sm text-gray-300 mb-4">
         <strong className="text-[#FFF5E7]">{regionName}</strong> doesn&apos;t have a warm/cold cycle
-        — its monthly temperature range is only {amplitudeC.toFixed(1)}°C across the year — but it
+        - its monthly temperature range is only {amplitudeC.toFixed(1)}°C across the year - but it
         does have a strong <strong className="text-sky-300">wet/dry cycle</strong>
         {wetDryRatio
           ? ` (the wettest month gets ${wetDryRatio.toFixed(0)}× as much rain as the driest)`
@@ -616,7 +616,7 @@ function ShiftExplanation({
   }
   return (
     <p className="text-sm text-gray-300 mb-4">
-      <strong className="text-[#FFF5E7]">{regionName}</strong> is weakly seasonal — temperature
+      <strong className="text-[#FFF5E7]">{regionName}</strong> is weakly seasonal - temperature
       barely changes across the year ({amplitudeC.toFixed(1)}°C range) and rainfall is fairly even.
       The clearest climate signal here is overall warming: monthly temperature has risen in every
       month.

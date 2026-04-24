@@ -105,11 +105,11 @@ const KIND_COLOR: Record<SeasonalityKind, string> = {
 
 // Standard-ish Köppen map palette (close to the Peel 2007 Wikipedia colours).
 const KOPPEN_COLOR: Record<KoppenGroup, string> = {
-  A: "#1b7837", // tropical — deep green
-  B: "#e6a23c", // arid — sand/amber
-  C: "#7fbc41", // temperate — olive-green
-  D: "#6a5acd", // continental — indigo
-  E: "#b0bec5", // polar — pale blue-grey
+  A: "#1b7837", // tropical - deep green
+  B: "#e6a23c", // arid - sand/amber
+  C: "#7fbc41", // temperate - olive-green
+  D: "#6a5acd", // continental - indigo
+  E: "#b0bec5", // polar - pale blue-grey
 };
 
 const KOPPEN_GROUP_LABEL: Record<KoppenGroup, string> = {
@@ -636,7 +636,7 @@ export default function GlobalShiftMap() {
       .catch(() => {
         if (!cancelled) setError("Could not load global shift data");
       });
-    // Subregional layers load in parallel and independently — failures here
+    // Subregional layers load in parallel and independently - failures here
     // don't disable the main map.
     fetch("/data/us-states.json")
       .then((r) => (r.ok ? r.json() : null))
@@ -753,7 +753,7 @@ export default function GlobalShiftMap() {
       aseasonal: "Weakly seasonal",
     };
     const koppenBlock = rec.koppen
-      ? `<div style="color:${KOPPEN_COLOR[rec.koppen.group]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px">Köppen ${rec.koppen.code} — ${rec.koppen.label}</div>`
+      ? `<div style="color:${KOPPEN_COLOR[rec.koppen.group]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px">Köppen ${rec.koppen.code} - ${rec.koppen.label}</div>`
       : "";
     layer.bindTooltip(
       `
@@ -809,9 +809,9 @@ export default function GlobalShiftMap() {
   ];
 
   return (
-    <div className="global-shift-map rounded-xl border border-gray-800/60 bg-gray-900/50 relative">
+    <div className="global-shift-map rounded-xl border border-gray-800/60 bg-gray-900/50 overflow-hidden">
       {/* Controls */}
-      <div className="p-3 border-b border-gray-800/60 space-y-2 rounded-t-xl overflow-hidden">
+      <div className="p-3 border-b border-gray-800/60 space-y-2">
         {metricGroups.map((group) => {
           const metrics = (Object.keys(METRIC_META) as MetricId[]).filter(
             (id) => METRIC_META[id].group === group.id,
@@ -878,7 +878,7 @@ export default function GlobalShiftMap() {
               style={styleForFeature as unknown as LeafletGeoJSON["options"]["style"]}
               onEachFeature={onEachFeature as never}
             />
-            {/* Subregional overlays — visible only when zoomed in. */}
+            {/* Subregional overlays - visible only when zoomed in. */}
             <USStatesOverlay
               key={`us-${metric}`}
               statesGeo={statesGeo}
