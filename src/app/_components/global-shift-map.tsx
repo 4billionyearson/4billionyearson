@@ -2,35 +2,35 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import type { GeoJSON as LeafletGeoJSON, Layer } from "leaflet";
+import type { GeoJSON as LeafletGeoJSON, Layer, LatLngExpression } from "leaflet";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
+import type {
+  SeasonalityKind,
+  TempShift,
+  RainShift,
+} from "@/lib/climate/shift-analysis";
 
 const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
 const GeoJSON = dynamic(() => import("react-leaflet").then((m) => m.GeoJSON), { ssr: false });
+const Polyline = dynamic(() => import("react-leaflet").then((m) => m.Polyline), { ssr: false });
 
 export type GlobalShiftRecord = {
+  kind: "country" | "us-state" | "uk-region";
   code?: string;
-  slug?: string;
-  id?: string;
   name: string;
   geojsonName?: string;
-  baselineStart: number;
-  baselineEnd: number;
-  recentStart: number;
-  recentEnd: number;
-  baselineAnnualMean: number;
-  baselineAmplitude?: number;
-  weaklySeasonal?: boolean;
-  baselineLen: number;
-  recentLen: number;
-  netShiftMonths: number | null;
-  springShiftDays: number | null;
-  autumnShiftDays: number | null;
-  biggestMonth: string;
-  biggestMonthWarming: number;
+  seasonality: SeasonalityKind;
+  windows: {
+    baselineStart: number;
+    baselineEnd: number;
+    recentStart: number;
+    recentEnd: number;
+  };
   yearsCoverage: number;
+  temp: TempShift;
+  rain: RainShift | null;
 };
 
 type GlobalShiftData = {
@@ -40,83 +40,171 @@ type GlobalShiftData = {
     countriesAnalysed: number;
     usStatesAnalysed: number;
     ukRegionsAnalysed: number;
-    withSeasonalCrossings: number;
-    earlierSprings: number;
-    laterAutumns: number;
-    longerWarmSeasons: number;
-    meanSpringShift: number | null;
-    meanAutumnShift: number | null;
-    meanNetShiftMonths: number | null;
+    seasonalityCounts: {
+      warmCold: number;
+      wetDry: number;
+      mixed: number;
+      aseasonal: number;
+    };
+    warmColdStats: {
+      total: number;
+      withCrossings: number;
+      earlierSprings: number;
+      laterAutumns: number;
+      meanSpringShift: number | null;
+      meanAutumnShift: number | null;
+      meanNetShiftMonths: number | null;
+      warmestMonthShifted: number;
+    };
+    wetDryStats: {
+      total: number;
+      withRainData: number;
+      wetSeasonsShorter: number;
+      wetSeasonsLonger: number;
+      meanWetSeasonOnsetShiftDays: number | null;
+      meanAnnualRainfallShiftPct: number | null;
+    };
   };
   countries: GlobalShiftRecord[];
   usStates: GlobalShiftRecord[];
   ukRegions: GlobalShiftRecord[];
 };
 
-type MetricId = "spring" | "autumn" | "net";
+type MetricId = "spring" | "autumn" | "net" | "wet-onset" | "wet-peak" | "wet-length" | "annual-rain" | "kind";
 
-const METRIC_META: Record<
-  MetricId,
-  {
-    label: string;
-    short: string;
-    unit: string;
-    domain: [number, number];
-    leftLabel: string;
-    rightLabel: string;
-    accessor: (r: GlobalShiftRecord) => number | null;
-    format: (v: number) => string;
-  }
-> = {
+type MetricMeta = {
+  label: string;
+  short: string;
+  group: "warm-cold" | "wet-dry" | "classification";
+  unit: string;
+  domain?: [number, number];
+  leftLabel?: string;
+  rightLabel?: string;
+  accessor: (r: GlobalShiftRecord) => number | null;
+  format: (v: number) => string;
+  /** If returns a color string, bypasses the diverging scale (used for "kind"). */
+  customColor?: (r: GlobalShiftRecord) => string | null;
+  invertForWarmer?: boolean;
+};
+
+const KIND_COLOR: Record<SeasonalityKind, string> = {
+  "warm-cold": "#f97316",
+  "wet-dry": "#38bdf8",
+  mixed: "#10b981",
+  aseasonal: "#6b7280",
+};
+
+const METRIC_META: Record<MetricId, MetricMeta> = {
   spring: {
     label: "Spring arriving earlier",
     short: "Spring shift",
+    group: "warm-cold",
     unit: "days",
     domain: [-30, 30],
     leftLabel: "Earlier",
     rightLabel: "Later",
-    accessor: (r) => r.springShiftDays,
+    accessor: (r) => r.temp.springShiftDays,
     format: (v) => `${v > 0 ? "+" : ""}${v.toFixed(1)} d`,
+    invertForWarmer: true,
   },
   autumn: {
     label: "Autumn arriving later",
     short: "Autumn shift",
+    group: "warm-cold",
     unit: "days",
     domain: [-30, 30],
     leftLabel: "Earlier",
     rightLabel: "Later",
-    accessor: (r) => r.autumnShiftDays,
+    accessor: (r) => r.temp.autumnShiftDays,
     format: (v) => `${v > 0 ? "+" : ""}${v.toFixed(1)} d`,
   },
   net: {
     label: "Warm-season length change",
     short: "Warm-season",
+    group: "warm-cold",
     unit: "months/yr",
     domain: [-1.5, 1.5],
     leftLabel: "Shorter",
     rightLabel: "Longer",
-    accessor: (r) => r.netShiftMonths,
+    accessor: (r) => r.temp.netShiftMonths,
     format: (v) => `${v > 0 ? "+" : ""}${v.toFixed(2)} mo`,
+  },
+  "wet-onset": {
+    label: "Wet-season onset shift",
+    short: "Wet onset",
+    group: "wet-dry",
+    unit: "days",
+    domain: [-30, 30],
+    leftLabel: "Earlier",
+    rightLabel: "Later",
+    accessor: (r) =>
+      r.seasonality === "wet-dry" || r.seasonality === "mixed"
+        ? r.rain?.wetSeasonOnsetShiftDays ?? null
+        : null,
+    format: (v) => `${v > 0 ? "+" : ""}${v.toFixed(1)} d`,
+  },
+  "wet-peak": {
+    label: "Peak-rain month shift",
+    short: "Peak-rain",
+    group: "wet-dry",
+    unit: "months",
+    domain: [-3, 3],
+    leftLabel: "Earlier",
+    rightLabel: "Later",
+    accessor: (r) =>
+      r.seasonality === "wet-dry" || r.seasonality === "mixed"
+        ? r.rain?.peakRainMonthShiftIndex ?? null
+        : null,
+    format: (v) => `${v > 0 ? "+" : ""}${v.toFixed(0)} mo`,
+  },
+  "wet-length": {
+    label: "Wet-season length change",
+    short: "Wet length",
+    group: "wet-dry",
+    unit: "months",
+    domain: [-3, 3],
+    leftLabel: "Shorter",
+    rightLabel: "Longer",
+    accessor: (r) =>
+      r.seasonality === "wet-dry" || r.seasonality === "mixed"
+        ? r.rain?.wetSeasonShiftMonths ?? null
+        : null,
+    format: (v) => `${v > 0 ? "+" : ""}${v.toFixed(0)} mo`,
+  },
+  "annual-rain": {
+    label: "Annual rainfall change",
+    short: "Annual rain",
+    group: "wet-dry",
+    unit: "%",
+    domain: [-25, 25],
+    leftLabel: "Drier",
+    rightLabel: "Wetter",
+    accessor: (r) => r.rain?.annualTotalShiftPct ?? null,
+    format: (v) => `${v > 0 ? "+" : ""}${v.toFixed(1)}%`,
+  },
+  kind: {
+    label: "Seasonality type",
+    short: "Seasonality type",
+    group: "classification",
+    unit: "",
+    accessor: () => 1, // placeholder
+    format: () => "",
+    customColor: (r) => KIND_COLOR[r.seasonality],
   },
 };
 
 /** Diverging red→grey→blue scale, clamped to [-1, 1]. */
-function divergingColor(t: number, metric: MetricId): string {
-  // Convention: for spring, negative (earlier) = red/warm; for autumn & net,
-  // positive (later / longer) = red/warm. Invert the sign for spring so the
-  // "warmer world" direction is always red.
-  const signed = metric === "spring" ? -t : t;
+function divergingColor(t: number, invert: boolean): string {
+  const signed = invert ? -t : t;
   const clamped = Math.max(-1, Math.min(1, signed));
-  // 7-stop diverging palette from cool (blue) to warm (red)
-  //                       -1          -0.5         0            +0.5         +1
   const stops: [number, [number, number, number]][] = [
-    [-1.0, [33, 102, 172]],   // deep blue
-    [-0.5, [103, 169, 207]],  // mid blue
-    [-0.15, [209, 229, 240]], // near-white blue
-    [0.0, [245, 245, 245]],   // neutral grey
-    [0.15, [253, 219, 199]],  // near-white red
-    [0.5, [239, 138, 98]],    // mid red
-    [1.0, [178, 24, 43]],     // deep red
+    [-1.0, [33, 102, 172]],
+    [-0.5, [103, 169, 207]],
+    [-0.15, [209, 229, 240]],
+    [0.0, [245, 245, 245]],
+    [0.15, [253, 219, 199]],
+    [0.5, [239, 138, 98]],
+    [1.0, [178, 24, 43]],
   ];
   for (let i = 0; i < stops.length - 1; i++) {
     const [t0, c0] = stops[i];
@@ -159,7 +247,6 @@ export default function GlobalShiftMap() {
     };
   }, []);
 
-  /** Map country geojson-name → shift record. */
   const byName = useMemo(() => {
     const m = new Map<string, GlobalShiftRecord>();
     if (!shifts) return m;
@@ -174,28 +261,28 @@ export default function GlobalShiftMap() {
   const styleForFeature = (feature?: Feature<Geometry, { name: string }>) => {
     if (!feature) return {};
     const rec = byName.get(feature.properties?.name || "");
-    if (!rec) {
-      return {
-        color: "#4b5563",
-        weight: 0.4,
-        fillColor: "#1f2937",
-        fillOpacity: 0.45,
-      };
+    const none = {
+      color: "#4b5563",
+      weight: 0.4,
+      fillColor: "#1f2937",
+      fillOpacity: 0.45,
+    };
+    if (!rec) return none;
+
+    if (meta.customColor) {
+      const c = meta.customColor(rec);
+      if (!c) return none;
+      return { color: "#111827", weight: 0.4, fillColor: c, fillOpacity: 0.75 };
     }
+
     const v = meta.accessor(rec);
-    if (v === null || Number.isNaN(v)) {
-      return {
-        color: "#4b5563",
-        weight: 0.4,
-        fillColor: "#1f2937",
-        fillOpacity: 0.45,
-      };
-    }
-    const t = v / Math.max(Math.abs(meta.domain[0]), Math.abs(meta.domain[1]));
+    if (v === null || Number.isNaN(v)) return none;
+    const dom = meta.domain ?? [-1, 1];
+    const t = v / Math.max(Math.abs(dom[0]), Math.abs(dom[1]));
     return {
       color: "#111827",
       weight: 0.4,
-      fillColor: divergingColor(t, metric),
+      fillColor: divergingColor(t, !!meta.invertForWarmer),
       fillOpacity: 0.85,
     };
   };
@@ -204,30 +291,48 @@ export default function GlobalShiftMap() {
     const name = feature.properties?.name || "Unknown";
     const rec = byName.get(name);
     if (!rec) {
-      layer.bindTooltip(`<strong>${name}</strong><br/><span style="color:#9ca3af">no long-term monthly data</span>`, {
-        sticky: true,
-        className: "global-shift-tooltip",
-      });
+      layer.bindTooltip(
+        `<strong>${name}</strong><br/><span style="color:#9ca3af">no long-term monthly data</span>`,
+        { sticky: true, className: "global-shift-tooltip" },
+      );
       return;
     }
-    const spring = rec.springShiftDays;
-    const autumn = rec.autumnShiftDays;
-    const net = rec.netShiftMonths;
+    const spring = rec.temp.springShiftDays;
+    const autumn = rec.temp.autumnShiftDays;
+    const net = rec.temp.netShiftMonths;
     const springTxt = spring === null ? "—" : `${spring > 0 ? "+" : ""}${spring.toFixed(1)} d`;
     const autumnTxt = autumn === null ? "—" : `${autumn > 0 ? "+" : ""}${autumn.toFixed(1)} d`;
-    const netTxt = net === null ? "—" : `${net > 0 ? "+" : ""}${net.toFixed(2)} mo/yr`;
-    const aseasonalLine = rec.weaklySeasonal
-      ? `<div style="color:#9ca3af;margin-top:3px;font-size:10px;font-style:italic">Weakly seasonal (${(rec.baselineAmplitude ?? 0).toFixed(1)}°C annual swing) — seasonal-crossing metrics are not meaningful here.</div>`
-      : "";
+    const netTxt = `${net > 0 ? "+" : ""}${net.toFixed(2)} mo/yr`;
+    const wet = rec.rain;
+    const wetBlock =
+      wet && (rec.seasonality === "wet-dry" || rec.seasonality === "mixed")
+        ? `
+      <div style="margin-top:4px;padding-top:4px;border-top:1px solid #1f2937">
+        <div style="color:#d1d5db">Peak rain: <strong style="color:#FFF5E7">${wet.peakRainMonthBaseline} → ${wet.peakRainMonthRecent}</strong></div>
+        <div style="color:#d1d5db">Wet-season onset: <strong style="color:#FFF5E7">${
+          wet.wetSeasonOnsetShiftDays !== null
+            ? `${wet.wetSeasonOnsetShiftDays > 0 ? "+" : ""}${wet.wetSeasonOnsetShiftDays.toFixed(0)} d`
+            : "—"
+        }</strong></div>
+        <div style="color:#d1d5db">Annual rain: <strong style="color:#FFF5E7">${wet.annualTotalShiftPct > 0 ? "+" : ""}${wet.annualTotalShiftPct.toFixed(1)}%</strong></div>
+      </div>`
+        : "";
+    const kindLabel: Record<SeasonalityKind, string> = {
+      "warm-cold": "Warm / cold seasons",
+      "wet-dry": "Wet / dry seasons",
+      mixed: "Warm/cold + wet/dry",
+      aseasonal: "Weakly seasonal",
+    };
     layer.bindTooltip(
       `
       <div style="font-size:12px;line-height:1.4">
         <div style="font-weight:600;color:#FFF5E7;margin-bottom:2px">${rec.name}</div>
+        <div style="color:${KIND_COLOR[rec.seasonality]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">${kindLabel[rec.seasonality]}</div>
         <div style="color:#d1d5db">Spring: <strong style="color:#FFF5E7">${springTxt}</strong></div>
         <div style="color:#d1d5db">Autumn: <strong style="color:#FFF5E7">${autumnTxt}</strong></div>
         <div style="color:#d1d5db">Warm season: <strong style="color:#FFF5E7">${netTxt}</strong></div>
-        <div style="color:#9ca3af;margin-top:3px;font-size:10px">${rec.baselineStart}–${rec.baselineEnd} → ${rec.recentStart}–${rec.recentEnd}</div>
-        ${aseasonalLine}
+        ${wetBlock}
+        <div style="color:#9ca3af;margin-top:3px;font-size:10px">${rec.windows.baselineStart}–${rec.windows.baselineEnd} → ${rec.windows.recentStart}–${rec.windows.recentEnd}</div>
       </div>`,
       { sticky: true, className: "global-shift-tooltip" },
     );
@@ -241,34 +346,58 @@ export default function GlobalShiftMap() {
     );
   }
 
+  // Tropic lines: straight latitude lines across the world
+  const tropicCancer: LatLngExpression[] = [[23.4368, -180], [23.4368, 180]];
+  const equator: LatLngExpression[] = [[0, -180], [0, 180]];
+  const tropicCapricorn: LatLngExpression[] = [[-23.4368, -180], [-23.4368, 180]];
+
+  const metricGroups: { id: "warm-cold" | "wet-dry" | "classification"; label: string }[] = [
+    { id: "warm-cold", label: "Warm / cold season" },
+    { id: "wet-dry", label: "Wet / dry season" },
+    { id: "classification", label: "Classification" },
+  ];
+
   return (
     <div className="rounded-xl border border-gray-800/60 bg-gray-900/50 overflow-hidden">
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-2 p-3 border-b border-gray-800/60">
-        <div role="tablist" aria-label="Global shift metric" className="flex gap-2 flex-wrap">
-          {(Object.keys(METRIC_META) as MetricId[]).map((id) => {
-            const active = metric === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setMetric(id)}
-                className={`inline-flex items-center rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
-                  active
-                    ? "border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]"
-                    : "border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]"
-                }`}
-              >
-                {METRIC_META[id].short}
-              </button>
-            );
-          })}
-        </div>
+      <div className="p-3 border-b border-gray-800/60 space-y-2">
+        {metricGroups.map((group) => {
+          const metrics = (Object.keys(METRIC_META) as MetricId[]).filter(
+            (id) => METRIC_META[id].group === group.id,
+          );
+          return (
+            <div key={group.id} className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] uppercase tracking-wider text-gray-500 font-mono w-36 shrink-0">
+                {group.label}
+              </span>
+              <div role="tablist" aria-label={group.label} className="flex gap-2 flex-wrap">
+                {metrics.map((id) => {
+                  const active = metric === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setMetric(id)}
+                      className={`inline-flex items-center rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
+                        active
+                          ? "border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]"
+                          : "border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]"
+                      }`}
+                    >
+                      {METRIC_META[id].short}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
         {shifts && (
-          <div className="ml-auto text-[11px] text-gray-400">
-            {shifts.globalStats.countriesAnalysed} countries · baseline first 30 complete years vs recent 10
+          <div className="text-[11px] text-gray-400 pt-1">
+            {shifts.globalStats.countriesAnalysed} countries · baseline first 30 complete years vs
+            recent 10 · rainfall data: World Bank CCKP (CRU TS 4.08, 1901–2023)
           </div>
         )}
       </div>
@@ -296,6 +425,19 @@ export default function GlobalShiftMap() {
               style={styleForFeature as unknown as LeafletGeoJSON["options"]["style"]}
               onEachFeature={onEachFeature as never}
             />
+            {/* Tropic reference lines */}
+            <Polyline
+              positions={tropicCancer}
+              pathOptions={{ color: "#D0A65E", weight: 1, opacity: 0.45, dashArray: "4 6" }}
+            />
+            <Polyline
+              positions={equator}
+              pathOptions={{ color: "#D0A65E", weight: 1.2, opacity: 0.6, dashArray: "2 4" }}
+            />
+            <Polyline
+              positions={tropicCapricorn}
+              pathOptions={{ color: "#D0A65E", weight: 1, opacity: 0.45, dashArray: "4 6" }}
+            />
           </MapContainer>
         )}
       </div>
@@ -304,28 +446,59 @@ export default function GlobalShiftMap() {
       <div className="p-3 border-t border-gray-800/60 text-xs text-gray-400 space-y-2">
         <div className="flex items-center gap-3 flex-wrap">
           <span className="font-semibold text-gray-200">{meta.label}</span>
-          <span>
-            Baseline annual mean temperature → month-count / crossing-date in recent decade vs first 30 years of record.
-          </span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] uppercase tracking-wider text-gray-500">{meta.leftLabel}</span>
-          <div
-            className="h-2 flex-1 max-w-sm rounded"
-            style={{
-              background:
-                metric === "spring"
-                  ? "linear-gradient(to right, #b2182b, #ef8a62, #fddbc7, #f5f5f5, #d1e5f0, #67a9cf, #2166ac)"
-                  : "linear-gradient(to right, #2166ac, #67a9cf, #d1e5f0, #f5f5f5, #fddbc7, #ef8a62, #b2182b)",
-            }}
-          />
-          <span className="text-[10px] uppercase tracking-wider text-gray-500">{meta.rightLabel}</span>
-        </div>
-        <div className="text-[11px] text-gray-500">
-          Shaded countries have ≥ 30 years of complete monthly temperature data (Our World in Data / Berkeley Earth).
-          Grey = insufficient data or tropical/polar regions with no clear seasonal crossing.
-          Hover any country for its individual shift.
-        </div>
+        {meta.group !== "classification" ? (
+          <>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] uppercase tracking-wider text-gray-500">
+                {meta.leftLabel}
+              </span>
+              <div
+                className="h-2 flex-1 max-w-sm rounded"
+                style={{
+                  background: meta.invertForWarmer
+                    ? "linear-gradient(to right, #b2182b, #ef8a62, #fddbc7, #f5f5f5, #d1e5f0, #67a9cf, #2166ac)"
+                    : "linear-gradient(to right, #2166ac, #67a9cf, #d1e5f0, #f5f5f5, #fddbc7, #ef8a62, #b2182b)",
+                }}
+              />
+              <span className="text-[10px] uppercase tracking-wider text-gray-500">
+                {meta.rightLabel}
+              </span>
+            </div>
+            <div className="text-[11px] text-gray-500">
+              Gold dashed lines mark the Tropic of Cancer (23.4°N), Equator, and Tropic of Capricorn
+              (23.4°S). Between the tropics, wet/dry seasonality usually dominates. Outside them,
+              warm/cold seasonality dominates. Grey = insufficient data or metric doesn&apos;t apply
+              to this region&apos;s seasonality type. Hover any country for its individual shift.
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-4 flex-wrap">
+              {(["warm-cold", "mixed", "wet-dry", "aseasonal"] as SeasonalityKind[]).map((k) => (
+                <span key={k} className="inline-flex items-center gap-1.5">
+                  <span
+                    className="inline-block w-3 h-3 rounded"
+                    style={{ backgroundColor: KIND_COLOR[k] }}
+                  />
+                  <span className="text-[11px]">
+                    {k === "warm-cold"
+                      ? "Warm/cold"
+                      : k === "wet-dry"
+                      ? "Wet/dry"
+                      : k === "mixed"
+                      ? "Both (mixed)"
+                      : "Weakly seasonal"}
+                  </span>
+                </span>
+              ))}
+            </div>
+            <div className="text-[11px] text-gray-500">
+              Each country coloured by the dominant annual-cycle type. Hover to see its individual
+              numbers.
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

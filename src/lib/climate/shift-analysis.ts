@@ -1,0 +1,303 @@
+/**
+ * Shared seasonal-shift analysis used by both the per-region SeasonalShiftCard
+ * and the global build-seasonal-shift-global aggregator.
+ *
+ * Produces three kinds of metrics from a region's monthly temperature (and
+ * optional monthly rainfall) record:
+ *
+ *  • warm/cold:  when the baseline monthly climatology swings ≥ 5°C peak-to-peak,
+ *                we compute warm-season-length (months above baseline annual mean)
+ *                and the spring/autumn threshold-crossing dates.
+ *
+ *  • wet/dry:    when rainfall is supplied and its peak-month / trough-month
+ *                ratio is ≥ 2×, we compute wet-season-length (months with above-
+ *                average rain), peak-rain month shift, wet-season onset shift,
+ *                and the change in annual total.
+ *
+ *  • aseasonal:  if neither of the above applies, only month-by-month warming
+ *                is meaningful.
+ *
+ * The baseline is the first 30 complete years of record; the recent window is
+ * the last 10 complete years. All thresholds are fixed to the baseline so a
+ * shift cleanly attributes to the climate changing, not to a moving target.
+ */
+
+export type MonthlyPoint = { year: number; month: number; value: number };
+
+export type SeasonalityKind = 'warm-cold' | 'wet-dry' | 'aseasonal' | 'mixed';
+
+export const SHIFT_MONTH_LABELS = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+const MID_MONTH_DOY = [15, 46, 75, 106, 136, 167, 197, 228, 259, 289, 320, 350];
+export const TEMP_AMPLITUDE_THRESHOLD_C = 5;
+export const WET_DRY_RATIO_THRESHOLD = 2;
+
+export function doyToLabel(doy: number): string {
+  const d = Math.max(1, Math.min(365, Math.round(doy)));
+  const date = new Date(2001, 0, d);
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+function completeYears(monthly: MonthlyPoint[]) {
+  const byYear = new Map<number, Map<number, number>>();
+  for (const p of monthly) {
+    if (!byYear.has(p.year)) byYear.set(p.year, new Map());
+    byYear.get(p.year)!.set(p.month, p.value);
+  }
+  return [...byYear.entries()]
+    .filter(([, m]) => m.size === 12)
+    .map(([year, m]) => ({
+      year,
+      months: Array.from({ length: 12 }, (_, i) => m.get(i + 1) as number),
+    }))
+    .sort((a, b) => a.year - b.year);
+}
+
+function findCrossings(monthly: number[], threshold: number): { spring: number; autumn: number } | null {
+  const above = monthly.map((v) => v > threshold);
+  if (above.every(Boolean) || !above.some(Boolean)) return null;
+  const firstWarm = above.indexOf(true);
+  const lastWarm = above.lastIndexOf(true);
+
+  let spring: number;
+  if (firstWarm === 0) spring = 1;
+  else {
+    const v0 = monthly[firstWarm - 1];
+    const v1 = monthly[firstWarm];
+    const frac = (threshold - v0) / (v1 - v0);
+    spring = MID_MONTH_DOY[firstWarm - 1] + frac * (MID_MONTH_DOY[firstWarm] - MID_MONTH_DOY[firstWarm - 1]);
+  }
+
+  let autumn: number;
+  if (lastWarm === 11) autumn = 365;
+  else {
+    const v0 = monthly[lastWarm];
+    const v1 = monthly[lastWarm + 1];
+    const frac = (v0 - threshold) / (v0 - v1);
+    autumn = MID_MONTH_DOY[lastWarm] + frac * (MID_MONTH_DOY[lastWarm + 1] - MID_MONTH_DOY[lastWarm]);
+  }
+
+  return { spring, autumn };
+}
+
+function baselineRecent(years: { year: number; months: number[] }[]) {
+  const baseline = years.slice(0, 30);
+  const recent = years.slice(-10);
+  const baseMonthly = Array.from({ length: 12 }, (_, m) => {
+    let s = 0; for (const y of baseline) s += y.months[m]; return s / baseline.length;
+  });
+  const recMonthly = Array.from({ length: 12 }, (_, m) => {
+    let s = 0; for (const y of recent) s += y.months[m]; return s / recent.length;
+  });
+  return { baseline, recent, baseMonthly, recMonthly };
+}
+
+export type TempShift = {
+  baselineAnnualMean: number;
+  baselineAmplitudeC: number;
+  baselineMonthly: number[];
+  recentMonthly: number[];
+  baselineLen: number;
+  recentLen: number;
+  netShiftMonths: number;
+  springShiftDays: number | null;
+  autumnShiftDays: number | null;
+  baselineSpringDoy: number | null;
+  baselineAutumnDoy: number | null;
+  recentSpringDoy: number | null;
+  recentAutumnDoy: number | null;
+  biggestMonth: string;
+  biggestMonthWarmingC: number;
+  warmestMonthBaseline: string;
+  warmestMonthRecent: string;
+  warmestMonthShiftIndex: number; // recent - baseline, in months (signed)
+};
+
+export function analyseTemperature(monthlyAll: MonthlyPoint[]): {
+  windows: { baselineStart: number; baselineEnd: number; recentStart: number; recentEnd: number };
+  yearsCoverage: number;
+  temp: TempShift;
+} | null {
+  if (!monthlyAll?.length) return null;
+  const years = completeYears(monthlyAll);
+  if (years.length < 30) return null;
+
+  const { baseline, recent, baseMonthly, recMonthly } = baselineRecent(years);
+
+  let sum = 0, count = 0;
+  for (const y of baseline) for (const v of y.months) { sum += v; count += 1; }
+  const baselineAnnualMean = sum / count;
+
+  const baselineAmplitudeC = Math.max(...baseMonthly) - Math.min(...baseMonthly);
+
+  const lengthSeries = years.map((y) => y.months.filter((v) => v > baselineAnnualMean).length);
+  const baselineLen = lengthSeries.slice(0, 30).reduce((a, b) => a + b, 0) / 30;
+  const recentLen = lengthSeries.slice(-10).reduce((a, b) => a + b, 0) / 10;
+
+  const baseCross = findCrossings(baseMonthly, baselineAnnualMean);
+  const recCross = findCrossings(recMonthly, baselineAnnualMean);
+  let springShiftDays: number | null = null;
+  let autumnShiftDays: number | null = null;
+  if (baseCross && recCross && baselineAmplitudeC >= TEMP_AMPLITUDE_THRESHOLD_C) {
+    springShiftDays = recCross.spring - baseCross.spring;
+    autumnShiftDays = recCross.autumn - baseCross.autumn;
+  }
+
+  const diffs = recMonthly.map((v, i) => v - baseMonthly[i]);
+  const biggestIdx = diffs.reduce((bi, v, i, arr) => v > arr[bi] ? i : bi, 0);
+  const warmestBaseIdx = baseMonthly.reduce((bi, v, i, arr) => v > arr[bi] ? i : bi, 0);
+  const warmestRecIdx = recMonthly.reduce((bi, v, i, arr) => v > arr[bi] ? i : bi, 0);
+
+  return {
+    windows: {
+      baselineStart: baseline[0].year,
+      baselineEnd: baseline[baseline.length - 1].year,
+      recentStart: recent[0].year,
+      recentEnd: recent[recent.length - 1].year,
+    },
+    yearsCoverage: years.length,
+    temp: {
+      baselineAnnualMean: +baselineAnnualMean.toFixed(2),
+      baselineAmplitudeC: +baselineAmplitudeC.toFixed(2),
+      baselineMonthly: baseMonthly.map((v) => +v.toFixed(2)),
+      recentMonthly: recMonthly.map((v) => +v.toFixed(2)),
+      baselineLen: +baselineLen.toFixed(2),
+      recentLen: +recentLen.toFixed(2),
+      netShiftMonths: +(recentLen - baselineLen).toFixed(2),
+      springShiftDays: springShiftDays === null ? null : +springShiftDays.toFixed(1),
+      autumnShiftDays: autumnShiftDays === null ? null : +autumnShiftDays.toFixed(1),
+      baselineSpringDoy: baseCross && baselineAmplitudeC >= TEMP_AMPLITUDE_THRESHOLD_C ? +baseCross.spring.toFixed(1) : null,
+      baselineAutumnDoy: baseCross && baselineAmplitudeC >= TEMP_AMPLITUDE_THRESHOLD_C ? +baseCross.autumn.toFixed(1) : null,
+      recentSpringDoy: recCross && baselineAmplitudeC >= TEMP_AMPLITUDE_THRESHOLD_C ? +recCross.spring.toFixed(1) : null,
+      recentAutumnDoy: recCross && baselineAmplitudeC >= TEMP_AMPLITUDE_THRESHOLD_C ? +recCross.autumn.toFixed(1) : null,
+      biggestMonth: SHIFT_MONTH_LABELS[biggestIdx],
+      biggestMonthWarmingC: +diffs[biggestIdx].toFixed(2),
+      warmestMonthBaseline: SHIFT_MONTH_LABELS[warmestBaseIdx],
+      warmestMonthRecent: SHIFT_MONTH_LABELS[warmestRecIdx],
+      warmestMonthShiftIndex: warmestRecIdx - warmestBaseIdx,
+    },
+  };
+}
+
+export type RainShift = {
+  baselineAnnualMm: number;
+  recentAnnualMm: number;
+  baselineMonthly: number[];
+  recentMonthly: number[];
+  wetDryRatio: number;
+  baselineWetMonths: number;
+  recentWetMonths: number;
+  wetSeasonShiftMonths: number;
+  peakRainMonthBaseline: string;
+  peakRainMonthRecent: string;
+  peakRainMonthShiftIndex: number;
+  wetSeasonOnsetDoyBaseline: number | null;
+  wetSeasonOnsetDoyRecent: number | null;
+  wetSeasonOnsetShiftDays: number | null;
+  annualTotalShiftPct: number;
+  biggestRainMonth: { month: string; diff: number; pctDiff: number };
+};
+
+/**
+ * Wet-season metrics. Uses the SAME year windows as the temperature analysis
+ * (first 30 vs last 10 complete years in the supplied rainfall series) so the
+ * two are directly comparable.
+ *
+ * A "wet month" is one whose monthly rainfall exceeds the baseline's own
+ * monthly-mean rainfall (annual total / 12). Wet-season onset is the day-of-
+ * year where cumulative rainfall (from 1 Jan) first crosses 25% of the
+ * baseline annual total — a standard agroclimate definition.
+ */
+export function analyseRainfall(
+  rainfallMonthly: MonthlyPoint[] | null | undefined,
+): RainShift | null {
+  if (!rainfallMonthly?.length) return null;
+  const years = completeYears(rainfallMonthly);
+  if (years.length < 30) return null;
+
+  const { baseline, recent, baseMonthly, recMonthly } = baselineRecent(years);
+
+  const baselineAnnual = baseMonthly.reduce((a, b) => a + b, 0);
+  const recentAnnual = recMonthly.reduce((a, b) => a + b, 0);
+
+  const maxBase = Math.max(...baseMonthly);
+  const minBase = Math.max(1, Math.min(...baseMonthly)); // avoid div-by-zero for very dry regions
+  const wetDryRatio = maxBase / minBase;
+
+  const monthlyMeanBase = baselineAnnual / 12;
+
+  const baselineWetMonths = baseMonthly.filter((v) => v > monthlyMeanBase).length;
+  const recentWetMonths = recMonthly.filter((v) => v > monthlyMeanBase).length;
+
+  const peakBaseIdx = baseMonthly.reduce((bi, v, i, arr) => v > arr[bi] ? i : bi, 0);
+  const peakRecIdx = recMonthly.reduce((bi, v, i, arr) => v > arr[bi] ? i : bi, 0);
+
+  // Wet-season onset: DOY where cumulative rainfall first passes 25% of annual
+  const cumulative = (monthly: number[], total: number): number | null => {
+    if (total <= 0) return null;
+    const target = total * 0.25;
+    let running = 0;
+    for (let i = 0; i < 12; i++) {
+      const next = running + monthly[i];
+      if (next >= target) {
+        const frac = (target - running) / Math.max(monthly[i], 0.001);
+        // Spread month uniformly across its days
+        const monthStart = MID_MONTH_DOY[i] - 15;
+        const monthEnd = MID_MONTH_DOY[i] + 15;
+        return monthStart + frac * (monthEnd - monthStart);
+      }
+      running = next;
+    }
+    return null;
+  };
+  const onsetBase = cumulative(baseMonthly, baselineAnnual);
+  const onsetRec = cumulative(recMonthly, recentAnnual);
+
+  const diffs = recMonthly.map((v, i) => v - baseMonthly[i]);
+  const biggestIdx = diffs.reduce((bi, v, i, arr) => Math.abs(v) > Math.abs(arr[bi]) ? i : bi, 0);
+  const biggestPct = baseMonthly[biggestIdx] > 0
+    ? +((diffs[biggestIdx] / baseMonthly[biggestIdx]) * 100).toFixed(1)
+    : 0;
+
+  return {
+    baselineAnnualMm: +baselineAnnual.toFixed(0),
+    recentAnnualMm: +recentAnnual.toFixed(0),
+    baselineMonthly: baseMonthly.map((v) => +v.toFixed(1)),
+    recentMonthly: recMonthly.map((v) => +v.toFixed(1)),
+    wetDryRatio: +wetDryRatio.toFixed(2),
+    baselineWetMonths,
+    recentWetMonths,
+    wetSeasonShiftMonths: recentWetMonths - baselineWetMonths,
+    peakRainMonthBaseline: SHIFT_MONTH_LABELS[peakBaseIdx],
+    peakRainMonthRecent: SHIFT_MONTH_LABELS[peakRecIdx],
+    peakRainMonthShiftIndex: peakRecIdx - peakBaseIdx,
+    wetSeasonOnsetDoyBaseline: onsetBase === null ? null : +onsetBase.toFixed(1),
+    wetSeasonOnsetDoyRecent: onsetRec === null ? null : +onsetRec.toFixed(1),
+    wetSeasonOnsetShiftDays:
+      onsetBase !== null && onsetRec !== null ? +(onsetRec - onsetBase).toFixed(1) : null,
+    annualTotalShiftPct:
+      baselineAnnual > 0
+        ? +(((recentAnnual - baselineAnnual) / baselineAnnual) * 100).toFixed(1)
+        : 0,
+    biggestRainMonth: {
+      month: SHIFT_MONTH_LABELS[biggestIdx],
+      diff: +diffs[biggestIdx].toFixed(1),
+      pctDiff: biggestPct,
+    },
+  };
+}
+
+/** Classify the region's annual-cycle character. */
+export function classifySeasonality(
+  temp: TempShift | null,
+  rain: RainShift | null,
+): SeasonalityKind {
+  const tempSeasonal = !!temp && temp.baselineAmplitudeC >= TEMP_AMPLITUDE_THRESHOLD_C;
+  const rainSeasonal = !!rain && rain.wetDryRatio >= WET_DRY_RATIO_THRESHOLD;
+  if (tempSeasonal && rainSeasonal) return 'mixed';
+  if (tempSeasonal) return 'warm-cold';
+  if (rainSeasonal) return 'wet-dry';
+  return 'aseasonal';
+}

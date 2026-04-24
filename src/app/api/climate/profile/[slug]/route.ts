@@ -38,7 +38,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v14`;
+  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v15`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
@@ -48,6 +48,7 @@ export async function GET(
 
   try {
     let countryData = null;
+    let countryPrecipData = null; // World Bank CKP monthly precip (CRU TS 4.08)
     let usStateData = null;
     let ukRegionData = null;
     let nationalData = null; // UK-wide or US-national for sub-national regions
@@ -58,7 +59,12 @@ export async function GET(
     const globalPromise = loadSnapshot('global-history.json');
 
     if (region.type === 'country') {
-      countryData = await loadSnapshot(`country/${region.apiCode}.json`);
+      const [cRes, pRes] = await Promise.all([
+        loadSnapshot(`country/${region.apiCode}.json`),
+        loadSnapshot(`country-precip/${region.apiCode}.json`),
+      ]);
+      countryData = cRes;
+      countryPrecipData = pRes;
       // For UK/USA countries, also load national Met Office / NOAA data
       if (region.apiCode === 'GBR') {
         nationalData = await loadSnapshot('uk-region/uk-uk.json');
@@ -98,6 +104,7 @@ export async function GET(
       emoji: region.emoji,
       dataSources: region.dataSources,
       countryData,
+      countryPrecipData,
       usStateData,
       ukRegionData,
       nationalData,

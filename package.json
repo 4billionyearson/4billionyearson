@@ -4,7 +4,9 @@
     "dev": "next dev --turbopack",
     "build": "tsx scripts/build-rankings.ts && next build",
     "start": "next start",
-    "build:climate-rankings": "tsx scripts/build-rankings.ts"
+    "build:climate-rankings": "tsx scripts/build-rankings.ts",
+    "build:climate-precip": "node scripts/build-country-precip.mjs",
+    "build:climate-shift-global": "tsx scripts/build-seasonal-shift-global.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.1.6",

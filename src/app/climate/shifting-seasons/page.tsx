@@ -116,15 +116,30 @@ type GlobalShiftData = {
     countriesAnalysed: number;
     usStatesAnalysed: number;
     ukRegionsAnalysed: number;
-    withSeasonalCrossings: number;
-    withWarmSeason: number;
-    weaklySeasonalExcluded: number;
-    earlierSprings: number;
-    laterAutumns: number;
-    longerWarmSeasons: number;
-    meanSpringShift: number | null;
-    meanAutumnShift: number | null;
-    meanNetShiftMonths: number | null;
+    seasonalityCounts: {
+      warmCold: number;
+      wetDry: number;
+      mixed: number;
+      aseasonal: number;
+    };
+    warmColdStats: {
+      total: number;
+      withCrossings: number;
+      earlierSprings: number;
+      laterAutumns: number;
+      meanSpringShift: number | null;
+      meanAutumnShift: number | null;
+      meanNetShiftMonths: number | null;
+      warmestMonthShifted: number;
+    };
+    wetDryStats: {
+      total: number;
+      withRainData: number;
+      wetSeasonsShorter: number;
+      wetSeasonsLonger: number;
+      meanWetSeasonOnsetShiftDays: number | null;
+      meanAnnualRainfallShiftPct: number | null;
+    };
   };
   countries: GlobalShiftRecord[];
   usStates: GlobalShiftRecord[];
@@ -277,18 +292,38 @@ export default function ShiftingSeasonsPage() {
       ...globalShift.usStates.map((r) => ({ ...r, kind: 'us-state' as const })),
       ...globalShift.ukRegions.map((r) => ({ ...r, kind: 'uk-region' as const })),
     ];
-    const withCross = all.filter((r) => r.springShiftDays !== null && r.autumnShiftDays !== null);
+    const withCross = all.filter(
+      (r) => r.temp.springShiftDays !== null && r.temp.autumnShiftDays !== null,
+    );
     const spring = [...withCross]
-      .sort((a, b) => (a.springShiftDays ?? 0) - (b.springShiftDays ?? 0))
+      .sort((a, b) => (a.temp.springShiftDays ?? 0) - (b.temp.springShiftDays ?? 0))
       .slice(0, 8);
     const autumn = [...withCross]
-      .sort((a, b) => (b.autumnShiftDays ?? 0) - (a.autumnShiftDays ?? 0))
+      .sort((a, b) => (b.temp.autumnShiftDays ?? 0) - (a.temp.autumnShiftDays ?? 0))
       .slice(0, 8);
     const net = [...all]
-      .filter((r) => r.netShiftMonths !== null)
-      .sort((a, b) => (b.netShiftMonths ?? 0) - (a.netShiftMonths ?? 0))
+      .filter((r) => r.seasonality === 'warm-cold' || r.seasonality === 'mixed')
+      .sort((a, b) => (b.temp.netShiftMonths ?? 0) - (a.temp.netShiftMonths ?? 0))
       .slice(0, 8);
-    return { spring, autumn, net };
+
+    const wetRegions = all.filter(
+      (r) => (r.seasonality === 'wet-dry' || r.seasonality === 'mixed') && r.rain,
+    );
+    const annualRainUp = [...wetRegions]
+      .sort((a, b) => (b.rain?.annualTotalShiftPct ?? 0) - (a.rain?.annualTotalShiftPct ?? 0))
+      .slice(0, 8);
+    const annualRainDown = [...wetRegions]
+      .sort((a, b) => (a.rain?.annualTotalShiftPct ?? 0) - (b.rain?.annualTotalShiftPct ?? 0))
+      .slice(0, 8);
+    const onsetShift = [...wetRegions]
+      .filter((r) => r.rain?.wetSeasonOnsetShiftDays !== null)
+      .sort(
+        (a, b) =>
+          Math.abs(b.rain?.wetSeasonOnsetShiftDays ?? 0) -
+          Math.abs(a.rain?.wetSeasonOnsetShiftDays ?? 0),
+      )
+      .slice(0, 8);
+    return { spring, autumn, net, annualRainUp, annualRainDown, onsetShift };
   }, [globalShift]);
 
   /* Kyoto derived series */
@@ -643,35 +678,79 @@ export default function ShiftingSeasonsPage() {
                     />
                     <StatBlock
                       label="Earlier springs"
-                      value={`${globalShift.globalStats.earlierSprings} / ${globalShift.globalStats.withSeasonalCrossings}`}
+                      value={`${globalShift.globalStats.warmColdStats.earlierSprings} / ${globalShift.globalStats.warmColdStats.withCrossings}`}
                       sub={
-                        globalShift.globalStats.meanSpringShift !== null
-                          ? `mean ${globalShift.globalStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.meanSpringShift.toFixed(1)} d`
+                        globalShift.globalStats.warmColdStats.meanSpringShift !== null
+                          ? `mean ${globalShift.globalStats.warmColdStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanSpringShift.toFixed(1)} d`
                           : undefined
                       }
                       color="text-rose-300"
                     />
                     <StatBlock
                       label="Later autumns"
-                      value={`${globalShift.globalStats.laterAutumns} / ${globalShift.globalStats.withSeasonalCrossings}`}
+                      value={`${globalShift.globalStats.warmColdStats.laterAutumns} / ${globalShift.globalStats.warmColdStats.withCrossings}`}
                       sub={
-                        globalShift.globalStats.meanAutumnShift !== null
-                          ? `mean ${globalShift.globalStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.meanAutumnShift.toFixed(1)} d`
+                        globalShift.globalStats.warmColdStats.meanAutumnShift !== null
+                          ? `mean ${globalShift.globalStats.warmColdStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanAutumnShift.toFixed(1)} d`
                           : undefined
                       }
                       color="text-amber-300"
                     />
                     <StatBlock
-                      label="Longer warm seasons"
-                      value={`${globalShift.globalStats.longerWarmSeasons} / ${globalShift.globalStats.withWarmSeason}`}
+                      label="Wet-season shifting"
+                      value={`${globalShift.globalStats.wetDryStats.wetSeasonsLonger + globalShift.globalStats.wetDryStats.wetSeasonsShorter} / ${globalShift.globalStats.wetDryStats.withRainData}`}
                       sub={
-                        globalShift.globalStats.meanNetShiftMonths !== null
-                          ? `mean ${globalShift.globalStats.meanNetShiftMonths > 0 ? '+' : ''}${globalShift.globalStats.meanNetShiftMonths.toFixed(2)} mo/yr`
+                        globalShift.globalStats.wetDryStats.meanAnnualRainfallShiftPct !== null
+                          ? `mean annual rain ${globalShift.globalStats.wetDryStats.meanAnnualRainfallShiftPct > 0 ? '+' : ''}${globalShift.globalStats.wetDryStats.meanAnnualRainfallShiftPct.toFixed(1)}%`
                           : undefined
                       }
-                      color="text-emerald-300"
+                      color="text-sky-300"
                     />
                   </div>
+
+                  <SubSection title="Seasonality at different latitudes">
+                    <p className="text-sm text-gray-300 leading-relaxed mb-3">
+                      Not every part of the world has the four-seasons rhythm mid-latitude
+                      readers are used to. Between the Tropic of Cancer (23.4°N) and
+                      Tropic of Capricorn (23.4°S), the dominant annual cycle is usually
+                      <strong className="text-sky-300"> wet vs dry</strong>, not warm vs
+                      cold — monsoons in India, the long/short rains in East Africa, the
+                      Sahel rainy season. So we classify every region:
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                      <KindStat
+                        color="#f97316"
+                        label="Warm / cold"
+                        count={globalShift.globalStats.seasonalityCounts.warmCold}
+                        sub="Classic four seasons (UK, Canada, Russia)"
+                      />
+                      <KindStat
+                        color="#10b981"
+                        label="Warm/cold + wet/dry"
+                        count={globalShift.globalStats.seasonalityCounts.mixed}
+                        sub="Both cycles clear (USA, China, Mediterranean)"
+                      />
+                      <KindStat
+                        color="#38bdf8"
+                        label="Wet / dry"
+                        count={globalShift.globalStats.seasonalityCounts.wetDry}
+                        sub="Monsoon / savanna (Ethiopia, Kenya, Colombia)"
+                      />
+                      <KindStat
+                        color="#6b7280"
+                        label="Weakly seasonal"
+                        count={globalShift.globalStats.seasonalityCounts.aseasonal}
+                        sub="Equatorial (Indonesia, Singapore)"
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-3">
+                      Rule: if the baseline monthly temperature swings ≥ 5 °C peak-to-peak
+                      it counts as warm/cold. If the wettest month gets ≥ 2× the rain of
+                      the driest, it counts as wet/dry. Regions meeting both qualify as
+                      <em> mixed</em>. Switch the map below between warm/cold metrics and
+                      wet/dry metrics to see each side of the story.
+                    </p>
+                  </SubSection>
 
                   <SubSection title="World map — pick a metric">
                     <GlobalShiftMap />
@@ -689,48 +768,64 @@ export default function ShiftingSeasonsPage() {
                         title="Spring advancing fastest"
                         accent="text-rose-300"
                         rows={leaderboards.spring}
-                        format={(r) => `${r.springShiftDays! > 0 ? '+' : ''}${r.springShiftDays!.toFixed(1)} d`}
+                        format={(r) => `${r.temp.springShiftDays! > 0 ? '+' : ''}${r.temp.springShiftDays!.toFixed(1)} d`}
                       />
                       <Leaderboard
                         title="Autumn extending latest"
                         accent="text-amber-300"
                         rows={leaderboards.autumn}
-                        format={(r) => `${r.autumnShiftDays! > 0 ? '+' : ''}${r.autumnShiftDays!.toFixed(1)} d`}
+                        format={(r) => `${r.temp.autumnShiftDays! > 0 ? '+' : ''}${r.temp.autumnShiftDays!.toFixed(1)} d`}
                       />
                       <Leaderboard
                         title="Warm season gaining most months"
                         accent="text-emerald-300"
                         rows={leaderboards.net}
-                        format={(r) => `${(r.netShiftMonths ?? 0) > 0 ? '+' : ''}${(r.netShiftMonths ?? 0).toFixed(2)} mo`}
+                        format={(r) => `${(r.temp.netShiftMonths ?? 0) > 0 ? '+' : ''}${(r.temp.netShiftMonths ?? 0).toFixed(2)} mo`}
                       />
                     </div>
                   </SubSection>
 
+                  {(leaderboards.annualRainUp.length > 0 || leaderboards.onsetShift.length > 0) && (
+                    <SubSection title="Where the wet/dry rhythm is shifting most">
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <Leaderboard
+                          title="Biggest wet-season onset shift"
+                          accent="text-sky-300"
+                          rows={leaderboards.onsetShift}
+                          format={(r) => {
+                            const d = r.rain?.wetSeasonOnsetShiftDays ?? 0;
+                            return `${d > 0 ? '+' : ''}${d.toFixed(0)} d`;
+                          }}
+                        />
+                        <Leaderboard
+                          title="Getting wetter"
+                          accent="text-sky-300"
+                          rows={leaderboards.annualRainUp}
+                          format={(r) => `${(r.rain?.annualTotalShiftPct ?? 0) > 0 ? '+' : ''}${(r.rain?.annualTotalShiftPct ?? 0).toFixed(1)}%`}
+                        />
+                        <Leaderboard
+                          title="Getting drier"
+                          accent="text-amber-300"
+                          rows={leaderboards.annualRainDown}
+                          format={(r) => `${(r.rain?.annualTotalShiftPct ?? 0) > 0 ? '+' : ''}${(r.rain?.annualTotalShiftPct ?? 0).toFixed(1)}%`}
+                        />
+                      </div>
+                    </SubSection>
+                  )}
+
                   <div className="mt-4 text-xs text-gray-500 leading-relaxed">
                     Method: for every region we build a baseline monthly climatology
                     from the first 30 complete years of record and a recent climatology
-                    from the last 10 complete years. &quot;Warm-season length&quot; is
-                    the number of months per year whose mean exceeds the region&apos;s
-                    own baseline annual mean; spring/autumn crossings are the
-                    interpolated day-of-year where the monthly climatology crosses that
-                    threshold.{' '}
-                    {globalShift.globalStats.weaklySeasonalExcluded > 0 && (
-                      <>
-                        We exclude{' '}
-                        <strong className="text-gray-400">
-                          {globalShift.globalStats.weaklySeasonalExcluded} weakly-seasonal regions
-                        </strong>{' '}
-                        (peak-to-peak monthly swing &lt; 5 °C, mostly equatorial
-                        countries like Ethiopia, Colombia, Indonesia) from the spring /
-                        autumn / warm-season numbers: when the annual temperature cycle
-                        is nearly flat, a small uniform warming can flip half the
-                        calendar across the baseline mean or push the crossing date to
-                        the edge of the year, so the metric stops being meaningful.
-                        Those regions still warm — but the right lens for them is a
-                        rainy-season or extreme-heat metric, not a boreal-style
-                        four-seasons shift.
-                      </>
-                    )}
+                    from the last 10 complete years. For warm/cold regions,
+                    &quot;warm-season length&quot; is the number of months per year
+                    whose mean exceeds the region&apos;s own baseline annual mean;
+                    spring/autumn crossings are the interpolated day-of-year where the
+                    monthly climatology crosses that threshold. For wet/dry regions,
+                    the &quot;wet-season onset&quot; is the day of year where cumulative
+                    rainfall from 1 Jan first passes 25% of the baseline annual total
+                    (a standard agro-climate definition). Rainfall data comes from the
+                    World Bank Climate Change Knowledge Portal (CRU TS 4.08 gridded
+                    observations, 1901–2023).
                   </div>
                 </SectionCard>
               )}
@@ -1015,6 +1110,19 @@ const KIND_BADGE: Record<'country' | 'us-state' | 'uk-region', { label: string; 
   'uk-region': { label: '🇬🇧', className: 'bg-gray-800 text-gray-300' },
 };
 
+function KindStat({ color, label, count, sub }: { color: string; label: string; count: number; sub: string }) {
+  return (
+    <div className="rounded-lg border border-gray-800/60 bg-gray-900/50 p-2.5">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: color }} />
+        <span className="text-[11px] uppercase tracking-wider text-gray-400 font-mono">{label}</span>
+      </div>
+      <div className="text-lg font-bold font-mono text-[#FFF5E7]">{count}</div>
+      <div className="text-[11px] text-gray-500 leading-tight">{sub}</div>
+    </div>
+  );
+}
+
 function Leaderboard({
   title,
   accent,
@@ -1033,7 +1141,7 @@ function Leaderboard({
         {rows.map((r, i) => {
           const badge = KIND_BADGE[r.kind];
           return (
-            <li key={`${r.kind}-${r.code ?? r.id ?? r.name}`} className="flex items-center gap-2 text-sm">
+            <li key={`${r.kind}-${r.code ?? r.name}-${i}`} className="flex items-center gap-2 text-sm">
               <span className="w-4 text-[11px] text-gray-500 text-right tabular-nums">{i + 1}</span>
               <span
                 className={`inline-flex h-5 min-w-[22px] items-center justify-center rounded text-[11px] ${badge.className}`}

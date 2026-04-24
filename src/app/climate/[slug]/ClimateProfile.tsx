@@ -75,6 +75,10 @@ interface ProfileData {
     precipYearly?: PrecipPoint[];
     dateRange: string;
   };
+  countryPrecipData?: {
+    code: string;
+    monthlyAll?: { year: number; month: number; value: number }[];
+  };
   usStateData?: {
     state: string;
     paramData: Record<string, MetricSeries>;
@@ -771,14 +775,15 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 const rainfallMonthly = data.ukRegionData?.varData?.Rainfall?.monthlyAll
                   || data.nationalData?.varData?.Rainfall?.monthlyAll
                   || data.usStateData?.paramData?.pcp?.monthlyAll
-                  || data.nationalData?.paramData?.pcp?.monthlyAll;
+                  || data.nationalData?.paramData?.pcp?.monthlyAll
+                  || data.countryPrecipData?.monthlyAll;
                 const sunshineMonthly = data.ukRegionData?.varData?.Sunshine?.monthlyAll
                   || data.nationalData?.varData?.Sunshine?.monthlyAll;
                 const chartSource = (data.ukRegionData || data.nationalData?.varData)
                   ? 'Data: Met Office UK Regional Series © Crown copyright'
                   : (data.usStateData || data.nationalData?.paramData)
                     ? 'Data: NOAA National Centers for Environmental Information'
-                    : 'Data: Our World in Data / NOAA';
+                    : 'Data: Our World in Data / NOAA (rainfall: World Bank CCKP / CRU TS 4.08)';
 
                 return (
                   <>
