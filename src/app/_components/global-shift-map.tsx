@@ -6,6 +6,8 @@ import type { GeoJSON as LeafletGeoJSON, Layer, LatLngExpression } from "leaflet
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import type {
+  KoppenGroup,
+  KoppenResult,
   SeasonalityKind,
   TempShift,
   RainShift,
@@ -22,6 +24,7 @@ export type GlobalShiftRecord = {
   name: string;
   geojsonName?: string;
   seasonality: SeasonalityKind;
+  koppen: KoppenResult | null;
   windows: {
     baselineStart: number;
     baselineEnd: number;
@@ -70,7 +73,7 @@ type GlobalShiftData = {
   ukRegions: GlobalShiftRecord[];
 };
 
-type MetricId = "spring" | "autumn" | "net" | "wet-onset" | "wet-peak" | "wet-length" | "annual-rain" | "kind";
+type MetricId = "spring" | "autumn" | "net" | "wet-onset" | "wet-peak" | "wet-length" | "annual-rain" | "kind" | "koppen";
 
 type MetricMeta = {
   label: string;
@@ -92,6 +95,23 @@ const KIND_COLOR: Record<SeasonalityKind, string> = {
   "wet-dry": "#38bdf8",
   mixed: "#10b981",
   aseasonal: "#6b7280",
+};
+
+// Standard-ish Köppen map palette (close to the Peel 2007 Wikipedia colours).
+const KOPPEN_COLOR: Record<KoppenGroup, string> = {
+  A: "#1b7837", // tropical — deep green
+  B: "#e6a23c", // arid — sand/amber
+  C: "#7fbc41", // temperate — olive-green
+  D: "#6a5acd", // continental — indigo
+  E: "#b0bec5", // polar — pale blue-grey
+};
+
+const KOPPEN_GROUP_LABEL: Record<KoppenGroup, string> = {
+  A: "Tropical",
+  B: "Arid",
+  C: "Temperate",
+  D: "Continental",
+  E: "Polar",
 };
 
 const METRIC_META: Record<MetricId, MetricMeta> = {
@@ -191,6 +211,15 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
     format: () => "",
     customColor: (r) => KIND_COLOR[r.seasonality],
   },
+  koppen: {
+    label: "Köppen–Geiger climate class",
+    short: "Köppen",
+    group: "classification",
+    unit: "",
+    accessor: () => 1,
+    format: () => "",
+    customColor: (r) => (r.koppen ? KOPPEN_COLOR[r.koppen.group] : null),
+  },
 };
 
 /** Diverging red→grey→blue scale, clamped to [-1, 1]. */
@@ -269,7 +298,7 @@ function stripOverseasTerritories(fc: FeatureCollection): FeatureCollection {
 export default function GlobalShiftMap() {
   const [world, setWorld] = useState<FeatureCollection | null>(null);
   const [shifts, setShifts] = useState<GlobalShiftData | null>(null);
-  const [metric, setMetric] = useState<MetricId>("spring");
+  const [metric, setMetric] = useState<MetricId>("koppen");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -369,10 +398,14 @@ export default function GlobalShiftMap() {
       mixed: "Warm/cold + wet/dry",
       aseasonal: "Weakly seasonal",
     };
+    const koppenBlock = rec.koppen
+      ? `<div style="color:${KOPPEN_COLOR[rec.koppen.group]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px">Köppen ${rec.koppen.code} — ${rec.koppen.label}</div>`
+      : "";
     layer.bindTooltip(
       `
       <div style="font-size:12px;line-height:1.4">
         <div style="font-weight:600;color:#FFF5E7;margin-bottom:2px">${rec.name}</div>
+        ${koppenBlock}
         <div style="color:${KIND_COLOR[rec.seasonality]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">${kindLabel[rec.seasonality]}</div>
         <div style="color:#d1d5db">Spring: <strong style="color:#FFF5E7">${springTxt}</strong></div>
         <div style="color:#d1d5db">Autumn: <strong style="color:#FFF5E7">${autumnTxt}</strong></div>
@@ -520,29 +553,57 @@ export default function GlobalShiftMap() {
           </>
         ) : (
           <>
-            <div className="flex items-center gap-4 flex-wrap">
-              {(["warm-cold", "mixed", "wet-dry", "aseasonal"] as SeasonalityKind[]).map((k) => (
-                <span key={k} className="inline-flex items-center gap-1.5">
-                  <span
-                    className="inline-block w-3 h-3 rounded"
-                    style={{ backgroundColor: KIND_COLOR[k] }}
-                  />
-                  <span className="text-[11px]">
-                    {k === "warm-cold"
-                      ? "Warm/cold"
-                      : k === "wet-dry"
-                      ? "Wet/dry"
-                      : k === "mixed"
-                      ? "Both (mixed)"
-                      : "Weakly seasonal"}
-                  </span>
-                </span>
-              ))}
-            </div>
-            <div className="text-[11px] text-gray-500">
-              Each country coloured by the dominant annual-cycle type. Hover to see its individual
-              numbers.
-            </div>
+            {metric === "koppen" ? (
+              <>
+                <div className="flex items-center gap-4 flex-wrap">
+                  {(["A", "B", "C", "D", "E"] as KoppenGroup[]).map((g) => (
+                    <span key={g} className="inline-flex items-center gap-1.5">
+                      <span
+                        className="inline-block w-3 h-3 rounded"
+                        style={{ backgroundColor: KOPPEN_COLOR[g] }}
+                      />
+                      <span className="text-[11px]">
+                        <strong className="text-gray-200">{g}</strong> · {KOPPEN_GROUP_LABEL[g]}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+                <div className="text-[11px] text-gray-500">
+                  The Köppen–Geiger classification (Peel, Finlayson &amp; McMahon 2007) is the most
+                  widely used climate grouping in atlases and peer-reviewed climate science. Five
+                  main groups: <strong>A</strong> tropical, <strong>B</strong> arid,{" "}
+                  <strong>C</strong> temperate, <strong>D</strong> continental,{" "}
+                  <strong>E</strong> polar. Hover any country for its full 2- or 3-letter code (e.g.
+                  Cfb = oceanic temperate, Aw = tropical savanna, BWh = hot desert).
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-4 flex-wrap">
+                  {(["warm-cold", "mixed", "wet-dry", "aseasonal"] as SeasonalityKind[]).map((k) => (
+                    <span key={k} className="inline-flex items-center gap-1.5">
+                      <span
+                        className="inline-block w-3 h-3 rounded"
+                        style={{ backgroundColor: KIND_COLOR[k] }}
+                      />
+                      <span className="text-[11px]">
+                        {k === "warm-cold"
+                          ? "Warm/cold"
+                          : k === "wet-dry"
+                          ? "Wet/dry"
+                          : k === "mixed"
+                          ? "Both (mixed)"
+                          : "Weakly seasonal"}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+                <div className="text-[11px] text-gray-500">
+                  Each country coloured by the dominant annual-cycle type. Hover to see its
+                  individual numbers.
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

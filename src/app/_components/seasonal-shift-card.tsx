@@ -9,6 +9,7 @@ import {
 import {
   analyseRainfall,
   analyseTemperature,
+  classifyKoppen,
   classifySeasonality,
   doyToLabel,
   SHIFT_MONTH_LABELS,
@@ -39,7 +40,8 @@ export default function SeasonalShiftCard({
     const rain = analyseRainfall(rainfallMonthly);
     const sunshine = analyseRainfall(sunshineMonthly); // reuse baseline/recent helper for hours
     const seasonality: SeasonalityKind = classifySeasonality(res.temp, rain);
-    return { ...res, rain, sunshine, seasonality };
+    const koppen = classifyKoppen(res.temp.baselineMonthly, rain?.baselineMonthly ?? null);
+    return { ...res, rain, sunshine, seasonality, koppen };
   }, [monthlyAll, rainfallMonthly, sunshineMonthly]);
 
   const defaultView: View = useMemo<View>(() => {
@@ -55,6 +57,7 @@ export default function SeasonalShiftCard({
   if (!stats) return null;
 
   const { temp, rain, sunshine, windows, seasonality } = stats;
+  const koppen = stats.koppen;
   const { baselineStart, baselineEnd, recentStart, recentEnd } = windows;
   const shift = temp.recentLen - temp.baselineLen;
   const shiftLabel = shift >= 0 ? `+${shift.toFixed(1)} months` : `${shift.toFixed(1)} months`;
@@ -138,6 +141,14 @@ export default function SeasonalShiftCard({
             {seasonalityBadge[seasonality].icon}
             {seasonalityBadge[seasonality].label}
           </span>
+          {koppen && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[#D0A65E]"
+              title={`Köppen–Geiger climate classification (Peel, Finlayson & McMahon 2007): ${koppen.code} — ${koppen.label}`}
+            >
+              Köppen {koppen.code} · {koppen.groupLabel}
+            </span>
+          )}
         </div>
         <div className="flex gap-1 text-xs flex-wrap">
           {hasTempSeasons && (

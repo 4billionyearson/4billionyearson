@@ -122,6 +122,8 @@ type GlobalShiftData = {
       mixed: number;
       aseasonal: number;
     };
+    koppenGroupCounts?: Record<'A' | 'B' | 'C' | 'D' | 'E', number>;
+    koppenCodeCounts?: Record<string, number>;
     warmColdStats: {
       total: number;
       withCrossings: number;

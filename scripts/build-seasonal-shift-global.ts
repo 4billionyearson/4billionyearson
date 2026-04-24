@@ -17,7 +17,9 @@ import path from 'node:path';
 import {
   analyseRainfall,
   analyseTemperature,
+  classifyKoppen,
   classifySeasonality,
+  type KoppenResult,
   type MonthlyPoint,
   type RainShift,
   type SeasonalityKind,
@@ -43,6 +45,7 @@ type ShiftRecord = {
   name: string;
   geojsonName?: string;
   seasonality: SeasonalityKind;
+  koppen: KoppenResult | null;
   windows: {
     baselineStart: number;
     baselineEnd: number;
@@ -79,11 +82,13 @@ async function analyseRegion(
   if (!res) return null;
   const rain = analyseRainfall(rainMonthly ?? null);
   const seasonality = classifySeasonality(res.temp, rain);
+  const koppen = classifyKoppen(res.temp.baselineMonthly, rain?.baselineMonthly ?? null);
 
   return {
     kind,
     name,
     seasonality,
+    koppen,
     windows: res.windows,
     yearsCoverage: res.yearsCoverage,
     temp: res.temp,
@@ -176,6 +181,15 @@ async function main(): Promise<void> {
 
   const warmestMonthShifted = warmCold.filter((r) => r.temp.warmestMonthShiftIndex !== 0).length;
 
+  // Köppen group tallies
+  const koppenGroupCounts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+  const koppenCodeCounts: Record<string, number> = {};
+  for (const r of all) {
+    if (!r.koppen) continue;
+    koppenGroupCounts[r.koppen.group] = (koppenGroupCounts[r.koppen.group] ?? 0) + 1;
+    koppenCodeCounts[r.koppen.code] = (koppenCodeCounts[r.koppen.code] ?? 0) + 1;
+  }
+
   const output = {
     generatedAt: new Date().toISOString(),
     globalStats: {
@@ -189,6 +203,8 @@ async function main(): Promise<void> {
         mixed: all.filter((r) => r.seasonality === 'mixed').length,
         aseasonal: aseasonal.length,
       },
+      koppenGroupCounts,
+      koppenCodeCounts,
       warmColdStats: {
         total: warmCold.length,
         withCrossings: withCrossings.length,
@@ -218,6 +234,9 @@ async function main(): Promise<void> {
   console.log(`✓ Wrote ${OUT}`);
   console.log(`  ${all.length} regions analysed`);
   console.log(`  Seasonality: warm-cold=${output.globalStats.seasonalityCounts.warmCold}, wet-dry=${output.globalStats.seasonalityCounts.wetDry}, mixed=${output.globalStats.seasonalityCounts.mixed}, aseasonal=${output.globalStats.seasonalityCounts.aseasonal}`);
+  console.log(`  Köppen groups: A=${koppenGroupCounts.A} B=${koppenGroupCounts.B} C=${koppenGroupCounts.C} D=${koppenGroupCounts.D} E=${koppenGroupCounts.E}`);
+  const topCodes = Object.entries(koppenCodeCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  console.log(`  Top codes: ${topCodes.map(([c, n]) => `${c}=${n}`).join(' ')}`);
   console.log(`  Warm/cold: ${earlierSprings}/${withCrossings.length} earlier springs, ${laterAutumns}/${withCrossings.length} later autumns`);
   console.log(`  Wet/dry: ${wetSeasonsLonger} longer / ${wetSeasonsShorter} shorter wet seasons; mean onset shift ${meanWetOnsetShift?.toFixed(1)} d; mean annual rainfall ${meanAnnualRainShiftPct?.toFixed(1)}%`);
 }

@@ -301,3 +301,202 @@ export function classifySeasonality(
   if (rainSeasonal) return 'wet-dry';
   return 'aseasonal';
 }
+
+/* --------------------------------------------------------------------- */
+/*  Köppen–Geiger climate classification                                  */
+/*                                                                        */
+/*  Produces the standard 2- or 3-letter code (e.g. Cfb, Dfb, Aw, BWh)    */
+/*  from monthly temperature (°C) and precipitation (mm) climatologies.   */
+/*                                                                        */
+/*  Thresholds follow Peel, Finlayson & McMahon (2007) "Updated world     */
+/*  map of the Köppen–Geiger climate classification", Hydrol. Earth Syst. */
+/*  Sci., 11, 1633–1644 — the most widely cited modern implementation.    */
+/* --------------------------------------------------------------------- */
+
+export type KoppenGroup = 'A' | 'B' | 'C' | 'D' | 'E';
+
+/** Short human label for each main group. */
+export const KOPPEN_GROUP_LABEL: Record<KoppenGroup, string> = {
+  A: 'Tropical',
+  B: 'Arid',
+  C: 'Temperate',
+  D: 'Continental',
+  E: 'Polar',
+};
+
+/** Long descriptive label for each full Köppen code we can emit. */
+export const KOPPEN_CODE_LABEL: Record<string, string> = {
+  Af: 'Tropical rainforest',
+  Am: 'Tropical monsoon',
+  Aw: 'Tropical savanna (dry winter)',
+  As: 'Tropical savanna (dry summer)',
+  BWh: 'Hot desert',
+  BWk: 'Cold desert',
+  BSh: 'Hot steppe',
+  BSk: 'Cold steppe',
+  Csa: 'Mediterranean — hot summer',
+  Csb: 'Mediterranean — warm summer',
+  Csc: 'Mediterranean — cold summer',
+  Cwa: 'Humid subtropical (dry winter)',
+  Cwb: 'Subtropical highland',
+  Cwc: 'Cold subtropical highland',
+  Cfa: 'Humid subtropical',
+  Cfb: 'Oceanic / temperate',
+  Cfc: 'Subpolar oceanic',
+  Dsa: 'Continental — dry, hot summer',
+  Dsb: 'Continental — dry, warm summer',
+  Dsc: 'Continental — dry, cold summer',
+  Dsd: 'Continental — dry, very cold winter',
+  Dwa: 'Humid continental — dry winter, hot summer',
+  Dwb: 'Humid continental — dry winter, warm summer',
+  Dwc: 'Subarctic — dry winter',
+  Dwd: 'Subarctic — dry winter, very cold',
+  Dfa: 'Humid continental — hot summer',
+  Dfb: 'Humid continental — warm summer',
+  Dfc: 'Subarctic',
+  Dfd: 'Subarctic — very cold winter',
+  ET: 'Tundra',
+  EF: 'Ice cap',
+};
+
+/**
+ * Identify summer half and winter half (6 warmer vs 6 cooler months).
+ *
+ * Uses hemispheric convention (summer = Apr–Sep NH or Oct–Mar SH). Hemisphere
+ * is detected by:
+ *   • Temperature amplitude ≥ 3°C → month of warmest T (Apr–Sep → NH, else SH)
+ *   • Amplitude < 3°C (near-equatorial) → rainfall concentration: whichever
+ *     6-month astronomical half holds more rain is treated as summer.
+ *     Defaults to NH if rainfall is flat or unavailable.
+ *
+ * This correctly distinguishes NH-monsoon regions like Uganda, Kenya, Nigeria
+ * (rain peaks in Apr–Sep) from SH-monsoon regions like Tanzania, Brazil
+ * (rain peaks in Oct–Mar), matching classical Köppen Aw classifications.
+ */
+function summerWinterIndices(
+  monthlyT: number[],
+  monthlyP?: number[] | null,
+): { summer: number[]; winter: number[]; isNH: boolean } {
+  const Tmax = Math.max(...monthlyT);
+  const Tmin = Math.min(...monthlyT);
+  const warmestIdx = monthlyT.indexOf(Tmax);
+  const NH_SUMMER = [3, 4, 5, 6, 7, 8]; // Apr–Sep
+  const SH_SUMMER = [9, 10, 11, 0, 1, 2]; // Oct–Mar
+
+  let isNH: boolean;
+  if (Tmax - Tmin >= 5) {
+    isNH = warmestIdx >= 3 && warmestIdx <= 8;
+  } else if (monthlyP && monthlyP.length === 12) {
+    const nhSum = NH_SUMMER.reduce((a, i) => a + monthlyP[i], 0);
+    const shSum = SH_SUMMER.reduce((a, i) => a + monthlyP[i], 0);
+    isNH = nhSum >= shSum;
+  } else {
+    isNH = true;
+  }
+  const summer = isNH ? [...NH_SUMMER] : [...SH_SUMMER];
+  const winter = isNH ? [...SH_SUMMER] : [...NH_SUMMER];
+  return { summer, winter, isNH };
+}
+
+export type KoppenResult = {
+  code: string;              // 2 or 3 letter code, e.g. 'Cfb', 'Aw', 'BWh'
+  group: KoppenGroup;        // first letter
+  label: string;             // human description
+  groupLabel: string;        // "Temperate" etc
+};
+
+/**
+ * Compute the dominant Köppen–Geiger class from baseline monthly climatology.
+ * `monthlyT` and `monthlyP` are 12-element arrays (Jan..Dec) of mean
+ * temperature (°C) and mean precipitation (mm).
+ */
+export function classifyKoppen(
+  monthlyT: number[],
+  monthlyP: number[] | null | undefined,
+): KoppenResult | null {
+  if (monthlyT.length !== 12) return null;
+  if (!monthlyP || monthlyP.length !== 12) return null;
+
+  const Tmin = Math.min(...monthlyT);
+  const Tmax = Math.max(...monthlyT);
+  const Tann = monthlyT.reduce((a, b) => a + b, 0) / 12;
+  const Pann = monthlyP.reduce((a, b) => a + b, 0);
+  const Pmin = Math.min(...monthlyP);
+  const monthsAbove10 = monthlyT.filter((v) => v > 10).length;
+
+  const { summer, winter } = summerWinterIndices(monthlyT, monthlyP);
+  const Psummer = summer.reduce((a, i) => a + monthlyP[i], 0);
+  const Pwinter = winter.reduce((a, i) => a + monthlyP[i], 0);
+  const Ps_max = Math.max(...summer.map((i) => monthlyP[i]));
+  const Ps_min = Math.min(...summer.map((i) => monthlyP[i]));
+  const Pw_max = Math.max(...winter.map((i) => monthlyP[i]));
+  const Pw_min = Math.min(...winter.map((i) => monthlyP[i]));
+
+  // --- B (arid) — must be tested BEFORE A/C/D ---
+  let bThreshold: number;
+  if (Psummer >= 0.7 * Pann) bThreshold = 20 * Tann + 280;
+  else if (Pwinter >= 0.7 * Pann) bThreshold = 20 * Tann;
+  else bThreshold = 20 * Tann + 140;
+
+  if (Pann < bThreshold) {
+    const second = Pann < bThreshold / 2 ? 'W' : 'S';
+    const third = Tann >= 18 ? 'h' : 'k';
+    const code = `B${second}${third}`;
+    return { code, group: 'B', label: KOPPEN_CODE_LABEL[code] ?? code, groupLabel: KOPPEN_GROUP_LABEL.B };
+  }
+
+  // --- E (polar) ---
+  if (Tmax < 10) {
+    const code = Tmax < 0 ? 'EF' : 'ET';
+    return { code, group: 'E', label: KOPPEN_CODE_LABEL[code] ?? code, groupLabel: KOPPEN_GROUP_LABEL.E };
+  }
+
+  // --- A (tropical) ---
+  if (Tmin >= 18) {
+    let second: 'f' | 'm' | 'w' | 's';
+    if (Pmin >= 60) second = 'f';
+    else if (Pmin >= 100 - Pann / 25) second = 'm';
+    else {
+      // driest month: is it in the summer half or winter half?
+      const driestIdx = monthlyP.indexOf(Pmin);
+      second = summer.includes(driestIdx) ? 's' : 'w';
+    }
+    const code = `A${second}`;
+    return { code, group: 'A', label: KOPPEN_CODE_LABEL[code] ?? code, groupLabel: KOPPEN_GROUP_LABEL.A };
+  }
+
+  // --- C (temperate) or D (continental) ---
+  // Distinguished by coldest-month temperature: C has Tmin > -3 (some use 0),
+  // D has Tmin ≤ -3. We follow Peel 2007's use of 0°C rather than -3°C.
+  const isD = Tmin <= 0;
+  const group: KoppenGroup = isD ? 'D' : 'C';
+
+  // Second letter: precipitation seasonality
+  //   s (dry summer): Ps_min < 40 mm AND Ps_min < Pw_max / 3
+  //   w (dry winter): Pw_min < Ps_max / 10
+  //   f: neither
+  let second: 's' | 'w' | 'f';
+  const isDrySummer = Ps_min < 40 && Ps_min < Pw_max / 3;
+  const isDryWinter = Pw_min < Ps_max / 10;
+  if (isDrySummer && !isDryWinter) second = 's';
+  else if (isDryWinter && !isDrySummer) second = 'w';
+  else if (isDrySummer && isDryWinter) {
+    // both marginal — pick the stronger signal
+    second = Psummer < Pwinter ? 's' : 'w';
+  } else second = 'f';
+
+  // Third letter: summer temperature
+  //   a: Tmax ≥ 22
+  //   b: Tmax < 22 AND monthsAbove10 ≥ 4
+  //   c: monthsAbove10 in 1..3 (and not d)
+  //   d: D-group only, Tmin < -38
+  let third: 'a' | 'b' | 'c' | 'd';
+  if (isD && Tmin < -38) third = 'd';
+  else if (Tmax >= 22) third = 'a';
+  else if (monthsAbove10 >= 4) third = 'b';
+  else third = 'c';
+
+  const code = `${group}${second}${third}`;
+  return { code, group, label: KOPPEN_CODE_LABEL[code] ?? code, groupLabel: KOPPEN_GROUP_LABEL[group] };
+}
+
