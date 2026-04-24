@@ -15,6 +15,20 @@ const ALPHA3_TO_ALPHA2: Record<string, string> = {
   IRQ: 'IQ', IRN: 'IR', BGD: 'BD', LKA: 'LK', MMR: 'MM', UKR: 'UA', ROU: 'RO',
   HUN: 'HU', CZE: 'CZ', TZA: 'TZ', GHA: 'GH', UGA: 'UG', COD: 'CD', DZA: 'DZ',
   SYR: 'SY', JAM: 'JM', ISL: 'IS',
+  // Additional codes for leaderboard coverage
+  BTN: 'BT', NPL: 'NP', AFG: 'AF', KHM: 'KH', LAO: 'LA', MNG: 'MN', KAZ: 'KZ',
+  UZB: 'UZ', TKM: 'TM', TJK: 'TJ', KGZ: 'KG', AZE: 'AZ', GEO: 'GE', ARM: 'AM',
+  YEM: 'YE', OMN: 'OM', KWT: 'KW', BHR: 'BH', QAT: 'QA', JOR: 'JO', LBY: 'LY',
+  TUN: 'TN', SDN: 'SD', TCD: 'TD', NER: 'NE', MLI: 'ML', SEN: 'SN', MRT: 'MR',
+  BFA: 'BF', GIN: 'GN', GNB: 'GW', SLE: 'SL', LBR: 'LR', CIV: 'CI', TGO: 'TG',
+  BEN: 'BJ', CMR: 'CM', CAF: 'CF', GAB: 'GA', GNQ: 'GQ', AGO: 'AO', ZMB: 'ZM',
+  ZWE: 'ZW', BWA: 'BW', NAM: 'NA', LSO: 'LS', SWZ: 'SZ', MOZ: 'MZ', MDG: 'MG',
+  RWA: 'RW', BDI: 'BI', DJI: 'DJ', ERI: 'ER', BGR: 'BG', SRB: 'RS',
+  HRV: 'HR', SVK: 'SK', SVN: 'SI', LTU: 'LT', LVA: 'LV', EST: 'EE', ALB: 'AL',
+  MKD: 'MK', MLT: 'MT', LUX: 'LU', BLR: 'BY', MDA: 'MD', MNE: 'ME', BIH: 'BA',
+  BHS: 'BS', DOM: 'DO', HTI: 'HT', CUB: 'CU', PRI: 'PR', TTO: 'TT', BLZ: 'BZ',
+  HND: 'HN', SLV: 'SV', GTM: 'GT', PAN: 'PA', ECU: 'EC', VEN: 'VE', URY: 'UY',
+  PRY: 'PY', PNG: 'PG', FJI: 'FJ', TLS: 'TL', BRN: 'BN',
 };
 
 export function countryFlag(owidCode?: string): string {

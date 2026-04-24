@@ -23,16 +23,15 @@ import {
   Loader2,
   Flower2,
   Snowflake,
-  Calendar,
   Activity,
   TrendingDown,
-  Info,
   MapPin,
   Leaf,
   Thermometer,
   Globe,
 } from 'lucide-react';
 import type { GlobalShiftRecord } from '@/app/_components/global-shift-map';
+import { countryFlag } from '@/lib/climate/locations';
 
 const SpringIndexMap = dynamic(() => import('@/app/_components/spring-index-map'), {
   ssr: false,
@@ -247,6 +246,19 @@ function SectionCard({ icon, title, children }: { icon: React.ReactNode; title: 
   );
 }
 
+function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-4 my-6">
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+        {icon}
+        <span>{title}</span>
+      </h2>
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+    </div>
+  );
+}
+
 function StatBlock({ label, value, sub, color = 'text-orange-300' }: {
   label: string; value: string; sub?: string; color?: string;
 }) {
@@ -355,6 +367,18 @@ export default function ShiftingSeasonsPage() {
     if (!data) return [];
     return data.snow.seasonalAnomaly.filter((s) => s.season === 'winter');
   }, [data]);
+  const snowHeadline = useMemo(() => {
+    if (!snowSpring.length || !snowWinter.length) return null;
+    const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+    const springRecent = mean(snowSpring.slice(-10).map((s) => s.anomPct).filter((v): v is number => v != null));
+    const winterRecent = mean(snowWinter.slice(-10).map((s) => s.anomPct).filter((v): v is number => v != null));
+    const springFirst = mean(snowSpring.slice(0, 10).map((s) => s.anomPct).filter((v): v is number => v != null));
+    return {
+      springRecent,
+      winterRecent,
+      springChange: springRecent - springFirst,
+    };
+  }, [snowSpring, snowWinter]);
   const snowLast24 = useMemo(() => {
     if (!data) return [];
     return data.snow.monthly.slice(-24);
@@ -386,8 +410,10 @@ export default function ShiftingSeasonsPage() {
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
                 The most personal way climate change shows up isn&apos;t in headlines — it&apos;s in
                 the timing of the year. Spring arrives earlier. Snow leaves sooner. The
-                growing season stretches. Here are two of the longest, cleanest records
-                we have of that shift.
+                growing season stretches. This page pulls together the longest, cleanest
+                records of that shift — a global analysis of hundreds of regions, Kyoto&apos;s
+                1,200-year cherry-blossom archive, the Northern Hemisphere snow record,
+                a live US spring tracker, and the US growing-season trend since 1895.
               </p>
             </div>
           </div>
@@ -408,54 +434,42 @@ export default function ShiftingSeasonsPage() {
           {data && (
             <>
               {/* ─── Headline numbers ───────────────────────────────────── */}
-              <SectionCard icon={<Activity className="text-emerald-400" />} title="At a glance">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <SectionCard icon={<Activity className="text-emerald-400" />} title="At a Glance">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {globalShift && (
                     <>
                       <StatBlock
-                        label="Regions analysed"
-                        value={`${globalShift.globalStats.totalAnalysed}`}
-                        sub={`${globalShift.globalStats.countriesAnalysed} countries · ${globalShift.globalStats.usStatesAnalysed} US · ${globalShift.globalStats.ukRegionsAnalysed} UK`}
-                        color="text-[#D0A65E]"
-                      />
-                      <StatBlock
-                        label="Earlier springs"
-                        value={`${globalShift.globalStats.warmColdStats.earlierSprings} / ${globalShift.globalStats.warmColdStats.withCrossings}`}
-                        sub={
+                        label="Earlier Springs"
+                        value={
                           globalShift.globalStats.warmColdStats.meanSpringShift !== null
-                            ? `mean ${globalShift.globalStats.warmColdStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanSpringShift.toFixed(1)} d`
-                            : 'vs baseline'
+                            ? `${globalShift.globalStats.warmColdStats.meanSpringShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanSpringShift.toFixed(1)} d`
+                            : '—'
                         }
+                        sub={`mean across ${globalShift.globalStats.warmColdStats.withCrossings} temperate regions (${globalShift.globalStats.warmColdStats.earlierSprings} earlier)`}
                         color="text-rose-300"
                       />
                       <StatBlock
-                        label="Later autumns"
-                        value={`${globalShift.globalStats.warmColdStats.laterAutumns} / ${globalShift.globalStats.warmColdStats.withCrossings}`}
-                        sub={
+                        label="Later Autumns"
+                        value={
                           globalShift.globalStats.warmColdStats.meanAutumnShift !== null
-                            ? `mean ${globalShift.globalStats.warmColdStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanAutumnShift.toFixed(1)} d`
-                            : 'vs baseline'
+                            ? `${globalShift.globalStats.warmColdStats.meanAutumnShift > 0 ? '+' : ''}${globalShift.globalStats.warmColdStats.meanAutumnShift.toFixed(1)} d`
+                            : '—'
                         }
+                        sub={`mean across ${globalShift.globalStats.warmColdStats.withCrossings} temperate regions (${globalShift.globalStats.warmColdStats.laterAutumns} later)`}
                         color="text-amber-300"
                       />
                     </>
                   )}
                   <StatBlock
-                    label="Kyoto cherry blossom"
+                    label="Kyoto Cherry Blossom"
                     value={`${data.kyoto.shiftDays > 0 ? '−' : '+'}${Math.abs(data.kyoto.shiftDays).toFixed(1)} days`}
-                    sub={`recent 30-yr mean vs pre-1850`}
+                    sub="recent 30-yr mean vs pre-1850"
                     color="text-pink-300"
                   />
                   <StatBlock
-                    label="NH snow, latest"
-                    value={data.snow.latest ? `${(data.snow.latest.areaKm2 / 1e6).toFixed(2)} M km²` : '—'}
-                    sub={data.snow.latest ? `${MONTHS_SHORT[data.snow.latest.month - 1]} ${data.snow.latest.year}` : ''}
-                    color="text-cyan-300"
-                  />
-                  <StatBlock
-                    label="Snow vs 1981–2010"
+                    label="NH Snow vs 1981–2010"
                     value={snowLatestAnomPct != null ? `${snowLatestAnomPct > 0 ? '+' : ''}${snowLatestAnomPct.toFixed(1)}%` : '—'}
-                    sub="same calendar month"
+                    sub={data.snow.latest ? `${MONTHS_SHORT[data.snow.latest.month - 1]} ${data.snow.latest.year} vs same calendar month` : 'same calendar month'}
                     color={snowLatestAnomPct != null && snowLatestAnomPct < 0 ? 'text-orange-300' : 'text-blue-300'}
                   />
                 </div>
@@ -464,11 +478,13 @@ export default function ShiftingSeasonsPage() {
                 </p>
               </SectionCard>
 
-              {/* ─── Global picture (moved to top — headline analysis) ─── */}
+              {/* ═══ THE GLOBAL PICTURE ═══ */}
+              <Divider icon={<Globe className="h-5 w-5" />} title="The Global Picture" />
+
               {globalShift && leaderboards && (
                 <SectionCard
                   icon={<Globe className="text-[#D0A65E]" />}
-                  title={`The global picture: how seasons have shifted across ${globalShift.globalStats.totalAnalysed} regions`}
+                  title={`How Seasons Have Shifted Across ${globalShift.globalStats.totalAnalysed} Regions`}
                 >
                   <p className="text-sm text-gray-300 leading-relaxed mb-4">
                     We&apos;ve applied the same month-crossing analysis used on every
@@ -480,19 +496,11 @@ export default function ShiftingSeasonsPage() {
                     baseline annual mean in spring and autumn.
                   </p>
 
-                  <SubSection title="World map — pick a metric">
+                  <SubSection title="World Map — Pick a Metric">
                     <GlobalShiftMap />
-                    <p className="text-[11px] text-gray-500 mt-2">
-                      Hover any country for its own Köppen classification, spring /
-                      autumn / warm-season or wet-season shift. Grey countries
-                      either don&apos;t have 30+ years of continuous monthly data,
-                      or the selected metric doesn&apos;t apply to their
-                      climate zone (e.g. spring/autumn crossings in the tropics).
-                      Zoom into the USA or UK for sub-national detail.
-                    </p>
                   </SubSection>
 
-                  <SubSection title="Where the warm-season shift is biggest — Köppen C + D regions">
+                  <SubSection title="Where the Warm-Season Shift Is Biggest — Köppen C + D Regions">
                     <p className="text-[11px] text-gray-500 mb-2">
                       Spring / autumn crossings are only meaningful where the
                       climate has a genuine winter, i.e. Köppen temperate (C) or
@@ -501,19 +509,19 @@ export default function ShiftingSeasonsPage() {
                     </p>
                     <div className="grid md:grid-cols-3 gap-4">
                       <Leaderboard
-                        title="Spring advancing fastest"
+                        title="Spring Advancing Fastest"
                         accent="text-rose-300"
                         rows={leaderboards.spring}
                         format={(r) => `${r.temp.springShiftDays! > 0 ? '+' : ''}${r.temp.springShiftDays!.toFixed(1)} d`}
                       />
                       <Leaderboard
-                        title="Autumn extending latest"
+                        title="Autumn Extending Latest"
                         accent="text-amber-300"
                         rows={leaderboards.autumn}
                         format={(r) => `${r.temp.autumnShiftDays! > 0 ? '+' : ''}${r.temp.autumnShiftDays!.toFixed(1)} d`}
                       />
                       <Leaderboard
-                        title="Warm season gaining most months"
+                        title="Warm Season Gaining Most Months"
                         accent="text-emerald-300"
                         rows={leaderboards.net}
                         format={(r) => `${(r.temp.netShiftMonths ?? 0) > 0 ? '+' : ''}${(r.temp.netShiftMonths ?? 0).toFixed(2)} mo`}
@@ -522,7 +530,7 @@ export default function ShiftingSeasonsPage() {
                   </SubSection>
 
                   {(leaderboards.onsetShift.length > 0 || leaderboards.annualRainUp.length > 0) && (
-                    <SubSection title="Where the wet/dry rhythm is shifting most — Köppen A + B regions">
+                    <SubSection title="Where the Wet/Dry Rhythm Is Shifting Most — Köppen A + B Regions">
                       <p className="text-[11px] text-gray-500 mb-2">
                         For tropical (A) and arid (B) climates the rains define
                         the year. Onset shift (when the wet season now starts
@@ -531,7 +539,7 @@ export default function ShiftingSeasonsPage() {
                       </p>
                       <div className="grid md:grid-cols-2 gap-4">
                         <Leaderboard
-                          title="Biggest wet-season onset shift"
+                          title="Biggest Wet-Season Onset Shift"
                           accent="text-sky-300"
                           rows={leaderboards.onsetShift}
                           format={(r) => {
@@ -540,7 +548,7 @@ export default function ShiftingSeasonsPage() {
                           }}
                         />
                         <Leaderboard
-                          title="Biggest annual-rainfall change"
+                          title="Biggest Annual-Rainfall Change"
                           accent="text-sky-300"
                           rows={[...leaderboards.annualRainUp, ...leaderboards.annualRainDown]
                             .sort(
@@ -572,17 +580,21 @@ export default function ShiftingSeasonsPage() {
                 </SectionCard>
               )}
 
-              {/* ─── Kyoto cherry-blossom record ─────────────────────────── */}
+              {/* ═══ HISTORICAL RECORDS ═══ */}
+              <Divider icon={<Flower2 className="h-5 w-5" />} title="Historical Records" />
+
+              {/* ─── Kyoto cherry-blossom record ───────────────────── */}
               <SectionCard
                 icon={<Flower2 className="text-pink-400" />}
-                title="Kyoto cherry blossom — 1,200 years of spring"
+                title="Kyoto, Japan — 1,200 Years of Cherry Blossom"
               >
                 <p className="text-sm text-gray-300 leading-relaxed mb-4">
-                  Court diaries, monastery records, and weather observations have logged
-                  the day each spring when Kyoto&apos;s cherry trees reach <em>full bloom</em> (満開,
-                  <em>mankai</em>) almost every year since 812&nbsp;CE. It&apos;s the longest
-                  continuous biological record of climate anywhere on Earth — and the
-                  signal of recent warming is unmistakable.
+                  In Kyoto, Japan, court diaries, monastery records, and weather
+                  observations have logged the day each spring when the city&apos;s
+                  cherry trees reach <em>full bloom</em> (満開, <em>mankai</em>) almost
+                  every year since 812&nbsp;CE. It&apos;s the longest continuous
+                  biological record of climate anywhere on Earth — and the signal of
+                  recent warming is unmistakable.
                 </p>
 
                 <div className="rounded-xl border border-pink-900/40 bg-gradient-to-br from-pink-950/30 to-pink-900/10 p-4 mb-4">
@@ -603,7 +615,7 @@ export default function ShiftingSeasonsPage() {
 
                 <div className="h-[420px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <ScatterChart margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <ScatterChart margin={{ top: 10, right: 10, left: -10, bottom: 24 }}>
                       <CartesianGrid stroke="#1f2937" strokeDasharray="3 3" />
                       <XAxis
                         type="number"
@@ -648,7 +660,7 @@ export default function ShiftingSeasonsPage() {
                         lineType="joint"
                         shape={() => <></>}
                       />
-                      <Legend wrapperStyle={{ fontSize: 12 }} />
+                      <Legend wrapperStyle={{ fontSize: 12, paddingTop: 18 }} />
                     </ScatterChart>
                   </ResponsiveContainer>
                 </div>
@@ -670,7 +682,7 @@ export default function ShiftingSeasonsPage() {
               {/* ─── NH snow cover ──────────────────────────────────────── */}
               <SectionCard
                 icon={<Snowflake className="text-cyan-400" />}
-                title="Northern Hemisphere snow cover"
+                title="Northern Hemisphere Snow Cover"
               >
                 <p className="text-sm text-gray-300 leading-relaxed mb-4">
                   Satellites have mapped Northern Hemisphere snow cover every week since
@@ -680,8 +692,31 @@ export default function ShiftingSeasonsPage() {
                   darker land that absorbs more sunlight and accelerates regional warming.
                 </p>
 
+                {snowHeadline && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+                    <StatBlock
+                      label="Spring (MAM) Anomaly"
+                      value={`${snowHeadline.springRecent.toFixed(1)}%`}
+                      sub={`recent 10-yr mean vs 1981–2010`}
+                      color="text-orange-300"
+                    />
+                    <StatBlock
+                      label="Winter (DJF) Anomaly"
+                      value={`${snowHeadline.winterRecent >= 0 ? '+' : ''}${snowHeadline.winterRecent.toFixed(1)}%`}
+                      sub={`recent 10-yr mean vs 1981–2010`}
+                      color={snowHeadline.winterRecent < 0 ? 'text-orange-300' : 'text-blue-300'}
+                    />
+                    <StatBlock
+                      label="Spring Snow Lost"
+                      value={`${snowHeadline.springChange.toFixed(1)} pp`}
+                      sub={`vs first 10 years on record (1967–1976)`}
+                      color="text-rose-300"
+                    />
+                  </div>
+                )}
+
                 {/* Spring vs winter trend */}
-                <SubSection title="Spring snow is shrinking, winter is holding up">
+                <SubSection title="Spring Snow Is Shrinking, Winter Is Holding Up">
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart
@@ -738,7 +773,7 @@ export default function ShiftingSeasonsPage() {
                 </SubSection>
 
                 {/* Last 24 months bars */}
-                <SubSection title="Last two years, month by month">
+                <SubSection title="Last Two Years, Month by Month">
                   <div className="h-[260px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -779,10 +814,13 @@ export default function ShiftingSeasonsPage() {
                 </div>
               </SectionCard>
 
-              {/* ─── USA-NPN live spring map ─────────────────────────────── */}
+              {/* ═══ UNITED STATES ═══ */}
+              <Divider icon={<MapPin className="h-5 w-5" />} title="United States" />
+
+              {/* ─── USA-NPN live spring map ───────────────────── */}
               <SectionCard
                 icon={<MapPin className="text-pink-400" />}
-                title="Live: how early is spring arriving across the US?"
+                title="Live: How Early Is Spring Arriving Across the US?"
               >
                 <p className="text-sm text-gray-300 leading-relaxed mb-4">
                   The USA National Phenology Network runs a daily-updated model that
@@ -797,7 +835,7 @@ export default function ShiftingSeasonsPage() {
               {/* ─── EPA growing season (US historical) ─────────────────── */}
               <SectionCard
                 icon={<Leaf className="text-emerald-400" />}
-                title="The US growing season is 17 days longer than a century ago"
+                title="The US Growing Season Is 17 Days Longer Than a Century Ago"
               >
                 <p className="text-sm text-gray-300 leading-relaxed mb-4">
                   Since 1895 the contiguous-US growing season — the stretch between the
@@ -808,26 +846,26 @@ export default function ShiftingSeasonsPage() {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
                   <StatBlock
-                    label="Recent 10-yr avg"
+                    label="Recent 10-yr Avg"
                     value={`${data.epa.headline.last10YearMean >= 0 ? '+' : ''}${data.epa.headline.last10YearMean.toFixed(1)} d`}
                     sub={`vs 1895–2020 mean (${data.epa.headline.last10YearWindow})`}
                     color="text-emerald-300"
                   />
                   <StatBlock
-                    label="First 30-yr avg"
+                    label="First 30-yr Avg"
                     value={`${data.epa.headline.first30YearMean >= 0 ? '+' : ''}${data.epa.headline.first30YearMean.toFixed(1)} d`}
                     sub={`${data.epa.headline.first30YearWindow}`}
                     color="text-amber-300"
                   />
                   <StatBlock
-                    label="Net lengthening"
+                    label="Net Lengthening"
                     value={`${data.epa.headline.shiftDays >= 0 ? '+' : ''}${data.epa.headline.shiftDays.toFixed(1)} days`}
                     sub="recent 10y minus first 30y"
                     color="text-orange-300"
                   />
                 </div>
 
-                <SubSection title="CONUS growing-season length, 1895 – 2020">
+                <SubSection title="CONUS Growing-Season Length, 1895–2020">
                   <div className="h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -873,52 +911,6 @@ export default function ShiftingSeasonsPage() {
                   follow-up.
                 </div>
               </SectionCard>
-
-              {/* ─── What's next ────────────────────────────────────────── */}
-              <SectionCard icon={<Calendar className="text-amber-400" />} title="Coming next">
-                <ul className="text-sm text-gray-300 leading-relaxed space-y-2 list-disc pl-5">
-                  <li>
-                    <strong className="text-[#FFF5E7]">Shifting seasons per region</strong>{' '}
-                    — a new <em>Shifting seasons</em> card now appears on every country,
-                    US state and UK region climate profile, showing warm-season length
-                    and month-by-month warming derived from each location&apos;s own
-                    long-term monthly temperature record.
-                  </li>
-                  <li>
-                    <strong className="text-[#FFF5E7]">NOAA xmACIS modern frost dates</strong>{' '}
-                    to extend the EPA series past 2020 with live year-to-date data.
-                  </li>
-                  <li>
-                    <strong className="text-[#FFF5E7]">UK phenology</strong> from the
-                    Woodland Trust Nature&apos;s Calendar, if licensing allows.
-                  </li>
-                </ul>
-              </SectionCard>
-
-              {/* ─── Methods / About ────────────────────────────────────── */}
-              <SectionCard icon={<Info className="text-gray-400" />} title="About this page">
-                <div className="text-sm text-gray-300 leading-relaxed space-y-3">
-                  <p>
-                    Phenology — the study of recurring biological events like flowering,
-                    leaf-out, and migration — provides some of the strongest, longest,
-                    and most personally relatable evidence of climate change.
-                  </p>
-                  <p>
-                    The Kyoto cherry-blossom record is unique because the same species at
-                    the same site has been observed for over a millennium. Pre-1850 dates
-                    sit in a tight band centred on roughly{' '}
-                    {doyToLabel(Math.round(data.kyoto.climatologyPre1850Mean))}; modern
-                    dates have shifted to a new, earlier band as Kyoto&apos;s March
-                    temperatures have warmed.
-                  </p>
-                  <p>
-                    Snow cover anomalies use Rutgers Global Snow Lab&apos;s monthly
-                    snow-covered area for Northern Hemisphere land, expressed as a percent
-                    deviation from the 1981–2010 mean for the same calendar month — so a
-                    January reading is compared to other Januaries, not to summer.
-                  </p>
-                </div>
-              </SectionCard>
             </>
           )}
 
@@ -942,10 +934,10 @@ function SubSection({ title, children }: { title: string; children: React.ReactN
   );
 }
 
-const KIND_BADGE: Record<'country' | 'us-state' | 'uk-region', { label: string; className: string }> = {
-  country: { label: '🌍', className: 'bg-gray-800 text-gray-300' },
-  'us-state': { label: '🇺🇸', className: 'bg-gray-800 text-gray-300' },
-  'uk-region': { label: '🇬🇧', className: 'bg-gray-800 text-gray-300' },
+const KIND_BADGE: Record<'country' | 'us-state' | 'uk-region', { fallback: string; className: string }> = {
+  country: { fallback: '🌍', className: 'bg-gray-800 text-gray-200' },
+  'us-state': { fallback: '🇺🇸', className: 'bg-gray-800 text-gray-200' },
+  'uk-region': { fallback: '🇬🇧', className: 'bg-gray-800 text-gray-200' },
 };
 
 function Leaderboard({
@@ -961,21 +953,23 @@ function Leaderboard({
 }) {
   return (
     <div className="rounded-xl border border-gray-800/60 bg-gray-900/50 p-3">
-      <div className="text-[11px] text-gray-400 uppercase tracking-wider mb-2">{title}</div>
-      <ol className="space-y-1.5">
+      <div className="text-xs text-gray-300 uppercase tracking-wider font-semibold mb-3">{title}</div>
+      <ol className="space-y-2">
         {rows.map((r, i) => {
           const badge = KIND_BADGE[r.kind];
+          const flag =
+            r.kind === 'country' ? countryFlag(r.code) : badge.fallback;
           return (
             <li key={`${r.kind}-${r.code ?? r.name}-${i}`} className="flex items-center gap-2 text-sm">
-              <span className="w-4 text-[11px] text-gray-500 text-right tabular-nums">{i + 1}</span>
+              <span className="w-5 text-xs text-gray-400 text-right tabular-nums">{i + 1}</span>
               <span
-                className={`inline-flex h-5 min-w-[22px] items-center justify-center rounded text-[11px] ${badge.className}`}
+                className={`inline-flex h-6 min-w-[26px] items-center justify-center rounded text-sm ${badge.className}`}
                 aria-hidden
               >
-                {badge.label}
+                {flag}
               </span>
-              <span className="flex-1 truncate text-gray-200">{r.name}</span>
-              <span className={`font-mono tabular-nums text-[13px] font-semibold ${accent}`}>
+              <span className="flex-1 truncate text-gray-100">{r.name}</span>
+              <span className={`font-mono tabular-nums text-sm font-semibold ${accent}`}>
                 {format(r)}
               </span>
             </li>

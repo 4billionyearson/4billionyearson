@@ -153,7 +153,7 @@ export default function SpringIndexMap() {
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] uppercase tracking-wider text-gray-500">Earlier</span>
-          <div className="h-2 flex-1 max-w-xs rounded" style={{ background: "linear-gradient(to right, #67001f, #d73027, #fee08b, #ffffbf, #a6d96a, #1a9850, #006837)" }} />
+          <div className="h-2 flex-1 max-w-xs rounded" style={{ background: "linear-gradient(to right, #67001f, #d73027, #fdae61, #fee090, #ffffff, #abd9e9, #74add1, #4575b4, #313695)" }} />
           <span className="text-[10px] uppercase tracking-wider text-gray-500">Later</span>
         </div>
         <div className="text-[11px] text-gray-500">
