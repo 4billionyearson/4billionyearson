@@ -512,6 +512,23 @@ export default function EnsoPage() {
             };
           })
           .sort((a, b) => a.x - b.x);
+        // Bridge the gap between the last weekly reading (typically a few
+        // days behind) and "today" by extending the observed series to
+        // todayX with the same currentOni value the "Now" dot uses. This
+        // eliminates the small black strip that otherwise appears under
+        // the Now dot.
+        if (observedPoints.length) {
+          const last = observedPoints[observedPoints.length - 1];
+          if (todayX > last.x + 0.0001) {
+            observedPoints.push({
+              x: todayX,
+              anom: currentOni,
+              pos: currentOni > 0 ? currentOni : 0,
+              neg: currentOni < 0 ? currentOni : 0,
+              dateLabel: `today (${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')})`,
+            });
+          }
+        }
 
         // Forecast curve — built from the IRI/Columbia ENSO plume (multi-model
         // mean of dynamical + statistical Niño 3.4 forecasts) when available,
@@ -734,22 +751,9 @@ export default function EnsoPage() {
                   connectNulls={false}
                 />
 
-                {/* Forecast labels */}
-                {isForecastingElNino && elNinoStart !== null && first50 && (
-                  <ReferenceLine
-                    x={elNinoStart}
-                    stroke="#f43f5e"
-                    strokeDasharray="2 2"
-                    strokeOpacity={0.6}
-                    label={{
-                      value: `${first50.season} ${first50.pElNino}%`,
-                      fill: '#f43f5e',
-                      fontSize: 10,
-                      position: 'insideTopRight',
-                      offset: 4,
-                    }}
-                  />
-                )}
+                {/* Forecast labels (start-probability and peak-season text
+                    labels intentionally suppressed — narrative below the
+                    chart carries the detail). */}
                 {isForecastingElNino && peakX !== null && (peakSeason || plumePeakPeriod) && (
                   <ReferenceDot
                     x={peakX}
@@ -758,16 +762,6 @@ export default function EnsoPage() {
                     fill="#f43f5e"
                     stroke="#0f172a"
                     strokeWidth={2}
-                    label={{
-                      value: plumePeakPeriod
-                        ? `peak ${plumePeakPeriod.label} ${plumePeakPeriod.seasonAnchorYear} · ~${fmtSigned(predictedPeakOni, 1)}°C`
-                        : `peak ${peakSeason!.season} (${peakSeason!.pElNino}%) · ~${fmtSigned(predictedPeakOni, 1)}°C`,
-                      fill: '#f43f5e',
-                      fontSize: 10,
-                      fontWeight: 600,
-                      position: 'top',
-                      offset: 8,
-                    }}
                   />
                 )}
 
@@ -795,7 +789,7 @@ export default function EnsoPage() {
                   x={todayX}
                   stroke="#D0A65E"
                   strokeDasharray="4 4"
-                  label={{ value: 'today', fill: '#D0A65E', fontSize: 11, position: 'top' }}
+                  label={{ value: 'Today', fill: '#D0A65E', fontSize: 11, position: 'top' }}
                 />
                 {/* "Now" dot at the actual current ONI value */}
                 <ReferenceDot
@@ -806,7 +800,7 @@ export default function EnsoPage() {
                   stroke="#0f172a"
                   strokeWidth={2}
                   label={{
-                    value: `now ${fmtSigned(currentOni, 2)}°C`,
+                    value: `Now ${fmtSigned(currentOni, 2)}°C`,
                     fill: '#D0A65E',
                     fontSize: 11,
                     fontWeight: 600,
@@ -814,6 +808,27 @@ export default function EnsoPage() {
                     offset: 12,
                   }}
                 />
+                {/* End of available forecast data — vertical marker at the
+                    last plume period (DJF n+1 by default — 9 periods ahead
+                    of issue date). IRI plume doesn't extend further. */}
+                {forecastPoints.length > 0 && (() => {
+                  const lastFc = forecastPoints[forecastPoints.length - 1];
+                  return (
+                    <ReferenceLine
+                      x={lastFc.x}
+                      stroke="#f43f5e"
+                      strokeDasharray="2 4"
+                      strokeOpacity={0.55}
+                      label={{
+                        value: 'End of current forecasts',
+                        fill: '#fda4af',
+                        fontSize: 10,
+                        position: 'insideTopLeft',
+                        offset: 6,
+                      }}
+                    />
+                  );
+                })()}
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -837,7 +852,7 @@ export default function EnsoPage() {
               Forecast (smoothed profile)
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / today
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / Today
             </span>
           </div>
 
@@ -921,25 +936,43 @@ export default function EnsoPage() {
           )}
 
           <p className="text-xs text-gray-500 mt-3">
-            Forecast source:{' '}
+            Sources:{' '}
+            <a
+              href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#D0A65E] hover:underline"
+            >
+              NOAA CPC weekly Niño 3.4 SST
+            </a>{' '}
+            (observed),{' '}
+            <a
+              href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#D0A65E] hover:underline"
+            >
+              IRI/CCSR ENSO plume
+            </a>{' '}
+            (forecast — multi-model dynamical &amp; statistical mean of {plume?.periods[0]?.modelCount ?? 0} models, issued {plume ? `${plume.issueMonth}/${plume.issueYear}` : 'monthly'}),{' '}
             <a
               href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#D0A65E] hover:underline"
             >
-              NOAA CPC ENSO probability outlook
+              NOAA CPC probability outlook
             </a>
-            . Past peaks computed from{' '}
+            , and{' '}
             <a
               href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#D0A65E] hover:underline"
             >
-              ONI v5
-            </a>
-            .
+              NOAA ONI v5
+            </a>{' '}
+            (past events). The IRI plume publishes 9 overlapping 3-month forecast periods; that limit is shown by the &ldquo;End of current forecasts&rdquo; line.
           </p>
         </SectionCard>
         );
