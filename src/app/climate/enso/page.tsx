@@ -281,9 +281,14 @@ export default function EnsoPage() {
 
       {/* ═══ PAST + FUTURE HERO STORY ════════════════════════════ */}
       {oni && (() => {
-        // Build combined dataset: past 30y of yearly-peak ONI + 9-season forecast.
+        // Build combined dataset on a SINGLE yearly timescale.
+        // Past = solid yearly peak ONI bars (1980→last historical year).
+        // Future = a single dashed "predicted 2026 El Niño" bar at the average
+        // of past El Niño peaks, labelled with the season window when probability
+        // crosses 50% and 90%.
         const yearsBack = 46;
-        const minYear = (oni.history[oni.history.length - 1]?.year || new Date().getFullYear()) - yearsBack + 1;
+        const lastHistYear = oni.history[oni.history.length - 1]?.year || new Date().getFullYear();
+        const minYear = lastHistYear - yearsBack + 1;
         const peaksByYear = new Map<number, number>();
         for (const p of oni.history) {
           if (p.year < minYear) continue;
@@ -298,41 +303,71 @@ export default function EnsoPage() {
             isForecast: false,
             peak,
             phase: peak >= 0.5 ? 'el-nino' : peak <= -0.5 ? 'la-nina' : 'neutral',
-            pEl: 0, pNeu: 0, pLa: 0,
           }));
-        const future = (data?.forecast?.seasons || []).map((s) => ({
-          key: s.season,
-          label: s.label,
-          isForecast: true,
-          peak: 0,
-          phase: 'forecast' as const,
-          pEl: s.pElNino,
-          pNeu: s.pNeutral,
-          pLa: s.pLaNina,
-        }));
-        const combined = [...past, ...future];
+
+        // Forecast analysis — find when El Niño probability crosses 50% and ≥90%.
+        const seasons = data?.forecast?.seasons || [];
+        const first50 = seasons.find((s) => s.pElNino >= 50);
+        const first90 = seasons.find((s) => s.pElNino >= 90);
+        const last90Idx = (() => {
+          let last = -1;
+          seasons.forEach((s, i) => { if (s.pElNino >= 90) last = i; });
+          return last;
+        })();
+        const last90 = last90Idx >= 0 ? seasons[last90Idx] : null;
+        const peakSeason = seasons.reduce<ForecastSeason | null>(
+          (a, b) => (a === null || b.pElNino > a.pElNino ? b : a),
+          null,
+        );
+        const isForecastingElNino = !!first50;
+
+        // Predicted peak ONI = mean of historical El Niño peaks (those ≥ +0.5°C).
+        const elNinoPeaks = past.filter((p) => p.peak >= 0.5).map((p) => p.peak);
+        const predictedPeakOni = elNinoPeaks.length
+          ? elNinoPeaks.reduce((a, b) => a + b, 0) / elNinoPeaks.length
+          : 1.5;
+
+        // Add the 2026 forecast bar to the same yearly axis.
+        const forecastYear = lastHistYear + 1;
+        const combined = [
+          ...past,
+          ...(isForecastingElNino
+            ? [{
+                key: String(forecastYear),
+                label: `${forecastYear} (forecast)`,
+                isForecast: true,
+                peak: predictedPeakOni,
+                phase: 'el-nino' as const,
+              }]
+            : []),
+        ];
 
         return (
         <SectionCard
           icon={<History className="text-[#D0A65E]" />}
-          title="Past & future — the ENSO story since 1980"
-          subtitle="Every El Niño (red) and La Niña (blue) peak since 1980, side by side with NOAA's official probability outlook for the next 9 seasons. The right-hand stacked bars show the chance of each phase developing — a probabilistic forecast, not a guaranteed value."
+          title="Past & future — the central thread of the ENSO story"
+          subtitle="Every El Niño (red) and La Niña (blue) since 1980 on one timeline — plus NOAA's forecast for the next event, drawn dashed at its expected strength. The 'today' line marks where measurement ends and prediction begins."
         >
           <div className="h-[360px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={combined} margin={{ top: 10, right: 14, left: 0, bottom: 18 }}>
+                <defs>
+                  <pattern id="enso-forecast-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+                    <rect width="6" height="6" fill="rgba(251,113,133,0.18)" />
+                    <rect width="3" height="6" fill="rgba(251,113,133,0.45)" />
+                  </pattern>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis
                   dataKey="key"
                   stroke="#9CA3AF"
-                  fontSize={9}
-                  interval={0}
+                  fontSize={10}
+                  interval={4}
                   angle={-90}
                   textAnchor="end"
                   height={50}
                 />
                 <YAxis
-                  yAxisId="oni"
                   stroke="#9CA3AF"
                   fontSize={10}
                   width={42}
@@ -340,49 +375,52 @@ export default function EnsoPage() {
                   ticks={[-3, -2, -1, 0, 1, 2, 3]}
                   tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
                 />
-                <YAxis
-                  yAxisId="prob"
-                  orientation="right"
-                  stroke="#9CA3AF"
-                  fontSize={10}
-                  width={36}
-                  domain={[0, 100]}
-                  ticks={[0, 25, 50, 75, 100]}
-                  tickFormatter={(v) => `${v}%`}
-                />
                 <Tooltip
                   contentStyle={TT_CONTENT}
                   labelStyle={TT_LABEL}
                   itemStyle={TT_ITEM}
                   cursor={TT_CURSOR}
-                  formatter={(value: any, name: any, p: any) => {
-                    if (p?.payload?.isForecast) {
-                      if (typeof value === 'number' && value > 0) return [`${value}%`, name];
-                      return null;
-                    }
-                    if (name === 'Peak ONI') return [`${fmtSigned(value, 1)}°C`, name];
-                    return null;
-                  }}
+                  formatter={(value: any) => [`${fmtSigned(value, 1)}°C`, 'Peak ONI']}
                   labelFormatter={(_label: any, p: any) => {
                     const pl = p?.[0]?.payload;
-                    if (pl?.isForecast) return `Forecast — ${pl.label}`;
-                    if (pl) return `${pl.label} · peak ${pl.phase === 'el-nino' ? 'El Niño' : pl.phase === 'la-nina' ? 'La Niña' : 'Neutral'}`;
-                    return '';
+                    if (!pl) return '';
+                    if (pl.isForecast) return `${pl.label} — predicted El Niño`;
+                    return `${pl.label} · ${pl.phase === 'el-nino' ? 'El Niño' : pl.phase === 'la-nina' ? 'La Niña' : 'Neutral'} year`;
                   }}
                 />
-                <ReferenceLine yAxisId="oni" y={0.5} stroke="#fb7185" strokeDasharray="3 3" />
-                <ReferenceLine yAxisId="oni" y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
-                <ReferenceLine yAxisId="oni" y={0} stroke="#6B7280" />
-                {/* Past peak ONI bars — Cell-coloured by phase */}
-                <Bar yAxisId="oni" dataKey="peak" name="Peak ONI" isAnimationActive={false}>
-                  {combined.map((d, i) => (
-                    <Cell key={i} fill={d.phase === 'el-nino' ? '#fb7185' : d.phase === 'la-nina' ? '#60a5fa' : '#6b7280'} />
-                  ))}
+                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" />
+                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
+                <ReferenceLine y={0} stroke="#6B7280" />
+                {/* "Today" boundary between history and forecast */}
+                {isForecastingElNino && (
+                  <ReferenceLine
+                    x={String(lastHistYear)}
+                    stroke="#D0A65E"
+                    strokeDasharray="4 4"
+                    label={{ value: 'today', fill: '#D0A65E', fontSize: 11, position: 'top' }}
+                  />
+                )}
+                <Bar dataKey="peak" name="Peak ONI" isAnimationActive={false}>
+                  {combined.map((d, i) => {
+                    if (d.isForecast) {
+                      return (
+                        <Cell
+                          key={i}
+                          fill="url(#enso-forecast-stripes)"
+                          stroke="#fb7185"
+                          strokeWidth={1.5}
+                          strokeDasharray="4 3"
+                        />
+                      );
+                    }
+                    return (
+                      <Cell
+                        key={i}
+                        fill={d.phase === 'el-nino' ? '#fb7185' : d.phase === 'la-nina' ? '#60a5fa' : '#6b7280'}
+                      />
+                    );
+                  })}
                 </Bar>
-                {/* Forecast stacked probability bars */}
-                <Bar yAxisId="prob" dataKey="pLa" name="P(La Niña)" stackId="prob" fill="#60a5fa" isAnimationActive={false} />
-                <Bar yAxisId="prob" dataKey="pNeu" name="P(Neutral)" stackId="prob" fill="#9ca3af" isAnimationActive={false} />
-                <Bar yAxisId="prob" dataKey="pEl" name="P(El Niño)" stackId="prob" fill="#fb7185" isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -390,49 +428,91 @@ export default function EnsoPage() {
           {/* Legend strip */}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-rose-400" /> El Niño peak
+              <span className="inline-block w-3 h-3 rounded-sm bg-rose-400" /> El Niño peak (≥ +0.5°C)
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-sky-400" /> La Niña peak
+              <span className="inline-block w-3 h-3 rounded-sm bg-sky-400" /> La Niña peak (≤ −0.5°C)
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block w-3 h-3 rounded-sm bg-gray-500" /> Neutral year
             </span>
-            <span className="inline-flex items-center gap-1.5 text-gray-400">
-              | <span className="font-mono">left axis</span>: peak ONI (°C) · <span className="font-mono">right axis</span>: forecast probability
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                className="inline-block w-3 h-3 rounded-sm border border-rose-400"
+                style={{ background: 'repeating-linear-gradient(45deg, rgba(251,113,133,0.15) 0 2px, rgba(251,113,133,0.45) 2px 4px)' }}
+              />{' '}
+              Forecast (dashed)
             </span>
           </div>
 
-          {/* Headline forecast call-out */}
-          {data?.forecast?.seasons?.length ? (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-              {(() => {
-                const seasons = data.forecast!.seasons;
-                const next = seasons[0];
-                const peak = seasons.reduce(
-                  (a, b) => (Math.max(b.pElNino, b.pLaNina) > Math.max(a.pElNino, a.pLaNina) ? b : a),
-                  seasons[0],
-                );
-                const last = seasons[seasons.length - 1];
-                const phaseOf = (s: ForecastSeason) =>
-                  s.pElNino >= 50 ? { name: 'El Niño', text: 'text-rose-300', p: s.pElNino }
-                  : s.pLaNina >= 50 ? { name: 'La Niña', text: 'text-sky-300', p: s.pLaNina }
-                  : { name: 'Neutral', text: 'text-gray-300', p: s.pNeutral };
-                const items: Array<[string, ForecastSeason, ReturnType<typeof phaseOf>]> = [
-                  ['This season', next, phaseOf(next)],
-                  ['Peak likelihood', peak, phaseOf(peak)],
-                  ['End of forecast', last, phaseOf(last)],
-                ];
-                return items.map(([title, s, ph]) => (
-                  <div key={title} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
-                    <p className="text-[10px] uppercase tracking-wider text-gray-400">{title}</p>
-                    <p className={`text-lg font-bold font-mono ${ph.text}`}>{ph.name}</p>
-                    <p className="text-xs text-gray-400 font-mono">{ph.p}% · {s.label}</p>
-                  </div>
-                ));
-              })()}
+          {/* Headline forecast narrative */}
+          {isForecastingElNino && (
+            <div className="mt-4 rounded-xl border border-rose-500/30 bg-gradient-to-br from-rose-950/30 to-gray-900/30 p-4">
+              <p className="text-xs uppercase tracking-wider text-rose-300/80 font-mono mb-1">NOAA forecast — what's coming</p>
+              <p className="text-sm text-gray-100 leading-relaxed">
+                A new <span className="font-semibold text-rose-300">El Niño</span> looks increasingly likely.{' '}
+                {first50 && (
+                  <>
+                    Probability first crosses{' '}
+                    <span className="font-mono font-semibold text-rose-200">50%</span> in{' '}
+                    <span className="font-mono">{first50.label}</span>
+                    {' '}({first50.pElNino}% chance)
+                    {first90 && (
+                      <>
+                        , climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in{' '}
+                        <span className="font-mono">{first90.label}</span>
+                      </>
+                    )}
+                    {peakSeason && (
+                      <>
+                        {' '}and peaks at{' '}
+                        <span className="font-mono font-semibold text-rose-200">{peakSeason.pElNino}%</span> in{' '}
+                        <span className="font-mono">{peakSeason.label}</span>
+                      </>
+                    )}
+                    {last90 && first90 && first90.season !== last90.season && (
+                      <>
+                        , staying above 90% through <span className="font-mono">{last90.label}</span>
+                      </>
+                    )}
+                    .
+                  </>
+                )}{' '}
+                The dashed bar shows the expected peak intensity — drawn at{' '}
+                <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span>,
+                the average of every El Niño peak since {past.find((p) => p.phase === 'el-nino')?.label || '1980'}.
+              </p>
             </div>
-          ) : null}
+          )}
+
+          {/* Compact season-by-season probability strip */}
+          {seasons.length > 0 && (
+            <div className="mt-3">
+              <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-1.5 font-mono">
+                Season-by-season El Niño probability
+              </p>
+              <div className="flex gap-1">
+                {seasons.map((s) => (
+                  <div
+                    key={s.season}
+                    className="flex-1 flex flex-col items-center"
+                    title={`${s.label}: ${s.pElNino}% El Niño · ${s.pNeutral}% Neutral · ${s.pLaNina}% La Niña`}
+                  >
+                    <div className="w-full h-12 bg-gray-800/40 rounded-sm overflow-hidden flex flex-col-reverse border border-gray-700/40">
+                      <div
+                        className={s.pElNino >= 50 ? 'bg-rose-500' : 'bg-rose-500/40'}
+                        style={{ height: `${s.pElNino}%` }}
+                      />
+                    </div>
+                    <span className="text-[9px] font-mono text-gray-400 mt-1">{s.season}</span>
+                    <span className={`text-[10px] font-mono font-bold ${s.pElNino >= 50 ? 'text-rose-300' : 'text-gray-500'}`}>
+                      {s.pElNino}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <p className="text-xs text-gray-500 mt-3">
             Forecast source:{' '}
