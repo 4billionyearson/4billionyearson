@@ -32,6 +32,10 @@ const SOURCES = {
   mei: 'https://psl.noaa.gov/enso/mei/data/meiv2.data',
   soi: 'https://www.cpc.ncep.noaa.gov/data/indices/soi',
   forecast: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php',
+  // IRI/Columbia ENSO plume - dynamical & statistical model forecasts of
+  // 3-month-rolling Niño 3.4 SST anomaly. Each issue covers 9 forecast
+  // periods starting ~1 month after the issue date. Issued ~19th of month.
+  plumeBase: 'https://ensoforecast.iri.columbia.edu/plumes_json',
 };
 
 const round2 = (v) => Math.round(v * 100) / 100;
@@ -137,13 +141,14 @@ function parseWeeklyNino(text) {
   if (!rows.length) return null;
   rows.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
   const latest = rows[rows.length - 1];
-  // Keep last ~5 years of weekly data (≈260 rows)
-  const trimmed = rows.slice(-260);
+  // Keep last ~7.5 years of weekly data (≈390 rows). The hero chart shows a
+  // 7-year window so anything shorter leaves a gap on the left.
+  const trimmed = rows.slice(-390);
   return {
     latest,
     weekly: trimmed,
     baseline: '1991–2020',
-    firstWeek: rows[0].date,
+    firstWeek: trimmed[0].date,
     lastWeek: latest.date,
   };
 }
@@ -269,16 +274,123 @@ function parseForecast(html) {
   return { seasons, imageUrl };
 }
 
+// 3-month season labels in calendar order, used to map plume forecast
+// periods (which are 1, 2, 3, ... months ahead of issue date) to season keys.
+const SEASON_ORDER = ['DJF','JFM','FMA','MAM','AMJ','MJJ','JJA','JAS','ASO','SON','OND','NDJ'];
+
+/**
+ * Try IRI plume JSON for issue {year, month}. Returns parsed JSON or null.
+ * The IRI publishes around the 19th, so the current month may not be ready
+ * yet \u2014 the caller walks back month-by-month until a 200 lands.
+ */
+async function fetchPlumeMonth(year, month) {
+  const url = `${SOURCES.plumeBase}/${year}/${month}`;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15_000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': '4billionyearson-climate-snapshot/1.0' },
+      redirect: 'follow',
+    });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const ct = res.headers.get('content-type') || '';
+    const text = await res.text();
+    if (!text || !text.trim().startsWith('{')) return null;
+    if (!ct.includes('json') && !text.includes('"models"')) return null;
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Latest available IRI plume \u2014 walk back up to 3 months to find one.
+ * Returns { issueYear, issueMonth, periods: [{period, label, mean, dynMean,
+ * statMean, modelCount, models:[{name,type,value}] }, ...] } or null.
+ */
+async function fetchLatestPlume() {
+  const now = new Date();
+  let y = now.getUTCFullYear();
+  let m = now.getUTCMonth() + 1;
+  for (let i = 0; i < 4; i++) {
+    console.log(`[IRI plume] trying ${y}/${m}`);
+    const json = await fetchPlumeMonth(y, m);
+    if (json && Array.isArray(json.models)) {
+      const issueMonth = Number(json.month) || m;
+      const issueYear = y;
+      const numPeriods = Math.max(...json.models.map((md) => (md.data || []).length));
+      const periods = [];
+      for (let p = 0; p < numPeriods; p++) {
+        const vals = [];
+        const dynVals = [];
+        const statVals = [];
+        const models = [];
+        let dynAvg = null;
+        let statAvg = null;
+        for (const md of json.models) {
+          const v = md.data?.[p];
+          if (v == null || v === -999 || v <= -990) continue;
+          const num = Number(v);
+          if (!Number.isFinite(num)) continue;
+          if (md.model === 'DYN AVG') dynAvg = num;
+          else if (md.model === 'STAT AVG') statAvg = num;
+          else if (md.model === 'CPC AVG' || md.type === 'Other') {
+            // skip aggregate rows from per-model accounting
+          } else {
+            vals.push(num);
+            if (md.type === 'Dynamical') dynVals.push(num);
+            if (md.type === 'Statistical') statVals.push(num);
+            models.push({ name: md.model, type: md.type, value: round2(num) });
+          }
+        }
+        if (!vals.length && dynAvg == null && statAvg == null) continue;
+        const mean = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+        const dynMean = dynVals.length ? dynVals.reduce((a, b) => a + b, 0) / dynVals.length : dynAvg;
+        const statMean = statVals.length ? statVals.reduce((a, b) => a + b, 0) / statVals.length : statAvg;
+        // Map plume period p to NOAA 3-month season label.
+        // IRI convention: issue month m → period[0] is the season whose
+        // first month is m+1. e.g. issue March → AMJ first (Apr-May-Jun).
+        // Use JS Date arithmetic for clean year-rollover handling.
+        const startDate = new Date(Date.UTC(issueYear, issueMonth + p, 1)); // first month of season
+        const centreDate = new Date(Date.UTC(issueYear, issueMonth + p + 1, 1));
+        const seasonStartMonth1 = startDate.getUTCMonth() + 1; // 1..12
+        // SEASON_ORDER is keyed by start month: Dec=0(DJF), Jan=1(JFM), ...
+        const seasonIdx = seasonStartMonth1 === 12 ? 0 : seasonStartMonth1;
+        const label = SEASON_ORDER[seasonIdx];
+        const seasonAnchorYear = centreDate.getUTCFullYear();
+        periods.push({
+          period: p,
+          label,
+          seasonAnchorYear,
+          mean: mean != null ? round2(mean) : null,
+          dynMean: dynMean != null ? round2(dynMean) : null,
+          statMean: statMean != null ? round2(statMean) : null,
+          modelCount: models.length,
+          models,
+        });
+      }
+      return { issueYear, issueMonth, periods };
+    }
+    // step back one month
+    m -= 1;
+    if (m === 0) { m = 12; y -= 1; }
+  }
+  return null;
+}
+
 // ───────────────────────────────────────────────────────────────────────────
 // Main
 
 (async function main() {
-  const [oniText, weeklyText, meiText, soiText, forecastHtml] = await Promise.all([
+  const [oniText, weeklyText, meiText, soiText, forecastHtml, plume] = await Promise.all([
     fetchText(SOURCES.oni, { label: 'NOAA CPC ONI' }),
     fetchText(SOURCES.weekly, { label: 'NOAA CPC weekly Niño SSTs' }),
     fetchText(SOURCES.mei, { label: 'NOAA PSL MEI v2' }),
     fetchText(SOURCES.soi, { label: 'NOAA CPC SOI' }),
     fetchText(SOURCES.forecast, { label: 'NOAA CPC probability forecast' }),
+    fetchLatestPlume(),
   ]);
 
   const oni = parseOni(oniText);
@@ -306,12 +418,14 @@ function parseForecast(html) {
     mei,
     soi,
     forecast,
+    plume,
     sources: {
       oni: SOURCES.oni,
       weekly: SOURCES.weekly,
       mei: SOURCES.mei,
       soi: SOURCES.soi,
       forecast: SOURCES.forecast,
+      plume: SOURCES.plumeBase,
       metOffice: 'https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina',
     },
     images: {
@@ -344,6 +458,7 @@ function parseForecast(html) {
   console.log(`  mei:    ${mei ? `${mei.history.length} pts, latest ${mei.latest.season} ${mei.latest.year} = ${mei.latest.value}` : 'null'}`);
   console.log(`  soi:    ${soi ? `${soi.history.length} pts, latest ${soi.latest.year}-${soi.latest.month} = ${soi.latest.value}` : 'null'}`);
   console.log(`  forecast: ${forecast ? `${forecast.seasons.length} seasons, first ${forecast.seasons[0].label}` : 'null'}`);
+  console.log(`  plume:    ${plume ? `${plume.periods.length} periods (issue ${plume.issueYear}/${plume.issueMonth}), first ${plume.periods[0].label} mean ${plume.periods[0].mean}` : 'null'}`);
 })().catch((err) => {
   console.error('FATAL', err);
   process.exit(1);

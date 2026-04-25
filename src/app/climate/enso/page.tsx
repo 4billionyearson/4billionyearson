@@ -93,12 +93,30 @@ type ForecastData = {
   imageUrl: string | null;
 };
 
+type PlumePeriod = {
+  period: number;
+  label: string;
+  seasonAnchorYear: number;
+  mean: number | null;
+  dynMean: number | null;
+  statMean: number | null;
+  modelCount: number;
+  models: { name: string; type: string; value: number }[];
+};
+
+type PlumeData = {
+  issueYear: number;
+  issueMonth: number;
+  periods: PlumePeriod[];
+};
+
 type EnsoSnapshot = {
   oni: OniData | null;
   weekly: WeeklyData | null;
   mei: MeiData | null;
   soi: SoiData | null;
   forecast: ForecastData | null;
+  plume: PlumeData | null;
   sources: Record<string, string>;
   images: {
     sstAnomalyMap: string;
@@ -166,8 +184,8 @@ function SectionCard({
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
 const ENSO_COLORS: Record<EnsoState, string> = {
-  'El Niño': '#fb7185',
-  'La Niña': '#60a5fa',
+  'El Niño': '#f43f5e',
+  'La Niña': '#0ea5e9',
   Neutral: '#a3a3a3',
 };
 
@@ -219,6 +237,7 @@ export default function EnsoPage() {
   }
 
   const { oni, weekly, mei, soi, images, generatedAt } = data;
+  const plume = data.plume;
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-6 md:py-10 space-y-4">
@@ -393,11 +412,29 @@ export default function EnsoPage() {
         );
         const isForecastingElNino = !!first50;
 
-        // Predicted peak intensity = mean of past El Niño peaks in window.
+        // Predicted peak intensity. Prefer the IRI plume (multi-model dynamical
+        // mean) when available — that's a real model-driven number, not just a
+        // historical average. Falls back to the mean of past El Niño peaks.
+        const plumePeaks = (data?.plume?.periods || [])
+          .map((p) => p.dynMean ?? p.mean)
+          .filter((v): v is number => v != null);
         const elNinoPeaks = past.filter((p) => p.peak >= 0.5).map((p) => p.peak);
-        const predictedPeakOni = elNinoPeaks.length
-          ? elNinoPeaks.reduce((a, b) => a + b, 0) / elNinoPeaks.length
-          : 1.5;
+        const predictedPeakOni = plumePeaks.length
+          ? Math.max(...plumePeaks)
+          : elNinoPeaks.length
+            ? elNinoPeaks.reduce((a, b) => a + b, 0) / elNinoPeaks.length
+            : 1.5;
+        // Locate which plume period holds that peak so labels match.
+        const plumePeakPeriod = (data?.plume?.periods || []).reduce<PlumePeriod | null>(
+          (a, b) => {
+            const bv = b.dynMean ?? b.mean;
+            const av = a ? (a.dynMean ?? a.mean) : null;
+            if (bv == null) return a;
+            if (av == null || bv > av) return b;
+            return a;
+          },
+          null,
+        );
 
         // Anchor seasons on current/next year. Seasons earlier in the array
         // belong to the current year; once labels wrap, anchor on next year.
@@ -412,11 +449,30 @@ export default function EnsoPage() {
           return last;
         })();
         const lastNotable = lastNotableIdx >= 0 ? seasons[lastNotableIdx] : null;
-        const elNinoEnd = lastNotable ? seasonWindow(lastNotable.season, currentYear)[1] : null;
-        const peakX = peakSeason ? seasonCentre(peakSeason.season, currentYear) : null;
+        // End of the forecast envelope. Prefer the last plume period (extends
+        // further than the CPC probability outlook) so the dashed window covers
+        // every model-predicted month.
+        const lastPlume = data?.plume?.periods?.[data.plume.periods.length - 1];
+        const elNinoEnd = lastPlume
+          ? seasonWindow(lastPlume.label, lastPlume.seasonAnchorYear)[1]
+          : lastNotable
+            ? seasonWindow(lastNotable.season, currentYear)[1]
+            : null;
+        // Peak X position. Plume gives us a model-driven peak season; otherwise
+        // fall back to the highest-probability CPC season.
+        const peakX = plumePeakPeriod
+          ? seasonCentre(plumePeakPeriod.label, plumePeakPeriod.seasonAnchorYear)
+          : peakSeason
+            ? seasonCentre(peakSeason.season, currentYear)
+            : null;
 
         const xMin = minYear - 0.5;
-        const xMax = Math.max(currentYear + 1.2, (elNinoEnd ?? currentYear + 1) + 0.1);
+        // Extend to the end of the year that contains elNinoEnd plus a small
+        // buffer, so the next integer tick (e.g. 2028) renders.
+        const xMax = Math.max(
+          currentYear + 1.5,
+          (elNinoEnd ?? currentYear + 1) + 0.5,
+        );
 
         // X-axis ticks — integer years only.
         const yearTicks: number[] = [];
@@ -457,21 +513,63 @@ export default function EnsoPage() {
           })
           .sort((a, b) => a.x - b.x);
 
-        // Synthetic forecast curve: piecewise interpolation through key anchors
-        // (today → forecast start at +0.6 → peak season at predictedPeakOni →
-        // forecast end at ~+0.3) with a small cosine smoothing.
+        // Forecast curve — built from the IRI/Columbia ENSO plume (multi-model
+        // mean of dynamical + statistical Niño 3.4 forecasts) when available,
+        // falling back to a synthetic peak-shaped profile otherwise. Each plume
+        // period is one 3-month overlapping season; we anchor the value at the
+        // season centre and let Recharts interpolate.
         const forecastPoints: ChartPoint[] = [];
-        if (
+        const plumePeriods = plume?.periods || [];
+        const usingPlume = plumePeriods.length > 0;
+
+        if (usingPlume) {
+          // Anchor each period at the centre of its 3-month window. Use the
+          // dynamical-model mean (it captures the dramatic super-El Niño
+          // signal that's currently dominant) but fall back to overall mean.
+          const anchors: { x: number; y: number; label: string }[] = [];
+          for (const pr of plumePeriods) {
+            const v = pr.dynMean ?? pr.mean ?? pr.statMean;
+            if (v == null) continue;
+            const cx = seasonCentre(pr.label, pr.seasonAnchorYear);
+            anchors.push({ x: cx, y: v, label: `${pr.label} ${pr.seasonAnchorYear}` });
+          }
+          // Sort by x just in case.
+          anchors.sort((a, b) => a.x - b.x);
+          // Bridge: prepend the live "now" value so the curve starts where the
+          // observed line ends and there's no visual jump.
+          const bridge = { x: todayX, y: currentOni, label: 'now' };
+          // Only keep anchors strictly after today (so the bridge is genuinely
+          // the start of the predicted curve).
+          const futureAnchors = anchors.filter((a) => a.x > todayX);
+          const allAnchors = [bridge, ...futureAnchors];
+          // Densify with cosine interpolation for smoothness.
+          const stepsPerLeg = 10;
+          for (let i = 0; i < allAnchors.length - 1; i++) {
+            const a0 = allAnchors[i];
+            const a1 = allAnchors[i + 1];
+            for (let s = 0; s <= stepsPerLeg; s++) {
+              const t = s / stepsPerLeg;
+              const eased = (1 - Math.cos(Math.PI * t)) / 2;
+              const fx = a0.x + (a1.x - a0.x) * t;
+              const fy = a0.y + (a1.y - a0.y) * eased;
+              // Skip duplicates at leg joins (except for the very first point).
+              if (i > 0 && s === 0) continue;
+              forecastPoints.push({ x: fx, fcAnom: fy, fcPos: fy > 0 ? fy : 0 });
+            }
+          }
+        } else if (
           isForecastingElNino &&
           elNinoStart !== null &&
           elNinoEnd !== null &&
           peakX !== null &&
           todayX < elNinoEnd
         ) {
+          // Fallback: synthetic three-segment cosine curve through past-peak
+          // average. Used only if the IRI plume feed is unavailable.
           const startVal = currentOni;
-          const startThresh = 0.6; // value at official 50% start
+          const startThresh = 0.6;
           const peakVal = predictedPeakOni;
-          const endVal = 0.3; // tapering back toward neutral by end of window
+          const endVal = 0.3;
           const steps = 28;
           for (let i = 0; i <= steps; i++) {
             const t = i / steps;
@@ -496,7 +594,6 @@ export default function EnsoPage() {
               fcPos: fy > 0 ? fy : 0,
             });
           }
-          // Bridge: ensure the forecast line connects to the last observed point.
           const lastObs = observedPoints[observedPoints.length - 1];
           if (lastObs && forecastPoints.length) {
             forecastPoints[0] = {
@@ -520,8 +617,8 @@ export default function EnsoPage() {
               <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 0, bottom: 18 }}>
                 <defs>
                   <pattern id="enso-forecast-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
-                    <rect width="6" height="6" fill="rgba(251,113,133,0.12)" />
-                    <rect width="3" height="6" fill="rgba(251,113,133,0.32)" />
+                    <rect width="6" height="6" fill="rgba(244,63,94,0.12)" />
+                    <rect width="3" height="6" fill="rgba(244,63,94,0.32)" />
                   </pattern>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -566,8 +663,8 @@ export default function EnsoPage() {
                   }}
                 />
                 {/* Threshold lines */}
-                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" strokeOpacity={0.5} />
-                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" strokeOpacity={0.5} />
+                <ReferenceLine y={0.5} stroke="#f43f5e" strokeDasharray="3 3" strokeOpacity={0.5} />
+                <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" strokeOpacity={0.5} />
                 <ReferenceLine y={0} stroke="#6B7280" />
 
                 {/* Observed area fills — profile-shaped from weekly data */}
@@ -575,7 +672,7 @@ export default function EnsoPage() {
                   type="monotone"
                   dataKey="pos"
                   stroke="none"
-                  fill="#fb7185"
+                  fill="#f43f5e"
                   fillOpacity={0.55}
                   isAnimationActive={false}
                   connectNulls={false}
@@ -584,7 +681,7 @@ export default function EnsoPage() {
                   type="monotone"
                   dataKey="neg"
                   stroke="none"
-                  fill="#60a5fa"
+                  fill="#0ea5e9"
                   fillOpacity={0.55}
                   isAnimationActive={false}
                   connectNulls={false}
@@ -598,7 +695,7 @@ export default function EnsoPage() {
                     y1={0}
                     y2={predictedPeakOni}
                     fill="url(#enso-forecast-stripes)"
-                    stroke="#fb7185"
+                    stroke="#f43f5e"
                     strokeWidth={1}
                     strokeDasharray="3 3"
                     strokeOpacity={0.45}
@@ -609,7 +706,7 @@ export default function EnsoPage() {
                   type="monotone"
                   dataKey="fcPos"
                   stroke="none"
-                  fill="#fb7185"
+                  fill="#f43f5e"
                   fillOpacity={0.35}
                   isAnimationActive={false}
                   connectNulls={false}
@@ -629,7 +726,7 @@ export default function EnsoPage() {
                 <Line
                   type="monotone"
                   dataKey="fcAnom"
-                  stroke="#fb7185"
+                  stroke="#f43f5e"
                   strokeWidth={2}
                   strokeDasharray="5 4"
                   dot={false}
@@ -641,29 +738,31 @@ export default function EnsoPage() {
                 {isForecastingElNino && elNinoStart !== null && first50 && (
                   <ReferenceLine
                     x={elNinoStart}
-                    stroke="#fb7185"
+                    stroke="#f43f5e"
                     strokeDasharray="2 2"
                     strokeOpacity={0.6}
                     label={{
                       value: `${first50.season} ${first50.pElNino}%`,
-                      fill: '#fb7185',
+                      fill: '#f43f5e',
                       fontSize: 10,
                       position: 'insideTopRight',
                       offset: 4,
                     }}
                   />
                 )}
-                {isForecastingElNino && peakX !== null && peakSeason && (
+                {isForecastingElNino && peakX !== null && (peakSeason || plumePeakPeriod) && (
                   <ReferenceDot
                     x={peakX}
                     y={predictedPeakOni}
                     r={5}
-                    fill="#fb7185"
+                    fill="#f43f5e"
                     stroke="#0f172a"
                     strokeWidth={2}
                     label={{
-                      value: `peak ${peakSeason.season} (${peakSeason.pElNino}%) · ~${fmtSigned(predictedPeakOni, 1)}°C`,
-                      fill: '#fb7185',
+                      value: plumePeakPeriod
+                        ? `peak ${plumePeakPeriod.label} ${plumePeakPeriod.seasonAnchorYear} · ~${fmtSigned(predictedPeakOni, 1)}°C`
+                        : `peak ${peakSeason!.season} (${peakSeason!.pElNino}%) · ~${fmtSigned(predictedPeakOni, 1)}°C`,
+                      fill: '#f43f5e',
                       fontSize: 10,
                       fontWeight: 600,
                       position: 'top',
@@ -725,15 +824,15 @@ export default function EnsoPage() {
               <span className="inline-block w-5 h-0.5 bg-[#fef3c7]" /> Weekly Niño 3.4 (observed)
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(251,113,133,0.55)' }} /> El Niño shading (above 0)
+              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(244,63,94,0.55)' }} /> El Niño shading (above 0)
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(96,165,250,0.55)' }} /> La Niña shading (below 0)
+              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(14,165,233,0.55)' }} /> La Niña shading (below 0)
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span
                 className="inline-block w-5 h-0.5"
-                style={{ background: 'repeating-linear-gradient(90deg, #fb7185 0 4px, transparent 4px 8px)' }}
+                style={{ background: 'repeating-linear-gradient(90deg, #f43f5e 0 4px, transparent 4px 8px)' }}
               />{' '}
               Forecast (smoothed profile)
             </span>
@@ -775,9 +874,19 @@ export default function EnsoPage() {
                     .
                   </>
                 )}{' '}
-                The dashed red box on the chart shows when this El Niño is expected, drawn at{' '}
-                <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span> —
-                the average peak strength of every El Niño since {past.find((p) => p.phase === 'el-nino')?.label || '2020'}.
+                The dashed red curve traces the multi-model{' '}
+                <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="text-rose-300 underline decoration-rose-400/40 underline-offset-2 hover:decoration-rose-300">
+                  IRI/CCSR plume forecast
+                </a>{' '}
+                {plume && (
+                  <>(issued {plume.issueMonth}/{plume.issueYear}, {plume.periods[0]?.modelCount ?? 0} dynamical &amp; statistical models). </>
+                )}
+                Peak intensity reaches{' '}
+                <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span>
+                {plumePeakPeriod && (
+                  <>{' '}in <span className="font-mono">{plumePeakPeriod.label} {plumePeakPeriod.seasonAnchorYear}</span></>
+                )}
+                {' '}— the dynamical-model average, which currently signals a strong-to-super El Niño.
               </p>
             </div>
           )}
@@ -849,8 +958,8 @@ export default function EnsoPage() {
               <AreaChart data={weekly.weekly} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="elnino-fill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#fb7185" stopOpacity={0.5} />
-                    <stop offset="100%" stopColor="#fb7185" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.5} />
+                    <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -877,8 +986,8 @@ export default function EnsoPage() {
                   ]}
                   labelFormatter={(d: any) => `Week of ${d}`}
                 />
-                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" label={{ value: 'El Niño', position: 'right', fill: '#fb7185', fontSize: 10 }} />
-                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" label={{ value: 'La Niña', position: 'right', fill: '#60a5fa', fontSize: 10 }} />
+                <ReferenceLine y={0.5} stroke="#f43f5e" strokeDasharray="3 3" label={{ value: 'El Niño', position: 'right', fill: '#f43f5e', fontSize: 10 }} />
+                <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" label={{ value: 'La Niña', position: 'right', fill: '#0ea5e9', fontSize: 10 }} />
                 <ReferenceLine y={0} stroke="#6B7280" />
                 <Area
                   type="monotone"
@@ -965,12 +1074,12 @@ export default function EnsoPage() {
                   formatter={(v: any) => [typeof v === 'number' ? `${fmtSigned(v)}°C` : '—', 'ONI']}
                   labelFormatter={(_, p: any) => (p?.[0]?.payload ? `${p[0].payload.season} ${p[0].payload.year}` : '')}
                 />
-                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" />
-                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
+                <ReferenceLine y={0.5} stroke="#f43f5e" strokeDasharray="3 3" />
+                <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" />
                 <ReferenceLine y={0} stroke="#6B7280" />
                 <Bar dataKey="anom" isAnimationActive={false}>
                   {oni.history.slice(-30).map((p, i) => (
-                    <Cell key={i} fill={p.anom >= 0.5 ? '#fb7185' : p.anom <= -0.5 ? '#60a5fa' : '#6b7280'} />
+                    <Cell key={i} fill={p.anom >= 0.5 ? '#f43f5e' : p.anom <= -0.5 ? '#0ea5e9' : '#6b7280'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -1020,8 +1129,8 @@ export default function EnsoPage() {
                   formatter={(v: any) => [typeof v === 'number' ? fmtSigned(v) : '—', 'MEI v2']}
                   labelFormatter={(_, p: any) => (p?.[0]?.payload ? `${p[0].payload.season} ${p[0].payload.year}` : '')}
                 />
-                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" />
-                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
+                <ReferenceLine y={0.5} stroke="#f43f5e" strokeDasharray="3 3" />
+                <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" />
                 <ReferenceLine y={0} stroke="#6B7280" />
                 <Line type="monotone" dataKey="value" stroke="#a78bfa" strokeWidth={1.8} dot={false} isAnimationActive={false} />
               </LineChart>
@@ -1075,7 +1184,7 @@ export default function EnsoPage() {
                 <ReferenceLine y={0} stroke="#6B7280" />
                 <Bar dataKey="value" isAnimationActive={false}>
                   {soi.history.slice(-60).map((p, i) => (
-                    <Cell key={i} fill={p.value >= 0.5 ? '#60a5fa' : p.value <= -0.5 ? '#fb7185' : '#6b7280'} />
+                    <Cell key={i} fill={p.value >= 0.5 ? '#0ea5e9' : p.value <= -0.5 ? '#f43f5e' : '#6b7280'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -1455,12 +1564,12 @@ export default function EnsoPage() {
                 contentStyle={TT_CONTENT} labelStyle={TT_LABEL} itemStyle={TT_ITEM} cursor={TT_CURSOR}
                 formatter={(v: any) => [typeof v === 'number' ? `${fmtSigned(v, 1)}°C peak ONI` : '—', '']}
               />
-              <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" />
-              <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
+              <ReferenceLine y={0.5} stroke="#f43f5e" strokeDasharray="3 3" />
+              <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" />
               <ReferenceLine y={0} stroke="#6B7280" />
               <Bar dataKey="peakOni" isAnimationActive={false}>
                 {PAST_EVENTS.map((e, i) => (
-                  <Cell key={i} fill={e.phase === 'el-nino' ? '#fb7185' : '#60a5fa'} />
+                  <Cell key={i} fill={e.phase === 'el-nino' ? '#f43f5e' : '#0ea5e9'} />
                 ))}
               </Bar>
             </BarChart>
