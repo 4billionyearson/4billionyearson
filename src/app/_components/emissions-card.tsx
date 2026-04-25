@@ -56,6 +56,16 @@ function formatTonnes(v: number): string {
   return `${v.toFixed(0)} t`;
 }
 
+function TonnesValue({ v }: { v: number }) {
+  const [num, unit] = formatTonnes(v).split(' ');
+  return (
+    <div className="text-3xl md:text-4xl font-bold font-mono text-white">
+      {num}
+      <span className="text-2xl text-gray-400 ml-1">{unit}</span>
+    </div>
+  );
+}
+
 function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
@@ -139,7 +149,7 @@ function GlobalCard({ data, deepLinkHref }: { data: GlobalApiResponse; deepLinkH
     <CardShell year={data.stats.latestAnnualYear} deepLinkHref={deepLinkHref}>
       <div className="flex items-end justify-between gap-3">
         <div>
-          <div className="text-3xl md:text-4xl font-bold font-mono text-white">{formatTonnes(data.stats.latestAnnual)}</div>
+          <TonnesValue v={data.stats.latestAnnual} />
           <div className="text-xs text-gray-400 mt-0.5">Total fossil CO₂ worldwide</div>
         </div>
         <div className={`text-right ${isUp ? 'text-orange-300' : 'text-emerald-300'}`}>
@@ -214,7 +224,7 @@ function CountryCard({ data, deepLinkHref }: { data: CountryApiResponse; deepLin
     <CardShell year={c.latestYear} deepLinkHref={deepLinkHref}>
       <div className="flex items-end justify-between gap-3">
         <div>
-          <div className="text-3xl md:text-4xl font-bold font-mono text-white">{formatTonnes(c.latestAnnual)}</div>
+          <TonnesValue v={c.latestAnnual} />
           <div className="text-xs text-gray-400 mt-0.5">CO₂ emissions · {c.name}</div>
         </div>
         <div className={`text-right ${isUp ? 'text-orange-300' : 'text-emerald-300'}`}>
@@ -376,7 +386,7 @@ function USStateCard({ data, stateName, deepLinkHref }: {
     <CardShell year={latestYear} deepLinkHref={deepLinkHref}>
       <div className="flex items-end justify-between gap-3">
         <div>
-          <div className="text-3xl md:text-4xl font-bold font-mono text-white">{formatTonnes(latestMt * 1e6)}</div>
+          <TonnesValue v={latestMt * 1e6} />
           <div className="text-xs text-gray-400 mt-0.5">Energy-related CO₂ · {stateName}</div>
         </div>
         <div className={`text-right ${isUp ? 'text-orange-300' : 'text-emerald-300'}`}>

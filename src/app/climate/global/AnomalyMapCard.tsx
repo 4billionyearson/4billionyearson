@@ -76,10 +76,7 @@ export default function AnomalyMapCard({
         ))}
       </div>
       <GlobalAnomalyMap countryAnomalies={countryAnomalies} window={anomalyWindow} />
-      <p className="text-xs text-gray-400 mt-3">
-        Each region is coloured by its temperature anomaly vs its own 1961&ndash;1990 baseline. Zoom in over the US or UK for state- and nation-level data. Grey = no data.
-      </p>
-      <p className="text-xs text-gray-500 mt-1">
+      <p className="text-xs text-gray-500 mt-3">
         Source: NOAA Climate at a Glance &middot; Met Office (UK) &middot; each region ranked against its own record, so colour reflects <em>relative</em> warming.
       </p>
     </div>

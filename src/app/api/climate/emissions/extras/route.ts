@@ -160,15 +160,28 @@ function buildRankings(index: ExtrasIndex): {
     return rows.slice(0, 15);
   };
 
-  // Trade rankings: trade_co2 = consumption - production (positive = net importer)
+  // Trade rankings: trade_co2 = consumption - production (positive = net importer).
+  // consumption_co2 / trade_co2 lag fossil CO₂ by ~1–2 years, so we scan back
+  // from the latest year to find the most recent year that has all three fields
+  // rather than relying on `latest` (which tracks the newest CO₂ row).
   const tradeRows: { name: string; value: number; year: number; production: number; consumption: number }[] = [];
   for (const [name, c] of Object.entries(index.countries)) {
-    const t = c.latest?.trade_co2;
-    const prod = c.latest?.co2;
-    const cons = c.latest?.consumption_co2;
-    if (typeof t === 'number' && typeof prod === 'number' && typeof cons === 'number' && c.latest) {
-      tradeRows.push({ name, value: t, year: c.latest.year, production: prod, consumption: cons });
+    let row: YearlyCompact | null = null;
+    for (let i = c.yearly.length - 1; i >= 0; i--) {
+      const y = c.yearly[i];
+      if (typeof y.trade_co2 === 'number' && typeof y.co2 === 'number' && typeof y.consumption_co2 === 'number') {
+        row = y;
+        break;
+      }
     }
+    if (!row) continue;
+    tradeRows.push({
+      name,
+      value: row.trade_co2 as number,
+      year: row.year,
+      production: row.co2 as number,
+      consumption: row.consumption_co2 as number,
+    });
   }
   // Filter tiny absolute values to avoid noise (< 5 Mt)
   const significant = tradeRows.filter(r => Math.abs(r.value) >= 5);

@@ -101,7 +101,7 @@ export default function SeasonTimelineGraphic() {
   return (
     <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 p-4">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-3">
-        Calendar-year view - Northern Hemisphere
+        <span className="hidden sm:inline">Calendar-year view - </span>Northern Hemisphere
       </div>
 
       {/* Mobile stacked view */}
@@ -116,15 +116,15 @@ export default function SeasonTimelineGraphic() {
                 className="inline-block h-2.5 w-2.5 rounded-full"
                 style={{ background: r.accent }}
               />
-              <span className="text-[12px] font-mono text-gray-200">{r.title}</span>
+              <span className="text-sm font-mono text-gray-200">{r.title}</span>
             </div>
-            <div className="text-[11px] text-gray-400 font-mono">
+            <div className="text-xs text-gray-400 font-mono">
               {r.baselineLabel}: <span className="text-gray-300">{r.baselineValue}</span>
             </div>
-            <div className="text-[11px] font-mono mt-0.5" style={{ color: r.accent }}>
+            <div className="text-xs font-mono mt-0.5" style={{ color: r.accent }}>
               {r.nowLabel}: {r.nowValue}
             </div>
-            <div className="text-[11px] font-semibold font-mono mt-1" style={{ color: r.accent }}>
+            <div className="text-xl font-bold font-mono mt-1.5" style={{ color: r.accent }}>
               {r.delta}
             </div>
           </div>
@@ -145,51 +145,51 @@ export default function SeasonTimelineGraphic() {
         </defs>
 
         {/* ───────── Row 1: US growing season ───────── */}
-        <text x={X0} y={GROW_Y - 6} fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text x={X0} y={GROW_Y - 6} fontSize={13} fill="#D1D5DB" fontFamily="ui-monospace, monospace">
           US growing season
         </text>
         {/* historical (dashed outline) */}
         <rect x={x(growOldStart)} y={GROW_Y} width={x(growOldEnd) - x(growOldStart)} height={10} rx={5} fill="none" stroke="#9CA3AF" strokeDasharray="4 3" />
-        <text x={(x(growOldStart) + x(growOldEnd)) / 2} y={GROW_Y - 2} textAnchor="middle" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text x={(x(growOldStart) + x(growOldEnd)) / 2} y={GROW_Y - 2} textAnchor="middle" fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
           1895 baseline · {Math.round((growOldEnd - growOldStart) * 365)} days
         </text>
         {/* current (solid emerald) */}
         <rect x={x(growNewStart)} y={GROW_Y + 14} width={x(growNewEnd) - x(growNewStart)} height={10} rx={5} fill="#10B981" fillOpacity={0.85} />
-        <text x={(x(growNewStart) + x(growNewEnd)) / 2} y={GROW_Y + 36} textAnchor="middle" fontSize={11} fill="#6EE7B7" fontFamily="ui-monospace, monospace">
+        <text x={(x(growNewStart) + x(growNewEnd)) / 2} y={GROW_Y + 38} textAnchor="middle" fontSize={13} fill="#6EE7B7" fontFamily="ui-monospace, monospace">
           Now · {Math.round((growNewEnd - growNewStart) * 365)} days (+{Math.round((growNewEnd - growNewStart - (growOldEnd - growOldStart)) * 365)})
         </text>
 
         {/* ───────── Row 2: Kyoto blossom ───────── */}
-        <text x={X0} y={BLOSSOM_Y - 6} fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text x={X0} y={BLOSSOM_Y - 6} fontSize={13} fill="#D1D5DB" fontFamily="ui-monospace, monospace">
           Kyoto cherry blossom peak bloom
         </text>
         {/* axis track (thin) */}
         <line x1={X0} y1={BLOSSOM_Y + 16} x2={X1} y2={BLOSSOM_Y + 16} stroke="#374151" strokeWidth={1} />
         {/* historical (hollow) */}
         <circle cx={x(kyotoOld)} cy={BLOSSOM_Y + 16} r={6} fill="none" stroke="#F9A8D4" strokeWidth={2} />
-        <text x={x(kyotoOld) + 10} y={BLOSSOM_Y + 20} fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text x={x(kyotoOld) + 10} y={BLOSSOM_Y + 20} fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
           historic Apr 17
         </text>
         {/* current (filled) */}
         <circle cx={x(kyotoNew)} cy={BLOSSOM_Y + 16} r={6} fill="#F472B6" />
         {/* arrow between old and new */}
         <line x1={x(kyotoOld) - 6} y1={BLOSSOM_Y + 16} x2={x(kyotoNew) + 8} y2={BLOSSOM_Y + 16} stroke="#F472B6" strokeWidth={1.5} markerEnd="url(#arrowPink)" />
-        <text x={x(kyotoNew) - 10} y={BLOSSOM_Y + 36} textAnchor="end" fontSize={11} fill="#F472B6" fontFamily="ui-monospace, monospace">
+        <text x={x(kyotoNew) - 10} y={BLOSSOM_Y + 38} textAnchor="end" fontSize={13} fill="#F472B6" fontFamily="ui-monospace, monospace">
           Now Apr 6 · 11 days earlier
         </text>
 
         {/* ───────── Row 3: NH snow-free season ───────── */}
-        <text x={X0} y={SNOW_Y - 6} fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text x={X0} y={SNOW_Y - 6} fontSize={13} fill="#D1D5DB" fontFamily="ui-monospace, monospace">
           NH snow-free season
         </text>
         {/* historical (dashed outline) */}
         <rect x={x(snowOldStart)} y={SNOW_Y} width={x(snowOldEnd) - x(snowOldStart)} height={10} rx={5} fill="none" stroke="#9CA3AF" strokeDasharray="4 3" />
-        <text x={(x(snowOldStart) + x(snowOldEnd)) / 2} y={SNOW_Y - 2} textAnchor="middle" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
+        <text x={(x(snowOldStart) + x(snowOldEnd)) / 2} y={SNOW_Y - 2} textAnchor="middle" fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
           1971–2000 baseline · {Math.round((snowOldEnd - snowOldStart) * 365)} days
         </text>
         {/* current (solid cyan) */}
         <rect x={x(snowNewStart)} y={SNOW_Y + 14} width={x(snowNewEnd) - x(snowNewStart)} height={10} rx={5} fill="#22D3EE" fillOpacity={0.8} />
-        <text x={(x(snowNewStart) + x(snowNewEnd)) / 2} y={SNOW_Y + 36} textAnchor="middle" fontSize={11} fill="#67E8F9" fontFamily="ui-monospace, monospace">
+        <text x={(x(snowNewStart) + x(snowNewEnd)) / 2} y={SNOW_Y + 38} textAnchor="middle" fontSize={13} fill="#67E8F9" fontFamily="ui-monospace, monospace">
           Now · {Math.round((snowNewEnd - snowNewStart) * 365)} days (+{Math.round((snowNewEnd - snowNewStart - (snowOldEnd - snowOldStart)) * 365)})
         </text>
 

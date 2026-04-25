@@ -370,9 +370,7 @@ export default function GlobalProfile() {
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
-              <div className="mb-3">
-                <GlobalRankingsTeaser />
-              </div>
+              <GlobalRankingsTeaser />
 
               {summary ? (
                 <div>
@@ -665,7 +663,7 @@ export default function GlobalProfile() {
                           dataSource="NOAA Climate at a Glance - Global Land+Ocean"
                         />
                         <p className="text-xs text-gray-400 mt-3">
-                          The headline global surface-temperature series - the same land + ocean dataset used by Copernicus, WMO and NOAA - and the one to cite when comparing the planet as a whole against a single country, state or region.
+                          The headline global series (land + ocean) - the dataset Copernicus, WMO and NOAA report against. Source: NOAA Climate at a Glance.
                         </p>
                       </div>
                     )}
@@ -677,7 +675,7 @@ export default function GlobalProfile() {
                           dataSource="Our World in Data / ERA5"
                         />
                         <p className="text-xs text-gray-400 mt-3">
-                          The same chart style as the individual country, state and region climate pages - which use land-only temperatures because there&rsquo;s no ocean inside their borders. This land-only global version is included so you can compare any specific place on those pages against the global land average on equal terms.
+                          Land-only equivalent, on the same scale as the country, state and region climate pages (which have no ocean inside their borders). Source: Our World in Data / ERA5.
                         </p>
                       </div>
                     )}
@@ -695,7 +693,7 @@ export default function GlobalProfile() {
                   <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons Worldwide</h3>
                 </div>
                 <p className="text-sm text-gray-300 mb-4">
-                  Global averages smooth out the seasonal cycle, but climate change shows up most clearly in the <em>timing</em> of the year — spring earlier, snow seasons shorter, growing seasons longer.
+                  Global averages smooth out the seasonal cycle, but climate change shows up most clearly in the <em>timing</em> of the year. Spring is arriving earlier, snow seasons are shorter and growing seasons are longer.
                 </p>
 
                 {/* Calendar-year timeline graphic */}

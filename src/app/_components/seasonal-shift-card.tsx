@@ -327,7 +327,11 @@ export default function SeasonalShiftCard({
         </div>
       )}
 
-      {effectiveView === 'length' && hasTempSeasons && (
+      {effectiveView === 'length' && hasTempSeasons && (() => {
+        const maxLen = lengthSeries.reduce((m, d) => Math.max(m, d.length), 0);
+        const yMax = Math.min(12, Math.max(6, Math.ceil(maxLen + 1)));
+        const yTicks = yMax <= 6 ? [0, 2, 4, 6] : yMax <= 9 ? [0, 3, 6, 9] : [0, 3, 6, 9, 12];
+        return (
         <>
           <div className="h-64 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -336,9 +340,9 @@ export default function SeasonalShiftCard({
                 <XAxis dataKey="year" tick={{ fontSize: 10, fill: '#9ca3af' }} />
                 <YAxis
                   tick={{ fontSize: 10, fill: '#9ca3af' }}
-                  domain={[0, 12]}
-                  ticks={[0, 3, 6, 9, 12]}
-                  width={44}
+                  domain={[0, yMax]}
+                  ticks={yTicks}
+                  width={32}
                   label={{ value: 'Months', angle: -90, position: 'insideLeft', offset: 12, fill: '#9ca3af', fontSize: 10 }}
                 />
                 <Tooltip
@@ -375,7 +379,8 @@ export default function SeasonalShiftCard({
             baseline average.
           </p>
         </>
-      )}
+        );
+      })()}
 
       {effectiveView === 'monthly' && (
         <>
@@ -507,10 +512,10 @@ export default function SeasonalShiftCard({
       <div className="mt-3 flex justify-end">
         <Link
           href="/climate/shifting-seasons"
-          className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
         >
           Explore Shifting Seasons worldwide
-          <ArrowRight className="h-3 w-3" />
+          <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </section>
@@ -593,7 +598,36 @@ function WarmSeasonShiftBar({
           {deltaDays > 0 ? `+${deltaDays} days longer` : deltaDays < 0 ? `${deltaDays} days shorter` : 'no change'}
         </div>
       </div>
-      <svg viewBox={`0 0 1000 ${TOTAL_H}`} className="w-full h-auto" role="img">
+
+      {/* Mobile stacked view - the wide SVG below scales to ~320 px on phones,
+          which makes its 10 px text effectively unreadable. */}
+      <div className="space-y-2 sm:hidden font-mono">
+        <div className="rounded-md border border-gray-700/60 bg-gray-900/60 p-2.5">
+          <div className="text-[11px] text-gray-400 mb-0.5">{baselineLabel} baseline</div>
+          <div className="text-sm text-gray-200">
+            {doyToLabel(baselineSpringDoy)} <span className="text-gray-500">→</span> {doyToLabel(baselineAutumnDoy)}
+            <span className="text-gray-500"> · {Math.round(baselineLen)}d</span>
+          </div>
+        </div>
+        <div className="rounded-md border p-2.5" style={{ borderColor: '#F59E0B66', background: '#F59E0B14' }}>
+          <div className="text-[11px] mb-0.5" style={{ color: '#FDE68A' }}>{recentLabel} now</div>
+          <div className="text-sm" style={{ color: '#FDE68A' }}>
+            {doyToLabel(recentSpringDoy)} <span className="opacity-60">→</span> {doyToLabel(recentAutumnDoy)}
+            <span className="opacity-70"> · {Math.round(recentLen)}d</span>
+          </div>
+          <div className="mt-1 text-xs" style={{ color: shiftColor }}>
+            {springShiftDays !== 0 && (
+              <span>{springShiftDays < 0 ? `${Math.abs(Math.round(springShiftDays))}d earlier spring` : `${Math.round(springShiftDays)}d later spring`}</span>
+            )}
+            {springShiftDays !== 0 && autumnShiftDays !== 0 && <span className="text-gray-500"> · </span>}
+            {autumnShiftDays !== 0 && (
+              <span>{autumnShiftDays > 0 ? `${Math.round(autumnShiftDays)}d later autumn` : `${Math.abs(Math.round(autumnShiftDays))}d earlier autumn`}</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <svg viewBox={`0 0 1000 ${TOTAL_H}`} className="w-full h-auto hidden sm:block" role="img">
         {/* Baseline row */}
         <text
           x={X0 - 10}
