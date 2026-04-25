@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell, ComposedChart,
 } from 'recharts';
-import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, MapPin, Wind, Info, BookOpen, Scale, Factory, Leaf, ArrowRight, Ruler } from 'lucide-react';
+import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, Wind, Info, BookOpen, Scale, Factory, Leaf, ArrowRight, Ruler } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import SeasonTimelineGraphic from '@/app/_components/season-timeline-graphic';
 import { getRegionBySlug } from '@/lib/climate/regions';
@@ -370,12 +370,6 @@ export default function GlobalProfile() {
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
-              <div className="inline-flex items-start gap-2 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
-                <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
-                <p className="text-xs md:text-sm font-medium text-[#D0A65E]">
-                  <span className="font-semibold">Coverage:</span> Whole Earth - land and ocean surface temperature
-                </p>
-              </div>
               <div className="mb-3">
                 <GlobalRankingsTeaser />
               </div>
