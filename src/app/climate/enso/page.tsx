@@ -13,6 +13,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   ReferenceLine,
+  ReferenceDot,
   Tooltip,
   XAxis,
   YAxis,
@@ -289,9 +290,14 @@ export default function EnsoPage() {
         const yearsBack = 46;
         const lastHistYear = oni.history[oni.history.length - 1]?.year || new Date().getFullYear();
         const minYear = lastHistYear - yearsBack + 1;
+        const currentYear = new Date().getFullYear();
+        const currentOni = oni.anomaly;
+
+        // Peaks per completed year (exclude current year — it gets the
+        // forecast treatment below).
         const peaksByYear = new Map<number, number>();
         for (const p of oni.history) {
-          if (p.year < minYear) continue;
+          if (p.year < minYear || p.year >= currentYear) continue;
           const cur = peaksByYear.get(p.year);
           if (cur === undefined || Math.abs(p.anom) > Math.abs(cur)) peaksByYear.set(p.year, p.anom);
         }
@@ -327,8 +333,9 @@ export default function EnsoPage() {
           ? elNinoPeaks.reduce((a, b) => a + b, 0) / elNinoPeaks.length
           : 1.5;
 
-        // Add the 2026 forecast bar to the same yearly axis.
-        const forecastYear = lastHistYear + 1;
+        // Place the forecast bar at the current (in-progress) year — the
+        // predicted peak (OND) lands inside this calendar year.
+        const forecastYear = currentYear;
         const combined = [
           ...past,
           ...(isForecastingElNino
@@ -339,7 +346,14 @@ export default function EnsoPage() {
                 peak: predictedPeakOni,
                 phase: 'el-nino' as const,
               }]
-            : []),
+            : [{
+                // No incoming El Niño — still draw current year so chart includes today.
+                key: String(forecastYear),
+                label: `${forecastYear}`,
+                isForecast: false,
+                peak: currentOni,
+                phase: (currentOni >= 0.5 ? 'el-nino' : currentOni <= -0.5 ? 'la-nina' : 'neutral') as 'el-nino' | 'la-nina' | 'neutral',
+              }]),
         ];
 
         return (
@@ -392,14 +406,28 @@ export default function EnsoPage() {
                 <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
                 <ReferenceLine y={0} stroke="#6B7280" />
                 {/* "Today" boundary between history and forecast */}
-                {isForecastingElNino && (
-                  <ReferenceLine
-                    x={String(lastHistYear)}
-                    stroke="#D0A65E"
-                    strokeDasharray="4 4"
-                    label={{ value: 'today', fill: '#D0A65E', fontSize: 11, position: 'top' }}
-                  />
-                )}
+                <ReferenceLine
+                  x={String(currentYear)}
+                  stroke="#D0A65E"
+                  strokeDasharray="4 4"
+                  label={{ value: 'today', fill: '#D0A65E', fontSize: 11, position: 'top' }}
+                />
+                {/* "Now" marker — current ONI value at the today line */}
+                <ReferenceDot
+                  x={String(currentYear)}
+                  y={currentOni}
+                  r={5}
+                  fill="#D0A65E"
+                  stroke="#0f172a"
+                  strokeWidth={2}
+                  label={{
+                    value: `now ${fmtSigned(currentOni, 1)}°C`,
+                    fill: '#D0A65E',
+                    fontSize: 11,
+                    position: currentOni >= 0 ? 'right' : 'right',
+                    offset: 8,
+                  }}
+                />
                 <Bar dataKey="peak" name="Peak ONI" isAnimationActive={false}>
                   {combined.map((d, i) => {
                     if (d.isForecast) {
