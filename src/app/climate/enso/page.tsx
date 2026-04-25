@@ -289,7 +289,10 @@ export default function EnsoPage() {
         const yearsBack = 7;
         const currentYear = new Date().getFullYear();
         const minYear = currentYear - yearsBack + 1;
-        const currentOni = oni.anomaly;
+        // Use the live weekly Niño 3.4 anomaly for "now" — it's the most
+        // up-to-date number and matches the headline card. Fall back to the
+        // lagging 3-month ONI if weekly is unavailable.
+        const currentOni = weekly?.latest.nino34.anom ?? oni.anomaly;
 
         // Decimal-year for "now" using actual current date.
         const now = new Date();
@@ -313,32 +316,31 @@ export default function EnsoPage() {
           const end = anchorYear + endMonth / 12;
           return [start, end];
         };
+        // Decimal-year for the centre month of a 3-month season.
+        const seasonCentre = (label: string, anchorYear: number): number => {
+          const [a, b] = seasonWindow(label, anchorYear);
+          return (a + b) / 2;
+        };
 
-        // Peaks per completed year.
-        const peaksByYear = new Map<number, number>();
+        // For each year in window, find the season + value at the absolute peak.
+        type PeakRec = { year: number; season: string; anom: number };
+        const peakByYear = new Map<number, PeakRec>();
         for (const p of oni.history) {
           if (p.year < minYear || p.year >= currentYear) continue;
-          const cur = peaksByYear.get(p.year);
-          if (cur === undefined || Math.abs(p.anom) > Math.abs(cur)) peaksByYear.set(p.year, p.anom);
-        }
-        // Add partial-year peak for current year so far (up to today, not the forecast).
-        let currentYearPeak: number | null = null;
-        for (const p of oni.history) {
-          if (p.year !== currentYear) continue;
-          if (currentYearPeak === null || Math.abs(p.anom) > Math.abs(currentYearPeak)) {
-            currentYearPeak = p.anom;
+          const cur = peakByYear.get(p.year);
+          if (cur === undefined || Math.abs(p.anom) > Math.abs(cur.anom)) {
+            peakByYear.set(p.year, { year: p.year, season: p.season, anom: p.anom });
           }
         }
-
-        const past = [...peaksByYear.entries()]
-          .sort((a, b) => a[0] - b[0])
-          .map(([year, peak]) => ({
-            x: year,
-            year,
-            label: `${year}`,
+        const past = [...peakByYear.values()]
+          .sort((a, b) => a.year - b.year)
+          .map((r) => ({
+            x: seasonCentre(r.season, r.year),
+            year: r.year,
+            label: `${r.season} ${r.year}`,
             isForecast: false,
-            peak,
-            phase: peak >= 0.5 ? 'el-nino' : peak <= -0.5 ? 'la-nina' : 'neutral',
+            peak: r.anom,
+            phase: r.anom >= 0.5 ? 'el-nino' : r.anom <= -0.5 ? 'la-nina' : 'neutral',
           }));
 
         // Forecast analysis.
@@ -377,10 +379,7 @@ export default function EnsoPage() {
         })();
         const lastNotable = lastNotableIdx >= 0 ? seasons[lastNotableIdx] : null;
         const elNinoEnd = lastNotable ? seasonWindow(lastNotable.season, currentYear)[1] : null;
-        const peakX = peakSeason ? (() => {
-          const [a, b] = seasonWindow(peakSeason.season, currentYear);
-          return (a + b) / 2;
-        })() : null;
+        const peakX = peakSeason ? seasonCentre(peakSeason.season, currentYear) : null;
 
         const xMin = minYear - 0.5;
         const xMax = Math.max(currentYear + 1.2, (elNinoEnd ?? currentYear + 1) + 0.1);
@@ -428,12 +427,12 @@ export default function EnsoPage() {
                   contentStyle={TT_CONTENT}
                   labelStyle={TT_LABEL}
                   itemStyle={TT_ITEM}
-                  cursor={TT_CURSOR}
+                  cursor={false}
                   formatter={(value: any) => [`${fmtSigned(value, 1)}°C`, 'Peak ONI']}
                   labelFormatter={(_label: any, p: any) => {
                     const pl = p?.[0]?.payload;
                     if (!pl) return '';
-                    return `${pl.label} · ${pl.phase === 'el-nino' ? 'El Niño' : pl.phase === 'la-nina' ? 'La Niña' : 'Neutral'} year`;
+                    return `${pl.label} · ${pl.phase === 'el-nino' ? 'El Niño' : pl.phase === 'la-nina' ? 'La Niña' : 'Neutral'} peak`;
                   }}
                 />
                 {/* Forecast El Niño window — positioned at MJJ start → NDJ end */}
@@ -511,8 +510,8 @@ export default function EnsoPage() {
                     offset: 12,
                   }}
                 />
-                {/* Past peaks — bars at integer-year x */}
-                <Bar dataKey="peak" name="Peak ONI" barSize={28} isAnimationActive={false}>
+                {/* Past peaks — bars at peak-season x */}
+                <Bar dataKey="peak" name="Peak ONI" barSize={20} isAnimationActive={false}>
                   {past.map((d, i) => (
                     <Cell
                       key={i}
@@ -520,14 +519,6 @@ export default function EnsoPage() {
                     />
                   ))}
                 </Bar>
-                {/* Current year-to-date partial bar (thin, lighter) */}
-                {currentYearPeak !== null && (
-                  <ReferenceDot
-                    x={currentYear}
-                    y={currentYearPeak}
-                    r={0}
-                  />
-                )}
               </ComposedChart>
             </ResponsiveContainer>
           </div>
