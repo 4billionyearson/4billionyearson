@@ -56,14 +56,85 @@ export default function SeasonTimelineGraphic() {
   const snowNewStart = toFrac(4, 14);
   const snowNewEnd = toFrac(11, 4);
 
+  // ─── Mobile cards (stacked) ──────────────────────────────────────────────
+  // The wide SVG below scales to ~320 px on small phones, which makes its
+  // 10-12 px text effectively unreadable. We render a stacked card view
+  // instead at < `sm` and reveal the timeline at `sm` and up.
+  const mobileRows: Array<{
+    title: string;
+    accent: string;
+    baselineLabel: string;
+    baselineValue: string;
+    nowLabel: string;
+    nowValue: string;
+    delta: string;
+  }> = [
+    {
+      title: 'US growing season',
+      accent: '#10B981',
+      baselineLabel: '1895 baseline',
+      baselineValue: `${Math.round((growOldEnd - growOldStart) * 365)} days · May 4 → Oct 7`,
+      nowLabel: 'Now',
+      nowValue: `${Math.round((growNewEnd - growNewStart) * 365)} days · Apr 26 → Oct 15`,
+      delta: `+${Math.round((growNewEnd - growNewStart - (growOldEnd - growOldStart)) * 365)} days`,
+    },
+    {
+      title: 'Kyoto cherry blossom peak bloom',
+      accent: '#F472B6',
+      baselineLabel: 'Historic',
+      baselineValue: 'Apr 17 (pre-1850 mean)',
+      nowLabel: 'Now',
+      nowValue: 'Apr 6',
+      delta: '11 days earlier',
+    },
+    {
+      title: 'NH snow-free season',
+      accent: '#22D3EE',
+      baselineLabel: '1971–2000 baseline',
+      baselineValue: `${Math.round((snowOldEnd - snowOldStart) * 365)} days · late Apr → late Oct`,
+      nowLabel: 'Now',
+      nowValue: `${Math.round((snowNewEnd - snowNewStart) * 365)} days · mid-Apr → early Nov`,
+      delta: `+${Math.round((snowNewEnd - snowNewStart - (snowOldEnd - snowOldStart)) * 365)} days`,
+    },
+  ];
+
   return (
     <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 p-4">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-3">
         Calendar-year view - Northern Hemisphere
       </div>
+
+      {/* Mobile stacked view */}
+      <div className="space-y-3 sm:hidden">
+        {mobileRows.map((r) => (
+          <div
+            key={r.title}
+            className="rounded-lg border border-gray-700/60 bg-gray-900/60 p-3"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full"
+                style={{ background: r.accent }}
+              />
+              <span className="text-[12px] font-mono text-gray-200">{r.title}</span>
+            </div>
+            <div className="text-[11px] text-gray-400 font-mono">
+              {r.baselineLabel}: <span className="text-gray-300">{r.baselineValue}</span>
+            </div>
+            <div className="text-[11px] font-mono mt-0.5" style={{ color: r.accent }}>
+              {r.nowLabel}: {r.nowValue}
+            </div>
+            <div className="text-[11px] font-semibold font-mono mt-1" style={{ color: r.accent }}>
+              {r.delta}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Wide SVG view */}
       <svg
         viewBox={`0 0 1000 ${TOTAL_H}`}
-        className="w-full h-auto"
+        className="w-full h-auto hidden sm:block"
         role="img"
         aria-label="Seasonal timing shifts across the calendar year - US growing season, Kyoto cherry blossom, NH snow-free season"
       >
@@ -136,7 +207,7 @@ export default function SeasonTimelineGraphic() {
           );
         })}
       </svg>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-gray-400">
+      <div className="hidden sm:flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-gray-400">
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block w-3 h-2 rounded-sm" style={{ background: '#10B981', opacity: 0.85 }} />
           Growing season (current)

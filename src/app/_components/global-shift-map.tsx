@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import { Info } from "lucide-react";
 import { useMap, useMapEvents } from "react-leaflet";
 import type { GeoJSON as LeafletGeoJSON, Layer, LatLngExpression, PathOptions } from "leaflet";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
+import InfoTooltip from "./info-tooltip";
 import type {
   KoppenGroup,
   KoppenResult,
@@ -372,53 +374,6 @@ function featureCentroid(feature: Feature): [number, number] | null {
 
 type LeafletMod = typeof import("leaflet");
 
-/**
- * Reparents the leaflet tooltip pane to the outer `.global-shift-map` wrapper so
- * tooltips can render outside the clipped map container. The map-pane's CSS
- * transform (pan offset) is mirrored onto the relocated tooltip pane on every
- * move/zoom so tooltip positions stay correct.
- */
-function TooltipPaneEscape() {
-  const map = useMap();
-  useEffect(() => {
-    const tp = map.getPane("tooltipPane");
-    const mapPane = map.getPane("mapPane");
-    const container = map.getContainer();
-    const host = container.closest(".global-shift-map") as HTMLElement | null;
-    if (!tp || !mapPane || !host) return;
-    const originalParent = tp.parentElement;
-    host.appendChild(tp);
-    tp.style.position = "absolute";
-    tp.style.left = "0";
-    tp.style.top = "0";
-    tp.style.pointerEvents = "none";
-    tp.style.zIndex = "650";
-    // Offset the relocated pane by the leaflet container's offset within .global-shift-map
-    const sync = () => {
-      const hostRect = host.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const dx = containerRect.left - hostRect.left;
-      const dy = containerRect.top - hostRect.top;
-      const mapTransform = mapPane.style.transform || "";
-      tp.style.transform = `translate3d(${dx}px, ${dy}px, 0) ${mapTransform}`;
-    };
-    sync();
-    map.on("move", sync);
-    map.on("zoom", sync);
-    map.on("viewreset", sync);
-    map.on("resize", sync);
-    return () => {
-      map.off("move", sync);
-      map.off("zoom", sync);
-      map.off("viewreset", sync);
-      map.off("resize", sync);
-      if (originalParent) originalParent.appendChild(tp);
-      tp.style.transform = "";
-    };
-  }, [map]);
-  return null;
-}
-
 function MapLabels({
   world,
   statesGeo,
@@ -567,12 +522,12 @@ function USStatesOverlay({
   statesGeo,
   byName,
   styleForRecord,
-  bindRecordTooltip,
+  bindRecordHover,
 }: {
   statesGeo: FeatureCollection | null;
   byName: Map<string, GlobalShiftRecord>;
   styleForRecord: (rec: GlobalShiftRecord | undefined, subregion?: boolean) => PathOptions;
-  bindRecordTooltip: (rec: GlobalShiftRecord, layer: Layer) => void;
+  bindRecordHover: (rec: GlobalShiftRecord | null, fallbackName: string, layer: Layer) => void;
 }) {
   const map = useMap();
   const [visible, setVisible] = useState(map.getZoom() >= US_STATES_ZOOM);
@@ -590,14 +545,9 @@ function USStatesOverlay({
     (feature: Feature<Geometry, { name: string }>, layer: Layer) => {
       const name = feature.properties?.name ?? "";
       const rec = byName.get(name.toLowerCase());
-      if (rec) bindRecordTooltip(rec, layer);
-      else
-        layer.bindTooltip(
-          `<strong>${name}</strong><br/><span style="color:#9ca3af">no state-level data</span>`,
-          { sticky: true, className: "global-shift-tooltip" },
-        );
+      bindRecordHover(rec ?? null, name, layer);
     },
-    [byName, bindRecordTooltip],
+    [byName, bindRecordHover],
   );
 
   if (!visible || !statesGeo) return null;
@@ -615,12 +565,12 @@ function UKNationsOverlay({
   ukGeo,
   bySlug,
   styleForRecord,
-  bindRecordTooltip,
+  bindRecordHover,
 }: {
   ukGeo: FeatureCollection | null;
   bySlug: Map<string, GlobalShiftRecord>;
   styleForRecord: (rec: GlobalShiftRecord | undefined, subregion?: boolean) => PathOptions;
-  bindRecordTooltip: (rec: GlobalShiftRecord, layer: Layer) => void;
+  bindRecordHover: (rec: GlobalShiftRecord | null, fallbackName: string, layer: Layer) => void;
 }) {
   const map = useMap();
   const [visible, setVisible] = useState(map.getZoom() >= UK_NATIONS_ZOOM);
@@ -639,14 +589,9 @@ function UKNationsOverlay({
       const slug = feature.properties?.slug ?? "";
       const name = feature.properties?.name ?? slug;
       const rec = bySlug.get(slug);
-      if (rec) bindRecordTooltip(rec, layer);
-      else
-        layer.bindTooltip(
-          `<strong>${name}</strong><br/><span style="color:#9ca3af">no UK-nation data</span>`,
-          { sticky: true, className: "global-shift-tooltip" },
-        );
+      bindRecordHover(rec ?? null, name, layer);
     },
-    [bySlug, bindRecordTooltip],
+    [bySlug, bindRecordHover],
   );
 
   if (!visible || !ukGeo) return null;
@@ -771,52 +716,26 @@ export default function GlobalShiftMap() {
     [meta],
   );
 
-  /** Bind a rich tooltip to a leaflet layer for a given record. */
-  const bindRecordTooltip = useCallback((rec: GlobalShiftRecord, layer: Layer) => {
-    const spring = rec.temp.springShiftDays;
-    const autumn = rec.temp.autumnShiftDays;
-    const net = rec.temp.netShiftMonths;
-    const springTxt = spring === null ? "—" : `${spring > 0 ? "+" : ""}${spring.toFixed(1)} d`;
-    const autumnTxt = autumn === null ? "—" : `${autumn > 0 ? "+" : ""}${autumn.toFixed(1)} d`;
-    const netTxt = `${net > 0 ? "+" : ""}${net.toFixed(2)} mo/yr`;
-    const wet = rec.rain;
-    const wetBlock =
-      wet && (rec.seasonality === "wet-dry" || rec.seasonality === "mixed")
-        ? `
-      <div style="margin-top:4px;padding-top:4px;border-top:1px solid #1f2937">
-        <div style="color:#d1d5db">Peak rain: <strong style="color:#FFF5E7">${wet.peakRainMonthBaseline} → ${wet.peakRainMonthRecent}</strong></div>
-        <div style="color:#d1d5db">Wet-season onset: <strong style="color:#FFF5E7">${
-          wet.wetSeasonOnsetShiftDays !== null
-            ? `${wet.wetSeasonOnsetShiftDays > 0 ? "+" : ""}${wet.wetSeasonOnsetShiftDays.toFixed(0)} d`
-            : "—"
-        }</strong></div>
-        <div style="color:#d1d5db">Annual rain: <strong style="color:#FFF5E7">${wet.annualTotalShiftPct > 0 ? "+" : ""}${wet.annualTotalShiftPct.toFixed(1)}%</strong></div>
-      </div>`
-        : "";
-    const kindLabel: Record<SeasonalityKind, string> = {
-      "warm-cold": "Warm / cold seasons",
-      "wet-dry": "Wet / dry seasons",
-      mixed: "Warm/cold + wet/dry",
-      aseasonal: "Weakly seasonal",
-    };
-    const koppenBlock = rec.koppen
-      ? `<div style="color:${KOPPEN_COLOR[rec.koppen.group]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px">Köppen ${rec.koppen.code} - ${rec.koppen.label}</div>`
-      : "";
-    layer.bindTooltip(
-      `
-      <div style="font-size:12px;line-height:1.4">
-        <div style="font-weight:600;color:#FFF5E7;margin-bottom:2px">${rec.name}</div>
-        ${koppenBlock}
-        <div style="color:${KIND_COLOR[rec.seasonality]};font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">${kindLabel[rec.seasonality]}</div>
-        <div style="color:#d1d5db">Spring: <strong style="color:#FFF5E7">${springTxt}</strong></div>
-        <div style="color:#d1d5db">Autumn: <strong style="color:#FFF5E7">${autumnTxt}</strong></div>
-        <div style="color:#d1d5db">Warm season: <strong style="color:#FFF5E7">${netTxt}</strong></div>
-        ${wetBlock}
-        <div style="color:#9ca3af;margin-top:3px;font-size:10px">${rec.windows.baselineStart}–${rec.windows.baselineEnd} → ${rec.windows.recentStart}–${rec.windows.recentEnd}</div>
-      </div>`,
-      { sticky: true, className: "global-shift-tooltip" },
-    );
-  }, []);
+  /** Hover info shown in a horizontal panel under the map. */
+  type Hovered = {
+    name: string;
+    rec: GlobalShiftRecord | null;
+  };
+  const [hovered, setHovered] = useState<Hovered | null>(null);
+
+  /** Bind hover/click/touch handlers that drive the bottom info panel. */
+  const bindRecordHover = useCallback(
+    (rec: GlobalShiftRecord | null, fallbackName: string, layer: Layer) => {
+      const show = () => setHovered({ name: rec?.name ?? fallbackName, rec });
+      const hide = () => setHovered(null);
+      // `as unknown as { on: ... }` because Layer's typed event names don't
+      // include "click"/"mouseover" but the leaflet runtime supports them.
+      (layer as unknown as { on: (ev: string, fn: () => void) => void }).on("mouseover", show);
+      (layer as unknown as { on: (ev: string, fn: () => void) => void }).on("click", show);
+      (layer as unknown as { on: (ev: string, fn: () => void) => void }).on("mouseout", hide);
+    },
+    [],
+  );
 
   const styleForFeature = (feature?: Feature<Geometry, { name: string }>) => {
     if (!feature) return {};
@@ -825,15 +744,8 @@ export default function GlobalShiftMap() {
 
   const onEachFeature = (feature: Feature<Geometry, { name: string }>, layer: Layer) => {
     const name = feature.properties?.name || "Unknown";
-    const rec = byName.get(name);
-    if (!rec) {
-      layer.bindTooltip(
-        `<strong>${name}</strong><br/><span style="color:#9ca3af">no long-term monthly data</span>`,
-        { sticky: true, className: "global-shift-tooltip" },
-      );
-      return;
-    }
-    bindRecordTooltip(rec, layer);
+    const rec = byName.get(name) ?? null;
+    bindRecordHover(rec, name, layer);
   };
 
   if (error) {
@@ -864,8 +776,8 @@ export default function GlobalShiftMap() {
             (id) => METRIC_META[id].group === group.id,
           );
           return (
-            <div key={group.id} className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] uppercase tracking-wider text-gray-500 font-mono w-36 shrink-0">
+            <div key={group.id} className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+              <span className="text-[11px] uppercase tracking-wider text-gray-500 font-mono sm:w-36 sm:shrink-0">
                 {group.label}
               </span>
               <div role="tablist" aria-label={group.label} className="flex gap-2 flex-wrap">
@@ -931,14 +843,14 @@ export default function GlobalShiftMap() {
               statesGeo={statesGeo}
               byName={usStatesByName}
               styleForRecord={styleForRecord}
-              bindRecordTooltip={bindRecordTooltip}
+              bindRecordHover={bindRecordHover}
             />
             <UKNationsOverlay
               key={`uk-${metric}`}
               ukGeo={ukGeo}
               bySlug={ukNationsBySlug}
               styleForRecord={styleForRecord}
-              bindRecordTooltip={bindRecordTooltip}
+              bindRecordHover={bindRecordHover}
             />
             {/* Tropic reference lines */}
             <Polyline
@@ -954,8 +866,12 @@ export default function GlobalShiftMap() {
               pathOptions={{ color: "#D0A65E", weight: 1, opacity: 0.45, dashArray: "4 6" }}
             />
             <MapLabels world={world} statesGeo={statesGeo} ukGeo={ukGeo} />
-            <TooltipPaneEscape />
           </MapContainer>
+        )}
+
+        {/* Hover info panel pinned to the bottom of the map (replaces popups). */}
+        {hovered && (
+          <HoverInfoPanel hovered={hovered} />
         )}
       </div>
 
@@ -992,29 +908,35 @@ export default function GlobalShiftMap() {
         ) : (
           <>
             {metric === "koppen" ? (
-              <>
-                <div className="flex items-center gap-4 flex-wrap">
-                  {(["A", "B", "C", "D", "E"] as KoppenGroup[]).map((g) => (
-                    <span key={g} className="inline-flex items-center gap-1.5">
-                      <span
-                        className="inline-block w-3 h-3 rounded"
-                        style={{ backgroundColor: KOPPEN_COLOR[g] }}
-                      />
-                      <span className="text-[11px]">
-                        <strong className="text-gray-200">{g}</strong> · {KOPPEN_GROUP_LABEL[g]}
-                      </span>
+              <div className="flex items-center gap-x-4 gap-y-1.5 flex-wrap">
+                {(["A", "B", "C", "D", "E"] as KoppenGroup[]).map((g) => (
+                  <span key={g} className="inline-flex items-center gap-1.5">
+                    <span
+                      className="inline-block w-3 h-3 rounded"
+                      style={{ backgroundColor: KOPPEN_COLOR[g] }}
+                    />
+                    <span className="text-[11px]">
+                      <strong className="text-gray-200">{g}</strong> · {KOPPEN_GROUP_LABEL[g]}
                     </span>
-                  ))}
-                </div>
-                <div className="text-[11px] text-gray-500">
-                  The Köppen–Geiger classification (Peel, Finlayson &amp; McMahon 2007) is the most
-                  widely used climate grouping in atlases and peer-reviewed climate science. Five
-                  main groups: <strong>A</strong> tropical, <strong>B</strong> arid,{" "}
-                  <strong>C</strong> temperate, <strong>D</strong> continental,{" "}
-                  <strong>E</strong> polar. Hover any country for its full 2- or 3-letter code (e.g.
-                  Cfb = oceanic temperate, Aw = tropical savanna, BWh = hot desert).
-                </div>
-              </>
+                  </span>
+                ))}
+                <InfoTooltip
+                  title="Köppen–Geiger climate classes"
+                  body={
+                    <>
+                      The standard climate grouping used in atlases and peer-reviewed
+                      science (Peel, Finlayson &amp; McMahon 2007). Hover any country
+                      for its full code, e.g. Cfb (oceanic temperate), Aw (tropical
+                      savanna), BWh (hot desert).
+                    </>
+                  }
+                >
+                  <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-200">
+                    <Info className="h-3.5 w-3.5" />
+                    <span>About</span>
+                  </span>
+                </InfoTooltip>
+              </div>
             ) : (
               <>
                 <div className="flex items-center gap-4 flex-wrap">
@@ -1043,6 +965,79 @@ export default function GlobalShiftMap() {
               </>
             )}
           </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Bottom info panel rendered over the map on hover/tap. Mirrors the pattern
+ * used on the global anomaly map – avoids leaflet popups going off-screen on
+ * mobile.
+ */
+function HoverInfoPanel({
+  hovered,
+}: {
+  hovered: { name: string; rec: GlobalShiftRecord | null };
+}) {
+  const { name, rec } = hovered;
+  const fmtDays = (v: number | null) =>
+    v === null ? "—" : `${v > 0 ? "+" : ""}${v.toFixed(1)} d`;
+  const fmtMonths = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)} mo/yr`;
+  const fmtPct = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(1)}%`;
+
+  return (
+    <div className="absolute bottom-0 left-0 right-0 z-[500] bg-gray-950/92 backdrop-blur-sm border-t border-gray-700/60 px-3 py-2 text-sm pointer-events-none">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="font-bold text-gray-100">{name}</span>
+        {rec?.koppen && (
+          <span
+            className="text-[10px] uppercase tracking-wider font-mono"
+            style={{ color: KOPPEN_COLOR[rec.koppen.group] }}
+          >
+            Köppen {rec.koppen.code} · {rec.koppen.label}
+          </span>
+        )}
+        {rec ? (
+          <>
+            <span className="text-gray-300">
+              <span className="text-gray-500">Spring</span>{" "}
+              <span className="font-mono text-gray-100">{fmtDays(rec.temp.springShiftDays)}</span>
+            </span>
+            <span className="text-gray-300">
+              <span className="text-gray-500">Autumn</span>{" "}
+              <span className="font-mono text-gray-100">{fmtDays(rec.temp.autumnShiftDays)}</span>
+            </span>
+            <span className="text-gray-300">
+              <span className="text-gray-500">Warm season</span>{" "}
+              <span className="font-mono text-gray-100">{fmtMonths(rec.temp.netShiftMonths)}</span>
+            </span>
+            {rec.rain && (rec.seasonality === "wet-dry" || rec.seasonality === "mixed") && (
+              <>
+                <span className="text-gray-300">
+                  <span className="text-gray-500">Wet onset</span>{" "}
+                  <span className="font-mono text-gray-100">
+                    {rec.rain.wetSeasonOnsetShiftDays !== null
+                      ? `${rec.rain.wetSeasonOnsetShiftDays > 0 ? "+" : ""}${rec.rain.wetSeasonOnsetShiftDays.toFixed(0)} d`
+                      : "—"}
+                  </span>
+                </span>
+                <span className="text-gray-300">
+                  <span className="text-gray-500">Annual rain</span>{" "}
+                  <span className="font-mono text-gray-100">
+                    {fmtPct(rec.rain.annualTotalShiftPct)}
+                  </span>
+                </span>
+              </>
+            )}
+            <span className="text-gray-500 text-xs ml-auto font-mono">
+              {rec.windows.baselineStart}–{rec.windows.baselineEnd} → {rec.windows.recentStart}–
+              {rec.windows.recentEnd}
+            </span>
+          </>
+        ) : (
+          <span className="text-gray-400 italic">no long-term monthly data on this site</span>
         )}
       </div>
     </div>

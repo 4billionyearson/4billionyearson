@@ -264,7 +264,7 @@ function StatBlock({ label, value, unit, sub, color = 'text-orange-300' }: {
   label: string; value: string; unit?: string; sub?: string; color?: string;
 }) {
   return (
-    <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
+    <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className="flex items-baseline gap-1 flex-wrap">
         <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
@@ -518,7 +518,7 @@ export default function ShiftingSeasonsPage() {
               {globalShift && leaderboards && (
                 <SectionCard
                   icon={<Globe className="text-[#D0A65E]" />}
-                  title={`How Seasons Have Shifted Across ${globalShift.globalStats.totalAnalysed} Regions`}
+                  title="How Seasons Have Shifted"
                 >
                   <p className="text-sm text-gray-300 leading-relaxed mb-4">
                     We&apos;ve applied the same month-crossing analysis used on every
@@ -727,21 +727,32 @@ export default function ShiftingSeasonsPage() {
                 </p>
 
                 {snowHeadline && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
-                    <StatBlock
-                      label="Spring (MAM) Anomaly"
-                      value={snowHeadline.springRecent.toFixed(1)}
-                      unit="%"
-                      sub={`recent 10-yr mean vs 1981-2010`}
-                      color="text-orange-300"
-                    />
-                    <StatBlock
-                      label="Winter (DJF) Anomaly"
-                      value={`${snowHeadline.winterRecent >= 0 ? '+' : ''}${snowHeadline.winterRecent.toFixed(1)}`}
-                      unit="%"
-                      sub={`recent 10-yr mean vs 1981-2010`}
-                      color={snowHeadline.winterRecent < 0 ? 'text-orange-300' : 'text-blue-300'}
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
+                    <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4">
+                      <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">
+                        Recent 10-yr Anomaly vs 1981–2010
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <div className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Spring (MAM)</div>
+                          <div className="flex items-baseline gap-1 flex-wrap">
+                            <span className="text-2xl font-bold font-mono text-orange-300">
+                              {snowHeadline.springRecent.toFixed(1)}
+                            </span>
+                            <span className="text-sm text-gray-400">%</span>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-[11px] text-gray-500 uppercase tracking-wider mb-0.5">Winter (DJF)</div>
+                          <div className="flex items-baseline gap-1 flex-wrap">
+                            <span className={`text-2xl font-bold font-mono ${snowHeadline.winterRecent < 0 ? 'text-orange-300' : 'text-blue-300'}`}>
+                              {snowHeadline.winterRecent >= 0 ? '+' : ''}{snowHeadline.winterRecent.toFixed(1)}
+                            </span>
+                            <span className="text-sm text-gray-400">%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <StatBlock
                       label="Spring Snow Lost"
                       value={snowHeadline.springChange.toFixed(1)}
@@ -872,7 +883,7 @@ export default function ShiftingSeasonsPage() {
               {/* ─── EPA growing season (US historical) ─────────────────── */}
               <SectionCard
                 icon={<Leaf className="text-emerald-400" />}
-                title="The US Growing Season Is 17 Days Longer Than a Century Ago"
+                title="The CONUS Growing Season"
               >
                 <p className="text-sm text-gray-300 leading-relaxed mb-4">
                   Since 1895 the contiguous-US growing season (the stretch between the
@@ -881,7 +892,7 @@ export default function ShiftingSeasonsPage() {
                   and later autumns compound.
                 </p>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
                   <StatBlock
                     label="Recent 10-yr Avg"
                     value={`${data.epa.headline.last10YearMean >= 0 ? '+' : ''}${data.epa.headline.last10YearMean.toFixed(1)}`}
@@ -890,17 +901,10 @@ export default function ShiftingSeasonsPage() {
                     color="text-emerald-300"
                   />
                   <StatBlock
-                    label="First 30-yr Avg"
-                    value={`${data.epa.headline.first30YearMean >= 0 ? '+' : ''}${data.epa.headline.first30YearMean.toFixed(1)}`}
-                    unit="days"
-                    sub={`${data.epa.headline.first30YearWindow}`}
-                    color="text-amber-300"
-                  />
-                  <StatBlock
                     label="Net Lengthening"
                     value={`${data.epa.headline.shiftDays >= 0 ? '+' : ''}${data.epa.headline.shiftDays.toFixed(1)}`}
                     unit="days"
-                    sub="recent 10y minus first 30y"
+                    sub={`recent 10y minus first 30y (${data.epa.headline.first30YearWindow})`}
                     color="text-orange-300"
                   />
                 </div>
@@ -921,7 +925,9 @@ export default function ShiftingSeasonsPage() {
                           label={{ value: 'Deviation (days)', angle: -90, position: 'insideLeft', offset: 0, fill: '#9ca3af', fontSize: 11 }}
                         />
                         <Tooltip
-                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
+                          contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12, color: '#e5e7eb' }}
+                          labelStyle={{ color: '#f3f4f6', fontWeight: 600, marginBottom: 2 }}
+                          itemStyle={{ color: '#e5e7eb' }}
                           formatter={(v) => [`${typeof v === 'number' ? (v > 0 ? '+' : '') + v.toFixed(1) : v} days`, 'Deviation']}
                         />
                         <ReferenceLine y={0} stroke="#6b7280" />
@@ -992,7 +998,7 @@ function Leaderboard({
   format: (r: GlobalShiftRecord) => string;
 }) {
   return (
-    <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
+    <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4">
       <div className="text-xs text-gray-300 uppercase tracking-wider font-semibold mb-3">{title}</div>
       <ol className="space-y-2">
         {rows.map((r, i) => {

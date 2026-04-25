@@ -12,13 +12,15 @@ const GeoJSON = dynamic(() => import("react-leaflet").then((m) => m.GeoJSON), { 
 
 type LayerId = "leaf_anomaly" | "bloom_anomaly";
 
-const LAYER_META: Record<LayerId, { title: string; desc: string }> = {
+const LAYER_META: Record<LayerId, { title: string; short: string; desc: string }> = {
   leaf_anomaly: {
     title: "Spring Leaf-Out anomaly",
+    short: "Leaf-out",
     desc: "Days earlier (red) or later (blue) than the 1991–2020 average for this date.",
   },
   bloom_anomaly: {
     title: "Spring Bloom anomaly",
+    short: "Bloom",
     desc: "Days earlier (red) or later (blue) than the 1991–2020 average - first flowering stage.",
   },
 };
@@ -89,7 +91,8 @@ export default function SpringIndexMap() {
                     : "border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]"
                 }`}
               >
-                {LAYER_META[id].title}
+                <span className="sm:hidden">{LAYER_META[id].short}</span>
+                <span className="hidden sm:inline">{LAYER_META[id].title}</span>
               </button>
             );
           })}
