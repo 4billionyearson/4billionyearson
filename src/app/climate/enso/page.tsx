@@ -322,26 +322,60 @@ export default function EnsoPage() {
           return (a + b) / 2;
         };
 
-        // For each year in window, find the season + value at the absolute peak.
-        type PeakRec = { year: number; season: string; anom: number };
-        const peakByYear = new Map<number, PeakRec>();
-        for (const p of oni.history) {
-          if (p.year < minYear || p.year >= currentYear) continue;
-          const cur = peakByYear.get(p.year);
-          if (cur === undefined || Math.abs(p.anom) > Math.abs(cur.anom)) {
-            peakByYear.set(p.year, { year: p.year, season: p.season, anom: p.anom });
+        // Detect past ENSO events: contiguous runs in oni.history where anomaly
+        // stays on the same side of ±0.5°C (≥+0.5 = El Niño, ≤−0.5 = La Niña).
+        // We render each event as a horizontal band spanning its full duration
+        // at its peak intensity.
+        const histInWindow = oni.history.filter((p) => p.year >= minYear && p.year < currentYear);
+        type EnsoEvent = {
+          phase: 'el-nino' | 'la-nina';
+          startX: number;
+          endX: number;
+          peak: number;
+          peakLabel: string;
+          firstLabel: string;
+          lastLabel: string;
+        };
+        const events: EnsoEvent[] = [];
+        let cur: { phase: 'el-nino' | 'la-nina'; rows: typeof histInWindow } | null = null;
+        const flush = () => {
+          if (!cur || cur.rows.length === 0) return;
+          const peakRow = cur.rows.reduce((a, b) => (Math.abs(b.anom) > Math.abs(a.anom) ? b : a));
+          const first = cur.rows[0];
+          const last = cur.rows[cur.rows.length - 1];
+          const [s] = seasonWindow(first.season, first.year);
+          const [, e] = seasonWindow(last.season, last.year);
+          events.push({
+            phase: cur.phase,
+            startX: s,
+            endX: e,
+            peak: peakRow.anom,
+            peakLabel: `${peakRow.season} ${peakRow.year}`,
+            firstLabel: `${first.season} ${first.year}`,
+            lastLabel: `${last.season} ${last.year}`,
+          });
+          cur = null;
+        };
+        for (const p of histInWindow) {
+          const phase: 'el-nino' | 'la-nina' | null = p.anom >= 0.5 ? 'el-nino' : p.anom <= -0.5 ? 'la-nina' : null;
+          if (phase === null) { flush(); continue; }
+          if (cur && cur.phase === phase) {
+            cur.rows.push(p);
+          } else {
+            flush();
+            cur = { phase, rows: [p] };
           }
         }
-        const past = [...peakByYear.values()]
-          .sort((a, b) => a.year - b.year)
-          .map((r) => ({
-            x: seasonCentre(r.season, r.year),
-            year: r.year,
-            label: `${r.season} ${r.year}`,
-            isForecast: false,
-            peak: r.anom,
-            phase: r.anom >= 0.5 ? 'el-nino' : r.anom <= -0.5 ? 'la-nina' : 'neutral',
-          }));
+        flush();
+        // Past = empty data array (we render bars via ReferenceArea below) but
+        // we still pass at least one row for axis domain calculations.
+        const past = events.map((ev) => ({
+          x: (ev.startX + ev.endX) / 2,
+          year: Math.floor((ev.startX + ev.endX) / 2),
+          label: `${ev.firstLabel} → ${ev.lastLabel}`,
+          phase: ev.phase,
+          peak: ev.peak,
+        }));
 
         // Forecast analysis.
         const seasons = data?.forecast?.seasons || [];
@@ -392,7 +426,7 @@ export default function EnsoPage() {
         <SectionCard
           icon={<History className="text-[#D0A65E]" />}
           title="Past & future — the central thread of the ENSO story"
-          subtitle="Each past El Niño (red) and La Niña (blue) is shown at its peak intensity. The dashed red box marks NOAA's forecast window for the next El Niño event — starting when probability crosses 50%, ending when it drops back. The 'today' line shows where we are now."
+          subtitle="Each red and blue band shows a real El Niño or La Niña event, drawn at its peak intensity for the months it actually lasted. The gold band is what's been observed so far this month. The dashed red box is NOAA's forecast for the next event — starting when probability crosses 50%, ending when it drops back."
         >
           <div className="h-[380px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -510,15 +544,38 @@ export default function EnsoPage() {
                     offset: 12,
                   }}
                 />
-                {/* Past peaks — bars at peak-season x */}
-                <Bar dataKey="peak" name="Peak ONI" barSize={20} isAnimationActive={false}>
-                  {past.map((d, i) => (
-                    <Cell
-                      key={i}
-                      fill={d.phase === 'el-nino' ? '#fb7185' : d.phase === 'la-nina' ? '#60a5fa' : '#6b7280'}
+                {/* Past ENSO events — full-duration bands at peak intensity */}
+                {events.map((ev, i) => (
+                  <ReferenceArea
+                    key={`ev-${i}`}
+                    x1={ev.startX}
+                    x2={ev.endX}
+                    y1={ev.peak >= 0 ? 0 : ev.peak}
+                    y2={ev.peak >= 0 ? ev.peak : 0}
+                    fill={ev.phase === 'el-nino' ? '#fb7185' : '#60a5fa'}
+                    fillOpacity={0.85}
+                    stroke="none"
+                    ifOverflow="extendDomain"
+                  />
+                ))}
+                {/* Recent observed period — start of current month → today, drawn solid */}
+                {(() => {
+                  const monthStart = currentYear + now.getMonth() / 12;
+                  if (todayX <= monthStart) return null;
+                  return (
+                    <ReferenceArea
+                      x1={monthStart}
+                      x2={todayX}
+                      y1={currentOni >= 0 ? 0 : currentOni}
+                      y2={currentOni >= 0 ? currentOni : 0}
+                      fill="#D0A65E"
+                      fillOpacity={0.55}
+                      stroke="none"
                     />
-                  ))}
-                </Bar>
+                  );
+                })()}
+                {/* Hidden bar to keep the data array non-empty so axis renders */}
+                <Bar dataKey="peak" barSize={0} fillOpacity={0} isAnimationActive={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -526,20 +583,20 @@ export default function EnsoPage() {
           {/* Legend strip */}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-rose-400" /> El Niño peak
+              <span className="inline-block w-4 h-3 rounded-sm bg-rose-400" /> Past El Niño event
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-sky-400" /> La Niña peak
+              <span className="inline-block w-4 h-3 rounded-sm bg-sky-400" /> Past La Niña event
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-gray-500" /> Neutral year
+              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(208,166,94,0.55)' }} /> Observed (this month → today)
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span
-                className="inline-block w-3 h-3 rounded-sm border border-rose-400"
+                className="inline-block w-4 h-3 rounded-sm border border-rose-400"
                 style={{ background: 'repeating-linear-gradient(45deg, rgba(251,113,133,0.12) 0 2px, rgba(251,113,133,0.32) 2px 4px)' }}
               />{' '}
-              Forecast El Niño window
+              Forecast El Niño (predicted)
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / today
