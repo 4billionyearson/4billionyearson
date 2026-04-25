@@ -287,10 +287,11 @@ export default function EnsoPage() {
         // Future = a single dashed "predicted 2026 El Niño" bar at the average
         // of past El Niño peaks, labelled with the season window when probability
         // crosses 50% and 90%.
-        const yearsBack = 46;
+        // Zoomed to recent years so the ramp toward the next El Niño is legible.
+        const yearsBack = 7;
         const lastHistYear = oni.history[oni.history.length - 1]?.year || new Date().getFullYear();
-        const minYear = lastHistYear - yearsBack + 1;
         const currentYear = new Date().getFullYear();
+        const minYear = currentYear - yearsBack + 1;
         const currentOni = oni.anomaly;
 
         // Peaks per completed year (exclude current year — it gets the
@@ -375,11 +376,9 @@ export default function EnsoPage() {
                 <XAxis
                   dataKey="key"
                   stroke="#9CA3AF"
-                  fontSize={10}
-                  interval={4}
-                  angle={-90}
-                  textAnchor="end"
-                  height={50}
+                  fontSize={11}
+                  interval={0}
+                  height={32}
                 />
                 <YAxis
                   stroke="#9CA3AF"
@@ -416,16 +415,17 @@ export default function EnsoPage() {
                 <ReferenceDot
                   x={String(currentYear)}
                   y={currentOni}
-                  r={5}
+                  r={6}
                   fill="#D0A65E"
                   stroke="#0f172a"
                   strokeWidth={2}
                   label={{
-                    value: `now ${fmtSigned(currentOni, 1)}°C`,
+                    value: `now ${fmtSigned(currentOni, 2)}°C`,
                     fill: '#D0A65E',
                     fontSize: 11,
-                    position: currentOni >= 0 ? 'right' : 'right',
-                    offset: 8,
+                    fontWeight: 600,
+                    position: 'left',
+                    offset: 12,
                   }}
                 />
                 <Bar dataKey="peak" name="Peak ONI" isAnimationActive={false}>
