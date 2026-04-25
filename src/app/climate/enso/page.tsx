@@ -7,11 +7,13 @@ import {
   Area,
   BarChart,
   Bar,
+  ComposedChart,
   LineChart,
   Line,
   Cell,
   CartesianGrid,
   ResponsiveContainer,
+  ReferenceArea,
   ReferenceLine,
   ReferenceDot,
   Tooltip,
@@ -282,37 +284,64 @@ export default function EnsoPage() {
 
       {/* ═══ PAST + FUTURE HERO STORY ════════════════════════════ */}
       {oni && (() => {
-        // Build combined dataset on a SINGLE yearly timescale.
-        // Past = solid yearly peak ONI bars (1980→last historical year).
-        // Future = a single dashed "predicted 2026 El Niño" bar at the average
-        // of past El Niño peaks, labelled with the season window when probability
-        // crosses 50% and 90%.
-        // Zoomed to recent years so the ramp toward the next El Niño is legible.
+        // Numeric (decimal-year) timeline so the forecast El Niño can be
+        // positioned exactly between MJJ 2026 and end of NDJ (Jan 2027).
         const yearsBack = 7;
-        const lastHistYear = oni.history[oni.history.length - 1]?.year || new Date().getFullYear();
         const currentYear = new Date().getFullYear();
         const minYear = currentYear - yearsBack + 1;
         const currentOni = oni.anomaly;
 
-        // Peaks per completed year (exclude current year — it gets the
-        // forecast treatment below).
+        // Decimal-year for "now" using actual current date.
+        const now = new Date();
+        const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
+        const endOfYear = new Date(now.getFullYear() + 1, 0, 1).getTime();
+        const todayX = now.getFullYear() + (now.getTime() - startOfYear) / (endOfYear - startOfYear);
+
+        // Map a 3-month season label like "MJJ" to its [start, end] decimal-year
+        // window. MJJ = May 1 → end of July.
+        const SEASON_MONTHS: Record<string, [number, number]> = {
+          DJF: [-1, 1], JFM: [0, 2], FMA: [1, 3], MAM: [2, 4], AMJ: [3, 5],
+          MJJ: [4, 6], JJA: [5, 7], JAS: [6, 8], ASO: [7, 9], SON: [8, 10],
+          OND: [9, 11], NDJ: [10, 12],
+        };
+        const seasonWindow = (label: string, anchorYear: number): [number, number] => {
+          const months = SEASON_MONTHS[label] || [0, 2];
+          // start is first day of months[0], end is first day of months[1]+1
+          const startMonth = months[0]; // 0-indexed; -1 means previous Dec
+          const endMonth = months[1] + 1;
+          const start = anchorYear + startMonth / 12;
+          const end = anchorYear + endMonth / 12;
+          return [start, end];
+        };
+
+        // Peaks per completed year.
         const peaksByYear = new Map<number, number>();
         for (const p of oni.history) {
           if (p.year < minYear || p.year >= currentYear) continue;
           const cur = peaksByYear.get(p.year);
           if (cur === undefined || Math.abs(p.anom) > Math.abs(cur)) peaksByYear.set(p.year, p.anom);
         }
+        // Add partial-year peak for current year so far (up to today, not the forecast).
+        let currentYearPeak: number | null = null;
+        for (const p of oni.history) {
+          if (p.year !== currentYear) continue;
+          if (currentYearPeak === null || Math.abs(p.anom) > Math.abs(currentYearPeak)) {
+            currentYearPeak = p.anom;
+          }
+        }
+
         const past = [...peaksByYear.entries()]
           .sort((a, b) => a[0] - b[0])
           .map(([year, peak]) => ({
-            key: String(year),
+            x: year,
+            year,
             label: `${year}`,
             isForecast: false,
             peak,
             phase: peak >= 0.5 ? 'el-nino' : peak <= -0.5 ? 'la-nina' : 'neutral',
           }));
 
-        // Forecast analysis — find when El Niño probability crosses 50% and ≥90%.
+        // Forecast analysis.
         const seasons = data?.forecast?.seasons || [];
         const first50 = seasons.find((s) => s.pElNino >= 50);
         const first90 = seasons.find((s) => s.pElNino >= 90);
@@ -328,57 +357,64 @@ export default function EnsoPage() {
         );
         const isForecastingElNino = !!first50;
 
-        // Predicted peak ONI = mean of historical El Niño peaks (those ≥ +0.5°C).
+        // Predicted peak intensity = mean of past El Niño peaks in window.
         const elNinoPeaks = past.filter((p) => p.peak >= 0.5).map((p) => p.peak);
         const predictedPeakOni = elNinoPeaks.length
           ? elNinoPeaks.reduce((a, b) => a + b, 0) / elNinoPeaks.length
           : 1.5;
 
-        // Place the forecast bar at the current (in-progress) year — the
-        // predicted peak (OND) lands inside this calendar year.
-        const forecastYear = currentYear;
-        const combined = [
-          ...past,
-          ...(isForecastingElNino
-            ? [{
-                key: String(forecastYear),
-                label: `${forecastYear} (forecast)`,
-                isForecast: true,
-                peak: predictedPeakOni,
-                phase: 'el-nino' as const,
-              }]
-            : [{
-                // No incoming El Niño — still draw current year so chart includes today.
-                key: String(forecastYear),
-                label: `${forecastYear}`,
-                isForecast: false,
-                peak: currentOni,
-                phase: (currentOni >= 0.5 ? 'el-nino' : currentOni <= -0.5 ? 'la-nina' : 'neutral') as 'el-nino' | 'la-nina' | 'neutral',
-              }]),
-        ];
+        // Anchor seasons on current/next year. Seasons earlier in the array
+        // belong to the current year; once labels wrap, anchor on next year.
+        // Simpler heuristic: anchor on currentYear, but NDJ rolls to currentYear too
+        // since NDJ runs Nov(currentYear)→Jan(currentYear+1) — its window already
+        // crosses the year via SEASON_MONTHS (endMonth=12 → 13 = next Jan).
+        const elNinoStart = first50 ? seasonWindow(first50.season, currentYear)[0] : null;
+        // End = end of last ≥30% El Niño season (i.e. when probability drops back).
+        const lastNotableIdx = (() => {
+          let last = -1;
+          seasons.forEach((s, i) => { if (s.pElNino >= 30) last = i; });
+          return last;
+        })();
+        const lastNotable = lastNotableIdx >= 0 ? seasons[lastNotableIdx] : null;
+        const elNinoEnd = lastNotable ? seasonWindow(lastNotable.season, currentYear)[1] : null;
+        const peakX = peakSeason ? (() => {
+          const [a, b] = seasonWindow(peakSeason.season, currentYear);
+          return (a + b) / 2;
+        })() : null;
+
+        const xMin = minYear - 0.5;
+        const xMax = Math.max(currentYear + 1.2, (elNinoEnd ?? currentYear + 1) + 0.1);
+
+        // X-axis ticks — integer years only.
+        const yearTicks: number[] = [];
+        for (let y = minYear; y <= Math.ceil(xMax); y++) yearTicks.push(y);
 
         return (
         <SectionCard
           icon={<History className="text-[#D0A65E]" />}
           title="Past & future — the central thread of the ENSO story"
-          subtitle="Every El Niño (red) and La Niña (blue) since 1980 on one timeline — plus NOAA's forecast for the next event, drawn dashed at its expected strength. The 'today' line marks where measurement ends and prediction begins."
+          subtitle="Each past El Niño (red) and La Niña (blue) is shown at its peak intensity. The dashed red box marks NOAA's forecast window for the next El Niño event — starting when probability crosses 50%, ending when it drops back. The 'today' line shows where we are now."
         >
-          <div className="h-[360px]">
+          <div className="h-[380px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={combined} margin={{ top: 10, right: 14, left: 0, bottom: 18 }}>
+              <ComposedChart data={past} margin={{ top: 24, right: 28, left: 0, bottom: 18 }}>
                 <defs>
                   <pattern id="enso-forecast-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
-                    <rect width="6" height="6" fill="rgba(251,113,133,0.18)" />
-                    <rect width="3" height="6" fill="rgba(251,113,133,0.45)" />
+                    <rect width="6" height="6" fill="rgba(251,113,133,0.12)" />
+                    <rect width="3" height="6" fill="rgba(251,113,133,0.32)" />
                   </pattern>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis
-                  dataKey="key"
+                  dataKey="x"
+                  type="number"
+                  domain={[xMin, xMax]}
+                  ticks={yearTicks}
+                  tickFormatter={(v) => String(Math.round(v))}
                   stroke="#9CA3AF"
                   fontSize={11}
-                  interval={0}
                   height={32}
+                  allowDecimals={false}
                 />
                 <YAxis
                   stroke="#9CA3AF"
@@ -397,23 +433,70 @@ export default function EnsoPage() {
                   labelFormatter={(_label: any, p: any) => {
                     const pl = p?.[0]?.payload;
                     if (!pl) return '';
-                    if (pl.isForecast) return `${pl.label} — predicted El Niño`;
                     return `${pl.label} · ${pl.phase === 'el-nino' ? 'El Niño' : pl.phase === 'la-nina' ? 'La Niña' : 'Neutral'} year`;
                   }}
                 />
-                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" />
-                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
+                {/* Forecast El Niño window — positioned at MJJ start → NDJ end */}
+                {isForecastingElNino && elNinoStart !== null && elNinoEnd !== null && (
+                  <ReferenceArea
+                    x1={elNinoStart}
+                    x2={elNinoEnd}
+                    y1={0}
+                    y2={predictedPeakOni}
+                    fill="url(#enso-forecast-stripes)"
+                    stroke="#fb7185"
+                    strokeWidth={1.5}
+                    strokeDasharray="4 3"
+                    ifOverflow="extendDomain"
+                  />
+                )}
+                {/* Forecast labels */}
+                {isForecastingElNino && elNinoStart !== null && first50 && (
+                  <ReferenceLine
+                    x={elNinoStart}
+                    stroke="#fb7185"
+                    strokeDasharray="2 2"
+                    strokeOpacity={0.6}
+                    label={{
+                      value: `${first50.season} ${first50.pElNino}%`,
+                      fill: '#fb7185',
+                      fontSize: 10,
+                      position: 'insideTopRight',
+                      offset: 4,
+                    }}
+                  />
+                )}
+                {isForecastingElNino && peakX !== null && peakSeason && (
+                  <ReferenceDot
+                    x={peakX}
+                    y={predictedPeakOni}
+                    r={5}
+                    fill="#fb7185"
+                    stroke="#0f172a"
+                    strokeWidth={2}
+                    label={{
+                      value: `peak ${peakSeason.season} (${peakSeason.pElNino}%) · ~${fmtSigned(predictedPeakOni, 1)}°C`,
+                      fill: '#fb7185',
+                      fontSize: 10,
+                      fontWeight: 600,
+                      position: 'top',
+                      offset: 8,
+                    }}
+                  />
+                )}
+                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" strokeOpacity={0.5} />
+                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" strokeOpacity={0.5} />
                 <ReferenceLine y={0} stroke="#6B7280" />
-                {/* "Today" boundary between history and forecast */}
+                {/* "Today" vertical */}
                 <ReferenceLine
-                  x={String(currentYear)}
+                  x={todayX}
                   stroke="#D0A65E"
                   strokeDasharray="4 4"
                   label={{ value: 'today', fill: '#D0A65E', fontSize: 11, position: 'top' }}
                 />
-                {/* "Now" marker — current ONI value at the today line */}
+                {/* "Now" dot at the actual current ONI value */}
                 <ReferenceDot
-                  x={String(currentYear)}
+                  x={todayX}
                   y={currentOni}
                   r={6}
                   fill="#D0A65E"
@@ -428,38 +511,34 @@ export default function EnsoPage() {
                     offset: 12,
                   }}
                 />
-                <Bar dataKey="peak" name="Peak ONI" isAnimationActive={false}>
-                  {combined.map((d, i) => {
-                    if (d.isForecast) {
-                      return (
-                        <Cell
-                          key={i}
-                          fill="url(#enso-forecast-stripes)"
-                          stroke="#fb7185"
-                          strokeWidth={1.5}
-                          strokeDasharray="4 3"
-                        />
-                      );
-                    }
-                    return (
-                      <Cell
-                        key={i}
-                        fill={d.phase === 'el-nino' ? '#fb7185' : d.phase === 'la-nina' ? '#60a5fa' : '#6b7280'}
-                      />
-                    );
-                  })}
+                {/* Past peaks — bars at integer-year x */}
+                <Bar dataKey="peak" name="Peak ONI" barSize={28} isAnimationActive={false}>
+                  {past.map((d, i) => (
+                    <Cell
+                      key={i}
+                      fill={d.phase === 'el-nino' ? '#fb7185' : d.phase === 'la-nina' ? '#60a5fa' : '#6b7280'}
+                    />
+                  ))}
                 </Bar>
-              </BarChart>
+                {/* Current year-to-date partial bar (thin, lighter) */}
+                {currentYearPeak !== null && (
+                  <ReferenceDot
+                    x={currentYear}
+                    y={currentYearPeak}
+                    r={0}
+                  />
+                )}
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
 
           {/* Legend strip */}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-rose-400" /> El Niño peak (≥ +0.5°C)
+              <span className="inline-block w-3 h-3 rounded-sm bg-rose-400" /> El Niño peak
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-sky-400" /> La Niña peak (≤ −0.5°C)
+              <span className="inline-block w-3 h-3 rounded-sm bg-sky-400" /> La Niña peak
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block w-3 h-3 rounded-sm bg-gray-500" /> Neutral year
@@ -467,9 +546,12 @@ export default function EnsoPage() {
             <span className="inline-flex items-center gap-1.5">
               <span
                 className="inline-block w-3 h-3 rounded-sm border border-rose-400"
-                style={{ background: 'repeating-linear-gradient(45deg, rgba(251,113,133,0.15) 0 2px, rgba(251,113,133,0.45) 2px 4px)' }}
+                style={{ background: 'repeating-linear-gradient(45deg, rgba(251,113,133,0.12) 0 2px, rgba(251,113,133,0.32) 2px 4px)' }}
               />{' '}
-              Forecast (dashed)
+              Forecast El Niño window
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / today
             </span>
           </div>
 
@@ -484,10 +566,10 @@ export default function EnsoPage() {
                     Probability first crosses{' '}
                     <span className="font-mono font-semibold text-rose-200">50%</span> in{' '}
                     <span className="font-mono">{first50.label}</span>
-                    {' '}({first50.pElNino}% chance)
+                    {' '}({first50.pElNino}% chance) — this is the official "start" of the event
                     {first90 && (
                       <>
-                        , climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in{' '}
+                        . It then climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in{' '}
                         <span className="font-mono">{first90.label}</span>
                       </>
                     )}
@@ -506,9 +588,9 @@ export default function EnsoPage() {
                     .
                   </>
                 )}{' '}
-                The dashed bar shows the expected peak intensity — drawn at{' '}
-                <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span>,
-                the average of every El Niño peak since {past.find((p) => p.phase === 'el-nino')?.label || '1980'}.
+                The dashed red box on the chart shows when this El Niño is expected, drawn at{' '}
+                <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span> —
+                the average peak strength of every El Niño since {past.find((p) => p.phase === 'el-nino')?.label || '2020'}.
               </p>
             </div>
           )}
