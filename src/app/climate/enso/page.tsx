@@ -77,18 +77,32 @@ type SoiData = {
   history: { year: number; month: number; value: number }[];
 };
 
+type ForecastSeason = {
+  season: string;
+  label: string;
+  pLaNina: number;
+  pNeutral: number;
+  pElNino: number;
+};
+
+type ForecastData = {
+  seasons: ForecastSeason[];
+  imageUrl: string | null;
+};
+
 type EnsoSnapshot = {
   oni: OniData | null;
   weekly: WeeklyData | null;
   mei: MeiData | null;
   soi: SoiData | null;
+  forecast: ForecastData | null;
   sources: Record<string, string>;
   images: {
     sstAnomalyMap: string;
     tropicalSstAnimation: string;
     subsurfaceAnomaly: string;
     hovmollerSst: string;
-    cpcProbabilityForecast: string;
+    cpcProbabilityForecast: string | null;
     metOfficePlumeNino34?: string;
     metOfficePlumeNino3?: string;
     metOfficePlumeNino4?: string;
@@ -104,6 +118,12 @@ type EnsoSnapshot = {
 /* ─── Shared styling ──────────────────────────────────────────────────────── */
 
 const ACCENT = '#D0A65E';
+
+// Recharts tooltip props - fixes default dark text on dark bg.
+const TT_CONTENT = { backgroundColor: '#0f172a', border: `1px solid ${ACCENT}`, borderRadius: 8, fontSize: 12, color: '#f3f4f6' } as const;
+const TT_LABEL = { color: '#ffffff', fontWeight: 600, marginBottom: 4 } as const;
+const TT_ITEM = { color: '#e5e7eb' } as const;
+const TT_CURSOR = { fill: 'rgba(208,166,94,0.08)' } as const;
 
 function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
@@ -259,6 +279,186 @@ export default function EnsoPage() {
         </SectionCard>
       )}
 
+      {/* ═══ PAST + FUTURE HERO STORY ════════════════════════════ */}
+      {oni && (() => {
+        // Build combined dataset: past 30y of yearly-peak ONI + 9-season forecast.
+        const yearsBack = 46;
+        const minYear = (oni.history[oni.history.length - 1]?.year || new Date().getFullYear()) - yearsBack + 1;
+        const peaksByYear = new Map<number, number>();
+        for (const p of oni.history) {
+          if (p.year < minYear) continue;
+          const cur = peaksByYear.get(p.year);
+          if (cur === undefined || Math.abs(p.anom) > Math.abs(cur)) peaksByYear.set(p.year, p.anom);
+        }
+        const past = [...peaksByYear.entries()]
+          .sort((a, b) => a[0] - b[0])
+          .map(([year, peak]) => ({
+            key: String(year),
+            label: `${year}`,
+            isForecast: false,
+            peak,
+            phase: peak >= 0.5 ? 'el-nino' : peak <= -0.5 ? 'la-nina' : 'neutral',
+            pEl: 0, pNeu: 0, pLa: 0,
+          }));
+        const future = (data?.forecast?.seasons || []).map((s) => ({
+          key: s.season,
+          label: s.label,
+          isForecast: true,
+          peak: 0,
+          phase: 'forecast' as const,
+          pEl: s.pElNino,
+          pNeu: s.pNeutral,
+          pLa: s.pLaNina,
+        }));
+        const combined = [...past, ...future];
+
+        return (
+        <SectionCard
+          icon={<History className="text-[#D0A65E]" />}
+          title="Past & future — the ENSO story since 1980"
+          subtitle="Every El Niño (red) and La Niña (blue) peak since 1980, side by side with NOAA's official probability outlook for the next 9 seasons. The right-hand stacked bars show the chance of each phase developing — a probabilistic forecast, not a guaranteed value."
+        >
+          <div className="h-[360px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={combined} margin={{ top: 10, right: 14, left: 0, bottom: 18 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis
+                  dataKey="key"
+                  stroke="#9CA3AF"
+                  fontSize={9}
+                  interval={0}
+                  angle={-90}
+                  textAnchor="end"
+                  height={50}
+                />
+                <YAxis
+                  yAxisId="oni"
+                  stroke="#9CA3AF"
+                  fontSize={10}
+                  width={42}
+                  domain={[-3, 3]}
+                  ticks={[-3, -2, -1, 0, 1, 2, 3]}
+                  tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
+                />
+                <YAxis
+                  yAxisId="prob"
+                  orientation="right"
+                  stroke="#9CA3AF"
+                  fontSize={10}
+                  width={36}
+                  domain={[0, 100]}
+                  ticks={[0, 25, 50, 75, 100]}
+                  tickFormatter={(v) => `${v}%`}
+                />
+                <Tooltip
+                  contentStyle={TT_CONTENT}
+                  labelStyle={TT_LABEL}
+                  itemStyle={TT_ITEM}
+                  cursor={TT_CURSOR}
+                  formatter={(value: any, name: any, p: any) => {
+                    if (p?.payload?.isForecast) {
+                      if (typeof value === 'number' && value > 0) return [`${value}%`, name];
+                      return null;
+                    }
+                    if (name === 'Peak ONI') return [`${fmtSigned(value, 1)}°C`, name];
+                    return null;
+                  }}
+                  labelFormatter={(_label: any, p: any) => {
+                    const pl = p?.[0]?.payload;
+                    if (pl?.isForecast) return `Forecast — ${pl.label}`;
+                    if (pl) return `${pl.label} · peak ${pl.phase === 'el-nino' ? 'El Niño' : pl.phase === 'la-nina' ? 'La Niña' : 'Neutral'}`;
+                    return '';
+                  }}
+                />
+                <ReferenceLine yAxisId="oni" y={0.5} stroke="#fb7185" strokeDasharray="3 3" />
+                <ReferenceLine yAxisId="oni" y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
+                <ReferenceLine yAxisId="oni" y={0} stroke="#6B7280" />
+                {/* Past peak ONI bars — Cell-coloured by phase */}
+                <Bar yAxisId="oni" dataKey="peak" name="Peak ONI" isAnimationActive={false}>
+                  {combined.map((d, i) => (
+                    <Cell key={i} fill={d.phase === 'el-nino' ? '#fb7185' : d.phase === 'la-nina' ? '#60a5fa' : '#6b7280'} />
+                  ))}
+                </Bar>
+                {/* Forecast stacked probability bars */}
+                <Bar yAxisId="prob" dataKey="pLa" name="P(La Niña)" stackId="prob" fill="#60a5fa" isAnimationActive={false} />
+                <Bar yAxisId="prob" dataKey="pNeu" name="P(Neutral)" stackId="prob" fill="#9ca3af" isAnimationActive={false} />
+                <Bar yAxisId="prob" dataKey="pEl" name="P(El Niño)" stackId="prob" fill="#fb7185" isAnimationActive={false} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Legend strip */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block w-3 h-3 rounded-sm bg-rose-400" /> El Niño peak
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block w-3 h-3 rounded-sm bg-sky-400" /> La Niña peak
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block w-3 h-3 rounded-sm bg-gray-500" /> Neutral year
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-gray-400">
+              | <span className="font-mono">left axis</span>: peak ONI (°C) · <span className="font-mono">right axis</span>: forecast probability
+            </span>
+          </div>
+
+          {/* Headline forecast call-out */}
+          {data?.forecast?.seasons?.length ? (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+              {(() => {
+                const seasons = data.forecast!.seasons;
+                const next = seasons[0];
+                const peak = seasons.reduce(
+                  (a, b) => (Math.max(b.pElNino, b.pLaNina) > Math.max(a.pElNino, a.pLaNina) ? b : a),
+                  seasons[0],
+                );
+                const last = seasons[seasons.length - 1];
+                const phaseOf = (s: ForecastSeason) =>
+                  s.pElNino >= 50 ? { name: 'El Niño', text: 'text-rose-300', p: s.pElNino }
+                  : s.pLaNina >= 50 ? { name: 'La Niña', text: 'text-sky-300', p: s.pLaNina }
+                  : { name: 'Neutral', text: 'text-gray-300', p: s.pNeutral };
+                const items: Array<[string, ForecastSeason, ReturnType<typeof phaseOf>]> = [
+                  ['This season', next, phaseOf(next)],
+                  ['Peak likelihood', peak, phaseOf(peak)],
+                  ['End of forecast', last, phaseOf(last)],
+                ];
+                return items.map(([title, s, ph]) => (
+                  <div key={title} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
+                    <p className="text-[10px] uppercase tracking-wider text-gray-400">{title}</p>
+                    <p className={`text-lg font-bold font-mono ${ph.text}`}>{ph.name}</p>
+                    <p className="text-xs text-gray-400 font-mono">{ph.p}% · {s.label}</p>
+                  </div>
+                ));
+              })()}
+            </div>
+          ) : null}
+
+          <p className="text-xs text-gray-500 mt-3">
+            Forecast source:{' '}
+            <a
+              href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#D0A65E] hover:underline"
+            >
+              NOAA CPC ENSO probability outlook
+            </a>
+            . Past peaks computed from{' '}
+            <a
+              href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#D0A65E] hover:underline"
+            >
+              ONI v5
+            </a>
+            .
+          </p>
+        </SectionCard>
+        );
+      })()}
+
       {/* ═══ WEEKLY ═══════════════════════════════════════════════ */}
       <Divider icon={<TrendingUp className="h-5 w-5" />} title="Weekly Niño 3.4" />
 
@@ -293,7 +493,7 @@ export default function EnsoPage() {
                   tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#111827', border: `1px solid ${ACCENT}`, borderRadius: 8, fontSize: 12 }}
+                  contentStyle={TT_CONTENT} labelStyle={TT_LABEL} itemStyle={TT_ITEM} cursor={TT_CURSOR}
                   formatter={(v: any) => [
                     typeof v === 'number' ? `${fmtSigned(v)}°C` : '—',
                     'Niño 3.4 anomaly',
@@ -384,7 +584,7 @@ export default function EnsoPage() {
                   tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#111827', border: `1px solid ${ACCENT}`, borderRadius: 8, fontSize: 12 }}
+                  contentStyle={TT_CONTENT} labelStyle={TT_LABEL} itemStyle={TT_ITEM} cursor={TT_CURSOR}
                   formatter={(v: any) => [typeof v === 'number' ? `${fmtSigned(v)}°C` : '—', 'ONI']}
                   labelFormatter={(_, p: any) => (p?.[0]?.payload ? `${p[0].payload.season} ${p[0].payload.year}` : '')}
                 />
@@ -439,7 +639,7 @@ export default function EnsoPage() {
                   tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#111827', border: `1px solid ${ACCENT}`, borderRadius: 8, fontSize: 12 }}
+                  contentStyle={TT_CONTENT} labelStyle={TT_LABEL} itemStyle={TT_ITEM} cursor={TT_CURSOR}
                   formatter={(v: any) => [typeof v === 'number' ? fmtSigned(v) : '—', 'MEI v2']}
                   labelFormatter={(_, p: any) => (p?.[0]?.payload ? `${p[0].payload.season} ${p[0].payload.year}` : '')}
                 />
@@ -489,7 +689,7 @@ export default function EnsoPage() {
                   tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#111827', border: `1px solid ${ACCENT}`, borderRadius: 8, fontSize: 12 }}
+                  contentStyle={TT_CONTENT} labelStyle={TT_LABEL} itemStyle={TT_ITEM} cursor={TT_CURSOR}
                   formatter={(v: any) => [typeof v === 'number' ? fmtSigned(v, 1) : '—', 'SOI']}
                   labelFormatter={(_, p: any) =>
                     p?.[0]?.payload ? `${MONTH_NAMES[p[0].payload.month - 1]} ${p[0].payload.year}` : ''
@@ -604,15 +804,80 @@ export default function EnsoPage() {
         title="Probability of El Niño / Neutral / La Niña — next 9 seasons"
         subtitle="Official NOAA Climate Prediction Center forecast probabilities, based on the operational dynamical and statistical model ensemble. Updated mid-month."
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={images.cpcProbabilityForecast}
-          alt="NOAA CPC probability forecast for ENSO over the next 9 overlapping 3-month seasons"
-          className="w-full rounded-lg border border-gray-700/50 bg-gray-900"
-          loading="lazy"
-        />
-        <p className="text-xs text-gray-500 mt-2">
-          Live image:{' '}
+        {data?.forecast?.seasons?.length ? (
+          <>
+            {/* Stacked horizontal-ish bar table */}
+            <div className="space-y-1.5">
+              {data.forecast.seasons.map((s) => {
+                const dominant = s.pElNino >= s.pLaNina && s.pElNino >= s.pNeutral
+                  ? 'El Niño'
+                  : s.pLaNina >= s.pNeutral
+                  ? 'La Niña'
+                  : 'Neutral';
+                return (
+                  <div key={s.season} className="flex items-center gap-2">
+                    <span className="w-32 shrink-0 text-xs font-mono text-gray-300">{s.label}</span>
+                    <div className="flex-1 h-7 flex rounded overflow-hidden bg-gray-800/40 border border-gray-700/50">
+                      {s.pLaNina > 0 && (
+                        <div
+                          className="bg-sky-500 flex items-center justify-center text-[10px] font-mono font-bold text-sky-50"
+                          style={{ width: `${s.pLaNina}%` }}
+                          title={`La Niña ${s.pLaNina}%`}
+                        >
+                          {s.pLaNina >= 8 ? `${s.pLaNina}%` : ''}
+                        </div>
+                      )}
+                      {s.pNeutral > 0 && (
+                        <div
+                          className="bg-gray-500 flex items-center justify-center text-[10px] font-mono font-bold text-gray-50"
+                          style={{ width: `${s.pNeutral}%` }}
+                          title={`Neutral ${s.pNeutral}%`}
+                        >
+                          {s.pNeutral >= 8 ? `${s.pNeutral}%` : ''}
+                        </div>
+                      )}
+                      {s.pElNino > 0 && (
+                        <div
+                          className="bg-rose-500 flex items-center justify-center text-[10px] font-mono font-bold text-rose-50"
+                          style={{ width: `${s.pElNino}%` }}
+                          title={`El Niño ${s.pElNino}%`}
+                        >
+                          {s.pElNino >= 8 ? `${s.pElNino}%` : ''}
+                        </div>
+                      )}
+                    </div>
+                    <span className="w-20 shrink-0 text-right text-xs font-mono text-gray-400">{dominant}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Mini legend */}
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-300">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 rounded-sm bg-rose-500" /> El Niño
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 rounded-sm bg-gray-500" /> Neutral
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-3 h-3 rounded-sm bg-sky-500" /> La Niña
+              </span>
+            </div>
+          </>
+        ) : images.cpcProbabilityForecast ? (
+          // Fallback to live image if structured data missing this run.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={images.cpcProbabilityForecast}
+            alt="NOAA CPC probability forecast for ENSO over the next 9 overlapping 3-month seasons"
+            className="w-full rounded-lg border border-gray-700/50 bg-gray-900"
+            loading="lazy"
+          />
+        ) : (
+          <p className="text-sm text-gray-400">Forecast data unavailable this update.</p>
+        )}
+        <p className="text-xs text-gray-500 mt-3">
+          Source:{' '}
           <a
             href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php"
             target="_blank"
@@ -810,7 +1075,7 @@ export default function EnsoPage() {
               <XAxis dataKey="label" stroke="#9CA3AF" fontSize={10} />
               <YAxis stroke="#9CA3AF" fontSize={10} width={40} domain={[-3, 3]} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#111827', border: `1px solid ${ACCENT}`, borderRadius: 8, fontSize: 12 }}
+                contentStyle={TT_CONTENT} labelStyle={TT_LABEL} itemStyle={TT_ITEM} cursor={TT_CURSOR}
                 formatter={(v: any) => [typeof v === 'number' ? `${fmtSigned(v, 1)}°C peak ONI` : '—', '']}
               />
               <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" />

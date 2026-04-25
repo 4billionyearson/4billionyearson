@@ -31,6 +31,7 @@ const SOURCES = {
   weekly: 'https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for',
   mei: 'https://psl.noaa.gov/enso/mei/data/meiv2.data',
   soi: 'https://www.cpc.ncep.noaa.gov/data/indices/soi',
+  forecast: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php',
 };
 
 const round2 = (v) => Math.round(v * 100) / 100;
@@ -224,21 +225,67 @@ function parseSoi(text) {
   };
 }
 
+/**
+ * NOAA CPC ENSO probability forecast - parses the HTML table on the
+ * roni/probabilities.php page. Each row is one overlapping 3-month
+ * season; columns are P(La Niña), P(Neutral), P(El Niño) in percent.
+ * Also extracts the date-stamped probability image URL from the same
+ * page so the live <img> always resolves.
+ */
+function parseForecast(html) {
+  if (!html) return null;
+  // Extract the table contents (first <table> after id="probabilities-table").
+  const tableMatch = html.match(/<table[^>]*id=["']probabilities-table["'][^>]*>([\s\S]*?)<\/table>/i);
+  if (!tableMatch) return null;
+  const rowMatches = [...tableMatch[1].matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+  const seasons = [];
+  const seasonRegex = /^([A-Z]{3})\s/;
+  for (const row of rowMatches) {
+    const cells = [...row[1].matchAll(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi)].map((m) =>
+      m[1].replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim(),
+    );
+    if (cells.length < 4) continue;
+    const [seasonRaw, lnStr, neuStr, enStr] = cells;
+    const seasonMatch = seasonRaw.match(seasonRegex);
+    if (!seasonMatch) continue;
+    const ln = Number(lnStr);
+    const neu = Number(neuStr);
+    const en = Number(enStr);
+    if (!Number.isFinite(ln) || !Number.isFinite(neu) || !Number.isFinite(en)) continue;
+    seasons.push({
+      season: seasonMatch[1], // e.g. 'AMJ'
+      label: seasonRaw.trim(), // e.g. 'AMJ Apr May Jun'
+      pLaNina: ln,
+      pNeutral: neu,
+      pElNino: en,
+    });
+  }
+  if (!seasons.length) return null;
+  // Find the date-stamped probability image URL.
+  const imgMatch = html.match(/figures\/(CPCoff_ENSOprobs_\d{6}\.png)/);
+  const imageUrl = imgMatch
+    ? `https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/figures/${imgMatch[1]}`
+    : null;
+  return { seasons, imageUrl };
+}
+
 // ───────────────────────────────────────────────────────────────────────────
 // Main
 
 (async function main() {
-  const [oniText, weeklyText, meiText, soiText] = await Promise.all([
+  const [oniText, weeklyText, meiText, soiText, forecastHtml] = await Promise.all([
     fetchText(SOURCES.oni, { label: 'NOAA CPC ONI' }),
     fetchText(SOURCES.weekly, { label: 'NOAA CPC weekly Niño SSTs' }),
     fetchText(SOURCES.mei, { label: 'NOAA PSL MEI v2' }),
     fetchText(SOURCES.soi, { label: 'NOAA CPC SOI' }),
+    fetchText(SOURCES.forecast, { label: 'NOAA CPC probability forecast' }),
   ]);
 
   const oni = parseOni(oniText);
   const weekly = parseWeeklyNino(weeklyText);
   const mei = parseMei(meiText);
   const soi = parseSoi(soiText);
+  const forecast = parseForecast(forecastHtml);
 
   if (!oni && !weekly && !mei && !soi) {
     throw new Error('All ENSO feeds failed - aborting snapshot write');
@@ -258,11 +305,13 @@ function parseSoi(text) {
     weekly,
     mei,
     soi,
+    forecast,
     sources: {
       oni: SOURCES.oni,
       weekly: SOURCES.weekly,
       mei: SOURCES.mei,
       soi: SOURCES.soi,
+      forecast: SOURCES.forecast,
       metOffice: 'https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina',
     },
     images: {
@@ -271,7 +320,7 @@ function parseSoi(text) {
       tropicalSstAnimation: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/sstanim.gif',
       subsurfaceAnomaly: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ocean/weeklyenso_clim_81-10/wkteq_xz_anm.gif',
       hovmollerSst: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/ssttlon5_c.gif',
-      cpcProbabilityForecast: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/figures/probabilities.gif',
+      cpcProbabilityForecast: forecast?.imageUrl || null,
       // Met Office monthly plume forecasts (regenerated mid-month).
       metOfficePlumeNino34: `${moBase}/nino34_anom_${moStamp}.png`,
       metOfficePlumeNino3: `${moBase}/nino3_anom_${moStamp}.png`,
@@ -294,6 +343,7 @@ function parseSoi(text) {
   console.log(`  weekly: ${weekly ? `${weekly.weekly.length} weeks, latest ${weekly.lastWeek} → Niño3.4 ${weekly.latest.nino34.anom > 0 ? '+' : ''}${weekly.latest.nino34.anom}°C` : 'null'}`);
   console.log(`  mei:    ${mei ? `${mei.history.length} pts, latest ${mei.latest.season} ${mei.latest.year} = ${mei.latest.value}` : 'null'}`);
   console.log(`  soi:    ${soi ? `${soi.history.length} pts, latest ${soi.latest.year}-${soi.latest.month} = ${soi.latest.value}` : 'null'}`);
+  console.log(`  forecast: ${forecast ? `${forecast.seasons.length} seasons, first ${forecast.seasons[0].label}` : 'null'}`);
 })().catch((err) => {
   console.error('FATAL', err);
   process.exit(1);
