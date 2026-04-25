@@ -20,12 +20,18 @@ import {
 import {
   Activity,
   ArrowRight,
+  CloudRain,
+  Globe2,
+  History,
   Loader2,
   Map as MapIcon,
+  Sun,
+  Thermometer,
   TrendingUp,
   Waves,
   Wind,
 } from 'lucide-react';
+import { REGION_IMPACTS, PAST_EVENTS, type ImpactPhase } from '@/lib/climate/enso-impacts';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -83,6 +89,14 @@ type EnsoSnapshot = {
     subsurfaceAnomaly: string;
     hovmollerSst: string;
     cpcProbabilityForecast: string;
+    metOfficePlumeNino34?: string;
+    metOfficePlumeNino3?: string;
+    metOfficePlumeNino4?: string;
+    metOfficePlumeNino12?: string;
+    metOfficeImpactElNinoTemp?: string;
+    metOfficeImpactElNinoPrecip?: string;
+    metOfficeImpactLaNinaTemp?: string;
+    metOfficeImpactLaNinaPrecip?: string;
   };
   generatedAt: string;
 };
@@ -149,6 +163,8 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 export default function EnsoPage() {
   const [data, setData] = useState<EnsoSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<ImpactPhase>('el-nino');
+  const [continentFilter, setContinentFilter] = useState<string>('All');
 
   useEffect(() => {
     fetch('/api/climate/enso')
@@ -614,6 +630,272 @@ export default function EnsoPage() {
           >
             IRI/CPC plume
           </a>
+        </p>
+      </SectionCard>
+
+      {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
+      <Divider icon={<Globe2 className="h-5 w-5" />} title="Global impacts" />
+
+      <SectionCard
+        title="What does each phase do to weather around the world?"
+        subtitle="Toggle between El Niño and La Niña to see the typical regional response. Probabilities are based on Davey et al. (2013) and NOAA composites - they describe how often the impact has occurred when the phase is active, not how likely the phase itself is."
+      >
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <button
+            onClick={() => setPhase('el-nino')}
+            className={`px-4 py-2 rounded-lg text-sm font-mono font-bold transition ${
+              phase === 'el-nino'
+                ? 'bg-rose-500/30 border-2 border-rose-400 text-rose-200'
+                : 'bg-gray-800/40 border-2 border-gray-700/50 text-gray-300 hover:border-rose-400/50'
+            }`}
+          >
+            El Niño impacts
+          </button>
+          <button
+            onClick={() => setPhase('la-nina')}
+            className={`px-4 py-2 rounded-lg text-sm font-mono font-bold transition ${
+              phase === 'la-nina'
+                ? 'bg-sky-500/30 border-2 border-sky-400 text-sky-200'
+                : 'bg-gray-800/40 border-2 border-gray-700/50 text-gray-300 hover:border-sky-400/50'
+            }`}
+          >
+            La Niña impacts
+          </button>
+          <span className="text-xs text-gray-500 ml-2">
+            Phase currently active: <span className={oni ? ENSO_TEXT[oni.state] : 'text-gray-300'}>{oni?.state || '—'}</span>
+          </span>
+        </div>
+
+        {/* Continent filter chips */}
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {['All', 'Africa', 'Asia', 'Europe', 'N. America', 'C. America', 'S. America', 'Oceania', 'Pacific Is.'].map((c) => (
+            <button
+              key={c}
+              onClick={() => setContinentFilter(c)}
+              className={`px-2.5 py-1 rounded-full text-[11px] font-mono transition ${
+                continentFilter === c
+                  ? 'bg-[#D0A65E]/20 border border-[#D0A65E] text-[#D0A65E]'
+                  : 'bg-gray-800/40 border border-gray-700/50 text-gray-400 hover:border-[#D0A65E]/40'
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+
+        {/* Region cards grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {REGION_IMPACTS.filter((r) => continentFilter === 'All' || r.continent === continentFilter)
+            .filter((r) => r.impacts[phase] && (r.impacts[phase]!.temp || r.impacts[phase]!.precip))
+            .map((r) => {
+              const imp = r.impacts[phase]!;
+              const tempColor = imp.temp === 'warmer' ? 'text-rose-300 bg-rose-900/30 border-rose-700/40' : imp.temp === 'cooler' ? 'text-sky-300 bg-sky-900/30 border-sky-700/40' : '';
+              const precipColor = imp.precip === 'wetter' ? 'text-emerald-300 bg-emerald-900/30 border-emerald-700/40' : imp.precip === 'drier' ? 'text-amber-300 bg-amber-900/30 border-amber-700/40' : '';
+              return (
+                <div key={r.id} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3 hover:border-[#D0A65E]/40 transition-colors">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white truncate">{r.region}</p>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">{r.continent} · {r.area}</p>
+                    </div>
+                    <span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-900/60 border border-gray-700/50 text-gray-300">
+                      {imp.season}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 my-2">
+                    {imp.temp && (
+                      <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full border ${tempColor} inline-flex items-center gap-1`}>
+                        {imp.temp === 'warmer' ? <Sun className="h-3 w-3" /> : <Thermometer className="h-3 w-3" />}
+                        {imp.temp}
+                      </span>
+                    )}
+                    {imp.precip && (
+                      <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full border ${precipColor} inline-flex items-center gap-1`}>
+                        <CloudRain className="h-3 w-3" />
+                        {imp.precip}
+                      </span>
+                    )}
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-gray-900/60 border border-gray-700/50 text-gray-300">
+                      ~{Math.round(imp.prob * 100)}% chance
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed">{imp.notes}</p>
+                </div>
+              );
+            })}
+        </div>
+      </SectionCard>
+
+      {/* Met Office schematic maps - the canonical reference */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SectionCard
+          icon={<Thermometer className="text-rose-300" />}
+          title={phase === 'el-nino' ? 'El Niño temperature impacts' : 'La Niña temperature impacts'}
+          subtitle="Met Office schematic, based on Davey et al. (2013). Coloured regions are likely warmer (red) or cooler (blue) than normal during the labelled season when the phase is active."
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={phase === 'el-nino' ? images.metOfficeImpactElNinoTemp : images.metOfficeImpactLaNinaTemp}
+            alt={`${phase === 'el-nino' ? 'El Niño' : 'La Niña'} temperature impacts schematic`}
+            className="w-full rounded-lg border border-gray-700/50 bg-white"
+            loading="lazy"
+          />
+        </SectionCard>
+        <SectionCard
+          icon={<CloudRain className="text-emerald-300" />}
+          title={phase === 'el-nino' ? 'El Niño rainfall impacts' : 'La Niña rainfall impacts'}
+          subtitle="Met Office schematic. Wetter regions in green, drier in brown. Precipitation teleconnections are noisier than temperature, so probabilities are typically lower."
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={phase === 'el-nino' ? images.metOfficeImpactElNinoPrecip : images.metOfficeImpactLaNinaPrecip}
+            alt={`${phase === 'el-nino' ? 'El Niño' : 'La Niña'} precipitation impacts schematic`}
+            className="w-full rounded-lg border border-gray-700/50 bg-white"
+            loading="lazy"
+          />
+        </SectionCard>
+      </div>
+      <p className="text-xs text-gray-500 px-4">
+        Schematic maps:{' '}
+        <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office GPC outlooks (Davey et al. 2013)</a>. © Crown Copyright.
+      </p>
+
+      {/* ═══ MET OFFICE PLUME FORECASTS ═════════════════ */}
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title="Met Office plume forecasts" />
+
+      <SectionCard
+        title="Forecast SST anomaly across the four Niño regions"
+        subtitle="Each red line is one member of the Met Office GloSea dynamical ensemble; black is the recent observed trajectory. Spread between members shows the forecast uncertainty - tighter spread means more confidence."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {([
+            ['Niño 3.4 (canonical ENSO yardstick)', images.metOfficePlumeNino34],
+            ['Niño 3 (eastern Pacific)', images.metOfficePlumeNino3],
+            ['Niño 4 (warm-pool edge)', images.metOfficePlumeNino4],
+            ['Niño 1+2 (coastal Peru/Ecuador)', images.metOfficePlumeNino12],
+          ] as const).filter(([, src]) => !!src).map(([label, src]) => (
+            <div key={label}>
+              <p className="text-xs text-gray-300 font-mono mb-1">{label}</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src!}
+                alt={`Met Office plume forecast for ${label}`}
+                className="w-full rounded-lg border border-gray-700/50 bg-white"
+                loading="lazy"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 mt-3">
+          Source:{' '}
+          <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">
+            Met Office GloSea ENSO forecasts
+          </a>. Updated around the 11th of each month. Image displays nothing if a new month's plumes haven't been published yet.
+        </p>
+      </SectionCard>
+
+      {/* ═══ PAST EVENTS ═════════════════════════ */}
+      <Divider icon={<History className="h-5 w-5" />} title="Past major events" />
+
+      <SectionCard
+        title="What happened the last time?"
+        subtitle="The eight most consequential ENSO events since 1980. Bar height shows peak ONI; colour shows phase."
+      >
+        {/* Mini bar chart of peak amplitudes */}
+        <div className="h-[200px] mb-4">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={PAST_EVENTS.map((e) => ({ ...e, label: `${e.start.slice(0, 4)}–${e.end.slice(2, 4)}` }))} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="label" stroke="#9CA3AF" fontSize={10} />
+              <YAxis stroke="#9CA3AF" fontSize={10} width={40} domain={[-3, 3]} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#111827', border: `1px solid ${ACCENT}`, borderRadius: 8, fontSize: 12 }}
+                formatter={(v: any) => [typeof v === 'number' ? `${fmtSigned(v, 1)}°C peak ONI` : '—', '']}
+              />
+              <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" />
+              <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" />
+              <ReferenceLine y={0} stroke="#6B7280" />
+              <Bar dataKey="peakOni" isAnimationActive={false}>
+                {PAST_EVENTS.map((e, i) => (
+                  <Cell key={i} fill={e.phase === 'el-nino' ? '#fb7185' : '#60a5fa'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Event timeline cards */}
+        <div className="space-y-3">
+          {PAST_EVENTS.slice().reverse().map((e) => {
+            const phaseColor = e.phase === 'el-nino' ? 'border-rose-700/40 bg-rose-900/10' : 'border-sky-700/40 bg-sky-900/10';
+            const phaseText = e.phase === 'el-nino' ? 'text-rose-300' : 'text-sky-300';
+            return (
+              <div key={`${e.start}-${e.end}`} className={`border-l-4 ${phaseColor} rounded-r-xl p-3`}>
+                <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                  <p className={`text-base font-bold font-mono ${phaseText}`}>
+                    {e.start.slice(0, 4)}–{e.end.slice(0, 4)} {e.phase === 'el-nino' ? 'El Niño' : 'La Niña'}
+                  </p>
+                  <span className="text-xs font-mono text-gray-400">
+                    {e.strength} · peak ONI {fmtSigned(e.peakOni, 1)}°C
+                  </span>
+                </div>
+                <p className="text-sm text-gray-300 mt-1">{e.summary}</p>
+                <ul className="mt-2 space-y-0.5 text-xs text-gray-400 list-disc pl-5">
+                  {e.highlights.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </SectionCard>
+
+      {/* ═══ CLIMATE CHANGE ══════════════════════ */}
+      <Divider icon={<Wind className="h-5 w-5" />} title="ENSO and climate change" />
+
+      <SectionCard
+        title="How does ENSO interact with the long-term warming trend?"
+        subtitle="ENSO is a natural mode of climate variability that has existed for thousands of years (proven by coral and tree-ring records). But human-driven warming is changing the backdrop on which it operates."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-rose-300 mb-2">El Niño + warming = record temperatures</p>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              Every El Niño now adds its temporary warming on top of a baseline that's already ~1.3 °C above pre-industrial.
+              The 1997-98, 2015-16 and 2023-24 El Niños each set new global temperature records; 2024 became the first calendar year above 1.5 °C.
+              Without continued greenhouse-gas warming, the same ENSO events would have produced much smaller temperature spikes.
+            </p>
+          </div>
+          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-sky-300 mb-2">La Niña no longer cools the planet below the trend</p>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              Strong La Niña years used to deliver global mean temperatures below the long-term average. Today, even the deepest La Niñas (2020-22) sit
+              well above any 20th-century year. La Niña buys a temporary pause in record-breaking - it doesn't reverse the warming.
+            </p>
+          </div>
+          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-amber-300 mb-2">Compound impacts are getting worse</p>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              Drought regions (Amazon, Southern Africa, Australia) are now drier in El Niño years than the same ENSO state would have produced 50 years ago,
+              because evaporative demand has risen. Flood regions (Pakistan 2022, Horn of Africa) see heavier short-duration rainfall on top of La Niña triggers because
+              a warmer atmosphere holds more moisture (~7 % per °C, Clausius-Clapeyron).
+            </p>
+          </div>
+          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-emerald-300 mb-2">Will ENSO itself change?</p>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              IPCC AR6 (2021) concluded with high confidence that ENSO sea-surface temperature variability has been larger over the past 50 years than at any time in
+              the previous 400 years. Most CMIP6 climate models project that ENSO rainfall variability will <em>increase</em> with further warming, even if the SST swings
+              themselves change less. Translation: bigger droughts and bigger floods in the same teleconnection regions, regardless of phase.
+            </p>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500">
+          Sources: IPCC AR6 WGI Chapter 4, Box TS.13;{' '}
+          <a href="https://www.science.org/doi/10.1126/science.aax6925" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Grothe et al. 2020 (coral records of ENSO amplification)</a>;{' '}
+          <a href="https://www.nature.com/articles/s41558-020-00963-x" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Cai et al. 2021 (Nature Climate Change)</a>.
         </p>
       </SectionCard>
 

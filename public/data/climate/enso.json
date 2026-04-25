@@ -8301,14 +8301,23 @@
     "oni": "https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt",
     "weekly": "https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for",
     "mei": "https://psl.noaa.gov/enso/mei/data/meiv2.data",
-    "soi": "https://www.cpc.ncep.noaa.gov/data/indices/soi"
+    "soi": "https://www.cpc.ncep.noaa.gov/data/indices/soi",
+    "metOffice": "https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina"
   },
   "images": {
     "sstAnomalyMap": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/sstweek_c.gif",
     "tropicalSstAnimation": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/sstanim.gif",
     "subsurfaceAnomaly": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ocean/weeklyenso_clim_81-10/wkteq_xz_anm.gif",
     "hovmollerSst": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/ssttlon5_c.gif",
-    "cpcProbabilityForecast": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/figures/probabilities.gif"
+    "cpcProbabilityForecast": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/figures/probabilities.gif",
+    "metOfficePlumeNino34": "https://www.metoffice.gov.uk/images/elnino/20260401/nino34_anom_20260401.png",
+    "metOfficePlumeNino3": "https://www.metoffice.gov.uk/images/elnino/20260401/nino3_anom_20260401.png",
+    "metOfficePlumeNino4": "https://www.metoffice.gov.uk/images/elnino/20260401/nino4_anom_20260401.png",
+    "metOfficePlumeNino12": "https://www.metoffice.gov.uk/images/elnino/20260401/nino12_anom_20260401.png",
+    "metOfficeImpactElNinoTemp": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/el-nino-temp.jpg",
+    "metOfficeImpactElNinoPrecip": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/el-nino-precip.jpg",
+    "metOfficeImpactLaNinaTemp": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-temp.jpg",
+    "metOfficeImpactLaNinaPrecip": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-precip.jpg"
   },
-  "generatedAt": "2026-04-25T10:10:46.758Z"
+  "generatedAt": "2026-04-25T13:47:23.821Z"
 }

@@ -244,6 +244,15 @@ function parseSoi(text) {
     throw new Error('All ENSO feeds failed - aborting snapshot write');
   }
 
+  // Met Office plume images for the four Niño regions are stamped with
+  // the first day of the current calendar month, e.g.:
+  //   https://www.metoffice.gov.uk/images/elnino/20260401/nino34_anom_20260401.png
+  // We compute that stamp here and let the page link to whichever image
+  // is the most recent published version (Met Office updates ~mid-month).
+  const now = new Date();
+  const moStamp = `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, '0')}01`;
+  const moBase = `https://www.metoffice.gov.uk/images/elnino/${moStamp}`;
+
   const snapshot = {
     oni,
     weekly,
@@ -254,6 +263,7 @@ function parseSoi(text) {
       weekly: SOURCES.weekly,
       mei: SOURCES.mei,
       soi: SOURCES.soi,
+      metOffice: 'https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina',
     },
     images: {
       // Live, self-updating NOAA/NCEP images. Embedded directly on the page.
@@ -262,6 +272,17 @@ function parseSoi(text) {
       subsurfaceAnomaly: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ocean/weeklyenso_clim_81-10/wkteq_xz_anm.gif',
       hovmollerSst: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/ssttlon5_c.gif',
       cpcProbabilityForecast: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/figures/probabilities.gif',
+      // Met Office monthly plume forecasts (regenerated mid-month).
+      metOfficePlumeNino34: `${moBase}/nino34_anom_${moStamp}.png`,
+      metOfficePlumeNino3: `${moBase}/nino3_anom_${moStamp}.png`,
+      metOfficePlumeNino4: `${moBase}/nino4_anom_${moStamp}.png`,
+      metOfficePlumeNino12: `${moBase}/nino12_anom_${moStamp}.png`,
+      // Met Office schematic regional impact maps (static URLs, refreshed
+      // when Davey et al analyses are updated; safe to hot-link).
+      metOfficeImpactElNinoTemp: 'https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/el-nino-temp.jpg',
+      metOfficeImpactElNinoPrecip: 'https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/el-nino-precip.jpg',
+      metOfficeImpactLaNinaTemp: 'https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-temp.jpg',
+      metOfficeImpactLaNinaPrecip: 'https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-precip.jpg',
     },
     generatedAt: new Date().toISOString(),
   };

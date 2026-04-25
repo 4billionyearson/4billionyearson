@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 const URL = 'https://4billionyearson.org/climate/enso';
 
 export const metadata: Metadata = {
-  title: 'El Niño / La Niña — Live ENSO Tracker (Niño 3.4, ONI, MEI, SOI)',
+  title: 'El Niño / La Niña — Live ENSO Tracker, Regional Impacts & Forecast',
   description:
-    "Live tracker for the El Niño-Southern Oscillation (ENSO). Weekly Niño 3.4 SST anomalies, the NOAA Oceanic Niño Index (ONI), Multivariate ENSO Index (MEI v2), Southern Oscillation Index (SOI), live tropical Pacific SST anomaly maps and the official CPC probability forecast. Updated monthly from NOAA CPC and PSL.",
+    "Live ENSO tracker: weekly Niño 3.4 SST anomalies, NOAA ONI, MEI v2 and SOI. Global impact maps showing which regions get warmer, cooler, wetter or drier under each phase. Met Office plume forecasts, past major events from 1982 to 2024, and how ENSO interacts with climate change.",
   keywords: [
     'El Niño',
     'La Niña',
@@ -19,8 +19,13 @@ export const metadata: Metadata = {
     'SOI',
     'Pacific Ocean SST',
     'ENSO forecast',
+    'ENSO impacts',
+    'El Niño regional impacts',
+    'La Niña regional impacts',
+    'ENSO and climate change',
     'NOAA CPC',
     'NOAA PSL',
+    'Met Office GloSea',
   ],
   alternates: { canonical: URL },
   openGraph: {
