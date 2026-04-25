@@ -397,7 +397,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
         {/* Info bar */}
         {selectedInfo && (
-          <div className="absolute bottom-0 left-0 right-0 z-[500] bg-gray-950/90 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex items-center gap-4 text-sm pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 z-[1001] bg-gray-950/95 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex items-center gap-4 text-sm pointer-events-none">
             <span className="font-bold text-gray-100">{selectedInfo.name}</span>
             <span className="font-semibold" style={{ color: selectedInfo.color }}>
               {selectedInfo.annual != null ? formatTonnes(selectedInfo.annual) + " / year" : "No data"}

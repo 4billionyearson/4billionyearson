@@ -655,7 +655,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
         </MapContainer>
 
         {selected && (
-          <div className="absolute bottom-0 left-0 right-0 z-[500] bg-gray-950/90 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 z-[1001] bg-gray-950/95 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm pointer-events-none">
             <span className="font-bold text-gray-100">{selected.name}</span>
             {selected.anomaly != null ? (
               <>

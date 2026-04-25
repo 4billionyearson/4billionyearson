@@ -642,7 +642,7 @@ function ClimateDashboard() {
                     href={`/climate/${getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode)}`}
                     className="ml-auto flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap"
                   >
-                    View Profile <ExternalLink className="h-3 w-3" />
+                    Full Monthly Update <ExternalLink className="h-3 w-3" />
                   </Link>
                 )}
               </div>

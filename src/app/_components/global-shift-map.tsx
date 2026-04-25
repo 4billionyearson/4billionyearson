@@ -988,7 +988,7 @@ function HoverInfoPanel({
   const fmtPct = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(1)}%`;
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-[500] bg-gray-950/92 backdrop-blur-sm border-t border-gray-700/60 px-3 py-2 text-sm pointer-events-none">
+    <div className="absolute bottom-0 left-0 right-0 z-[1001] bg-gray-950/95 backdrop-blur-sm border-t border-gray-700/60 px-3 py-2 text-sm pointer-events-none">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="font-bold text-gray-100">{name}</span>
         {rec?.koppen && (

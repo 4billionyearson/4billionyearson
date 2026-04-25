@@ -496,6 +496,8 @@ export function getAllSlugs(): string[] {
 }
 
 export function getProfileSlugForLocation(locationId: string, owidCode?: string): string | null {
+  // UK "whole" pseudo-region from the dashboard maps to the UK country profile.
+  if (locationId === 'uk-uk') return 'uk';
   const region = CLIMATE_REGIONS.find(
     (entry) => entry.apiCode === locationId || (owidCode && entry.apiCode === owidCode),
   );
