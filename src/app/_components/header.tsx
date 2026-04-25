@@ -212,6 +212,9 @@ const Header = () => {
                 <Link href="/climate/shifting-seasons" className={desktopDropdownItemClass(pathname === '/climate/shifting-seasons', 'text-pink-400', 'hover:text-pink-400')} onClick={closeMenu}>
                   Shifting Seasons<MonthlyBadge />
                 </Link>
+                <Link href="/climate/enso" className={desktopDropdownItemClass(pathname === '/climate/enso', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
+                  El Niño / La Niña<MonthlyBadge />
+                </Link>
                 <Link href="/extreme-weather" className={desktopDropdownItemClass(pathname === '/extreme-weather', 'text-orange-400', 'hover:text-orange-400')} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
                 </Link>
@@ -430,6 +433,9 @@ const Header = () => {
                 </Link>
                 <Link href="/climate/shifting-seasons" className={mobileDropdownItemClass(pathname === '/climate/shifting-seasons', 'text-pink-400', 'hover:text-pink-400')} onClick={closeMenu}>
                   Shifting Seasons<MonthlyBadge />
+                </Link>
+                <Link href="/climate/enso" className={mobileDropdownItemClass(pathname === '/climate/enso', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
+                  El Niño / La Niña<MonthlyBadge />
                 </Link>
                 <Link href="/extreme-weather" className={mobileDropdownItemClass(pathname === '/extreme-weather', 'text-orange-400', 'hover:text-orange-400')} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />

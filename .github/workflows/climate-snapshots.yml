@@ -35,6 +35,10 @@ jobs:
       - name: Rebuild global snapshot
         run: node scripts/build-global-snapshot.mjs
 
+      # ── ENSO / Pacific oceans tracker (NOAA CPC + PSL) ──────────────
+      - name: Rebuild ENSO snapshot
+        run: node scripts/build-enso-snapshot.mjs
+
       # ── Per-country monthly precipitation (World Bank CCKP) ─────────
       # Must run BEFORE build-country-snapshots so the country profiles can
       # enrich themselves with the monthly-comparison chart data.

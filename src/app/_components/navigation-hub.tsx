@@ -72,6 +72,7 @@ const SECTIONS: Section[] = [
       { group: "Earth Systems", href: "/greenhouse-gases", label: "Greenhouse Gases", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "CO₂, methane & N₂O levels" },
       { group: "Earth Systems", href: "/sea-levels-ice", label: "Sea Levels & Ice", icon: <Waves className="h-4 w-4" />, badge: "monthly", desc: "Sea level rise & Arctic ice extent" },
       { group: "Earth Systems", href: "/climate/shifting-seasons", label: "Shifting Seasons", icon: <Flower2 className="h-4 w-4" />, badge: "monthly", desc: "How spring, summer & winter are moving" },
+      { group: "Earth Systems", href: "/climate/enso", label: "El Niño / La Niña", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "Live ENSO tracker: Niño 3.4, MEI, SOI & forecast" },
       { group: "Earth Systems", href: "/extreme-weather", label: "Extreme Weather", icon: <CloudLightning className="h-4 w-4" />, badge: "live", desc: "Active disasters worldwide" },
       { group: "Earth Systems", href: "/emissions", label: "CO₂ Emissions", icon: <Factory className="h-4 w-4" />, badge: "annual", desc: "Country rankings & trends" },
       { group: "Learn", href: "/climate-explained", label: "Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },

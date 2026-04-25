@@ -131,6 +131,21 @@ A long-record look at how the seasonal calendar is moving:
 - Global threshold-date map showing spring/autumn shifts country-by-country
 
 Key findings as of latest update: Kyoto's cherry blossoms now bloom roughly 11 days earlier than the pre-1850 average; US growing seasons are lengthening; Northern Hemisphere spring snow-cover is in sustained decline.
+
+## El Niño / La Niña — Live ENSO Tracker
+URL: ${baseUrl}/climate/enso
+A real-time tracker of the El Niño-Southern Oscillation, the single biggest year-to-year driver of global temperature and rainfall after the long-term warming trend:
+- Current ENSO state (El Niño / Neutral / La Niña) with strength category
+- Weekly Niño 3.4 SST anomaly chart (last 5 years, 1991–2020 baseline) from NOAA CPC
+- Snapshot of all four Niño regions (1+2, 3, 3.4, 4)
+- Historical Oceanic Niño Index (ONI, 3-month running mean of Niño 3.4 SST)
+- Multivariate ENSO Index v2 (MEI v2 — combines SST, sea-level pressure, surface winds and outgoing longwave radiation)
+- Southern Oscillation Index (SOI — Tahiti minus Darwin sea-level pressure)
+- Live tropical Pacific SST anomaly map and equatorial subsurface heat cross-section
+- Time-longitude (Hovmöller) SST anomaly diagram
+- Official NOAA CPC probability forecast for the next 9 overlapping seasons
+
+Sources: NOAA Climate Prediction Center (ONI v5, weekly Niño-region SSTs, SOI, ENSO probabilities), NOAA Physical Sciences Laboratory (MEI v2).
 `;
 
   return new NextResponse(body, {

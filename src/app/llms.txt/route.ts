@@ -85,6 +85,11 @@ Core value proposition: Real-time and regularly updated data dashboards, plain-E
   - US frost-free growing-season length (EPA, since 1895)
   - Northern Hemisphere snow-cover extent (Rutgers Global Snow Lab)
   - Global spring/autumn threshold-date shifts by country and region
+- El Niño / La Niña (ENSO) tracker: ${baseUrl}/climate/enso
+  - Weekly Niño 3.4 SST anomaly + all four Niño regions (NOAA CPC)
+  - Oceanic Niño Index (ONI), Multivariate ENSO Index v2 (MEI), Southern Oscillation Index (SOI)
+  - Live tropical Pacific SST anomaly map and equatorial subsurface heat
+  - Official NOAA CPC probability forecast for the next 9 seasons
 
 ## Explainer pages
 

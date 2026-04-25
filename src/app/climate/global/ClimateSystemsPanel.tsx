@@ -93,6 +93,9 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
           NOAA CPC ONI <ExternalLink className="h-2.5 w-2.5" />
         </a>
       </p>
+      <Link href="/climate/enso" className="mt-2 text-xs font-semibold text-[#D0A65E] hover:text-[#E5C088] inline-flex items-center gap-1">
+        Full ENSO tracker (Niño 3.4, MEI, SOI, forecast) <ArrowUpRight className="h-3 w-3" />
+      </Link>
     </Tile>
   );
 }
