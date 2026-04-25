@@ -422,15 +422,102 @@ export default function EnsoPage() {
         const yearTicks: number[] = [];
         for (let y = minYear; y <= Math.ceil(xMax); y++) yearTicks.push(y);
 
+        // Build the detailed time series: weekly Niño 3.4 anomalies for the
+        // observed past, plus a synthetic profile through the forecast window.
+        type ChartPoint = {
+          x: number;
+          anom?: number; // observed weekly value
+          pos?: number;  // positive (El Niño) area fill
+          neg?: number;  // negative (La Niña) area fill
+          fcAnom?: number; // forecast value
+          fcPos?: number;  // forecast positive area fill
+          dateLabel?: string;
+        };
+        const decimalYearFromYMD = (y: number, m: number, d: number) => {
+          const start = new Date(y, 0, 1).getTime();
+          const end = new Date(y + 1, 0, 1).getTime();
+          const t = new Date(y, m - 1, d).getTime();
+          return y + (t - start) / (end - start);
+        };
+        const observedPoints: ChartPoint[] = (weekly?.weekly || [])
+          .filter((w) => {
+            const dx = decimalYearFromYMD(w.year, w.month, w.day);
+            return dx >= xMin && dx <= todayX + 0.001;
+          })
+          .map((w) => {
+            const dx = decimalYearFromYMD(w.year, w.month, w.day);
+            const a = w.nino34.anom;
+            return {
+              x: dx,
+              anom: a,
+              pos: a > 0 ? a : 0,
+              neg: a < 0 ? a : 0,
+              dateLabel: `${w.year}-${String(w.month).padStart(2, '0')}-${String(w.day).padStart(2, '0')}`,
+            };
+          })
+          .sort((a, b) => a.x - b.x);
+
+        // Synthetic forecast curve: piecewise interpolation through key anchors
+        // (today → forecast start at +0.6 → peak season at predictedPeakOni →
+        // forecast end at ~+0.3) with a small cosine smoothing.
+        const forecastPoints: ChartPoint[] = [];
+        if (
+          isForecastingElNino &&
+          elNinoStart !== null &&
+          elNinoEnd !== null &&
+          peakX !== null &&
+          todayX < elNinoEnd
+        ) {
+          const startVal = currentOni;
+          const startThresh = 0.6; // value at official 50% start
+          const peakVal = predictedPeakOni;
+          const endVal = 0.3; // tapering back toward neutral by end of window
+          const steps = 28;
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const fx = todayX + t * (elNinoEnd - todayX);
+            let fy: number;
+            if (fx <= elNinoStart) {
+              const u = (fx - todayX) / Math.max(0.001, elNinoStart - todayX);
+              const eased = (1 - Math.cos(Math.PI * u)) / 2;
+              fy = startVal + (startThresh - startVal) * eased;
+            } else if (fx <= peakX) {
+              const u = (fx - elNinoStart) / Math.max(0.001, peakX - elNinoStart);
+              const eased = (1 - Math.cos(Math.PI * u)) / 2;
+              fy = startThresh + (peakVal - startThresh) * eased;
+            } else {
+              const u = (fx - peakX) / Math.max(0.001, elNinoEnd - peakX);
+              const eased = (1 - Math.cos(Math.PI * u)) / 2;
+              fy = peakVal + (endVal - peakVal) * eased;
+            }
+            forecastPoints.push({
+              x: fx,
+              fcAnom: fy,
+              fcPos: fy > 0 ? fy : 0,
+            });
+          }
+          // Bridge: ensure the forecast line connects to the last observed point.
+          const lastObs = observedPoints[observedPoints.length - 1];
+          if (lastObs && forecastPoints.length) {
+            forecastPoints[0] = {
+              ...forecastPoints[0],
+              fcAnom: lastObs.anom ?? forecastPoints[0].fcAnom,
+              fcPos: (lastObs.anom ?? 0) > 0 ? (lastObs.anom ?? 0) : 0,
+            };
+          }
+        }
+
+        const chartData: ChartPoint[] = [...observedPoints, ...forecastPoints];
+
         return (
         <SectionCard
           icon={<History className="text-[#D0A65E]" />}
           title="Past & future — the central thread of the ENSO story"
-          subtitle="Each red and blue band shows a real El Niño or La Niña event, drawn at its peak intensity for the months it actually lasted. The gold band is what's been observed so far this month. The dashed red box is NOAA's forecast for the next event — starting when probability crosses 50%, ending when it drops back."
+          subtitle="The thin line traces the actual weekly Niño 3.4 anomaly. Red shading shows where it ran above zero (El Niño territory above the +0.5 line); blue shading where it ran below (La Niña). The dashed red curve is a smoothed profile of NOAA's forecast through the next predicted El Niño peak."
         >
           <div className="h-[380px]">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={past} margin={{ top: 24, right: 28, left: 0, bottom: 18 }}>
+              <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 0, bottom: 18 }}>
                 <defs>
                   <pattern id="enso-forecast-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
                     <rect width="6" height="6" fill="rgba(251,113,133,0.12)" />
@@ -461,15 +548,49 @@ export default function EnsoPage() {
                   contentStyle={TT_CONTENT}
                   labelStyle={TT_LABEL}
                   itemStyle={TT_ITEM}
-                  cursor={false}
-                  formatter={(value: any) => [`${fmtSigned(value, 1)}°C`, 'Peak ONI']}
-                  labelFormatter={(_label: any, p: any) => {
+                  cursor={{ stroke: '#D0A65E', strokeDasharray: '3 3' }}
+                  formatter={(value: any, name: any) => {
+                    if (value === null || value === undefined) return ['', ''];
+                    const labelMap: Record<string, string> = {
+                      anom: 'Observed Niño 3.4',
+                      fcAnom: 'Forecast (smoothed)',
+                    };
+                    return [`${fmtSigned(Number(value), 2)}°C`, labelMap[name] || name];
+                  }}
+                  labelFormatter={(v: any, p: any) => {
                     const pl = p?.[0]?.payload;
-                    if (!pl) return '';
-                    return `${pl.label} · ${pl.phase === 'el-nino' ? 'El Niño' : pl.phase === 'la-nina' ? 'La Niña' : 'Neutral'} peak`;
+                    if (pl?.dateLabel) return pl.dateLabel;
+                    const yr = Math.floor(v);
+                    const mo = Math.floor((v - yr) * 12);
+                    return `${yr}-${String(mo + 1).padStart(2, '0')}`;
                   }}
                 />
-                {/* Forecast El Niño window — positioned at MJJ start → NDJ end */}
+                {/* Threshold lines */}
+                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" strokeOpacity={0.5} />
+                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" strokeOpacity={0.5} />
+                <ReferenceLine y={0} stroke="#6B7280" />
+
+                {/* Observed area fills — profile-shaped from weekly data */}
+                <Area
+                  type="monotone"
+                  dataKey="pos"
+                  stroke="none"
+                  fill="#fb7185"
+                  fillOpacity={0.55}
+                  isAnimationActive={false}
+                  connectNulls={false}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="neg"
+                  stroke="none"
+                  fill="#60a5fa"
+                  fillOpacity={0.55}
+                  isAnimationActive={false}
+                  connectNulls={false}
+                />
+
+                {/* Forecast El Niño envelope — profiled, dashed border */}
                 {isForecastingElNino && elNinoStart !== null && elNinoEnd !== null && (
                   <ReferenceArea
                     x1={elNinoStart}
@@ -478,11 +599,44 @@ export default function EnsoPage() {
                     y2={predictedPeakOni}
                     fill="url(#enso-forecast-stripes)"
                     stroke="#fb7185"
-                    strokeWidth={1.5}
-                    strokeDasharray="4 3"
+                    strokeWidth={1}
+                    strokeDasharray="3 3"
+                    strokeOpacity={0.45}
                     ifOverflow="extendDomain"
                   />
                 )}
+                <Area
+                  type="monotone"
+                  dataKey="fcPos"
+                  stroke="none"
+                  fill="#fb7185"
+                  fillOpacity={0.35}
+                  isAnimationActive={false}
+                  connectNulls={false}
+                />
+
+                {/* Observed weekly line — the actual Niño 3.4 trace */}
+                <Line
+                  type="monotone"
+                  dataKey="anom"
+                  stroke="#fef3c7"
+                  strokeWidth={1.5}
+                  dot={false}
+                  isAnimationActive={false}
+                  connectNulls={false}
+                />
+                {/* Forecast smoothed curve — dashed */}
+                <Line
+                  type="monotone"
+                  dataKey="fcAnom"
+                  stroke="#fb7185"
+                  strokeWidth={2}
+                  strokeDasharray="5 4"
+                  dot={false}
+                  isAnimationActive={false}
+                  connectNulls={false}
+                />
+
                 {/* Forecast labels */}
                 {isForecastingElNino && elNinoStart !== null && first50 && (
                   <ReferenceLine
@@ -517,9 +671,26 @@ export default function EnsoPage() {
                     }}
                   />
                 )}
-                <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" strokeOpacity={0.5} />
-                <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" strokeOpacity={0.5} />
-                <ReferenceLine y={0} stroke="#6B7280" />
+
+                {/* Past event labels — peak markers */}
+                {events.map((ev, i) => {
+                  const cx = (ev.startX + ev.endX) / 2;
+                  return (
+                    <ReferenceLine
+                      key={`ev-label-${i}`}
+                      x={cx}
+                      stroke="transparent"
+                      label={{
+                        value: ev.phase === 'el-nino' ? 'El Niño' : 'La Niña',
+                        fill: ev.phase === 'el-nino' ? '#fecaca' : '#bfdbfe',
+                        fontSize: 9.5,
+                        position: ev.peak >= 0 ? 'insideTop' : 'insideBottom',
+                        offset: 4,
+                      }}
+                    />
+                  );
+                })}
+
                 {/* "Today" vertical */}
                 <ReferenceLine
                   x={todayX}
@@ -544,38 +715,6 @@ export default function EnsoPage() {
                     offset: 12,
                   }}
                 />
-                {/* Past ENSO events — full-duration bands at peak intensity */}
-                {events.map((ev, i) => (
-                  <ReferenceArea
-                    key={`ev-${i}`}
-                    x1={ev.startX}
-                    x2={ev.endX}
-                    y1={ev.peak >= 0 ? 0 : ev.peak}
-                    y2={ev.peak >= 0 ? ev.peak : 0}
-                    fill={ev.phase === 'el-nino' ? '#fb7185' : '#60a5fa'}
-                    fillOpacity={0.85}
-                    stroke="none"
-                    ifOverflow="extendDomain"
-                  />
-                ))}
-                {/* Recent observed period — start of current month → today, drawn solid */}
-                {(() => {
-                  const monthStart = currentYear + now.getMonth() / 12;
-                  if (todayX <= monthStart) return null;
-                  return (
-                    <ReferenceArea
-                      x1={monthStart}
-                      x2={todayX}
-                      y1={currentOni >= 0 ? 0 : currentOni}
-                      y2={currentOni >= 0 ? currentOni : 0}
-                      fill="#D0A65E"
-                      fillOpacity={0.55}
-                      stroke="none"
-                    />
-                  );
-                })()}
-                {/* Hidden bar to keep the data array non-empty so axis renders */}
-                <Bar dataKey="peak" barSize={0} fillOpacity={0} isAnimationActive={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -583,20 +722,20 @@ export default function EnsoPage() {
           {/* Legend strip */}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-4 h-3 rounded-sm bg-rose-400" /> Past El Niño event
+              <span className="inline-block w-5 h-0.5 bg-[#fef3c7]" /> Weekly Niño 3.4 (observed)
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-4 h-3 rounded-sm bg-sky-400" /> Past La Niña event
+              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(251,113,133,0.55)' }} /> El Niño shading (above 0)
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(208,166,94,0.55)' }} /> Observed (this month → today)
+              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(96,165,250,0.55)' }} /> La Niña shading (below 0)
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span
-                className="inline-block w-4 h-3 rounded-sm border border-rose-400"
-                style={{ background: 'repeating-linear-gradient(45deg, rgba(251,113,133,0.12) 0 2px, rgba(251,113,133,0.32) 2px 4px)' }}
+                className="inline-block w-5 h-0.5"
+                style={{ background: 'repeating-linear-gradient(90deg, #fb7185 0 4px, transparent 4px 8px)' }}
               />{' '}
-              Forecast El Niño (predicted)
+              Forecast (smoothed profile)
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / today
