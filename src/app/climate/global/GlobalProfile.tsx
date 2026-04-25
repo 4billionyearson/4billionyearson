@@ -493,15 +493,15 @@ export default function GlobalProfile() {
 
                 return (
                   <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:flex-wrap">
                       <div className="min-w-0 flex-1">
                         <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
                           <Scale className="h-5 w-5 shrink-0 text-orange-400 mt-1" />
-                          <span className="min-w-0 flex-1">Paris Agreement Tracker - How close are we to 1.5°C and 2°C?</span>
+                          <span className="min-w-0 flex-1">Paris Agreement Tracker</span>
                         </h3>
-                        <p className="text-xs text-gray-400">Global land + ocean surface temperature (NOAA) - the series used by Copernicus, WMO and the IPCC.</p>
+                        <p className="text-xs text-gray-400">How close are we to 1.5°C and 2°C? Global land + ocean surface temperature (NOAA) – the series used by Copernicus, WMO and the IPCC.</p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-left sm:text-right">
                         <p className={`text-4xl md:text-5xl font-bold font-mono ${atOrPast15 ? 'text-red-300' : 'text-orange-300'}`}>
                           {formatSigned(vsPreIndustrial)}°C
                         </p>
@@ -701,7 +701,7 @@ export default function GlobalProfile() {
                   <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons Worldwide</h3>
                 </div>
                 <p className="text-sm text-gray-300 mb-4">
-                  Global averages smooth out the seasonal cycle, but climate change shows up most clearly in the <em>timing</em> of the year. Spring is arriving earlier across the Northern Hemisphere, snow seasons are shrinking, and growing seasons are stretching at both ends. Because global land+ocean temperatures barely vary across a single year, the warm-season analysis below only makes sense region by region.
+                  Global averages smooth out the seasonal cycle, but climate change shows up most clearly in the <em>timing</em> of the year — spring earlier, snow seasons shorter, growing seasons longer.
                 </p>
 
                 {/* Calendar-year timeline graphic */}
@@ -723,7 +723,7 @@ export default function GlobalProfile() {
               </section>
 
               {/* Long-view charts: yearly trend + last-12-months anomaly comparison */}
-              <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Global Temperature - Long View" />
+              <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Global Temperature" />
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Yearly trend chart */}

@@ -129,7 +129,7 @@ export default function ClimateProfilesIndex() {
               </div>
               <div className="bg-gray-950 px-4 py-3 md:px-6 md:py-4">
                 <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                  Monthly climate updates for every country, US state and UK region we track - 144 regions in all. Temperature, rainfall and emissions trends drawn from OWID, NOAA and the Met Office, with AI-drafted narratives grounded in reputable news.
+                  Monthly climate updates for 144 countries, US states and UK regions – temperature, rainfall and emissions trends from OWID, NOAA and the Met Office.
                 </p>
               </div>
               <div className="sticky top-0 z-30 bg-gray-950 px-4 pt-2 pb-1 md:px-6">

@@ -83,8 +83,7 @@ export function ClimateTabsBar() {
     <div
       role="tablist"
       aria-label="Climate hub sections"
-      className="flex gap-2 overflow-x-auto"
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      className="flex flex-wrap gap-1.5"
     >
       {TABS.map((tab) => {
         const Icon = tab.icon;
@@ -99,7 +98,7 @@ export function ClimateTabsBar() {
             aria-controls={`panel-${tab.id}`}
             id={`tab-${tab.id}`}
             onClick={() => setActive(tab.id)}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 h-8 text-[12px] sm:text-[13px] font-medium transition-colors ${
               isActive
                 ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
                 : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:bg-gray-900 hover:text-[#FFF5E7]'
@@ -109,7 +108,7 @@ export function ClimateTabsBar() {
             <span>{tab.label}</span>
             {count != null && (
               <span
-                className={`rounded-full px-1.5 text-[10px] font-semibold ${
+                className={`hidden sm:inline rounded-full px-1.5 text-[10px] font-semibold ${
                   isActive ? 'bg-[#1A0E00]/15 text-[#1A0E00]' : 'bg-gray-800 text-gray-400'
                 }`}
               >
