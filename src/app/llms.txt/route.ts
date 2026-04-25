@@ -65,6 +65,27 @@ Core value proposition: Real-time and regularly updated data dashboards, plain-E
 - AI Dashboard: ${baseUrl}/ai-dashboard
 - Biotech Dashboard: ${baseUrl}/biotech-dashboard
 
+## Climate profiles & regional analysis
+
+- Climate Data Hub: ${baseUrl}/climate
+  - Monthly climate profiles for 144 countries, US states and UK regions
+  - AI-drafted monthly summaries grounded in the underlying data
+  - Temperature, rainfall, seasonal shifts, emissions, electricity mix
+- Global Climate Update: ${baseUrl}/climate/global
+  - Paris Agreement 1.5°C & 2.0°C tracker (10-year mean progress)
+  - ENSO state (Niño 3.4), atmospheric CO₂, methane and N₂O
+  - Arctic and Antarctic sea-ice extent anomalies
+  - Continental temperature comparison and country-anomaly map
+  - Global emissions and electricity generation mix
+- Climate Rankings: ${baseUrl}/climate/rankings
+  - Sortable league table of monthly temperature anomalies across 144 regions
+  - Biggest movers since last month, continent-level roll-ups, peer comparisons
+- Shifting Seasons: ${baseUrl}/climate/shifting-seasons
+  - Kyoto cherry-blossom phenology record since AD 812
+  - US frost-free growing-season length (EPA, since 1895)
+  - Northern Hemisphere snow-cover extent (Rutgers Global Snow Lab)
+  - Global spring/autumn threshold-date shifts by country and region
+
 ## Explainer pages
 
 - Climate Explained: ${baseUrl}/climate-explained

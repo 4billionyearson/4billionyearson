@@ -77,6 +77,60 @@ URL: ${baseUrl}/about
 - Planetary Boundaries (monthly): ${baseUrl}/planetary-boundaries - nine Earth-system limits including biodiversity, ocean acidification
 - AI Dashboard (monthly): ${baseUrl}/ai-dashboard - AI investment, compute, adoption, model capabilities, energy use
 - Biotech Dashboard (annual): ${baseUrl}/biotech-dashboard - genome sequencing costs, CRISPR research, clinical trials, publications
+
+---
+
+# Regional climate profiles
+
+## Climate Data Hub
+URL: ${baseUrl}/climate
+Monthly climate profiles for 144 countries, US states and UK regions, unified under one dashboard. Every profile carries an AI-drafted narrative summary grounded in the underlying numbers and links through to deeper data. The hub itself offers Editors' Picks, a country/state/region browser, and a full league table (Rankings) across all 144 regions.
+
+Each profile typically includes (availability varies by region):
+- Temperature averages vs the 1961–1990 WMO baseline, with monthly rank-in-record
+- Rainfall and rain-days (UK/US/Met Office and World Bank CKP / CRU TS for countries)
+- Sunshine hours and air-frost days (UK regions, Met Office)
+- Seasonal-timing analysis: spring/autumn threshold-date shifts, warm-/wet-season length
+- CO₂ emissions trend (country-level, Our World in Data / Global Carbon Project)
+- Electricity generation mix and renewables share (country and US state, Ember / EIA)
+- Century-scale charts and data provenance
+
+All data refreshes monthly. Slug examples: /climate/usa, /climate/california, /climate/england, /climate/india.
+
+## Global Climate Update
+URL: ${baseUrl}/climate/global
+The whole-planet view, tracking how close we are to the Paris Agreement thresholds and how every connected climate system is reacting. Includes:
+
+- Headline temperature: NOAA land+ocean monthly anomaly vs 1961–1990, plus ERA5 land-only series
+- Paris Agreement Tracker: 10-year mean vs pre-industrial (1850–1900), with milestones for 1.5°C and 2.0°C
+- ENSO state (Niño 3.4) with El Niño / La Niña / Neutral classification
+- Atmospheric greenhouse gases: CO₂, methane (CH₄), nitrous oxide (N₂O)
+- Sea-ice extent anomalies (Arctic and Antarctic, NSIDC)
+- Continental temperature comparison bar
+- Country-level temperature-anomaly map
+- Shifting Seasons section (linked deep-dive below)
+- Emissions & Energy cards: global CO₂ and electricity generation mix
+
+Baselines clearly labelled: 1961–1990 (WMO) for monthly anomalies; 1850–1900 (pre-industrial ≈ 13.5°C) for Paris thresholds; 20th-century mean (~13.9°C) for NOAA individual-month anomalies.
+
+## Climate Rankings
+URL: ${baseUrl}/climate/rankings
+Sortable league table and monthly trend analysis for every country, US state and UK region we track. Answers at a glance:
+- Which regions are warmest this month (vs the 1961–1990 baseline)?
+- Biggest rank-movers since last month
+- Continent-level roll-ups
+- Peer comparisons within region type
+
+## Shifting Seasons
+URL: ${baseUrl}/climate/shifting-seasons
+A long-record look at how the seasonal calendar is moving:
+- Kyoto cherry-blossom peak-bloom dates from AD 812 — the longest continuous phenology record in the world
+- US frost-free growing-season length since 1895 (EPA Climate Change Indicators)
+- Northern Hemisphere snow-cover extent (Rutgers Global Snow Lab)
+- Extended Spring Indices (USA-NPN) for regional first-leaf and first-bloom dates
+- Global threshold-date map showing spring/autumn shifts country-by-country
+
+Key findings as of latest update: Kyoto's cherry blossoms now bloom roughly 11 days earlier than the pre-1850 average; US growing seasons are lengthening; Northern Hemisphere spring snow-cover is in sustained decline.
 `;
 
   return new NextResponse(body, {

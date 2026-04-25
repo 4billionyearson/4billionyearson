@@ -63,15 +63,30 @@ export function getClimateMetadataTitle(region: ClimateRegion, updateLabel = get
     : region.type === 'us-state'
       ? 'Temperature & Precipitation'
       : region.type === 'special'
-        ? 'Global Temperature, Land vs Ocean & Paris Thresholds'
-        : 'Temperature, Rainfall & Emissions';
+        ? 'Global Temperature, Paris 1.5°C Tracker & Seasonal Shifts'
+        : 'Temperature, Rainfall, Seasonal Shifts & Emissions';
 
   return `${region.name} Climate Update, ${updateLabel} | ${topicLabel}`;
 }
 
+function featureSuffixForRegion(region: ClimateRegion): string {
+  switch (region.type) {
+    case 'special':
+      return 'Covers land-and-ocean anomalies vs the 1961–1990 baseline, Paris 1.5°C and 2.0°C progress (10-year mean), ENSO state, atmospheric CO₂/methane/N₂O, sea-ice extent, continental comparison, seasonal timing shifts, and global emissions & energy outlook.';
+    case 'uk-region':
+      return 'Covers Met Office temperature, rainfall, rain-days, sunshine and air-frost series vs the 1961–1990 baseline, plus spring/autumn shift analysis.';
+    case 'us-state':
+      return 'Covers NOAA temperature and precipitation vs the 1961–1990 baseline, monthly rank-in-record, seasonal shifts, and state-level emissions and electricity generation mix where available.';
+    case 'country':
+    default:
+      return 'Covers country-scale temperature, rainfall (CRU TS), warm/wet-season shifts, CO₂ emissions (Our World in Data) and electricity generation mix — each vs the 1961–1990 baseline and ranked in record.';
+  }
+}
+
 export function getClimateMetadataDescription(region: ClimateRegion, updateLabel = getClimateUpdateDateLabel()): string {
   const baseDescription = stripTrailingPeriod(region.description.replace(/\s*Updated monthly\.?$/i, ''));
-  return `${baseDescription}. Latest monthly climate update: ${updateLabel}.`;
+  const suffix = featureSuffixForRegion(region);
+  return `${baseDescription}. ${suffix} Latest monthly climate update: ${updateLabel}.`;
 }
 
 export const CURATED_CLIMATE_REGIONS: ClimateRegion[] = [
@@ -81,7 +96,7 @@ export const CURATED_CLIMATE_REGIONS: ClimateRegion[] = [
     type: 'special',
     apiCode: 'global',
     tagline: 'The whole-planet temperature record — how the world is warming',
-    description: 'Global climate update with NOAA land-and-ocean temperature anomaly, ERA5 land surface temperature, progress versus the 1.5°C and 2.0°C Paris thresholds, and month-by-month context against the 1961–1990 baseline. Updated monthly.',
+    description: 'Global climate update with NOAA land-and-ocean temperature anomaly, ERA5 land surface temperature, Paris Agreement 1.5°C and 2.0°C progress (10-year mean), ENSO state, atmospheric CO₂, methane and N₂O, Arctic and Antarctic sea ice, continental temperature comparison, seasonal timing shifts and global emissions and electricity mix. Updated monthly.',
     emoji: '🌍',
     dataSources: ['noaa-global', 'owid-temp'],
     keywords: [
@@ -89,9 +104,14 @@ export const CURATED_CLIMATE_REGIONS: ClimateRegion[] = [
       'global warming data',
       'world climate update',
       '1.5 degree threshold',
+      'Paris Agreement tracker',
       'global land ocean temperature',
       'NOAA global temperature',
-      'Paris Agreement tracking',
+      'ENSO state',
+      'atmospheric CO2 methane N2O',
+      'sea ice extent',
+      'shifting seasons',
+      'global emissions energy mix',
     ],
   },
   {

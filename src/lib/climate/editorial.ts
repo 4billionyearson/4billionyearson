@@ -320,11 +320,14 @@ export function buildStubCopy(
   if (type === 'country') {
     return {
       tagline: `Temperature, rainfall and emissions data for ${name}`,
-      description: `${name} climate profile${cityPhrase} with temperature trends, rainfall data where available, and CO₂ emissions tracking. Updated monthly.`,
+      description: `${name} climate profile${cityPhrase} with temperature anomalies, rainfall (CRU TS), warm/wet-season shift analysis, CO₂ emissions (Our World in Data) and electricity generation mix — all vs the 1961–1990 baseline. Updated monthly.`,
       keywords: [
         `${name} climate data`,
         `${name} temperature trends`,
+        `${name} rainfall`,
+        `${name} seasonal shift`,
         `${name} emissions`,
+        `${name} electricity mix`,
         `${name} climate change`,
         ...cityKeywords,
       ],
@@ -333,11 +336,14 @@ export function buildStubCopy(
   if (type === 'us-state') {
     return {
       tagline: `${name} climate data from NOAA Climate at a Glance`,
-      description: `${name} climate profile${cityPhrase} with NOAA temperature and precipitation data, baselines and monthly anomalies. Updated monthly.`,
+      description: `${name} climate profile${cityPhrase} with NOAA temperature and precipitation vs the 1961–1990 baseline, monthly rank-in-record, spring/autumn timing shifts, and state-level emissions and electricity generation mix. Updated monthly.`,
       keywords: [
         `${name} climate data`,
         `${name} temperature`,
         `${name} precipitation`,
+        `${name} rainfall trends`,
+        `${name} seasonal shift`,
+        `${name} emissions`,
         `NOAA ${name}`,
         ...cityKeywords,
       ],
@@ -345,11 +351,15 @@ export function buildStubCopy(
   }
   return {
     tagline: `${name} climate data from the Met Office regional series`,
-    description: `${name} climate profile${cityPhrase} with Met Office temperature, rainfall, sunshine and frost data. Updated monthly.`,
+    description: `${name} climate profile${cityPhrase} with Met Office temperature, rainfall, rain-days, sunshine and air-frost series vs the 1961–1990 baseline, plus spring/autumn shift analysis. Updated monthly.`,
     keywords: [
       `${name} climate data`,
       `${name} temperature`,
       `${name} rainfall`,
+      `${name} sunshine`,
+      `${name} frost days`,
+      `${name} seasonal shift`,
+      'Met Office',
       ...cityKeywords,
     ],
   };

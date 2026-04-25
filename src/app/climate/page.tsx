@@ -8,25 +8,65 @@ import { ClimateTabsProvider, ClimateTabsBar, ClimateTabsPanels } from './climat
 import EditorsPicksPanel from './editors-picks-panel';
 import ClimateRankingsPanel from './climate-rankings-panel';
 
+const REGION_COUNT = CLIMATE_REGIONS.length;
+const HUB_URL = 'https://4billionyearson.org/climate';
+
 export const metadata: Metadata = {
-  title: 'Climate Updates - Country, State & Region Climate Data',
-  description:
-    'Explore climate data profiles for countries, US states, and UK regions. Temperature trends, precipitation, emissions, and monthly summaries with data from OWID, NOAA, and the Met Office.',
+  title: `Climate Data Hub – ${REGION_COUNT} Countries, US States & UK Regions | 4 Billion Years On`,
+  description: `Monthly climate updates for ${REGION_COUNT} regions worldwide: temperature anomalies, rainfall, spring/autumn timing shifts, CO₂ emissions and electricity mix. Plus the Global Climate Tracker (Paris 1.5°C / 2°C progress), country rankings, and the Shifting Seasons analysis. Data from NOAA, Met Office, OWID, CRU TS and the World Bank, all vs the 1961–1990 baseline.`,
   keywords: [
     'climate data by country',
     'US state climate data',
     'UK regional climate data',
-    'temperature trends',
-    'climate updates',
+    'temperature anomaly by country',
+    'Paris Agreement 1.5 tracker',
+    'shifting seasons climate',
+    'climate league table',
     'country emissions data',
+    'electricity generation mix',
+    'monthly climate update',
   ],
+  alternates: { canonical: HUB_URL },
   openGraph: {
-    title: 'Climate Updates - Country, State & Region Climate Data',
-    description:
-      'Explore climate data profiles for countries, US states, and UK regions. Temperature trends, precipitation, emissions, and monthly summaries.',
+    title: `Climate Data Hub – ${REGION_COUNT} Countries, US States & UK Regions`,
+    description: `Monthly climate updates for ${REGION_COUNT} regions: temperature, rainfall, seasonal shifts, emissions and electricity mix. With the Global Climate Tracker (Paris 1.5°C), Climate Rankings and Shifting Seasons analysis.`,
     type: 'website',
+    url: HUB_URL,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Climate Data Hub – ${REGION_COUNT} Regions`,
+    description: 'Temperature, rainfall, seasonal shifts, emissions and electricity mix for every country, US state and UK region we track. Plus the Paris 1.5°C tracker.',
   },
 };
+
+function HubSchema() {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `Climate Data Hub — ${REGION_COUNT} Regions`,
+    description: `Monthly climate profiles for ${REGION_COUNT} countries, US states and UK regions, plus a global tracker and rankings.`,
+    url: HUB_URL,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: '4 Billion Years On',
+      url: 'https://4billionyearson.org',
+    },
+    about: [
+      { '@type': 'Thing', name: 'Climate change' },
+      { '@type': 'Thing', name: 'Global temperature anomaly' },
+      { '@type': 'Thing', name: 'Paris Agreement (1.5°C and 2°C)' },
+      { '@type': 'Thing', name: 'Rainfall and seasonal shifts' },
+      { '@type': 'Thing', name: 'CO₂ emissions' },
+      { '@type': 'Thing', name: 'Electricity generation mix' },
+    ],
+    numberOfItems: REGION_COUNT,
+    inLanguage: 'en-GB',
+  };
+  return (
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+  );
+}
 
 export default function ClimateProfilesIndex() {
   const countries = CLIMATE_REGIONS.filter(r => r.type === 'country' && r.slug !== 'ireland');
@@ -35,6 +75,7 @@ export default function ClimateProfilesIndex() {
 
   return (
     <main>
+      <HubSchema />
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
 
