@@ -64,7 +64,7 @@ const strokeFor = (a: number) =>
 
 const fmtSigned = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)}`;
 
-const EnsoRegionMapInner = dynamic(
+const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
   () =>
     Promise.all([import("react-leaflet"), import("leaflet")]).then(
       ([mod, L]) => {
@@ -168,9 +168,9 @@ const EnsoRegionMapInner = dynamic(
           );
         }
 
-        return Map as any;
+        return Map;
       },
-    ),
+    ) as any,
   {
     ssr: false,
     loading: () => (

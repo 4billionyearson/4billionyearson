@@ -243,18 +243,22 @@ export default function EnsoPage() {
   return (
     <main className="max-w-6xl mx-auto px-4 py-6 md:py-10 space-y-4">
       {/* ─── Hero ───────────────────────────────────────────────── */}
-      <header className="bg-[#D0A65E] rounded-2xl p-6 md:p-8 shadow-xl">
-        <h1 className="text-3xl md:text-5xl font-bold font-mono text-white tracking-tight">
-          El Niño / La Niña — Live ENSO Tracker
-        </h1>
-        <p className="text-white/85 mt-3 max-w-3xl text-sm md:text-base">
-          The El Niño-Southern Oscillation (ENSO) is the single biggest year-to-year driver of
-          global temperature and rainfall after the long-term warming trend itself. This page
-          combines the four most-watched indicators - Niño 3.4 SST, the Oceanic Niño Index,
-          the Multivariate ENSO Index and the Southern Oscillation Index - with live
-          tropical Pacific maps and the official NOAA forecast.
-        </p>
-      </header>
+      <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
+        <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+          <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+            El Niño / La Niña — Live ENSO Tracker
+          </h1>
+        </div>
+        <div className="bg-gray-950/90 backdrop-blur-md p-4">
+          <p className="text-sm md:text-lg text-gray-300 leading-relaxed max-w-4xl">
+            The El Niño-Southern Oscillation (ENSO) is the single biggest year-to-year driver of
+            global temperature and rainfall after the long-term warming trend itself. This page
+            combines the four most-watched indicators – Niño 3.4 SST, the Oceanic Niño Index,
+            the Multivariate ENSO Index and the Southern Oscillation Index – with live
+            tropical Pacific maps and the official NOAA forecast.
+          </p>
+        </div>
+      </div>
 
       {/* ─── Hero state + Niño-region map ──────────────────────── */}
       {oni && (() => {
