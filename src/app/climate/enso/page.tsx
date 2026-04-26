@@ -1456,8 +1456,8 @@ export default function EnsoPage() {
               const tempColor = imp.temp === 'warmer' ? 'text-rose-300 bg-rose-900/30 border-rose-700/40' : imp.temp === 'cooler' ? 'text-sky-300 bg-sky-900/30 border-sky-700/40' : '';
               const precipColor = imp.precip === 'wetter' ? 'text-emerald-300 bg-emerald-900/30 border-emerald-700/40' : imp.precip === 'drier' ? 'text-amber-300 bg-amber-900/30 border-amber-700/40' : '';
               const accent = phase === 'el-nino'
-                ? 'border-l-4 border-l-rose-500/70 border border-gray-800 bg-gray-900/50 hover:border-[#D0A65E]/45'
-                : 'border-l-4 border-l-sky-400/70 border border-gray-800 bg-gray-900/50 hover:border-[#D0A65E]/45';
+                ? 'border-l-4 border-l-rose-500/70 border border-gray-700/50 bg-gray-800/60 hover:border-[#D0A65E]/45'
+                : 'border-l-4 border-l-sky-400/70 border border-gray-700/50 bg-gray-800/60 hover:border-[#D0A65E]/45';
               return (
                 <div key={r.id} className={`group flex flex-col rounded-xl p-3.5 transition-all duration-200 ${accent}`}>
                   <div className="flex items-center gap-2 mb-1.5">
@@ -1465,7 +1465,7 @@ export default function EnsoPage() {
                     <h4 className="flex-1 min-w-0 text-sm font-semibold text-[#FFF5E7] leading-tight truncate">
                       {r.region}
                     </h4>
-                    <span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-900/60 border border-gray-700/50 text-gray-300">
+                    <span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-700/50 border border-gray-600/50 text-gray-300">
                       {imp.season}
                     </span>
                   </div>
