@@ -304,7 +304,13 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
   return (
     <div className="space-y-4">
       {panels.map((panel) => {
-        const isNarrow = panel.sections.length === 1 && (panel.sections[0]?.rows.length ?? 0) === 1;
+        // Only the rainfall panel uses the narrow side-column layout that shows
+        // the "About these numbers" explainer; sunshine and frost panels always
+        // use the compact single-line footer regardless of how many rows they
+        // have, so the explainer doesn't keep appearing for countries with
+        // only national-level data.
+        const isRainfall = /rain|precip/i.test(panel.title);
+        const isNarrow = isRainfall && panel.sections.length === 1 && (panel.sections[0]?.rows.length ?? 0) === 1;
         return (
         <div key={panel.title} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
           <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">

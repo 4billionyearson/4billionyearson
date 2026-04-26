@@ -600,28 +600,28 @@ export default function GlobalProfile() {
                     <div className="mt-5 pt-4 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
                       <div>
                         <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">10-year mean ({decadeStart}–{decadeEnd})</p>
-                        <p className="font-mono text-white mt-0.5">
+                        <p className="font-mono text-white mt-0.5 text-2xl md:text-2xl font-bold">
                           <span className={atOrPast15 ? 'text-red-300' : 'text-orange-300'}>{formatSigned(vsPreIndustrial)}°C</span>
                         </p>
                         <p className="text-[11px] text-gray-400">{rolling10yr.toFixed(2)}°C absolute · official Paris metric</p>
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Latest full year ({decadeEnd})</p>
-                        <p className="font-mono text-white mt-0.5">
+                        <p className="font-mono text-white mt-0.5 text-2xl md:text-2xl font-bold">
                           {latestYearDelta != null ? formatSigned(latestYearDelta) : '—'}°C
                         </p>
                         <p className="text-[11px] text-gray-400">{latestYearValue != null ? `${latestYearValue.toFixed(2)}°C absolute` : '—'}</p>
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Hottest year on record</p>
-                        <p className="font-mono text-white mt-0.5">
+                        <p className="font-mono text-white mt-0.5 text-2xl md:text-2xl font-bold">
                           {hottestYear ? `${formatSigned(hottestYear.annualAnomaly)}°C` : '—'}
                         </p>
                         <p className="text-[11px] text-gray-400">{hottestYear ? `in ${hottestYear.year}` : '—'}</p>
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">First year above 1.5°C</p>
-                        <p className="font-mono text-white mt-0.5">
+                        <p className="font-mono text-white mt-0.5 text-2xl md:text-2xl font-bold">
                           {firstAnnualBreach15 ? firstAnnualBreach15.year : 'not yet'}
                         </p>
                         <p className="text-[11px] text-gray-400">
