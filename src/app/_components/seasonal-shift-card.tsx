@@ -266,7 +266,7 @@ export default function SeasonalShiftCard({
 
       {hasWetDry && rain && effectiveView === 'wet-season' && (
         <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-2.5">
+          <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-2.5">
             <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono mb-1">Wet-season onset</div>
             <div className="flex items-baseline justify-between gap-2 flex-wrap">
               <div className="text-sm text-gray-300">
@@ -302,7 +302,7 @@ export default function SeasonalShiftCard({
             </div>
             <div className="text-[10px] text-gray-500 mt-1">When 25% of annual rain has fallen</div>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-2.5">
+          <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-2.5">
             <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono mb-1">Peak-rain month</div>
             <div className="flex items-baseline justify-between gap-2 flex-wrap">
               <div className="text-sm text-gray-300">
@@ -552,7 +552,7 @@ function StatTile({
   bordered?: boolean;
 }) {
   return (
-    <div className={`bg-gray-900 border rounded-lg p-2.5 text-center ${bordered ? 'border-[#D0A65E]/40' : 'border-gray-800'}`}>
+    <div className={`bg-gray-800/60 border rounded-lg p-2.5 text-center ${bordered ? 'border-[#D0A65E]/40' : 'border-gray-700/50'}`}>
       <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono">{label}</div>
       <div className={`text-lg sm:text-2xl font-bold font-mono ${valueClassName}`}>{value}</div>
       {sub && <div className="text-[11px] text-gray-400">{sub}</div>}
@@ -589,7 +589,7 @@ function WarmSeasonShiftBar({
   const shiftColor = deltaDays > 0 ? '#fb923c' : deltaDays < 0 ? '#38bdf8' : '#9CA3AF';
   const TOTAL_H = 110;
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4">
+    <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-3 mb-4">
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
         <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider">
           Spring &amp; autumn shift
@@ -602,7 +602,7 @@ function WarmSeasonShiftBar({
       {/* Mobile stacked view - the wide SVG below scales to ~320 px on phones,
           which makes its 10 px text effectively unreadable. */}
       <div className="space-y-2 sm:hidden font-mono">
-        <div className="rounded-md border border-gray-700/60 bg-gray-900/60 p-2.5">
+        <div className="rounded-md border border-gray-700/50 bg-gray-800/60 p-2.5">
           <div className="text-[11px] text-gray-400 mb-0.5">{baselineLabel} baseline</div>
           <div className="text-sm text-gray-200">
             {doyToLabel(baselineSpringDoy)} <span className="text-gray-500">→</span> {doyToLabel(baselineAutumnDoy)}

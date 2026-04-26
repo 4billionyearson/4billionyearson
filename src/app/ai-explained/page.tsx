@@ -98,7 +98,7 @@ export default function AIExplainedPage() {
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
             <div className="grid gap-3">
               {KEY_FACTS.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                <div key={i} className="flex items-start gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                   {icon}
                   <p className="text-sm text-gray-300 leading-relaxed">{text}</p>
                 </div>
@@ -144,7 +144,7 @@ export default function AIExplainedPage() {
                   { title: "AI regulation", desc: "The EU AI Act, US executive orders, and UK AI Safety Institute mark the beginning of serious AI governance. Balancing innovation with safety is the central policy challenge." },
                   { title: "Scaling debate", desc: "Whether simply making models bigger continues to improve them ('scaling laws') or whether new architectures are needed is one of the biggest open questions in the field." },
                 ].map(({ title, desc }) => (
-                  <div key={title} className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                  <div key={title} className="bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                     <p className="text-sm font-semibold text-[#88DDFC] mb-1">{title}</p>
                     <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
                   </div>
@@ -177,7 +177,7 @@ export default function AIExplainedPage() {
                 <a
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
+                  className="flex items-center gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50 hover:border-gray-600 transition-colors group"
                 >
                   <ArrowUpRight className={`h-4 w-4 ${color} flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
                   <div>
@@ -199,7 +199,7 @@ export default function AIExplainedPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
+                  className="flex items-start gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50 hover:border-gray-600 transition-colors group"
                 >
                   <ExternalLink className="h-4 w-4 text-[#88DDFC] flex-shrink-0 mt-0.5" />
                   <div>

@@ -94,7 +94,7 @@ export default function ClimateExplainedPage() {
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
             <div className="grid gap-3">
               {KEY_FACTS.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                <div key={i} className="flex items-start gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                   {icon}
                   <p className="text-sm text-gray-300 leading-relaxed">{text}</p>
                 </div>
@@ -160,11 +160,11 @@ export default function ClimateExplainedPage() {
                   The <strong className="text-white">NAO</strong> describes the pressure difference between the Icelandic Low and the Azores High. It is the dominant driver of winter weather across Europe and eastern North America.
                 </p>
                 <div className="grid sm:grid-cols-2 gap-3 mb-2">
-                  <div className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                  <div className="bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                     <p className="text-sm font-semibold text-amber-400 mb-1">Positive NAO</p>
                     <p className="text-xs text-gray-400 leading-relaxed">A strong pressure gradient steers the jet stream northward, bringing mild, wet, and windy winters to northern Europe and drier conditions to the Mediterranean.</p>
                   </div>
-                  <div className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                  <div className="bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                     <p className="text-sm font-semibold text-teal-400 mb-1">Negative NAO</p>
                     <p className="text-xs text-gray-400 leading-relaxed">A weaker gradient lets the jet stream meander south, allowing Arctic air to plunge into Europe and the eastern US. This brings cold snaps, snow, and blocking high-pressure systems.</p>
                   </div>
@@ -174,19 +174,19 @@ export default function ClimateExplainedPage() {
               <div className="border-t border-gray-800/60 pt-5">
                 <h3 className="text-base font-bold text-white mb-1">Other Key Oscillations</h3>
                 <div className="space-y-3">
-                  <div className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                  <div className="bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                     <p className="text-sm font-semibold text-white mb-0.5">AMO – Atlantic Multidecadal Oscillation</p>
                     <p className="text-xs text-gray-400 leading-relaxed">A 60–80 year cycle in North Atlantic sea-surface temperatures that influences hurricane activity, Sahel rainfall, and European summer temperatures. Currently in its warm phase since the mid-1990s.</p>
                   </div>
-                  <div className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                  <div className="bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                     <p className="text-sm font-semibold text-white mb-0.5">PDO – Pacific Decadal Oscillation</p>
                     <p className="text-xs text-gray-400 leading-relaxed">Like a slow-motion ENSO, the PDO shifts Pacific temperatures on 20–30 year timescales. Its warm phase tends to enhance El Ni&ntilde;o effects, while its cool phase amplifies La Ni&ntilde;a impacts.</p>
                   </div>
-                  <div className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                  <div className="bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                     <p className="text-sm font-semibold text-white mb-0.5">IOD – Indian Ocean Dipole</p>
                     <p className="text-xs text-gray-400 leading-relaxed">A temperature gradient across the Indian Ocean that strongly affects rainfall in East Africa, India, and Australia. A positive IOD can compound drought conditions in Australia when paired with El Ni&ntilde;o.</p>
                   </div>
-                  <div className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                  <div className="bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                     <p className="text-sm font-semibold text-white mb-0.5">MJO – Madden-Julian Oscillation</p>
                     <p className="text-xs text-gray-400 leading-relaxed">A 30–60 day tropical weather pattern that moves eastward around the equator, modulating monsoon strength, tropical cyclone formation, and even mid-latitude weather patterns.</p>
                   </div>
@@ -215,7 +215,7 @@ export default function ClimateExplainedPage() {
                 <div
                   key={d.id}
                   id={d.id}
-                  className="rounded-xl border border-gray-700/40 bg-gray-900/60 p-4 scroll-mt-24"
+                  className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4 scroll-mt-24"
                 >
                   <h3 className="text-base font-bold text-teal-200 mb-1">{d.term}</h3>
                   <p className="text-sm text-gray-300 leading-relaxed mb-2">{d.long}</p>

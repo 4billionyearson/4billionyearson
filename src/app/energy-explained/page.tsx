@@ -96,7 +96,7 @@ export default function EnergyExplainedPage() {
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
             <div className="grid gap-3">
               {KEY_FACTS.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                <div key={i} className="flex items-start gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                   {icon}
                   <p className="text-sm text-gray-300 leading-relaxed">{text}</p>
                 </div>
@@ -186,7 +186,7 @@ export default function EnergyExplainedPage() {
                 <a
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
+                  className="flex items-center gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50 hover:border-gray-600 transition-colors group"
                 >
                   <ArrowUpRight className={`h-4 w-4 ${color} flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
                   <div>
@@ -208,7 +208,7 @@ export default function EnergyExplainedPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
+                  className="flex items-start gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50 hover:border-gray-600 transition-colors group"
                 >
                   <ExternalLink className="h-4 w-4 text-[#D2E369] flex-shrink-0 mt-0.5" />
                   <div>

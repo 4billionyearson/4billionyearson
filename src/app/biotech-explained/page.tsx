@@ -97,7 +97,7 @@ export default function BiotechExplainedPage() {
             <h2 className="text-xl md:text-2xl font-bold font-mono text-white mb-5">Key Facts</h2>
             <div className="grid gap-3">
               {KEY_FACTS.map(({ icon, text }, i) => (
-                <div key={i} className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                <div key={i} className="flex items-start gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                   {icon}
                   <p className="text-sm text-gray-300 leading-relaxed">{text}</p>
                 </div>
@@ -143,7 +143,7 @@ export default function BiotechExplainedPage() {
                   { title: "Epigenetic editing", desc: "New tools that modify gene expression without changing the underlying DNA sequence – potentially offering reversible gene therapy and treatments for diseases of ageing." },
                   { title: "Xenotransplantation", desc: "Genetically modified pig organs have been transplanted into human patients for the first time, offering hope for the severe shortage of donor organs." },
                 ].map(({ title, desc }) => (
-                  <div key={title} className="bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40">
+                  <div key={title} className="bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50">
                     <p className="text-sm font-semibold text-[#FFF5E7] mb-1">{title}</p>
                     <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
                   </div>
@@ -176,7 +176,7 @@ export default function BiotechExplainedPage() {
                 <a
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
+                  className="flex items-center gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50 hover:border-gray-600 transition-colors group"
                 >
                   <ArrowUpRight className={`h-4 w-4 ${color} flex-shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`} />
                   <div>
@@ -198,7 +198,7 @@ export default function BiotechExplainedPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 bg-gray-900/60 rounded-xl p-3.5 border border-gray-700/40 hover:border-gray-600 transition-colors group"
+                  className="flex items-start gap-3 bg-gray-800/60 rounded-xl p-3.5 border border-gray-700/50 hover:border-gray-600 transition-colors group"
                 >
                   <ExternalLink className="h-4 w-4 text-[#FFF5E7] flex-shrink-0 mt-0.5" />
                   <div>

@@ -37,7 +37,7 @@ export default function AboutPage() {
                   Whether we are dissecting the latest breakthroughs in AI, examining sustainable solutions to protect our global ecosystems, or marveling at the sheer resilience of life, our goal is to inspire curiosity.
                 </p>
                 <p>
-                  Thank you for joining us on this journey. If you have any questions, suggestions, or just want to discuss the cosmos, feel free to reach out to us at <a href="mailto:chris.4billionyears@gmail.com" className="text-blue-600 hover:underline">chris.4billionyears@gmail.com</a>.
+                  Thank you for joining us on this journey. If you have any questions, suggestions, or just want to discuss the cosmos, feel free to reach out to us at <a href="mailto:chris.4billionyears@gmail.com" className="text-teal-300 hover:text-teal-200 underline">chris.4billionyears@gmail.com</a>.
                 </p>
               </div>
             </div>

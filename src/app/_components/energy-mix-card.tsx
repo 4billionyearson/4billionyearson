@@ -175,7 +175,7 @@ function MixPanel({ yearly, countryName }: { yearly: YearlyPoint[]; countryName?
       </div>
 
       <div className="grid grid-cols-2 gap-3 pt-1">
-        <div className="rounded-lg border border-gray-800/60 bg-gray-900/40 p-2.5">
+        <div className="rounded-lg border border-gray-700/50 bg-gray-800/60 p-2.5">
           <div className="flex items-center justify-between text-[11px] mb-1">
             <span className="text-gray-400">Wind</span>
             <span className="font-mono font-semibold text-cyan-300">{(latestPoint.windShareElec ?? 0).toFixed(1)}%</span>
@@ -183,7 +183,7 @@ function MixPanel({ yearly, countryName }: { yearly: YearlyPoint[]; countryName?
           <MiniSparkline data={windSeries} color="#22d3ee" />
           <div className="text-[10px] text-gray-500 font-mono mt-0.5">{recent[0].year} → {latestPoint.year}</div>
         </div>
-        <div className="rounded-lg border border-gray-800/60 bg-gray-900/40 p-2.5">
+        <div className="rounded-lg border border-gray-700/50 bg-gray-800/60 p-2.5">
           <div className="flex items-center justify-between text-[11px] mb-1">
             <span className="text-gray-400">Solar</span>
             <span className="font-mono font-semibold text-amber-300">{(latestPoint.solarShareElec ?? 0).toFixed(1)}%</span>

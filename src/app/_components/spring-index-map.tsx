@@ -105,7 +105,7 @@ export default function SpringIndexMap() {
             min="2016-01-01"
             max={new Date().toISOString().slice(0, 10)}
             onChange={(e) => setDate(e.target.value)}
-            className="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1 text-sm text-gray-200 focus:border-[#D0A65E]/55 focus:outline-none"
+            className="rounded-lg border border-gray-700/50 bg-gray-800/60 px-2 py-1 text-sm text-gray-200 focus:border-[#D0A65E]/55 focus:outline-none"
           />
         </div>
       </div>
