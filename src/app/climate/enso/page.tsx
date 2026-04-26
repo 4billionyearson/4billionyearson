@@ -241,8 +241,10 @@ export default function EnsoPage() {
   const plume = data.plume;
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-6 md:py-10 space-y-4">
-      {/* ─── Hero ───────────────────────────────────────────────── */}
+    <main>
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
+        <div className="max-w-6xl mx-auto space-y-4">
+          {/* ─── Hero ───────────────────────────────────────────────── */}
       <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
         <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
           <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
@@ -1681,6 +1683,8 @@ export default function EnsoPage() {
           Back to climate hub <ArrowRight className="h-3 w-3" />
         </Link>
       </p>
+        </div>
+      </div>
     </main>
   );
 }
