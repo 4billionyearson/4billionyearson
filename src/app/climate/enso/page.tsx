@@ -200,6 +200,29 @@ const ENSO_TEXT: Record<EnsoState, string> = {
 const fmtSigned = (v: number, d = 2) => `${v > 0 ? '+' : ''}${v.toFixed(d)}`;
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTH_NAMES_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+// 3-month NOAA season labels in calendar order. Index = first month (0-based).
+// e.g. 'MJJ' = May/Jun/Jul, middle month index 5 (June).
+const SEASON_LABELS = ['DJF', 'JFM', 'FMA', 'MAM', 'AMJ', 'MJJ', 'JJA', 'JAS', 'ASO', 'SON', 'OND', 'NDJ'];
+// Convert a season label like "MJJ" + anchorYear to the middle calendar month
+// as "June 2026". DJF and NDJ straddle the year boundary; the middle month is
+// January (next year) and December (anchor year) respectively.
+const seasonMiddleMonth = (label: string, anchorYear: number): string => {
+  const idx = SEASON_LABELS.indexOf(label);
+  if (idx < 0) return `${label} ${anchorYear}`;
+  // Middle month = (firstMonth + 1) mod 12. Middle month for DJF (first=Dec
+  // of prevYear) is January of anchorYear. NDJ middle month is December of
+  // anchorYear. Anchor year already represents the season's reference year
+  // (DJF anchored on the year of January), so the middle-month year is just
+  // the anchor year for all but NDJ where the anchor is the year of November.
+  let monthIdx: number;
+  let year = anchorYear;
+  if (label === 'DJF') { monthIdx = 0; }
+  else if (label === 'NDJ') { monthIdx = 11; }
+  else { monthIdx = (idx + 1) % 12; }
+  return `${MONTH_NAMES_FULL[monthIdx]} ${year}`;
+};
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 
@@ -244,33 +267,30 @@ export default function EnsoPage() {
   // Top-level forecast summary so the Current State header can hint at the
   // outlook the Past & Future chart confirms in detail.
   const forecastSeasonsTop = data.forecast?.seasons || [];
-  const forecastFirst50 = forecastSeasonsTop.find((s) => s.pElNino >= 50) || null;
-  const forecastFirst50La = forecastSeasonsTop.find((s) => s.pLaNina >= 50) || null;
-  const forecastPlumePeak = (plume?.periods || []).reduce<PlumePeriod | null>(
-    (a, b) => {
-      const bv = b.dynMean ?? b.mean;
-      const av = a ? (a.dynMean ?? a.mean) : null;
-      if (bv == null) return a;
-      if (av == null || Math.abs(bv) > Math.abs(av)) return b;
-      return a;
-    },
-    null,
-  );
-  const forecastPeakValue = forecastPlumePeak?.dynMean ?? forecastPlumePeak?.mean ?? null;
+  // Anchor each forecast season to a calendar year by walking the array and
+  // bumping the year when the season index wraps. The first season in the
+  // array represents the current/next 3-month period.
+  const now = new Date();
+  let runYear = now.getUTCFullYear();
+  let prevIdx = -1;
+  const forecastWithYear = forecastSeasonsTop.map((s) => {
+    const idx = SEASON_LABELS.indexOf(s.season);
+    if (prevIdx >= 0 && idx >= 0 && idx < prevIdx) runYear += 1;
+    if (idx >= 0) prevIdx = idx;
+    return { ...s, anchorYear: runYear };
+  });
+  const forecastFirst50 = forecastWithYear.find((s) => s.pElNino >= 50) || null;
+  const forecastFirst50La = forecastWithYear.find((s) => s.pLaNina >= 50) || null;
   const forecastVerdict: { phase: 'el-nino' | 'la-nina' | null; label: string | null } =
     forecastFirst50
       ? {
           phase: 'el-nino',
-          label: `El Niño predicted by ${forecastFirst50.label}${forecastPlumePeak && forecastPeakValue != null
-            ? ` · peak ${fmtSigned(forecastPeakValue, 1)}°C in ${forecastPlumePeak.label} ${forecastPlumePeak.seasonAnchorYear}`
-            : ''}`,
+          label: `El Niño predicted by ${seasonMiddleMonth(forecastFirst50.season, forecastFirst50.anchorYear)}`,
         }
       : forecastFirst50La
         ? {
             phase: 'la-nina',
-            label: `La Niña predicted by ${forecastFirst50La.label}${forecastPlumePeak && forecastPeakValue != null
-              ? ` · trough ${fmtSigned(forecastPeakValue, 1)}°C in ${forecastPlumePeak.label} ${forecastPlumePeak.seasonAnchorYear}`
-              : ''}`,
+            label: `La Niña predicted by ${seasonMiddleMonth(forecastFirst50La.season, forecastFirst50La.anchorYear)}`,
           }
         : { phase: null, label: 'Neutral conditions favoured through the forecast window' };
 
@@ -281,17 +301,19 @@ export default function EnsoPage() {
           {/* ─── Hero ───────────────────────────────────────────────── */}
       <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
         <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-          <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+          <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
             El Niño / La Niña - Live ENSO Tracker
           </h1>
         </div>
         <div className="bg-gray-950/90 backdrop-blur-md p-4">
           <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
             The El Niño-Southern Oscillation (ENSO) is the single biggest year-to-year driver of
-            global temperature and rainfall after the long-term warming trend itself. This page
-            combines the four most-watched indicators - Niño 3.4 SST, the Oceanic Niño Index,
-            the Multivariate ENSO Index and the Southern Oscillation Index - with live
-            tropical Pacific maps and the official NOAA forecast.
+            global temperature and rainfall after the long-term warming trend itself. It is also a
+            <span className="text-[#FFF5E7] font-semibold"> natural amplifier of climate change</span>
+            {' '}- elevated tropical-ocean heat now stacks on top of every El Niño, fuelling stronger
+            droughts, heavier floods and record-breaking global temperatures. This page combines the
+            four most-watched indicators - Niño 3.4 SST, the Oceanic Niño Index, the Multivariate
+            ENSO Index and the Southern Oscillation Index - with the official NOAA forecast.
           </p>
         </div>
       </div>
@@ -356,26 +378,27 @@ export default function EnsoPage() {
           >
             {/* Headline: ONI · Niño 3.4 weekly · Thresholds */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
+              <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">ONI · 3-month mean</p>
-                <p className={`text-3xl font-bold font-mono ${ENSO_TEXT[oni.state]}`}>{oni.state}</p>
+                <p className={`text-2xl font-bold font-mono ${ENSO_TEXT[oni.state]}`}>{oni.state}</p>
                 <p className="text-sm text-gray-400 mt-1">
                   <span className="font-mono text-white">{fmtSigned(oni.anomaly)}°C</span> ·{' '}
                   {oni.season} {oni.seasonYear}
                 </p>
               </div>
               {weekly && (
-                <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
+                <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
                   <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Niño 3.4 · this week</p>
-                  <p className={`text-3xl font-bold font-mono ${anomColor(weekly.latest.nino34.anom)}`}>
-                    {fmtSigned(weekly.latest.nino34.anom)}°C
-                  </p>
+                  <div className="flex items-baseline gap-1 flex-wrap">
+                    <span className={`text-2xl font-bold font-mono ${anomColor(weekly.latest.nino34.anom)}`}>{fmtSigned(weekly.latest.nino34.anom)}</span>
+                    <span className="text-sm text-gray-400">°C</span>
+                  </div>
                   <p className="text-sm text-gray-400 mt-1">
                     SST {weekly.latest.nino34.sst.toFixed(1)}°C · week of {weekly.lastWeek}
                   </p>
                 </div>
               )}
-              <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
+              <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Thresholds</p>
                 <p className="text-sm text-gray-200 font-mono">
                   <span className="text-rose-400">≥ +0.5°C</span> El Niño
@@ -418,9 +441,12 @@ export default function EnsoPage() {
                   const v = (weekly.latest as any)[r.key] as { sst: number; anom: number };
                   const lean = leaningLabel(v.anom);
                   return (
-                    <div key={r.key} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
+                    <div key={r.key} className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
                       <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{r.label}</p>
-                      <p className={`text-2xl font-bold font-mono ${anomColor(v.anom)}`}>{fmtSigned(v.anom)}°C</p>
+                      <div className="flex items-baseline gap-1 flex-wrap">
+                        <span className={`text-2xl font-bold font-mono ${anomColor(v.anom)}`}>{fmtSigned(v.anom)}</span>
+                        <span className="text-sm text-gray-400">°C</span>
+                      </div>
                       <p className={`text-[10px] font-mono uppercase tracking-wider mt-0.5 ${lean.cls}`}>{lean.text}</p>
                       <p className="text-xs text-gray-400 mt-1">SST {v.sst.toFixed(1)}°C</p>
                     </div>
@@ -439,6 +465,9 @@ export default function EnsoPage() {
           </SectionCard>
         );
       })()}
+
+      {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title="Prediction" />
 
       {/* ═══ PAST + FUTURE HERO STORY ════════════════════════════ */}
       {oni && (() => {
@@ -775,7 +804,7 @@ export default function EnsoPage() {
         return (
         <SectionCard
           icon={<History className="text-[#D0A65E]" />}
-          title="Past & Future - the Central Thread of the ENSO Story"
+          title="Forecast vs. History"
           subtitle="The thin line traces the actual weekly Niño 3.4 anomaly. Red shading shows where it ran above zero (El Niño territory above the +0.5 line); blue shading where it ran below (La Niña). The dashed red curve is a smoothed profile of NOAA's forecast through the next predicted El Niño peak."
         >
           <div className="h-[380px]">
@@ -1184,7 +1213,7 @@ export default function EnsoPage() {
         return (
           <SectionCard
             icon={<Activity className="h-5 w-5 text-amber-300" />}
-            title="Do the Indicators Agree? - Niño 3.4 SST · MEI v2 · −SOI, Last 5 Years"
+            title="Do the Indicators Agree?"
             subtitle="The same five-year window for all three most-watched ENSO indicators on one axis. Niño 3.4 is the ocean (weekly SST anomaly), MEI v2 is the coupled ocean–atmosphere index (bi-monthly, five variables), and SOI is the atmospheric pressure see-saw between Tahiti and Darwin (monthly). SOI is plotted inverted (−SOI) because its sign is reversed relative to ENSO - that way all three lines rise together when El Niño is building. If all three are climbing in lock-step toward the +0.5 line, the forecast above has independent ocean and atmosphere support."
           >
             <div className="h-[340px]">
@@ -1544,39 +1573,44 @@ export default function EnsoPage() {
       <Divider icon={<Wind className="h-5 w-5" />} title="ENSO and Climate Change" />
 
       <SectionCard
-        title="How does ENSO interact with the long-term warming trend?"
-        subtitle="ENSO is a natural mode of climate variability that has existed for thousands of years (proven by coral and tree-ring records). But human-driven warming is changing the backdrop on which it operates."
+        title="A natural amplifier of climate change"
+        subtitle="ENSO is a natural cycle that has run for thousands of years (proven by coral and tree-ring records). Human-driven warming acts as a force multiplier - elevated tropical-ocean heat now combines with every El Niño, sharpening droughts, floods, heatwaves and record-breaking global temperatures."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-rose-300 mb-2">El Niño + warming = record temperatures</p>
+          <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-rose-300 mb-2">Intensification of extremes</p>
             <p className="text-xs text-gray-300 leading-relaxed">
-              Every El Niño now adds its temporary warming on top of a baseline that's already ~1.3 °C above pre-industrial.
-              The 1997-98, 2015-16 and 2023-24 El Niños each set new global temperature records; 2024 became the first calendar year above 1.5 °C.
-              Without continued greenhouse-gas warming, the same ENSO events would have produced much smaller temperature spikes.
+              ENSO is a natural cycle, but climate change acts as a force multiplier. Higher global temperatures are deepening El Niño droughts in Australia, Brazil and the Amazon, and driving heavier rainfall across the southern US and East Africa - the same teleconnection patterns, but with sharper edges.
             </p>
           </div>
-          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-sky-300 mb-2">La Niña no longer cools the planet below the trend</p>
+          <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-amber-300 mb-2">More frequent, more intense events</p>
             <p className="text-xs text-gray-300 leading-relaxed">
-              Strong La Niña years used to deliver global mean temperatures below the long-term average. Today, even the deepest La Niñas (2020-22) sit
-              well above any 20th-century year. La Niña buys a temporary pause in record-breaking - it doesn't reverse the warming.
+              Warmer sea-surface temperatures favour more rapid ENSO development and a higher occurrence of strong El Niño events. IPCC AR6 (2021) found with high confidence that ENSO SST variability over the past 50 years has been larger than at any time in the previous 400.
             </p>
           </div>
-          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-amber-300 mb-2">Compound impacts are getting worse</p>
+          <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-orange-300 mb-2">Temperature records stack up</p>
             <p className="text-xs text-gray-300 leading-relaxed">
-              Drought regions (Amazon, Southern Africa, Australia) are now drier in El Niño years than the same ENSO state would have produced 50 years ago,
-              because evaporative demand has risen. Flood regions (Pakistan 2022, Horn of Africa) see heavier short-duration rainfall on top of La Niña triggers because
-              a warmer atmosphere holds more moisture (~7 % per °C, Clausius-Clapeyron).
+              Every El Niño now releases its heat onto a baseline already ~1.3 °C above pre-industrial. The 1997-98, 2015-16 and 2023-24 events each set new global temperature records; 2024 became the first calendar year above 1.5 °C. Without continued greenhouse-gas warming the same ENSO events would have produced much smaller spikes.
             </p>
           </div>
-          <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-emerald-300 mb-2">Will ENSO itself change?</p>
+          <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-sky-300 mb-2">La Niña no longer cools below the trend</p>
             <p className="text-xs text-gray-300 leading-relaxed">
-              IPCC AR6 (2021) concluded with high confidence that ENSO sea-surface temperature variability has been larger over the past 50 years than at any time in
-              the previous 400 years. Most CMIP6 climate models project that ENSO rainfall variability will <em>increase</em> with further warming, even if the SST swings
-              themselves change less. Translation: bigger droughts and bigger floods in the same teleconnection regions, regardless of phase.
+              Strong La Niña years used to deliver global mean temperatures below the long-term average. Today, even the deepest La Niñas (2020-22) sit well above any 20th-century year. La Niña now buys a temporary pause in record-breaking - it does not reverse the warming.
+            </p>
+          </div>
+          <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-purple-300 mb-2">Oceans and sea ice take a hit</p>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              Warmer ocean waters combined with ENSO trigger more widespread coral bleaching and deeper marine heatwaves. The atmospheric changes also push warmer water to higher latitudes, helping to reduce Arctic sea ice during strong El Niño years.
+            </p>
+          </div>
+          <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+            <p className="text-sm font-bold text-emerald-300 mb-2">A more volatile climate system</p>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              An accelerated Hadley circulation during El Niño, combined with a warmer atmosphere holding ~7 % more moisture per °C, is making compound extremes harder to predict. Most CMIP6 models project ENSO rainfall variability will <em>increase</em> with further warming - bigger droughts and bigger floods in the same teleconnection regions.
             </p>
           </div>
         </div>
