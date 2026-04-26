@@ -23,14 +23,21 @@ import {
 import {
   Activity,
   ArrowRight,
+  BookOpen,
   CloudRain,
+  Droplets,
+  ExternalLink,
+  Flame,
   Globe2,
   History,
   Loader2,
+  Snowflake,
   Sun,
   Thermometer,
   TrendingUp,
+  Waves,
   Wind,
+  Zap,
 } from 'lucide-react';
 import { REGION_IMPACTS, PAST_EVENTS, type ImpactPhase } from '@/lib/climate/enso-impacts';
 import EnsoRegionMap from './EnsoRegionMap';
@@ -180,6 +187,19 @@ function SectionCard({
       </div>
       {children}
     </div>
+  );
+}
+
+function RelatedLink({ href, label, desc }: { href: string; label: string; desc: string }) {
+  return (
+    <Link
+      href={href}
+      className="relative block rounded-xl border border-gray-700/50 bg-gray-900 hover:bg-gray-800 hover:border-gray-600 p-4 transition-all shadow-md"
+    >
+      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-cyan-400" />
+      <div className="font-semibold text-white text-sm pr-5">{label}</div>
+      <div className="text-xs text-gray-300 mt-1">{desc}</div>
+    </Link>
   );
 }
 
@@ -1392,7 +1412,8 @@ export default function EnsoPage() {
       <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impacts" />
 
       <SectionCard
-        title="What does each phase do to weather around the world?"
+        icon={<Globe2 className="text-[#D0A65E]" />}
+        title="What Does Each Phase Do to Weather Around the World?"
         subtitle="Toggle between El Niño and La Niña to see the typical regional response. Probabilities are based on Davey et al. (2013) and NOAA composites - they describe how often the impact has occurred when the phase is active, not how likely the phase itself is."
       >
         <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -1447,7 +1468,7 @@ export default function EnsoPage() {
               const tempColor = imp.temp === 'warmer' ? 'text-rose-300 bg-rose-900/30 border-rose-700/40' : imp.temp === 'cooler' ? 'text-sky-300 bg-sky-900/30 border-sky-700/40' : '';
               const precipColor = imp.precip === 'wetter' ? 'text-emerald-300 bg-emerald-900/30 border-emerald-700/40' : imp.precip === 'drier' ? 'text-amber-300 bg-amber-900/30 border-amber-700/40' : '';
               return (
-                <div key={r.id} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3 hover:border-[#D0A65E]/40 transition-colors">
+                <div key={r.id} className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-3 hover:border-[#D0A65E]/40 transition-colors">
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-white truncate">{r.region}</p>
@@ -1485,7 +1506,7 @@ export default function EnsoPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <SectionCard
           icon={<Thermometer className="text-rose-300" />}
-          title={phase === 'el-nino' ? 'El Niño temperature impacts' : 'La Niña temperature impacts'}
+          title={phase === 'el-nino' ? 'El Niño Temperature Impacts' : 'La Niña Temperature Impacts'}
           subtitle="Met Office schematic, based on Davey et al. (2013). Coloured regions are likely warmer (red) or cooler (blue) than normal during the labelled season when the phase is active."
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1498,7 +1519,7 @@ export default function EnsoPage() {
         </SectionCard>
         <SectionCard
           icon={<CloudRain className="text-emerald-300" />}
-          title={phase === 'el-nino' ? 'El Niño rainfall impacts' : 'La Niña rainfall impacts'}
+          title={phase === 'el-nino' ? 'El Niño Rainfall Impacts' : 'La Niña Rainfall Impacts'}
           subtitle="Met Office schematic. Wetter regions in green, drier in brown. Precipitation teleconnections are noisier than temperature, so probabilities are typically lower."
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1522,7 +1543,8 @@ export default function EnsoPage() {
       <Divider icon={<History className="h-5 w-5" />} title="Past Major Events" />
 
       <SectionCard
-        title="What happened the last time?"
+        icon={<History className="text-[#D0A65E]" />}
+        title="What Happened the Last Time?"
         subtitle="The eight most consequential ENSO events since 1980. Bar height shows peak ONI; colour shows phase."
       >
         {/* Mini bar chart of peak amplitudes */}
@@ -1551,13 +1573,13 @@ export default function EnsoPage() {
         {/* Event timeline cards */}
         <div className="space-y-3">
           {PAST_EVENTS.slice().reverse().map((e) => {
-            const phaseColor = e.phase === 'el-nino' ? 'border-rose-700/40 bg-rose-900/10' : 'border-sky-700/40 bg-sky-900/10';
+            const phaseAccent = e.phase === 'el-nino' ? 'border-l-rose-500/70' : 'border-l-sky-400/70';
             const phaseText = e.phase === 'el-nino' ? 'text-rose-300' : 'text-sky-300';
             return (
-              <div key={`${e.start}-${e.end}`} className={`border-l-4 ${phaseColor} rounded-r-xl p-3`}>
+              <div key={`${e.start}-${e.end}`} className={`bg-gray-800/90 border border-gray-700/50 border-l-4 ${phaseAccent} rounded-xl p-4`}>
                 <div className="flex items-baseline justify-between gap-2 flex-wrap">
                   <p className={`text-base font-bold font-mono ${phaseText}`}>
-                    {e.start.slice(0, 4)}–{e.end.slice(0, 4)} {e.phase === 'el-nino' ? 'El Niño' : 'La Niña'}
+                    {e.start.slice(0, 4)}-{e.end.slice(0, 4)} {e.phase === 'el-nino' ? 'El Niño' : 'La Niña'}
                   </p>
                   <span className="text-xs font-mono text-gray-400">
                     {e.strength} · peak ONI {fmtSigned(e.peakOni, 1)}°C
@@ -1579,42 +1601,43 @@ export default function EnsoPage() {
       <Divider icon={<Wind className="h-5 w-5" />} title="ENSO and Climate Change" />
 
       <SectionCard
-        title="A natural amplifier of climate change"
+        icon={<Wind className="text-[#D0A65E]" />}
+        title="A Natural Amplifier of Climate Change"
         subtitle="ENSO is a natural cycle that has run for thousands of years (proven by coral and tree-ring records). Human-driven warming acts as a force multiplier - elevated tropical-ocean heat now combines with every El Niño, sharpening droughts, floods, heatwaves and record-breaking global temperatures."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-rose-300 mb-2">Intensification of extremes</p>
+            <p className="text-sm font-bold text-rose-300 mb-2 flex items-center gap-2"><Flame className="h-4 w-4" /> Intensification of Extremes</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               ENSO is a natural cycle, but climate change acts as a force multiplier. Higher global temperatures are deepening El Niño droughts in Australia, Brazil and the Amazon, and driving heavier rainfall across the southern US and East Africa - the same teleconnection patterns, but with sharper edges.
             </p>
           </div>
           <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-amber-300 mb-2">More frequent, more intense events</p>
+            <p className="text-sm font-bold text-amber-300 mb-2 flex items-center gap-2"><Zap className="h-4 w-4" /> More Frequent, More Intense Events</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               Warmer sea-surface temperatures favour more rapid ENSO development and a higher occurrence of strong El Niño events. IPCC AR6 (2021) found with high confidence that ENSO SST variability over the past 50 years has been larger than at any time in the previous 400.
             </p>
           </div>
           <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-orange-300 mb-2">Temperature records stack up</p>
+            <p className="text-sm font-bold text-orange-300 mb-2 flex items-center gap-2"><Thermometer className="h-4 w-4" /> Temperature Records Stack Up</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               Every El Niño now releases its heat onto a baseline already ~1.3 °C above pre-industrial. The 1997-98, 2015-16 and 2023-24 events each set new global temperature records; 2024 became the first calendar year above 1.5 °C. Without continued greenhouse-gas warming the same ENSO events would have produced much smaller spikes.
             </p>
           </div>
           <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-sky-300 mb-2">La Niña no longer cools below the trend</p>
+            <p className="text-sm font-bold text-sky-300 mb-2 flex items-center gap-2"><Snowflake className="h-4 w-4" /> La Niña No Longer Cools Below the Trend</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               Strong La Niña years used to deliver global mean temperatures below the long-term average. Today, even the deepest La Niñas (2020-22) sit well above any 20th-century year. La Niña now buys a temporary pause in record-breaking - it does not reverse the warming.
             </p>
           </div>
           <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-purple-300 mb-2">Oceans and sea ice take a hit</p>
+            <p className="text-sm font-bold text-purple-300 mb-2 flex items-center gap-2"><Waves className="h-4 w-4" /> Oceans and Sea Ice Take a Hit</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               Warmer ocean waters combined with ENSO trigger more widespread coral bleaching and deeper marine heatwaves. The atmospheric changes also push warmer water to higher latitudes, helping to reduce Arctic sea ice during strong El Niño years.
             </p>
           </div>
           <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
-            <p className="text-sm font-bold text-emerald-300 mb-2">A more volatile climate system</p>
+            <p className="text-sm font-bold text-emerald-300 mb-2 flex items-center gap-2"><Droplets className="h-4 w-4" /> A More Volatile Climate System</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               An accelerated Hadley circulation during El Niño, combined with a warmer atmosphere holding ~7 % more moisture per °C, is making compound extremes harder to predict. Most CMIP6 models project ENSO rainfall variability will <em>increase</em> with further warming - bigger droughts and bigger floods in the same teleconnection regions.
             </p>
@@ -1628,7 +1651,7 @@ export default function EnsoPage() {
       </SectionCard>
 
       {/* ─── Footer / methodology ───────────────────────────── */}
-      <SectionCard title="Methodology & sources">
+      <SectionCard icon={<Activity className="text-[#D0A65E]" />} title="Methodology & Sources">
         <ul className="space-y-2 text-sm text-gray-300 list-disc pl-5">
           <li>
             <strong className="text-white">Oceanic Niño Index (ONI)</strong> - 3-month running mean of
@@ -1655,28 +1678,23 @@ export default function EnsoPage() {
         </p>
       </SectionCard>
 
-      {/* ─── Related ─────────────────────────────────────────── */}
-      <SectionCard title="Explore further">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {[
-            { href: '/climate/global', label: 'Global Climate Update', desc: 'Whole-planet temperature & trend update' },
-            { href: '/climate', label: 'Country, State & Region Updates', desc: '144 regions tracked monthly' },
-            { href: '/climate/shifting-seasons', label: 'Shifting Seasons', desc: 'How season timing is moving worldwide' },
-            { href: '/sea-levels-ice', label: 'Sea Levels & Ice', desc: 'Ocean heat, sea level rise & polar ice' },
-          ].map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="group bg-gray-800/40 border border-gray-700/50 rounded-xl p-3 hover:border-[#D0A65E]/60 transition-colors"
-            >
-              <p className="text-sm font-semibold text-white group-hover:text-[#D0A65E] transition-colors flex items-center gap-1">
-                {l.label} <ArrowRight className="h-3 w-3" />
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">{l.desc}</p>
-            </Link>
-          ))}
+      {/* ─── Explore More ───────────────────────────────────── */}
+      <Divider icon={<BookOpen className="h-5 w-5 text-[#D0A65E]" />} title="Explore" />
+
+      <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+        <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2">
+          <BookOpen className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+          <span className="min-w-0 flex-1">Explore Climate Data</span>
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <RelatedLink href="/climate/global" label="Global Climate Update" desc="Whole-planet temperature & trend update" />
+          <RelatedLink href="/climate" label="Country, State & Region Updates" desc="144 regions tracked monthly" />
+          <RelatedLink href="/climate/shifting-seasons" label="Shifting Seasons" desc="How season timing is moving worldwide" />
+          <RelatedLink href="/climate/rankings" label="Climate Rankings" desc="League table of anomalies across 144 regions" />
+          <RelatedLink href="/sea-levels-ice" label="Sea Levels & Ice" desc="Ocean heat, sea level rise & polar ice" />
+          <RelatedLink href="/climate-explained" label="Climate Explained" desc="ENSO, greenhouse effect, glossary" />
         </div>
-      </SectionCard>
+      </section>
 
       <p className="text-center text-xs text-gray-500 mt-6">
         <Link href="/climate" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
