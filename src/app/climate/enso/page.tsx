@@ -830,7 +830,7 @@ export default function EnsoPage() {
         >
           <div className="h-[380px]">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 8, bottom: 18 }}>
+              <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 0, bottom: 18 }}>
                 <defs>
                   <pattern id="enso-forecast-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
                     <rect width="6" height="6" fill="rgba(244,63,94,0.12)" />
@@ -852,7 +852,7 @@ export default function EnsoPage() {
                 <YAxis
                   stroke="#9CA3AF"
                   fontSize={10}
-                  width={42}
+                  width={36}
                   domain={[-3, 3]}
                   ticks={[-3, -2, -1, 0, 1, 2, 3]}
                   tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
@@ -976,7 +976,7 @@ export default function EnsoPage() {
                         value: `${ev.phase === 'el-nino' ? 'El Niño' : 'La Niña'}${ev.weak ? ' (weak)' : ''}`,
                         fill: ev.phase === 'el-nino' ? '#fecaca' : '#bfdbfe',
                         fontSize: 9.5,
-                        position: ev.peak >= 0 ? 'insideTop' : 'insideBottom',
+                        position: ev.peak >= 0 ? 'insideTopRight' : 'insideBottomRight',
                         offset: 4,
                       }}
                     />
@@ -1024,6 +1024,7 @@ export default function EnsoPage() {
                         fontSize: 10,
                         position: 'insideTopLeft',
                         offset: 6,
+                        className: 'hidden md:block',
                       }}
                     />
                   );
@@ -1239,7 +1240,7 @@ export default function EnsoPage() {
           >
             <div className="h-[340px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart margin={{ top: 10, right: 64, left: 8, bottom: 0 }}>
+                <ComposedChart margin={{ top: 10, right: 64, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis
                     dataKey="t"
@@ -1274,13 +1275,11 @@ export default function EnsoPage() {
                     y={0.5}
                     stroke="#f43f5e"
                     strokeDasharray="3 3"
-                    label={{ value: 'El Niño', position: 'right', fill: '#f43f5e', fontSize: 10, offset: 8 }}
                   />
                   <ReferenceLine
                     y={-0.5}
                     stroke="#0ea5e9"
                     strokeDasharray="3 3"
-                    label={{ value: 'La Niña', position: 'right', fill: '#0ea5e9', fontSize: 10, offset: 8 }}
                   />
                   <ReferenceLine y={0} stroke="#6B7280" />
                   <Line

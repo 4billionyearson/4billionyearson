@@ -175,7 +175,7 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
 
           return (
             <MapContainer
-              center={[0, 205]}
+              center={[0, 220]}
               zoom={2}
               minZoom={2}
               maxZoom={5}
