@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 const STATS = [
-  { value: "9",       label: "Live Dashboards", color: "#88DDFC" },
+  { value: "15",      label: "Live Dashboards", color: "#88DDFC" },
   { value: "4",       label: "Topic Hubs",      color: "#D2E369" },
-  { value: "Monthly", label: "Data Updates",    color: "#D0A65E" },
+  { value: "Regular", label: "Data Updates",    color: "#D0A65E" },
   { value: "Free",    label: "Open Access",     color: "#FFF5E7" },
 ];
 
