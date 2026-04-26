@@ -194,26 +194,3 @@ html {
 .live-dot {
   animation: live-pulse 1.5s ease-in-out infinite;
 }
-
-/* ENSO region map overlay - scale labels and arrows down on narrow screens
-   so they don't run into each other when the map fits the equatorial band
-   to a small mobile container. */
-@media (max-width: 767px) {
-  .enso-region-label > div {
-    font-size: 10px !important;
-  }
-  .enso-region-label > div > div {
-    font-size: 9px !important;
-  }
-  .enso-continent-label > div {
-    font-size: 9px !important;
-    letter-spacing: 0.05em !important;
-  }
-  .enso-warm-pool > div {
-    font-size: 9px !important;
-  }
-  .enso-trade-arrow {
-    transform: scale(0.7);
-    transform-origin: center center;
-  }
-}

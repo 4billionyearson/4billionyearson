@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -66,7 +67,7 @@ const strokeFor = (a: number) =>
 
 const fmtSigned = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)}`;
 
-const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
+const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState; isMobile: boolean }>(
   () =>
     Promise.all([import("react-leaflet"), import("leaflet")]).then(
       ([mod, L]) => {
@@ -75,15 +76,40 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
           TileLayer,
           Rectangle,
           Marker,
+          useMap,
         } = mod;
 
-        function Map({ anoms, state }: { anoms: RegionAnoms; state: EnsoMapState }) {
+        // Refits the map when the breakpoint changes so we can use a
+        // narrower bounds on mobile and a wider, more contextual view on
+        // desktop without remounting the MapContainer.
+        function BoundsController({ bounds }: { bounds: [[number, number], [number, number]] }) {
+          const map = useMap();
+          useEffect(() => {
+            map.fitBounds(bounds, { animate: false });
+          }, [map, bounds]);
+          return null;
+        }
+
+        function Map({ anoms, state, isMobile }: { anoms: RegionAnoms; state: EnsoMapState; isMobile: boolean }) {
+          // Mobile: tight focus on the equatorial Pacific so the four Niño
+          // boxes dominate the view without colliding labels.
+          // Desktop: wider extent so the surrounding continents are visible
+          // for spatial context.
+          const bounds: [[number, number], [number, number]] = isMobile
+            ? [[-14, 150], [14, 290]]
+            : [[-26, 120], [26, 305]];
+
+          const labelW = isMobile ? 54 : 80;
+          const labelH = isMobile ? 28 : 36;
+          const labelFont = isMobile ? 9 : 12;
+          const labelAnomFont = isMobile ? 8 : 11;
+
           const labelIcon = (label: string, anom: number) =>
             (L as any).divIcon({
               className: "enso-region-label",
               html: `<div style="
                 font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-                font-size: 12px;
+                font-size: ${labelFont}px;
                 font-weight: 700;
                 color: #0f172a;
                 text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;
@@ -93,7 +119,7 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
               ">
                 ${label}
                 <div style="
-                  font-size: 11px;
+                  font-size: ${labelAnomFont}px;
                   font-weight: 700;
                   color: ${
                     anom >= 0.5
@@ -104,16 +130,17 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
                   };
                 ">${fmtSigned(anom)}°C</div>
               </div>`,
-              iconSize: [80, 36],
-              iconAnchor: [40, 18],
+              iconSize: [labelW, labelH],
+              iconAnchor: [labelW / 2, labelH / 2],
             });
 
+          const continentFont = isMobile ? 9 : 12;
           const continentIcon = (label: string) =>
             (L as any).divIcon({
               className: "enso-continent-label",
               html: `<div style="
                 font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-                font-size: 11px;
+                font-size: ${continentFont}px;
                 font-weight: 700;
                 letter-spacing: 0.08em;
                 text-transform: uppercase;
@@ -121,18 +148,25 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
                 text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;
                 white-space: nowrap;
                 pointer-events: none;
-                opacity: 0.8;
+                opacity: 0.85;
               ">${label}</div>`,
               iconSize: [120, 16],
               iconAnchor: [60, 8],
             });
 
-          const CONTINENTS: Array<{ label: string; pos: [number, number] }> = [
-            { label: "Asia", pos: [30, 110] },
-            { label: "Australia", pos: [-25, 135] },
-            { label: "North America", pos: [30, 260] },
-            { label: "South America", pos: [-15, 295] },
-          ];
+          // Continent label positions are tuned per breakpoint so they sit
+          // over the right landmass given the view extent.
+          const CONTINENTS: Array<{ label: string; pos: [number, number] }> = isMobile
+            ? [
+                { label: "Australia", pos: [-12, 145] },
+                { label: "S. America", pos: [-10, 290] },
+              ]
+            : [
+                { label: "Asia", pos: [22, 125] },
+                { label: "Australia", pos: [-22, 140] },
+                { label: "North America", pos: [22, 260] },
+                { label: "South America", pos: [-15, 290] },
+              ];
 
           // Trade-wind arrows along the equator. The Pacific normally has
           // east→west trade winds that pile warm water in the western warm
@@ -147,12 +181,13 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
             const points = dir === "east" ? "4,12 36,12 36,6 50,16 36,26 36,20 4,20" : "46,12 14,12 14,6 0,16 14,26 14,20 46,20";
             return `\n              <svg width=\"50\" height=\"32\" viewBox=\"0 0 50 32\" xmlns=\"http://www.w3.org/2000/svg\">\n                <polygon points=\"${points}\" fill=\"${arrowColor}\" stroke=\"#ffffff\" stroke-width=\"${arrowStrokeWidth * 0.4}\" opacity=\"0.92\" />\n              </svg>`;
           };
+          const arrowSize: [number, number] = isMobile ? [32, 20] : [50, 32];
           const tradeArrowIcon = (dir: "east" | "west") =>
             (L as any).divIcon({
               className: "enso-trade-arrow",
-              html: `<div style=\"pointer-events: none;\">${arrowSvg(dir)}</div>`,
-              iconSize: [50, 32],
-              iconAnchor: [25, 16],
+              html: `<div style=\"pointer-events: none; width:${arrowSize[0]}px; height:${arrowSize[1]}px; display:flex; align-items:center; justify-content:center;\"><div style=\"transform: scale(${arrowSize[0] / 50}); transform-origin: center center;\">${arrowSvg(dir)}</div></div>`,
+              iconSize: arrowSize,
+              iconAnchor: [arrowSize[0] / 2, arrowSize[1] / 2],
             });
           // Three arrows along the equator. Use latitude 0 (centre line) so
           // they sit between the Niño-region rectangles and stay visible.
@@ -162,23 +197,22 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
             [-12, 215],
             [-12, 255],
           ];
-          // Warm-pool centre marker: sits west under La Niña/Neutral, drifts
-          // east under El Niño. Lat 13 keeps it clear of the (now taller)
-          // Niño rectangles whose top edge is at lat 8.
-          const warmPoolPos: [number, number] = isElNino ? [13, 230] : [13, 165];
+          // Warm-pool centre marker: the Indo-Pacific Warm Pool sits in the
+          // far west Pacific (~150°E). Under La Niña/Neutral the pool stays
+          // pinned to the west; under El Niño warm water spreads east toward
+          // the dateline.
+          const warmPoolPos: [number, number] = isElNino ? [11, 195] : [11, 152];
+          const warmPoolFont = isMobile ? 8 : 10;
           const warmPoolIcon = (L as any).divIcon({
             className: "enso-warm-pool",
-            html: `<div style=\"\n              font-family: ui-monospace, SFMono-Regular, Menlo, monospace;\n              font-size: 10px;\n              font-weight: 700;\n              letter-spacing: 0.05em;\n              text-transform: uppercase;\n              color: #b91c1c;\n              text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;\n              white-space: nowrap;\n              pointer-events: none;\n            \">\u2600 Warm pool</div>`,
+            html: `<div style=\"\n              font-family: ui-monospace, SFMono-Regular, Menlo, monospace;\n              font-size: ${warmPoolFont}px;\n              font-weight: 700;\n              letter-spacing: 0.05em;\n              text-transform: uppercase;\n              color: #b91c1c;\n              text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;\n              white-space: nowrap;\n              pointer-events: none;\n            \">\u2600 Warm pool</div>`,
             iconSize: [110, 14],
             iconAnchor: [55, 7],
           });
 
           return (
             <MapContainer
-              bounds={[
-                [-18, 150],
-                [18, 290],
-              ]}
+              bounds={bounds}
               minZoom={1}
               maxZoom={5}
               scrollWheelZoom={false}
@@ -187,13 +221,14 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
               zoomControl={false}
               attributionControl={false}
               maxBounds={[
-                [-40, 100],
-                [40, 310],
+                [-55, 80],
+                [55, 330],
               ]}
               maxBoundsViscosity={1.0}
-              className="h-[200px] md:h-[320px] w-full z-0"
+              className="h-[200px] md:h-[340px] w-full z-0"
               style={{ background: "#BEEEF9" }}
             >
+              <BoundsController bounds={bounds} />
               <TileLayer
                 attribution='&copy; <a href="https://carto.com/">CARTO</a>'
                 url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
@@ -256,7 +291,7 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[200px] md:h-[320px] w-full rounded-lg bg-gray-900/40 flex items-center justify-center">
+      <div className="h-[200px] md:h-[340px] w-full rounded-lg bg-gray-900/40 flex items-center justify-center">
         <div className="animate-spin h-6 w-6 border-2 border-[#D0A65E] border-t-transparent rounded-full" />
       </div>
     ),
@@ -264,9 +299,16 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
 );
 
 export default function EnsoRegionMap({ anoms, state }: { anoms: RegionAnoms; state: EnsoMapState }) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   return (
     <div className="rounded-xl overflow-hidden border border-gray-700/50">
-      <EnsoRegionMapInner anoms={anoms} state={state} />
+      <EnsoRegionMapInner anoms={anoms} state={state} isMobile={isMobile} />
     </div>
   );
 }
