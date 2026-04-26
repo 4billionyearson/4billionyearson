@@ -51,6 +51,13 @@ export interface WarmingDriver {
     climateHints?: string[];          // 'arid', 'coastal', 'mountainous', 'urban', 'forested', 'polar'
   };
   source: { name: string; url: string };
+  /**
+   * Optional internal path to a live tracker page for this driver. When set,
+   * the inline <Term> trigger becomes a real navigation link (so clicking
+   * "ENSO" / "El Niño" inside an AI summary jumps to /climate/enso) while
+   * the hover tooltip still shows the short definition.
+   */
+  livePagePath?: string;
 }
 
 export const WARMING_DRIVERS: WarmingDriver[] = [
@@ -290,6 +297,7 @@ export const WARMING_DRIVERS: WarmingDriver[] = [
       name: 'NOAA Climate.gov — ENSO',
       url: 'https://www.climate.gov/enso',
     },
+    livePagePath: '/climate/enso',
   },
   {
     id: 'nao',

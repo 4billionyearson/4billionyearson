@@ -83,18 +83,28 @@ export default function Term({ id, className, children }: TermProps) {
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
-      <button
-        type="button"
-        aria-describedby={open ? tooltipId : undefined}
-        aria-expanded={open}
-        onClick={(e) => {
-          e.preventDefault();
-          setOpen((v) => !v);
-        }}
-        className={`border-b border-dotted border-teal-300/60 text-teal-300 hover:text-teal-200 hover:border-teal-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-950 transition-colors cursor-help ${className ?? ''}`}
-      >
-        {children}
-      </button>
+      {driver.livePagePath ? (
+        <Link
+          href={driver.livePagePath}
+          aria-describedby={open ? tooltipId : undefined}
+          className={`border-b border-dotted border-teal-300/60 text-teal-300 hover:text-teal-200 hover:border-teal-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-950 transition-colors ${className ?? ''}`}
+        >
+          {children}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          aria-describedby={open ? tooltipId : undefined}
+          aria-expanded={open}
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen((v) => !v);
+          }}
+          className={`border-b border-dotted border-teal-300/60 text-teal-300 hover:text-teal-200 hover:border-teal-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300/60 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-950 transition-colors cursor-help ${className ?? ''}`}
+        >
+          {children}
+        </button>
+      )}
 
       {open && mounted && coords &&
         createPortal(
@@ -109,6 +119,15 @@ export default function Term({ id, className, children }: TermProps) {
             <span className="block font-semibold text-teal-200 mb-1">{driver.term}</span>
             <span className="block text-gray-300">{driver.short}</span>
             <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+              {driver.livePagePath && (
+                <Link
+                  href={driver.livePagePath}
+                  className="text-[#D0A65E] hover:text-[#E5C088] font-semibold"
+                  onClick={() => setOpen(false)}
+                >
+                  Live tracker →
+                </Link>
+              )}
               <Link
                 href={`/climate-explained#${driver.id}`}
                 className="text-teal-300 hover:text-teal-200 font-semibold"
