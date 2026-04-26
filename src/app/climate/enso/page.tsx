@@ -450,7 +450,7 @@ export default function EnsoPage() {
                   const v = (weekly.latest as any)[r.key] as { sst: number; anom: number };
                   const lean = leaningLabel(v.anom);
                   return (
-                    <div key={r.key} className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+                    <div key={r.key} className="bg-gray-800/60 border border-gray-700/50 rounded-xl p-4">
                       <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{r.label}</p>
                       <div className="flex items-baseline gap-1 flex-wrap">
                         <span className={`text-2xl font-bold font-mono ${anomColor(v.anom)}`}>{fmtSigned(v.anom)}</span>
@@ -1572,7 +1572,7 @@ export default function EnsoPage() {
             const phaseAccent = e.phase === 'el-nino' ? 'border-l-rose-500/70' : 'border-l-sky-400/70';
             const phaseText = e.phase === 'el-nino' ? 'text-rose-300' : 'text-sky-300';
             return (
-              <div key={`${e.start}-${e.end}`} className={`rounded-xl border border-gray-800 bg-gray-900/50 border-l-4 ${phaseAccent} p-4`}>
+              <div key={`${e.start}-${e.end}`} className={`rounded-xl border border-gray-700/50 bg-gray-800/60 border-l-4 ${phaseAccent} p-4`}>
                 <div className="flex items-baseline justify-between gap-2 flex-wrap">
                   <p className={`text-base font-bold font-mono ${phaseText}`}>
                     {e.start.slice(0, 4)}-{e.end.slice(0, 4)} {e.phase === 'el-nino' ? 'El Niño' : 'La Niña'}
@@ -1602,37 +1602,37 @@ export default function EnsoPage() {
         subtitle="ENSO is a natural cycle that has run for thousands of years (proven by coral and tree-ring records). Human-driven warming acts as a force multiplier - elevated tropical-ocean heat now combines with every El Niño, sharpening droughts, floods, heatwaves and record-breaking global temperatures."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
+          <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
             <p className="text-sm font-bold text-rose-300 mb-2 flex items-center gap-2"><Flame className="h-4 w-4" /> Intensification of Extremes</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               ENSO is a natural cycle, but climate change acts as a force multiplier. Higher global temperatures are deepening El Niño droughts in Australia, Brazil and the Amazon, and driving heavier rainfall across the southern US and East Africa - the same teleconnection patterns, but with sharper edges.
             </p>
           </div>
-          <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
+          <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
             <p className="text-sm font-bold text-amber-300 mb-2 flex items-center gap-2"><Zap className="h-4 w-4" /> More Frequent, More Intense Events</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               Warmer sea-surface temperatures favour more rapid ENSO development and a higher occurrence of strong El Niño events. IPCC AR6 (2021) found with high confidence that ENSO SST variability over the past 50 years has been larger than at any time in the previous 400.
             </p>
           </div>
-          <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
+          <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
             <p className="text-sm font-bold text-orange-300 mb-2 flex items-center gap-2"><Thermometer className="h-4 w-4" /> Temperature Records Stack Up</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               Every El Niño now releases its heat onto a baseline already ~1.3 °C above pre-industrial. The 1997-98, 2015-16 and 2023-24 events each set new global temperature records; 2024 became the first calendar year above 1.5 °C. Without continued greenhouse-gas warming the same ENSO events would have produced much smaller spikes.
             </p>
           </div>
-          <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
+          <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
             <p className="text-sm font-bold text-sky-300 mb-2 flex items-center gap-2"><Snowflake className="h-4 w-4" /> La Niña No Longer Cools Below the Trend</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               Strong La Niña years used to deliver global mean temperatures below the long-term average. Today, even the deepest La Niñas (2020-22) sit well above any 20th-century year. La Niña now buys a temporary pause in record-breaking - it does not reverse the warming.
             </p>
           </div>
-          <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
+          <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
             <p className="text-sm font-bold text-purple-300 mb-2 flex items-center gap-2"><Waves className="h-4 w-4" /> Oceans and Sea Ice Take a Hit</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               Warmer ocean waters combined with ENSO trigger more widespread coral bleaching and deeper marine heatwaves. The atmospheric changes also push warmer water to higher latitudes, helping to reduce Arctic sea ice during strong El Niño years.
             </p>
           </div>
-          <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
+          <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
             <p className="text-sm font-bold text-emerald-300 mb-2 flex items-center gap-2"><Droplets className="h-4 w-4" /> A More Volatile Climate System</p>
             <p className="text-xs text-gray-300 leading-relaxed">
               An accelerated Hadley circulation during El Niño, combined with a warmer atmosphere holding ~7 % more moisture per °C, is making compound extremes harder to predict. Most CMIP6 models project ENSO rainfall variability will <em>increase</em> with further warming - bigger droughts and bigger floods in the same teleconnection regions.

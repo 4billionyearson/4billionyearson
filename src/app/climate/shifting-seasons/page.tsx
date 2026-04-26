@@ -728,7 +728,7 @@ export default function ShiftingSeasonsPage() {
 
                 {snowHeadline && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
-                    <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4">
+                    <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
                       <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">
                         Recent 10-yr Anomaly vs 1981–2010
                       </div>
@@ -998,7 +998,7 @@ function Leaderboard({
   format: (r: GlobalShiftRecord) => string;
 }) {
   return (
-    <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4">
+    <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
       <div className="text-xs text-gray-300 uppercase tracking-wider font-semibold mb-3">{title}</div>
       <ol className="space-y-2">
         {rows.map((r, i) => {
