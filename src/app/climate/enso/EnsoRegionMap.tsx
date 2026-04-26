@@ -107,9 +107,35 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
               iconAnchor: [40, 18],
             });
 
+          const continentIcon = (label: string) =>
+            (L as any).divIcon({
+              className: "enso-continent-label",
+              html: `<div style="
+                font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: #475569;
+                text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;
+                white-space: nowrap;
+                pointer-events: none;
+                opacity: 0.8;
+              ">${label}</div>`,
+              iconSize: [120, 16],
+              iconAnchor: [60, 8],
+            });
+
+          const CONTINENTS: Array<{ label: string; pos: [number, number] }> = [
+            { label: "Asia", pos: [30, 110] },
+            { label: "Australia", pos: [-25, 135] },
+            { label: "North America", pos: [30, 260] },
+            { label: "South America", pos: [-15, 295] },
+          ];
+
           return (
             <MapContainer
-              center={[5, 215]}
+              center={[0, 205]}
               zoom={2}
               minZoom={2}
               maxZoom={5}
@@ -131,6 +157,14 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
                 url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
                 noWrap={false}
               />
+              {CONTINENTS.map((c) => (
+                <Marker
+                  key={`continent-${c.label}`}
+                  position={c.pos}
+                  icon={continentIcon(c.label)}
+                  interactive={false}
+                />
+              ))}
               {REGIONS.map((r) => {
                 const a = anoms[r.key];
                 return (

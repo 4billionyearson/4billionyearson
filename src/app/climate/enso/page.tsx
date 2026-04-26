@@ -27,11 +27,9 @@ import {
   Globe2,
   History,
   Loader2,
-  Map as MapIcon,
   Sun,
   Thermometer,
   TrendingUp,
-  Waves,
   Wind,
 } from 'lucide-react';
 import { REGION_IMPACTS, PAST_EVENTS, type ImpactPhase } from '@/lib/climate/enso-impacts';
@@ -149,10 +147,13 @@ const TT_CURSOR = { fill: 'rgba(208,166,94,0.08)' } as const;
 
 function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
-    <div className="mt-8 mb-4 flex items-center gap-3">
-      <span className="text-[#D0A65E]">{icon}</span>
-      <h2 className="text-2xl font-bold font-mono text-white">{title}</h2>
-      <div className="flex-1 border-t border-[#D0A65E]/30" />
+    <div className="flex items-center gap-4 my-6">
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+        {icon}
+        <span>{title}</span>
+      </h2>
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
     </div>
   );
 }
@@ -240,6 +241,39 @@ export default function EnsoPage() {
   const { oni, weekly, mei, soi, images, generatedAt } = data;
   const plume = data.plume;
 
+  // Top-level forecast summary so the Current State header can hint at the
+  // outlook the Past & Future chart confirms in detail.
+  const forecastSeasonsTop = data.forecast?.seasons || [];
+  const forecastFirst50 = forecastSeasonsTop.find((s) => s.pElNino >= 50) || null;
+  const forecastFirst50La = forecastSeasonsTop.find((s) => s.pLaNina >= 50) || null;
+  const forecastPlumePeak = (plume?.periods || []).reduce<PlumePeriod | null>(
+    (a, b) => {
+      const bv = b.dynMean ?? b.mean;
+      const av = a ? (a.dynMean ?? a.mean) : null;
+      if (bv == null) return a;
+      if (av == null || Math.abs(bv) > Math.abs(av)) return b;
+      return a;
+    },
+    null,
+  );
+  const forecastPeakValue = forecastPlumePeak?.dynMean ?? forecastPlumePeak?.mean ?? null;
+  const forecastVerdict: { phase: 'el-nino' | 'la-nina' | null; label: string | null } =
+    forecastFirst50
+      ? {
+          phase: 'el-nino',
+          label: `El Niño predicted by ${forecastFirst50.label}${forecastPlumePeak && forecastPeakValue != null
+            ? ` · peak ${fmtSigned(forecastPeakValue, 1)}°C in ${forecastPlumePeak.label} ${forecastPlumePeak.seasonAnchorYear}`
+            : ''}`,
+        }
+      : forecastFirst50La
+        ? {
+            phase: 'la-nina',
+            label: `La Niña predicted by ${forecastFirst50La.label}${forecastPlumePeak && forecastPeakValue != null
+              ? ` · trough ${fmtSigned(forecastPeakValue, 1)}°C in ${forecastPlumePeak.label} ${forecastPlumePeak.seasonAnchorYear}`
+              : ''}`,
+          }
+        : { phase: null, label: 'Neutral conditions favoured through the forecast window' };
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -317,7 +351,7 @@ export default function EnsoPage() {
         return (
           <SectionCard
             icon={<Activity className="text-sky-300" />}
-            title={`Current state - ${oni.state}${oni.strength ? `, ${oni.strength}` : ''}`}
+            title={`Current State - ${oni.state}${oni.strength ? `, ${oni.strength}` : ''}${forecastVerdict.label ? ` · ${forecastVerdict.label}` : ''}`}
             subtitle="The four NOAA Niño regions sample different stretches of the equatorial Pacific. Niño 3.4 (central Pacific) is the official ENSO yardstick - it drives the headline number. The other three regions add texture: Niño 1+2 off Peru leads coastal signals, Niño 4 captures the western warm-pool dynamics."
           >
             {/* Headline: ONI · Niño 3.4 weekly · Thresholds */}
@@ -742,7 +776,7 @@ export default function EnsoPage() {
         return (
         <SectionCard
           icon={<History className="text-[#D0A65E]" />}
-          title="Past & future - the central thread of the ENSO story"
+          title="Past & Future - the Central Thread of the ENSO Story"
           subtitle="The thin line traces the actual weekly Niño 3.4 anomaly. Red shading shows where it ran above zero (El Niño territory above the +0.5 line); blue shading where it ran below (La Niña). The dashed red curve is a smoothed profile of NOAA's forecast through the next predicted El Niño peak."
         >
           <div className="h-[380px]">
@@ -1151,7 +1185,7 @@ export default function EnsoPage() {
         return (
           <SectionCard
             icon={<Activity className="h-5 w-5 text-amber-300" />}
-            title="Do the indicators agree? - Niño 3.4 SST · MEI v2 · −SOI, last 5 years"
+            title="Do the Indicators Agree? - Niño 3.4 SST · MEI v2 · −SOI, Last 5 Years"
             subtitle="The same five-year window for all three most-watched ENSO indicators on one axis. Niño 3.4 is the ocean (weekly SST anomaly), MEI v2 is the coupled ocean–atmosphere index (bi-monthly, five variables), and SOI is the atmospheric pressure see-saw between Tahiti and Darwin (monthly). SOI is plotted inverted (−SOI) because its sign is reversed relative to ENSO - that way all three lines rise together when El Niño is building. If all three are climbing in lock-step toward the +0.5 line, the forecast above has independent ocean and atmosphere support."
           >
             <div className="h-[340px]">
@@ -1320,90 +1354,8 @@ export default function EnsoPage() {
         );
       })()}
 
-      {/* ═══ MAPS ═══════════════════════════════════════════════ */}
-      <Divider icon={<MapIcon className="h-5 w-5" />} title="Live tropical Pacific maps" />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SectionCard
-          icon={<Waves className="text-sky-300" />}
-          title="Weekly SST anomaly"
-          subtitle="Tropical Pacific sea-surface temperature anomaly relative to the 1991–2020 climatology. Red = warmer; blue = cooler."
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={images.sstAnomalyMap}
-            alt="Tropical Pacific weekly SST anomaly"
-            className="w-full rounded-lg border border-gray-700/50 bg-gray-900"
-            loading="lazy"
-          />
-          <p className="text-xs text-gray-500 mt-2">
-            Live image:{' '}
-            <a
-              href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/sstweek_c.gif"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#D0A65E] hover:underline"
-            >
-              NOAA CPC
-            </a>
-          </p>
-        </SectionCard>
-
-        <SectionCard
-          icon={<Wind className="text-amber-300" />}
-          title="Subsurface ocean heat"
-          subtitle="Equatorial Pacific temperature anomaly with depth (cross-section). A warm pulse moving east at depth often precedes an El Niño at the surface a few months later."
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={images.subsurfaceAnomaly}
-            alt="Equatorial Pacific subsurface temperature anomaly cross-section"
-            className="w-full rounded-lg border border-gray-700/50 bg-gray-900"
-            loading="lazy"
-          />
-          <p className="text-xs text-gray-500 mt-2">
-            Live image:{' '}
-            <a
-              href="https://www.cpc.ncep.noaa.gov/products/GODAS/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#D0A65E] hover:underline"
-            >
-              NOAA CPC GODAS
-            </a>
-          </p>
-        </SectionCard>
-      </div>
-
-      <SectionCard
-        title="Time-longitude SST anomaly (Hovmöller)"
-        subtitle="The last several months of equatorial Pacific SST anomalies, shown as a strip from west to east. Red plumes drifting east are the canonical El Niño signature."
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={images.hovmollerSst}
-          alt="Time-longitude (Hovmöller) of equatorial Pacific SST anomalies"
-          className="w-full rounded-lg border border-gray-700/50 bg-gray-900"
-          loading="lazy"
-        />
-        <p className="text-xs text-gray-500 mt-2">
-          Live image:{' '}
-          <a
-            href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/ssttlon5_c.gif"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#D0A65E] hover:underline"
-          >
-            NOAA CPC
-          </a>
-        </p>
-      </SectionCard>
-
-      {/* CPC probability bars removed - the hero past+future chart and
-          narrative already convey the season-by-season probabilities. */}
-
       {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
-      <Divider icon={<Globe2 className="h-5 w-5" />} title="Global impacts" />
+      <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impacts" />
 
       <SectionCard
         title="What does each phase do to weather around the world?"
@@ -1533,7 +1485,7 @@ export default function EnsoPage() {
           drives the forecast curve in the hero past+future chart. */}
 
       {/* ═══ PAST EVENTS ═════════════════════════ */}
-      <Divider icon={<History className="h-5 w-5" />} title="Past major events" />
+      <Divider icon={<History className="h-5 w-5" />} title="Past Major Events" />
 
       <SectionCard
         title="What happened the last time?"
@@ -1590,7 +1542,7 @@ export default function EnsoPage() {
       </SectionCard>
 
       {/* ═══ CLIMATE CHANGE ══════════════════════ */}
-      <Divider icon={<Wind className="h-5 w-5" />} title="ENSO and climate change" />
+      <Divider icon={<Wind className="h-5 w-5" />} title="ENSO and Climate Change" />
 
       <SectionCard
         title="How does ENSO interact with the long-term warming trend?"
