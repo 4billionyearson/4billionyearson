@@ -74,7 +74,6 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
           MapContainer,
           TileLayer,
           Rectangle,
-          Tooltip,
           Marker,
         } = mod;
 
@@ -175,9 +174,11 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
 
           return (
             <MapContainer
-              center={[0, 220]}
-              zoom={2}
-              minZoom={2}
+              bounds={[
+                [-18, 150],
+                [18, 290],
+              ]}
+              minZoom={1}
               maxZoom={5}
               scrollWheelZoom={false}
               dragging={false}
@@ -220,13 +221,7 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
                       }),
                       fillOpacity: 0.55,
                     }}
-                  >
-                    <Tooltip direction="top" offset={[0, -4]} sticky>
-                      <span style={{ fontFamily: "ui-monospace, monospace" }}>
-                        <strong>{r.label}</strong>: {fmtSigned(a)}°C
-                      </span>
-                    </Tooltip>
-                  </Rectangle>
+                  />
                 );
               })}
               {REGIONS.map((r) => (

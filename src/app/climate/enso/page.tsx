@@ -964,8 +964,8 @@ export default function EnsoPage() {
                   />
                 )}
 
-                {/* Past event labels - peak markers */}
-                {events.map((ev, i) => {
+                {/* Past event labels - peak markers (skip events too close to the left edge to avoid label overflow into the y-axis) */}
+                {events.filter((ev) => ((ev.startX + ev.endX) / 2) - xMin >= 1).map((ev, i) => {
                   const cx = (ev.startX + ev.endX) / 2;
                   return (
                     <ReferenceLine
@@ -976,7 +976,7 @@ export default function EnsoPage() {
                         value: `${ev.phase === 'el-nino' ? 'El Niño' : 'La Niña'}${ev.weak ? ' (weak)' : ''}`,
                         fill: ev.phase === 'el-nino' ? '#fecaca' : '#bfdbfe',
                         fontSize: 9.5,
-                        position: ev.peak >= 0 ? 'insideTopRight' : 'insideBottomRight',
+                        position: ev.peak >= 0 ? 'insideTop' : 'insideBottom',
                         offset: 4,
                       }}
                     />
@@ -1034,22 +1034,22 @@ export default function EnsoPage() {
           </div>
 
           {/* Legend strip */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
+          <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-5 h-0.5 bg-[#fef3c7]" /> Weekly Niño 3.4 (observed)
+              <span className="inline-block w-5 h-0.5 bg-[#fef3c7]" /> Weekly Niño 3.4
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(244,63,94,0.55)' }} /> El Niño shading (above 0)
+              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(244,63,94,0.55)' }} /> El Niño shading
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(14,165,233,0.55)' }} /> La Niña shading (below 0)
+              <span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(14,165,233,0.55)' }} /> La Niña shading
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span
                 className="inline-block w-5 h-0.5"
                 style={{ background: 'repeating-linear-gradient(90deg, #f43f5e 0 4px, transparent 4px 8px)' }}
               />{' '}
-              Forecast (smoothed profile)
+              Forecast
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / Today
@@ -1317,7 +1317,7 @@ export default function EnsoPage() {
               </ResponsiveContainer>
             </div>
             {/* Legend + read-out */}
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
+            <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
               <span className="inline-flex items-center gap-1.5">
                 <span className="inline-block w-4 h-[2px] bg-amber-400" /> Niño 3.4 weekly SST anomaly (°C)
               </span>
