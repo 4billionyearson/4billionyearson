@@ -246,7 +246,7 @@ export default function EnsoPage() {
       <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
         <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
           <h1 className="text-2xl md:text-3xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-            El Niño / La Niña — Live ENSO Tracker
+            El Niño / La Niña - Live ENSO Tracker
           </h1>
         </div>
         <div className="bg-gray-950/90 backdrop-blur-md p-4">
@@ -306,8 +306,8 @@ export default function EnsoPage() {
         return (
           <SectionCard
             icon={<Activity className="text-sky-300" />}
-            title={`Current state — ${oni.state}${oni.strength ? `, ${oni.strength}` : ''}`}
-            subtitle="The four NOAA Niño regions sample different stretches of the equatorial Pacific. Niño 3.4 (central Pacific) is the official ENSO yardstick — it drives the headline number. The other three regions add texture: Niño 1+2 off Peru leads coastal signals, Niño 4 captures the western warm-pool dynamics."
+            title={`Current state - ${oni.state}${oni.strength ? `, ${oni.strength}` : ''}`}
+            subtitle="The four NOAA Niño regions sample different stretches of the equatorial Pacific. Niño 3.4 (central Pacific) is the official ENSO yardstick - it drives the headline number. The other three regions add texture: Niño 1+2 off Peru leads coastal signals, Niño 4 captures the western warm-pool dynamics."
           >
             {/* Headline: ONI · Niño 3.4 weekly · Thresholds */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -346,7 +346,7 @@ export default function EnsoPage() {
             {weekly && (
               <div className="mt-5 rounded-xl border border-gray-700/50 bg-gray-800/30 p-3">
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">
-                  Where the data comes from — equatorial Pacific
+                  Where the data comes from - equatorial Pacific
                 </p>
                 <EnsoRegionMap
                   anoms={{
@@ -361,7 +361,7 @@ export default function EnsoPage() {
                   {' '}<span className="text-rose-300">warmer than average</span>{' '}
                   (El Niño-leaning) or{' '}
                   <span className="text-sky-300">cooler than average</span>{' '}
-                  (La Niña-leaning). Niño&nbsp;3 and Niño&nbsp;3.4 overlap by design — 3.4
+                  (La Niña-leaning). Niño&nbsp;3 and Niño&nbsp;3.4 overlap by design - 3.4
                   is the central slice that NOAA tracks for the official ENSO state.
                 </p>
               </div>
@@ -387,9 +387,9 @@ export default function EnsoPage() {
             <p className="text-xs text-gray-400 mt-4 leading-relaxed">
               El Niño years tend to push global temperature higher (El Niño 2023-24 helped make
               2024 the hottest year on record). La Niña years temporarily damp the long-term
-              warming trend — but the underlying greenhouse-gas-driven trend continues either way.
+              warming trend - but the underlying greenhouse-gas-driven trend continues either way.
               The four-region snapshot above shows how those signals are forming right now across
-              the Pacific basin — and feed into the forecast curve below.
+              the Pacific basin - and feed into the forecast curve below.
             </p>
           </SectionCard>
         );
@@ -402,7 +402,7 @@ export default function EnsoPage() {
         const yearsBack = 7;
         const currentYear = new Date().getFullYear();
         const minYear = currentYear - yearsBack + 1;
-        // Use the live weekly Niño 3.4 anomaly for "now" — it's the most
+        // Use the live weekly Niño 3.4 anomaly for "now" - it's the most
         // up-to-date number and matches the headline card. Fall back to the
         // lagging 3-month ONI if weekly is unavailable.
         const currentOni = weekly?.latest.nino34.anom ?? oni.anomaly;
@@ -440,7 +440,7 @@ export default function EnsoPage() {
         // 5 consecutive overlapping 3-month seasons. Brief one- or two-season
         // excursions (e.g. early-2020 weak warmth, isolated late-2025 wobbles)
         // do NOT qualify as El Niño/La Niña events and should not be labelled
-        // — they're noise relative to the year-to-year ENSO cycle.
+        // - they're noise relative to the year-to-year ENSO cycle.
         const MIN_CONSECUTIVE_SEASONS = 5;
         // We also require the event peak to clearly exceed the threshold, so
         // a string of marginal +0.5/+0.6 readings doesn't get flagged.
@@ -517,7 +517,7 @@ export default function EnsoPage() {
         const isForecastingElNino = !!first50;
 
         // Predicted peak intensity. Prefer the IRI plume (multi-model dynamical
-        // mean) when available — that's a real model-driven number, not just a
+        // mean) when available - that's a real model-driven number, not just a
         // historical average. Falls back to the mean of past El Niño peaks.
         const plumePeaks = (data?.plume?.periods || [])
           .map((p) => p.dynMean ?? p.mean)
@@ -543,7 +543,7 @@ export default function EnsoPage() {
         // Anchor seasons on current/next year. Seasons earlier in the array
         // belong to the current year; once labels wrap, anchor on next year.
         // Simpler heuristic: anchor on currentYear, but NDJ rolls to currentYear too
-        // since NDJ runs Nov(currentYear)→Jan(currentYear+1) — its window already
+        // since NDJ runs Nov(currentYear)→Jan(currentYear+1) - its window already
         // crosses the year via SEASON_MONTHS (endMonth=12 → 13 = next Jan).
         const elNinoStart = first50 ? seasonWindow(first50.season, currentYear)[0] : null;
         // End = end of last ≥30% El Niño season (i.e. when probability drops back).
@@ -578,7 +578,7 @@ export default function EnsoPage() {
           (elNinoEnd ?? currentYear + 1) + 0.5,
         );
 
-        // X-axis ticks — integer years only.
+        // X-axis ticks - integer years only.
         const yearTicks: number[] = [];
         for (let y = minYear; y <= Math.ceil(xMax); y++) yearTicks.push(y);
 
@@ -634,7 +634,7 @@ export default function EnsoPage() {
           }
         }
 
-        // Forecast curve — built from the IRI/Columbia ENSO plume (multi-model
+        // Forecast curve - built from the IRI/Columbia ENSO plume (multi-model
         // mean of dynamical + statistical Niño 3.4 forecasts) when available,
         // falling back to a synthetic peak-shaped profile otherwise. Each plume
         // period is one 3-month overlapping season; we anchor the value at the
@@ -730,7 +730,7 @@ export default function EnsoPage() {
         return (
         <SectionCard
           icon={<History className="text-[#D0A65E]" />}
-          title="Past & future — the central thread of the ENSO story"
+          title="Past & future - the central thread of the ENSO story"
           subtitle="The thin line traces the actual weekly Niño 3.4 anomaly. Red shading shows where it ran above zero (El Niño territory above the +0.5 line); blue shading where it ran below (La Niña). The dashed red curve is a smoothed profile of NOAA's forecast through the next predicted El Niño peak."
         >
           <div className="h-[380px]">
@@ -788,7 +788,7 @@ export default function EnsoPage() {
                 <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" strokeOpacity={0.5} />
                 <ReferenceLine y={0} stroke="#6B7280" />
 
-                {/* Observed area fills — profile-shaped from weekly data */}
+                {/* Observed area fills - profile-shaped from weekly data */}
                 <Area
                   type="monotone"
                   dataKey="pos"
@@ -808,7 +808,7 @@ export default function EnsoPage() {
                   connectNulls={false}
                 />
 
-                {/* Forecast El Niño envelope — profiled, dashed border */}
+                {/* Forecast El Niño envelope - profiled, dashed border */}
                 {isForecastingElNino && elNinoStart !== null && elNinoEnd !== null && (
                   <ReferenceArea
                     x1={elNinoStart}
@@ -833,7 +833,7 @@ export default function EnsoPage() {
                   connectNulls={false}
                 />
 
-                {/* Observed weekly line — the actual Niño 3.4 trace */}
+                {/* Observed weekly line - the actual Niño 3.4 trace */}
                 <Line
                   type="monotone"
                   dataKey="anom"
@@ -843,7 +843,7 @@ export default function EnsoPage() {
                   isAnimationActive={false}
                   connectNulls={false}
                 />
-                {/* Forecast smoothed curve — dashed */}
+                {/* Forecast smoothed curve - dashed */}
                 <Line
                   type="monotone"
                   dataKey="fcAnom"
@@ -856,7 +856,7 @@ export default function EnsoPage() {
                 />
 
                 {/* Forecast labels (start-probability and peak-season text
-                    labels intentionally suppressed — narrative below the
+                    labels intentionally suppressed - narrative below the
                     chart carries the detail). */}
                 {isForecastingElNino && peakX !== null && (peakSeason || plumePeakPeriod) && (
                   <ReferenceDot
@@ -869,7 +869,7 @@ export default function EnsoPage() {
                   />
                 )}
 
-                {/* Past event labels — peak markers */}
+                {/* Past event labels - peak markers */}
                 {events.map((ev, i) => {
                   const cx = (ev.startX + ev.endX) / 2;
                   return (
@@ -912,8 +912,8 @@ export default function EnsoPage() {
                     offset: 12,
                   }}
                 />
-                {/* End of available forecast data — vertical marker at the
-                    last plume period (DJF n+1 by default — 9 periods ahead
+                {/* End of available forecast data - vertical marker at the
+                    last plume period (DJF n+1 by default - 9 periods ahead
                     of issue date). IRI plume doesn't extend further. */}
                 {forecastPoints.length > 0 && (() => {
                   const lastFc = forecastPoints[forecastPoints.length - 1];
@@ -963,7 +963,7 @@ export default function EnsoPage() {
           {/* Headline forecast narrative */}
           {isForecastingElNino && (
             <div className="mt-4 rounded-xl border border-rose-500/30 bg-gradient-to-br from-rose-950/30 to-gray-900/30 p-4">
-              <p className="text-xs uppercase tracking-wider text-rose-300/80 font-mono mb-1">NOAA forecast — what's coming</p>
+              <p className="text-xs uppercase tracking-wider text-rose-300/80 font-mono mb-1">NOAA forecast - what's coming</p>
               <p className="text-sm text-gray-100 leading-relaxed">
                 A new <span className="font-semibold text-rose-300">El Niño</span> looks increasingly likely.{' '}
                 {first50 && (
@@ -971,7 +971,7 @@ export default function EnsoPage() {
                     Probability first crosses{' '}
                     <span className="font-mono font-semibold text-rose-200">50%</span> in{' '}
                     <span className="font-mono">{first50.label}</span>
-                    {' '}({first50.pElNino}% chance) — this is the official "start" of the event
+                    {' '}({first50.pElNino}% chance) - this is the official "start" of the event
                     {first90 && (
                       <>
                         . It then climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in{' '}
@@ -1005,7 +1005,7 @@ export default function EnsoPage() {
                 {plumePeakPeriod && (
                   <>{' '}in <span className="font-mono">{plumePeakPeriod.label} {plumePeakPeriod.seasonAnchorYear}</span></>
                 )}
-                {' '}— the dynamical-model average, which currently signals a strong-to-super El Niño.
+                {' '}- the dynamical-model average, which currently signals a strong-to-super El Niño.
               </p>
             </div>
           )}
@@ -1058,7 +1058,7 @@ export default function EnsoPage() {
             >
               IRI/CCSR ENSO plume
             </a>{' '}
-            (forecast — multi-model dynamical &amp; statistical mean of {plume?.periods[0]?.modelCount ?? 0} models, issued {plume ? `${plume.issueMonth}/${plume.issueYear}` : 'monthly'}),{' '}
+            (forecast - multi-model dynamical &amp; statistical mean of {plume?.periods[0]?.modelCount ?? 0} models, issued {plume ? `${plume.issueMonth}/${plume.issueYear}` : 'monthly'}),{' '}
             <a
               href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php"
               target="_blank"
@@ -1085,7 +1085,7 @@ export default function EnsoPage() {
       {/* ═══ INDICATOR CROSS-CHECK ═══════════════════════════════ */}
       {(weekly || mei || soi) && (() => {
         // Build a single time-aligned dataset combining the three most-watched
-        // ENSO indicators so the reader can see — at a glance — whether the
+        // ENSO indicators so the reader can see - at a glance - whether the
         // ocean (Niño 3.4 SST) and the atmosphere (MEI v2, SOI) are all
         // pointing the same way as the hero forecast above. SOI is plotted
         // inverted (−SOI) because its sign is reversed relative to ENSO:
@@ -1101,7 +1101,7 @@ export default function EnsoPage() {
           .map((w) => ({ t: Date.parse(w.date), v: w.nino34.anom }))
           .filter((p) => Number.isFinite(p.t) && p.t >= startMs);
 
-        // MEI v2 — seasonIndex 1..12 (DJ, JF, FM, …, ND); we map to the mid-
+        // MEI v2 - seasonIndex 1..12 (DJ, JF, FM, …, ND); we map to the mid-
         // month of the second month in the bi-monthly window.
         const meiSeries = (mei?.history ?? [])
           .map((m) => ({
@@ -1139,8 +1139,8 @@ export default function EnsoPage() {
         return (
           <SectionCard
             icon={<Activity className="h-5 w-5 text-amber-300" />}
-            title="Do the indicators agree? — Niño 3.4 SST · MEI v2 · −SOI, last 5 years"
-            subtitle="The same five-year window for all three most-watched ENSO indicators on one axis. Niño 3.4 is the ocean (weekly SST anomaly), MEI v2 is the coupled ocean–atmosphere index (bi-monthly, five variables), and SOI is the atmospheric pressure see-saw between Tahiti and Darwin (monthly). SOI is plotted inverted (−SOI) because its sign is reversed relative to ENSO — that way all three lines rise together when El Niño is building. If all three are climbing in lock-step toward the +0.5 line, the forecast above has independent ocean and atmosphere support."
+            title="Do the indicators agree? - Niño 3.4 SST · MEI v2 · −SOI, last 5 years"
+            subtitle="The same five-year window for all three most-watched ENSO indicators on one axis. Niño 3.4 is the ocean (weekly SST anomaly), MEI v2 is the coupled ocean–atmosphere index (bi-monthly, five variables), and SOI is the atmospheric pressure see-saw between Tahiti and Darwin (monthly). SOI is plotted inverted (−SOI) because its sign is reversed relative to ENSO - that way all three lines rise together when El Niño is building. If all three are climbing in lock-step toward the +0.5 line, the forecast above has independent ocean and atmosphere support."
           >
             <div className="h-[340px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -1171,7 +1171,7 @@ export default function EnsoPage() {
                     cursor={TT_CURSOR}
                     labelFormatter={(t: any) => (typeof t === 'number' ? fmtFullDate(t) : '')}
                     formatter={(v: any, name: any) => [
-                      typeof v === 'number' ? fmtSigned(v, 2) : '—',
+                      typeof v === 'number' ? fmtSigned(v, 2) : '-',
                       name,
                     ]}
                   />
@@ -1247,28 +1247,28 @@ export default function EnsoPage() {
               const leaningNeg =
                 agree(lastNino?.v, -1) || agree(lastMei?.v, -1) || agree(lastSoi?.v, -1);
               const verdict = leaningPos && !leaningNeg
-                ? 'All three are currently above zero and trending toward the +0.5 El Niño threshold — the ocean (Niño 3.4) and the atmosphere (MEI, −SOI) are independently supporting the forecast above.'
+                ? 'All three are currently above zero and trending toward the +0.5 El Niño threshold - the ocean (Niño 3.4) and the atmosphere (MEI, −SOI) are independently supporting the forecast above.'
                 : leaningNeg && !leaningPos
-                ? 'All three are currently below zero — the ocean and atmosphere are leaning La Niña-ward.'
-                : 'The three indicators are mixed right now — watch for them to converge before reading too much into the forecast above.';
+                ? 'All three are currently below zero - the ocean and atmosphere are leaning La Niña-ward.'
+                : 'The three indicators are mixed right now - watch for them to converge before reading too much into the forecast above.';
               return (
                 <p className="text-xs text-gray-400 mt-2">
                   <strong className="text-gray-200">Latest:</strong>{' '}
                   Niño 3.4 ={' '}
                   <span className="font-mono text-amber-300">
-                    {typeof lastNino?.v === 'number' ? fmtSigned(lastNino.v) : '—'}
+                    {typeof lastNino?.v === 'number' ? fmtSigned(lastNino.v) : '-'}
                   </span>
                   °C · MEI v2 ={' '}
                   <span className="font-mono text-violet-300">
-                    {typeof lastMei?.v === 'number' ? fmtSigned(lastMei.v) : '—'}
+                    {typeof lastMei?.v === 'number' ? fmtSigned(lastMei.v) : '-'}
                   </span>
                   {' · '}−SOI ={' '}
                   <span className="font-mono text-emerald-300">
-                    {typeof lastSoi?.v === 'number' ? fmtSigned(lastSoi.v) : '—'}
+                    {typeof lastSoi?.v === 'number' ? fmtSigned(lastSoi.v) : '-'}
                   </span>
                   {' '}(SOI raw ={' '}
                   <span className="font-mono">
-                    {typeof (lastSoi as any)?.raw === 'number' ? fmtSigned((lastSoi as any).raw, 1) : '—'}
+                    {typeof (lastSoi as any)?.raw === 'number' ? fmtSigned((lastSoi as any).raw, 1) : '-'}
                   </span>
                   ). {verdict}
                 </p>
@@ -1387,7 +1387,7 @@ export default function EnsoPage() {
         </p>
       </SectionCard>
 
-      {/* CPC probability bars removed — the hero past+future chart and
+      {/* CPC probability bars removed - the hero past+future chart and
           narrative already convey the season-by-season probabilities. */}
 
       {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
@@ -1419,7 +1419,7 @@ export default function EnsoPage() {
             La Niña impacts
           </button>
           <span className="text-xs text-gray-500 ml-2">
-            Phase currently active: <span className={oni ? ENSO_TEXT[oni.state] : 'text-gray-300'}>{oni?.state || '—'}</span>
+            Phase currently active: <span className={oni ? ENSO_TEXT[oni.state] : 'text-gray-300'}>{oni?.state || '-'}</span>
           </span>
         </div>
 
@@ -1517,7 +1517,7 @@ export default function EnsoPage() {
         <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office GPC outlooks (Davey et al. 2013)</a>. © Crown Copyright.
       </p>
 
-      {/* Met Office plume forecasts removed — the IRI/CCSR plume already
+      {/* Met Office plume forecasts removed - the IRI/CCSR plume already
           drives the forecast curve in the hero past+future chart. */}
 
       {/* ═══ PAST EVENTS ═════════════════════════ */}
@@ -1536,7 +1536,7 @@ export default function EnsoPage() {
               <YAxis stroke="#9CA3AF" fontSize={10} width={40} domain={[-3, 3]} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
               <Tooltip
                 contentStyle={TT_CONTENT} labelStyle={TT_LABEL} itemStyle={TT_ITEM} cursor={TT_CURSOR}
-                formatter={(v: any) => [typeof v === 'number' ? `${fmtSigned(v, 1)}°C peak ONI` : '—', '']}
+                formatter={(v: any) => [typeof v === 'number' ? `${fmtSigned(v, 1)}°C peak ONI` : '-', '']}
               />
               <ReferenceLine y={0.5} stroke="#f43f5e" strokeDasharray="3 3" />
               <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" />
@@ -1628,21 +1628,21 @@ export default function EnsoPage() {
       <SectionCard title="Methodology & sources">
         <ul className="space-y-2 text-sm text-gray-300 list-disc pl-5">
           <li>
-            <strong className="text-white">Oceanic Niño Index (ONI)</strong> — 3-month running mean of
+            <strong className="text-white">Oceanic Niño Index (ONI)</strong> - 3-month running mean of
             ERSSTv5 SST anomalies in the Niño 3.4 box (5°S–5°N, 170°W–120°W) relative to a centred
             30-year base period that updates every 5 years. NOAA's official ENSO yardstick.
           </li>
           <li>
-            <strong className="text-white">Weekly Niño-region SSTs</strong> — OISSTv2-based weekly
+            <strong className="text-white">Weekly Niño-region SSTs</strong> - OISSTv2-based weekly
             mean SST and SST anomaly (1991–2020 baseline) for Niño 1+2, 3, 3.4 and 4.
           </li>
           <li>
-            <strong className="text-white">Multivariate ENSO Index v2</strong> — bi-monthly principal-
+            <strong className="text-white">Multivariate ENSO Index v2</strong> - bi-monthly principal-
             component combination of SST, sea-level pressure, zonal & meridional surface winds and
             outgoing longwave radiation over the tropical Pacific. Captures atmospheric coupling.
           </li>
           <li>
-            <strong className="text-white">Southern Oscillation Index</strong> — standardised
+            <strong className="text-white">Southern Oscillation Index</strong> - standardised
             difference in sea-level pressure between Tahiti and Darwin. The classical atmospheric
             measure of ENSO; persistent negative SOI accompanies El Niño.
           </li>
