@@ -250,11 +250,11 @@ export default function EnsoPage() {
           </h1>
         </div>
         <div className="bg-gray-950/90 backdrop-blur-md p-4">
-          <p className="text-sm md:text-lg text-gray-300 leading-relaxed max-w-4xl">
+          <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
             The El Niño-Southern Oscillation (ENSO) is the single biggest year-to-year driver of
             global temperature and rainfall after the long-term warming trend itself. This page
-            combines the four most-watched indicators – Niño 3.4 SST, the Oceanic Niño Index,
-            the Multivariate ENSO Index and the Southern Oscillation Index – with live
+            combines the four most-watched indicators - Niño 3.4 SST, the Oceanic Niño Index,
+            the Multivariate ENSO Index and the Southern Oscillation Index - with live
             tropical Pacific maps and the official NOAA forecast.
           </p>
         </div>
@@ -322,7 +322,7 @@ export default function EnsoPage() {
               {weekly && (
                 <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
                   <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Niño 3.4 · this week</p>
-                  <p className="text-3xl font-bold font-mono text-white">
+                  <p className={`text-3xl font-bold font-mono ${anomColor(weekly.latest.nino34.anom)}`}>
                     {fmtSigned(weekly.latest.nino34.anom)}°C
                   </p>
                   <p className="text-sm text-gray-400 mt-1">
@@ -333,10 +333,10 @@ export default function EnsoPage() {
               <div className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4">
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Thresholds</p>
                 <p className="text-sm text-gray-200 font-mono">
-                  <span className="text-rose-300">≥ +0.5°C</span> El Niño
+                  <span className="text-rose-400">≥ +0.5°C</span> El Niño
                 </p>
                 <p className="text-sm text-gray-200 font-mono">
-                  <span className="text-sky-300">≤ −0.5°C</span> La Niña
+                  <span className="text-sky-400">≤ −0.5°C</span> La Niña
                 </p>
                 <p className="text-sm text-gray-200 font-mono">otherwise Neutral</p>
               </div>
@@ -357,12 +357,11 @@ export default function EnsoPage() {
                   }}
                 />
                 <p className="text-[11px] text-gray-500 mt-2 leading-snug">
-                  Box colour shows this week&rsquo;s SST anomaly:
-                  {' '}<span className="text-rose-300">warmer than average</span>{' '}
+                  Box colour shows this week&rsquo;s SST anomaly relative to the 1991-2020 baseline:
+                  {' '}<span className="text-rose-400">warmer than average</span>{' '}
                   (El Niño-leaning) or{' '}
-                  <span className="text-sky-300">cooler than average</span>{' '}
-                  (La Niña-leaning). Niño&nbsp;3 and Niño&nbsp;3.4 overlap by design - 3.4
-                  is the central slice that NOAA tracks for the official ENSO state.
+                  <span className="text-sky-400">cooler than average</span>{' '}
+                  (La Niña-leaning). A pink box does not by itself mean an El Niño event has been declared - that requires sustained Niño&nbsp;3.4 anomalies above +0.5&deg;C for several months. Niño&nbsp;3 and Niño&nbsp;3.4 overlap by design; 3.4 is the central slice that NOAA tracks for the official ENSO state.
                 </p>
               </div>
             )}
@@ -372,11 +371,13 @@ export default function EnsoPage() {
               <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
                 {regions.map((r) => {
                   const v = (weekly.latest as any)[r.key] as { sst: number; anom: number };
+                  const lean = leaningLabel(v.anom);
                   return (
                     <div key={r.key} className="bg-gray-800/40 border border-gray-700/50 rounded-xl p-3">
                       <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">{r.label}</p>
                       <p className={`text-2xl font-bold font-mono ${anomColor(v.anom)}`}>{fmtSigned(v.anom)}°C</p>
-                      <p className="text-xs text-gray-400 mt-0.5">SST {v.sst.toFixed(1)}°C</p>
+                      <p className={`text-[10px] font-mono uppercase tracking-wider mt-0.5 ${lean.cls}`}>{lean.text}</p>
+                      <p className="text-xs text-gray-400 mt-1">SST {v.sst.toFixed(1)}°C</p>
                       <p className="text-[10px] text-gray-500 mt-1.5 leading-snug">{r.area}</p>
                     </div>
                   );

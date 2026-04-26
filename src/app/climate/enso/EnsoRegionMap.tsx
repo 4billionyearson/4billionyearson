@@ -84,8 +84,8 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
                 font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
                 font-size: 12px;
                 font-weight: 700;
-                color: #f3f4f6;
-                text-shadow: 0 0 4px #0b1220, 0 0 4px #0b1220, 0 0 4px #0b1220;
+                color: #0f172a;
+                text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;
                 text-align: center;
                 white-space: nowrap;
                 pointer-events: none;
@@ -93,13 +93,13 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
                 ${label}
                 <div style="
                   font-size: 11px;
-                  font-weight: 600;
+                  font-weight: 700;
                   color: ${
                     anom >= 0.5
-                      ? "#fb7185"
+                      ? "#be123c"
                       : anom <= -0.5
-                        ? "#38bdf8"
-                        : "#cbd5e1"
+                        ? "#0369a1"
+                        : "#1f2937"
                   };
                 ">${fmtSigned(anom)}°C</div>
               </div>`,
@@ -124,12 +124,11 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
               ]}
               maxBoundsViscosity={1.0}
               className="h-[260px] md:h-[320px] w-full z-0"
-              style={{ background: "#0b1220" }}
+              style={{ background: "#BEEEF9" }}
             >
               <TileLayer
                 attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-                url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
-                opacity={0.45}
+                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
                 noWrap={false}
               />
               {REGIONS.map((r) => {
