@@ -12,6 +12,8 @@ export type RegionAnoms = {
   nino4: number;
 };
 
+export type EnsoMapState = 'el-nino' | 'la-nina' | 'neutral';
+
 // Map uses 0–360° longitude so the Pacific is contiguous (no antimeridian
 // split for Niño 4, which spans 160°E–150°W).
 const REGIONS = [
@@ -64,7 +66,7 @@ const strokeFor = (a: number) =>
 
 const fmtSigned = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(2)}`;
 
-const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
+const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
   () =>
     Promise.all([import("react-leaflet"), import("leaflet")]).then(
       ([mod, L]) => {
@@ -76,7 +78,7 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
           Marker,
         } = mod;
 
-        function Map({ anoms }: { anoms: RegionAnoms }) {
+        function Map({ anoms, state }: { anoms: RegionAnoms; state: EnsoMapState }) {
           const labelIcon = (label: string, anom: number) =>
             (L as any).divIcon({
               className: "enso-region-label",
@@ -132,6 +134,44 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
             { label: "North America", pos: [30, 260] },
             { label: "South America", pos: [-15, 295] },
           ];
+
+          // Trade-wind arrows along the equator. The Pacific normally has
+          // east→west trade winds that pile warm water in the western warm
+          // pool. La Niña intensifies that flow; El Niño weakens or reverses
+          // it, sending warm water east.
+          const isLaNina = state === "la-nina";
+          const isElNino = state === "el-nino";
+          const arrowColor = isElNino ? "#be123c" : isLaNina ? "#0369a1" : "#475569";
+          const arrowStrokeWidth = isLaNina ? 3.2 : isElNino ? 2.6 : 2;
+          // Arrow direction: El Niño = eastward (▶), otherwise westward (◀).
+          const arrowSvg = (dir: "east" | "west") => {
+            const points = dir === "east" ? "4,12 36,12 36,6 50,16 36,26 36,20 4,20" : "46,12 14,12 14,6 0,16 14,26 14,20 46,20";
+            return `\n              <svg width=\"50\" height=\"32\" viewBox=\"0 0 50 32\" xmlns=\"http://www.w3.org/2000/svg\">\n                <polygon points=\"${points}\" fill=\"${arrowColor}\" stroke=\"#ffffff\" stroke-width=\"${arrowStrokeWidth * 0.4}\" opacity=\"0.92\" />\n              </svg>`;
+          };
+          const tradeArrowIcon = (dir: "east" | "west") =>
+            (L as any).divIcon({
+              className: "enso-trade-arrow",
+              html: `<div style=\"pointer-events: none;\">${arrowSvg(dir)}</div>`,
+              iconSize: [50, 32],
+              iconAnchor: [25, 16],
+            });
+          // Three arrows along the equator. Use latitude 0 (centre line) so
+          // they sit between the Niño-region rectangles and stay visible.
+          const arrowDir: "east" | "west" = isElNino ? "east" : "west";
+          const ARROWS: Array<[number, number]> = [
+            [-12, 175],
+            [-12, 215],
+            [-12, 255],
+          ];
+          // Warm-pool centre marker: sits west under La Niña/Neutral, drifts
+          // east under El Niño.
+          const warmPoolPos: [number, number] = isElNino ? [8, 230] : [8, 165];
+          const warmPoolIcon = (L as any).divIcon({
+            className: "enso-warm-pool",
+            html: `<div style=\"\n              font-family: ui-monospace, SFMono-Regular, Menlo, monospace;\n              font-size: 10px;\n              font-weight: 700;\n              letter-spacing: 0.05em;\n              text-transform: uppercase;\n              color: #b91c1c;\n              text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;\n              white-space: nowrap;\n              pointer-events: none;\n            \">\u2600 Warm pool</div>`,
+            iconSize: [110, 14],
+            iconAnchor: [55, 7],
+          });
 
           return (
             <MapContainer
@@ -197,6 +237,19 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
                   interactive={false}
                 />
               ))}
+              {ARROWS.map((pos, i) => (
+                <Marker
+                  key={`trade-arrow-${i}`}
+                  position={pos}
+                  icon={tradeArrowIcon(arrowDir)}
+                  interactive={false}
+                />
+              ))}
+              <Marker
+                position={warmPoolPos}
+                icon={warmPoolIcon}
+                interactive={false}
+              />
             </MapContainer>
           );
         }
@@ -214,10 +267,10 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms }>(
   },
 );
 
-export default function EnsoRegionMap({ anoms }: { anoms: RegionAnoms }) {
+export default function EnsoRegionMap({ anoms, state }: { anoms: RegionAnoms; state: EnsoMapState }) {
   return (
     <div className="rounded-xl overflow-hidden border border-gray-700/50">
-      <EnsoRegionMapInner anoms={anoms} />
+      <EnsoRegionMapInner anoms={anoms} state={state} />
     </div>
   );
 }

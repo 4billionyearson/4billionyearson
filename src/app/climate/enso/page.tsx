@@ -423,13 +423,17 @@ export default function EnsoPage() {
                     nino34: weekly.latest.nino34.anom,
                     nino4: weekly.latest.nino4.anom,
                   }}
+                  state={oni.state === 'El Niño' ? 'el-nino' : oni.state === 'La Niña' ? 'la-nina' : 'neutral'}
                 />
                 <p className="text-[11px] text-gray-500 mt-2 leading-snug">
                   Box colour shows this week&rsquo;s SST anomaly relative to the 1991-2020 baseline:
                   {' '}<span className="text-rose-400">warmer than average</span>{' '}
                   (El Niño-leaning) or{' '}
                   <span className="text-sky-400">cooler than average</span>{' '}
-                  (La Niña-leaning). A pink box does not by itself mean an El Niño event has been declared - that requires sustained Niño&nbsp;3.4 anomalies above +0.5&deg;C for several months. Niño&nbsp;3 and Niño&nbsp;3.4 overlap by design; 3.4 is the central slice that NOAA tracks for the official ENSO state.
+                  (La Niña-leaning). Equatorial arrows show the trade-wind / surface-current direction:
+                  {' '}<span className="text-sky-400">strong westward push under La Niña</span>{' '}(stronger trades, warm pool piled west),
+                  {' '}<span className="text-rose-400">eastward flow under El Niño</span>{' '}(trades weaken or reverse, warm pool spreads east),
+                  {' '}or muted under neutral conditions. A pink box does not by itself mean an El Niño event has been declared - that requires sustained Niño&nbsp;3.4 anomalies above +0.5&deg;C for several months. Niño&nbsp;3 and Niño&nbsp;3.4 overlap by design; 3.4 is the central slice that NOAA tracks for the official ENSO state.
                 </p>
               </div>
             )}
@@ -509,19 +513,20 @@ export default function EnsoPage() {
           return (a + b) / 2;
         };
 
-        // Detect past ENSO events using the NOAA-official rule: an event is
-        // declared only when the ONI stays at or beyond ±0.5°C for at least
-        // 5 consecutive overlapping 3-month seasons. Brief one- or two-season
-        // excursions (e.g. early-2020 weak warmth, isolated late-2025 wobbles)
-        // do NOT qualify as El Niño/La Niña events and should not be labelled
-        // - they're noise relative to the year-to-year ENSO cycle.
-        const MIN_CONSECUTIVE_SEASONS = 5;
-        // We also require the event peak to clearly exceed the threshold, so
-        // a string of marginal +0.5/+0.6 readings doesn't get flagged.
+        // Detect past ENSO events. NOAA's strict declaration rule asks for
+        // 5 consecutive overlapping 3-month seasons at or beyond ±0.5°C, but
+        // even shorter persistent runs are routinely reported as weak events
+        // (e.g. NOAA classified mid-2024 → early 2026 as a weak La Niña despite
+        // multi-month gaps). We use a 3-season minimum so those are visible,
+        // and tag any event whose peak magnitude stays below 1.0°C as 'weak'.
+        const MIN_CONSECUTIVE_SEASONS = 3;
+        // We also require the event peak to clearly reach the threshold.
         const MIN_PEAK_MAGNITUDE = 0.5;
+        const WEAK_PEAK_MAX = 1.0;
         const histInWindow = oni.history.filter((p) => p.year >= minYear && p.year < currentYear);
         type EnsoEvent = {
           phase: 'el-nino' | 'la-nina';
+          weak: boolean;
           startX: number;
           endX: number;
           peak: number;
@@ -544,6 +549,7 @@ export default function EnsoPage() {
           const [, e] = seasonWindow(last.season, last.year);
           events.push({
             phase: cur.phase,
+            weak: Math.abs(peakRow.anom) < WEAK_PEAK_MAX,
             startX: s,
             endX: e,
             peak: peakRow.anom,
@@ -952,7 +958,7 @@ export default function EnsoPage() {
                       x={cx}
                       stroke="transparent"
                       label={{
-                        value: ev.phase === 'el-nino' ? 'El Niño' : 'La Niña',
+                        value: `${ev.phase === 'el-nino' ? 'El Niño' : 'La Niña'}${ev.weak ? ' (weak)' : ''}`,
                         fill: ev.phase === 'el-nino' ? '#fecaca' : '#bfdbfe',
                         fontSize: 9.5,
                         position: ev.peak >= 0 ? 'insideTop' : 'insideBottom',
