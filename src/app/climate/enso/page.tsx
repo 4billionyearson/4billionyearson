@@ -830,7 +830,7 @@ export default function EnsoPage() {
         >
           <div className="h-[380px]">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 0, bottom: 18 }}>
+              <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 0, bottom: 0 }}>
                 <defs>
                   <pattern id="enso-forecast-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
                     <rect width="6" height="6" fill="rgba(244,63,94,0.12)" />
@@ -846,7 +846,6 @@ export default function EnsoPage() {
                   tickFormatter={(v) => String(Math.round(v))}
                   stroke="#9CA3AF"
                   fontSize={11}
-                  height={32}
                   allowDecimals={false}
                 />
                 <YAxis

@@ -21,8 +21,8 @@ const REGIONS = [
     key: "nino4" as const,
     label: "Niño 4",
     bounds: [
-      [-5, 160],
-      [5, 210],
+      [-8, 160],
+      [8, 210],
     ] as [[number, number], [number, number]],
     centroid: [0, 185] as [number, number],
   },
@@ -30,8 +30,8 @@ const REGIONS = [
     key: "nino34" as const,
     label: "Niño 3.4",
     bounds: [
-      [-5, 190],
-      [5, 240],
+      [-8, 190],
+      [8, 240],
     ] as [[number, number], [number, number]],
     centroid: [0, 215] as [number, number],
   },
@@ -39,8 +39,8 @@ const REGIONS = [
     key: "nino3" as const,
     label: "Niño 3",
     bounds: [
-      [-5, 210],
-      [5, 270],
+      [-8, 210],
+      [8, 270],
     ] as [[number, number], [number, number]],
     centroid: [0, 240] as [number, number],
   },
@@ -163,8 +163,9 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
             [-12, 255],
           ];
           // Warm-pool centre marker: sits west under La Niña/Neutral, drifts
-          // east under El Niño.
-          const warmPoolPos: [number, number] = isElNino ? [8, 230] : [8, 165];
+          // east under El Niño. Lat 13 keeps it clear of the (now taller)
+          // Niño rectangles whose top edge is at lat 8.
+          const warmPoolPos: [number, number] = isElNino ? [13, 230] : [13, 165];
           const warmPoolIcon = (L as any).divIcon({
             className: "enso-warm-pool",
             html: `<div style=\"\n              font-family: ui-monospace, SFMono-Regular, Menlo, monospace;\n              font-size: 10px;\n              font-weight: 700;\n              letter-spacing: 0.05em;\n              text-transform: uppercase;\n              color: #b91c1c;\n              text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;\n              white-space: nowrap;\n              pointer-events: none;\n            \">\u2600 Warm pool</div>`,
