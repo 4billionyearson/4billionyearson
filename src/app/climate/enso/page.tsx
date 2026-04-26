@@ -305,12 +305,12 @@ export default function EnsoPage() {
     forecastFirst50
       ? {
           phase: 'el-nino',
-          label: `El Niño predicted by ${seasonMiddleMonth(forecastFirst50.season, forecastFirst50.anchorYear)}`,
+          label: `El Niño Predicted by ${seasonMiddleMonth(forecastFirst50.season, forecastFirst50.anchorYear)}`,
         }
       : forecastFirst50La
         ? {
             phase: 'la-nina',
-            label: `La Niña predicted by ${seasonMiddleMonth(forecastFirst50La.season, forecastFirst50La.anchorYear)}`,
+            label: `La Niña Predicted by ${seasonMiddleMonth(forecastFirst50La.season, forecastFirst50La.anchorYear)}`,
           }
         : { phase: null, label: 'Neutral conditions favoured through the forecast window' };
 
@@ -397,7 +397,7 @@ export default function EnsoPage() {
             subtitle="Niño 3.4 (central Pacific) is the official ENSO yardstick. Niño 1+2 leads coastal signals off Peru; Niño 4 captures the western warm pool."
           >
             {/* Headline: ONI · Niño 3.4 weekly */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">ONI · 3-month mean</p>
                 <p className={`text-2xl font-bold font-mono ${ENSO_TEXT[oni.state]}`}>{oni.state}</p>
