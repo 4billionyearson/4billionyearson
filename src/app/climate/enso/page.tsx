@@ -277,7 +277,7 @@ export default function EnsoPage() {
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
-        <div className="max-w-6xl mx-auto space-y-4">
+        <div className="max-w-7xl mx-auto space-y-6">
           {/* ─── Hero ───────────────────────────────────────────────── */}
       <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
         <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
@@ -423,7 +423,6 @@ export default function EnsoPage() {
                       <p className={`text-2xl font-bold font-mono ${anomColor(v.anom)}`}>{fmtSigned(v.anom)}°C</p>
                       <p className={`text-[10px] font-mono uppercase tracking-wider mt-0.5 ${lean.cls}`}>{lean.text}</p>
                       <p className="text-xs text-gray-400 mt-1">SST {v.sst.toFixed(1)}°C</p>
-                      <p className="text-[10px] text-gray-500 mt-1.5 leading-snug">{r.area}</p>
                     </div>
                   );
                 })}
