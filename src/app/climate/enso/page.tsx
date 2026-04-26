@@ -35,6 +35,7 @@ import {
   Wind,
 } from 'lucide-react';
 import { REGION_IMPACTS, PAST_EVENTS, type ImpactPhase } from '@/lib/climate/enso-impacts';
+import EnsoRegionMap from './EnsoRegionMap';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -260,17 +261,6 @@ export default function EnsoPage() {
         // Anomaly → text-class for headline numbers
         const anomColor = (a: number) =>
           a >= 0.5 ? 'text-rose-300' : a <= -0.5 ? 'text-sky-300' : 'text-gray-200';
-        // Anomaly → fill colour for the region rectangles on the map.
-        // Saturation scales with |anomaly| so a +2°C event reads vividly
-        // and ±0.1°C reads as near-neutral.
-        const fillFor = (a: number) => {
-          const mag = Math.min(1, Math.abs(a) / 2.5); // saturate at 2.5°C
-          const alpha = 0.18 + 0.55 * mag;
-          if (a >= 0) return `rgba(244, 63, 94, ${alpha.toFixed(2)})`; // rose-500
-          return `rgba(14, 165, 233, ${alpha.toFixed(2)})`;            // sky-500
-        };
-        const strokeFor = (a: number) =>
-          a >= 0.5 ? '#fb7185' : a <= -0.5 ? '#38bdf8' : '#94a3b8';
 
         const regions = weekly
           ? ([
@@ -348,121 +338,20 @@ export default function EnsoPage() {
               </div>
             </div>
 
-            {/* Stylised map of the four Niño regions */}
+            {/* Live Leaflet map of the four Niño regions over the equatorial Pacific */}
             {weekly && (
               <div className="mt-5 rounded-xl border border-gray-700/50 bg-gray-800/30 p-3">
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">
                   Where the data comes from — equatorial Pacific
                 </p>
-                <div className="w-full">
-                  <svg
-                    viewBox="0 0 1000 320"
-                    className="w-full h-auto"
-                    preserveAspectRatio="xMidYMid meet"
-                    role="img"
-                    aria-label="Map of the four NOAA Niño regions across the equatorial Pacific"
-                  >
-                    {/* Ocean background */}
-                    <rect x="0" y="0" width="1000" height="320" fill="#0b1220" />
-                    {/* Subtle latitude / longitude grid */}
-                    {[60, 120, 180, 240].map((y) => (
-                      <line key={y} x1="0" x2="1000" y1={y} y2={y} stroke="#1e293b" strokeWidth="1" />
-                    ))}
-                    {[200, 400, 600, 800].map((x) => (
-                      <line key={x} x1={x} x2={x} y1="0" y2="320" stroke="#1e293b" strokeWidth="1" />
-                    ))}
-                    {/* Equator */}
-                    <line x1="0" x2="1000" y1="150" y2="150" stroke="#475569" strokeWidth="1" strokeDasharray="6 6" />
-                    <text x="6" y="146" fontSize="11" fill="#64748b" fontFamily="ui-monospace, monospace">
-                      Equator
-                    </text>
-                    {/* Date line */}
-                    <line x1="353" x2="353" y1="0" y2="320" stroke="#334155" strokeWidth="1" strokeDasharray="3 5" />
-                    <text x="358" y="14" fontSize="10" fill="#64748b" fontFamily="ui-monospace, monospace">
-                      180°
-                    </text>
-                    {/* Simplified land masses */}
-                    {/* Asia / Indonesia / Papua (top-left + bottom-left) */}
-                    <path
-                      d="M 0 0 L 220 0 L 210 40 L 175 70 L 130 90 L 70 110 L 0 130 Z"
-                      fill="#1f2937"
-                      opacity="0.85"
-                    />
-                    <path
-                      d="M 0 250 L 90 240 L 170 245 L 230 270 L 240 320 L 0 320 Z"
-                      fill="#1f2937"
-                      opacity="0.85"
-                    />
-                    {/* Americas (right edge) */}
-                    <path
-                      d="M 1000 0 L 940 30 L 920 80 L 905 140 L 900 175 L 920 220 L 945 270 L 970 320 L 1000 320 Z"
-                      fill="#1f2937"
-                      opacity="0.9"
-                    />
-                    {/* Region rectangles (drawn back-to-front so 3.4 sits on
-                        top of 3 — they overlap by definition) */}
-                    {(() => {
-                      const order = ['nino4', 'nino3', 'nino34', 'nino12'] as const;
-                      return order.map((k) => {
-                        const r = regions.find((x) => x.key === k)!;
-                        const v = (weekly.latest as any)[k] as { anom: number };
-                        return (
-                          <g key={k}>
-                            <rect
-                              x={r.box.x}
-                              y={r.box.y}
-                              width={r.box.w}
-                              height={r.box.h}
-                              fill={fillFor(v.anom)}
-                              stroke={strokeFor(v.anom)}
-                              strokeWidth="2"
-                              rx="3"
-                            />
-                          </g>
-                        );
-                      });
-                    })()}
-                    {/* Region labels with anomaly */}
-                    {regions.map((r) => {
-                      const v = (weekly.latest as any)[r.key] as { anom: number };
-                      return (
-                        <g key={`lbl-${r.key}`}>
-                          <text
-                            x={r.labelAt.x}
-                            y={r.labelAt.y}
-                            fontSize="13"
-                            fontWeight="700"
-                            fill="#e5e7eb"
-                            textAnchor="middle"
-                            fontFamily="ui-monospace, monospace"
-                            style={{ paintOrder: 'stroke', stroke: '#0b1220', strokeWidth: 3 }}
-                          >
-                            {r.label}
-                          </text>
-                          <text
-                            x={r.labelAt.x}
-                            y={r.labelAt.y + 14}
-                            fontSize="12"
-                            fontWeight="600"
-                            fill={v.anom >= 0.5 ? '#fb7185' : v.anom <= -0.5 ? '#38bdf8' : '#cbd5e1'}
-                            textAnchor="middle"
-                            fontFamily="ui-monospace, monospace"
-                            style={{ paintOrder: 'stroke', stroke: '#0b1220', strokeWidth: 3 }}
-                          >
-                            {fmtSigned(v.anom)}°C
-                          </text>
-                        </g>
-                      );
-                    })}
-                    {/* Edge labels for orientation */}
-                    <text x="10" y="312" fontSize="10" fill="#64748b" fontFamily="ui-monospace, monospace">
-                      Asia / Australia
-                    </text>
-                    <text x="990" y="312" fontSize="10" fill="#64748b" fontFamily="ui-monospace, monospace" textAnchor="end">
-                      Americas
-                    </text>
-                  </svg>
-                </div>
+                <EnsoRegionMap
+                  anoms={{
+                    nino12: weekly.latest.nino12.anom,
+                    nino3: weekly.latest.nino3.anom,
+                    nino34: weekly.latest.nino34.anom,
+                    nino4: weekly.latest.nino4.anom,
+                  }}
+                />
                 <p className="text-[11px] text-gray-500 mt-2 leading-snug">
                   Box colour shows this week&rsquo;s SST anomaly:
                   {' '}<span className="text-rose-300">warmer than average</span>{' '}
@@ -542,10 +431,16 @@ export default function EnsoPage() {
           return (a + b) / 2;
         };
 
-        // Detect past ENSO events: contiguous runs in oni.history where anomaly
-        // stays on the same side of ±0.5°C (≥+0.5 = El Niño, ≤−0.5 = La Niña).
-        // We render each event as a horizontal band spanning its full duration
-        // at its peak intensity.
+        // Detect past ENSO events using the NOAA-official rule: an event is
+        // declared only when the ONI stays at or beyond ±0.5°C for at least
+        // 5 consecutive overlapping 3-month seasons. Brief one- or two-season
+        // excursions (e.g. early-2020 weak warmth, isolated late-2025 wobbles)
+        // do NOT qualify as El Niño/La Niña events and should not be labelled
+        // — they're noise relative to the year-to-year ENSO cycle.
+        const MIN_CONSECUTIVE_SEASONS = 5;
+        // We also require the event peak to clearly exceed the threshold, so
+        // a string of marginal +0.5/+0.6 readings doesn't get flagged.
+        const MIN_PEAK_MAGNITUDE = 0.5;
         const histInWindow = oni.history.filter((p) => p.year >= minYear && p.year < currentYear);
         type EnsoEvent = {
           phase: 'el-nino' | 'la-nina';
@@ -560,7 +455,11 @@ export default function EnsoPage() {
         let cur: { phase: 'el-nino' | 'la-nina'; rows: typeof histInWindow } | null = null;
         const flush = () => {
           if (!cur || cur.rows.length === 0) return;
+          // Skip runs that don't meet NOAA's 5-season duration rule.
+          if (cur.rows.length < MIN_CONSECUTIVE_SEASONS) { cur = null; return; }
           const peakRow = cur.rows.reduce((a, b) => (Math.abs(b.anom) > Math.abs(a.anom) ? b : a));
+          // Belt-and-braces: also require a clear peak.
+          if (Math.abs(peakRow.anom) < MIN_PEAK_MAGNITUDE) { cur = null; return; }
           const first = cur.rows[0];
           const last = cur.rows[cur.rows.length - 1];
           const [s] = seasonWindow(first.season, first.year);
