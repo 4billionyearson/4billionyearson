@@ -267,6 +267,15 @@ export default function EnsoPage() {
         // Anomaly → text-class for headline numbers
         const anomColor = (a: number) =>
           a >= 0.5 ? 'text-rose-300' : a <= -0.5 ? 'text-sky-300' : 'text-gray-200';
+        // Short tag explaining what the anomaly colour means, so a hot
+        // sub-region (e.g. Niño 1+2 = +1.8°C) isn't misread as "El Niño
+        // event in progress" when the headline ENSO state is Neutral.
+        const leaningLabel = (a: number) =>
+          a >= 0.5
+            ? { text: 'El Niño-leaning', cls: 'text-rose-300' }
+            : a <= -0.5
+              ? { text: 'La Niña-leaning', cls: 'text-sky-300' }
+              : { text: 'near baseline', cls: 'text-gray-300' };
 
         const regions = weekly
           ? ([
