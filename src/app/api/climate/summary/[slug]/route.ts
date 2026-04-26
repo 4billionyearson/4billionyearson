@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { getRegionBySlug, type ClimateRegion } from '@/lib/climate/regions';
 import { buildDriverVocabularySection } from '@/lib/climate/warming-drivers';
+import { getEnsoImpactsForSlug, type RegionImpact, type ImpactPhase } from '@/lib/climate/enso-impacts';
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -509,9 +510,75 @@ function buildRankingsInsights(rankings: any, focusSlug?: string): string {
   return lines.join('\n');
 }
 
+// ─── ENSO snapshot section ─────────────────────────────────────────────────
+
+/**
+ * Compact ENSO state + forecast block for the prompt. Pulled from
+ * /api/climate/enso (built monthly by build-enso-snapshot.mjs and
+ * powering the /climate/enso tracker page). Region-specific
+ * teleconnection text is added when we have a slug → impact mapping.
+ */
+function buildEnsoSection(ensoData: any, region?: ClimateRegion): string {
+  if (!ensoData?.oni) return '';
+  const lines: string[] = [];
+  lines.push('\n═══ ENSO (EL NIÑO / LA NIÑA) - LIVE STATE & FORECAST ═══');
+  lines.push('Site tracker: /climate/enso  - link to this page whenever you mention the current ENSO state, forecast, or its impacts (write the bare path, the site auto-linkifies it).');
+  lines.push('Use the values below as the AUTHORITATIVE current ENSO state. Do NOT override them from web search; web search may be used to add CONSEQUENCES (drought, floods, marine heatwaves) actually attributed to this ENSO phase in recent reporting.');
+  lines.push('');
+
+  const oni = ensoData.oni;
+  const stateLabel = `${oni.state}${oni.strength ? ` (${oni.strength})` : ''}`;
+  lines.push(`CURRENT STATE (NOAA ONI 3-month, ${oni.season} ${oni.seasonYear}): ${stateLabel}, anomaly ${oni.anomaly > 0 ? '+' : ''}${oni.anomaly}°C vs 1991–2020`);
+
+  const wk = ensoData.weekly?.latest;
+  if (wk?.nino34) {
+    const a = wk.nino34.anom;
+    lines.push(`Weekly Niño 3.4 SST anomaly (${wk.date}): ${a > 0 ? '+' : ''}${a}°C${wk.nino4 ? ` · Niño 4 ${wk.nino4.anom > 0 ? '+' : ''}${wk.nino4.anom}°C` : ''}${wk.nino3 ? ` · Niño 3 ${wk.nino3.anom > 0 ? '+' : ''}${wk.nino3.anom}°C` : ''}`);
+  }
+
+  const meiLast = Array.isArray(ensoData.mei) ? ensoData.mei[ensoData.mei.length - 1] : null;
+  const soiLast = Array.isArray(ensoData.soi) ? ensoData.soi[ensoData.soi.length - 1] : null;
+  if (meiLast?.value != null) lines.push(`MEI v2 (${meiLast.label || meiLast.season || ''}): ${meiLast.value > 0 ? '+' : ''}${meiLast.value}`);
+  if (soiLast?.value != null) lines.push(`SOI (${soiLast.label || soiLast.month || ''}): ${soiLast.value > 0 ? '+' : ''}${soiLast.value}`);
+
+  const seasons = ensoData.forecast?.seasons;
+  if (Array.isArray(seasons) && seasons.length) {
+    lines.push('');
+    lines.push('NOAA CPC PROBABILITY FORECAST (next seasons):');
+    for (const s of seasons.slice(0, 5)) {
+      const dom = Math.max(s.pLaNina ?? 0, s.pNeutral ?? 0, s.pElNino ?? 0);
+      const domLabel = dom === (s.pLaNina ?? 0) ? 'La Niña' : dom === (s.pElNino ?? 0) ? 'El Niño' : 'Neutral';
+      lines.push(`  ${s.label || s.season}: La Niña ${s.pLaNina ?? 0}% · Neutral ${s.pNeutral ?? 0}% · El Niño ${s.pElNino ?? 0}%  (most likely: ${domLabel} ${dom}%)`);
+    }
+  }
+
+  // Region-specific teleconnection patterns
+  if (region) {
+    const impacts = getEnsoImpactsForSlug(region.slug);
+    if (impacts.length) {
+      lines.push('');
+      lines.push(`TYPICAL ENSO TELECONNECTIONS FOR ${region.name.toUpperCase()} (Met Office GPC / NOAA composites):`);
+      const phasesToShow: ImpactPhase[] = ['el-nino', 'la-nina'];
+      for (const r of impacts) {
+        for (const phase of phasesToShow) {
+          const imp = r.impacts[phase];
+          if (!imp) continue;
+          const phaseLabel = phase === 'el-nino' ? 'El Niño' : 'La Niña';
+          const tempBit = imp.temp ? `${imp.temp}` : 'no clear temp signal';
+          const precipBit = imp.precip ? `${imp.precip}` : 'no clear precip signal';
+          lines.push(`  ${r.region} - ${phaseLabel} (${imp.season}, ~${Math.round(imp.prob * 100)}% historical): ${tempBit}, ${precipBit}. ${imp.notes}`);
+        }
+      }
+      lines.push('Use the entry that matches the CURRENT or imminently FORECAST phase above (or note that the current Neutral state means muted ENSO influence).');
+    }
+  }
+
+  return lines.join('\n');
+}
+
 // ─── Prompt builder ─────────────────────────────────────────────────────────
 
-function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any, gdacsEvents: any[], rankings: any): string {
+function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any, gdacsEvents: any[], rankings: any, ensoData: any): string {
   const lines: string[] = [];
 
   lines.push(`You are a climate journalist writing a compelling monthly update for ${region.name}.`);
@@ -522,7 +589,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('STRUCTURE - organise the update using these short sub-headings, each on its own line prefixed with "## " exactly (two hashes and a space). Omit a section if you have nothing specific to say about it.');
   lines.push('  ## This month in numbers   - lead with the latest-month anomaly, ranking, and the 1 or 2 most newsworthy RANKED HIGHLIGHTS.');
   lines.push('  ## What changed          - 3-month/seasonal trend, how this region compares to the national/global picture, and (if relevant) its CROSS-REGION rank or cluster.');
-  lines.push('  ## What’s driving change? - explain WHY this region is warming/cooling the way it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below (using the exact canonical term - e.g. "Arctic amplification", "urban heat island effect", "jet stream shifts"). Also weave in ENSO/NAO state and any active GDACS or recent notable weather events.');
+  lines.push('  ## What’s driving change? - explain WHY this region is warming/cooling the way it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below (using the exact canonical term - e.g. "Arctic amplification", "urban heat island effect", "jet stream shifts"). Also weave in the CURRENT ENSO state from the ENSO LIVE STATE section below (with the /climate/enso link), the NAO state, and any active GDACS or recent notable weather events.');
   lines.push('  ## Looking ahead         - ONE carefully hedged forward-looking sentence (e.g. what forecasters or outlooks suggest). Only include if there is a concrete source to cite; otherwise omit.');
   lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
   lines.push('');
@@ -531,8 +598,9 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('2. LATEST MONTH (Priority 2): After the seasonal ranking lead, discuss the most recent single month. What ranked highest/lowest?');
   lines.push('3. ANNUAL / LONG-TERM (Priority 3): Put it all in context - previous full year, warming trend.');
   lines.push('4. EXTREME WEATHER (MANDATORY when present): If the ACTIVE EXTREME WEATHER EVENTS section below lists any clusters (≥3 of the same type, or ≥40% of the 12-month total), you MUST mention them in the "What’s driving change?" or a dedicated sentence - with the count, type and rough date window. Use Google Search to say whether this is unusually high for the region and season. Include our live tracker link by writing the bare path /extreme-weather in the text; the site turns it into a link.');
-  lines.push('5. CLIMATE DRIVERS: If El Niño, La Niña, NAO etc. are relevant, briefly mention them.');
-  lines.push('6. CROSS-REGION RANKINGS: If this region is in the top 20 (or bottom 10) of any window in the CROSS-REGION RANKINGS section, mention the rank. If the top 10 shows a striking geographic concentration (e.g. mostly US states), that pattern is worth a single sentence of context.');
+  lines.push('5. ENSO (MANDATORY when phase is active or strongly forecast): Use the ENSO LIVE STATE section below as the authoritative current state - do NOT invent it from web search. If the current state is El Niño or La Niña, OR if a transition is dominant in the forecast, mention it briefly with the strength and the typical teleconnection for this region (drier/wetter, warmer/cooler) drawn from the structured data provided. Include our live tracker by writing the bare path /climate/enso in the text; the site turns it into a link. If the state is Neutral, you may still note it in one short clause to set context.');
+  lines.push('6. OTHER CLIMATE DRIVERS: If NAO, IOD, AO, MJO etc. are relevant, briefly mention them too.');
+  lines.push('7. CROSS-REGION RANKINGS: If this region is in the top 20 (or bottom 10) of any window in the CROSS-REGION RANKINGS section, mention the rank. If the top 10 shows a striking geographic concentration (e.g. mostly US states), that pattern is worth a single sentence of context.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
   lines.push('- RANKINGS ARE THE STORY: The ranked data IS the narrative. "The 3rd sunniest January–March on record" or "the 4th fewest frost days in over a century of records" - these are the headlines. If a metric ranks in the top/bottom 10, it MUST be mentioned.');
@@ -609,6 +677,12 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
     lines.push(buildGDACSSection(gdacsEvents, gdacsEvents, region));
   }
 
+  // ENSO live state, forecast and regional teleconnections
+  const ensoSection = buildEnsoSection(ensoData, region);
+  if (ensoSection) {
+    lines.push(ensoSection);
+  }
+
   // Cross-region rankings
   const rankingsSection = buildRankingsInsights(rankings, region.slug);
   if (rankingsSection) {
@@ -620,9 +694,9 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push(`═══ WEB SEARCH INSTRUCTION ═══`);
   lines.push(`Use Google Search to find recent weather news and climate events for ${region.name} in the last 1–3 months.`);
   lines.push(`Look for: major storms, floods, heatwaves, droughts, wildfires, or other extreme weather events.`);
-  lines.push(`Also check: Is El Niño or La Niña currently active? Is the ENSO state affecting ${region.name}?`);
+  lines.push(`The ENSO state is already provided above (NOAA CPC) - use Google Search only to find recent CONSEQUENCES attributed to that phase (e.g. ENSO-driven drought, floods, marine heatwaves), not to redefine the state itself.`);
   lines.push(`Source quality: PREFER national meteorological services (Met Office, NOAA, Meteo France, DWD, JMA, BoM), Copernicus C3S, WMO, peer-reviewed journals, and established newspapers (BBC, Reuters, AP, Guardian, NYT, FT). AVOID aggregator sites, blogs, or paywalled sources that add no primary information.`);
-  lines.push(`Verify dates: only cite events and ENSO states active during or close to ${region.name}'s latest data month. Do NOT carry over a previous month's ENSO state without checking.`);
+  lines.push(`Verify dates: only cite events active during or close to ${region.name}'s latest data month.`);
   lines.push(`Summarise any relevant findings in your own words and weave them into the update narrative.`);
 
   return lines.join('\n');
@@ -708,7 +782,7 @@ async function callGemini(
 
 // ─── Global prompt builder ─────────────────────────────────────────────────
 
-function buildGlobalPrompt(globalData: any, rankings: any): string {
+function buildGlobalPrompt(globalData: any, rankings: any, ensoData: any): string {
   const lines: string[] = [];
 
   lines.push('You are a climate journalist writing the monthly Global Climate Update for a general audience.');
@@ -720,14 +794,15 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
   lines.push('  ## This month in numbers  - lead with the latest-month NOAA land+ocean anomaly, its ranking, and the 10-year mean vs pre-industrial (Paris thresholds).');
   lines.push('  ## Land vs ocean          - contrast land-only and ocean-only figures; note that land is warming faster.');
   lines.push('  ## Cross-region picture   - one striking pattern from the CROSS-REGION RANKINGS section (e.g. "8 of the 10 hottest were US states") with 2–3 named regions.');
-  lines.push('  ## What’s driving change? - ENSO state, major climate events, key announcements from Copernicus / WMO / NOAA / IPCC / COP, and WHY the planet-scale trend is what it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "land-ocean warming contrast", "Arctic amplification", "aerosol reduction").');
+  lines.push('  ## What’s driving change? - the CURRENT ENSO state from the ENSO LIVE STATE section below (with the /climate/enso link when you mention it), major climate events, key announcements from Copernicus / WMO / NOAA / IPCC / COP, and WHY the planet-scale trend is what it is. Name 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term (e.g. "land-ocean warming contrast", "Arctic amplification", "aerosol reduction").');
   lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
   lines.push('');
   lines.push('CONTENT PRIORITY:');
   lines.push('1. LEAD WITH THE LATEST MONTH - the most recent NOAA global LAND+OCEAN anomaly vs the 1961–1990 WMO baseline. State the figure, whether it was unusually warm or cool, and the all-time ranking. This is the headline number used by Copernicus, WMO and the world\'s climate press; use it rather than any land-only series.');
   lines.push('2. 10-YEAR ROLLING AVERAGE vs PRE-INDUSTRIAL - how close is the 10-year global land+ocean mean to the Paris 1.5°C and 2°C thresholds? This is the headline climate policy number (WMO/IPCC AR6 methodology).');
   lines.push('3. LAND vs OCEAN - briefly note that global land is warming faster than the ocean, ideally with a concrete figure from the separate NOAA land-only and ocean-only series below.');
-  lines.push('4. WEB-GROUNDED CONTEXT - if Google Search surfaces relevant current events (ENSO state, notable extreme weather month, major climate report release, COP outcomes), weave them in naturally. Verify ENSO state against the month being summarised.');
+  lines.push('4. ENSO STATE (MANDATORY): Use the ENSO LIVE STATE section below as the authoritative current state - do NOT invent it from web search. State the current phase, ONI value and the dominant probability for the next 1–2 seasons in one short sentence, and write the bare path /climate/enso so the site links to our tracker. If the phase is contributing to global temperature (El Niño boosting it; La Niña tempering it), say so plainly.');
+  lines.push('5. WEB-GROUNDED CONTEXT - if Google Search surfaces other relevant current events (notable extreme weather month, major climate report release, COP outcomes, major attribution studies), weave them in naturally.');
   lines.push('5. CROSS-REGION RANKINGS - the CROSS-REGION RANKINGS section below is a site-exclusive view across every country, US state and UK region we track. Call out the most striking pattern from it in ONE sentence (e.g. "Eight of the ten hottest 1-month anomalies this month were US states" or similar). Name 2–3 specific regions from the top 10 where they make the pattern vivid.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
@@ -835,12 +910,18 @@ function buildGlobalPrompt(globalData: any, rankings: any): string {
     }
   }
 
+  // ENSO live state and forecast (planetary scale)
+  const ensoSection = buildEnsoSection(ensoData);
+  if (ensoSection) {
+    lines.push(ensoSection);
+  }
+
   lines.push('');
   lines.push('═══ WEB SEARCH INSTRUCTION ═══');
   lines.push('Use Google Search to find relevant planetary-scale climate news from the last 1–3 months.');
-  lines.push('Look for: current ENSO state (El Niño / La Niña / neutral), notable global climate records, major heat or storm events with clear climate-change attribution, key IPCC / WMO / Copernicus / NOAA announcements, COP outcomes.');
+  lines.push('The ENSO state is already provided above (NOAA CPC) - use Google Search to find ENSO-related CONSEQUENCES (record temperatures, marine heatwaves, droughts, floods) attributed to the current phase, not to redefine the state itself.');
+  lines.push('Look for: notable global climate records, major heat or storm events with clear climate-change attribution, key IPCC / WMO / Copernicus / NOAA announcements, COP outcomes.');
   lines.push('Source quality: PREFER Copernicus C3S monthly bulletins, NOAA Monthly Climate Reports, WMO press releases, NASA GISS updates, Met Office press releases, peer-reviewed journals, and established newspapers (BBC, Reuters, AP, Guardian, NYT, FT). AVOID aggregator sites, blogs, or paywalled sources that add no primary information.');
-  lines.push('Verify the ENSO state against the month being summarised - do NOT carry over a previous month’s state without checking.');
   lines.push('Summarise any relevant findings in your own words and weave them into the update narrative.');
 
   // Cross-region rankings
@@ -877,7 +958,7 @@ export async function GET(
         prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v26`;
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v27`;
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {
@@ -903,15 +984,16 @@ export async function GET(
 
   // ─── Special branch: global planet-level summary ───────────────────────
   if (region.type === 'special' && slug === 'global') {
-    const [globalData, rankings] = await Promise.all([
+    const [globalData, rankings, ensoData] = await Promise.all([
       fetchJSON(`${base}/api/climate/global`),
       fetchJSON(`${base}/data/climate/rankings.json`),
+      fetchJSON(`${base}/api/climate/enso`),
     ]);
     if (!globalData) {
       return NextResponse.json({ error: 'No global data available' }, { status: 503 });
     }
 
-    const prompt = buildGlobalPrompt(globalData, rankings);
+    const prompt = buildGlobalPrompt(globalData, rankings, ensoData);
 
     try {
       let result = await callGemini(apiKey, prompt, true);
@@ -952,11 +1034,12 @@ export async function GET(
   }
 
   // ─── Regional summaries (existing path) ────────────────────────────────
-  // Fetch full profile data, GDACS events and cross-region rankings in parallel
-  const [profileData, extremeWeatherData, rankings] = await Promise.all([
+  // Fetch full profile data, GDACS events, cross-region rankings and ENSO snapshot in parallel
+  const [profileData, extremeWeatherData, rankings, ensoData] = await Promise.all([
     fetchJSON(`${base}/api/climate/profile/${slug}`),
     fetchJSON(`${base}/api/climate/extreme-weather`),
     fetchJSON(`${base}/data/climate/rankings.json`),
+    fetchJSON(`${base}/api/climate/enso`),
   ]);
 
   if (!profileData) {
@@ -976,7 +1059,7 @@ export async function GET(
     ? filterGDACSEvents(extremeWeatherData.gdacsEvents, region)
     : [];
 
-  const prompt = buildPrompt(region, profileData, nationalData, gdacsEvents, rankings);
+  const prompt = buildPrompt(region, profileData, nationalData, gdacsEvents, rankings, ensoData);
 
   try {
     // Try with Google Search grounding first, fall back to without

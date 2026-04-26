@@ -184,6 +184,7 @@ function highlightRankings(text: string): string {
     if (p === '/climate-dashboard') return 'Climate dashboard';
     if (p === '/climate/rankings') return 'climate rankings';
     if (p === '/climate/global') return 'Global climate page';
+    if (p === '/climate/enso') return 'ENSO tracker';
     if (p === '/climate/shifting-seasons') return 'Shifting Seasons';
     if (p.startsWith('/climate/')) return 'climate page';
     return path;

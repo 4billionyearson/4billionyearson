@@ -276,6 +276,165 @@ export const REGION_IMPACTS: RegionImpact[] = [
   },
 ];
 
+/* ─── Region slug → impact ids mapping ───────────────────────────── */
+
+/**
+ * Maps a site climate-region slug (country, US state, UK region or
+ * locationIdToSlug stub) to one or more REGION_IMPACTS ids whose
+ * teleconnection patterns apply. Used by the Gemini summary prompt
+ * builder so each regional update can reference its own ENSO impact
+ * profile rather than generic global text. Add entries here as new
+ * regions are curated.
+ */
+const SLUG_TO_IMPACT_IDS: Record<string, string[]> = {
+  // ─── Countries ───
+  india: ['india'],
+  pakistan: ['india'],
+  bangladesh: ['india'],
+  'sri-lanka': ['india'],
+  nepal: ['india'],
+  china: ['east-asia'],
+  japan: ['east-asia'],
+  'south-korea': ['east-asia'],
+  korea: ['east-asia'],
+  indonesia: ['sea-maritime'],
+  malaysia: ['sea-maritime'],
+  philippines: ['sea-maritime'],
+  'papua-new-guinea': ['sea-maritime'],
+  thailand: ['sea-maritime'],
+  vietnam: ['sea-maritime'],
+  australia: ['e-australia', 'n-australia'],
+  'new-zealand': ['sw-pacific'],
+  fiji: ['sw-pacific'],
+  vanuatu: ['sw-pacific'],
+  samoa: ['sw-pacific'],
+  kiribati: ['tropical-pacific-is'],
+  tuvalu: ['tropical-pacific-is'],
+  tokelau: ['tropical-pacific-is'],
+  // Africa
+  kenya: ['east-africa'],
+  ethiopia: ['east-africa'],
+  somalia: ['east-africa'],
+  uganda: ['east-africa'],
+  tanzania: ['east-africa'],
+  'south-sudan': ['east-africa'],
+  'south-africa': ['southern-africa'],
+  zimbabwe: ['southern-africa'],
+  mozambique: ['southern-africa'],
+  botswana: ['southern-africa'],
+  namibia: ['southern-africa'],
+  zambia: ['southern-africa'],
+  malawi: ['southern-africa'],
+  senegal: ['sahel'],
+  mali: ['sahel'],
+  niger: ['sahel'],
+  chad: ['sahel'],
+  'burkina-faso': ['sahel'],
+  sudan: ['sahel'],
+  mauritania: ['sahel'],
+  // Americas
+  usa: ['sw-us', 'nw-us-canada', 'se-us', 'ne-us-canada'],
+  canada: ['nw-us-canada', 'ne-us-canada'],
+  mexico: ['central-america'],
+  guatemala: ['central-america'],
+  honduras: ['central-america'],
+  nicaragua: ['central-america'],
+  'el-salvador': ['central-america'],
+  'costa-rica': ['central-america'],
+  panama: ['central-america'],
+  cuba: ['caribbean'],
+  jamaica: ['caribbean'],
+  haiti: ['caribbean'],
+  'dominican-republic': ['caribbean'],
+  'puerto-rico': ['caribbean'],
+  'trinidad-and-tobago': ['caribbean'],
+  brazil: ['ne-brazil', 's-brazil-arg', 'amazonia'],
+  argentina: ['s-brazil-arg'],
+  uruguay: ['s-brazil-arg'],
+  paraguay: ['s-brazil-arg'],
+  peru: ['peru-ecuador'],
+  ecuador: ['peru-ecuador'],
+  bolivia: ['amazonia'],
+  colombia: ['amazonia'],
+  venezuela: ['amazonia'],
+  // Europe
+  uk: ['n-europe'],
+  ireland: ['n-europe'],
+  norway: ['n-europe'],
+  sweden: ['n-europe'],
+  finland: ['n-europe'],
+  denmark: ['n-europe'],
+  iceland: ['n-europe'],
+  germany: ['n-europe'],
+  netherlands: ['n-europe'],
+  belgium: ['n-europe'],
+  france: ['n-europe', 's-europe'],
+  spain: ['s-europe'],
+  portugal: ['s-europe'],
+  italy: ['s-europe'],
+  greece: ['s-europe'],
+  croatia: ['s-europe'],
+  morocco: ['s-europe'],
+  algeria: ['s-europe'],
+  tunisia: ['s-europe'],
+  egypt: ['s-europe'],
+  // ─── US states ───
+  california: ['sw-us'],
+  arizona: ['sw-us'],
+  'new-mexico': ['sw-us'],
+  nevada: ['sw-us'],
+  utah: ['sw-us'],
+  washington: ['nw-us-canada'],
+  oregon: ['nw-us-canada'],
+  idaho: ['nw-us-canada'],
+  montana: ['nw-us-canada'],
+  florida: ['se-us'],
+  texas: ['se-us', 'sw-us'],
+  louisiana: ['se-us'],
+  alabama: ['se-us'],
+  mississippi: ['se-us'],
+  georgia: ['se-us'],
+  'south-carolina': ['se-us'],
+  'north-carolina': ['se-us'],
+  tennessee: ['se-us'],
+  arkansas: ['se-us'],
+  'new-york': ['ne-us-canada'],
+  pennsylvania: ['ne-us-canada'],
+  massachusetts: ['ne-us-canada'],
+  connecticut: ['ne-us-canada'],
+  'rhode-island': ['ne-us-canada'],
+  vermont: ['ne-us-canada'],
+  'new-hampshire': ['ne-us-canada'],
+  maine: ['ne-us-canada'],
+  'new-jersey': ['ne-us-canada'],
+  // ─── UK regions ───
+  england: ['n-europe'],
+  wales: ['n-europe'],
+  scotland: ['n-europe'],
+  'northern-ireland': ['n-europe'],
+  'england-and-wales': ['n-europe'],
+  'england-north': ['n-europe'],
+  'england-south': ['n-europe'],
+  'scotland-east': ['n-europe'],
+  'scotland-north': ['n-europe'],
+  'scotland-west': ['n-europe'],
+  'england-east-and-north-east': ['n-europe'],
+  'england-nw-and-north-wales': ['n-europe'],
+  midlands: ['n-europe'],
+  'east-anglia': ['n-europe'],
+  'england-sw-and-south-wales': ['n-europe'],
+  'england-se-central-south': ['n-europe'],
+};
+
+/** Look up REGION_IMPACTS entries that apply to a site region slug. */
+export function getEnsoImpactsForSlug(slug: string): RegionImpact[] {
+  const ids = SLUG_TO_IMPACT_IDS[slug];
+  if (!ids?.length) return [];
+  return ids
+    .map((id) => REGION_IMPACTS.find((r) => r.id === id))
+    .filter((r): r is RegionImpact => Boolean(r));
+}
+
 /* ─── Past major events ───────────────────────────────────────────── */
 
 export interface PastEvent {
