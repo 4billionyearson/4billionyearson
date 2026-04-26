@@ -394,10 +394,10 @@ export default function EnsoPage() {
           <SectionCard
             icon={<Activity className="text-sky-300" />}
             title={`Current State - ${oni.state}${oni.strength ? `, ${oni.strength}` : ''}${forecastVerdict.label ? ` · ${forecastVerdict.label}` : ''}`}
-            subtitle="The four NOAA Niño regions sample different stretches of the equatorial Pacific. Niño 3.4 (central Pacific) is the official ENSO yardstick - it drives the headline number. The other three regions add texture: Niño 1+2 off Peru leads coastal signals, Niño 4 captures the western warm-pool dynamics."
+            subtitle="Niño 3.4 (central Pacific) is the official ENSO yardstick. Niño 1+2 leads coastal signals off Peru; Niño 4 captures the western warm pool."
           >
-            {/* Headline: ONI · Niño 3.4 weekly · Thresholds */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* Headline: ONI · Niño 3.4 weekly */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">ONI · 3-month mean</p>
                 <p className={`text-2xl font-bold font-mono ${ENSO_TEXT[oni.state]}`}>{oni.state}</p>
@@ -414,20 +414,10 @@ export default function EnsoPage() {
                     <span className="text-sm text-gray-400">°C</span>
                   </div>
                   <p className="text-sm text-gray-400 mt-1">
-                    SST {weekly.latest.nino34.sst.toFixed(1)}°C · week of {weekly.lastWeek}
+                    {(() => { const [y, m, d] = weekly.lastWeek.split('-'); return `SST ${weekly.latest.nino34.sst.toFixed(1)}°C · w/e ${d}-${m}-${y.slice(2)}`; })()}
                   </p>
                 </div>
               )}
-              <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Thresholds</p>
-                <p className="text-sm text-gray-200 font-mono">
-                  <span className="text-rose-400">≥ +0.5°C</span> El Niño
-                </p>
-                <p className="text-sm text-gray-200 font-mono">
-                  <span className="text-sky-400">≤ −0.5°C</span> La Niña
-                </p>
-                <p className="text-sm text-gray-200 font-mono">otherwise Neutral</p>
-              </div>
             </div>
 
             {/* Live Leaflet map of the four Niño regions over the equatorial Pacific */}
@@ -475,11 +465,9 @@ export default function EnsoPage() {
             )}
 
             <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-              El Niño years tend to push global temperature higher (El Niño 2023-24 helped make
-              2024 the hottest year on record). La Niña years temporarily damp the long-term
-              warming trend - but the underlying greenhouse-gas-driven trend continues either way.
-              The four-region snapshot above shows how those signals are forming right now across
-              the Pacific basin - and feed into the forecast curve below.
+              El Niño years push global temperatures higher; La Niña years temporarily damp them — though the underlying greenhouse-gas trend continues either way.
+              Thresholds: <span className="text-rose-400 font-mono">≥ +0.5°C</span> El Niño ·{' '}
+              <span className="text-sky-400 font-mono">≤ −0.5°C</span> La Niña · otherwise Neutral.
             </p>
           </SectionCard>
         );
@@ -1239,7 +1227,7 @@ export default function EnsoPage() {
           >
             <div className="h-[340px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart margin={{ top: 10, right: 64, left: 0, bottom: 0 }}>
+                <ComposedChart margin={{ top: 10, right: 28, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis
                     dataKey="t"
