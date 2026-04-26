@@ -260,6 +260,7 @@ export default function ClimateExplainedPage() {
                 { href: "/greenhouse-gases", label: "Greenhouse Gases", color: "text-amber-400", desc: "CO₂, methane & N₂O concentrations" },
                 { href: "/sea-levels-ice", label: "Sea Levels & Ice", color: "text-teal-400", desc: "Sea level rise, Arctic ice extent" },
                 { href: "/extreme-weather", label: "Extreme Weather", color: "text-orange-400", desc: "Disasters, storms & heatwaves" },
+                { href: "/climate/enso", label: "El Niño / La Niña", color: "text-sky-400", desc: "Live ENSO state, Niño 3.4 & forecast" },
                 { href: "/emissions", label: "CO₂ Emissions", color: "text-rose-400", desc: "Country rankings & global trends" },
               ].map(({ href, label, color, desc }) => (
                 <a

@@ -13,7 +13,7 @@ const HUB_URL = 'https://4billionyearson.org/climate';
 
 export const metadata: Metadata = {
   title: `Climate Data Hub – ${REGION_COUNT} Countries, US States & UK Regions | 4 Billion Years On`,
-  description: `Monthly climate updates for ${REGION_COUNT} regions worldwide: temperature anomalies, rainfall, spring/autumn timing shifts, CO₂ emissions and electricity mix. Plus the Global Climate Tracker (Paris 1.5°C / 2°C progress), country rankings, and the Shifting Seasons analysis. Data from NOAA, Met Office, OWID, CRU TS and the World Bank, all vs the 1961–1990 baseline.`,
+  description: `Monthly climate updates for ${REGION_COUNT} regions worldwide: temperature anomalies, rainfall, spring/autumn timing shifts, CO₂ emissions and electricity mix. Plus the Global Climate Tracker (Paris 1.5°C / 2°C progress), country rankings, the Shifting Seasons analysis and the live El Niño / La Niña (ENSO) tracker. Data from NOAA, Met Office, OWID, CRU TS and the World Bank, all vs the 1961–1990 baseline.`,
   keywords: [
     'climate data by country',
     'US state climate data',
@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     'temperature anomaly by country',
     'Paris Agreement 1.5 tracker',
     'shifting seasons climate',
+    'El Niño tracker',
+    'La Niña tracker',
+    'ENSO state',
     'climate league table',
     'country emissions data',
     'electricity generation mix',
@@ -29,7 +32,7 @@ export const metadata: Metadata = {
   alternates: { canonical: HUB_URL },
   openGraph: {
     title: `Climate Data Hub – ${REGION_COUNT} Countries, US States & UK Regions`,
-    description: `Monthly climate updates for ${REGION_COUNT} regions: temperature, rainfall, seasonal shifts, emissions and electricity mix. With the Global Climate Tracker (Paris 1.5°C), Climate Rankings and Shifting Seasons analysis.`,
+    description: `Monthly climate updates for ${REGION_COUNT} regions: temperature, rainfall, seasonal shifts, emissions and electricity mix. With the Global Climate Tracker (Paris 1.5°C), Climate Rankings, Shifting Seasons and the live El Niño / La Niña (ENSO) tracker.`,
     type: 'website',
     url: HUB_URL,
   },
