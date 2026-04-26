@@ -1179,12 +1179,231 @@ export default function EnsoPage() {
         );
       })()}
 
-      {/* Removed (now redundant with the hero past+future chart and the
-          stylised four-region map above):
-            • Weekly Niño 3.4 5-year area chart
-            • ONI “last 30 seasons” bar chart
-            • Multivariate ENSO Index v2 line chart
-            • Southern Oscillation Index 5-year bars                       */}
+      {/* ═══ INDICATOR CROSS-CHECK ═══════════════════════════════ */}
+      {(weekly || mei || soi) && (() => {
+        // Build a single time-aligned dataset combining the three most-watched
+        // ENSO indicators so the reader can see — at a glance — whether the
+        // ocean (Niño 3.4 SST) and the atmosphere (MEI v2, SOI) are all
+        // pointing the same way as the hero forecast above. SOI is plotted
+        // inverted (−SOI) because its sign is reversed relative to ENSO:
+        // negative SOI = El Niño-favourable, so flipping it lets all three
+        // lines rise together when El Niño is building.
+
+        const FIVE_YEARS_MS = 5 * 365.25 * 24 * 3600 * 1000;
+        const nowMs = Date.now();
+        const startMs = nowMs - FIVE_YEARS_MS;
+
+        // Niño 3.4 weekly anomaly
+        const ninoSeries = (weekly?.weekly ?? [])
+          .map((w) => ({ t: Date.parse(w.date), v: w.nino34.anom }))
+          .filter((p) => Number.isFinite(p.t) && p.t >= startMs);
+
+        // MEI v2 — seasonIndex 1..12 (DJ, JF, FM, …, ND); we map to the mid-
+        // month of the second month in the bi-monthly window.
+        const meiSeries = (mei?.history ?? [])
+          .map((m) => ({
+            t: Date.UTC(m.year, Math.max(0, Math.min(11, m.seasonIndex - 1)), 15),
+            v: m.value,
+            label: `${m.season} ${m.year}`,
+          }))
+          .filter((p) => p.t >= startMs);
+
+        // SOI monthly, plotted inverted so it lines up with Niño 3.4 / MEI.
+        const soiSeries = (soi?.history ?? [])
+          .map((s) => ({
+            t: Date.UTC(s.year, s.month - 1, 15),
+            v: -s.value,
+            raw: s.value,
+            label: `${MONTH_NAMES[s.month - 1]} ${s.year}`,
+          }))
+          .filter((p) => p.t >= startMs);
+
+        // X-axis ticks: one per year start over the last 5 years.
+        const startYear = new Date(startMs).getUTCFullYear();
+        const endYear = new Date(nowMs).getUTCFullYear();
+        const yearTicks: number[] = [];
+        for (let y = startYear; y <= endYear; y++) yearTicks.push(Date.UTC(y, 0, 1));
+
+        const fmtDate = (t: number) => {
+          const d = new Date(t);
+          return `${d.getUTCFullYear()}`;
+        };
+        const fmtFullDate = (t: number) => {
+          const d = new Date(t);
+          return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+        };
+
+        return (
+          <SectionCard
+            icon={<Activity className="h-5 w-5 text-amber-300" />}
+            title="Do the indicators agree? — Niño 3.4 SST · MEI v2 · −SOI, last 5 years"
+            subtitle="The same five-year window for all three most-watched ENSO indicators on one axis. Niño 3.4 is the ocean (weekly SST anomaly), MEI v2 is the coupled ocean–atmosphere index (bi-monthly, five variables), and SOI is the atmospheric pressure see-saw between Tahiti and Darwin (monthly). SOI is plotted inverted (−SOI) because its sign is reversed relative to ENSO — that way all three lines rise together when El Niño is building. If all three are climbing in lock-step toward the +0.5 line, the forecast above has independent ocean and atmosphere support."
+          >
+            <div className="h-[340px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis
+                    dataKey="t"
+                    type="number"
+                    domain={[startMs, nowMs]}
+                    ticks={yearTicks}
+                    tickFormatter={fmtDate}
+                    stroke="#9CA3AF"
+                    fontSize={10}
+                    allowDuplicatedCategory={false}
+                  />
+                  <YAxis
+                    stroke="#9CA3AF"
+                    fontSize={10}
+                    width={36}
+                    domain={[-3, 3]}
+                    ticks={[-3, -2, -1, 0, 1, 2, 3]}
+                    tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
+                  />
+                  <Tooltip
+                    contentStyle={TT_CONTENT}
+                    labelStyle={TT_LABEL}
+                    itemStyle={TT_ITEM}
+                    cursor={TT_CURSOR}
+                    labelFormatter={(t: any) => (typeof t === 'number' ? fmtFullDate(t) : '')}
+                    formatter={(v: any, name: any) => [
+                      typeof v === 'number' ? fmtSigned(v, 2) : '—',
+                      name,
+                    ]}
+                  />
+                  <ReferenceLine
+                    y={0.5}
+                    stroke="#f43f5e"
+                    strokeDasharray="3 3"
+                    label={{ value: 'El Niño', position: 'right', fill: '#f43f5e', fontSize: 10 }}
+                  />
+                  <ReferenceLine
+                    y={-0.5}
+                    stroke="#0ea5e9"
+                    strokeDasharray="3 3"
+                    label={{ value: 'La Niña', position: 'right', fill: '#0ea5e9', fontSize: 10 }}
+                  />
+                  <ReferenceLine y={0} stroke="#6B7280" />
+                  <Line
+                    data={ninoSeries}
+                    dataKey="v"
+                    name="Niño 3.4 SST anomaly (°C)"
+                    type="monotone"
+                    stroke="#fbbf24"
+                    strokeWidth={1.6}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                  <Line
+                    data={meiSeries}
+                    dataKey="v"
+                    name="MEI v2 (index)"
+                    type="monotone"
+                    stroke="#a78bfa"
+                    strokeWidth={1.8}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                  <Line
+                    data={soiSeries}
+                    dataKey="v"
+                    name="−SOI (sign-flipped)"
+                    type="monotone"
+                    stroke="#34d399"
+                    strokeWidth={1.6}
+                    strokeDasharray="4 2"
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+            {/* Legend + read-out */}
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-300">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-4 h-[2px] bg-amber-400" /> Niño 3.4 weekly SST anomaly (°C)
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-4 h-[2px] bg-violet-400" /> MEI v2 (bi-monthly, 5 variables)
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-4 h-[2px] bg-emerald-400" style={{ borderTop: '2px dashed #34d399', height: 0 }} /> −SOI (sign-flipped)
+              </span>
+            </div>
+            {(() => {
+              const lastNino = ninoSeries[ninoSeries.length - 1];
+              const lastMei = meiSeries[meiSeries.length - 1];
+              const lastSoi = soiSeries[soiSeries.length - 1];
+              const agree = (v: number | undefined, side: 1 | -1) =>
+                typeof v === 'number' && Math.sign(v) === side && Math.abs(v) >= 0.3;
+              // What's the hero chart predicting? Check whether the most
+              // recent points are all leaning the same way (+ = El Niño-ward).
+              const leaningPos =
+                agree(lastNino?.v, 1) || agree(lastMei?.v, 1) || agree(lastSoi?.v, 1);
+              const leaningNeg =
+                agree(lastNino?.v, -1) || agree(lastMei?.v, -1) || agree(lastSoi?.v, -1);
+              const verdict = leaningPos && !leaningNeg
+                ? 'All three are currently above zero and trending toward the +0.5 El Niño threshold — the ocean (Niño 3.4) and the atmosphere (MEI, −SOI) are independently supporting the forecast above.'
+                : leaningNeg && !leaningPos
+                ? 'All three are currently below zero — the ocean and atmosphere are leaning La Niña-ward.'
+                : 'The three indicators are mixed right now — watch for them to converge before reading too much into the forecast above.';
+              return (
+                <p className="text-xs text-gray-400 mt-2">
+                  <strong className="text-gray-200">Latest:</strong>{' '}
+                  Niño 3.4 ={' '}
+                  <span className="font-mono text-amber-300">
+                    {typeof lastNino?.v === 'number' ? fmtSigned(lastNino.v) : '—'}
+                  </span>
+                  °C · MEI v2 ={' '}
+                  <span className="font-mono text-violet-300">
+                    {typeof lastMei?.v === 'number' ? fmtSigned(lastMei.v) : '—'}
+                  </span>
+                  {' · '}−SOI ={' '}
+                  <span className="font-mono text-emerald-300">
+                    {typeof lastSoi?.v === 'number' ? fmtSigned(lastSoi.v) : '—'}
+                  </span>
+                  {' '}(SOI raw ={' '}
+                  <span className="font-mono">
+                    {typeof (lastSoi as any)?.raw === 'number' ? fmtSigned((lastSoi as any).raw, 1) : '—'}
+                  </span>
+                  ). {verdict}
+                </p>
+              );
+            })()}
+            <p className="text-xs text-gray-500 mt-3">
+              Sources:{' '}
+              <a
+                href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D0A65E] hover:underline"
+              >
+                NOAA CPC weekly Niño-region SSTs
+              </a>
+              ,{' '}
+              <a
+                href="https://psl.noaa.gov/enso/mei/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D0A65E] hover:underline"
+              >
+                NOAA PSL MEI v2
+              </a>
+              , and{' '}
+              <a
+                href="https://www.cpc.ncep.noaa.gov/data/indices/soi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D0A65E] hover:underline"
+              >
+                NOAA CPC SOI
+              </a>
+              .
+            </p>
+          </SectionCard>
+        );
+      })()}
 
       {/* ═══ MAPS ═══════════════════════════════════════════════ */}
       <Divider icon={<MapIcon className="h-5 w-5" />} title="Live tropical Pacific maps" />
