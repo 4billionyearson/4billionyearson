@@ -132,7 +132,7 @@ A long-record look at how the seasonal calendar is moving:
 
 Key findings as of latest update: Kyoto's cherry blossoms now bloom roughly 11 days earlier than the pre-1850 average; US growing seasons are lengthening; Northern Hemisphere spring snow-cover is in sustained decline.
 
-## El Niño / La Niña — Live ENSO Tracker
+## El Niño / La Niña — ENSO Tracker
 URL: ${baseUrl}/climate/enso
 A real-time tracker of the El Niño-Southern Oscillation, the single biggest year-to-year driver of global temperature and rainfall after the long-term warming trend:
 - Current ENSO state (El Niño / Neutral / La Niña) with strength category

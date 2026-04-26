@@ -189,7 +189,7 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
                 [40, 310],
               ]}
               maxBoundsViscosity={1.0}
-              className="h-[260px] md:h-[320px] w-full z-0"
+              className="h-[200px] md:h-[320px] w-full z-0"
               style={{ background: "#BEEEF9" }}
             >
               <TileLayer
@@ -260,7 +260,7 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState }>(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[260px] md:h-[320px] w-full rounded-lg bg-gray-900/40 flex items-center justify-center">
+      <div className="h-[200px] md:h-[320px] w-full rounded-lg bg-gray-900/40 flex items-center justify-center">
         <div className="animate-spin h-6 w-6 border-2 border-[#D0A65E] border-t-transparent rounded-full" />
       </div>
     ),

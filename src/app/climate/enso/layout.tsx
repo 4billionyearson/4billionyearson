@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 const URL = 'https://4billionyearson.org/climate/enso';
 
 export const metadata: Metadata = {
-  title: 'El Niño / La Niña — Live ENSO Tracker, Regional Impacts & Forecast',
+  title: 'El Niño / La Niña — ENSO Tracker, Regional Impacts & Forecast',
   description:
-    "Live ENSO tracker: weekly Niño 3.4 SST anomalies, NOAA ONI, MEI v2 and SOI. Global impact maps showing which regions get warmer, cooler, wetter or drier under each phase. Met Office plume forecasts, past major events from 1982 to 2024, and how ENSO interacts with climate change.",
+    "Weekly ENSO tracker: Niño 3.4 SST anomalies, NOAA ONI, MEI v2 and SOI. Global impact maps showing which regions get warmer, cooler, wetter or drier under each phase. Met Office plume forecasts, past major events from 1982 to 2024, and how ENSO interacts with climate change.",
   keywords: [
     'El Niño',
     'La Niña',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: URL },
   openGraph: {
-    title: 'El Niño / La Niña — Live ENSO Tracker',
+    title: 'El Niño / La Niña — ENSO Tracker',
     description:
       'Where in the El Niño / La Niña cycle is the Pacific right now? Weekly Niño 3.4 SST anomalies, ONI, MEI, SOI and the live NOAA forecast plume.',
     type: 'article',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'El Niño / La Niña — Live ENSO Tracker',
+    title: 'El Niño / La Niña — ENSO Tracker',
     description:
       'Live ENSO indicators: weekly Niño 3.4, ONI 3-month, MEI v2, SOI and NOAA forecast probabilities.',
   },

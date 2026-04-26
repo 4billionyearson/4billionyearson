@@ -14,7 +14,7 @@ interface SubLink {
   href: string;
   label: string;
   icon: React.ReactNode;
-  badge?: "live" | "monthly" | "annual";
+  badge?: "live" | "weekly" | "monthly" | "annual";
   blogCategory?: string;   // slug for article-badge lookup
   desc: string;
   group?: string;          // optional sub-group heading (e.g. "Monitor", "Earth Systems", "Learn")
@@ -72,7 +72,7 @@ const SECTIONS: Section[] = [
       { group: "Earth Systems", href: "/greenhouse-gases", label: "Greenhouse Gases", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "CO₂, methane & N₂O levels" },
       { group: "Earth Systems", href: "/sea-levels-ice", label: "Sea Levels & Ice", icon: <Waves className="h-4 w-4" />, badge: "monthly", desc: "Sea level rise & Arctic ice extent" },
       { group: "Earth Systems", href: "/climate/shifting-seasons", label: "Shifting Seasons", icon: <Flower2 className="h-4 w-4" />, badge: "monthly", desc: "How spring, summer & winter are moving" },
-      { group: "Earth Systems", href: "/climate/enso", label: "El Niño / La Niña", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "Live ENSO tracker: Niño 3.4, MEI, SOI & forecast" },
+      { group: "Earth Systems", href: "/climate/enso", label: "El Niño / La Niña", icon: <Wind className="h-4 w-4" />, badge: "weekly", desc: "ENSO tracker: Niño 3.4, MEI, SOI & forecast" },
       { group: "Earth Systems", href: "/extreme-weather", label: "Extreme Weather", icon: <CloudLightning className="h-4 w-4" />, badge: "live", desc: "Active disasters worldwide" },
       { group: "Earth Systems", href: "/emissions", label: "CO₂ Emissions", icon: <Factory className="h-4 w-4" />, badge: "annual", desc: "Country rankings & trends" },
       { group: "Learn", href: "/climate-explained", label: "Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
@@ -97,12 +97,19 @@ const SECTIONS: Section[] = [
 
 /* ─── Badge components ───────────────────────────────────────────────────── */
 
-function Badge({ type }: { type: "live" | "monthly" | "annual" }) {
+function Badge({ type }: { type: "live" | "weekly" | "monthly" | "annual" }) {
   if (type === "live")
     return (
       <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-red-400 flex-shrink-0">
         <span className="live-dot w-1.5 h-1.5 rounded-full bg-red-500" />
         Live
+      </span>
+    );
+  if (type === "weekly")
+    return (
+      <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-emerald-400 flex-shrink-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        Updated Weekly
       </span>
     );
   if (type === "monthly")

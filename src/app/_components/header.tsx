@@ -18,6 +18,12 @@ const Header = () => {
       Updated Monthly
     </span>
   );
+  const WeeklyBadge = () => (
+    <span className="flex items-center gap-1 mt-0.5 text-[10px] font-bold tracking-wide uppercase text-emerald-400">
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+      Updated Weekly
+    </span>
+  );
   const AnnualBadge = () => (
     <span className="flex items-center gap-1 mt-0.5 text-[10px] font-bold tracking-wide uppercase text-violet-400">
       <span className="w-1.5 h-1.5 rounded-full bg-violet-500 inline-block" />
@@ -213,7 +219,7 @@ const Header = () => {
                   Shifting Seasons<MonthlyBadge />
                 </Link>
                 <Link href="/climate/enso" className={desktopDropdownItemClass(pathname === '/climate/enso', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
-                  El Niño / La Niña<MonthlyBadge />
+                  El Niño / La Niña<WeeklyBadge />
                 </Link>
                 <Link href="/extreme-weather" className={desktopDropdownItemClass(pathname === '/extreme-weather', 'text-orange-400', 'hover:text-orange-400')} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
@@ -435,7 +441,7 @@ const Header = () => {
                   Shifting Seasons<MonthlyBadge />
                 </Link>
                 <Link href="/climate/enso" className={mobileDropdownItemClass(pathname === '/climate/enso', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
-                  El Niño / La Niña<MonthlyBadge />
+                  El Niño / La Niña<WeeklyBadge />
                 </Link>
                 <Link href="/extreme-weather" className={mobileDropdownItemClass(pathname === '/extreme-weather', 'text-orange-400', 'hover:text-orange-400')} onClick={closeMenu}>
                   Extreme Weather<LiveBadge />
