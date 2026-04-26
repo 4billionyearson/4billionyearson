@@ -1140,7 +1140,7 @@ export default function EnsoPage() {
           >
             <div className="h-[340px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                <ComposedChart margin={{ top: 10, right: 64, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis
                     dataKey="t"
@@ -1175,13 +1175,13 @@ export default function EnsoPage() {
                     y={0.5}
                     stroke="#f43f5e"
                     strokeDasharray="3 3"
-                    label={{ value: 'El Niño', position: 'right', fill: '#f43f5e', fontSize: 10 }}
+                    label={{ value: 'El Niño', position: 'right', fill: '#f43f5e', fontSize: 10, offset: 8 }}
                   />
                   <ReferenceLine
                     y={-0.5}
                     stroke="#0ea5e9"
                     strokeDasharray="3 3"
-                    label={{ value: 'La Niña', position: 'right', fill: '#0ea5e9', fontSize: 10 }}
+                    label={{ value: 'La Niña', position: 'right', fill: '#0ea5e9', fontSize: 10, offset: 8 }}
                   />
                   <ReferenceLine y={0} stroke="#6B7280" />
                   <Line
