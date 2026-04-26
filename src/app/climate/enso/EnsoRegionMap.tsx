@@ -81,28 +81,33 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState; is
 
         // Refits the map when the breakpoint changes so we can use a
         // narrower bounds on mobile and a wider, more contextual view on
-        // desktop without remounting the MapContainer.
+        // desktop without remounting the MapContainer. Also calls
+        // invalidateSize so leaflet picks up any container size change after
+        // the breakpoint flips.
         function BoundsController({ bounds }: { bounds: [[number, number], [number, number]] }) {
           const map = useMap();
           useEffect(() => {
+            map.invalidateSize();
             map.fitBounds(bounds, { animate: false });
           }, [map, bounds]);
           return null;
         }
 
         function Map({ anoms, state, isMobile }: { anoms: RegionAnoms; state: EnsoMapState; isMobile: boolean }) {
-          // Mobile: tight focus on the equatorial Pacific so the four Niño
-          // boxes dominate the view without colliding labels.
+          // Mobile: very tight focus on the equatorial Pacific so the four
+          // Niño boxes dominate the view without colliding labels. We pull
+          // the lat band right in (±8°) so the four rectangles fill the
+          // narrow viewport vertically.
           // Desktop: wider extent so the surrounding continents are visible
           // for spatial context.
           const bounds: [[number, number], [number, number]] = isMobile
-            ? [[-14, 150], [14, 290]]
+            ? [[-10, 155], [10, 285]]
             : [[-26, 120], [26, 305]];
 
-          const labelW = isMobile ? 54 : 80;
-          const labelH = isMobile ? 28 : 36;
-          const labelFont = isMobile ? 9 : 12;
-          const labelAnomFont = isMobile ? 8 : 11;
+          const labelW = isMobile ? 44 : 80;
+          const labelH = isMobile ? 24 : 36;
+          const labelFont = isMobile ? 8 : 12;
+          const labelAnomFont = isMobile ? 7 : 11;
 
           const labelIcon = (label: string, anom: number) =>
             (L as any).divIcon({
@@ -154,13 +159,10 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState; is
               iconAnchor: [60, 8],
             });
 
-          // Continent label positions are tuned per breakpoint so they sit
-          // over the right landmass given the view extent.
+          // Continent labels only on desktop — on mobile they crowd the
+          // tight equatorial-Pacific view and overlap the Niño rectangles.
           const CONTINENTS: Array<{ label: string; pos: [number, number] }> = isMobile
-            ? [
-                { label: "Australia", pos: [-12, 145] },
-                { label: "S. America", pos: [-10, 290] },
-              ]
+            ? []
             : [
                 { label: "Asia", pos: [22, 125] },
                 { label: "Australia", pos: [-22, 140] },
@@ -181,7 +183,7 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState; is
             const points = dir === "east" ? "4,12 36,12 36,6 50,16 36,26 36,20 4,20" : "46,12 14,12 14,6 0,16 14,26 14,20 46,20";
             return `\n              <svg width=\"50\" height=\"32\" viewBox=\"0 0 50 32\" xmlns=\"http://www.w3.org/2000/svg\">\n                <polygon points=\"${points}\" fill=\"${arrowColor}\" stroke=\"#ffffff\" stroke-width=\"${arrowStrokeWidth * 0.4}\" opacity=\"0.92\" />\n              </svg>`;
           };
-          const arrowSize: [number, number] = isMobile ? [32, 20] : [50, 32];
+          const arrowSize: [number, number] = isMobile ? [22, 14] : [50, 32];
           const tradeArrowIcon = (dir: "east" | "west") =>
             (L as any).divIcon({
               className: "enso-trade-arrow",
@@ -200,9 +202,11 @@ const EnsoRegionMapInner = dynamic<{ anoms: RegionAnoms; state: EnsoMapState; is
           // Warm-pool centre marker: the Indo-Pacific Warm Pool sits in the
           // far west Pacific (~150°E). Under La Niña/Neutral the pool stays
           // pinned to the west; under El Niño warm water spreads east toward
-          // the dateline.
-          const warmPoolPos: [number, number] = isElNino ? [11, 195] : [11, 152];
-          const warmPoolFont = isMobile ? 8 : 10;
+          // the dateline. On mobile we tuck it inside the tighter bounds.
+          const warmPoolPos: [number, number] = isMobile
+            ? (isElNino ? [8, 200] : [8, 162])
+            : (isElNino ? [11, 195] : [11, 152]);
+          const warmPoolFont = isMobile ? 7 : 10;
           const warmPoolIcon = (L as any).divIcon({
             className: "enso-warm-pool",
             html: `<div style=\"\n              font-family: ui-monospace, SFMono-Regular, Menlo, monospace;\n              font-size: ${warmPoolFont}px;\n              font-weight: 700;\n              letter-spacing: 0.05em;\n              text-transform: uppercase;\n              color: #b91c1c;\n              text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 3px #ffffff;\n              white-space: nowrap;\n              pointer-events: none;\n            \">\u2600 Warm pool</div>`,
