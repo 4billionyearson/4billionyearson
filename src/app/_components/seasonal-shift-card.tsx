@@ -347,6 +347,8 @@ export default function SeasonalShiftCard({
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#374151', fontSize: 12 }}
+                  labelStyle={{ color: '#f3f4f6', fontWeight: 600 }}
+                  itemStyle={{ color: '#e5e7eb' }}
                   formatter={(v) => [`${v} months`, 'Months above annual mean']}
                 />
                 <ReferenceLine
@@ -583,8 +585,10 @@ function WarmSeasonShiftBar({
   const X1 = 960;
   const x = (doy: number) => X0 + (doy / 365) * (X1 - X0);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const baselineLen = baselineAutumnDoy - baselineSpringDoy;
-  const recentLen = recentAutumnDoy - recentSpringDoy;
+  // For southern-hemisphere locations spring DOY > autumn DOY (e.g. spring≈305, autumn≈106)
+  const isWrap = baselineSpringDoy > baselineAutumnDoy;
+  const baselineLen = isWrap ? (365 - baselineSpringDoy + baselineAutumnDoy) : (baselineAutumnDoy - baselineSpringDoy);
+  const recentLen   = (recentSpringDoy > recentAutumnDoy)  ? (365 - recentSpringDoy  + recentAutumnDoy)  : (recentAutumnDoy  - recentSpringDoy);
   const deltaDays = Math.round(recentLen - baselineLen);
   const shiftColor = deltaDays > 0 ? '#fb923c' : deltaDays < 0 ? '#38bdf8' : '#9CA3AF';
   const TOTAL_H = 110;
@@ -639,16 +643,14 @@ function WarmSeasonShiftBar({
         >
           {baselineLabel} baseline
         </text>
-        <rect
-          x={x(baselineSpringDoy)}
-          y={14}
-          width={x(baselineAutumnDoy) - x(baselineSpringDoy)}
-          height={10}
-          rx={5}
-          fill="none"
-          stroke="#9CA3AF"
-          strokeDasharray="4 3"
-        />
+        {isWrap ? (
+          <>
+            <rect x={X0} y={14} width={x(baselineAutumnDoy) - X0} height={10} rx={5} fill="none" stroke="#9CA3AF" strokeDasharray="4 3" />
+            <rect x={x(baselineSpringDoy)} y={14} width={X1 - x(baselineSpringDoy)} height={10} rx={5} fill="none" stroke="#9CA3AF" strokeDasharray="4 3" />
+          </>
+        ) : (
+          <rect x={x(baselineSpringDoy)} y={14} width={x(baselineAutumnDoy) - x(baselineSpringDoy)} height={10} rx={5} fill="none" stroke="#9CA3AF" strokeDasharray="4 3" />
+        )}
         <text x={x(baselineSpringDoy) - 4} y={22} textAnchor="end" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
           {doyToLabel(baselineSpringDoy)}
         </text>
@@ -667,15 +669,14 @@ function WarmSeasonShiftBar({
         >
           {recentLabel} now
         </text>
-        <rect
-          x={x(recentSpringDoy)}
-          y={48}
-          width={x(recentAutumnDoy) - x(recentSpringDoy)}
-          height={10}
-          rx={5}
-          fill="#F59E0B"
-          fillOpacity={0.85}
-        />
+        {isWrap ? (
+          <>
+            <rect x={X0} y={48} width={x(recentAutumnDoy) - X0} height={10} rx={5} fill="#F59E0B" fillOpacity={0.85} />
+            <rect x={x(recentSpringDoy)} y={48} width={X1 - x(recentSpringDoy)} height={10} rx={5} fill="#F59E0B" fillOpacity={0.85} />
+          </>
+        ) : (
+          <rect x={x(recentSpringDoy)} y={48} width={x(recentAutumnDoy) - x(recentSpringDoy)} height={10} rx={5} fill="#F59E0B" fillOpacity={0.85} />
+        )}
         <text x={x(recentSpringDoy) - 4} y={56} textAnchor="end" fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
           {doyToLabel(recentSpringDoy)}
         </text>

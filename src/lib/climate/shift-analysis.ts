@@ -58,6 +58,25 @@ function completeYears(monthly: MonthlyPoint[]) {
 function findCrossings(monthly: number[], threshold: number): { spring: number; autumn: number } | null {
   const above = monthly.map((v) => v > threshold);
   if (above.every(Boolean) || !above.some(Boolean)) return null;
+
+  // Southern-hemisphere case: warm season straddles the year boundary (e.g. NZ,
+  // Argentina). Both Jan and Dec are above the annual mean. We find the cool-season
+  // boundaries instead to derive the real spring (Oct/Nov) and autumn (Apr/May).
+  // The returned spring DOY will be > autumn DOY — the caller handles the wrap.
+  if (above[0] && above[11]) {
+    const firstCool = above.indexOf(false);        // first month below threshold → "autumn" crossing
+    const lastCool  = above.lastIndexOf(false);    // last month below threshold  → "spring" crossing
+    // autumn: interpolate between month[firstCool-1] (warm) → month[firstCool] (cool)
+    const va0 = monthly[firstCool - 1], va1 = monthly[firstCool];
+    const fracA = (va0 - threshold) / (va0 - va1);
+    const autumn = MID_MONTH_DOY[firstCool - 1] + fracA * (MID_MONTH_DOY[firstCool] - MID_MONTH_DOY[firstCool - 1]);
+    // spring: interpolate between month[lastCool] (cool) → month[lastCool+1] (warm)
+    const vs0 = monthly[lastCool], vs1 = monthly[lastCool + 1];
+    const fracS = (threshold - vs0) / (vs1 - vs0);
+    const spring = MID_MONTH_DOY[lastCool] + fracS * (MID_MONTH_DOY[lastCool + 1] - MID_MONTH_DOY[lastCool]);
+    return { spring, autumn }; // spring > autumn signals the wrap (e.g. spring≈305, autumn≈106)
+  }
+
   const firstWarm = above.indexOf(true);
   const lastWarm = above.lastIndexOf(true);
 
