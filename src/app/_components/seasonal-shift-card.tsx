@@ -48,10 +48,9 @@ export default function SeasonalShiftCard({
   }, [monthlyAll, rainfallMonthly, sunshineMonthly]);
 
   const defaultView: View = useMemo<View>(() => {
-    if (!stats) return 'length';
+    if (!stats) return 'monthly';
     if (stats.seasonality === 'wet-dry' && stats.rain) return 'wet-season';
-    if (stats.seasonality === 'aseasonal') return 'monthly';
-    return 'length';
+    return 'monthly';
   }, [stats]);
 
   const [view, setView] = useState<View | null>(null);
@@ -175,14 +174,14 @@ export default function SeasonalShiftCard({
           )}
         </div>
         <div className="flex gap-2 text-xs flex-wrap">
+          <TabButton active={effectiveView === 'monthly'} onClick={() => setView('monthly')}>
+            Month-by-month
+          </TabButton>
           {hasTempSeasons && (
             <TabButton active={effectiveView === 'length'} onClick={() => setView('length')}>
               Spring &amp; Autumn
             </TabButton>
           )}
-          <TabButton active={effectiveView === 'monthly'} onClick={() => setView('monthly')}>
-            Month-by-month
-          </TabButton>
           {hasWetDry && (
             <TabButton active={effectiveView === 'wet-season'} onClick={() => setView('wet-season')}>
               Wet / dry season
