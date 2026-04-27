@@ -92,28 +92,23 @@ export default function CalendarTimeline({
   rows,
   className = '',
   labelColPx = 192,
+  showAxis = true,
 }: {
   rows: TimelineRow[];
   className?: string;
   /** desktop label column width in px (mobile collapses to single column) */
   labelColPx?: number;
+  /** render the Jan-Dec axis row at the bottom (default true) */
+  showAxis?: boolean;
 }) {
   const cssVars: React.CSSProperties = {
     // @ts-expect-error CSS custom property
     '--cal-label-col': `${labelColPx}px`,
   };
 
-  // Tag the first non-header row so we can render the inline
-  // "baseline / now" mini-legend on it.
-  let firstDataIdx = -1;
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i].kind !== 'header') { firstDataIdx = i; break; }
-  }
-
   return (
     <div className={`cal-timeline ${className}`} style={cssVars}>
-      {rows.map((row, i) => {
-        const isFirstData = i === firstDataIdx;
+      {rows.map((row) => {
         switch (row.kind) {
           case 'header':
             return <SectionHeader key={row.key} label={row.label} accent={row.accent} />;
@@ -132,7 +127,6 @@ export default function CalendarTimeline({
                 recentFracStart={doyToFrac(row.recentSpringDoy)}
                 recentFracEnd={doyToFrac(row.recentAutumnDoy)}
                 recentWraps={row.recentSpringDoy > row.recentAutumnDoy}
-                showAnnotations={isFirstData}
               />
             );
           case 'fixed-bar':
@@ -150,7 +144,6 @@ export default function CalendarTimeline({
                 recentFracStart={row.recentFrac.start}
                 recentFracEnd={row.recentFrac.end}
                 recentWraps={row.recentFrac.start > row.recentFrac.end}
-                showAnnotations={isFirstData}
               />
             );
           case 'point':
@@ -164,12 +157,11 @@ export default function CalendarTimeline({
                 color={row.color}
                 baselineFrac={doyToFrac(row.baselineDoy)}
                 recentFrac={doyToFrac(row.recentDoy)}
-                showAnnotations={isFirstData}
               />
             );
         }
       })}
-      <MonthAxisRow />
+      {showAxis && <MonthAxisRow />}
     </div>
   );
 }
@@ -236,7 +228,6 @@ function BarRow({
   title, sub, delta, deltaColor, recentColor,
   baselineFracStart, baselineFracEnd, baselineWraps,
   recentFracStart, recentFracEnd, recentWraps,
-  showAnnotations,
 }: {
   title: string;
   sub?: string;
@@ -249,7 +240,6 @@ function BarRow({
   recentFracStart: number;
   recentFracEnd: number;
   recentWraps: boolean;
-  showAnnotations?: boolean;
 }) {
   return (
     <div className="cal-row">
@@ -272,7 +262,6 @@ function BarRow({
           color: recentColor,
           top: RECENT_TOP,
         })}
-        {showAnnotations && <InlineAnnotations color={recentColor} />}
       </div>
     </div>
   );
@@ -322,7 +311,6 @@ function renderBarSegments({
 
 function PointRow({
   title, sub, delta, deltaColor, color, baselineFrac, recentFrac,
-  showAnnotations,
 }: {
   title: string;
   sub?: string;
@@ -331,7 +319,6 @@ function PointRow({
   color: string;
   baselineFrac: number;
   recentFrac: number;
-  showAnnotations?: boolean;
 }) {
   const reversed = recentFrac < baselineFrac;
   const baselineCenter = BAR_TOP + BAR_H / 2;
@@ -400,13 +387,12 @@ function PointRow({
         >
           {reversed ? '←' : '→'}
         </div>
-        {showAnnotations && <InlineAnnotations color={color} />}
       </div>
     </div>
   );
 }
 
-/* ───────────────── Track backdrop + inline annotations ───────────────── */
+/* ───────────────── Track backdrop ───────────────── */
 
 function TrackBackdrop() {
   return (
@@ -429,37 +415,6 @@ function TrackBackdrop() {
             'linear-gradient(90deg, rgba(148,163,184,0) 0%, rgba(148,163,184,0.18) 8%, rgba(148,163,184,0.18) 92%, rgba(148,163,184,0) 100%)',
         }}
       />
-    </>
-  );
-}
-
-function InlineAnnotations({ color }: { color: string }) {
-  return (
-    <>
-      <span
-        className="absolute text-[9px] uppercase font-mono tracking-wider hidden sm:block"
-        style={{
-          right: 'calc(100% + 6px)',
-          top: BAR_TOP + BAR_H / 2,
-          transform: 'translateY(-50%)',
-          color: '#94A3B8',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        baseline
-      </span>
-      <span
-        className="absolute text-[9px] uppercase font-mono tracking-wider hidden sm:block"
-        style={{
-          right: 'calc(100% + 6px)',
-          top: RECENT_TOP + BAR_H / 2,
-          transform: 'translateY(-50%)',
-          color: hexToRgba(color, 0.95),
-          whiteSpace: 'nowrap',
-        }}
-      >
-        now
-      </span>
     </>
   );
 }

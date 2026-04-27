@@ -594,21 +594,21 @@ function WarmSeasonShiftBar({
   const springText = springShiftDays === 0
     ? null
     : springShiftDays < 0
-      ? `${Math.abs(Math.round(springShiftDays))}d earlier spring`
-      : `${Math.round(springShiftDays)}d later spring`;
+      ? `Spring ${Math.abs(Math.round(springShiftDays))} days earlier`
+      : `Spring ${Math.round(springShiftDays)} days later`;
   const autumnText = autumnShiftDays === 0
     ? null
     : autumnShiftDays > 0
-      ? `${Math.round(autumnShiftDays)}d later autumn`
-      : `${Math.abs(Math.round(autumnShiftDays))}d earlier autumn`;
+      ? `Autumn ${Math.round(autumnShiftDays)} days later`
+      : `Autumn ${Math.abs(Math.round(autumnShiftDays))} days earlier`;
 
   const rows: TimelineRow[] = [
     {
       kind: 'bar',
       key: 'warm',
       title: 'Warm season',
-      sub: `${baselineLabel} baseline: ${doyToLabel(baselineSpringDoy)} → ${doyToLabel(baselineAutumnDoy)} · ${Math.round(baselineLen)}d`,
-      delta: `${recentLabel} now: ${doyToLabel(recentSpringDoy)} → ${doyToLabel(recentAutumnDoy)} · ${Math.round(recentLen)}d`,
+      sub: `${baselineLabel} baseline: ${doyToLabel(baselineSpringDoy)} → ${doyToLabel(baselineAutumnDoy)} · ${Math.round(baselineLen)} days`,
+      delta: `${recentLabel} now: ${doyToLabel(recentSpringDoy)} → ${doyToLabel(recentAutumnDoy)} · ${Math.round(recentLen)} days`,
       deltaColor: '#FDE68A',
       recentColor: '#F59E0B',
       baselineSpringDoy,

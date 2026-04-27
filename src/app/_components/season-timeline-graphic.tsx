@@ -24,7 +24,7 @@ export default function SeasonTimelineGraphic() {
       key: 'us-grow',
       title: 'US growing season',
       sub: '1895 → present · EPA frost-free season',
-      delta: '156 d → 172 d (+15 d)',
+      delta: '156 days → 172 days (+15 days)',
       deltaColor: '#10B981',
       recentColor: '#10B981',
       baselineFrac: { start: toFrac(5, 4), end: toFrac(10, 7) },
@@ -46,7 +46,7 @@ export default function SeasonTimelineGraphic() {
       key: 'nh-snow',
       title: 'NH snow-free season',
       sub: '1971–2000 → present · NOAA Rutgers GSL',
-      delta: '187 d → 204 d (+17 d)',
+      delta: '187 days → 204 days (+17 days)',
       deltaColor: '#22D3EE',
       recentColor: '#22D3EE',
       baselineFrac: { start: toFrac(4, 24), end: toFrac(10, 28) },
@@ -57,8 +57,8 @@ export default function SeasonTimelineGraphic() {
   return (
     <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 p-3 sm:p-5">
       <div className="flex items-center justify-between gap-2 flex-wrap mb-4">
-        <div className="text-xs text-gray-400 uppercase tracking-wider">
-          Calendar-year view · Northern Hemisphere
+        <div className="text-xs text-gray-400 uppercase tracking-wider font-mono">
+          Jan <span className="text-gray-500">→</span> Dec · Baseline vs Now
         </div>
         <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider font-mono text-gray-500">
           <span className="flex items-center gap-1.5">
@@ -72,7 +72,7 @@ export default function SeasonTimelineGraphic() {
           </span>
         </div>
       </div>
-      <CalendarTimeline rows={rows} labelColPx={188} />
+      <CalendarTimeline rows={rows} labelColPx={188} showAxis={false} />
     </div>
   );
 }

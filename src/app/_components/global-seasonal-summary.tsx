@@ -207,8 +207,8 @@ export default function GlobalSeasonalSummary() {
 
   const { hemiRows, koppenWarmRows, wetRows, total } = cohorts;
 
-  const fmtShift = (d: number) => `${d > 0 ? '+' : ''}${d.toFixed(1)} d`;
-  const fmtMonths = (m: number | null) => (m === null ? '—' : `${m > 0 ? '+' : ''}${m.toFixed(2)} mo`);
+  const fmtShift = (d: number) => `${d > 0 ? '+' : ''}${d.toFixed(1)} days`;
+  const fmtMonths = (m: number | null) => (m === null ? '—' : `${m > 0 ? '+' : ''}${m.toFixed(2)} months`);
 
   function warmToRow(c: WarmCohort): TimelineRow {
     return {
@@ -216,7 +216,7 @@ export default function GlobalSeasonalSummary() {
       key: c.key,
       title: c.label,
       sub: `${c.count} regions · ${doyToLabel(c.recentSpringDoy)} → ${doyToLabel(c.recentAutumnDoy)}`,
-      delta: `spring ${fmtShift(c.meanSpringShift)} · autumn ${fmtShift(c.meanAutumnShift)}${c.meanNetMonths !== null ? ` · ${fmtMonths(c.meanNetMonths)}` : ''}`,
+      delta: `Spring ${fmtShift(c.meanSpringShift)} · Autumn ${fmtShift(c.meanAutumnShift)}${c.meanNetMonths !== null ? ` · ${fmtMonths(c.meanNetMonths)}` : ''}`,
       deltaColor: c.color,
       recentColor: c.color,
       baselineSpringDoy: c.baselineSpringDoy,
@@ -252,7 +252,7 @@ export default function GlobalSeasonalSummary() {
       key: 'us-grow',
       title: 'US growing season',
       sub: '1895 → present · EPA frost-free season',
-      delta: '156 d → 172 d (+15 d)',
+      delta: '156 days → 172 days (+15 days)',
       deltaColor: '#10B981',
       recentColor: '#10B981',
       baselineFrac: { start: dayOfYear(5, 4) / 365, end: dayOfYear(10, 7) / 365 },
@@ -263,7 +263,7 @@ export default function GlobalSeasonalSummary() {
       key: 'nh-snow',
       title: 'NH snow-free season',
       sub: '1971–2000 → present · NOAA Rutgers GSL',
-      delta: '187 d → 204 d (+17 d)',
+      delta: '187 days → 204 days (+17 days)',
       deltaColor: '#22D3EE',
       recentColor: '#22D3EE',
       baselineFrac: { start: dayOfYear(4, 24) / 365, end: dayOfYear(10, 28) / 365 },
@@ -297,8 +297,8 @@ export default function GlobalSeasonalSummary() {
 
       <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 p-3 sm:p-5">
         <div className="flex items-center justify-between gap-2 flex-wrap mb-4">
-          <div className="text-xs text-gray-400 uppercase tracking-wider">
-            Calendar-year view · baseline vs now
+          <div className="text-xs text-gray-400 uppercase tracking-wider font-mono">
+            Jan <span className="text-gray-500">→</span> Dec · Baseline vs Now
           </div>
           <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider font-mono text-gray-500">
             <span className="flex items-center gap-1.5">
@@ -312,7 +312,7 @@ export default function GlobalSeasonalSummary() {
             </span>
           </div>
         </div>
-        <CalendarTimeline rows={rows} labelColPx={196} />
+        <CalendarTimeline rows={rows} labelColPx={196} showAxis={false} />
       </div>
 
       <p className="text-xs text-gray-500">
