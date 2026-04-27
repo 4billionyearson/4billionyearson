@@ -95,7 +95,7 @@ type WetCohort = {
   meanRainPct: number;
 };
 
-export default function GlobalSeasonalSummary() {
+export default function GlobalSeasonalSummary({ hideExploreLink = false }: { hideExploreLink?: boolean } = {}) {
   const [data, setData] = useState<GlobalShiftData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -321,13 +321,15 @@ export default function GlobalSeasonalSummary() {
       </p>
 
       <div className="flex justify-end">
-        <Link
-          href="/climate/shifting-seasons"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
-        >
-          Explore Shifting Seasons worldwide
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        {!hideExploreLink && (
+          <Link
+            href="/climate/shifting-seasons"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
+          >
+            Explore Shifting Seasons worldwide
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
       </div>
     </div>
   );

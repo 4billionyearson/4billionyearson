@@ -468,9 +468,9 @@ export default function ShiftingSeasonsPage() {
                   )}
                   <StatBlock
                     label="Kyoto Cherry Blossom"
-                    value={`${data.kyoto.shiftDays > 0 ? '−' : '+'}${Math.abs(data.kyoto.shiftDays).toFixed(1)}`}
+                    value={`${data.kyoto.shiftDays > 0 ? '+' : '−'}${Math.abs(data.kyoto.shiftDays).toFixed(1)}`}
                     unit="days"
-                    sub="recent 30-yr mean vs pre-1850"
+                    sub={`recent 30-yr mean vs pre-1850 (${data.kyoto.shiftDays < 0 ? 'earlier' : 'later'})`}
                     color="text-pink-300"
                   />
                   <StatBlock
@@ -506,7 +506,7 @@ export default function ShiftingSeasonsPage() {
                   and notable Northern-Hemisphere records. Mirrors the
                   Shifting-Seasons block on /climate/global. */}
               <SectionCard icon={<Leaf className="text-emerald-400" />} title="Shifting Seasons Worldwide">
-                <GlobalSeasonalSummary />
+                <GlobalSeasonalSummary hideExploreLink />
               </SectionCard>
 
               {/* ═══ THE GLOBAL PICTURE ═══ */}
