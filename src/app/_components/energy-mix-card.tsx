@@ -108,14 +108,16 @@ function CardShell({ title, year, deepLinkHref, children }: {
           <span className="text-[11px] text-gray-500 font-mono font-normal mt-1.5">{year}</span>
         </h2>
       </div>
-      <div className="p-4 md:p-5 space-y-4">{children}</div>
-      <div className="flex justify-end px-4 py-2.5 border-t border-gray-800/60 bg-gray-900/40">
-        <Link
-          href={deepLinkHref}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
-        >
-          See full energy data <ArrowUpRight className="h-3.5 w-3.5" />
-        </Link>
+      <div className="p-4 md:p-5 space-y-4">
+        {children}
+        <div className="flex justify-end">
+          <Link
+            href={deepLinkHref}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+          >
+            See full energy data <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </div>
     </div>
   );
