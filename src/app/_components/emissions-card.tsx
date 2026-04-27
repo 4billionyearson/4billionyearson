@@ -112,7 +112,7 @@ const TOP_COLORS = ['#ef4444', '#f97316', '#fbbf24', '#a3e635', '#22d3ee', '#a78
 
 function CardShell({ year, deepLinkHref, children }: { year: number; deepLinkHref: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden">
+    <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden flex flex-col">
       <div className="p-4 pb-0">
         <h2 className="text-xl font-bold font-mono text-white flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-6 [&>svg]:w-6 md:[&>svg]:h-5 md:[&>svg]:w-5">
           <Factory className="text-rose-400" />
@@ -120,16 +120,14 @@ function CardShell({ year, deepLinkHref, children }: { year: number; deepLinkHre
           <span className="text-[11px] text-gray-500 font-mono font-normal mt-1.5">{year}</span>
         </h2>
       </div>
-      <div className="p-4 md:p-5 space-y-4">
-        {children}
-        <div className="flex justify-end">
-          <Link
-            href={deepLinkHref}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
-          >
-            See full emissions data <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
+      <div className="p-4 md:p-5 space-y-4 flex-1">{children}</div>
+      <div className="flex justify-end px-4 pb-4">
+        <Link
+          href={deepLinkHref}
+          className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+        >
+          See full emissions data <ArrowUpRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </div>
   );
