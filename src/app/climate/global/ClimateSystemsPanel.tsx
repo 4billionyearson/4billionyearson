@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { LineChart, Line, BarChart, Bar, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
+import { LineChart, Line, BarChart, Bar, Cell, ComposedChart, Area, ReferenceArea, ReferenceDot, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
 import { Waves, Snowflake, Flame, Wind, ExternalLink, ArrowUpRight } from 'lucide-react';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -27,6 +27,32 @@ function TileHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: s
 
 // ─── ENSO ───────────────────────────────────────────────────────────────────
 
+interface ForecastSeason {
+  season: string;
+  label: string;
+  pLaNina: number;
+  pNeutral: number;
+  pElNino: number;
+}
+
+interface WeeklyRow {
+  date: string;
+  year: number;
+  month: number;
+  day: number;
+  nino34: { sst: number; anom: number };
+}
+
+interface PlumePeriod {
+  period: number;
+  label: string;
+  seasonAnchorYear: number;
+  mean: number | null;
+  dynMean: number | null;
+  statMean: number | null;
+  modelCount: number;
+}
+
 interface EnsoData {
   state: 'El Niño' | 'La Niña' | 'Neutral';
   strength: string;
@@ -34,66 +60,277 @@ interface EnsoData {
   season: string;
   seasonYear: number;
   history: { season: string; year: number; anom: number }[];
+  weekly?: { weekly: WeeklyRow[]; lastWeek: string } | null;
+  forecast?: { seasons: ForecastSeason[] } | null;
+  plume?: { issueYear: number; issueMonth: number; periods: PlumePeriod[] } | null;
+}
+
+const ENSO_SEASON_LABELS = ['DJF', 'JFM', 'FMA', 'MAM', 'AMJ', 'MJJ', 'JJA', 'JAS', 'ASO', 'SON', 'OND', 'NDJ'];
+const ENSO_MONTH_NAMES_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+function ensoSeasonMiddleMonth(label: string, anchorYear: number): string {
+  const idx = ENSO_SEASON_LABELS.indexOf(label);
+  if (idx < 0) return `${label} ${anchorYear}`;
+  let monthIdx: number;
+  if (label === 'DJF') { monthIdx = 0; }
+  else if (label === 'NDJ') { monthIdx = 11; }
+  else { monthIdx = (idx + 1) % 12; }
+  return `${ENSO_MONTH_NAMES_FULL[monthIdx]} ${anchorYear}`;
+}
+
+const ENSO_SEASON_MONTHS: Record<string, [number, number]> = {
+  DJF: [-1, 1], JFM: [0, 2], FMA: [1, 3], MAM: [2, 4], AMJ: [3, 5],
+  MJJ: [4, 6], JJA: [5, 7], JAS: [6, 8], ASO: [7, 9], SON: [8, 10],
+  OND: [9, 11], NDJ: [10, 12],
+};
+
+function ensoSeasonWindow(label: string, anchorYear: number): [number, number] {
+  const months = ENSO_SEASON_MONTHS[label] || [0, 2];
+  return [anchorYear + months[0] / 12, anchorYear + (months[1] + 1) / 12];
+}
+
+function ensoSeasonCentre(label: string, anchorYear: number): number {
+  const [a, b] = ensoSeasonWindow(label, anchorYear);
+  return (a + b) / 2;
 }
 
 export function EnsoCard({ enso }: { enso: EnsoData | null }) {
   if (!enso) return null;
   const state = enso.state;
-  const color = state === 'El Niño' ? '#fb7185' : state === 'La Niña' ? '#60a5fa' : '#a3a3a3';
   const accent = state === 'El Niño' ? 'text-rose-300' : state === 'La Niña' ? 'text-sky-300' : 'text-gray-300';
 
-  // Chart data - last 36 seasons with indexed x to keep spacing even
-  const chart = enso.history.map((p, i) => ({ i, label: p.season, anom: p.anom, year: p.year }));
+  // Forecast verdict — same logic as the full ENSO page
+  const now = new Date();
+  let runYear = now.getUTCFullYear();
+  let prevIdx = -1;
+  const forecastWithYear = (enso.forecast?.seasons || []).map((s) => {
+    const idx = ENSO_SEASON_LABELS.indexOf(s.season);
+    if (prevIdx >= 0 && idx >= 0 && idx < prevIdx) runYear += 1;
+    if (idx >= 0) prevIdx = idx;
+    return { ...s, anchorYear: runYear };
+  });
+  const forecastFirst50 = forecastWithYear.find((s) => s.pElNino >= 50) || null;
+  const forecastFirst50La = forecastWithYear.find((s) => s.pLaNina >= 50) || null;
+  const forecastVerdictLabel = forecastFirst50
+    ? `El Niño Predicted by ${ensoSeasonMiddleMonth(forecastFirst50.season, forecastFirst50.anchorYear)}`
+    : forecastFirst50La
+      ? `La Niña Predicted by ${ensoSeasonMiddleMonth(forecastFirst50La.season, forecastFirst50La.anchorYear)}`
+      : null;
+  const cardTitle = `ENSO – ${state}${forecastVerdictLabel ? ` · ${forecastVerdictLabel}` : ''}`;
+  const isForecastingElNino = !!forecastFirst50;
+
+  // ── Forecast chart data ──────────────────────────────────────────────────
+  const plumePeriods = enso.plume?.periods || [];
+  const usingPlume = plumePeriods.length > 0;
+  const currentYear = now.getFullYear();
+  const yearsBack = 7;
+  const xMin = currentYear - yearsBack + 0.5;
+  const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
+  const endOfYear = new Date(now.getFullYear() + 1, 0, 1).getTime();
+  const todayX = now.getFullYear() + (now.getTime() - startOfYear) / (endOfYear - startOfYear);
+  const currentOni = enso.weekly?.weekly?.length
+    ? enso.weekly.weekly[enso.weekly.weekly.length - 1].nino34.anom
+    : enso.anomaly;
+
+  const decimalYearFromYMD = (y: number, m: number, d: number) => {
+    const start = new Date(y, 0, 1).getTime();
+    const end = new Date(y + 1, 0, 1).getTime();
+    return y + (new Date(y, m - 1, d).getTime() - start) / (end - start);
+  };
+
+  type ChartPoint = { x: number; anom?: number; pos?: number; neg?: number; fcAnom?: number; fcPos?: number; dateLabel?: string };
+
+  const observedPoints: ChartPoint[] = (enso.weekly?.weekly || [])
+    .filter((w) => {
+      const dx = decimalYearFromYMD(w.year, w.month, w.day);
+      return dx >= xMin && dx <= todayX + 0.001;
+    })
+    .map((w) => {
+      const dx = decimalYearFromYMD(w.year, w.month, w.day);
+      const a = w.nino34.anom;
+      return { x: dx, anom: a, pos: a > 0 ? a : 0, neg: a < 0 ? a : 0, dateLabel: w.date };
+    })
+    .sort((a, b) => a.x - b.x);
+
+  if (observedPoints.length) {
+    const last = observedPoints[observedPoints.length - 1];
+    if (todayX > last.x + 0.0001) {
+      observedPoints.push({ x: todayX, anom: currentOni, pos: currentOni > 0 ? currentOni : 0, neg: currentOni < 0 ? currentOni : 0 });
+    }
+  }
+
+  const forecastPoints: ChartPoint[] = [];
+  if (usingPlume) {
+    const anchors = plumePeriods
+      .map((pr) => {
+        const v = pr.dynMean ?? pr.mean ?? pr.statMean;
+        if (v == null) return null;
+        return { x: ensoSeasonCentre(pr.label, pr.seasonAnchorYear), y: v };
+      })
+      .filter((a): a is { x: number; y: number } => a != null)
+      .sort((a, b) => a.x - b.x)
+      .filter((a) => a.x > todayX);
+
+    const allAnchors = [{ x: todayX, y: currentOni }, ...anchors];
+    const stepsPerLeg = 8;
+    for (let i = 0; i < allAnchors.length - 1; i++) {
+      const a0 = allAnchors[i];
+      const a1 = allAnchors[i + 1];
+      for (let s = 0; s <= stepsPerLeg; s++) {
+        if (i > 0 && s === 0) continue;
+        const t = s / stepsPerLeg;
+        const eased = (1 - Math.cos(Math.PI * t)) / 2;
+        const fx = a0.x + (a1.x - a0.x) * t;
+        const fy = a0.y + (a1.y - a0.y) * eased;
+        forecastPoints.push({ x: fx, fcAnom: fy, fcPos: fy > 0 ? fy : 0 });
+      }
+    }
+  }
+
+  const plumePeaks = plumePeriods.map((p) => p.dynMean ?? p.mean).filter((v): v is number => v != null);
+  const predictedPeakOni = plumePeaks.length ? Math.max(...plumePeaks) : 1.5;
+  const plumePeakPeriod = plumePeriods.reduce<PlumePeriod | null>((a, b) => {
+    const bv = b.dynMean ?? b.mean;
+    const av = a ? (a.dynMean ?? a.mean) : null;
+    if (bv == null) return a;
+    if (av == null || bv > av) return b;
+    return a;
+  }, null);
+
+  const elNinoStart = forecastFirst50 ? ensoSeasonWindow(forecastFirst50.season, forecastFirst50.anchorYear)[0] : null;
+  const lastPlume = plumePeriods[plumePeriods.length - 1];
+  const elNinoEnd = lastPlume ? ensoSeasonWindow(lastPlume.label, lastPlume.seasonAnchorYear)[1] : null;
+  const peakX = plumePeakPeriod ? ensoSeasonCentre(plumePeakPeriod.label, plumePeakPeriod.seasonAnchorYear) : null;
+
+  const xMax = Math.max(currentYear + 1.5, (elNinoEnd ?? currentYear + 1) + 0.5);
+  const yearTicks: number[] = [];
+  for (let y = currentYear - yearsBack + 1; y <= Math.ceil(xMax); y++) yearTicks.push(y);
+
+  const chartData: ChartPoint[] = [...observedPoints, ...forecastPoints];
+
+  // Forecast narrative detail
+  const seasons = enso.forecast?.seasons || [];
+  const first50 = seasons.find((s) => s.pElNino >= 50);
+  const first90 = seasons.find((s) => s.pElNino >= 90);
+  const peakSeason = seasons.reduce<ForecastSeason | null>((a, b) => (a === null || b.pElNino > a.pElNino ? b : a), null);
+  let last90: ForecastSeason | null = null;
+  seasons.forEach((s) => { if (s.pElNino >= 90) last90 = s; });
+  const fmtSigned = (v: number, d = 2) => `${v > 0 ? '+' : ''}${v.toFixed(d)}`;
 
   return (
     <Tile>
       <TileHeader
         icon={<Wind className="h-5 w-5 text-sky-300" />}
-        title="ENSO - El Niño / La Niña State"
-        subtitle={`NOAA CPC Oceanic Niño Index (3-month running mean of Niño 3.4 SST)`}
+        title={cardTitle}
+        subtitle="NOAA CPC Oceanic Niño Index · Weekly Niño 3.4 SST · IRI/CCSR forecast plume"
       />
-      <div className="flex items-baseline justify-between gap-3 flex-wrap">
+
+      {/* Description */}
+      <p className="text-sm text-gray-300 leading-relaxed mb-3">
+        The El Niño-Southern Oscillation (ENSO) is the single biggest year-to-year driver of
+        global temperature and rainfall after the long-term warming trend itself. It is also a{' '}
+        <span className="text-[#FFF5E7] font-semibold">natural amplifier of climate change</span>.
+      </p>
+
+      {/* Current state readout */}
+      <div className="flex items-baseline justify-between gap-3 flex-wrap mb-3">
         <div>
           <p className={`text-3xl font-bold font-mono ${accent}`}>{state}</p>
           {enso.strength ? <p className="text-xs text-gray-400 capitalize">{enso.strength}</p> : null}
         </div>
         <div className="text-right">
           <p className="font-mono text-white text-lg">{enso.anomaly > 0 ? '+' : ''}{enso.anomaly.toFixed(2)}°C</p>
-          <p className="text-[11px] text-gray-400">{enso.season} {enso.seasonYear}</p>
+          <p className="text-[11px] text-gray-400">{enso.season} {enso.seasonYear} · ONI</p>
         </div>
       </div>
-      <div className="h-36 mt-3 -ml-1">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chart} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="label" stroke="#9CA3AF" fontSize={9} interval={5} />
-            <YAxis stroke="#9CA3AF" fontSize={10} width={28} domain={[-3, 3]} ticks={[-2, -1, 0, 1, 2]} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12 }}
-              formatter={(v: any) => [typeof v === 'number' ? `${v > 0 ? '+' : ''}${v.toFixed(2)}°C` : '—', 'ONI anomaly']}
-              labelFormatter={(_, p: any) => p?.[0]?.payload ? `${p[0].payload.label} ${p[0].payload.year}` : ''}
-            />
-            <ReferenceLine y={0.5} stroke="#fb7185" strokeDasharray="3 3" strokeWidth={1} />
-            <ReferenceLine y={-0.5} stroke="#60a5fa" strokeDasharray="3 3" strokeWidth={1} />
-            <ReferenceLine y={0} stroke="#6B7280" />
-            <Bar dataKey="anom" isAnimationActive={false}>
-              {chart.map((p, i) => (
-                <Cell key={i} fill={p.anom >= 0.5 ? '#fb7185' : p.anom <= -0.5 ? '#60a5fa' : '#6b7280'} fillOpacity={p.i === chart.length - 1 ? 1 : 0.7} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <p className="text-[11px] text-gray-400 mt-1">
-        ≥ +0.5°C = El Niño · ≤ -0.5°C = La Niña · between = Neutral. El Niño years tend to push global temperature up; La Niña years temporarily damp it.
+
+      {/* Forecast chart */}
+      {chartData.length > 0 && (
+        <div className="h-[260px] -ml-1">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={chartData} margin={{ top: 16, right: 20, left: 0, bottom: 0 }}>
+              <defs>
+                <pattern id="enso-card-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+                  <rect width="6" height="6" fill="rgba(244,63,94,0.12)" />
+                  <rect width="3" height="6" fill="rgba(244,63,94,0.32)" />
+                </pattern>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="x" type="number" domain={[xMin, xMax]} ticks={yearTicks} tickFormatter={(v) => String(Math.round(v))} stroke="#9CA3AF" fontSize={10} allowDecimals={false} />
+              <YAxis stroke="#9CA3AF" fontSize={10} width={30} domain={[-3, 3]} ticks={[-2, -1, 0, 1, 2]} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12, color: '#f3f4f6' }}
+                formatter={(value: any, name: any) => {
+                  if (value == null) return ['', ''];
+                  const labels: Record<string, string> = { anom: 'Niño 3.4 observed', fcAnom: 'Forecast' };
+                  return [`${fmtSigned(Number(value), 2)}°C`, labels[name] || name];
+                }}
+                labelFormatter={(v: any, p: any) => p?.[0]?.payload?.dateLabel || `${Math.floor(v)}-${String(Math.floor((v - Math.floor(v)) * 12) + 1).padStart(2, '0')}`}
+              />
+              <ReferenceLine y={0.5} stroke="#f43f5e" strokeDasharray="3 3" strokeOpacity={0.5} />
+              <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" strokeOpacity={0.5} />
+              <ReferenceLine y={0} stroke="#6B7280" />
+              <Area type="monotone" dataKey="pos" stroke="none" fill="#f43f5e" fillOpacity={0.55} isAnimationActive={false} connectNulls={false} />
+              <Area type="monotone" dataKey="neg" stroke="none" fill="#0ea5e9" fillOpacity={0.55} isAnimationActive={false} connectNulls={false} />
+              {isForecastingElNino && elNinoStart !== null && elNinoEnd !== null && (
+                <ReferenceArea x1={elNinoStart} x2={elNinoEnd} y1={0} y2={predictedPeakOni} fill="url(#enso-card-stripes)" stroke="#f43f5e" strokeWidth={1} strokeDasharray="3 3" strokeOpacity={0.45} ifOverflow="extendDomain" />
+              )}
+              <Area type="monotone" dataKey="fcPos" stroke="none" fill="#f43f5e" fillOpacity={0.35} isAnimationActive={false} connectNulls={false} />
+              <Line type="monotone" dataKey="anom" stroke="#fef3c7" strokeWidth={1.5} dot={false} isAnimationActive={false} connectNulls={false} />
+              <Line type="monotone" dataKey="fcAnom" stroke="#f43f5e" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} connectNulls={false} />
+              {isForecastingElNino && peakX !== null && (
+                <ReferenceDot x={peakX} y={predictedPeakOni} r={4} fill="#f43f5e" stroke="#0f172a" strokeWidth={2} />
+              )}
+              <ReferenceLine x={todayX} stroke="#D0A65E" strokeDasharray="4 4" label={{ value: 'Today', fill: '#D0A65E', fontSize: 10, position: 'top' }} />
+              <ReferenceDot x={todayX} y={currentOni} r={5} fill="#D0A65E" stroke="#0f172a" strokeWidth={2}
+                label={{ value: `Now ${fmtSigned(currentOni, 2)}°C`, fill: '#D0A65E', fontSize: 10, fontWeight: 600, position: 'left', offset: 10 }} />
+              {forecastPoints.length > 0 && (() => {
+                const lastFc = forecastPoints[forecastPoints.length - 1];
+                return <ReferenceLine x={lastFc.x} stroke="#f43f5e" strokeDasharray="2 4" strokeOpacity={0.55} label={{ value: 'End of forecasts', fill: '#fda4af', fontSize: 9, position: 'insideTopLeft', offset: 4 }} />;
+              })()}
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Legend */}
+      {chartData.length > 0 && (
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-gray-300">
+          <span className="inline-flex items-center gap-1.5"><span className="inline-block w-5 h-0.5 bg-[#fef3c7]" /> Weekly Niño 3.4</span>
+          <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(244,63,94,0.55)' }} /> El Niño shading</span>
+          <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(14,165,233,0.55)' }} /> La Niña shading</span>
+          <span className="inline-flex items-center gap-1.5"><span className="inline-block w-5 h-0.5" style={{ background: 'repeating-linear-gradient(90deg,#f43f5e 0 4px,transparent 4px 8px)' }} /> Forecast</span>
+          <span className="inline-flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / Today</span>
+        </div>
+      )}
+
+      {/* Forecast narrative */}
+      {isForecastingElNino && first50 && (
+        <div className="mt-3 rounded-xl border border-rose-500/30 bg-gradient-to-br from-rose-950/30 to-gray-900/30 p-3">
+          <p className="text-[10px] uppercase tracking-wider text-rose-300/80 font-mono mb-1">NOAA forecast - what&apos;s coming</p>
+          <p className="text-xs text-gray-100 leading-relaxed">
+            A new <span className="font-semibold text-rose-300">El Niño</span> looks increasingly likely.{' '}
+            Probability first crosses <span className="font-mono font-semibold text-rose-200">50%</span> in{' '}
+            <span className="font-mono">{first50.label}</span> ({first50.pElNino}% chance)
+            {first90 && <> — climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in <span className="font-mono">{first90.label}</span></>}
+            {peakSeason && <> and peaks at <span className="font-mono font-semibold text-rose-200">{peakSeason.pElNino}%</span> in <span className="font-mono">{peakSeason.label}</span></>}
+            {last90 && first90 && (last90 as ForecastSeason).season !== first90.season && <>, staying above 90% through <span className="font-mono">{(last90 as ForecastSeason).label}</span></>}
+            {'. '}
+            {enso.plume && <>The dashed red curve traces the multi-model <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="text-rose-300 underline decoration-rose-400/40 underline-offset-2 hover:decoration-rose-300">IRI/CCSR plume forecast</a>{' '}
+            (issued {enso.plume.issueMonth}/{enso.plume.issueYear}, {enso.plume.periods[0]?.modelCount ?? 0} dynamical &amp; statistical models).</>}
+            {plumePeakPeriod && <> Peak intensity reaches <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span> in <span className="font-mono">{plumePeakPeriod.label} {plumePeakPeriod.seasonAnchorYear}</span> — the dynamical-model average, which currently signals a strong-to-super El Niño.</>}
+          </p>
+        </div>
+      )}
+
+      <p className="text-[11px] text-gray-400 mt-2">
+        Sources:{' '}
+        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">NOAA CPC ONI</a>,{' '}
+        <a href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">NOAA CPC weekly Niño 3.4</a>,{' '}
+        <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">IRI/CCSR plume forecast</a>,{' '}
+        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">NOAA CPC probability outlook</a>.
       </p>
-      <p className="text-[11px] text-gray-400 mt-1">
-        <span style={{ color }} /> Source:&nbsp;
-        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
-          NOAA CPC ONI <ExternalLink className="h-2.5 w-2.5" />
-        </a>
-      </p>
-      <Link href="/climate/enso" className="mt-2 text-xs font-semibold text-[#D0A65E] hover:text-[#E5C088] inline-flex items-center gap-1">
+      <Link href="/climate/enso" className="mt-2 text-xs font-semibold text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1">
         Full ENSO tracker (Niño 3.4, MEI, SOI, forecast) <ArrowUpRight className="h-3 w-3" />
       </Link>
     </Tile>

@@ -776,9 +776,9 @@ function LiveEventsSection({
         <EventsMap events={sorted} />
       </div>
 
-      {/* 3. Overview - hotspot clusters + Red/Amber singletons, expandable full list */}
+      {/* 3. Key active events/clusters + Red/Amber singletons, expandable full list */}
       <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-        {hotspots.length > 0 ? "Overview - active events" : "Active events"}
+        {hotspots.length > 0 ? "Key active events/clusters" : "Active events"}
       </h4>
         {hotspots.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">

@@ -634,16 +634,20 @@ function ClimateDashboard() {
 
           {hasData && !loading && (
             <div className="flex items-start gap-2 mt-3">
-              <div className="flex items-center gap-1.5 flex-1 text-green-400 bg-green-950/40 py-1.5 px-4 rounded-lg border border-green-800/50">
-                <MapPin className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium text-sm">{getLocationLabel()}</span>
+              <div className="flex flex-col gap-0.5 flex-1 text-green-400 bg-green-950/40 py-1.5 px-4 rounded-lg border border-green-800/50">
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                  <span className="font-medium text-sm">{getLocationLabel()}</span>
+                </div>
                 {selectedLocation && getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode) && (
-                  <Link
-                    href={`/climate/${getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode)}`}
-                    className="ml-auto flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap"
-                  >
-                    Full Monthly Update <ExternalLink className="h-3 w-3" />
-                  </Link>
+                  <div className="flex justify-end">
+                    <Link
+                      href={`/climate/${getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode)}`}
+                      className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap"
+                    >
+                      Full Monthly Update <ExternalLink className="h-3 w-3" />
+                    </Link>
+                  </div>
                 )}
               </div>
               <button
