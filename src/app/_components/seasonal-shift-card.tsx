@@ -177,7 +177,7 @@ export default function SeasonalShiftCard({
         <div className="flex gap-2 text-xs flex-wrap">
           {hasTempSeasons && (
             <TabButton active={effectiveView === 'length'} onClick={() => setView('length')}>
-              Spring &amp; autumn
+              Spring &amp; Autumn
             </TabButton>
           )}
           <TabButton active={effectiveView === 'monthly'} onClick={() => setView('monthly')}>
@@ -622,7 +622,7 @@ function WarmSeasonShiftBar({
     <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-3 mb-4">
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
         <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider">
-          Spring &amp; autumn shift
+          Spring &amp; Autumn shift
         </div>
         <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
           {deltaDays > 0 ? `+${deltaDays} days longer` : deltaDays < 0 ? `${deltaDays} days shorter` : 'no change'}
