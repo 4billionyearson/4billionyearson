@@ -31,6 +31,7 @@ export type GlobalShiftRecord = {
   code?: string;
   name: string;
   geojsonName?: string;
+  hemisphere: "N" | "S";
   seasonality: SeasonalityKind;
   koppen: KoppenResult | null;
   windows: {

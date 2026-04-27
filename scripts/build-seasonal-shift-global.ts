@@ -52,6 +52,7 @@ type ShiftRecord = {
   id?: string;
   name: string;
   geojsonName?: string;
+  hemisphere: 'N' | 'S';
   seasonality: SeasonalityKind;
   koppen: KoppenResult | null;
   windows: {
@@ -64,6 +65,30 @@ type ShiftRecord = {
   temp: TempShift;
   rain: RainShift | null;
 };
+
+// Countries whose climate sits south of the equator. Border-straddling countries
+// (Brazil, Colombia, Ecuador, Indonesia, Kenya, Uganda, DRC, Republic of Congo,
+// São Tomé, Gabon, etc.) are assigned by where the centroid + bulk of population
+// fall climatically. Used only for the global NH/SH summary.
+const SOUTHERN_HEMISPHERE_COUNTRIES = new Set([
+  // South America
+  'Argentina', 'Bolivia', 'Brazil', 'Chile', 'Paraguay', 'Peru', 'Uruguay',
+  // Africa
+  'Angola', 'Botswana', 'Burundi', 'Comoros', 'Eswatini', 'Lesotho', 'Madagascar',
+  'Malawi', 'Mauritius', 'Mozambique', 'Namibia', 'Rwanda', 'South Africa',
+  'Tanzania', 'Zambia', 'Zimbabwe',
+  // Oceania / Pacific
+  'Australia', 'East Timor', 'Timor-Leste', 'Fiji', 'Indonesia', 'New Zealand',
+  'Papua New Guinea', 'Samoa', 'Solomon Islands', 'Tonga', 'Vanuatu',
+  // Antarctica
+  'Antarctica',
+]);
+
+function classifyHemisphere(kind: ShiftRecord['kind'], name: string): 'N' | 'S' {
+  if (kind === 'us-state') return 'N';
+  if (kind === 'uk-region') return 'N';
+  return SOUTHERN_HEMISPHERE_COUNTRIES.has(name) ? 'S' : 'N';
+}
 
 async function readJson<T = any>(file: string): Promise<T> {
   return JSON.parse(await fs.readFile(file, 'utf8'));
@@ -116,6 +141,7 @@ async function analyseRegion(
   return {
     kind,
     name,
+    hemisphere: classifyHemisphere(kind, name),
     seasonality,
     koppen,
     windows: res.windows,

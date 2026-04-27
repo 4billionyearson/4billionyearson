@@ -5,9 +5,9 @@ import Link from 'next/link';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell, ComposedChart,
 } from 'recharts';
-import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, Wind, Info, BookOpen, Scale, Factory, Leaf, ArrowRight, Ruler } from 'lucide-react';
+import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, Wind, Info, BookOpen, Scale, Factory, Leaf, Ruler } from 'lucide-react';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
-import SeasonTimelineGraphic from '@/app/_components/season-timeline-graphic';
+import GlobalSeasonalSummary from '@/app/_components/global-seasonal-summary';
 import { getRegionBySlug } from '@/lib/climate/regions';
 import {
   OverviewGrid,
@@ -684,35 +684,16 @@ export default function GlobalProfile() {
                 </>
               ) : null}
 
-              {/* Shifting Seasons teaser - global temperature is too flat to run
-                  the standard warm/cold analysis, so we link out to the full
-                  worldwide treatment instead. */}
+              {/* Shifting Seasons summary - splits the ~236 analysed regions by
+                  hemisphere and Köppen climate zone, since global mean temperature
+                  is too flat to run the standard warm/cold analysis on its own. */}
               <Divider icon={<Leaf className="h-5 w-5 text-emerald-400" />} title="Shifting Seasons" />
               <section className="bg-gray-950/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
                   <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons Worldwide</h3>
                 </div>
-                <p className="text-sm text-gray-300 mb-4">
-                  Global averages smooth out the seasonal cycle, but climate change shows up most clearly in the <em>timing</em> of the year. Spring is arriving earlier, snow seasons are shorter and growing seasons are longer.
-                </p>
-
-                {/* Calendar-year timeline graphic */}
-                <SeasonTimelineGraphic />
-
-                <p className="text-xs text-gray-500 mt-3">
-                  Sources: EPA (US frost-free growing season since 1895) · Aono &amp; Kazui 2008 (Kyoto peak-bloom 1,200-year record) · NOAA Rutgers Global Snow Lab (NH snow cover).
-                </p>
-
-                <div className="mt-4 flex justify-end">
-                  <Link
-                    href="/climate/shifting-seasons"
-                    className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
-                  >
-                    Explore Shifting Seasons worldwide
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </div>
+                <GlobalSeasonalSummary />
               </section>
 
               {/* Long-view charts: yearly trend + last-12-months anomaly comparison */}
