@@ -196,12 +196,46 @@ html {
 }
 
 /* Calendar-year timeline component (src/app/_components/calendar-timeline.tsx).
-   Single column on phones, [label | track] on sm+. Uses CSS var for label width. */
+   Each row is its own [label | track] grid so labels and bars stay visually
+   bound. Mobile collapses to a single column. Alternating row backgrounds
+   create a horizontal band that ties title+sub+delta to the bar geometry. */
 .cal-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.cal-row {
+  display: grid;
   grid-template-columns: minmax(0, 1fr);
+  gap: 0.25rem 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+}
+.cal-row + .cal-row {
+  margin-top: 0.125rem;
+}
+.cal-row:nth-of-type(odd) {
+  background: rgba(148, 163, 184, 0.04);
+}
+.cal-row-track {
+  position: relative;
+  align-self: center;
+  min-width: 0;
+}
+.cal-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 0.75rem 0.375rem;
+  margin-top: 0.5rem;
+}
+.cal-section-header:first-child {
+  padding-top: 0;
+  margin-top: 0;
 }
 @media (min-width: 640px) {
-  .cal-timeline {
-    grid-template-columns: var(--cal-label-col, 160px) minmax(0, 1fr);
+  .cal-row {
+    grid-template-columns: var(--cal-label-col, 192px) minmax(0, 1fr);
+    align-items: center;
   }
 }

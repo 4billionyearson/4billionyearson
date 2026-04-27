@@ -55,25 +55,24 @@ export default function SeasonTimelineGraphic() {
   ];
 
   return (
-    <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 p-3 sm:p-4">
-      <div className="text-xs text-gray-400 uppercase tracking-wider mb-3">
-        Calendar-year view · Northern Hemisphere
+    <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 p-3 sm:p-5">
+      <div className="flex items-center justify-between gap-2 flex-wrap mb-4">
+        <div className="text-xs text-gray-400 uppercase tracking-wider">
+          Calendar-year view · Northern Hemisphere
+        </div>
+        <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider font-mono text-gray-500">
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-4 h-2 rounded-full border border-dashed border-gray-400" />
+            baseline
+          </span>
+          <span className="text-gray-600">→</span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-4 h-2 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-500" />
+            now
+          </span>
+        </div>
       </div>
-      <CalendarTimeline rows={rows} labelColPx={160} />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-[11px] text-gray-400">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-3 h-2 rounded-sm border border-dashed border-gray-500" />
-          Baseline window
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-3 h-2 rounded-sm bg-emerald-500" />
-          Recent window
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-2.5 h-2.5 rounded-full bg-pink-400" />
-          Kyoto peak bloom
-        </span>
-      </div>
+      <CalendarTimeline rows={rows} labelColPx={188} />
     </div>
   );
 }
