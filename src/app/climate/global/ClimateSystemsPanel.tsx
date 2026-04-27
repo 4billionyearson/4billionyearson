@@ -208,6 +208,38 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
 
   const chartData: ChartPoint[] = [...observedPoints, ...forecastPoints];
 
+  // ── Past event labels (same logic as the full ENSO tracker page) ─────────
+  type EnsoEvent = { phase: 'el-nino' | 'la-nina'; weak: boolean; startX: number; endX: number; peak: number };
+  const ensoEvents: EnsoEvent[] = [];
+  {
+    const MIN_CONSEC = 3;
+    const MIN_PEAK = 0.5;
+    const WEAK_MAX = 1.0;
+    const histInWindow = (enso.history || []).filter((p) => {
+      const [s] = ensoSeasonWindow(p.season, p.year);
+      return s >= xMin && s < todayX;
+    });
+    let cur: { phase: 'el-nino' | 'la-nina'; rows: typeof histInWindow } | null = null;
+    const flush = () => {
+      if (!cur || cur.rows.length < MIN_CONSEC) { cur = null; return; }
+      const peakRow = cur.rows.reduce((a, b) => (Math.abs(b.anom) > Math.abs(a.anom) ? b : a));
+      if (Math.abs(peakRow.anom) < MIN_PEAK) { cur = null; return; }
+      const first = cur.rows[0];
+      const last = cur.rows[cur.rows.length - 1];
+      const [s] = ensoSeasonWindow(first.season, first.year);
+      const [, e] = ensoSeasonWindow(last.season, last.year);
+      ensoEvents.push({ phase: cur.phase, weak: Math.abs(peakRow.anom) < WEAK_MAX, startX: s, endX: e, peak: peakRow.anom });
+      cur = null;
+    };
+    for (const p of histInWindow) {
+      const phase: 'el-nino' | 'la-nina' | null = p.anom >= 0.5 ? 'el-nino' : p.anom <= -0.5 ? 'la-nina' : null;
+      if (phase === null) { flush(); continue; }
+      if (cur && cur.phase === phase) { cur.rows.push(p); }
+      else { flush(); cur = { phase, rows: [p] }; }
+    }
+    flush();
+  }
+
   // Forecast narrative detail
   const seasons = enso.forecast?.seasons || [];
   const first50 = seasons.find((s) => s.pElNino >= 50);
@@ -297,6 +329,24 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
               {isForecastingElNino && peakX !== null && (
                 <ReferenceDot x={peakX} y={predictedPeakOni} r={4} fill="#f43f5e" stroke="#0f172a" strokeWidth={2} />
               )}
+              {/* Past event labels — same logic as the full ENSO tracker */}
+              {ensoEvents.filter((ev) => ((ev.startX + ev.endX) / 2) - xMin >= 1).map((ev, i) => {
+                const cx = (ev.startX + ev.endX) / 2;
+                return (
+                  <ReferenceLine
+                    key={`ev-label-${i}`}
+                    x={cx}
+                    stroke="transparent"
+                    label={{
+                      value: `${ev.phase === 'el-nino' ? 'El Niño' : 'La Niña'}${ev.weak ? ' (weak)' : ''}`,
+                      fill: ev.phase === 'el-nino' ? '#fecaca' : '#bfdbfe',
+                      fontSize: 9.5,
+                      position: ev.peak >= 0 ? 'insideTop' : 'insideBottom',
+                      offset: 4,
+                    }}
+                  />
+                );
+              })}
               <ReferenceLine x={todayX} stroke="#D0A65E" strokeDasharray="4 4" label={{ value: 'Today', fill: '#D0A65E', fontSize: 10, position: 'top' }} />
               <ReferenceDot x={todayX} y={currentOni} r={5} fill="#D0A65E" stroke="#0f172a" strokeWidth={2}
                 label={{ value: `Now ${fmtSigned(currentOni, 2)}°C`, fill: '#D0A65E', fontSize: 10, fontWeight: 600, position: 'left', offset: 10 }} />
@@ -341,14 +391,16 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
 
       <p className="text-[11px] text-gray-400 mt-2">
         Sources:{' '}
-        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">NOAA CPC ONI</a>,{' '}
-        <a href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">NOAA CPC weekly Niño 3.4</a>,{' '}
-        <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">IRI/CCSR plume forecast</a>,{' '}
-        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200">NOAA CPC probability outlook</a>.
+        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC ONI</a>,{' '}
+        <a href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC weekly Niño 3.4</a>,{' '}
+        <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">IRI/CCSR plume forecast</a>,{' '}
+        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC probability outlook</a>.
       </p>
-      <Link href="/climate/enso" className="mt-2 text-xs font-semibold text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1">
-        Full ENSO tracker (Niño 3.4, MEI, SOI, forecast) <ArrowUpRight className="h-3 w-3" />
-      </Link>
+      <div className="flex justify-end mt-2">
+        <Link href="/climate/enso" className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1">
+          Full ENSO tracker (Niño 3.4, MEI, SOI, forecast) <ArrowUpRight className="h-3 w-3" />
+        </Link>
+      </div>
     </Tile>
   );
 }
@@ -414,20 +466,20 @@ export function GhgTile({ ghgStats }: { ghgStats: { co2: GhgStat | null; ch4: Gh
       <p className="text-[11px] text-gray-400 mt-2">
         Sparklines: last 10 years of monthly values. Pre-industrial reference values: CO₂ 280 ppm, CH₄ 722 ppb, N₂O 270 ppb.
       </p>
-      <div className="mt-auto pt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
-        <Link href="/greenhouse-gases" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
+      <p className="text-[11px] text-gray-400 mt-1">
+        Source:&nbsp;
+        <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">
+          NOAA GML Trends
+        </a>
+      </p>
+      <div className="mt-auto pt-2 flex flex-wrap justify-end gap-x-3 gap-y-1 text-[11px]">
+        <Link href="/greenhouse-gases" className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold">
           Greenhouse gases dashboard <ArrowUpRight className="h-3 w-3" />
         </Link>
-        <Link href="/emissions" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
+        <Link href="/emissions" className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold">
           Emissions by country <ArrowUpRight className="h-3 w-3" />
         </Link>
       </div>
-      <p className="text-[11px] text-gray-400 mt-1">
-        Source:&nbsp;
-        <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
-          NOAA GML Trends <ExternalLink className="h-2.5 w-2.5" />
-        </a>
-      </p>
     </Tile>
   );
 }
@@ -503,17 +555,17 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
         </ResponsiveContainer>
       </div>
       <p className="text-[11px] text-gray-400 mt-1">Last 60 months. Long-term trend is down - Arctic loss exceeds Antarctic variability.</p>
-      <div className="mt-auto pt-2 text-[11px]">
-        <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
+      <p className="text-[11px] text-gray-400 mt-1">
+        Source:&nbsp;
+        <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">
+          NSIDC via global-warming.org
+        </a>
+      </p>
+      <div className="mt-auto pt-2 flex justify-end text-[11px]">
+        <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold">
           Sea levels &amp; ice dashboard <ArrowUpRight className="h-3 w-3" />
         </Link>
       </div>
-      <p className="text-[11px] text-gray-400 mt-1">
-        Source:&nbsp;
-        <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
-          NSIDC via global-warming.org <ExternalLink className="h-2.5 w-2.5" />
-        </a>
-      </p>
     </Tile>
   );
 }
@@ -565,8 +617,8 @@ export function ContinentalBar({ continents }: { continents: ContinentStat[] | n
       </p>
       <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
-        <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
-          NOAA Climate at a Glance <ExternalLink className="h-2.5 w-2.5" />
+        <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">
+          NOAA Climate at a Glance
         </a>
       </p>
     </Tile>

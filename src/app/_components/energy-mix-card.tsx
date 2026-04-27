@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Wind, ArrowUp, ArrowDown, ExternalLink, Loader2 } from 'lucide-react';
+import { Wind, ArrowUp, ArrowDown, ArrowUpRight, Loader2 } from 'lucide-react';
 
 interface YearlyPoint {
   year: number;
@@ -109,13 +109,14 @@ function CardShell({ title, year, deepLinkHref, children }: {
         </h2>
       </div>
       <div className="p-4 md:p-5 space-y-4">{children}</div>
-      <Link
-        href={deepLinkHref}
-        className="flex items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-800/60 bg-gray-900/40 text-xs text-[#D1E368] hover:text-[#E4F088] hover:bg-[#D1E368]/5 transition-colors"
-      >
-        <span>See full energy data</span>
-        <ExternalLink className="h-3.5 w-3.5" />
-      </Link>
+      <div className="flex justify-end px-4 py-2.5 border-t border-gray-800/60 bg-gray-900/40">
+        <Link
+          href={deepLinkHref}
+          className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+        >
+          See full energy data <ArrowUpRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
     </div>
   );
 }
