@@ -18,6 +18,7 @@ import {
   type MonthlyPoint,
   type SeasonalityKind,
 } from '@/lib/climate/shift-analysis';
+import CalendarTimeline, { type TimelineRow } from '@/app/_components/calendar-timeline';
 
 interface SeasonalShiftCardProps {
   monthlyAll: MonthlyPoint[];
@@ -581,17 +582,42 @@ function WarmSeasonShiftBar({
   springShiftDays: number;
   autumnShiftDays: number;
 }) {
-  const X0 = 170;
-  const X1 = 960;
-  const x = (doy: number) => X0 + (doy / 365) * (X1 - X0);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  // For southern-hemisphere locations spring DOY > autumn DOY (e.g. spring≈305, autumn≈106)
-  const isWrap = baselineSpringDoy > baselineAutumnDoy;
-  const baselineLen = isWrap ? (365 - baselineSpringDoy + baselineAutumnDoy) : (baselineAutumnDoy - baselineSpringDoy);
-  const recentLen   = (recentSpringDoy > recentAutumnDoy)  ? (365 - recentSpringDoy  + recentAutumnDoy)  : (recentAutumnDoy  - recentSpringDoy);
+  // Warm-season length helper (handles year-wrap for southern-hemisphere regions
+  // where spring DOY ≈ Sep/Oct > autumn DOY ≈ Mar/Apr).
+  const lenOf = (springDoy: number, autumnDoy: number) =>
+    springDoy > autumnDoy ? 365 - springDoy + autumnDoy : autumnDoy - springDoy;
+  const baselineLen = lenOf(baselineSpringDoy, baselineAutumnDoy);
+  const recentLen = lenOf(recentSpringDoy, recentAutumnDoy);
   const deltaDays = Math.round(recentLen - baselineLen);
   const shiftColor = deltaDays > 0 ? '#fb923c' : deltaDays < 0 ? '#38bdf8' : '#9CA3AF';
-  const TOTAL_H = 110;
+
+  const springText = springShiftDays === 0
+    ? null
+    : springShiftDays < 0
+      ? `${Math.abs(Math.round(springShiftDays))}d earlier spring`
+      : `${Math.round(springShiftDays)}d later spring`;
+  const autumnText = autumnShiftDays === 0
+    ? null
+    : autumnShiftDays > 0
+      ? `${Math.round(autumnShiftDays)}d later autumn`
+      : `${Math.abs(Math.round(autumnShiftDays))}d earlier autumn`;
+
+  const rows: TimelineRow[] = [
+    {
+      kind: 'bar',
+      key: 'warm',
+      title: 'Warm season',
+      sub: `${baselineLabel} baseline: ${doyToLabel(baselineSpringDoy)} → ${doyToLabel(baselineAutumnDoy)} · ${Math.round(baselineLen)}d`,
+      delta: `${recentLabel} now: ${doyToLabel(recentSpringDoy)} → ${doyToLabel(recentAutumnDoy)} · ${Math.round(recentLen)}d`,
+      deltaColor: '#FDE68A',
+      recentColor: '#F59E0B',
+      baselineSpringDoy,
+      baselineAutumnDoy,
+      recentSpringDoy,
+      recentAutumnDoy,
+    },
+  ];
+
   return (
     <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-3 mb-4">
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
@@ -602,110 +628,12 @@ function WarmSeasonShiftBar({
           {deltaDays > 0 ? `+${deltaDays} days longer` : deltaDays < 0 ? `${deltaDays} days shorter` : 'no change'}
         </div>
       </div>
-
-      {/* Mobile stacked view - the wide SVG below scales to ~320 px on phones,
-          which makes its 10 px text effectively unreadable. */}
-      <div className="space-y-2 sm:hidden font-mono">
-        <div className="rounded-md border border-gray-700/50 bg-gray-800/60 p-2.5">
-          <div className="text-[11px] text-gray-400 mb-0.5">{baselineLabel} baseline</div>
-          <div className="text-sm text-gray-200">
-            {doyToLabel(baselineSpringDoy)} <span className="text-gray-500">→</span> {doyToLabel(baselineAutumnDoy)}
-            <span className="text-gray-500"> · {Math.round(baselineLen)}d</span>
-          </div>
+      <CalendarTimeline rows={rows} labelColPx={150} />
+      {(springText || autumnText) && (
+        <div className="mt-2 text-xs font-mono text-center" style={{ color: shiftColor }}>
+          {[springText, autumnText].filter(Boolean).join(' · ')}
         </div>
-        <div className="rounded-md border p-2.5" style={{ borderColor: '#F59E0B66', background: '#F59E0B14' }}>
-          <div className="text-[11px] mb-0.5" style={{ color: '#FDE68A' }}>{recentLabel} now</div>
-          <div className="text-sm" style={{ color: '#FDE68A' }}>
-            {doyToLabel(recentSpringDoy)} <span className="opacity-60">→</span> {doyToLabel(recentAutumnDoy)}
-            <span className="opacity-70"> · {Math.round(recentLen)}d</span>
-          </div>
-          <div className="mt-1 text-xs" style={{ color: shiftColor }}>
-            {springShiftDays !== 0 && (
-              <span>{springShiftDays < 0 ? `${Math.abs(Math.round(springShiftDays))}d earlier spring` : `${Math.round(springShiftDays)}d later spring`}</span>
-            )}
-            {springShiftDays !== 0 && autumnShiftDays !== 0 && <span className="text-gray-500"> · </span>}
-            {autumnShiftDays !== 0 && (
-              <span>{autumnShiftDays > 0 ? `${Math.round(autumnShiftDays)}d later autumn` : `${Math.abs(Math.round(autumnShiftDays))}d earlier autumn`}</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <svg viewBox={`0 0 1000 ${TOTAL_H}`} className="w-full h-auto hidden sm:block" role="img">
-        {/* Baseline row */}
-        <text
-          x={X0 - 10}
-          y={10}
-          textAnchor="end"
-          fontSize={11}
-          fill="#9CA3AF"
-          fontFamily="ui-monospace, monospace"
-        >
-          {baselineLabel} baseline
-        </text>
-        {isWrap ? (
-          <>
-            <rect x={X0} y={14} width={x(baselineAutumnDoy) - X0} height={10} rx={5} fill="none" stroke="#9CA3AF" strokeDasharray="4 3" />
-            <rect x={x(baselineSpringDoy)} y={14} width={X1 - x(baselineSpringDoy)} height={10} rx={5} fill="none" stroke="#9CA3AF" strokeDasharray="4 3" />
-          </>
-        ) : (
-          <rect x={x(baselineSpringDoy)} y={14} width={x(baselineAutumnDoy) - x(baselineSpringDoy)} height={10} rx={5} fill="none" stroke="#9CA3AF" strokeDasharray="4 3" />
-        )}
-        <text x={x(baselineSpringDoy) - 4} y={22} textAnchor="end" fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
-          {doyToLabel(baselineSpringDoy)}
-        </text>
-        <text x={x(baselineAutumnDoy) + 4} y={22} fontSize={10} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
-          {doyToLabel(baselineAutumnDoy)}
-        </text>
-
-        {/* Recent row */}
-        <text
-          x={X0 - 10}
-          y={44}
-          textAnchor="end"
-          fontSize={11}
-          fill="#FDE68A"
-          fontFamily="ui-monospace, monospace"
-        >
-          {recentLabel} now
-        </text>
-        {isWrap ? (
-          <>
-            <rect x={X0} y={48} width={x(recentAutumnDoy) - X0} height={10} rx={5} fill="#F59E0B" fillOpacity={0.85} />
-            <rect x={x(recentSpringDoy)} y={48} width={X1 - x(recentSpringDoy)} height={10} rx={5} fill="#F59E0B" fillOpacity={0.85} />
-          </>
-        ) : (
-          <rect x={x(recentSpringDoy)} y={48} width={x(recentAutumnDoy) - x(recentSpringDoy)} height={10} rx={5} fill="#F59E0B" fillOpacity={0.85} />
-        )}
-        <text x={x(recentSpringDoy) - 4} y={56} textAnchor="end" fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
-          {doyToLabel(recentSpringDoy)}
-        </text>
-        <text x={x(recentAutumnDoy) + 4} y={56} fontSize={10} fill="#FDE68A" fontFamily="ui-monospace, monospace">
-          {doyToLabel(recentAutumnDoy)}
-        </text>
-
-        {/* Shift annotations */}
-        <text x={x((baselineSpringDoy + recentSpringDoy) / 2)} y={76} textAnchor="middle" fontSize={10} fill={shiftColor} fontFamily="ui-monospace, monospace">
-          {springShiftDays < 0 ? `${Math.abs(Math.round(springShiftDays))}d earlier` : springShiftDays > 0 ? `${Math.round(springShiftDays)}d later` : ''}
-        </text>
-        <text x={x((baselineAutumnDoy + recentAutumnDoy) / 2)} y={76} textAnchor="middle" fontSize={10} fill={shiftColor} fontFamily="ui-monospace, monospace">
-          {autumnShiftDays > 0 ? `${Math.round(autumnShiftDays)}d later` : autumnShiftDays < 0 ? `${Math.abs(Math.round(autumnShiftDays))}d earlier` : ''}
-        </text>
-
-        {/* Month axis */}
-        <line x1={X0} y1={86} x2={X1} y2={86} stroke="#4B5563" strokeWidth={1} />
-        {months.map((m, i) => {
-          const cx = X0 + ((i + 0.5) / 12) * (X1 - X0);
-          return (
-            <g key={m}>
-              <line x1={cx} y1={82} x2={cx} y2={90} stroke="#6B7280" strokeWidth={1} />
-              <text x={cx} y={104} textAnchor="middle" fontSize={11} fill="#9CA3AF" fontFamily="ui-monospace, monospace">
-                {m}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+      )}
     </div>
   );
 }

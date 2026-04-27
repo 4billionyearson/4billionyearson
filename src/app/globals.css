@@ -194,3 +194,14 @@ html {
 .live-dot {
   animation: live-pulse 1.5s ease-in-out infinite;
 }
+
+/* Calendar-year timeline component (src/app/_components/calendar-timeline.tsx).
+   Single column on phones, [label | track] on sm+. Uses CSS var for label width. */
+.cal-timeline {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 640px) {
+  .cal-timeline {
+    grid-template-columns: var(--cal-label-col, 160px) minmax(0, 1fr);
+  }
+}
