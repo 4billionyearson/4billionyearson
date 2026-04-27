@@ -232,16 +232,32 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
         <span className="text-[#FFF5E7] font-semibold">natural amplifier of climate change</span>.
       </p>
 
-      {/* Current state readout */}
-      <div className="flex items-baseline justify-between gap-3 flex-wrap mb-3">
-        <div>
-          <p className={`text-3xl font-bold font-mono ${accent}`}>{state}</p>
-          {enso.strength ? <p className="text-xs text-gray-400 capitalize">{enso.strength}</p> : null}
+      {/* ONI + This week stat boxes */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">ONI · 3-month mean</p>
+          <p className={`text-2xl font-bold font-mono ${accent}`}>{state}</p>
+          <p className="text-sm text-gray-400 mt-1">
+            <span className="font-mono text-white">{enso.anomaly > 0 ? '+' : ''}{enso.anomaly.toFixed(2)}°C</span>{' ·'}{' '}
+            {enso.season} {enso.seasonYear}
+          </p>
         </div>
-        <div className="text-right">
-          <p className="font-mono text-white text-lg">{enso.anomaly > 0 ? '+' : ''}{enso.anomaly.toFixed(2)}°C</p>
-          <p className="text-[11px] text-gray-400">{enso.season} {enso.seasonYear} · ONI</p>
-        </div>
+        {enso.weekly?.weekly?.length ? (() => {
+          const lastW = enso.weekly!.weekly[enso.weekly!.weekly.length - 1];
+          const wa = lastW.nino34.anom;
+          const wColor = wa >= 0.5 ? 'text-rose-300' : wa <= -0.5 ? 'text-sky-300' : 'text-gray-200';
+          const [wy, wm, wd] = enso.weekly!.lastWeek.split('-');
+          return (
+            <div className="bg-gray-800/90 border border-gray-700/50 rounded-xl p-4">
+              <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Niño 3.4 · this week</p>
+              <div className="flex items-baseline gap-1 flex-wrap">
+                <span className={`text-2xl font-bold font-mono ${wColor}`}>{wa > 0 ? '+' : ''}{wa.toFixed(2)}</span>
+                <span className="text-sm text-gray-400">°C</span>
+              </div>
+              <p className="text-sm text-gray-400 mt-1">SST {lastW.nino34.sst.toFixed(1)}°C · w/e {wd}-{wm}-{wy.slice(2)}</p>
+            </div>
+          );
+        })() : null}
       </div>
 
       {/* Forecast chart */}

@@ -15,7 +15,7 @@ import {
   type OverviewPanel,
   type OverviewRow,
 } from '../_shared/overview-grid';
-import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar, WhatChangedTile } from './ClimateSystemsPanel';
+import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar } from './ClimateSystemsPanel';
 import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
 import AnomalyMapCard from './AnomalyMapCard';
 import EmissionsCard from '@/app/_components/emissions-card';
@@ -779,17 +779,13 @@ export default function GlobalProfile() {
               {(data.enso || data.ghgStats || data.seaIceStats || data.continentStats?.length || data.previousLatestMonthStats) && (
                 <>
                   <Divider icon={<Wind className="h-5 w-5 text-sky-300" />} title="Climate Systems" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {data.enso && <EnsoCard enso={data.enso} />}
-                    {data.ghgStats && <GhgTile ghgStats={data.ghgStats} />}
-                    {data.seaIceStats && <SeaIceTile seaIce={data.seaIceStats} />}
-                    {data.noaaStats?.landOcean?.latestMonthStats && data.previousLatestMonthStats?.landOcean && (
-                      <WhatChangedTile
-                        current={data.noaaStats.landOcean.latestMonthStats}
-                        previous={data.previousLatestMonthStats.landOcean}
-                      />
-                    )}
-                  </div>
+                  {data.enso && <EnsoCard enso={data.enso} />}
+                  {(data.ghgStats || data.seaIceStats) && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {data.ghgStats && <GhgTile ghgStats={data.ghgStats} />}
+                      {data.seaIceStats && <SeaIceTile seaIce={data.seaIceStats} />}
+                    </div>
+                  )}
                   {data.continentStats?.length ? (
                     <div className="mt-6">
                       <ContinentalBar continents={data.continentStats} />
