@@ -631,7 +631,7 @@ function WarmSeasonShiftBar({
         {/* Baseline row */}
         <text
           x={X0 - 10}
-          y={20}
+          y={10}
           textAnchor="end"
           fontSize={11}
           fill="#9CA3AF"
@@ -659,7 +659,7 @@ function WarmSeasonShiftBar({
         {/* Recent row */}
         <text
           x={X0 - 10}
-          y={54}
+          y={44}
           textAnchor="end"
           fontSize={11}
           fill="#FDE68A"
