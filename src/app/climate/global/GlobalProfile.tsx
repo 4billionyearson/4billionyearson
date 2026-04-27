@@ -833,20 +833,20 @@ export default function GlobalProfile() {
                   </h3>
                   <ul className="text-sm text-gray-300 grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-1.5">
                     <li>
-                      <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
-                        NOAA Climate at a Glance <ExternalLink className="h-3 w-3" />
+                      <a href="https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land_ocean/1/0/1950-2026" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 underline">
+                        NOAA Climate at a Glance
                       </a>
                       <span className="text-xs text-gray-500"> - Land+Ocean anomalies</span>
                     </li>
                     <li>
-                      <a href="https://ourworldindata.org/grapher/temperature-anomaly" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
-                        Our World in Data <ExternalLink className="h-3 w-3" />
+                      <a href="https://ourworldindata.org/grapher/temperature-anomaly" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 underline">
+                        Our World in Data
                       </a>
                       <span className="text-xs text-gray-500"> - ERA5 land-only series</span>
                     </li>
                     <li>
-                      <a href="https://www.ipcc.ch/report/ar6/syr/" target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
-                        IPCC AR6 Synthesis <ExternalLink className="h-3 w-3" />
+                      <a href="https://www.ipcc.ch/report/ar6/syr/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 underline">
+                        IPCC AR6 Synthesis
                       </a>
                       <span className="text-xs text-gray-500"> - 1.5°C / 2.0°C basis</span>
                     </li>
