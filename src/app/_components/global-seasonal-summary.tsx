@@ -240,12 +240,15 @@ export default function GlobalSeasonalSummary({ hideExploreLink = false }: { hid
     };
   }
 
-  const rows: TimelineRow[] = [
+  const leftRows: TimelineRow[] = [
     { kind: 'header', key: 'h1', label: 'Hemispheres', accent: '#FB923C' },
     ...hemiRows.map(warmToRow),
     { kind: 'header', key: 'h2', label: 'By Köppen climate zone', accent: '#A3E635' },
     ...koppenWarmRows.map(warmToRow),
     ...wetRows.map(wetToRow),
+  ];
+
+  const rightRows: TimelineRow[] = [
     { kind: 'header', key: 'h3', label: 'Notable Northern-Hemisphere records', accent: '#22D3EE' },
     {
       kind: 'fixed-bar',
@@ -312,7 +315,10 @@ export default function GlobalSeasonalSummary({ hideExploreLink = false }: { hid
             </span>
           </div>
         </div>
-        <CalendarTimeline rows={rows} labelColPx={196} showAxis={false} />
+        <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-x-6">
+          <CalendarTimeline rows={leftRows} labelColPx={196} showAxis={false} />
+          <CalendarTimeline rows={rightRows} labelColPx={196} showAxis={false} />
+        </div>
       </div>
 
       <p className="text-xs text-gray-500">
