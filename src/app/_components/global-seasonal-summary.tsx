@@ -315,7 +315,7 @@ export default function GlobalSeasonalSummary({ hideExploreLink = false }: { hid
             </span>
           </div>
         </div>
-        <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-x-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-6">
           <CalendarTimeline rows={leftRows} labelColPx={196} showAxis={false} />
           <CalendarTimeline rows={rightRows} labelColPx={196} showAxis={false} />
         </div>
