@@ -9,13 +9,11 @@ export const metadata: Metadata = {
     title: "Live Extreme Weather Tracker – Floods, Wildfires, Droughts & Storms",
     description:
       "Live extreme weather alerts and historical data. Track floods, wildfires, droughts, cyclones, deaths, and economic damage worldwide.",
-    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: "Extreme Weather Tracker | 4 Billion Years On",
     description: "Live extreme weather alerts and historical data. Track floods, wildfires, droughts, cyclones, deaths, and economic damage worldwide.",
-    images: ['/Category%20image%20for%20social%20media%20links.png'],
   },
 };
 
