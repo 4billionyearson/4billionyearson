@@ -1,13 +1,12 @@
 import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { getCached } from '@/lib/climate/redis';
 
 export const runtime = 'nodejs';
 export const alt = 'Extreme Weather Tracker – Live Alerts & Historical Trends | 4 Billion Years On';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
-// Revalidate once per hour so live alert counts stay reasonably fresh.
-export const revalidate = 3600;
 
 async function loadDataUrl(relativePath: string, mime: string): Promise<string | null> {
   try {
@@ -22,24 +21,13 @@ async function loadDataUrl(relativePath: string, mime: string): Promise<string |
 type GDACSEvent = {
   type: string;
   alertLevel: string;
-  country: string;
 };
 
-async function fetchGDACS(): Promise<GDACSEvent[]> {
+// Read from the same Redis cache key used by the API route — fast and reliable.
+async function getGDACSFromCache(): Promise<GDACSEvent[]> {
   try {
-    const now = new Date();
-    const to = now.toISOString().slice(0, 10);
-    const from = new Date(now.getTime() - 365 * 86400000).toISOString().slice(0, 10);
-    const url = `https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=TC,FL,DR,WF&fromDate=${from}&toDate=${to}&alertlevel=Green;Orange;Red`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (!data?.features) return [];
-    return data.features.map((f: any) => ({
-      type: f.properties?.eventtype ?? '',
-      alertLevel: f.properties?.alertlevel ?? 'Green',
-      country: f.properties?.country ?? '',
-    }));
+    const events = await getCached<GDACSEvent[]>('climate:extreme-weather:gdacs:v1');
+    return events ?? [];
   } catch {
     return [];
   }
@@ -62,7 +50,7 @@ export default async function OgImage() {
   const [bgUrl, logoUrl, events] = await Promise.all([
     loadDataUrl('background.png', 'image/png'),
     loadDataUrl('header-logo.png', 'image/png'),
-    fetchGDACS(),
+    getGDACSFromCache(),
   ]);
 
   // Alert-level counts
