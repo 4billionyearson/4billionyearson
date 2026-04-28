@@ -47,7 +47,7 @@ async function loadRegionSnapshot(region: ReturnType<typeof getRegionBySlug>): P
     }
     if (region.type === 'us-state') {
       const t = d?.paramData?.tavg;
-      return { one: t?.latestMonthStats ?? null, three: t?.latestThreeMonthStats ?? null, unit: '°F' };
+      return { one: t?.latestMonthStats ?? null, three: t?.latestThreeMonthStats ?? null, unit: '°C' };
     }
     if (region.type === 'uk-region') {
       const t = d?.varData?.Tmean;
