@@ -263,6 +263,19 @@ export default function EnsoPage() {
       .catch((e) => setError(e?.message || 'Failed to load'));
   }, []);
 
+  // Scroll to the hashed section after data renders (the element doesn't exist
+  // during the loading spinner phase, so the browser's native scroll fails).
+  useEffect(() => {
+    if (!data) return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    const id = setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+    return () => clearTimeout(id);
+  }, [data]);
+
   if (error) {
     return (
       <main className="max-w-6xl mx-auto px-4 py-10">

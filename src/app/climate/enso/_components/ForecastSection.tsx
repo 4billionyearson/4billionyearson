@@ -22,9 +22,9 @@ import type { EnsoSnapshot, ForecastSeason, PlumePeriod } from '../types';
 
 const PAGE_URL = 'https://4billionyearson.org/climate/enso#forecast';
 const EMBED_URL = 'https://4billionyearson.org/climate/enso/embed/forecast';
-const EMBED_CODE = `<iframe\n  src="${EMBED_URL}"\n  width="100%" height="520"\n  style="border:none;border-radius:16px;"\n  title="ENSO Forecast — 4 Billion Years On"\n></iframe>`;
+const EMBED_CODE = `<iframe\n  src="${EMBED_URL}"\n  width="100%" height="520"\n  style="border:none;border-radius:16px;"\n  title="ENSO Forecast - 4 Billion Years On"\n></iframe>`;
 
-const SHARE_TEXT = encodeURIComponent('ENSO Forecast — El Niño / La Niña tracker with the latest NOAA forecast 🌊');
+const SHARE_TEXT = encodeURIComponent('ENSO Forecast - El Nino / La Nina tracker with the latest NOAA forecast');
 const SHARE_URL  = encodeURIComponent(PAGE_URL);
 
 function ShareBar() {
