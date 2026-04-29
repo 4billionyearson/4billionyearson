@@ -210,6 +210,7 @@ type ChartPoint = {
   neg?: number;
   fcAnom?: number;
   fcPos?: number;
+  cnnAnom?: number;
   dateLabel?: string;
 };
 
@@ -408,9 +409,17 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
       : null;
 
   const xMin = minYear - 0.5;
-  const xMax = Math.max(
-    currentYear + 1.5,
-    (elNinoEnd ?? currentYear + 1) + 0.5,
+
+  // Extend the chart x-axis to cover the CNN forecast (may go further than
+  // the IRI plume) but cap at 2.5 years ahead to keep the chart readable.
+  const cnnXMax = cnnPoints.length > 0 ? cnnPoints[cnnPoints.length - 1].x + 0.1 : 0;
+  const xMax = Math.min(
+    Math.max(
+      currentYear + 1.5,
+      (elNinoEnd ?? currentYear + 1) + 0.5,
+      cnnXMax,
+    ),
+    todayX + 2.5,
   );
 
   const yearTicks: number[] = [];
@@ -528,11 +537,50 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
 
   const chartData: ChartPoint[] = [...observedPoints, ...forecastPoints];
 
+  // ── SNU CNN forecast line ───────────────────────────────────────────────
+  // Convert each { yyyymm, nino34 } point to a decimal-year x coordinate and
+  // merge into chartData.  Only future points are shown; we bridge from the
+  // current observed value to the first future CNN point.
+  const cnnPoints: { x: number; cnnAnom: number }[] = [];
+  const cnnPeriods = data?.cnnForecast?.points || [];
+  if (cnnPeriods.length > 0) {
+    for (const pt of cnnPeriods) {
+      const year  = Math.floor(pt.yyyymm / 100);
+      const month = pt.yyyymm % 100; // 1–12
+      const x = year + (month - 0.5) / 12; // middle of month
+      if (x > todayX) {
+        cnnPoints.push({ x, cnnAnom: pt.nino34 });
+      }
+    }
+    // Prepend a bridge point from today's observed value
+    if (cnnPoints.length > 0) {
+      cnnPoints.unshift({ x: todayX, cnnAnom: currentOni });
+    }
+  }
+
+  // Merge CNN values into chartData by x-coordinate proximity, or append
+  // extra points beyond the existing chartData range.
+  for (const cp of cnnPoints) {
+    // Find the closest existing ChartPoint within 0.01 years
+    let closest: ChartPoint | null = null;
+    let minDist = Infinity;
+    for (const dp of chartData) {
+      const d = Math.abs(dp.x - cp.x);
+      if (d < minDist) { minDist = d; closest = dp; }
+    }
+    if (closest && minDist < 0.015) {
+      closest.cnnAnom = cp.cnnAnom;
+    } else {
+      chartData.push({ x: cp.x, cnnAnom: cp.cnnAnom });
+    }
+  }
+  chartData.sort((a, b) => a.x - b.x);
+
   return (
     <SectionCard
       icon={<History className="text-[#D0A65E]" />}
       title="Forecast"
-      subtitle="Weekly Niño 3.4 anomaly: red above zero (El Niño-leaning), blue below (La Niña). The dashed red curve is NOAA's smoothed forecast."
+      subtitle="Weekly Niño 3.4 anomaly: red above zero (El Niño-leaning), blue below (La Niña). Dashed red = NOAA smoothed forecast; dashed purple = SNU AI/CNN forecast (Ham et al. 2019)."
     >
       <div className="h-[380px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -572,7 +620,8 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
                 if (value === null || value === undefined) return ['', ''];
                 const labelMap: Record<string, string> = {
                   anom: 'Observed Niño 3.4',
-                  fcAnom: 'Forecast (smoothed)',
+                  fcAnom: 'NOAA forecast',
+                  cnnAnom: 'SNU CNN forecast',
                 };
                 return [`${fmtSigned(Number(value), 2)}°C`, labelMap[name] || name];
               }}
@@ -607,6 +656,7 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
             <Area type="monotone" dataKey="fcPos" stroke="none" fill="#f43f5e" fillOpacity={0.35} isAnimationActive={false} connectNulls={false} />
             <Line type="monotone" dataKey="anom" stroke="#fef3c7" strokeWidth={1.5} dot={false} isAnimationActive={false} connectNulls={false} />
             <Line type="monotone" dataKey="fcAnom" stroke="#f43f5e" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} connectNulls={false} />
+            <Line type="monotone" dataKey="cnnAnom" stroke="#a78bfa" strokeWidth={1.75} strokeDasharray="4 3" dot={false} isAnimationActive={false} connectNulls={false} />
             {isForecastingElNino && peakX !== null && (peakSeason || plumePeakPeriod) && (
               <ReferenceDot x={peakX} y={predictedPeakOni} r={5} fill="#f43f5e" stroke="#0f172a" strokeWidth={2} />
             )}
@@ -687,8 +737,17 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
             className="inline-block w-5 h-0.5"
             style={{ background: 'repeating-linear-gradient(90deg, #f43f5e 0 4px, transparent 4px 8px)' }}
           />{' '}
-          Forecast
+          NOAA forecast
         </span>
+        {cnnPoints.length > 1 && (
+          <span className="inline-flex items-center gap-1.5">
+            <span
+              className="inline-block w-5 h-0.5"
+              style={{ background: 'repeating-linear-gradient(90deg, #a78bfa 0 3px, transparent 3px 6px)' }}
+            />{' '}
+            SNU CNN forecast
+          </span>
+        )}
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / Today
         </span>
@@ -786,11 +845,18 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
         <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">
           NOAA CPC probability outlook
         </a>
-        , and{' '}
+        ,{' '}
         <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">
           NOAA ONI v5
         </a>{' '}
-        (past events). The IRI plume publishes 9 overlapping 3-month forecast periods; that limit is shown by the &ldquo;End of current forecasts&rdquo; line.
+        (past events){cnnPoints.length > 1 ? (
+          <>, and{' '}
+          <a href="https://aiclimate.snu.ac.kr/enso/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">
+            SNU ACE Lab CNN forecast
+          </a>{' '}
+          (Ham et al. 2019, <em>Nature</em> 573, issued {data.cnnForecast ? `${String(data.cnnForecast.issueYearMonth).slice(4).replace(/^0/, '')}/${String(data.cnnForecast.issueYearMonth).slice(0,4)}` : 'monthly'})</>
+        ) : null}
+        . The IRI plume publishes 9 overlapping 3-month forecast periods; that limit is shown by the &ldquo;End of current forecasts&rdquo; line.
       </p>
 
       <ShareBar />

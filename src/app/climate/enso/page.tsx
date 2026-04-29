@@ -125,6 +125,7 @@ type EnsoSnapshot = {
   soi: SoiData | null;
   forecast: ForecastData | null;
   plume: PlumeData | null;
+  cnnForecast: { issueYearMonth: number; points: { yyyymm: number; nino34: number }[] } | null;
   sources: Record<string, string>;
   images: {
     sstAnomalyMap: string;

@@ -23,6 +23,7 @@
 
 import { writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
+import { inflateRawSync } from 'node:zlib';
 
 const OUT_PATH = resolve(process.cwd(), 'public', 'data', 'climate', 'enso.json');
 
@@ -381,16 +382,205 @@ async function fetchLatestPlume() {
 }
 
 // ───────────────────────────────────────────────────────────────────────────
+// SNU ACE Lab CNN ENSO forecast (Ham et al. 2019, Nature 573)
+//
+// The page at https://aiclimate.snu.ac.kr/enso/ lists download links for
+// annual XLSX files.  Each file has one row per forecast issue month (YYYYMM
+// in column A) and leads 1–23 in columns B–X giving Niño 3.4 anomaly
+// predictions for successive months.
+
+/** Fetch a URL and return the raw bytes as a Buffer, with retry. */
+async function fetchBuffer(url, { attempts = 3, timeoutMs = 30_000, label = 'buffer' } = {}) {
+  let lastErr;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      console.log(`[${label}] attempt ${attempt}/${attempts} → ${url}`);
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: { 'User-Agent': '4billionyearson-climate-snapshot/1.0' },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const buf = Buffer.from(await res.arrayBuffer());
+      console.log(`[${label}] ✓ ${buf.length} bytes`);
+      return buf;
+    } catch (err) {
+      lastErr = err;
+      console.warn(`[${label}] attempt ${attempt} failed: ${err?.message ?? err}`);
+      if (attempt < attempts) await new Promise((r) => setTimeout(r, 2_000 * attempt));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  console.warn(`⚠ [${label}] giving up: ${lastErr?.message ?? lastErr}`);
+  return null;
+}
+
+/**
+ * Minimal ZIP entry extractor.  Reads local file headers sequentially until
+ * the requested entry is found; decompresses stored (method 0) or deflated
+ * (method 8) data.  Returns a Buffer or null if the entry is not found.
+ */
+function unzipEntry(buf, targetName) {
+  let offset = 0;
+  while (offset + 30 <= buf.length) {
+    const sig = buf.readUInt32LE(offset);
+    if (sig !== 0x04034b50) break; // not a local file header
+    const flags          = buf.readUInt16LE(offset + 6);
+    const method         = buf.readUInt16LE(offset + 8);
+    const compressedSize = buf.readUInt32LE(offset + 18);
+    const filenameLen    = buf.readUInt16LE(offset + 26);
+    const extraLen       = buf.readUInt16LE(offset + 28);
+    const filename       = buf.slice(offset + 30, offset + 30 + filenameLen).toString('utf8');
+    const dataStart      = offset + 30 + filenameLen + extraLen;
+    if (filename === targetName) {
+      const compressed = buf.slice(dataStart, dataStart + compressedSize);
+      if (method === 0) return compressed;
+      if (method === 8) return inflateRawSync(compressed);
+      console.warn(`[SNU xlsx] unsupported ZIP method ${method} for ${filename}`);
+      return null;
+    }
+    // Advance; when the data-descriptor flag is set sizes may be zero in the
+    // local header — bail out and rely on compressedSize being non-zero.
+    const advance = (flags & 0x8) && compressedSize === 0
+      ? null
+      : compressedSize;
+    if (advance === null) break; // can't determine length safely
+    offset = dataStart + advance;
+  }
+  return null;
+}
+
+/** Parse sharedStrings.xml from an XLSX and return a string array. */
+function parseSharedStrings(xml) {
+  const strings = [];
+  for (const m of xml.matchAll(/<si>([\s\S]*?)<\/si>/g)) {
+    const tMatch = m[1].match(/<t[^>]*>([^<]*)<\/t>/);
+    strings.push(tMatch ? tMatch[1] : '');
+  }
+  return strings;
+}
+
+/**
+ * Parse sheet1.xml from the SNU XLSX.
+ * Returns an array of row objects keyed by column letter, values being
+ * numbers or strings.
+ */
+function parseSnuSheet(xml, sharedStrings) {
+  const rows = {};
+  // Match every <row> element
+  for (const rowM of xml.matchAll(/<row[^>]+r="(\d+)"[^>]*>([\s\S]*?)<\/row>/g)) {
+    const rowNum = Number(rowM[1]);
+    const rowXml = rowM[2];
+    const cells = {};
+    // Shared-string cells: t="s"
+    for (const cm of rowXml.matchAll(/<c r="([A-Z]+)\d+"[^>]*t="s"[^>]*><v>(\d+)<\/v>/g)) {
+      cells[cm[1]] = sharedStrings[Number(cm[2])] ?? '';
+    }
+    // Numeric cells (no t attribute, or t="n")
+    for (const cm of rowXml.matchAll(/<c r="([A-Z]+)\d+"(?![^>]*t=)[^>]*><v>([^<]+)<\/v>/g)) {
+      cells[cm[1]] = Number(cm[2]);
+    }
+    rows[rowNum] = cells;
+  }
+  return rows;
+}
+
+/**
+ * Scrape the SNU ENSO page for XLSX download links, download the most recent
+ * one, parse it, and return the latest forecast row as a CnnForecast object.
+ */
+async function fetchCnnForecast() {
+  // 1. Fetch the page to discover the current XLSX URL
+  const pageHtml = await fetchText('https://aiclimate.snu.ac.kr/enso/', {
+    label: 'SNU ENSO page',
+    attempts: 3,
+    timeoutMs: 20_000,
+  });
+  if (!pageHtml) {
+    console.warn('⚠ [SNU CNN] could not fetch SNU ENSO page');
+    return null;
+  }
+
+  // Extract all RT_ENSO_FCST_CNN_*.xlsx links and pick the one with the
+  // highest year number in the filename.
+  const linkRe = /https?:\/\/[^\s"']+RT_ENSO_FCST_CNN_(\d{4})[^\s"']*\.xlsx/gi;
+  const found = [];
+  for (const m of pageHtml.matchAll(linkRe)) {
+    found.push({ url: m[0].replace(/&amp;/g, '&'), year: Number(m[1]) });
+  }
+  if (!found.length) {
+    console.warn('⚠ [SNU CNN] no XLSX links found on SNU ENSO page');
+    return null;
+  }
+  found.sort((a, b) => b.year - a.year);
+  const xlsxUrl = found[0].url;
+
+  // 2. Download the XLSX binary
+  const xlsxBuf = await fetchBuffer(xlsxUrl, { label: 'SNU CNN xlsx', attempts: 2, timeoutMs: 30_000 });
+  if (!xlsxBuf) return null;
+
+  // 3. Extract the two XML entries we need from the ZIP
+  const sharedStringsXml = unzipEntry(xlsxBuf, 'xl/sharedStrings.xml');
+  const sheetXml         = unzipEntry(xlsxBuf, 'xl/worksheets/sheet1.xml');
+  if (!sharedStringsXml || !sheetXml) {
+    console.warn('⚠ [SNU CNN] could not extract XML entries from XLSX');
+    return null;
+  }
+
+  const sharedStrings = parseSharedStrings(sharedStringsXml.toString('utf8'));
+  const rows = parseSnuSheet(sheetXml.toString('utf8'), sharedStrings);
+
+  // 4. Column mapping: A=forecast start (YYYYMM), B–X = lead 1–23
+  const COL_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWX'.split('');
+  // Find the data rows (rows 3+), skip header rows 1–2
+  const dataRows = Object.entries(rows)
+    .map(([rowNumStr, cells]) => ({ rowNum: Number(rowNumStr), cells }))
+    .filter(({ rowNum, cells }) => rowNum >= 3 && typeof cells['A'] === 'number')
+    .sort((a, b) => b.cells['A'] - a.cells['A']); // latest first
+
+  if (!dataRows.length) {
+    console.warn('⚠ [SNU CNN] no data rows found in XLSX');
+    return null;
+  }
+
+  const latestRow = dataRows[0];
+  const issueYearMonth = latestRow.cells['A'];
+
+  // Derive target month for each lead: lead N → issueMonth + N
+  const issueYear  = Math.floor(issueYearMonth / 100);
+  const issueMonth = issueYearMonth % 100; // 1–12
+
+  const points = [];
+  for (let lead = 1; lead <= 23; lead++) {
+    const colLetter = COL_LETTERS[lead]; // B=lead1, C=lead2, … X=lead23
+    const val = latestRow.cells[colLetter];
+    if (typeof val !== 'number' || !Number.isFinite(val)) continue;
+    // Target calendar month
+    const totalMonth = issueMonth + lead; // may exceed 12
+    const targetYear  = issueYear + Math.floor((totalMonth - 1) / 12);
+    const targetMonth = ((totalMonth - 1) % 12) + 1; // 1–12
+    const yyyymm = targetYear * 100 + targetMonth;
+    points.push({ yyyymm, nino34: round2(val) });
+  }
+
+  console.log(`[SNU CNN] ✓ issueYearMonth=${issueYearMonth}, ${points.length} forecast points, range ${points[0]?.yyyymm}–${points[points.length - 1]?.yyyymm}`);
+  return { issueYearMonth, points };
+}
+
+// ───────────────────────────────────────────────────────────────────────────
 // Main
 
 (async function main() {
-  const [oniText, weeklyText, meiText, soiText, forecastHtml, plume] = await Promise.all([
+  const [oniText, weeklyText, meiText, soiText, forecastHtml, plume, cnnForecast] = await Promise.all([
     fetchText(SOURCES.oni, { label: 'NOAA CPC ONI' }),
     fetchText(SOURCES.weekly, { label: 'NOAA CPC weekly Niño SSTs' }),
     fetchText(SOURCES.mei, { label: 'NOAA PSL MEI v2' }),
     fetchText(SOURCES.soi, { label: 'NOAA CPC SOI' }),
     fetchText(SOURCES.forecast, { label: 'NOAA CPC probability forecast' }),
     fetchLatestPlume(),
+    fetchCnnForecast(),
   ]);
 
   const oni = parseOni(oniText);
@@ -419,6 +609,7 @@ async function fetchLatestPlume() {
     soi,
     forecast,
     plume,
+    cnnForecast,
     sources: {
       oni: SOURCES.oni,
       weekly: SOURCES.weekly,
@@ -426,6 +617,7 @@ async function fetchLatestPlume() {
       soi: SOURCES.soi,
       forecast: SOURCES.forecast,
       plume: SOURCES.plumeBase,
+      cnn: 'https://aiclimate.snu.ac.kr/enso/',
       metOffice: 'https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina',
     },
     images: {
@@ -459,6 +651,7 @@ async function fetchLatestPlume() {
   console.log(`  soi:    ${soi ? `${soi.history.length} pts, latest ${soi.latest.year}-${soi.latest.month} = ${soi.latest.value}` : 'null'}`);
   console.log(`  forecast: ${forecast ? `${forecast.seasons.length} seasons, first ${forecast.seasons[0].label}` : 'null'}`);
   console.log(`  plume:    ${plume ? `${plume.periods.length} periods (issue ${plume.issueYear}/${plume.issueMonth}), first ${plume.periods[0].label} mean ${plume.periods[0].mean}` : 'null'}`);
+  console.log(`  cnn:      ${cnnForecast ? `issue ${cnnForecast.issueYearMonth}, ${cnnForecast.points.length} pts, last ${cnnForecast.points[cnnForecast.points.length - 1]?.yyyymm}` : 'null'}`);
 })().catch((err) => {
   console.error('FATAL', err);
   process.exit(1);

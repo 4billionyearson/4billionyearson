@@ -70,6 +70,17 @@ export type PlumeData = {
   periods: PlumePeriod[];
 };
 
+/** SNU ACE Lab CNN monthly Niño 3.4 forecast (Ham et al. 2019) */
+export type CnnForecastPoint = {
+  yyyymm: number;  // e.g. 202605 = May 2026
+  nino34: number;  // Niño 3.4 anomaly prediction (°C)
+};
+
+export type CnnForecast = {
+  issueYearMonth: number;       // e.g. 202604 = April 2026
+  points: CnnForecastPoint[];
+};
+
 export type EnsoSnapshot = {
   oni: OniData | null;
   weekly: WeeklyData | null;
@@ -77,6 +88,7 @@ export type EnsoSnapshot = {
   soi: SoiData | null;
   forecast: ForecastData | null;
   plume: PlumeData | null;
+  cnnForecast: CnnForecast | null;
   sources: Record<string, string>;
   images: {
     sstAnomalyMap: string;
