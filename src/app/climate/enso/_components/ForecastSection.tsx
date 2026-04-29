@@ -410,6 +410,23 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
 
   const xMin = minYear - 0.5;
 
+  // ── SNU CNN forecast points (needed for xMax calculation below) ─────────
+  const cnnPoints: { x: number; cnnAnom: number }[] = [];
+  const cnnPeriods = data?.cnnForecast?.points || [];
+  if (cnnPeriods.length > 0) {
+    for (const pt of cnnPeriods) {
+      const year  = Math.floor(pt.yyyymm / 100);
+      const month = pt.yyyymm % 100; // 1–12
+      const x = year + (month - 0.5) / 12; // middle of month
+      if (x > todayX) {
+        cnnPoints.push({ x, cnnAnom: pt.nino34 });
+      }
+    }
+    if (cnnPoints.length > 0) {
+      cnnPoints.unshift({ x: todayX, cnnAnom: currentOni });
+    }
+  }
+
   // Extend the chart x-axis to cover the CNN forecast (may go further than
   // the IRI plume) but cap at 2.5 years ahead to keep the chart readable.
   const cnnXMax = cnnPoints.length > 0 ? cnnPoints[cnnPoints.length - 1].x + 0.1 : 0;
@@ -538,26 +555,6 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
   const chartData: ChartPoint[] = [...observedPoints, ...forecastPoints];
 
   // ── SNU CNN forecast line ───────────────────────────────────────────────
-  // Convert each { yyyymm, nino34 } point to a decimal-year x coordinate and
-  // merge into chartData.  Only future points are shown; we bridge from the
-  // current observed value to the first future CNN point.
-  const cnnPoints: { x: number; cnnAnom: number }[] = [];
-  const cnnPeriods = data?.cnnForecast?.points || [];
-  if (cnnPeriods.length > 0) {
-    for (const pt of cnnPeriods) {
-      const year  = Math.floor(pt.yyyymm / 100);
-      const month = pt.yyyymm % 100; // 1–12
-      const x = year + (month - 0.5) / 12; // middle of month
-      if (x > todayX) {
-        cnnPoints.push({ x, cnnAnom: pt.nino34 });
-      }
-    }
-    // Prepend a bridge point from today's observed value
-    if (cnnPoints.length > 0) {
-      cnnPoints.unshift({ x: todayX, cnnAnom: currentOni });
-    }
-  }
-
   // Merge CNN values into chartData by x-coordinate proximity, or append
   // extra points beyond the existing chartData range.
   for (const cp of cnnPoints) {
