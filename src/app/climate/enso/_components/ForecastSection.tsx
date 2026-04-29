@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   AreaChart,
   Area,
@@ -14,8 +15,132 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { History } from 'lucide-react';
+import { Check, Code2, Copy, History, Link2 } from 'lucide-react';
 import type { EnsoSnapshot, ForecastSeason, PlumePeriod } from '../types';
+
+/* ─── Share bar ───────────────────────────────────────────────────────────── */
+
+const PAGE_URL = 'https://4billionyearson.org/climate/enso#forecast';
+const EMBED_URL = 'https://4billionyearson.org/climate/enso/embed/forecast';
+const EMBED_CODE = `<iframe\n  src="${EMBED_URL}"\n  width="100%" height="520"\n  style="border:none;border-radius:16px;"\n  title="ENSO Forecast — 4 Billion Years On"\n></iframe>`;
+
+const SHARE_TEXT = encodeURIComponent('ENSO Forecast — El Niño / La Niña tracker with the latest NOAA forecast 🌊');
+const SHARE_URL  = encodeURIComponent(PAGE_URL);
+
+function ShareBar() {
+  const [copied, setCopied]       = useState(false);
+  const [showEmbed, setShowEmbed] = useState(false);
+  const [embedCopied, setEmbedCopied] = useState(false);
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(PAGE_URL).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const copyEmbed = () => {
+    navigator.clipboard.writeText(EMBED_CODE).then(() => {
+      setEmbedCopied(true);
+      setTimeout(() => setEmbedCopied(false), 2000);
+    });
+  };
+
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-end gap-2 flex-wrap">
+        <span className="text-[10px] uppercase tracking-widest text-gray-500 font-mono mr-1">Share</span>
+
+        {/* Copy link */}
+        <button
+          onClick={copyLink}
+          title="Copy link to this section"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-[#D0A65E]/50 text-gray-300 hover:text-white transition-all"
+        >
+          {copied ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Link2 className="h-3.5 w-3.5" />}
+          {copied ? 'Copied!' : 'Copy link'}
+        </button>
+
+        {/* X / Twitter */}
+        <a
+          href={`https://x.com/intent/tweet?url=${SHARE_URL}&text=${SHARE_TEXT}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Share on X"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-[#D0A65E]/50 text-gray-300 hover:text-white transition-all"
+        >
+          {/* X logo */}
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.912-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+          Post
+        </a>
+
+        {/* Facebook */}
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${SHARE_URL}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Share on Facebook"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-[#D0A65E]/50 text-gray-300 hover:text-white transition-all"
+        >
+          {/* Facebook logo */}
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
+          </svg>
+          Share
+        </a>
+
+        {/* LinkedIn */}
+        <a
+          href={`https://www.linkedin.com/sharing/share-offsite/?url=${SHARE_URL}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Share on LinkedIn"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-[#D0A65E]/50 text-gray-300 hover:text-white transition-all"
+        >
+          {/* LinkedIn logo */}
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+          </svg>
+          Share
+        </a>
+
+        {/* Embed code */}
+        <button
+          onClick={() => setShowEmbed((v) => !v)}
+          title="Get embed code"
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+            showEmbed
+              ? 'bg-[#D0A65E]/20 border-[#D0A65E]/50 text-[#D0A65E]'
+              : 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-[#D0A65E]/50 text-gray-300 hover:text-white'
+          }`}
+        >
+          <Code2 className="h-3.5 w-3.5" />
+          Embed
+        </button>
+      </div>
+
+      {/* Embed code panel */}
+      {showEmbed && (
+        <div className="mt-3 rounded-xl border border-[#D0A65E]/30 bg-gray-900/60 p-3">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] uppercase tracking-wider text-[#D0A65E]/70 font-mono">Embed this chart</p>
+            <button
+              onClick={copyEmbed}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors"
+            >
+              {embedCopied ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
+              {embedCopied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <pre className="text-[11px] font-mono text-gray-300 bg-gray-950 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap break-all select-all">{EMBED_CODE}</pre>
+          <p className="text-[10px] text-gray-500 mt-2">Paste into any webpage. The chart updates automatically with live NOAA data.</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ─── Types ────────────────────────────────────────────────────────────────── */
 
@@ -608,6 +733,8 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
         </a>{' '}
         (past events). The IRI plume publishes 9 overlapping 3-month forecast periods; that limit is shown by the &ldquo;End of current forecasts&rdquo; line.
       </p>
+
+      <ShareBar />
     </SectionCard>
   );
 }
