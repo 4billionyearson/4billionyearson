@@ -354,6 +354,7 @@ export default function EnsoPage() {
       </div>
 
       {/* ─── Hero state + Niño-region map ──────────────────────── */}
+      <div id="current-state" className="scroll-mt-6">
       {oni && (() => {
         // Anomaly → text-class for headline numbers
         const anomColor = (a: number) =>
@@ -484,9 +485,17 @@ export default function EnsoPage() {
               Thresholds: <span className="text-rose-400 font-mono">≥ +0.5°C</span> El Niño ·{' '}
               <span className="text-sky-400 font-mono">≤ −0.5°C</span> La Niña · otherwise Neutral.
             </p>
+            <ShareBar
+              pageUrl="https://4billionyearson.org/climate/enso#current-state"
+              shareText={encodeURIComponent('Current ENSO state - El Nino / La Nina tracker with live NOAA data')}
+              emailSubject="Current ENSO state - El Nino / La Nina tracker"
+              embedUrl="https://4billionyearson.org/climate/enso/embed/current-state"
+              embedCode={`<iframe\n  src="https://4billionyearson.org/climate/enso/embed/current-state"\n  width="100%" height="620"\n  style="border:none;"\n  title="ENSO Current State - 4 Billion Years On"\n></iframe>`}
+            />
           </SectionCard>
         );
       })()}
+      </div>
 
       {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
       <div id="forecast" className="scroll-mt-6">

@@ -51,7 +51,6 @@ export default function ImpactsSection({ data }: { data: EnsoSnapshot }) {
   const [continentFilter, setContinentFilter] = useState('All');
 
   const oni = data.oni;
-  const images = data.images;
 
   return (
     <div className="space-y-4">
@@ -164,44 +163,6 @@ export default function ImpactsSection({ data }: { data: EnsoSnapshot }) {
           embedCode={EMBED_CODE}
         />
       </SectionCard>
-
-      {/* ── Met Office schematic maps ───────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SectionCard
-          icon={<Thermometer className="text-rose-300" />}
-          title={phase === 'el-nino' ? 'El Niño Temperature Impacts' : 'La Niña Temperature Impacts'}
-          subtitle="Met Office schematic, based on Davey et al. (2013). Coloured regions are likely warmer (red) or cooler (blue) than normal during the labelled season when the phase is active."
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={phase === 'el-nino' ? images.metOfficeImpactElNinoTemp : images.metOfficeImpactLaNinaTemp}
-            alt={`${phase === 'el-nino' ? 'El Niño' : 'La Niña'} temperature impacts schematic`}
-            className="w-full rounded-lg border border-gray-700/50 bg-white"
-            loading="lazy"
-          />
-          <p className="text-[11px] text-gray-500 mt-2">
-            Source:{' '}
-            <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office GPC outlooks (Davey et al. 2013)</a>. © Crown Copyright.
-          </p>
-        </SectionCard>
-        <SectionCard
-          icon={<CloudRain className="text-emerald-300" />}
-          title={phase === 'el-nino' ? 'El Niño Rainfall Impacts' : 'La Niña Rainfall Impacts'}
-          subtitle="Met Office schematic. Wetter regions in green, drier in brown. Precipitation teleconnections are noisier than temperature, so probabilities are typically lower."
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={phase === 'el-nino' ? images.metOfficeImpactElNinoPrecip : images.metOfficeImpactLaNinaPrecip}
-            alt={`${phase === 'el-nino' ? 'El Niño' : 'La Niña'} precipitation impacts schematic`}
-            className="w-full rounded-lg border border-gray-700/50 bg-white"
-            loading="lazy"
-          />
-          <p className="text-[11px] text-gray-500 mt-2">
-            Source:{' '}
-            <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office GPC outlooks (Davey et al. 2013)</a>. © Crown Copyright.
-          </p>
-        </SectionCard>
-      </div>
     </div>
   );
 }
