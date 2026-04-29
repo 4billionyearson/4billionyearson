@@ -573,6 +573,21 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
   }
   chartData.sort((a, b) => a.x - b.x);
 
+  // ── Dynamic Y-axis domain ────────────────────────────────────────────────
+  // Collect all numeric values from observed + forecast + CNN data so the
+  // axis expands to fit (e.g. when CNN peaks above the historical +3 ceiling).
+  const allYValues: number[] = [
+    ...observedPoints.map((p) => p.anom).filter((v): v is number => v != null),
+    ...forecastPoints.map((p) => p.fcAnom).filter((v): v is number => v != null),
+    ...cnnPoints.map((p) => p.cnnAnom),
+  ];
+  const rawYMin = allYValues.length ? Math.min(...allYValues) : -3;
+  const rawYMax = allYValues.length ? Math.max(...allYValues) : 3;
+  const yDomainMin = Math.floor(rawYMin - 0.4);
+  const yDomainMax = Math.ceil(rawYMax + 0.4);
+  const yTicks: number[] = [];
+  for (let v = yDomainMin; v <= yDomainMax; v++) yTicks.push(v);
+
   return (
     <SectionCard
       icon={<History className="text-[#D0A65E]" />}
@@ -603,8 +618,8 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
               stroke="#9CA3AF"
               fontSize={10}
               width={36}
-              domain={[-3, 3]}
-              ticks={[-3, -2, -1, 0, 1, 2, 3]}
+              domain={[yDomainMin, yDomainMax]}
+              ticks={yTicks}
               tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
             />
             <Tooltip
@@ -653,7 +668,7 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
             <Area type="monotone" dataKey="fcPos" stroke="none" fill="#f43f5e" fillOpacity={0.35} isAnimationActive={false} connectNulls={false} />
             <Line type="monotone" dataKey="anom" stroke="#fef3c7" strokeWidth={1.5} dot={false} isAnimationActive={false} connectNulls={false} />
             <Line type="monotone" dataKey="fcAnom" stroke="#f43f5e" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} connectNulls={false} />
-            <Line type="monotone" dataKey="cnnAnom" stroke="#a78bfa" strokeWidth={1.75} strokeDasharray="4 3" dot={false} isAnimationActive={false} connectNulls={false} />
+            <Line type="monotone" dataKey="cnnAnom" stroke="#a78bfa" strokeWidth={1.75} strokeDasharray="4 3" dot={false} isAnimationActive={false} connectNulls={true} />
             {isForecastingElNino && peakX !== null && (peakSeason || plumePeakPeriod) && (
               <ReferenceDot x={peakX} y={predictedPeakOni} r={5} fill="#f43f5e" stroke="#0f172a" strokeWidth={2} />
             )}
