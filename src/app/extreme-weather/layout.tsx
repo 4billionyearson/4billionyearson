@@ -28,6 +28,7 @@ const jsonLd = {
   temporalCoverage: "1960/..",
   spatialCoverage: "Global",
   updateFrequency: "Daily",
+  license: "https://creativecommons.org/licenses/by/4.0/",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

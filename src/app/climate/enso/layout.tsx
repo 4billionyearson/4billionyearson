@@ -91,6 +91,7 @@ export default function EnsoLayout({ children }: { children: React.ReactNode }) 
         url: 'https://www.cpc.ncep.noaa.gov/data/indices/soi',
       },
     ],
+    license: 'https://creativecommons.org/licenses/by/4.0/',
   };
 
   const breadcrumbSchema = {

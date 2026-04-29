@@ -30,6 +30,7 @@ const jsonLd = {
   temporalCoverage: "1993/..",
   spatialCoverage: "Global, Arctic, Antarctic",
   updateFrequency: "Monthly",
+  license: "https://creativecommons.org/licenses/by/4.0/",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

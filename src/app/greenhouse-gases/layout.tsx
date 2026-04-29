@@ -30,6 +30,7 @@ const jsonLd = {
   temporalCoverage: "-800000/..",
   spatialCoverage: "Global",
   updateFrequency: "Monthly",
+  license: "https://creativecommons.org/licenses/by/4.0/",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
