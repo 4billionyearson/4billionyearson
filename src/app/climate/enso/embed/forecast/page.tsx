@@ -39,14 +39,16 @@ export default function EmbedForecastPage() {
   return (
     <div className="p-3">
       <ForecastSection data={data} />
-      <div className="mt-2 text-right">
+      <div className="mt-2 flex justify-end">
         <a
           href="https://4billionyearson.org/climate/enso#forecast"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[10px] text-[#D0A65E]/60 hover:text-[#D0A65E] transition-colors"
+          className="inline-flex items-center gap-1.5 text-[10px] text-[#D0A65E]/60 hover:text-[#D0A65E] transition-colors"
         >
-          4 Billion Years On — ENSO Tracker ↗
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="4 Billion Years On" className="h-4 w-4 rounded-sm opacity-60" />
+          4 Billion Years On - ENSO Tracker ↗
         </a>
       </div>
     </div>

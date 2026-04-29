@@ -7,6 +7,19 @@ html {
   overflow-y: scroll;
 }
 
+/* Embed mode: hide site chrome so iframes show only the embedded section */
+html[data-embed] header,
+html[data-embed] footer,
+html[data-embed] .fixed.inset-0 {
+  display: none !important;
+}
+html[data-embed] body {
+  background: transparent !important;
+}
+html[data-embed] .relative.z-10 {
+  min-height: unset !important;
+}
+
 @layer utilities {
   .text-outline {
     text-shadow:
