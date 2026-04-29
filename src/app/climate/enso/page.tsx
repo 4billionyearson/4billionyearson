@@ -23,7 +23,9 @@ import {
 import {
   Activity,
   BookOpen,
+  Check,
   CloudRain,
+  Copy,
   Droplets,
   ExternalLink,
   Flame,
@@ -152,13 +154,31 @@ const TT_LABEL = { color: '#ffffff', fontWeight: 600, marginBottom: 4 } as const
 const TT_ITEM = { color: '#e5e7eb' } as const;
 const TT_CURSOR = { fill: 'rgba(208,166,94,0.08)' } as const;
 
-function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
+function Divider({ icon, title, shareSlug }: { icon: React.ReactNode; title: string; shareSlug?: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleShare = () => {
+    const url = `${window.location.origin}${window.location.pathname}#${shareSlug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
   return (
     <div className="flex items-center gap-4 my-6">
       <div className="h-px bg-[#D0A65E]/30 flex-1" />
       <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
         {icon}
         <span>{title}</span>
+        {shareSlug && (
+          <button
+            onClick={handleShare}
+            title="Copy link to this section"
+            className="ml-1 p-1 rounded-md hover:bg-white/10 transition-colors text-[#D0A65E]/60 hover:text-[#D0A65E]"
+            aria-label="Copy section link"
+          >
+            {copied ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
+          </button>
+        )}
       </h2>
       <div className="h-px bg-[#D0A65E]/30 flex-1" />
     </div>
@@ -474,7 +494,8 @@ export default function EnsoPage() {
       })()}
 
       {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
-      <Divider icon={<TrendingUp className="h-5 w-5" />} title="Prediction" />
+      <div id="forecast" className="scroll-mt-6">
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title="Prediction" shareSlug="forecast" />
 
       {/* ═══ PAST + FUTURE HERO STORY ════════════════════════════ */}
       {oni && (() => {
@@ -1164,6 +1185,7 @@ export default function EnsoPage() {
         </SectionCard>
         );
       })()}
+      </div>
 
       {/* ═══ INDICATOR CROSS-CHECK ═══════════════════════════════ */}
       {(weekly || mei || soi) && (() => {

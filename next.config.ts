@@ -19,6 +19,21 @@ const nextConfig: NextConfig = {
       './public/data/climate/**/*.json',
     ],
   },
+  async headers() {
+    return [
+      {
+        // Allow embed routes to be iframed by any origin.
+        // All other routes keep the default SAMEORIGIN-equivalent behaviour
+        // (no X-Frame-Options header → browsers apply their default policy,
+        // which is to allow same-origin framing).
+        source: '/climate/enso/embed/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'ALLOWALL' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors *" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       {
