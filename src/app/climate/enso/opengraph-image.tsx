@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 export const runtime = 'nodejs';
 
-export const alt = 'El Niño / La Niña — live ENSO tracker';
+export const alt = 'El Niño / La Niña - live ENSO tracker';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -140,7 +140,7 @@ export default async function OgImage() {
 
           <div style={{ display: 'flex', marginBottom: '24px' }}>
             <span style={{ fontSize: 30, color: '#e2e8f0', lineHeight: 1.3, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
-              Live ENSO tracker — Niño 3.4 SST, ONI, MEI, SOI &amp; NOAA forecast plume
+              Live ENSO tracker - Niño 3.4 SST, ONI, MEI, SOI &amp; NOAA forecast plume
             </span>
           </div>
 

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 const URL = 'https://4billionyearson.org/climate/enso';
 
 export const metadata: Metadata = {
-  title: 'El Niño / La Niña — ENSO Tracker, Regional Impacts & Forecast',
+  title: 'El Niño / La Niña - ENSO Tracker, Regional Impacts & Forecast',
   description:
     "Weekly ENSO tracker: Niño 3.4 SST anomalies, NOAA ONI, MEI v2 and SOI. Global impact maps showing which regions get warmer, cooler, wetter or drier under each phase. Met Office plume forecasts, past major events from 1982 to 2024, and how ENSO interacts with climate change.",
   keywords: [
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: URL },
   openGraph: {
-    title: 'El Niño / La Niña — ENSO Tracker',
+    title: 'El Niño / La Niña - ENSO Tracker',
     description:
       'Where in the El Niño / La Niña cycle is the Pacific right now? Weekly Niño 3.4 SST anomalies, ONI, MEI, SOI and the live NOAA forecast plume.',
     type: 'article',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'El Niño / La Niña — ENSO Tracker',
+    title: 'El Niño / La Niña - ENSO Tracker',
     description:
       'Live ENSO indicators: weekly Niño 3.4, ONI 3-month, MEI v2, SOI and NOAA forecast probabilities.',
   },
@@ -47,7 +47,7 @@ export default function EnsoLayout({ children }: { children: React.ReactNode }) 
   const datasetSchema = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'El Niño / La Niña — live ENSO indicators',
+    name: 'El Niño / La Niña - live ENSO indicators',
     description:
       'Live indicators of the El Niño-Southern Oscillation cycle, combining weekly Niño-region SST anomalies, the Oceanic Niño Index, the Multivariate ENSO Index v2 and the Southern Oscillation Index. Pacific tropical SST maps and the CPC probability forecast are embedded as live NOAA images.',
     url: URL,
@@ -55,9 +55,9 @@ export default function EnsoLayout({ children }: { children: React.ReactNode }) 
     spatialCoverage: { '@type': 'Place', name: 'Equatorial Pacific Ocean' },
     variableMeasured: [
       { '@type': 'PropertyValue', name: 'Niño 3.4 sea-surface temperature anomaly (weekly)' },
-      { '@type': 'PropertyValue', name: 'Oceanic Niño Index — 3-month running mean of Niño 3.4 SST' },
+      { '@type': 'PropertyValue', name: 'Oceanic Niño Index - 3-month running mean of Niño 3.4 SST' },
       { '@type': 'PropertyValue', name: 'Multivariate ENSO Index v2 (bi-monthly)' },
-      { '@type': 'PropertyValue', name: 'Southern Oscillation Index — Tahiti–Darwin standardised SLP (monthly)' },
+      { '@type': 'PropertyValue', name: 'Southern Oscillation Index - Tahiti–Darwin standardised SLP (monthly)' },
     ],
     creator: {
       '@type': 'Organization',
@@ -106,7 +106,7 @@ export default function EnsoLayout({ children }: { children: React.ReactNode }) 
   const webPageSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'El Niño / La Niña — ENSO Tracker',
+    name: 'El Niño / La Niña - ENSO Tracker',
     url: URL,
     description:
       'Live ENSO tracker: current state, weekly Niño 3.4 SST anomaly, NOAA ONI / MEI v2 / SOI, official NOAA CPC probability forecast, regional impact maps and past major events from 1982 to today.',
