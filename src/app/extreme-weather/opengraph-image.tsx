@@ -23,7 +23,7 @@ type GDACSEvent = {
   alertLevel: string;
 };
 
-// Read from the same Redis cache key used by the API route — fast and reliable.
+// Read from the same Redis cache key used by the API route - fast and reliable.
 async function getGDACSFromCache(): Promise<GDACSEvent[]> {
   try {
     const events = await getCached<GDACSEvent[]>('climate:extreme-weather:gdacs:v1');

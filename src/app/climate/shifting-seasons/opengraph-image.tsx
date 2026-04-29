@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 export const runtime = 'nodejs';
 
-export const alt = 'Shifting Seasons — how climate change is moving the calendar';
+export const alt = 'Shifting Seasons - how climate change is moving the calendar';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
