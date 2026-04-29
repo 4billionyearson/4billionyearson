@@ -828,6 +828,8 @@ export default function EnsoPage() {
           pageUrl="https://4billionyearson.org/climate/enso#impacts"
           shareText={encodeURIComponent('El Nino / La Nina regional weather impacts - ENSO Tracker')}
           emailSubject="El Nino / La Nina regional weather impacts - ENSO Tracker"
+          embedUrl="https://4billionyearson.org/climate/enso/embed/impacts"
+          embedCode={`<iframe\n  src="https://4billionyearson.org/climate/enso/embed/impacts"\n  width="100%" height="900"\n  style="border:none;"\n  title="ENSO Regional Weather Impacts - 4 Billion Years On"\n></iframe>`}
         />
       </SectionCard>
 
@@ -934,6 +936,8 @@ export default function EnsoPage() {
           pageUrl="https://4billionyearson.org/climate/enso#past-events"
           shareText={encodeURIComponent('The biggest El Nino / La Nina events since 1980 - ENSO Tracker')}
           emailSubject="The biggest El Nino / La Nina events since 1980 - ENSO Tracker"
+          embedUrl="https://4billionyearson.org/climate/enso/embed/past-events"
+          embedCode={`<iframe\n  src="https://4billionyearson.org/climate/enso/embed/past-events"\n  width="100%" height="750"\n  style="border:none;"\n  title="ENSO Past Major Events - 4 Billion Years On"\n></iframe>`}
         />
       </SectionCard>
 
