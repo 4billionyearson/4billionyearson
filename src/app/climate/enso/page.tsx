@@ -42,6 +42,7 @@ import {
 import { REGION_IMPACTS, PAST_EVENTS, type ImpactPhase } from '@/lib/climate/enso-impacts';
 import EnsoRegionMap from './EnsoRegionMap';
 import ForecastSection from './_components/ForecastSection';
+import ShareBar from './_components/ShareBar';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -719,7 +720,9 @@ export default function EnsoPage() {
       })()}
 
       {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
-      <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impacts" />
+      <div id="impacts" className="scroll-mt-6">
+        <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impacts" />
+      </div>
 
       <SectionCard
         icon={<Globe2 className="text-[#D0A65E]" />}
@@ -821,6 +824,11 @@ export default function EnsoPage() {
               );
             })}
         </div>
+        <ShareBar
+          pageUrl="https://4billionyearson.org/climate/enso#impacts"
+          shareText={encodeURIComponent('El Nino / La Nina regional weather impacts - ENSO Tracker')}
+          emailSubject="El Nino / La Nina regional weather impacts - ENSO Tracker"
+        />
       </SectionCard>
 
       {/* Met Office schematic maps - the canonical reference */}
@@ -865,7 +873,9 @@ export default function EnsoPage() {
           drives the forecast curve in the hero past+future chart. */}
 
       {/* ═══ PAST EVENTS ═════════════════════════ */}
-      <Divider icon={<History className="h-5 w-5" />} title="Past Major Events" />
+      <div id="past-events" className="scroll-mt-6">
+        <Divider icon={<History className="h-5 w-5" />} title="Past Major Events" />
+      </div>
 
       <SectionCard
         icon={<History className="text-[#D0A65E]" />}
@@ -920,6 +930,11 @@ export default function EnsoPage() {
             );
           })}
         </div>
+        <ShareBar
+          pageUrl="https://4billionyearson.org/climate/enso#past-events"
+          shareText={encodeURIComponent('The biggest El Nino / La Nina events since 1980 - ENSO Tracker')}
+          emailSubject="The biggest El Nino / La Nina events since 1980 - ENSO Tracker"
+        />
       </SectionCard>
 
       {/* ═══ CLIMATE CHANGE ══════════════════════ */}
