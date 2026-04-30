@@ -17,6 +17,14 @@ async function loadDataUrl(relativePath: string, mime: string): Promise<string |
   }
 }
 
+// Climate page colours: #D0A65E bar, #FFF5E7 title text
+const HEADER_BG = '#D0A65E';
+const HEADER_TEXT = '#FFF5E7';
+const HEADER_SUB = 'rgba(255,245,231,0.75)';
+const CHIP_BG = 'rgba(208,166,94,0.15)';
+const CHIP_BORDER = 'rgba(208,166,94,0.45)';
+const CHIP_TEXT = '#D0A65E';
+
 const TOPICS = [
   { icon: '🌍', label: 'Global warming' },
   { icon: '📉', label: 'Carbon emissions' },
@@ -77,65 +85,64 @@ export default async function OgImage() {
             zIndex: 1,
           }}
         >
-          {/* Gold title bar */}
+          {/* Coloured title bar */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              background: '#D0A65E',
-              padding: '28px 52px',
+              background: HEADER_BG,
+              padding: '24px 48px',
+              flexShrink: 0,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-              <span style={{ fontSize: 58 }}>🌍</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <span style={{ fontSize: 54 }}>🌍</span>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 52, fontWeight: 800, color: '#1e2a3a', lineHeight: 1.05 }}>
+                <span style={{ fontSize: 46, fontWeight: 800, color: HEADER_TEXT, lineHeight: 1.05 }}>
                   Climate Change Books
                 </span>
-                <span style={{ fontSize: 22, color: '#3d4f62', marginTop: 4, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase' }}>
-                  📖  Recommended Reading
+                <span style={{ fontSize: 20, color: HEADER_SUB, marginTop: 4, fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase' }}>
+                  Recommended Reading
                 </span>
               </div>
             </div>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="4 Billion Years On" width={260} height={46} style={{ objectFit: 'contain', flexShrink: 0, marginLeft: 20 }} />
+            ) : (
+              <span style={{ fontSize: 20, fontWeight: 700, color: HEADER_TEXT }}>4billionyearson.org</span>
+            )}
           </div>
 
           {/* Body */}
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '32px 52px', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 26, color: '#e2e8f0', lineHeight: 1.45, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
-              From leading climate scientists to policy experts — books on global warming, the environment, and our response.
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '30px 48px 36px', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 25, color: '#e2e8f0', lineHeight: 1.45, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+              From leading climate scientists to policy experts - books on global warming, the environment, and our response.
             </span>
 
-            {/* Topics + logo row */}
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {TOPICS.map((t) => (
-                  <div
-                    key={t.label}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '7px',
-                      background: 'rgba(208,166,94,0.15)',
-                      border: '1px solid rgba(208,166,94,0.45)',
-                      borderRadius: '999px',
-                      padding: '6px 16px',
-                      fontSize: 19,
-                      color: '#E8C97A',
-                      fontWeight: 600,
-                    }}
-                  >
-                    <span>{t.icon}</span>
-                    <span>{t.label}</span>
-                  </div>
-                ))}
-              </div>
-              {logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt="4 Billion Years On" width={300} height={52} style={{ objectFit: 'contain', flexShrink: 0, marginLeft: 24 }} />
-              ) : (
-                <span style={{ fontSize: 22, fontWeight: 700, color: '#e5e7eb' }}>4billionyearson.org</span>
-              )}
+            {/* Topic chips */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {TOPICS.map((t) => (
+                <div
+                  key={t.label}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '7px',
+                    background: CHIP_BG,
+                    border: `1px solid ${CHIP_BORDER}`,
+                    borderRadius: '999px',
+                    padding: '6px 16px',
+                    fontSize: 19,
+                    color: CHIP_TEXT,
+                    fontWeight: 600,
+                  }}
+                >
+                  <span>{t.icon}</span>
+                  <span>{t.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
