@@ -17,21 +17,14 @@ async function loadDataUrl(relativePath: string, mime: string): Promise<string |
   }
 }
 
-// Climate page colours: #D0A65E bar, #FFF5E7 title text
-const HEADER_BG = '#D0A65E';
-const HEADER_TEXT = '#FFF5E7';
-const HEADER_SUB = 'rgba(255,245,231,0.75)';
-const CHIP_BG = 'rgba(208,166,94,0.15)';
-const CHIP_BORDER = 'rgba(208,166,94,0.45)';
-const CHIP_TEXT = '#D0A65E';
+const ACCENT = '#D0A65E';
+const ACCENT_DIM = 'rgba(208,166,94,0.65)';
+const BORDER = 'rgba(208,166,94,0.35)';
 
-const TOPICS = [
-  { icon: '🌍', label: 'Global warming' },
-  { icon: '📉', label: 'Carbon emissions' },
-  { icon: '🌊', label: 'Sea level & ice' },
-  { icon: '🌿', label: 'Nature-based solutions' },
-  { icon: '⚡', label: 'Clean energy transition' },
-  { icon: '🤝', label: 'Paris Agreement' },
+const FEATURED = [
+  { title: 'Not the End of the World', author: 'Hannah Ritchie' },
+  { title: 'How to Avoid a Climate Disaster', author: 'Bill Gates' },
+  { title: 'The Ministry for the Future', author: 'Kim Stanley Robinson' },
 ];
 
 export default async function OgImage() {
@@ -44,14 +37,102 @@ export default async function OgImage() {
     (
       <div
         style={{
-          width: '1200px',
-          height: '630px',
           display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
           position: 'relative',
-          backgroundColor: '#030712',
-          fontFamily: 'Inter, system-ui, sans-serif',
+          background: '#030712',
+          fontFamily: 'system-ui, sans-serif',
         }}
       >
+        {bgUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={bgUrl}
+            alt=""
+            width={1200}
+            height={630}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55 }}
+          />
+        ) : null}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            background: 'linear-gradient(135deg, rgba(3,7,18,0.88) 0%, rgba(15,23,42,0.82) 50%, rgba(3,7,18,0.92) 100%)',
+          }}
+        />
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            padding: '52px 60px',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
+          {/* Top row: icon + title | logo */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <svg width="68" height="68" viewBox="0 0 24 24" fill="none">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke={ACCENT} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke={ACCENT} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span style={{ fontSize: 58, fontWeight: 800, color: ACCENT, textShadow: '0 2px 10px rgba(0,0,0,0.9)', lineHeight: 1.05 }}>
+                Climate Books
+              </span>
+            </div>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="4 Billion Years On" width={340} height={60} style={{ objectFit: 'contain' }} />
+            ) : (
+              <span style={{ fontSize: 24, fontWeight: 700, color: '#e5e7eb' }}>4billionyearson.org</span>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', marginBottom: '24px' }}>
+            <span style={{ fontSize: 22, color: ACCENT_DIM, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 600 }}>
+              Recommended Reading
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', marginBottom: '28px' }}>
+            <span style={{ fontSize: 26, color: '#e2e8f0', lineHeight: 1.35, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+              Global warming, carbon emissions, sea level and the energy transition - from leading climate scientists and bestselling authors.
+            </span>
+          </div>
+
+          {/* Featured books panel */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              background: 'rgba(3,7,18,0.88)',
+              border: `1px solid ${BORDER}`,
+              borderRadius: 16,
+              padding: '18px 24px',
+            }}
+          >
+            {FEATURED.map((b, i) => (
+              <div key={b.title} style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                <span style={{ fontSize: 15, color: ACCENT, fontWeight: 700, minWidth: 22 }}>{i + 1}.</span>
+                <span style={{ fontSize: 22, fontWeight: 700, color: '#f1f5f9' }}>{b.title}</span>
+                <span style={{ fontSize: 18, color: '#94a3b8' }}>- {b.author}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    { ...size }
+  );
+}
         {/* Background image */}
         {bgUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
