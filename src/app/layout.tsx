@@ -1,6 +1,6 @@
 import Footer from "@/app/_components/footer";
 import Header from "@/app/_components/header";
-import { CMS_NAME, HOME_OG_IMAGE_URL } from "@/lib/constants";
+import { CMS_NAME } from "@/lib/constants";
 import type { Metadata } from "next";
 import { Inter, Space_Mono } from "next/font/google";
 import cn from "classnames";
@@ -49,14 +49,12 @@ export const metadata: Metadata = {
     title: "4 Billion Years On - Climate, Energy, AI & Biotech Data",
     description:
       "Interactive dashboards and data-driven articles covering climate change, renewable energy, artificial intelligence and biotechnology.",
-    images: [HOME_OG_IMAGE_URL],
   },
   twitter: {
     card: "summary_large_image",
     title: "4 Billion Years On",
     description:
       "Interactive climate, energy, AI and biotech dashboards with sourced data visualisations.",
-    images: [HOME_OG_IMAGE_URL],
   },
   category: "Science & Technology",
   other: {

@@ -9,13 +9,13 @@ export const metadata: Metadata = {
     title: "Local & Global Energy Data",
     description:
       "Live energy data updated monthly. Track global and country-level renewable energy generation and the clean energy transition.",
-    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
+
   },
   twitter: {
     card: 'summary_large_image',
     title: "Renewable Energy Data Dashboard | 4 Billion Years On",
     description: "Live energy data updated monthly. Track global and country-level renewable energy generation and the clean energy transition.",
-    images: ['/Category%20image%20for%20social%20media%20links.png'],
+    images: [],
   },
 };
 

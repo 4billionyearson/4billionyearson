@@ -9,13 +9,13 @@ export const metadata: Metadata = {
     title: "AI Industry Data",
     description:
       "Track global AI investment, adoption, research output, compute trends, and regulation with interactive charts and data.",
-    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
+
   },
   twitter: {
     card: 'summary_large_image',
     title: "AI Industry Data Dashboard | 4 Billion Years On",
     description: "Track global AI investment, adoption, research output, compute trends, and regulation with interactive charts and data.",
-    images: ['/Category%20image%20for%20social%20media%20links.png'],
+    images: [],
   },
 };
 

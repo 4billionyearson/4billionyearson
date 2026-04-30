@@ -9,13 +9,13 @@ export const metadata: Metadata = {
     title: "Live Greenhouse Gas Tracker – CO₂, Methane & Temperature",
     description:
       "Live greenhouse gas data updated monthly. Track CO₂, methane, temperature anomalies, and historical ice core records.",
-    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
+
   },
   twitter: {
     card: 'summary_large_image',
     title: "Greenhouse Gas Tracker | 4 Billion Years On",
     description: "Live greenhouse gas data updated monthly. Track CO₂, methane, temperature anomalies, and 800,000-year ice core records.",
-    images: ['/Category%20image%20for%20social%20media%20links.png'],
+    images: [],
   },
 };
 
