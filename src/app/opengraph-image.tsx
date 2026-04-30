@@ -31,28 +31,63 @@ async function loadLiveStats(): Promise<{ co2: number | null; tempAnomaly: numbe
 
 const PILLARS = [
   {
-    icon: '🌍',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D0A65E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+        <path d="M2 12h20"/>
+      </svg>
+    ),
     name: 'Climate',
     accent: '#D0A65E',
     border: 'rgba(208,166,94,0.35)',
     features: ['200+ regions · monthly', 'Anomalies · rankings'],
   },
   {
-    icon: '⚡',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D2E369" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+      </svg>
+    ),
     name: 'Energy',
     accent: '#D2E369',
     border: 'rgba(210,227,105,0.35)',
     features: ['Solar · wind · hydro', 'Country comparisons'],
   },
   {
-    icon: '🤖',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#88DDFC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 18V5"/>
+        <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/>
+        <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/>
+        <path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/>
+        <path d="M18 18a4 4 0 0 0 2-7.464"/>
+        <path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/>
+        <path d="M6 18a4 4 0 0 1-2-7.464"/>
+        <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/>
+      </svg>
+    ),
     name: 'AI',
     accent: '#88DDFC',
     border: 'rgba(136,221,252,0.35)',
     features: ['Investment · compute', 'Adoption · regulation'],
   },
   {
-    icon: '🧬',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D26742" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m10 16 1.5 1.5"/>
+        <path d="m14 8-1.5-1.5"/>
+        <path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/>
+        <path d="m16.5 10.5 1 1"/>
+        <path d="m17 6-2.891-2.891"/>
+        <path d="M2 15c6.667-6 13.333 0 20-6"/>
+        <path d="m20 9 .891.891"/>
+        <path d="M3.109 14.109 4 15"/>
+        <path d="m6.5 12.5 1 1"/>
+        <path d="m7 18 2.891 2.891"/>
+        <path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/>
+      </svg>
+    ),
     name: 'Biotech',
     accent: '#D26742',
     border: 'rgba(210,103,66,0.35)',
@@ -171,7 +206,7 @@ export default async function OgImage() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                  <span style={{ fontSize: 28 }}>{p.icon}</span>
+                  <div style={{ display: 'flex' }}>{p.icon}</div>
                   <span style={{ fontSize: 20, fontWeight: 800, color: p.accent }}>{p.name}</span>
                 </div>
                 <span style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6 }}>{p.features[0]}</span>
