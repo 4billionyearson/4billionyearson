@@ -12,7 +12,6 @@ export const metadata: Metadata = {
     title: "Best Renewable Energy Books | 4 Billion Years On",
     description:
       "Recommended books on renewable energy, the clean energy transition, and sustainable power – from expert authors and bestselling titles.",
-    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 

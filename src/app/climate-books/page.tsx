@@ -12,7 +12,6 @@ export const metadata: Metadata = {
     title: "Best Climate Change Books | 4 Billion Years On",
     description:
       "Recommended books on climate change, global warming, and the environment – from bestselling authors and leading scientists.",
-    images: [{ url: '/Category%20image%20for%20social%20media%20links.png', width: 1200, height: 630 }],
   },
 };
 
