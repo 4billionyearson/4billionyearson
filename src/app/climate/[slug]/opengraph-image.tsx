@@ -245,9 +245,10 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
                     : 'Temperature · Rainfall · Emissions'}
               </span>
             </div>
-            <span style={{ fontSize: 20, fontWeight: 700, color: '#e5e7eb', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
-              4billionyearson.org/climate/{region.slug}
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+              <span style={{ fontSize: 18, fontWeight: 700, color: '#D0A65E', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>Full history · charts · anomaly rankings →</span>
+              <span style={{ fontSize: 15, color: '#6b7280', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>4billionyearson.org/climate/{region.slug}</span>
+            </div>
           </div>
         </div>
       </div>

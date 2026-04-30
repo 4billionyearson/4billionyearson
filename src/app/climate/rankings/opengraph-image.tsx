@@ -156,9 +156,12 @@ export default async function OgImage() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14, fontSize: 18, color: '#9ca3af' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14, fontSize: 18, color: '#9ca3af', alignItems: 'flex-end' }}>
             <span>{total} regions · 1961–1990 baseline</span>
-            <span style={{ color: '#D0A65E', fontWeight: 700 }}>4billionyearson.org/climate/rankings</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+              <span style={{ color: '#D0A65E', fontWeight: 700, fontSize: 18 }}>See all {total} regions · interactive table →</span>
+              <span style={{ color: '#6b7280', fontSize: 14 }}>4billionyearson.org/climate/rankings</span>
+            </div>
           </div>
         </div>
       </div>

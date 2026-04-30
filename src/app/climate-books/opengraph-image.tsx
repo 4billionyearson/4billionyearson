@@ -127,6 +127,12 @@ export default async function OgImage() {
               </div>
             ))}
           </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginTop: '18px' }}>
+            <span style={{ fontSize: 20, fontWeight: 700, color: ACCENT }}>
+              + more titles · explore the full reading list →
+            </span>
+          </div>
         </div>
       </div>
     ),

@@ -255,9 +255,10 @@ export default async function OgImage() {
             <span style={{ fontSize: 17, color: '#6b7280' }}>
               Sources: GDACS (EU/JRC) · EM-DAT / Our World in Data
             </span>
-            <span style={{ fontSize: 20, fontWeight: 700, color: '#D0A65E' }}>
-              4billionyearson.org/extreme-weather
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+              <span style={{ fontSize: 18, fontWeight: 700, color: '#D0A65E' }}>Live alerts · historical charts &amp; trends →</span>
+              <span style={{ fontSize: 15, color: '#6b7280' }}>4billionyearson.org/extreme-weather</span>
+            </div>
           </div>
         </div>
       </div>

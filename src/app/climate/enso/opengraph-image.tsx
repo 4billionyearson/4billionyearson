@@ -210,10 +210,15 @@ export default async function OgImage() {
           <div style={{ display: 'flex', flex: 1 }} />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <span style={{ fontSize: 20, color: '#cbd5e1', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
-              4billionyearson.org/climate/enso
-            </span>
-            <span style={{ fontSize: 20, color: '#94a3b8', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: 18, fontWeight: 700, color: '#D0A65E', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+                ONI history · MEI · SOI · forecast plume →
+              </span>
+              <span style={{ fontSize: 15, color: '#6b7280', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
+                4billionyearson.org/climate/enso
+              </span>
+            </div>
+            <span style={{ fontSize: 17, color: '#6b7280', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
               Updated weekly
             </span>
           </div>

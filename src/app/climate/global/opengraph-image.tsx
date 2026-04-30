@@ -172,7 +172,10 @@ export default async function OgImage() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <span style={{ fontSize: 18, color: '#94a3b8', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>Sources: NOAA · NSIDC · NOAA CPC · NOAA GML</span>
-            <span style={{ fontSize: 22, fontWeight: 700, color: '#e5e7eb', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>4billionyearson.org/climate/global</span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+              <span style={{ fontSize: 19, fontWeight: 700, color: '#D0A65E', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>Interactive charts, history &amp; analysis →</span>
+              <span style={{ fontSize: 15, color: '#6b7280', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>4billionyearson.org/climate/global</span>
+            </div>
           </div>
         </div>
       </div>
