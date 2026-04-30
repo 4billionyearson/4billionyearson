@@ -114,7 +114,7 @@ export default async function OgImage() {
               flexDirection: 'column',
               gap: '10px',
               background: 'rgba(3,7,18,0.88)',
-              border: `1px solid ${BORDER}`,
+              border: '1px solid ' + BORDER,
               borderRadius: 16,
               padding: '18px 24px',
             }}
