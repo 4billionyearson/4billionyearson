@@ -1,26 +1,27 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { Sparkles, Globe2, Flag, MapPin, Trophy, type LucideIcon } from 'lucide-react';
+import { Sparkles, Globe2, Flag, MapPin, Trophy, Layers, type LucideIcon } from 'lucide-react';
 
-export type ClimateTabId = 'editors-picks' | 'countries' | 'us-states' | 'uk-regions' | 'rankings';
+export type ClimateTabId = 'editors-picks' | 'continents-regions' | 'countries' | 'us-states' | 'uk-regions' | 'rankings';
 
 type TabDef = {
   id: ClimateTabId;
   label: string;
   icon: LucideIcon;
-  countKey?: 'countries' | 'usStates' | 'ukRegions';
+  countKey?: 'countries' | 'usStates' | 'ukRegions' | 'groups';
 };
 
 const TABS: TabDef[] = [
   { id: 'editors-picks', label: "Editor's Picks", icon: Sparkles },
+  { id: 'continents-regions', label: 'Continents & Regions', icon: Layers, countKey: 'groups' },
   { id: 'countries', label: 'Countries', icon: Globe2, countKey: 'countries' },
   { id: 'us-states', label: 'US States', icon: Flag, countKey: 'usStates' },
   { id: 'uk-regions', label: 'UK Regions', icon: MapPin, countKey: 'ukRegions' },
   { id: 'rankings', label: 'Climate Ranking', icon: Trophy },
 ];
 
-type Counts = { countries: number; usStates: number; ukRegions: number };
+type Counts = { countries: number; usStates: number; ukRegions: number; groups: number };
 type Panels = Record<ClimateTabId, ReactNode>;
 
 function isTabId(value: string): value is ClimateTabId {

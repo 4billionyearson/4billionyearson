@@ -9,6 +9,7 @@ import {
   getClimatePageUrl,
 } from '@/lib/climate/regions';
 import ClimateProfile from './ClimateProfile';
+import ClimateGroupProfile from './ClimateGroupProfile';
 
 // Build curated pages eagerly; stub (auto-generated) pages render
 // on-demand and are then cached, so builds stay fast.
@@ -100,6 +101,17 @@ export default async function ClimateProfilePage(
   const { slug } = await params;
   const region = getRegionBySlug(slug);
   if (!region) notFound();
+
+  // Group/aggregate slugs (continents, US climate regions) get their own
+  // server-rendered template that reads continent / region snapshots directly.
+  if (region.type === 'group') {
+    return (
+      <>
+        <DatasetSchema region={region} />
+        <ClimateGroupProfile region={region} />
+      </>
+    );
+  }
 
   return (
     <>

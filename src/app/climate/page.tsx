@@ -4,6 +4,7 @@ import { Globe2, Flag } from 'lucide-react';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import UKRegionsBrowser from './uk-regions-browser';
 import ClimateRegionsBrowser from './climate-regions-browser';
+import GroupsBrowserPanel from './groups-browser-panel';
 import { ClimateTabsProvider, ClimateTabsBar, ClimateTabsPanels } from './climate-hub-tabs';
 import EditorsPicksPanel from './editors-picks-panel';
 import ClimateRankingsPanel from './climate-rankings-panel';
@@ -75,6 +76,7 @@ export default function ClimateProfilesIndex() {
   const countries = CLIMATE_REGIONS.filter(r => r.type === 'country' && r.slug !== 'ireland');
   const usStates = CLIMATE_REGIONS.filter(r => r.type === 'us-state');
   const ukAndIrelandRegions = CLIMATE_REGIONS.filter(r => r.type === 'uk-region' || r.slug === 'ireland');
+  const groups = CLIMATE_REGIONS.filter(r => r.type === 'group');
 
   return (
     <main>
@@ -87,9 +89,11 @@ export default function ClimateProfilesIndex() {
               countries: countries.length,
               usStates: usStates.length,
               ukRegions: ukAndIrelandRegions.length,
+              groups: groups.length,
             }}
             panels={{
               'editors-picks': <EditorsPicksPanel regions={CLIMATE_REGIONS} />,
+              'continents-regions': <GroupsBrowserPanel groups={groups} />,
               countries: (
                 <ClimateRegionsBrowser
                   title="Countries"
@@ -132,7 +136,8 @@ export default function ClimateProfilesIndex() {
               </div>
               <div className="bg-gray-950 px-4 py-3 md:px-6 md:py-4">
                 <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                  Monthly climate updates for 144 countries, US states and UK regions – temperature, rainfall and emissions trends from OWID, NOAA and the Met Office.
+                  Monthly climate updates for {REGION_COUNT} continents, climate regions, countries, US states and UK regions –
+                  temperature, rainfall and emissions trends from NOAA, OWID, the Met Office and CRU TS.
                 </p>
               </div>
               <div className="sticky top-0 z-30 bg-gray-950 px-4 pt-2 pb-1 md:px-6">

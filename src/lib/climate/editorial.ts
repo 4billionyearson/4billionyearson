@@ -41,6 +41,23 @@ export const EDITORS_PICKS: string[] = [
  * entries already cover them (by slug) in CURATED_CLIMATE_REGIONS.
  */
 export const CURATED_SLUGS = new Set<string>([
+  // Group/aggregate slugs
+  'africa',
+  'asia',
+  'europe',
+  'oceania',
+  'north-america',
+  'south-america',
+  'us-northeast',
+  'us-upper-midwest',
+  'us-ohio-valley',
+  'us-southeast',
+  'us-northern-rockies-plains',
+  'us-south',
+  'us-southwest',
+  'us-northwest',
+  'us-west',
+  // Special / countries / states / UK
   'global',
   'uk',
   'usa',
