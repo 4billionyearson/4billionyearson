@@ -4,7 +4,7 @@ import { CLIMATE_REGIONS, type ClimateRegion } from '@/lib/climate/regions';
 
 export const maxDuration = 60;
 
-const CACHE_KEY = 'climate:emissions:us-region:v1';
+const CACHE_KEY = 'climate:emissions:us-region:v2';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 const EIA_API_KEY = process.env.EIA_API_KEY || 'DEMO_KEY';
