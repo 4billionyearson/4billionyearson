@@ -678,6 +678,7 @@ export const CURATED_CLIMATE_REGIONS: ClimateRegion[] = [
 function buildStubs(): ClimateRegion[] {
   const stubs: ClimateRegion[] = [];
   for (const loc of ALL_LOCATIONS) {
+    if (loc.type === 'group') continue;
     if (CURATED_LOCATION_IDS.has(loc.id)) continue;
     const slug = locationIdToSlug(loc.id, loc.name, loc.type);
     let apiCode = '';

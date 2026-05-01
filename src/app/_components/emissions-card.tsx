@@ -347,6 +347,17 @@ export default function EmissionsCard({ countryName, usStateCode, usStateName, c
     return <CountryCard data={country} deepLinkHref={href} />;
   }
 
+  if (continentName) {
+    if (!country) {
+      return (
+        <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-8 flex items-center justify-center">
+          <Loader2 className="h-5 w-5 animate-spin text-rose-400" />
+        </div>
+      );
+    }
+    return <CountryCard data={country} deepLinkHref={href} />;
+  }
+
   if (!global) {
     return (
       <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-8 flex items-center justify-center">

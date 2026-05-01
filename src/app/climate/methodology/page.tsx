@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { FileText, BookOpen, Database, Calendar, CalendarRange, Trophy, AlertTriangle, Scale } from 'lucide-react';
+import { BookOpen, Database, Calendar, CalendarRange, Trophy, AlertTriangle, Scale } from 'lucide-react';
 import BaselineExplainer from '../_components/BaselineExplainer';
 import DataSourceTimeline, {
   MonthlyReleaseTimeline,
@@ -198,9 +198,8 @@ export default function MethodologyPage() {
           style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}
         >
           <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-            <h1 className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight flex items-center gap-3" style={{ color: '#FFF5E7' }}>
-              <FileText className="h-7 w-7 md:h-8 md:w-8 shrink-0" />
-              <span>Climate Data Methodology</span>
+            <h1 className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+              Climate Data Methodology
             </h1>
           </div>
           <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5">

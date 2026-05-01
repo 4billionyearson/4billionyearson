@@ -3,10 +3,9 @@ import path from 'node:path';
 import Link from 'next/link';
 import { BarChart3, ExternalLink, MapPin, Layers, Scale, AlertTriangle, FileText, BookOpen, TrendingUp, TrendingDown } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
-import { CLIMATE_REGIONS, getProfileSlugForLocation } from '@/lib/climate/regions';
+import { CLIMATE_REGIONS, getProfileSlugForLocation, getClimateUpdateDateLabel } from '@/lib/climate/regions';
 import { ALL_LOCATIONS } from '@/lib/climate/locations';
 import { CONTINENT_BY_ISO } from '@/lib/climate/editorial';
-import GroupAnomalyChart, { type MonthlyPoint } from './GroupAnomalyChart';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import GroupSummaryPanel from './GroupSummaryPanel';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
@@ -83,27 +82,6 @@ function fmtSigned(v: number | null | undefined, digits = 2, units = '°C'): str
   return `${v > 0 ? '+' : ''}${v.toFixed(digits)} ${units}`;
 }
 
-function ymKey(year: number, month: number): string {
-  return `${year}-${String(month).padStart(2, '0')}`;
-}
-
-/** Compute calendar-month climatology (mean per month) over a year range, returning `{1: mean, 2: mean, ...}`. */
-function climatology(monthly: { year: number; month: number; value: number }[], startYear: number, endYear: number): Record<number, number> {
-  const sums: Record<number, { s: number; n: number }> = {};
-  for (const m of monthly) {
-    if (m.year < startYear || m.year > endYear || m.value == null) continue;
-    if (!sums[m.month]) sums[m.month] = { s: 0, n: 0 };
-    sums[m.month].s += m.value;
-    sums[m.month].n += 1;
-  }
-  const out: Record<number, number> = {};
-  for (const k of Object.keys(sums)) {
-    const m = Number(k);
-    if (sums[m].n > 0) out[m] = sums[m].s / sums[m].n;
-  }
-  return out;
-}
-
 function isoToCountryRegion(iso3: string): ClimateRegion | undefined {
   const slug = getProfileSlugForLocation('', iso3) ?? undefined;
   if (!slug) return undefined;
@@ -135,6 +113,55 @@ function StatTile({ label, value, sub }: { label: string; value: string; sub?: s
       <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{label}</div>
       <div className="mt-1 font-mono text-2xl font-bold text-[#FFF5E7]">{value}</div>
       {sub ? <div className="mt-0.5 text-[11px] text-gray-500">{sub}</div> : null}
+    </div>
+  );
+}
+
+// Three-column "snapshot" table mirroring the country update page layout:
+// 1-month / 3-month / 12-month windows with the comparison anomaly,
+// optionally a source-native row, and a footnote.
+interface SnapshotCol { window: string; period: string; anomaly: number | null | undefined; nativeAnomaly?: number | null; }
+function SnapshotTable({ columns, comparisonBaseline = '1961–1990', nativeBaseline, footnote }: {
+  columns: SnapshotCol[];
+  comparisonBaseline?: string;
+  nativeBaseline?: string | null;
+  footnote?: React.ReactNode;
+}) {
+  const showNative = columns.some((c) => c.nativeAnomaly != null && Number.isFinite(c.nativeAnomaly as number));
+  const gridStyle = { gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` };
+  return (
+    <div className="rounded-xl border border-gray-700/50 bg-gray-800/40 overflow-hidden">
+      <div className="grid border-b border-gray-600/40" style={gridStyle}>
+        {columns.map((c) => (
+          <div key={c.window} className="px-2 py-2 text-center border-r border-gray-700/40 last:border-r-0">
+            <div className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-gray-300">{c.window}</div>
+            <div className="text-[10px] md:text-[11px] text-gray-500 font-mono">{c.period || '—'}</div>
+          </div>
+        ))}
+      </div>
+      <div className="grid" style={gridStyle}>
+        {columns.map((c) => (
+          <div key={`v-${c.window}`} className="px-2 py-3 text-center border-r border-gray-700/40 last:border-r-0">
+            <div className="font-mono text-lg md:text-xl font-bold text-[#FFF5E7]">{fmtSigned(c.anomaly)}</div>
+            <div className="text-[10px] text-gray-500 mt-0.5">vs {comparisonBaseline}</div>
+          </div>
+        ))}
+      </div>
+      {showNative && (
+        <div className="grid border-t border-gray-600/40 bg-gray-900/40" style={gridStyle}>
+          {columns.map((c) => (
+            <div key={`n-${c.window}`} className="px-2 py-2 text-center border-r border-gray-700/40 last:border-r-0">
+              <div className="font-mono text-sm font-semibold text-gray-200">{fmtSigned(c.nativeAnomaly)}</div>
+              <div className="text-[10px] text-gray-500 mt-0.5">vs {nativeBaseline ?? '1901–2000'}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      {footnote ? (
+        <div className="border-t border-gray-700/40 bg-gray-900/30 px-3 py-2 text-[11px] text-gray-400">
+          {footnote}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -196,7 +223,7 @@ function MemberRankingsCard({ members, regionName }: { members: RankingRow[]; re
   const bottom = sorted.slice(-5).reverse();
   const slugForMember = (m: RankingRow): string => m.slug;
   return (
-    <Card icon={<BarChart3 className="h-5 w-5" />} title={`Hottest & Coolest in ${regionName} this month`}>
+    <Card icon={<BarChart3 className="h-5 w-5" />} title={`Hottest & Coolest in ${regionName} this Month`}>
       <p className="text-sm text-gray-400 mb-3">
         1-month anomaly vs 1961–1990 across the {valid.length} {regionName === 'United States' ? 'states' : 'members'} we cover. Click a name to open its profile.
       </p>
@@ -289,78 +316,60 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
     </Card>;
   }
 
-  // Build chart data — native series available for 4 NOAA continents.
-  const monthly: MonthlyPoint[] = (row.monthly ?? []).map((m) => ({
-    ym: ymKey(m.year, m.month),
-    year: m.year,
-    month: m.month,
-    anomaly: m.anomaly ?? null,
-    nativeAnomaly: m.nativeAnomaly ?? null,
-  }));
-
   const isAgg = !!row.aggregate;
   const sourceLabel = isAgg
     ? '4BYO aggregate (NOAA does not publish a standalone continental land series for this region)'
     : 'NOAA Climate at a Glance — continental land temperature';
 
+  // Build the 1m / 3m / 12m window labels for the snapshot table.
+  const monthShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const lm = row.latestMonth;
+  const window1Period = row.label1m ?? (lm ? `${monthShort[lm.month - 1]} ${lm.year}` : '');
+  const window3Period = lm
+    ? (() => {
+        // 3-month rolling ending at latest month → start = month-2
+        let sm = lm.month - 2; let sy = lm.year;
+        if (sm <= 0) { sm += 12; sy -= 1; }
+        if (sy === lm.year) return `${monthShort[sm - 1]}–${monthShort[lm.month - 1]} ${lm.year}`;
+        return `${monthShort[sm - 1]} ${sy}–${monthShort[lm.month - 1]} ${lm.year}`;
+      })()
+    : '';
+  const window12Period = row.label12m ?? (lm ? (() => {
+    let sm = lm.month + 1; let sy = lm.year - 1;
+    if (sm > 12) { sm -= 12; sy += 1; }
+    return `${monthShort[sm - 1]} ${sy}–${monthShort[lm.month - 1]} ${lm.year}`;
+  })() : '');
+
   return (
     <>
-      {/* Latest stats */}
-      <Card icon={<BarChart3 className="h-5 w-5" />} title="Latest temperature anomaly">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          <StatTile
-            label={`1-month (${row.label1m ?? '—'})`}
-            value={fmtSigned(row.anomaly1m)}
-            sub="vs 1961–1990"
-          />
-          <StatTile
-            label="3-month rolling"
-            value={fmtSigned(row.anomaly3m)}
-            sub="vs 1961–1990"
-          />
-          <StatTile
-            label={`12-month (${row.label12m ?? '—'})`}
-            value={fmtSigned(row.anomaly12m)}
-            sub="vs 1961–1990"
-          />
-          {!isAgg && (
-            <StatTile
-              label="1-month (native)"
-              value={fmtSigned(row.nativeAnomaly1m)}
-              sub={`vs ${row.nativeBaseline ?? '1901–2000'}`}
-            />
-          )}
-        </div>
-        {isAgg && (
-          <p className="mt-3 text-xs text-amber-200/80 flex items-start gap-1.5">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />
-            <span>
-              {row.note ?? 'NOAA does not publish a standalone continental land series; values aggregate the country anomalies in our coverage.'}
+      {/* Latest snapshot table — mirrors country update page layout */}
+      <Card icon={<BarChart3 className="h-5 w-5" />} title="Temperature Snapshot">
+        <SnapshotTable
+          columns={[
+            { window: '1-Month', period: window1Period, anomaly: row.anomaly1m, nativeAnomaly: row.nativeAnomaly1m },
+            { window: '3-Month', period: window3Period, anomaly: row.anomaly3m, nativeAnomaly: row.nativeAnomaly3m },
+            { window: '12-Month', period: window12Period, anomaly: row.anomaly12m, nativeAnomaly: row.nativeAnomaly12m },
+          ]}
+          nativeBaseline={row.nativeBaseline}
+          footnote={isAgg ? (
+            <span className="flex items-start gap-1.5">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />
+              <span>{row.note ?? 'NOAA does not publish a standalone continental land series; values aggregate the country anomalies in our coverage.'}</span>
             </span>
-          </p>
-        )}
+          ) : null}
+        />
       </Card>
-
-      {/* Chart */}
-      {monthly.length > 0 && (
-        <Card icon={<BarChart3 className="h-5 w-5" />} title="Monthly temperature anomaly history">
-          <p className="text-sm text-gray-400 mb-3 leading-relaxed">
-            {isAgg
-              ? '4BYO aggregate of country anomalies vs the 1961–1990 baseline.'
-              : 'NOAA continental series. Gold line is rebased to the 1961–1990 comparison baseline; the lighter line shows the source-native 1901–2000 anomaly published by NOAA.'}
-          </p>
-          <GroupAnomalyChart data={monthly} showNative={!isAgg} />
-        </Card>
-      )}
 
       {/* Spaghetti chart + seasonal-shift cards (member-country aggregate absolutes) */}
       {absolutes?.monthlyAll?.length ? (
         <>
-          <TemperatureSpaghettiChart
-            monthlyAll={absolutes.monthlyAll}
-            regionName={region.name}
-            dataSource={`4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`}
-          />
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+            <TemperatureSpaghettiChart
+              monthlyAll={absolutes.monthlyAll}
+              regionName={region.name}
+              dataSource={`4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`}
+            />
+          </section>
           <SeasonalShiftCard monthlyAll={absolutes.monthlyAll} regionName={region.name} dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures." />
         </>
       ) : null}
@@ -411,7 +420,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
       )}
 
       {!isAgg && (
-        <Card icon={<MapPin className="h-5 w-5" />} title="Explore countries on this continent">
+        <Card icon={<MapPin className="h-5 w-5" />} title="Explore Countries on this Continent">
           <p className="text-sm text-gray-400 mb-3">
             This page shows the NOAA continental series. To browse country-level pages within {region.name}, use the
             countries tab on the Climate Updates hub and filter by continent.
@@ -429,7 +438,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
       <MemberRankingsCard members={members} regionName={region.name} />
 
       {/* Sources */}
-      <Card icon={<FileText className="h-5 w-5" />} title="Data source">
+      <Card icon={<FileText className="h-5 w-5" />} title="Data Sources">
         <ul className="space-y-1.5 text-sm text-gray-300">
           <li className="flex items-start gap-2">
             <Layers className="h-4 w-4 shrink-0 text-[#D0A65E] mt-0.5" />
@@ -475,81 +484,36 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
   const tavg = data.paramData.tavg;
   const pcp = data.paramData.pcp;
 
-  // Build comparison-baseline (1961–1990) monthly anomaly series from monthlyAll.
-  const climComparison = climatology(tavg.monthlyAll, 1961, 1990);
-  const climNative = climatology(tavg.monthlyAll, 1901, 2000);
-  const monthly: MonthlyPoint[] = tavg.monthlyAll
-    .filter((m) => Number.isFinite(m.value))
-    .map((m) => {
-      const cBase = climComparison[m.month];
-      const nBase = climNative[m.month];
-      return {
-        ym: ymKey(m.year, m.month),
-        year: m.year,
-        month: m.month,
-        anomaly: cBase != null ? +(m.value - cBase).toFixed(3) : null,
-        nativeAnomaly: nBase != null ? +(m.value - nBase).toFixed(3) : null,
-      };
-    });
-
   const latestComp = tavg.latestMonthStats;
   const latestComp3 = tavg.latestThreeMonthStats;
   const native1 = tavg.nativeStats?.latestMonth;
   const native3 = tavg.nativeStats?.latestThreeMonth;
+  const usNativeBaseline = tavg.nativeStats?.baseline ?? '1901–2000';
 
   return (
     <>
-      <Card icon={<BarChart3 className="h-5 w-5" />} title="Latest temperature anomaly">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {latestComp && (
-            <StatTile
-              label={`1-month (${latestComp.label})`}
-              value={fmtSigned(latestComp.diff)}
-              sub={`Rank ${latestComp.rank}/${latestComp.total} · vs 1961–1990`}
-            />
-          )}
-          {latestComp3 && (
-            <StatTile
-              label={`3-month (${latestComp3.label})`}
-              value={fmtSigned(latestComp3.diff)}
-              sub={`Rank ${latestComp3.rank}/${latestComp3.total} · vs 1961–1990`}
-            />
-          )}
-          {native1 && (
-            <StatTile
-              label={`1-month (native)`}
-              value={fmtSigned(native1.nativeAnomaly)}
-              sub={`vs ${tavg.nativeStats?.baseline ?? '1901–2000'}`}
-            />
-          )}
-          {native3 && (
-            <StatTile
-              label={`3-month (native)`}
-              value={fmtSigned(native3.nativeAnomaly)}
-              sub={`vs ${tavg.nativeStats?.baseline ?? '1901–2000'}`}
-            />
-          )}
-        </div>
+      {/* Snapshot table */}
+      <Card icon={<BarChart3 className="h-5 w-5" />} title="Temperature Snapshot">
+        <SnapshotTable
+          columns={[
+            ...(latestComp ? [{ window: '1-Month', period: latestComp.label, anomaly: latestComp.diff, nativeAnomaly: native1?.nativeAnomaly ?? null }] : []),
+            ...(latestComp3 ? [{ window: '3-Month', period: latestComp3.label, anomaly: latestComp3.diff, nativeAnomaly: native3?.nativeAnomaly ?? null }] : []),
+          ]}
+          nativeBaseline={usNativeBaseline}
+          footnote={latestComp ? <>Rank {latestComp.rank} of {latestComp.total} months in record.</> : null}
+        />
       </Card>
-
-      {/* Chart */}
-      {monthly.length > 0 && (
-        <Card icon={<BarChart3 className="h-5 w-5" />} title="Monthly temperature anomaly history">
-          <p className="text-sm text-gray-400 mb-3 leading-relaxed">
-            Computed from NOAA Climate at a Glance regional <code>tavg</code>. Gold line uses the 1961–1990 comparison baseline; the lighter line uses NOAA&apos;s 1901–2000 source-native baseline.
-          </p>
-          <GroupAnomalyChart data={monthly} />
-        </Card>
-      )}
 
       {/* Spaghetti chart + seasonal-shift card (NOAA regional tavg monthlyAll) */}
       {tavg.monthlyAll?.length ? (
         <>
-          <TemperatureSpaghettiChart
-            monthlyAll={tavg.monthlyAll}
-            regionName={region.name}
-            dataSource="NOAA Climate at a Glance — regional tavg (monthly absolute °C)."
-          />
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+            <TemperatureSpaghettiChart
+              monthlyAll={tavg.monthlyAll}
+              regionName={region.name}
+              dataSource="NOAA Climate at a Glance — regional tavg (monthly absolute °C)."
+            />
+          </section>
           <SeasonalShiftCard
             monthlyAll={tavg.monthlyAll}
             regionName={region.name}
@@ -612,7 +576,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
       <MemberRankingsCard members={members} regionName={region.name} />
 
       {/* Sources */}
-      <Card icon={<FileText className="h-5 w-5" />} title="Data source">
+      <Card icon={<FileText className="h-5 w-5" />} title="Data Sources">
         <ul className="space-y-1.5 text-sm text-gray-300">
           <li className="flex items-start gap-2">
             <Layers className="h-4 w-4 shrink-0 text-[#D0A65E] mt-0.5" />
@@ -655,11 +619,10 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
         >
           <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
             <h1
-              className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight flex items-center gap-3"
+              className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight"
               style={{ color: '#FFF5E7' }}
             >
-              <span className="text-3xl md:text-4xl shrink-0" aria-hidden>{region.emoji}</span>
-              <span>{region.name} Climate Update</span>
+              {region.name} Climate Update, {getClimateUpdateDateLabel()}
             </h1>
           </div>
           <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5">

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
@@ -16,9 +16,11 @@ import Link from 'next/link';
 interface LocationResult {
   id: string;
   name: string;
-  type: 'country' | 'us-state' | 'uk-region';
+  type: 'country' | 'us-state' | 'uk-region' | 'group';
   owidCode?: string;
   parentCountry?: string;
+  groupSlug?: string;
+  groupKind?: 'continent' | 'us-climate-region';
 }
 
 // ─── Custom Tooltips ─────────────────────────────────────────────────────────
@@ -306,6 +308,7 @@ export default function ClimateDashboardPage() {
 
 function ClimateDashboard() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [searchInput, setSearchInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -411,6 +414,14 @@ function ClimateDashboard() {
   const handleSelectLocation = useCallback(async (location: LocationResult) => {
     setShowDropdown(false);
     setSearchResults([]);
+
+    // Continents and US climate regions don't have dashboard data — open the
+    // dedicated /climate/{slug} update page instead.
+    if (location.type === 'group' && location.groupSlug) {
+      router.push(`/climate/${location.groupSlug}`);
+      return;
+    }
+
     setSelectedLocation(location);
     setLoading(true);
     setError(null);
@@ -472,7 +483,7 @@ function ClimateDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   // Auto-search from ?q= URL param
   useEffect(() => {
@@ -611,12 +622,17 @@ function ClimateDashboard() {
                       <span className="text-lg">
                         {result.type === 'us-state' ? '🇺🇸'
                           : result.type === 'uk-region' ? '🇬🇧'
+                          : result.type === 'group' ? (result.groupKind === 'us-climate-region' ? '🇺🇸' : '🌍')
                           : countryFlag(result.owidCode)}
                       </span>
                       <div>
                         <span className="font-medium text-gray-200">{result.name}</span>
                         <span className="text-xs text-gray-400 ml-2">
-                          {result.type === 'country' ? 'Country' : result.type === 'us-state' ? 'US State' : 'UK Region'}
+                          {result.type === 'country' ? 'Country'
+                            : result.type === 'us-state' ? 'US State'
+                            : result.type === 'uk-region' ? 'UK Region'
+                            : result.groupKind === 'us-climate-region' ? 'US Climate Region'
+                            : 'Continent'}
                         </span>
                       </div>
                     </button>
@@ -634,20 +650,18 @@ function ClimateDashboard() {
 
           {hasData && !loading && (
             <div className="flex items-start gap-2 mt-3">
-              <div className="flex flex-col gap-0.5 flex-1 text-green-400 bg-green-950/40 py-1.5 px-4 rounded-lg border border-green-800/50">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between md:gap-3 gap-0.5 flex-1 text-green-400 bg-green-950/40 py-1.5 px-4 rounded-lg border border-green-800/50">
                 <div className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4 flex-shrink-0" />
                   <span className="font-medium text-sm">{getLocationLabel()}</span>
                 </div>
                 {selectedLocation && getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode) && (
-                  <div className="flex justify-end">
-                    <Link
-                      href={`/climate/${getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode)}`}
-                      className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap"
-                    >
-                      Full Monthly Update <ExternalLink className="h-3 w-3" />
-                    </Link>
-                  </div>
+                  <Link
+                    href={`/climate/${getProfileSlugForLocation(selectedLocation.id, selectedLocation.owidCode)}`}
+                    className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap md:self-auto self-end"
+                  >
+                    Full Monthly Update <ExternalLink className="h-3 w-3" />
+                  </Link>
                 )}
               </div>
               <button

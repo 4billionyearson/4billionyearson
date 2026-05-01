@@ -32,7 +32,7 @@ export default function BaselineExplainer({
     <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
         <Info className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-        <span className="min-w-0 flex-1">Which Baseline Is In Use</span>
+        <span className="min-w-0 flex-1">Which Baseline is in Use</span>
       </h2>
       <p className="text-sm text-gray-300 leading-relaxed">
         Most temperature anomalies on this site are quoted against the

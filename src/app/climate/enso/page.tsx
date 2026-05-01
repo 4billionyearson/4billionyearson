@@ -1042,7 +1042,7 @@ export default function EnsoPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <RelatedLink href="/climate/global" label="Global Climate Update" desc="Whole-planet temperature & trend update" />
-          <RelatedLink href="/climate" label="Country, State & Region Updates" desc="144 regions tracked monthly" />
+          <RelatedLink href="/climate" label="Continent, Country, State & Region Updates" desc="160+ regions tracked monthly" />
           <RelatedLink href="/climate/shifting-seasons" label="Shifting Seasons" desc="How season timing is moving worldwide" />
           <RelatedLink href="/climate/rankings" label="Climate Rankings" desc="League table of anomalies across 144 regions" />
           <RelatedLink href="/sea-levels-ice" label="Sea Levels & Ice" desc="Ocean heat, sea level rise & polar ice" />

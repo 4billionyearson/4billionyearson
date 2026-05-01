@@ -41,7 +41,7 @@ export function countryFlag(owidCode?: string): string {
 export interface LocationResult {
   id: string;
   name: string;
-  type: 'country' | 'us-state' | 'uk-region';
+  type: 'country' | 'us-state' | 'uk-region' | 'group';
   // OWID entity ID for country-level temperature
   owidEntityId?: number;
   owidCode?: string;
@@ -51,6 +51,9 @@ export interface LocationResult {
   metOfficeRegion?: string;
   // Parent country code for sub-national locations
   parentCountry?: string;
+  // For groups (continent / US climate region) — slug for /climate/{slug}
+  groupSlug?: string;
+  groupKind?: 'continent' | 'us-climate-region';
 }
 
 // NOAA US state codes (used in Climate at a Glance API)
@@ -344,8 +347,28 @@ export const COUNTRIES: LocationResult[] = [
   { id: 'c-swz', name: 'Eswatini', type: 'country', owidEntityId: 78, owidCode: 'SWZ' },
 ];
 
+// Continents and US climate regions — link straight to /climate/{slug}.
+// Kept here (not imported from regions.ts) to avoid a circular dependency.
+export const CLIMATE_GROUPS: LocationResult[] = [
+  { id: 'g-africa', name: 'Africa', type: 'group', groupKind: 'continent', groupSlug: 'africa' },
+  { id: 'g-asia', name: 'Asia', type: 'group', groupKind: 'continent', groupSlug: 'asia' },
+  { id: 'g-europe', name: 'Europe', type: 'group', groupKind: 'continent', groupSlug: 'europe' },
+  { id: 'g-oceania', name: 'Oceania', type: 'group', groupKind: 'continent', groupSlug: 'oceania' },
+  { id: 'g-north-america', name: 'North America', type: 'group', groupKind: 'continent', groupSlug: 'north-america' },
+  { id: 'g-south-america', name: 'South America', type: 'group', groupKind: 'continent', groupSlug: 'south-america' },
+  { id: 'g-us-northeast', name: 'US Northeast', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-northeast' },
+  { id: 'g-us-upper-midwest', name: 'US Upper Midwest', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-upper-midwest' },
+  { id: 'g-us-ohio-valley', name: 'US Ohio Valley', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-ohio-valley' },
+  { id: 'g-us-southeast', name: 'US Southeast', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-southeast' },
+  { id: 'g-us-northern-rockies-plains', name: 'US Northern Rockies & Plains', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-northern-rockies-plains' },
+  { id: 'g-us-south', name: 'US South', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-south' },
+  { id: 'g-us-southwest', name: 'US Southwest', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-southwest' },
+  { id: 'g-us-northwest', name: 'US Northwest', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-northwest' },
+  { id: 'g-us-west', name: 'US West', type: 'group', groupKind: 'us-climate-region', groupSlug: 'us-west' },
+];
+
 // All locations combined for search (sub-national first so they take priority over same-name countries)
-export const ALL_LOCATIONS = [...UK_REGIONS, ...US_STATES, ...COUNTRIES];
+export const ALL_LOCATIONS = [...UK_REGIONS, ...US_STATES, ...COUNTRIES, ...CLIMATE_GROUPS];
 
 // Search function with fuzzy matching
 export function searchLocations(query: string, limit = 10): LocationResult[] {

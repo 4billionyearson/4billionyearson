@@ -192,7 +192,7 @@ const Header = () => {
                   className={desktopDropdownItemClass(isClimateUpdatesPage && pathname !== '/climate/rankings' && pathname !== '/climate/global', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
                   onClick={closeMenu}
                 >
-                  Country, State & Region Updates<MonthlyBadge />
+                  Continent, Country, State & Region Updates<MonthlyBadge />
                 </Link>
                 <Link
                   href="/climate/rankings"
@@ -417,7 +417,7 @@ const Header = () => {
                   className={mobileDropdownItemClass(isClimateUpdatesPage && pathname !== '/climate/rankings' && pathname !== '/climate/global', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
                   onClick={closeMenu}
                 >
-                  Country, State & Region Updates<MonthlyBadge />
+                  Continent, Country, State & Region Updates<MonthlyBadge />
                 </Link>
                 <Link
                   href="/climate/rankings"

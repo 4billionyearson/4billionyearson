@@ -65,7 +65,7 @@ const SECTIONS: Section[] = [
     icon: <Globe className="h-6 w-6" />,
     links: [
       { group: "Monitor", href: "/climate/global", label: "Global Update", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Whole-planet temperature & trend update" },
-      { group: "Monitor", href: "/climate", label: "Country, State & Region Updates", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "78 countries · 50 US states · 17 UK regions" },
+      { group: "Monitor", href: "/climate", label: "Continent, Country, State & Region Updates", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "6 continents · 78 countries · 50 US states · 9 US climate regions · 17 UK regions" },
       { group: "Monitor", href: "/climate/rankings", label: "Rankings", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "League table of 144 regions + monthly trends" },
       { group: "Monitor", href: "/climate-dashboard", label: "Dashboard", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Global & local temperature anomalies" },
       { group: "Earth Systems", href: "/planetary-boundaries", label: "Planetary Boundaries", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Nine Earth-system thresholds" },
