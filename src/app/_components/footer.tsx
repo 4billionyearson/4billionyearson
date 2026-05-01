@@ -3,12 +3,15 @@ import Link from "next/link";
 export function Footer() {
   return (
     <footer className="bg-gray-950/90 backdrop-blur-md border-t border-gray-800 text-white mt-16">
-      <div className="container mx-auto px-5 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <nav className="flex gap-6 text-sm">
+      {/* 3-column grid so the social icons are centred horizontally on the
+          page (aligned with the vertical colour-bar accent in the background)
+          rather than just centred between the nav and copyright blocks. */}
+      <div className="container mx-auto px-5 py-8 flex flex-col md:grid md:grid-cols-3 items-center gap-4">
+        <nav className="flex gap-6 text-sm md:justify-self-start">
           <Link href="/about" className="hover:text-gray-300 transition-colors">About Us</Link>
           <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy Policy</Link>
         </nav>
-        <div className="flex gap-5 text-sm items-center text-gray-400">
+        <div className="flex gap-5 text-sm items-center text-gray-400 md:justify-self-center">
           <a href="https://www.facebook.com/profile.php?id=61588811433188" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="Facebook">
             <svg fill="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
               <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
@@ -40,7 +43,7 @@ export function Footer() {
             </svg>
           </a>
         </div>
-        <p className="text-sm text-gray-400">Copyright © {new Date().getFullYear()} 4 billion years on</p>
+        <p className="text-sm text-gray-400 md:justify-self-end">Copyright © {new Date().getFullYear()} 4 billion years on</p>
       </div>
     </footer>
   );

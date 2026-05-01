@@ -897,16 +897,30 @@ function buildGroupPrompt(region: ClimateRegion, groupData: any, rankings: any, 
   lines.push('STRUCTURE - organise the update using these short sub-headings, each on its own line prefixed with "## " exactly (two hashes and a space). Omit a section only if truly nothing to say.');
   lines.push(`  ## This month in numbers  - lead with the latest 1-month anomaly for ${region.name} vs 1961–1990, the 3-month and 12-month figures, and how the group sits within the cross-region rankings.`);
   lines.push(`  ## Hottest & coolest ${memberLabelPlural} - name 2–3 specific ${memberLabelPlural} from the MEMBER RANKINGS section that are running unusually warm, and 1 cool one if striking. Always link the bare path /climate/{slug} for any ${memberLabel} you name.`);
-  lines.push('  ## What\'s driving change? - the CURRENT ENSO state from the ENSO LIVE STATE section, any major climate events, and 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term.');
+  lines.push('  ## What\'s driving change? - the CURRENT ENSO state from the ENSO LIVE STATE section (write the bare path /climate/enso so the site links to our tracker), any major recent climate events surfaced via Google Search, and 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term.');
+  lines.push('  ## Looking ahead          - ONE carefully hedged forward-looking sentence (e.g. NOAA / Met Office seasonal outlook, or what an emerging El Niño / La Niña would mean for the group). Only include if there is a concrete source to cite; otherwise omit.');
   lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
+  lines.push('');
+  lines.push('CONTENT PRIORITY (follow this order strictly):');
+  lines.push(`1. LATEST GROUP ANOMALY (Priority 1): Lead with ${region.name}'s latest 1-month anomaly vs 1961–1990, then the 3-month and 12-month figures. State whether this is unusually warm or cool, and where the group sits across the cross-region rankings.`);
+  lines.push(`2. MEMBER STAND-OUTS (Priority 2): Use the MEMBER RANKINGS section to name the 2–3 hottest ${memberLabelPlural} (and the coolest if striking). Always include the bare path /climate/{slug} so the site auto-links each ${memberLabel}.`);
+  lines.push('3. ENSO STATE (MANDATORY): Use the ENSO LIVE STATE section as the authoritative current state - do NOT invent it from web search. State the current phase, ONI value and the dominant probability for the next 1–2 seasons in one short sentence, and write the bare path /climate/enso so the site links to our tracker. If the phase is contributing to or tempering warmth in this group, say so plainly.');
+  lines.push('4. EXTREME WEATHER & MAJOR EVENTS: Use Google Search to find any major weather events, attribution studies, or major climate-policy announcements (Copernicus / WMO / NOAA / IPCC / COP) that fall in the latest data month. Weave them in naturally if they are directly relevant to the group; include the bare path /extreme-weather where helpful.');
+  lines.push('5. CROSS-REGION RANKINGS: If the CROSS-REGION RANKINGS section shows a striking pattern (e.g. "8 of the 10 hottest were US states") that is worth ONE sentence to set the global context.');
+  lines.push('');
+  lines.push('KEY PRINCIPLES:');
+  lines.push('- MAKE IT CONCRETE: Translate anomalies into tangible terms - record-warm winters, scorching summers, drought-driven crop stress, marine heatwaves and bleaching, etc.');
+  lines.push('- NARRATIVE FLOW: Tell a story, not a list of statistics. Connect the group anomaly to the member stand-outs to the underlying drivers.');
+  lines.push(`- This page is a ${groupTypeLabel} update, not a national or global one - keep the lens on the ${memberLabelPlural} and the group as a whole.`);
+  lines.push('- DO NOT compare to a single country.');
   lines.push('');
   lines.push('RULES:');
   lines.push('- British English spelling throughout.');
-  lines.push('- Plain text only - no markdown emphasis (no **bold**, no *italics*), no bullet points, no headings except the sub-headings specified above.');
+  lines.push('- Plain text only - no markdown emphasis (no **bold**, no *italics*), no bullet points, no headings except the sub-headings specified above. Never surround driver terms or any other phrase with asterisks - the site styles them automatically.');
   lines.push('- Use the EXACT values from the DATA section below. Do NOT invent figures.');
   lines.push('- Use numeric ordinals (1st, 2nd, 3rd) rather than written-out words.');
+  lines.push('- For web search findings, summarise in your own words. Do not copy text verbatim.');
   lines.push('- No policy recommendations.');
-  lines.push(`- This page is a ${groupTypeLabel} update, not a national one - keep the lens on the ${memberLabelPlural} and the group as a whole.`);
   lines.push('- CRITICAL: Ensure you complete your final sentence. Do not abruptly truncate.');
   lines.push('');
   lines.push(buildDriverVocabularySection());
@@ -972,6 +986,18 @@ function buildGroupPrompt(region: ClimateRegion, groupData: any, rankings: any, 
 
   const rankingsSection = buildRankingsInsights(rankings, region.slug);
   if (rankingsSection) lines.push(rankingsSection);
+
+  // Web search instruction (matches the country / global prompts so Gemini
+  // brings in recent extreme-weather news, attribution studies, COP outcomes
+  // etc. and surfaces them via Google Search grounding).
+  lines.push('');
+  lines.push('═══ WEB SEARCH INSTRUCTION ═══');
+  lines.push(`Use Google Search to find recent weather news and climate events across ${region.name} in the last 1–3 months.`);
+  lines.push(`Look for: major storms, floods, heatwaves, droughts, wildfires or other extreme weather events affecting ${memberLabelPlural} in this group; major climate-report releases (Copernicus C3S, WMO State of the Climate, NOAA Climate at a Glance, IPCC, COP outcomes); and notable peer-reviewed attribution studies.`);
+  lines.push(`The ENSO state is already provided above (NOAA CPC) - use Google Search only to find recent CONSEQUENCES attributed to that phase (e.g. ENSO-driven drought, floods, marine heatwaves), not to redefine the state itself.`);
+  lines.push(`Source quality: PREFER national meteorological services (NOAA, Met Office, Meteo France, DWD, JMA, BoM), Copernicus C3S, WMO, peer-reviewed journals, and established newspapers (BBC, Reuters, AP, Guardian, NYT, FT). AVOID aggregator sites, blogs, or paywalled sources that add no primary information.`);
+  lines.push('Verify dates: only cite events active during or close to the latest data month above.');
+  lines.push('Summarise any relevant findings in your own words and weave them into the update narrative.');
 
   return lines.join('\n');
 }
