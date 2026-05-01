@@ -84,9 +84,9 @@ URL: ${baseUrl}/about
 
 ## Climate Data Hub
 URL: ${baseUrl}/climate
-Monthly climate profiles for 144 countries, US states and UK regions, unified under one dashboard. Every profile carries an AI-drafted narrative summary grounded in the underlying numbers and links through to deeper data. The hub itself offers Editors' Picks, a country/state/region browser, and a full league table (Rankings) across all 144 regions.
+Monthly climate profiles for 144 countries, US states and UK regions plus 6 continents and 9 NOAA US climate regions — unified under one dashboard. Every profile carries an AI-drafted narrative summary grounded in the underlying numbers and links through to deeper data. The hub itself offers Editors' Picks, a Continents & Regions browser, country/state/region browsers, and a full league table (Rankings) across all regions.
 
-Each profile typically includes (availability varies by region):
+Each country/state/UK profile typically includes (availability varies by region):
 - Temperature averages vs the 1961–1990 WMO baseline, with monthly rank-in-record
 - Rainfall and rain-days (UK/US/Met Office and World Bank CKP / CRU TS for countries)
 - Sunshine hours and air-frost days (UK regions, Met Office)
@@ -96,6 +96,33 @@ Each profile typically includes (availability varies by region):
 - Century-scale charts and data provenance
 
 All data refreshes monthly. Slug examples: /climate/usa, /climate/california, /climate/england, /climate/india.
+
+## Continents (NOAA + 4BYO aggregates)
+URL: ${baseUrl}/climate#continents-regions
+Six continent-level pages, each with a two-baseline view (1961–1990 comparison + source-native 1901–2000):
+- /climate/africa, /climate/asia, /climate/europe, /climate/oceania — NOAA Climate at a Glance continental land temperature series
+- /climate/north-america, /climate/south-america — 4BYO aggregates of country snapshots (NOAA does not publish a standalone continental land series for these regions)
+
+## US Climate Regions (NOAA)
+URL: ${baseUrl}/climate#continents-regions
+Nine NOAA-defined US climate regions, each rebuilt as a standalone profile with monthly temperature and precipitation versus both the 1961–1990 comparison baseline and the source-native 1901–2000 baseline:
+- /climate/us-northeast (CT, DE, ME, MA, MD, NH, NJ, NY, PA, RI, VT)
+- /climate/us-upper-midwest (IA, MI, MN, WI)
+- /climate/us-ohio-valley (IL, IN, KY, MO, OH, TN, WV)
+- /climate/us-southeast (AL, FL, GA, NC, SC, VA)
+- /climate/us-northern-rockies-plains (MT, NE, ND, SD, WY)
+- /climate/us-south (AR, KS, LA, MS, OK, TX)
+- /climate/us-southwest (AZ, CO, NM, UT)
+- /climate/us-northwest (ID, OR, WA)
+- /climate/us-west (CA, NV)
+
+## Climate Methodology & Sources
+URL: ${baseUrl}/climate/methodology
+Full provenance for every dataset behind the climate hub:
+- Two-baseline model: 1961–1990 comparison baseline (used on rankings, maps and roll-ups) plus the source-native baseline shown alongside (NOAA 1901–2000, Met Office HadUK-Grid 1991–2020, NSIDC sea-ice 1991–2020, Paris 1850–1900)
+- Source inventory: NOAA NCEI Climate at a Glance, NOAA GML (Mauna Loa CO₂, CH₄, N₂O), NSIDC Sea Ice Index v4, NOAA CPC Oceanic Niño Index, Met Office HadUK-Grid, OWID HadCRUT5-derived country temperature, World Bank CCKP / CRU TS country precipitation, Global Carbon Budget, IEA WEO, Ember country electricity mix
+- Source record-start timeline (1850–present) plus monthly publication-day timeline (when each source publishes the previous month) and annual publication timeline
+- Rankings methodology and cross-source caveats
 
 ## Global Climate Update
 URL: ${baseUrl}/climate/global

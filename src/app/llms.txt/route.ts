@@ -68,9 +68,19 @@ Core value proposition: Real-time and regularly updated data dashboards, plain-E
 ## Climate profiles & regional analysis
 
 - Climate Data Hub: ${baseUrl}/climate
-  - Monthly climate profiles for 144 countries, US states and UK regions
+  - Monthly climate updates for 144 countries, US states and UK regions, plus 6 NOAA-aligned continents and 9 NOAA US climate regions
   - AI-drafted monthly summaries grounded in the underlying data
   - Temperature, rainfall, seasonal shifts, emissions, electricity mix
+- Continents & US Climate Regions: ${baseUrl}/climate#continents-regions
+  - Africa, Asia, Europe, Oceania (NOAA-native continental land series)
+  - North America, South America (4BYO aggregates of country snapshots)
+  - 9 NOAA US climate regions: Northeast, Upper Midwest, Ohio Valley, Southeast, Northern Rockies & Plains, South, Southwest, Northwest, West
+  - Each page shows a two-baseline view (1961–1990 comparison + source-native 1901–2000)
+- Methodology & Sources: ${baseUrl}/climate/methodology
+  - Two-baseline model explanation (1961–1990 comparison vs 1901–2000 / 1991–2020 / 1850–1900 native)
+  - Full source inventory (NOAA, OWID, Met Office HadUK-Grid, NSIDC, World Bank CCKP, CRU TS, IEA, Ember)
+  - Source-record start years and monthly / annual publication-day timelines
+  - Cross-source caveats and rankings methodology
 - Global Climate Update: ${baseUrl}/climate/global
   - Paris Agreement 1.5°C & 2.0°C tracker (10-year mean progress)
   - ENSO state (Niño 3.4), atmospheric CO₂, methane and N₂O

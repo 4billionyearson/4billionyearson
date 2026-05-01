@@ -2,9 +2,10 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
-import { getRegionBySlug, type ClimateRegion } from '@/lib/climate/regions';
+import { getRegionBySlug, type ClimateRegion, CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { buildDriverVocabularySection } from '@/lib/climate/warming-drivers';
 import { getEnsoImpactsForSlug, type RegionImpact, type ImpactPhase } from '@/lib/climate/enso-impacts';
+import { CONTINENT_BY_ISO, US_REGION_BY_ID, US_CLIMATE_REGION_SLUG } from '@/lib/climate/editorial';
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -510,6 +511,98 @@ function buildRankingsInsights(rankings: any, focusSlug?: string): string {
   return lines.join('\n');
 }
 
+// ─── Group context (continent / US climate region peers) ──────────────────
+
+function buildGroupContext(region: ClimateRegion, rankings: any): string {
+  if (!rankings?.rows?.length) return '';
+  if (region.type !== 'country' && region.type !== 'us-state') return '';
+
+  // Build slug → {apiCode, type} map from CLIMATE_REGIONS.
+  const meta = new Map<string, { apiCode: string; type: ClimateRegion['type'] }>();
+  for (const r of CLIMATE_REGIONS) {
+    meta.set(r.slug, { apiCode: r.apiCode, type: r.type });
+  }
+
+  let groupLabel: string | null = null;
+  let groupSlug: string | null = null;
+  let peerSlugs: Set<string> = new Set();
+
+  if (region.type === 'country') {
+    const continent = CONTINENT_BY_ISO[region.apiCode];
+    if (!continent) return '';
+    groupLabel = continent;
+    // Map continent → group page slug for cross-linking.
+    const contSlug: Record<string, string> = {
+      'Africa': 'africa', 'Asia': 'asia', 'Europe': 'europe', 'Oceania': 'oceania',
+      'North America': 'north-america', 'South America': 'south-america',
+    };
+    groupSlug = contSlug[continent] ?? null;
+    for (const r of CLIMATE_REGIONS) {
+      if (r.type === 'country' && r.slug !== region.slug && CONTINENT_BY_ISO[r.apiCode] === continent) {
+        peerSlugs.add(r.slug);
+      }
+    }
+  } else {
+    const usReg = US_REGION_BY_ID[region.apiCode];
+    if (!usReg) return '';
+    groupLabel = `NOAA ${usReg} US climate region`;
+    groupSlug = US_CLIMATE_REGION_SLUG[usReg] ?? null;
+    for (const r of CLIMATE_REGIONS) {
+      if (r.type === 'us-state' && r.slug !== region.slug && US_REGION_BY_ID[r.apiCode] === usReg) {
+        peerSlugs.add(r.slug);
+      }
+    }
+  }
+
+  const rows: RankingRow[] = rankings.rows;
+  const focus = rows.find((r) => r.slug === region.slug);
+  const peers = rows.filter((r) => peerSlugs.has(r.slug));
+  if (peers.length === 0 && !focus) return '';
+
+  const lines: string[] = [];
+  lines.push('\n═══ REGIONAL GROUP CONTEXT ═══');
+  lines.push(`${region.name} sits within the ${groupLabel} group.`);
+  if (groupSlug) {
+    lines.push(`A dedicated group page is at /climate/${groupSlug} (you may reference it once if relevant).`);
+  }
+
+  const meanOf = (key: 'anomaly1m' | 'anomaly3m' | 'anomaly12m', arr: RankingRow[]) => {
+    const vals = arr.map((r) => r[key]).filter((v): v is number => typeof v === 'number');
+    if (!vals.length) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  };
+
+  const allInGroup = focus ? [focus, ...peers] : peers;
+  const m1 = meanOf('anomaly1m', allInGroup);
+  const m3 = meanOf('anomaly3m', allInGroup);
+  const m12 = meanOf('anomaly12m', allInGroup);
+  const fmt = (v: number | null) => (v === null ? 'n/a' : `${v >= 0 ? '+' : ''}${v.toFixed(2)}°C`);
+  lines.push(`Group mean anomaly vs 1961–1990 across ${allInGroup.length} members: 1-month ${fmt(m1)}, 3-month ${fmt(m3)}, 12-month ${fmt(m12)}.`);
+
+  if (focus && m1 !== null && typeof focus.anomaly1m === 'number') {
+    const diff = focus.anomaly1m - m1;
+    const dir = diff >= 0 ? 'warmer' : 'cooler';
+    lines.push(`${region.name}'s 1-month anomaly is ${Math.abs(diff).toFixed(2)}°C ${dir} than its group average.`);
+  }
+
+  if (peers.length) {
+    const sorted = [...allInGroup].sort((a, b) => (b.anomaly1m ?? -99) - (a.anomaly1m ?? -99));
+    const top = sorted.slice(0, Math.min(5, sorted.length));
+    lines.push('── Top movers in this group (1-month anomaly) ──');
+    top.forEach((r, i) => {
+      const v = r.anomaly1m;
+      const sign = v !== null && v >= 0 ? '+' : '';
+      const label = v === null ? 'n/a' : `${sign}${v.toFixed(2)}°C`;
+      const marker = r.slug === region.slug ? ' ◄ this region' : '';
+      lines.push(`  ${i + 1}. ${r.name}: ${label}${marker}`);
+    });
+  }
+
+  lines.push('');
+  lines.push('USE: Mention the group ranking only if it adds context (e.g. this region is the warmest/coolest in its continent or US climate region this month, or the whole group is exceptionally warm).');
+  return lines.join('\n');
+}
+
 // ─── ENSO snapshot section ─────────────────────────────────────────────────
 
 /**
@@ -601,6 +694,7 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   lines.push('5. ENSO (MANDATORY when phase is active or strongly forecast): Use the ENSO LIVE STATE section below as the authoritative current state - do NOT invent it from web search. If the current state is El Niño or La Niña, OR if a transition is dominant in the forecast, mention it briefly with the strength and the typical teleconnection for this region (drier/wetter, warmer/cooler) drawn from the structured data provided. Include our live tracker by writing the bare path /climate/enso in the text; the site turns it into a link. If the state is Neutral, you may still note it in one short clause to set context.');
   lines.push('6. OTHER CLIMATE DRIVERS: If NAO, IOD, AO, MJO etc. are relevant, briefly mention them too.');
   lines.push('7. CROSS-REGION RANKINGS: If this region is in the top 20 (or bottom 10) of any window in the CROSS-REGION RANKINGS section, mention the rank. If the top 10 shows a striking geographic concentration (e.g. mostly US states), that pattern is worth a single sentence of context.');
+  lines.push('8. GROUP CONTEXT: The REGIONAL GROUP CONTEXT section below shows this region within its NOAA continent (or US climate region). If the region is the warmest/coolest of its group, or if the whole group is running unusually warm/cool, that is worth a sentence and you may link to /climate/{group-slug}.');
   lines.push('');
   lines.push('KEY PRINCIPLES:');
   lines.push('- RANKINGS ARE THE STORY: The ranked data IS the narrative. "The 3rd sunniest January–March on record" or "the 4th fewest frost days in over a century of records" - these are the headlines. If a metric ranks in the top/bottom 10, it MUST be mentioned.');
@@ -687,6 +781,12 @@ function buildPrompt(region: ClimateRegion, profileData: any, nationalData: any,
   const rankingsSection = buildRankingsInsights(rankings, region.slug);
   if (rankingsSection) {
     lines.push(rankingsSection);
+  }
+
+  // Group context (continent / US climate region peers and roll-up)
+  const groupSection = buildGroupContext(region, rankings);
+  if (groupSection) {
+    lines.push(groupSection);
   }
 
   // Search instruction
