@@ -98,13 +98,13 @@ Each country/state/UK profile typically includes (availability varies by region)
 All data refreshes monthly. Slug examples: /climate/usa, /climate/california, /climate/england, /climate/india.
 
 ## Continents (NOAA + 4BYO aggregates)
-URL: ${baseUrl}/climate#continents-regions
+URL: ${baseUrl}/climate#continents
 Six continent-level pages, each with a two-baseline view (1961–1990 comparison + source-native 1901–2000):
 - /climate/africa, /climate/asia, /climate/europe, /climate/oceania — NOAA Climate at a Glance continental land temperature series
 - /climate/north-america, /climate/south-america — 4BYO aggregates of country snapshots (NOAA does not publish a standalone continental land series for these regions)
 
 ## US Climate Regions (NOAA)
-URL: ${baseUrl}/climate#continents-regions
+URL: ${baseUrl}/climate#us-climate-regions
 Nine NOAA-defined US climate regions, each rebuilt as a standalone profile with monthly temperature and precipitation versus both the 1961–1990 comparison baseline and the source-native 1901–2000 baseline:
 - /climate/us-northeast (CT, DE, ME, MA, MD, NH, NJ, NY, PA, RI, VT)
 - /climate/us-upper-midwest (IA, MI, MN, WI)

@@ -158,6 +158,18 @@ function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
+// Expand short month abbreviations ("Mar 2026") to full names ("March 2026")
+// while leaving already-full or unrecognised labels untouched.
+function expandMonthLabel(label: string | null | undefined): string {
+  if (!label) return '';
+  const SHORT_TO_FULL: Record<string, string> = {
+    Jan: 'January', Feb: 'February', Mar: 'March', Apr: 'April',
+    May: 'May', Jun: 'June', Jul: 'July', Aug: 'August',
+    Sep: 'September', Sept: 'September', Oct: 'October', Nov: 'November', Dec: 'December',
+  };
+  return label.replace(/^([A-Za-z]{3,4})(\b)/, (_m, p1: string, p2: string) => (SHORT_TO_FULL[p1] ?? p1) + p2);
+}
+
 interface RollupGroup {
   label: string;
   count: number;
@@ -276,7 +288,7 @@ export default async function RankingsPage() {
           >
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-                Climate Rankings{latestLabel ? ` - ${latestLabel}` : ''}
+                Climate Rankings{latestLabel ? ` - ${expandMonthLabel(latestLabel)}` : ''}
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5 space-y-4">
@@ -408,17 +420,17 @@ export default async function RankingsPage() {
           </section>
 
           {/* Footer - methodology summary + link to full page */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] text-xs text-gray-400 space-y-2">
-            <h2 className="flex items-center gap-2 text-base font-semibold text-[#D0A65E]">
-              <Info className="h-4 w-4" /> Methodology &amp; baselines
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+            <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+              <Info className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+              <span className="min-w-0 flex-1">Methodology &amp; Baselines</span>
             </h2>
-            <p>
+            <p className="text-sm text-gray-300 leading-relaxed">
               Anomaly = monthly mean temperature − 1961–1990 mean for the same calendar month. The 12-month figure is the trailing 12-month mean minus the 12-month baseline. Country data is from Our World in Data / NOAA; UK regions from the Met Office Regional Series; US states &amp; climate regions from NOAA Climate at a Glance. NOAA values are re-baselined from their native 1901–2000 to 1961–1990 for cross-region comparison; the source-native figure is shown alongside for verification.
             </p>
-            <p>
+            <p className="mt-3 text-sm text-gray-300 leading-relaxed">
               See the <Link href="/climate/methodology" className="text-[#E8C97A] underline hover:text-white">full methodology &amp; data sources</Link> page for the complete two-baseline model, source timeline and known caveats.
             </p>
-            <p>Data snapshot: {new Date(data.generatedAt).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' })}.</p>
           </section>
         </div>
       </div>

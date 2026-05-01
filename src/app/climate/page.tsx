@@ -77,6 +77,8 @@ export default function ClimateProfilesIndex() {
   const usStates = CLIMATE_REGIONS.filter(r => r.type === 'us-state');
   const ukAndIrelandRegions = CLIMATE_REGIONS.filter(r => r.type === 'uk-region' || r.slug === 'ireland');
   const groups = CLIMATE_REGIONS.filter(r => r.type === 'group');
+  const continentsGroup = groups.filter(g => g.groupKind === 'continent');
+  const usClimateRegions = groups.filter(g => g.groupKind === 'us-climate-region');
 
   return (
     <main>
@@ -89,11 +91,12 @@ export default function ClimateProfilesIndex() {
               countries: countries.length,
               usStates: usStates.length,
               ukRegions: ukAndIrelandRegions.length,
-              groups: groups.length,
+              continents: continentsGroup.length,
+              usClimateRegions: usClimateRegions.length,
             }}
             panels={{
               'editors-picks': <EditorsPicksPanel regions={CLIMATE_REGIONS} />,
-              'continents-regions': <GroupsBrowserPanel groups={groups} />,
+              continents: <GroupsBrowserPanel groups={continentsGroup} kind="continent" />,
               countries: (
                 <ClimateRegionsBrowser
                   title="Countries"
@@ -102,6 +105,11 @@ export default function ClimateProfilesIndex() {
                   mode="country"
                   headless
                 />
+              ),
+              'uk-regions': (
+                <Suspense fallback={<UKRegionsFallback />}>
+                  <UKRegionsBrowser regions={ukAndIrelandRegions} headless />
+                </Suspense>
               ),
               'us-states': (
                 <ClimateRegionsBrowser
@@ -112,11 +120,7 @@ export default function ClimateProfilesIndex() {
                   headless
                 />
               ),
-              'uk-regions': (
-                <Suspense fallback={<UKRegionsFallback />}>
-                  <UKRegionsBrowser regions={ukAndIrelandRegions} headless />
-                </Suspense>
-              ),
+              'us-climate-regions': <GroupsBrowserPanel groups={usClimateRegions} kind="us-climate-region" />,
               rankings: <ClimateRankingsPanel />,
             }}
           >

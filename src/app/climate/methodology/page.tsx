@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, FileText, BookOpen, Database, Calendar, CalendarRange, Trophy, AlertTriangle, Scale } from 'lucide-react';
+import { FileText, BookOpen, Database, Calendar, CalendarRange, Trophy, AlertTriangle, Scale } from 'lucide-react';
 import BaselineExplainer from '../_components/BaselineExplainer';
 import DataSourceTimeline, {
   MonthlyReleaseTimeline,
@@ -185,19 +185,13 @@ const ANNUAL_RELEASES: AnnualReleaseRow[] = [
 
 export default function MethodologyPage() {
   return (
-    <main className="container mx-auto px-3 md:px-4 pt-2 pb-8 md:pt-4 md:pb-12 max-w-5xl font-sans text-gray-200">
+    <main className="container mx-auto px-3 md:px-4 pt-2 pb-8 md:pt-4 md:pb-10 font-sans text-gray-200">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSONLD) }}
       />
 
-      <nav className="mb-3 text-xs text-gray-400">
-        <Link href="/climate" className="inline-flex items-center gap-1 hover:text-[#E8C97A]">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to Climate hub
-        </Link>
-      </nav>
-
-      <div className="space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
         {/* Hero */}
         <div
           className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
@@ -212,10 +206,7 @@ export default function MethodologyPage() {
           <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5">
             <p className="text-sm md:text-base text-gray-300 leading-relaxed">
               How this site builds its climate dataset, which baselines apply where, when each
-              upstream source&apos;s record begins, and when fresh data lands each month and
-              year. Everything below is reproducible from the public data files in{' '}
-              <code className="text-[#E8C97A]">/public/data/climate/</code> and the build scripts
-              in <code className="text-[#E8C97A]">/scripts/</code>.
+              upstream source&apos;s record begins, and when fresh data lands each month and year.
             </p>
           </div>
         </div>

@@ -224,7 +224,7 @@ export default function RankingsTable({ rows, generatedAt, groups }: { rows: Ran
       </div>
 
       <p className="text-[11px] text-gray-500">
-        All anomalies vs 1961–1990 baseline. {rows.length} regions total. Snapshot generated {new Date(generatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.
+        All anomalies vs 1961–1990 baseline. {rows.length} regions total.
       </p>
     </div>
   );

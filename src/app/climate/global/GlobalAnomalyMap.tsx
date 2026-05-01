@@ -46,7 +46,7 @@ interface CountryAnomaly {
 }
 
 export type AnomalyWindow = '1m' | '3m' | '12m';
-export type MapLevel = 'countries' | 'continents' | 'us-regions';
+export type MapLevel = 'continents' | 'countries' | 'uk-regions' | 'us-states' | 'us-regions';
 
 // Country ISO3 → continent group key used in rankings.json groups.continents.
 // Mirrors CONTINENT_BY_ISO in src/lib/climate/editorial.ts but kept inline
@@ -196,6 +196,31 @@ function InvalidateOnMount() {
     const t = setTimeout(() => map.invalidateSize(), 250);
     return () => clearTimeout(t);
   }, [map]);
+  return null;
+}
+
+// Bounds presets for the level toggle so e.g. selecting "US states" zooms
+// the map into the contiguous US instead of leaving the user on the world view.
+const LEVEL_BOUNDS: Partial<Record<string, [[number, number], [number, number]]>> = {
+  'us-states': [[24.5, -125], [49.5, -66.5]],
+  'us-regions': [[24.5, -125], [49.5, -66.5]],
+  'uk-regions': [[49.7, -8.7], [60.9, 1.9]],
+};
+
+function ZoomToLevel({ level }: { level: MapLevel }) {
+  const map = useMap();
+  // Track whether this is the first run so we don't fight the initial center/zoom.
+  const firstRef = React.useRef(true);
+  useEffect(() => {
+    if (firstRef.current) { firstRef.current = false; return; }
+    const b = LEVEL_BOUNDS[level];
+    if (b) {
+      map.flyToBounds(b, { duration: 0.6, padding: [20, 20] });
+    } else {
+      // continents / countries: return to a world view
+      map.flyTo([20, 0], 2, { duration: 0.6 });
+    }
+  }, [level, map]);
   return null;
 }
 
@@ -437,16 +462,23 @@ function UKNationsOverlay({
   windowSel,
   onInfo,
   ukGeo,
+  level,
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
   onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
   ukGeo: FeatureCollection | null;
+  level: MapLevel;
 }) {
   const map = useMap();
-  const [visible, setVisible] = useState(map.getZoom() >= UK_NATIONS_ZOOM);
+  const forced = level === 'uk-regions';
+  const [visible, setVisible] = useState(forced || map.getZoom() >= UK_NATIONS_ZOOM);
 
-  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= UK_NATIONS_ZOOM) });
+  useMapEvents({ zoomend: () => setVisible(forced || map.getZoom() >= UK_NATIONS_ZOOM) });
+
+  useEffect(() => {
+    setVisible(forced || map.getZoom() >= UK_NATIONS_ZOOM);
+  }, [forced, map]);
 
   const bySlug = useMemo(() => {
     const m = new Map<string, RankingRow>();
@@ -515,15 +547,16 @@ function USStatesOverlay({
   usRegionGroups: GroupRow[] | null;
 }) {
   const map = useMap();
-  // In us-regions mode, force the overlay to be visible at any zoom so the
-  // region tinting is the main story rather than a zoom-only enhancement.
-  const [visible, setVisible] = useState(level === 'us-regions' || map.getZoom() >= US_STATES_ZOOM);
+  // In us-states / us-regions mode the overlay is forced visible at any zoom
+  // so the choropleth is the main story rather than a zoom-only enhancement.
+  const forced = level === 'us-states' || level === 'us-regions';
+  const [visible, setVisible] = useState(forced || map.getZoom() >= US_STATES_ZOOM);
 
-  useMapEvents({ zoomend: () => setVisible(level === 'us-regions' || map.getZoom() >= US_STATES_ZOOM) });
+  useMapEvents({ zoomend: () => setVisible(forced || map.getZoom() >= US_STATES_ZOOM) });
 
   useEffect(() => {
-    setVisible(level === 'us-regions' || map.getZoom() >= US_STATES_ZOOM);
-  }, [level, map]);
+    setVisible(forced || map.getZoom() >= US_STATES_ZOOM);
+  }, [forced, map]);
 
   const byName = useMemo(() => {
     const m = new Map<string, RankingRow>();
@@ -664,6 +697,11 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
   }, [windowSel]);
 
   const pick = useCallback((c: CountryAnomaly | undefined): { anomaly: number | null; label: string | null } => {
+    // In sub-national levels we don't tint country polygons - the overlay
+    // (US states or UK nations) carries the data instead.
+    if (level === 'us-states' || level === 'us-regions' || level === 'uk-regions') {
+      return { anomaly: null, label: null };
+    }
     if (level === 'continents') {
       if (!c) return { anomaly: null, label: null };
       const groupKey = CONTINENT_GROUP_KEY[c.iso3];
@@ -750,6 +788,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
           style={{ background: '#0b1220' }}
         >
           <InvalidateOnMount />
+          <ZoomToLevel level={level} />
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
@@ -779,6 +818,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
             rankings={rankings}
             windowSel={windowSel}
             ukGeo={ukGeo}
+            level={level}
             onInfo={(info) =>
               setSelected(
                 info

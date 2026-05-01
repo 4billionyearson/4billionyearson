@@ -32,7 +32,7 @@ export interface CountryAnomalyRow {
 }
 
 type AnomalyWindow = '1m' | '3m' | '12m';
-type MapLevel = 'countries' | 'continents' | 'us-regions';
+type MapLevel = 'continents' | 'countries' | 'uk-regions' | 'us-states' | 'us-regions';
 
 const WINDOW_OPTS = [
   { key: '1m', label: '1 month' },
@@ -41,8 +41,10 @@ const WINDOW_OPTS = [
 ] as const;
 
 const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [
-  { key: 'countries', label: 'Countries / states' },
   { key: 'continents', label: 'Continents' },
+  { key: 'countries', label: 'Countries' },
+  { key: 'uk-regions', label: 'UK regions' },
+  { key: 'us-states', label: 'US states' },
   { key: 'us-regions', label: 'US climate regions' },
 ];
 
@@ -58,7 +60,7 @@ export default function AnomalyMapCard({
   initialWindow?: AnomalyWindow;
 }) {
   const [anomalyWindow, setAnomalyWindow] = useState<AnomalyWindow>(initialWindow);
-  const [level, setLevel] = useState<MapLevel>('countries');
+  const [level, setLevel] = useState<MapLevel>('continents');
 
   if (!countryAnomalies || countryAnomalies.length === 0) return null;
 

@@ -71,7 +71,7 @@ Core value proposition: Real-time and regularly updated data dashboards, plain-E
   - Monthly climate updates for 144 countries, US states and UK regions, plus 6 NOAA-aligned continents and 9 NOAA US climate regions
   - AI-drafted monthly summaries grounded in the underlying data
   - Temperature, rainfall, seasonal shifts, emissions, electricity mix
-- Continents & US Climate Regions: ${baseUrl}/climate#continents-regions
+- Continents & US Climate Regions: ${baseUrl}/climate#continents
   - Africa, Asia, Europe, Oceania (NOAA-native continental land series)
   - North America, South America (4BYO aggregates of country snapshots)
   - 9 NOAA US climate regions: Northeast, Upper Midwest, Ohio Valley, Southeast, Northern Rockies & Plains, South, Southwest, Northwest, West
