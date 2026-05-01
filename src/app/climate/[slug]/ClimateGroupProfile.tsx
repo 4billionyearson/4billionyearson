@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import Link from 'next/link';
-import { BarChart3, ExternalLink, MapPin, Layers, Scale, AlertTriangle, FileText, BookOpen, TrendingUp, TrendingDown } from 'lucide-react';
+import { BarChart3, ExternalLink, MapPin, Layers, Scale, AlertTriangle, FileText, BookOpen, TrendingUp, TrendingDown, Thermometer, CloudRain } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { CLIMATE_REGIONS, getProfileSlugForLocation, getClimateUpdateDateLabel } from '@/lib/climate/regions';
 import { ALL_LOCATIONS } from '@/lib/climate/locations';
@@ -12,6 +12,7 @@ import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-c
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
+import { OverviewGrid, buildOverviewRow, type OverviewPanel, type OverviewRow } from '@/app/climate/_shared/overview-grid';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
 
@@ -342,8 +343,8 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
 
   return (
     <>
-      {/* Latest snapshot table — mirrors country update page layout */}
-      <Card icon={<BarChart3 className="h-5 w-5" />} title="Temperature Snapshot">
+      {/* Temperature – Average panel (matches country update page layout) */}
+      <Card icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature – Average">
         <SnapshotTable
           columns={[
             { window: '1-Month', period: window1Period, anomaly: row.anomaly1m, nativeAnomaly: row.nativeAnomaly1m },
@@ -471,8 +472,9 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
 // ─── US climate region renderer ────────────────────────────────────────────
 
 async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
-  const [data, members] = await Promise.all([
+  const [data, usNational, members] = await Promise.all([
     readJson<UsRegionData>(`us-climate-region/${region.slug}.json`),
+    readJson<UsRegionData>('us-national.json'),
     loadMembersForRegion(region),
   ]);
   if (!data) {
@@ -483,26 +485,40 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
 
   const tavg = data.paramData.tavg;
   const pcp = data.paramData.pcp;
+  const usTavg = usNational?.paramData.tavg;
+  const usPcp = usNational?.paramData.pcp;
 
-  const latestComp = tavg.latestMonthStats;
-  const latestComp3 = tavg.latestThreeMonthStats;
-  const native1 = tavg.nativeStats?.latestMonth;
-  const native3 = tavg.nativeStats?.latestThreeMonth;
-  const usNativeBaseline = tavg.nativeStats?.baseline ?? '1901–2000';
+  // ── Build OverviewGrid panels (same shape as country / global pages) ──
+  const tempRows = [
+    buildOverviewRow(region.name, tavg.yearly, tavg.latestMonthStats, tavg.latestThreeMonthStats, '°C', 1, false, true),
+    usTavg ? buildOverviewRow('United States', usTavg.yearly, usTavg.latestMonthStats, usTavg.latestThreeMonthStats, '°C', 1) : null,
+  ].filter((r): r is OverviewRow => Boolean(r));
+  const tempPanel: OverviewPanel | null = tempRows.length ? {
+    title: 'Temperature – Average',
+    icon: <Thermometer className="text-orange-400" />,
+    accentClass: 'bg-orange-600',
+    accentBg: 'bg-orange-600/50',
+    accentBorder: 'border-orange-400/80',
+    sections: [{ rows: tempRows }],
+  } : null;
+
+  const rainRows = [
+    pcp ? buildOverviewRow(region.name, pcp.yearly, pcp.latestMonthStats, pcp.latestThreeMonthStats, ' mm', 0, false, true) : null,
+    usPcp ? buildOverviewRow('United States', usPcp.yearly, usPcp.latestMonthStats, usPcp.latestThreeMonthStats, ' mm', 0) : null,
+  ].filter((r): r is OverviewRow => Boolean(r));
+  const rainPanel: OverviewPanel | null = rainRows.length ? {
+    title: 'Rainfall & Rain Days – Totals',
+    icon: <CloudRain className="text-blue-400" />,
+    accentClass: 'bg-blue-600',
+    accentBg: 'bg-blue-950/50',
+    accentBorder: 'border-blue-400/80',
+    sections: [{ title: 'Rainfall / Precipitation', rows: rainRows }],
+  } : null;
 
   return (
     <>
-      {/* Snapshot table */}
-      <Card icon={<BarChart3 className="h-5 w-5" />} title="Temperature Snapshot">
-        <SnapshotTable
-          columns={[
-            ...(latestComp ? [{ window: '1-Month', period: latestComp.label, anomaly: latestComp.diff, nativeAnomaly: native1?.nativeAnomaly ?? null }] : []),
-            ...(latestComp3 ? [{ window: '3-Month', period: latestComp3.label, anomaly: latestComp3.diff, nativeAnomaly: native3?.nativeAnomaly ?? null }] : []),
-          ]}
-          nativeBaseline={usNativeBaseline}
-          footnote={latestComp ? <>Rank {latestComp.rank} of {latestComp.total} months in record.</> : null}
-        />
-      </Card>
+      {/* Temperature – Average (region + US national rows) */}
+      {tempPanel ? <OverviewGrid panels={[tempPanel]} /> : null}
 
       {/* Spaghetti chart + seasonal-shift card (NOAA regional tavg monthlyAll) */}
       {tavg.monthlyAll?.length ? (
@@ -522,32 +538,12 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
         </>
       ) : null}
 
-      {/* Precipitation */}
-      {pcp && pcp.latestMonthStats && (
-        <Card icon={<BarChart3 className="h-5 w-5" />} title="Latest precipitation anomaly">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <StatTile
-              label={`1-month (${pcp.latestMonthStats.label})`}
-              value={fmtSigned(pcp.latestMonthStats.diff, 1, 'mm')}
-              sub={`Rank ${pcp.latestMonthStats.rank}/${pcp.latestMonthStats.total} · vs 1961–1990`}
-            />
-            {pcp.latestThreeMonthStats && (
-              <StatTile
-                label={`3-month (${pcp.latestThreeMonthStats.label})`}
-                value={fmtSigned(pcp.latestThreeMonthStats.diff, 1, 'mm')}
-                sub={`Rank ${pcp.latestThreeMonthStats.rank}/${pcp.latestThreeMonthStats.total} · vs 1961–1990`}
-              />
-            )}
-          </div>
-        </Card>
-      )}
+      {/* Rainfall – Totals (region + US national rows) */}
+      {rainPanel ? <OverviewGrid panels={[rainPanel]} /> : null}
 
       {/* Member states */}
       {region.memberSlugs && region.memberSlugs.length > 0 && (
-        <Card icon={<MapPin className="h-5 w-5" />} title={`Member states (${region.memberSlugs.length})`}>
-          <p className="text-sm text-gray-400 mb-3">
-            States grouped under the NOAA {data.region} climate region (NOAA code {data.noaaCode}).
-          </p>
+        <Card icon={<MapPin className="h-5 w-5" />} title={`Member States (${region.memberSlugs.length})`}>
           <div className="flex flex-wrap gap-2">
             {region.memberSlugs.map((slug) => {
               const member = CLIMATE_REGIONS.find((r) => r.slug === slug);
@@ -607,6 +603,16 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
 export default async function ClimateGroupProfile({ region }: { region: ClimateRegion }) {
   const isContinent = region.groupKind === 'continent';
 
+  // Title parity with country / global pages: "<Region> Climate – <Month Year> Update"
+  // with dynamic font sizing so longer names (e.g. "US Northeast Climate – April 2026 Update") still fit.
+  const updateLabel = getClimateUpdateDateLabel();
+  const combinedTitle = `${region.name} Climate – ${updateLabel} Update`;
+  const h1SizeClass =
+    combinedTitle.length > 38 ? 'text-xl md:text-2xl' :
+    combinedTitle.length > 28 ? 'text-2xl md:text-3xl' :
+    combinedTitle.length > 20 ? 'text-2xl md:text-4xl' :
+    'text-3xl md:text-5xl';
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-8 md:pt-4 md:pb-10 font-sans text-gray-200">
@@ -619,16 +625,15 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
         >
           <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
             <h1
-              className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight"
+              className={`${h1SizeClass} font-bold font-mono tracking-wide leading-tight`}
               style={{ color: '#FFF5E7' }}
             >
-              {region.name} Climate Update, {getClimateUpdateDateLabel()}
+              {combinedTitle}
             </h1>
           </div>
           <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5">
-            <p className="text-sm md:text-base text-gray-300 leading-relaxed">{region.tagline}</p>
             {region.isAggregate ? (
-              <p className="mt-2 text-xs text-amber-200/80 flex items-start gap-1.5">
+              <p className="mb-3 text-xs text-amber-200/80 flex items-start gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />
                 <span>
                   This is a 4BYO aggregate. NOAA does not publish a standalone continental land series for {region.name},
@@ -638,7 +643,7 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
               </p>
             ) : null}
             <ClimateRankPill slug={region.slug} />
-            <div className="mt-4 pt-4 border-t border-gray-800/60">
+            <div className="mt-3">
               <GroupSummaryPanel slug={region.slug} regionName={region.name} />
             </div>
           </div>

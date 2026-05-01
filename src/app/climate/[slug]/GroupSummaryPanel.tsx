@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 
 interface SummaryResponse {
@@ -86,10 +86,6 @@ export default function GroupSummaryPanel({ slug, regionName }: { slug: string; 
 
   return (
     <div>
-      <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full border border-[#D0A65E]/40 bg-[#D0A65E]/10 mb-3">
-        <Sparkles className="h-3 w-3 text-[#D0A65E]" />
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[#D0A65E]">AI Climate Update</span>
-      </div>
       <div className="text-gray-300 text-sm leading-relaxed space-y-3">
         {summary.split('\n\n').map((para, i) => {
           const trimmed = para.trim();
