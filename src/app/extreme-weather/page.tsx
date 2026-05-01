@@ -85,7 +85,7 @@ const EVENT_ICONS: Record<string, React.ReactNode> = {
 };
 
 const EVENT_LABELS: Record<string, string> = {
-  TC: "Tropical Cyclone",
+  TC: "Storms & Cyclones",
   FL: "Flood",
   DR: "Drought",
   WF: "Wildfire",
@@ -958,9 +958,10 @@ function LongTermTrendsSection({
       const vals = rows.map((r) => (typeof r[key] === "number" ? (r[key] as number) : 0));
       return vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : 0;
     };
-    const active = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    return active
-      .map(([gdacsType]) => {
+    // Always show all 4 types regardless of live event activity
+    const FIXED_ORDER: string[] = ["WF", "FL", "TC", "DR"];
+    return FIXED_ORDER
+      .map((gdacsType) => {
         const emdatLabel = GDACS_TO_EMDAT[gdacsType];
         if (!emdatLabel) return null;
         const recentAvg = avg(recentWindow, emdatLabel);
@@ -982,7 +983,7 @@ function LongTermTrendsSection({
         };
       })
       .filter((x): x is NonNullable<typeof x> => x != null);
-  }, [disastersByType, counts]);
+  }, [disastersByType]);
 
   if (historicalContext.length === 0) return null;
 
