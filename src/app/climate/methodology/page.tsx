@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, FileText, BookOpen, Database, Calendar, CalendarRange, Trophy, AlertTriangle, Scale } from 'lucide-react';
 import BaselineExplainer from '../_components/BaselineExplainer';
-import DataSourceTimeline from './DataSourceTimeline';
+import DataSourceTimeline, {
+  MonthlyReleaseTimeline,
+  AnnualReleaseTimeline,
+  type MonthlyReleaseRow,
+  type AnnualReleaseRow,
+} from './DataSourceTimeline';
 
 const PAGE_URL = 'https://4billionyearson.org/climate/methodology';
 
@@ -151,6 +156,33 @@ const BREADCRUMB_JSONLD = {
   ],
 };
 
+// ─── Publication timing ─────────────────────────────────────────────────────
+// Day-of-month each upstream source publishes the previous month's data,
+// followed by our snapshot rebuild that aggregates them all. Day windows
+// reflect typical observed lag in production.
+
+const MONTHLY_RELEASES: MonthlyReleaseRow[] = [
+  { source: 'NSIDC Sea Ice Index v4', release: '3rd–5th', startDay: 3, endDay: 5, variable: 'Arctic / Antarctic monthly extent', family: 'ice' },
+  { source: 'Met Office HadUK-Grid Regional', release: '3rd–7th', startDay: 3, endDay: 7, variable: 'UK regional Tmean / Tmax / Tmin / rainfall / sunshine / frost', family: 'temp' },
+  { source: 'NOAA CPC Oceanic Niño Index', release: '5th', startDay: 5, endDay: 6, variable: 'ENSO state (3-month running SST anomaly)', family: 'enso' },
+  { source: 'NOAA GML Mauna Loa CO₂', release: '5th', startDay: 5, endDay: 6, variable: 'Atmospheric CO₂ monthly mean', family: 'co2' },
+  { source: 'NOAA GML Global CH₄ / N₂O', release: '5th', startDay: 5, endDay: 7, variable: 'Atmospheric CH₄ and N₂O monthly mean', family: 'ghg' },
+  { source: 'NOAA NCEI Climate at a Glance', release: '6th–10th', startDay: 6, endDay: 10, variable: 'Global / hemispheric / continental / statewide / climate-region temperature & precipitation', family: 'temp' },
+  { source: 'OWID country temperature (HadCRUT5-derived)', release: '12th–18th', startDay: 12, endDay: 18, variable: 'Country-level temperature anomaly', family: 'temp' },
+  { source: '4BYO snapshot rebuild', release: '12th–14th', startDay: 12, endDay: 14, variable: 'Aggregates all sources above into the public JSON snapshots', family: 'snapshot' },
+];
+
+// Annual datasets — month each is typically published, covering the previous calendar year.
+const ANNUAL_RELEASES: AnnualReleaseRow[] = [
+  { source: 'World Bank CCKP / CRU TS country precipitation', release: 'May–Sep', startMonth: 5, endMonth: 9, variable: 'Annual country precipitation back to 1901', family: 'precip' },
+  { source: 'Ember / EIA country electricity mix', release: 'Mar–May', startMonth: 3, endMonth: 5, variable: 'Annual country electricity generation by fuel', family: 'temp' },
+  { source: 'IEA World Energy Outlook & Statistics', release: 'Jun–Aug', startMonth: 6, endMonth: 8, variable: 'Annual energy demand, supply and emissions', family: 'temp' },
+  { source: 'Our World in Data CO₂ emissions', release: 'Nov–Dec', startMonth: 11, endMonth: 12, variable: 'Country and global annual CO₂ emissions (Global Carbon Budget)', family: 'temp' },
+  { source: 'NOAA NCEI Annual State of the Climate', release: 'Jan', startMonth: 1, endMonth: 1, variable: 'Annual global / continental / national rankings & analysis', family: 'temp' },
+  { source: 'IPCC / WMO Assessment / State of Climate', release: 'Mar–May', startMonth: 3, endMonth: 5, variable: 'WMO State of the Global Climate report', family: 'temp' },
+  { source: '4BYO annual rebuild', release: 'Q1', startMonth: 1, endMonth: 3, variable: 'Refresh annual aggregates and update editorial copy', family: 'snapshot' },
+];
+
 export default function MethodologyPage() {
   return (
     <main className="container mx-auto px-3 md:px-4 pt-2 pb-8 md:pt-4 md:pb-12 max-w-5xl font-sans text-gray-200">
@@ -159,30 +191,44 @@ export default function MethodologyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSONLD) }}
       />
 
-      <nav className="mb-4 text-xs text-gray-400">
+      <nav className="mb-3 text-xs text-gray-400">
         <Link href="/climate" className="inline-flex items-center gap-1 hover:text-[#E8C97A]">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Climate hub
         </Link>
       </nav>
 
-      <header className="mb-6">
-        <h1 className="font-mono text-2xl md:text-3xl font-bold text-white flex items-start gap-2">
-          <FileText className="h-6 w-6 shrink-0 text-[#D0A65E] mt-1" />
-          <span>Climate Data Methodology</span>
-        </h1>
-        <p className="mt-2 text-sm text-gray-400 max-w-3xl leading-relaxed">
-          How this site builds its climate dataset, which baselines apply where, and when each
-          upstream source&apos;s record begins. Everything below is reproducible from the public
-          data files in <code className="text-gray-300">/public/data/climate/</code> and the
-          build scripts in <code className="text-gray-300">/scripts/</code>.
-        </p>
-      </header>
-
       <div className="space-y-6">
+        {/* Hero */}
+        <div
+          className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
+          style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}
+        >
+          <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+            <h1 className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight flex items-center gap-3" style={{ color: '#FFF5E7' }}>
+              <FileText className="h-7 w-7 md:h-8 md:w-8 shrink-0" />
+              <span>Climate Data Methodology</span>
+            </h1>
+          </div>
+          <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5">
+            <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+              How this site builds its climate dataset, which baselines apply where, when each
+              upstream source&apos;s record begins, and when fresh data lands each month and
+              year. Everything below is reproducible from the public data files in{' '}
+              <code className="text-[#E8C97A]">/public/data/climate/</code> and the build scripts
+              in <code className="text-[#E8C97A]">/scripts/</code>.
+            </p>
+          </div>
+        </div>
+
+        {/* Baseline explainer (already styled) */}
         <BaselineExplainer />
 
-        <section className="rounded-2xl border border-gray-800 bg-gray-950/70 p-4 md:p-5">
-          <h2 className="font-mono text-lg font-bold text-white mb-2">The two-baseline model</h2>
+        {/* Two-baseline model */}
+        <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+            <Scale className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+            <span className="min-w-0 flex-1">The Two-Baseline Model</span>
+          </h2>
           <p className="text-sm text-gray-300 leading-relaxed">
             Climate normals are arbitrary. Different agencies use different 30-year reference
             periods, and switching baseline only shifts every value by a constant — the trend is
@@ -211,8 +257,12 @@ export default function MethodologyPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-gray-800 bg-gray-950/70 p-4 md:p-5">
-          <h2 className="font-mono text-lg font-bold text-white mb-3">Data source timeline</h2>
+        {/* Data source timeline (full record start years) */}
+        <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+            <CalendarRange className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+            <span className="min-w-0 flex-1">Data Source Timeline (Record Start)</span>
+          </h2>
           <p className="text-sm text-gray-300 leading-relaxed mb-4">
             Each bar shows the year the upstream record begins through to the latest available
             month. Bars are colour-coded by data family. The vertical guideline marks the start
@@ -221,8 +271,42 @@ export default function MethodologyPage() {
           <DataSourceTimeline sources={SOURCES} />
         </section>
 
-        <section className="rounded-2xl border border-gray-800 bg-gray-950/70 p-4 md:p-5">
-          <h2 className="font-mono text-lg font-bold text-white mb-3">Source inventory</h2>
+        {/* Monthly publication timeline */}
+        <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+            <Calendar className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+            <span className="min-w-0 flex-1">When Monthly Data Lands</span>
+          </h2>
+          <p className="text-sm text-gray-300 leading-relaxed mb-4">
+            Each bar shows the calendar day of the month the upstream source publishes the
+            previous month&apos;s data, and when 4BYO runs its snapshot rebuild. The snapshot is
+            timed to fall <em>after</em> the slowest source has refreshed so every page is
+            current as of the same reference month.
+          </p>
+          <MonthlyReleaseTimeline rows={MONTHLY_RELEASES} />
+        </section>
+
+        {/* Annual publication timeline */}
+        <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+            <CalendarRange className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+            <span className="min-w-0 flex-1">When Annual Data Lands</span>
+          </h2>
+          <p className="text-sm text-gray-300 leading-relaxed mb-4">
+            Datasets that publish only once a year — country precipitation, electricity mix,
+            CO₂ emissions, IEA energy outlook and the WMO/NOAA annual State-of-the-Climate
+            reports. Bars show the typical month of release; data covers the previous calendar
+            year.
+          </p>
+          <AnnualReleaseTimeline rows={ANNUAL_RELEASES} />
+        </section>
+
+        {/* Source inventory table */}
+        <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+            <Database className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+            <span className="min-w-0 flex-1">Source Inventory</span>
+          </h2>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="bg-gray-900/80 text-xs uppercase tracking-wider text-gray-400">
@@ -263,8 +347,12 @@ export default function MethodologyPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-gray-800 bg-gray-950/70 p-4 md:p-5">
-          <h2 className="font-mono text-lg font-bold text-white mb-2">How rankings are computed</h2>
+        {/* Rankings methodology */}
+        <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+            <Trophy className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+            <span className="min-w-0 flex-1">How Rankings Are Computed</span>
+          </h2>
           <ul className="list-disc pl-5 text-sm text-gray-300 space-y-1.5">
             <li>
               For each region we read the latest complete month from the per-region snapshot
@@ -283,13 +371,17 @@ export default function MethodologyPage() {
             </li>
             <li>
               Movers (climbers / fallers) compare the current snapshot against the previous
-              month&apos;s archived snapshot in <code>rankings-previous.json</code>.
+              month&apos;s archived snapshot in <code className="text-[#E8C97A]">rankings-previous.json</code>.
             </li>
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-gray-800 bg-gray-950/70 p-4 md:p-5">
-          <h2 className="font-mono text-lg font-bold text-white mb-2">Cross-source caveats</h2>
+        {/* Caveats */}
+        <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+            <AlertTriangle className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+            <span className="min-w-0 flex-1">Cross-Source Caveats</span>
+          </h2>
           <ul className="list-disc pl-5 text-sm text-gray-300 space-y-1.5">
             <li>
               Country and US-state series come from different upstream pipelines (OWID/HadCRUT5
@@ -310,6 +402,28 @@ export default function MethodologyPage() {
               Subnational series outside the US (Canadian provinces, Australian states, etc.)
               are not published by NOAA. They are deferred to a Phase 2 build that will pull
               from each national meteorological service (ECCC, BoM, DWD, JMA, …).
+            </li>
+          </ul>
+        </section>
+
+        {/* Footer / further reading */}
+        <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+          <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+            <BookOpen className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+            <span className="min-w-0 flex-1">Further Reading</span>
+          </h2>
+          <ul className="list-disc pl-5 text-sm text-gray-300 space-y-1.5">
+            <li>
+              <Link href="/climate/rankings" className="text-[#E8C97A] hover:underline">Climate rankings &amp; league table</Link> — every region we track, sortable by 1m / 3m / 12m anomaly.
+            </li>
+            <li>
+              <Link href="/climate/global" className="text-[#E8C97A] hover:underline">Global climate update</Link> — Paris tracker, continental bars, ENSO state, GHG, sea ice.
+            </li>
+            <li>
+              <Link href="/climate" className="text-[#E8C97A] hover:underline">Climate updates</Link> — country, US state and UK region detail pages.
+            </li>
+            <li>
+              <Link href="/climate-explained" className="text-[#E8C97A] hover:underline">Climate, explained</Link> — plain-English guide to the science behind the data.
             </li>
           </ul>
         </section>
