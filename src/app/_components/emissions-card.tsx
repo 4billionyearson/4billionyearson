@@ -270,10 +270,11 @@ function CountryCard({ data, deepLinkHref }: { data: CountryApiResponse; deepLin
   );
 }
 
-export default function EmissionsCard({ countryName, usStateCode, usStateName, deepLinkHref }: {
+export default function EmissionsCard({ countryName, usStateCode, usStateName, continentName, deepLinkHref }: {
   countryName?: string;
   usStateCode?: string;
   usStateName?: string;
+  continentName?: string;
   deepLinkHref?: string;
 }) {
   const [global, setGlobal] = useState<GlobalApiResponse | null>(null);
@@ -289,6 +290,11 @@ export default function EmissionsCard({ countryName, usStateCode, usStateName, d
         .then(r => r.json())
         .then(d => { if (!cancelled) { if (d.error) throw new Error(d.error); setStateData(d); } })
         .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
+    } else if (continentName) {
+      fetch(`/api/climate/emissions/country?continent=${encodeURIComponent(continentName)}`)
+        .then(r => r.json())
+        .then(d => { if (!cancelled) { if (d.error) throw new Error(d.error); setCountry(d); } })
+        .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
     } else if (countryName) {
       fetch(`/api/climate/emissions/country?name=${encodeURIComponent(countryName)}`)
         .then(r => r.json())
@@ -301,13 +307,15 @@ export default function EmissionsCard({ countryName, usStateCode, usStateName, d
         .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
     }
     return () => { cancelled = true; };
-  }, [countryName, usStateCode, usStateName]);
+  }, [countryName, usStateCode, usStateName, continentName]);
 
   const href = deepLinkHref ?? (usStateCode
     ? `/energy-dashboard?state=${encodeURIComponent(usStateCode)}`
-    : countryName
-      ? `/emissions?country=${encodeURIComponent(countryName)}`
-      : '/emissions');
+    : continentName
+      ? `/emissions`
+      : countryName
+        ? `/emissions?country=${encodeURIComponent(countryName)}`
+        : '/emissions');
 
   if (error) {
     return (

@@ -21,6 +21,11 @@ const EXCLUDE_NAMES = new Set([
   'International shipping', 'Kuwaiti Oil Fires',
 ]);
 
+// OWID continent aggregate names — NOT excluded when requested via ?continent=
+const CONTINENT_AGGREGATE_NAMES = new Set([
+  'Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania',
+]);
+
 interface YearPoint { year: number; value: number }
 
 interface ByCountryEntry {
@@ -39,6 +44,7 @@ interface ByCountryEntry {
 
 interface ByCountryIndex {
   countries: Record<string, ByCountryEntry>;
+  continents: Record<string, ByCountryEntry>;
   worldAnnualLatest: number;
   worldAnnualLatestYear: number;
   fetchedAt: string;
@@ -100,6 +106,23 @@ function groupByCountry(
   return out;
 }
 
+function groupByContinent(
+  rows: { year: number; entityId: number; value: number }[],
+  entityMap: Record<number, string>,
+): Record<string, YearPoint[]> {
+  const out: Record<string, YearPoint[]> = {};
+  for (const r of rows) {
+    const name = entityMap[r.entityId];
+    if (!name || !CONTINENT_AGGREGATE_NAMES.has(name)) continue;
+    if (!out[name]) out[name] = [];
+    out[name].push({ year: r.year, value: r.value });
+  }
+  for (const name of Object.keys(out)) {
+    out[name].sort((a, b) => a.year - b.year);
+  }
+  return out;
+}
+
 function getWorldSeries(
   rows: { year: number; entityId: number; value: number }[],
   entityMap: Record<number, string>,
@@ -131,6 +154,10 @@ async function buildIndex(): Promise<ByCountryIndex> {
   const annualBy = groupByCountry(annualRows, entityMap);
   const perCapBy = groupByCountry(perCapRows, entityMap);
   const cumulBy = groupByCountry(cumulRows, entityMap);
+
+  const annualByCont = groupByContinent(annualRows, entityMap);
+  const perCapByCont = groupByContinent(perCapRows, entityMap);
+  const cumulByCont = groupByContinent(cumulRows, entityMap);
 
   // World totals (latest)
   const worldAnnual = getWorldSeries(annualRows, entityMap);
@@ -183,8 +210,38 @@ async function buildIndex(): Promise<ByCountryIndex> {
   });
   for (const n of Object.keys(entries)) entries[n].perCapOf = perCapSortable.length;
 
+  // Continent aggregates from OWID — no rank, just the series.
+  const continentEntries: Record<string, ByCountryEntry> = {};
+  const allContNames = new Set<string>([
+    ...Object.keys(annualByCont),
+    ...Object.keys(perCapByCont),
+    ...Object.keys(cumulByCont),
+  ]);
+  for (const name of allContNames) {
+    const annual = annualByCont[name] ?? [];
+    const perCapita = perCapByCont[name] ?? [];
+    const cumulative = cumulByCont[name] ?? [];
+    const a = annual[annual.length - 1];
+    const p = perCapita[perCapita.length - 1];
+    const c = cumulative[cumulative.length - 1];
+    continentEntries[name] = {
+      annual,
+      perCapita,
+      cumulative,
+      latestYear: a?.year ?? p?.year ?? 0,
+      latestAnnual: a?.value ?? null,
+      latestPerCapita: p?.value ?? null,
+      latestCumulative: c?.value ?? null,
+      annualRank: null,
+      annualOf: 0,
+      perCapRank: null,
+      perCapOf: 0,
+    };
+  }
+
   return {
     countries: entries,
+    continents: continentEntries,
     worldAnnualLatest: worldLatest?.value ?? 0,
     worldAnnualLatestYear: worldLatest?.year ?? 0,
     fetchedAt: new Date().toISOString(),
@@ -203,12 +260,13 @@ function findCountry(index: ByCountryIndex, name: string): { key: string; entry:
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const name = url.searchParams.get('name');
-  if (!name) {
-    return NextResponse.json({ error: 'Missing required ?name= parameter' }, { status: 400 });
+  const continent = url.searchParams.get('continent');
+  if (!name && !continent) {
+    return NextResponse.json({ error: 'Missing required ?name= or ?continent= parameter' }, { status: 400 });
   }
 
   let index = await getCached<ByCountryIndex>(BY_COUNTRY_CACHE_KEY);
-  if (!index) {
+  if (!index || !index.continents) {
     try {
       index = await buildIndex();
       await setShortTerm(BY_COUNTRY_CACHE_KEY, index);
@@ -217,7 +275,22 @@ export async function GET(req: Request) {
     }
   }
 
-  const found = findCountry(index, name);
+  if (continent) {
+    const entry = index.continents[continent];
+    if (!entry) {
+      return NextResponse.json({ error: `Continent '${continent}' not found in OWID aggregates` }, { status: 404 });
+    }
+    const globalSharePct = entry.latestAnnual != null && index.worldAnnualLatest > 0
+      ? (entry.latestAnnual / index.worldAnnualLatest) * 100
+      : null;
+    return NextResponse.json({
+      country: { name: continent, ...entry, globalSharePct },
+      world: { annualLatest: index.worldAnnualLatest, annualLatestYear: index.worldAnnualLatestYear },
+      fetchedAt: index.fetchedAt,
+    });
+  }
+
+  const found = findCountry(index, name as string);
   if (!found) {
     return NextResponse.json({ error: `Country '${name}' not found` }, { status: 404 });
   }

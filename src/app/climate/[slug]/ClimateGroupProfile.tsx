@@ -11,6 +11,8 @@ import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import GroupSummaryPanel from './GroupSummaryPanel';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
+import EmissionsCard from '@/app/_components/emissions-card';
+import EnergyMixCard from '@/app/_components/energy-mix-card';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
 
@@ -362,6 +364,20 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
           <SeasonalShiftCard monthlyAll={absolutes.monthlyAll} regionName={region.name} dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures." />
         </>
       ) : null}
+
+      {/* Emissions + energy mix (OWID continent aggregates) */}
+      {region.groupKind === 'continent' && CONTINENT_KEY_TO_NAME[region.groupKey ?? ''] && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <EmissionsCard
+            continentName={CONTINENT_KEY_TO_NAME[region.groupKey ?? '']}
+            deepLinkHref="/emissions"
+          />
+          <EnergyMixCard
+            countryName={CONTINENT_KEY_TO_NAME[region.groupKey ?? '']}
+            deepLinkHref="/energy-rankings"
+          />
+        </div>
+      )}
 
       {/* Members */}
       {isAgg && row.members && row.members.length > 0 && (
