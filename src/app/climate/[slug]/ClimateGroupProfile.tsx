@@ -13,7 +13,7 @@ import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
 import { OverviewGrid } from '@/app/climate/_shared/overview-grid';
-import { buildOverviewRow, type OverviewPanel, type OverviewRow } from '@/app/climate/_shared/overview-grid-types';
+import { buildOverviewRow, type OverviewPanel, type OverviewRow, type RankedPeriodStat } from '@/app/climate/_shared/overview-grid-types';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
 
@@ -55,6 +55,13 @@ interface ContinentRow {
 interface GlobalHistory {
   continentStats: ContinentRow[];
   aggregatedContinents: ContinentRow[];
+  noaaStats?: {
+    landOcean?: {
+      yearly?: { year: number; avgTemp?: number; rollingAvg?: number }[];
+      latestMonthStats?: RankedPeriodStat;
+      latestThreeMonthStats?: RankedPeriodStat;
+    };
+  };
 }
 
 interface UsRegionParam {
@@ -93,6 +100,88 @@ function isoToCountryRegion(iso3: string): ClimateRegion | undefined {
 function isoToCountryName(iso3: string): string {
   const loc = ALL_LOCATIONS.find((l) => l.type === 'country' && l.owidCode === iso3);
   return loc?.name ?? iso3;
+}
+
+// Build yearly + latestMonthStats + latestThreeMonthStats from a monthlyAll
+// series of absolute monthly mean temperatures (°C). Mirrors the shape produced
+// by the US-state / US-region snapshot builders so the result can be fed into
+// the shared OverviewGrid via buildOverviewRow().
+function buildClimatologyStats(monthlyAll: { year: number; month: number; value: number }[]): {
+  yearly: { year: number; value: number }[];
+  latestMonthStats: RankedPeriodStat;
+  latestThreeMonthStats: RankedPeriodStat | null;
+} | null {
+  if (!monthlyAll?.length) return null;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  const sorted = [...monthlyAll].sort((a, b) => a.year === b.year ? a.month - b.month : a.year - b.year);
+  const latest = sorted[sorted.length - 1];
+
+  // Yearly mean (only complete years, except include the in-progress latest year if it has ≥1 month)
+  const byYear = new Map<number, number[]>();
+  for (const p of sorted) {
+    if (!byYear.has(p.year)) byYear.set(p.year, []);
+    byYear.get(p.year)!.push(p.value);
+  }
+  const yearly = Array.from(byYear.entries())
+    .filter(([y, arr]) => y === latest.year || arr.length === 12)
+    .map(([y, arr]) => ({ year: y, value: arr.reduce((s, v) => s + v, 0) / arr.length }))
+    .sort((a, b) => a.year - b.year);
+
+  // Latest month stats — rank within same calendar month across all years
+  const sameMonth = sorted.filter((p) => p.month === latest.month);
+  const baseline = sameMonth.filter((p) => p.year >= 1961 && p.year <= 1990).map((p) => p.value);
+  const baseAvg = baseline.length ? baseline.reduce((s, v) => s + v, 0) / baseline.length : null;
+  const sortedSame = [...sameMonth].sort((a, b) => b.value - a.value);
+  const rank = sortedSame.findIndex((p) => p.year === latest.year) + 1;
+  const record = sortedSame[0];
+  const latestMonthStats: RankedPeriodStat = {
+    label: `${months[latest.month - 1]} ${latest.year}`,
+    value: latest.value,
+    diff: baseAvg == null ? null : latest.value - baseAvg,
+    rank,
+    total: sameMonth.length,
+    recordLabel: `${months[record.month - 1]} ${record.year}`,
+    recordValue: record.value,
+  };
+
+  // 3-month rolling means ending at each month, then rank by ending month-of-year
+  const ymKey = (y: number, m: number) => y * 12 + m;
+  const valByKey = new Map<number, number>();
+  for (const p of sorted) valByKey.set(ymKey(p.year, p.month), p.value);
+  const rolling: { year: number; month: number; value: number }[] = [];
+  for (const p of sorted) {
+    const k = ymKey(p.year, p.month);
+    const v0 = valByKey.get(k - 2);
+    const v1 = valByKey.get(k - 1);
+    const v2 = p.value;
+    if (v0 != null && v1 != null) rolling.push({ year: p.year, month: p.month, value: (v0 + v1 + v2) / 3 });
+  }
+
+  let latestThreeMonthStats: RankedPeriodStat | null = null;
+  const latestRoll = rolling.find((p) => p.year === latest.year && p.month === latest.month);
+  if (latestRoll) {
+    const sameEnd = rolling.filter((p) => p.month === latest.month);
+    const base3 = sameEnd.filter((p) => p.year >= 1961 && p.year <= 1990).map((p) => p.value);
+    const base3Avg = base3.length ? base3.reduce((s, v) => s + v, 0) / base3.length : null;
+    const sortedEnd = [...sameEnd].sort((a, b) => b.value - a.value);
+    const rank3 = sortedEnd.findIndex((p) => p.year === latest.year) + 1;
+    const rec3 = sortedEnd[0];
+    const startMonth = (m: number) => { let sm = m - 2; if (sm <= 0) sm += 12; return sm; };
+    const sm = startMonth(latest.month);
+    const recSm = startMonth(rec3.month);
+    latestThreeMonthStats = {
+      label: `${months[sm - 1]}–${months[latest.month - 1]} ${latest.year}`,
+      value: latestRoll.value,
+      diff: base3Avg == null ? null : latestRoll.value - base3Avg,
+      rank: rank3,
+      total: sameEnd.length,
+      recordLabel: `${months[recSm - 1]}–${months[rec3.month - 1]} ${rec3.year}`,
+      recordValue: rec3.value,
+    };
+  }
+
+  return { yearly, latestMonthStats, latestThreeMonthStats };
 }
 
 // ─── Section / card primitives (match other climate pages) ──────────────────
@@ -344,23 +433,56 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
 
   return (
     <>
-      {/* Temperature – Average panel (matches country update page layout) */}
-      <Card icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature – Average">
-        <SnapshotTable
-          columns={[
-            { window: '1-Month', period: window1Period, anomaly: row.anomaly1m, nativeAnomaly: row.nativeAnomaly1m },
-            { window: '3-Month', period: window3Period, anomaly: row.anomaly3m, nativeAnomaly: row.nativeAnomaly3m },
-            { window: '12-Month', period: window12Period, anomaly: row.anomaly12m, nativeAnomaly: row.nativeAnomaly12m },
-          ]}
-          nativeBaseline={row.nativeBaseline}
-          footnote={isAgg ? (
-            <span className="flex items-start gap-1.5">
-              <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />
-              <span>{row.note ?? 'NOAA does not publish a standalone continental land series; values aggregate the country anomalies in our coverage.'}</span>
-            </span>
-          ) : null}
-        />
-      </Card>
+      {/* Temperature – Average panel (matches country / US-region update pages).
+         Uses 4BYO continent-absolutes (CRU TS aggregate) so we get absolute °C +
+         rank-within-record stats; falls back to the anomaly-only snapshot when
+         the absolute series is unavailable (e.g. for some 4BYO aggregates). */}
+      {(() => {
+        const continentStats = absolutes?.monthlyAll?.length ? buildClimatologyStats(absolutes.monthlyAll) : null;
+        const globalLandOcean = history.noaaStats?.landOcean;
+        const continentOverviewRow = continentStats
+          ? buildOverviewRow(region.name, continentStats.yearly, continentStats.latestMonthStats, continentStats.latestThreeMonthStats ?? undefined, '°C', 1, false, true)
+          : null;
+        const globalOverviewRow = globalLandOcean
+          ? (() => {
+              const r = buildOverviewRow('Global', globalLandOcean.yearly, globalLandOcean.latestMonthStats, globalLandOcean.latestThreeMonthStats, '°C', 1);
+              return r ? { ...r, sublabel: 'Land + Ocean' } : null;
+            })()
+          : null;
+        const tempRows: OverviewRow[] = [continentOverviewRow, globalOverviewRow].filter((r): r is OverviewRow => Boolean(r));
+
+        if (tempRows.length >= 1 && continentOverviewRow) {
+          const tempPanel: OverviewPanel = {
+            title: 'Temperature – Average',
+            icon: <Thermometer className="text-orange-400" />,
+            accentClass: 'bg-orange-600',
+            accentBg: 'bg-orange-600/50',
+            accentBorder: 'border-orange-400/80',
+            sections: [{ rows: tempRows }],
+          };
+          return <OverviewGrid panels={[tempPanel]} />;
+        }
+
+        // Fallback: anomaly-only 1m / 3m / 12m snapshot (legacy layout).
+        return (
+          <Card icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature – Average">
+            <SnapshotTable
+              columns={[
+                { window: '1-Month', period: window1Period, anomaly: row.anomaly1m, nativeAnomaly: row.nativeAnomaly1m },
+                { window: '3-Month', period: window3Period, anomaly: row.anomaly3m, nativeAnomaly: row.nativeAnomaly3m },
+                { window: '12-Month', period: window12Period, anomaly: row.anomaly12m, nativeAnomaly: row.nativeAnomaly12m },
+              ]}
+              nativeBaseline={row.nativeBaseline}
+              footnote={isAgg ? (
+                <span className="flex items-start gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />
+                  <span>{row.note ?? 'NOAA does not publish a standalone continental land series; values aggregate the country anomalies in our coverage.'}</span>
+                </span>
+              ) : null}
+            />
+          </Card>
+        );
+      })()}
 
       {/* Spaghetti chart + seasonal-shift cards (member-country aggregate absolutes) */}
       {absolutes?.monthlyAll?.length ? (
@@ -473,10 +595,11 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
 // ─── US climate region renderer ────────────────────────────────────────────
 
 async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
-  const [data, usNational, members] = await Promise.all([
+  const [data, usNational, members, history] = await Promise.all([
     readJson<UsRegionData>(`us-climate-region/${region.slug}.json`),
     readJson<UsRegionData>('us-national.json'),
     loadMembersForRegion(region),
+    readJson<GlobalHistory>('global-history.json'),
   ]);
   if (!data) {
     return <Card icon={<AlertTriangle className="h-5 w-5" />} title="Data unavailable">
@@ -488,11 +611,16 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
   const pcp = data.paramData.pcp;
   const usTavg = usNational?.paramData.tavg;
   const usPcp = usNational?.paramData.pcp;
+  const globalLandOcean = history?.noaaStats?.landOcean;
 
   // ── Build OverviewGrid panels (same shape as country / global pages) ──
   const tempRows = [
     buildOverviewRow(region.name, tavg.yearly, tavg.latestMonthStats, tavg.latestThreeMonthStats, '°C', 1, false, true),
     usTavg ? buildOverviewRow('United States', usTavg.yearly, usTavg.latestMonthStats, usTavg.latestThreeMonthStats, '°C', 1) : null,
+    globalLandOcean ? (() => {
+      const r = buildOverviewRow('Global', globalLandOcean.yearly, globalLandOcean.latestMonthStats, globalLandOcean.latestThreeMonthStats, '°C', 1);
+      return r ? { ...r, sublabel: 'Land + Ocean' } : null;
+    })() : null,
   ].filter((r): r is OverviewRow => Boolean(r));
   const tempPanel: OverviewPanel | null = tempRows.length ? {
     title: 'Temperature – Average',
@@ -622,7 +750,7 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
 
   return (
     <main>
-      <div className="container mx-auto px-3 md:px-4 pt-2 pb-8 md:pt-4 md:pb-10 font-sans text-gray-200">
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Hero */}
@@ -638,7 +766,7 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
               {combinedTitle}
             </h1>
           </div>
-          <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5">
+          <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
             {region.isAggregate ? (
               <p className="mb-3 text-xs text-amber-200/80 flex items-start gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />
@@ -649,10 +777,10 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
                 </span>
               </p>
             ) : null}
-            <ClimateRankPill slug={region.slug} />
-            <div className="mt-3">
-              <GroupSummaryPanel slug={region.slug} regionName={region.name} />
+            <div className="mb-3">
+              <ClimateRankPill slug={region.slug} />
             </div>
+            <GroupSummaryPanel slug={region.slug} regionName={region.name} />
           </div>
         </div>
 

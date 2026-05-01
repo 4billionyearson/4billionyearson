@@ -23,7 +23,19 @@ interface StateEnergyApiResponse {
   fetchedAt: string;
 }
 
-type Mode = 'country' | 'us-state' | 'continent';
+type Mode = 'country' | 'us-state' | 'continent' | 'us-region';
+
+const US_CLIMATE_REGIONS: { slug: string; name: string }[] = [
+  { slug: 'us-northeast', name: 'Northeast' },
+  { slug: 'us-upper-midwest', name: 'Upper Midwest' },
+  { slug: 'us-ohio-valley', name: 'Ohio Valley' },
+  { slug: 'us-southeast', name: 'Southeast' },
+  { slug: 'us-northern-rockies-plains', name: 'Northern Rockies & Plains' },
+  { slug: 'us-south', name: 'South' },
+  { slug: 'us-southwest', name: 'Southwest' },
+  { slug: 'us-northwest', name: 'Northwest' },
+  { slug: 'us-west', name: 'West' },
+];
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -281,14 +293,21 @@ export default function EmissionsCountryPanel({
   const [stateLoading, setStateLoading] = useState(false);
   const [stateError, setStateError] = useState<string | null>(null);
 
-  // Read ?country= or ?state= from URL on mount
+  // US climate region deep-dive (re-uses stateData/USStateDeepDive)
+  const [regionSlug, setRegionSlug] = useState<string | null>(null);
+
+  // Read ?country= or ?state= or ?region= from URL on mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     const c = params.get('country');
     const s = params.get('state');
     const sName = params.get('stateName');
-    if (s && sName) {
+    const r = params.get('region');
+    if (r) {
+      setMode('us-region');
+      setRegionSlug(r);
+    } else if (s && sName) {
       setMode('us-state');
       setStateSelection({ name: sName, code: s.toUpperCase() });
     } else if (c) {
@@ -321,7 +340,7 @@ export default function EmissionsCountryPanel({
 
   // Fetch state data whenever selection changes
   useEffect(() => {
-    if (!stateSelection) { setStateData(null); setStateError(null); return; }
+    if (!stateSelection) { if (mode === 'us-state') { setStateData(null); setStateError(null); } return; }
     let cancelled = false;
     setStateLoading(true);
     setStateError(null);
@@ -335,7 +354,25 @@ export default function EmissionsCountryPanel({
       .catch(e => { if (!cancelled) setStateError(e.message || 'Failed to load'); })
       .finally(() => { if (!cancelled) setStateLoading(false); });
     return () => { cancelled = true; };
-  }, [stateSelection]);
+  }, [stateSelection, mode]);
+
+  // Fetch US climate region data (re-uses StateEnergyApiResponse shape)
+  useEffect(() => {
+    if (!regionSlug) { if (mode === 'us-region') { setStateData(null); setStateError(null); } return; }
+    let cancelled = false;
+    setStateLoading(true);
+    setStateError(null);
+    fetch(`/api/climate/emissions/us-region?slug=${encodeURIComponent(regionSlug)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (cancelled) return;
+        if (d.error) throw new Error(d.error);
+        setStateData(d);
+      })
+      .catch(e => { if (!cancelled) setStateError(e.message || 'Failed to load'); })
+      .finally(() => { if (!cancelled) setStateLoading(false); });
+    return () => { cancelled = true; };
+  }, [regionSlug, mode]);
 
   const selectCountry = useCallback((name: string) => {
     setCountryName(name);
@@ -358,6 +395,22 @@ export default function EmissionsCountryPanel({
       url.searchParams.set('state', code);
       url.searchParams.set('stateName', name);
       url.searchParams.delete('country');
+      url.searchParams.delete('region');
+      window.history.replaceState({}, '', url.toString());
+      requestAnimationFrame(() => {
+        document.getElementById('emissions-country-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, []);
+
+  const selectRegion = useCallback((slug: string) => {
+    setRegionSlug(slug);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('region', slug);
+      url.searchParams.delete('country');
+      url.searchParams.delete('state');
+      url.searchParams.delete('stateName');
       window.history.replaceState({}, '', url.toString());
       requestAnimationFrame(() => {
         document.getElementById('emissions-country-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -369,12 +422,14 @@ export default function EmissionsCountryPanel({
     setCountryName(null);
     setData(null);
     setStateSelection(null);
+    setRegionSlug(null);
     setStateData(null);
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.delete('country');
       url.searchParams.delete('state');
       url.searchParams.delete('stateName');
+      url.searchParams.delete('region');
       window.history.replaceState({}, '', url.toString());
     }
   }, []);
@@ -390,13 +445,17 @@ export default function EmissionsCountryPanel({
     ? ''
     : 'bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl';
 
-  const hasSelection = mode === 'us-state' ? stateData?.usState != null : country != null;
+  const hasSelection = mode === 'us-state'
+    ? stateData?.usState != null
+    : mode === 'us-region'
+      ? stateData?.usState != null
+      : country != null;
 
   return (
     <div id="emissions-country-panel" className={wrapperClass}>
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <Factory className="h-5 w-5 text-[#D0A65E]" />
-        <h2 className="text-lg font-bold font-mono text-white">Country &amp; State Deep Dive</h2>
+        <h2 className="text-lg font-bold font-mono text-white">Continent, Country, US Climate Region &amp; State Deep Dive</h2>
         {hasSelection && (
           <button
             onClick={clearSelection}
@@ -410,8 +469,9 @@ export default function EmissionsCountryPanel({
       {/* ─── Tabs (climate-hub styled) ──────────────────────────────────── */}
       <div role="tablist" aria-label="Emissions region type" className="flex gap-2 overflow-x-auto mb-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {([
-          { id: 'country', label: 'Countries', Icon: Globe2 },
           { id: 'continent', label: 'Continents', Icon: Globe },
+          { id: 'country', label: 'Countries', Icon: Globe2 },
+          { id: 'us-region', label: 'US Climate Regions', Icon: MapPin },
           { id: 'us-state', label: 'US States', Icon: Flag },
         ] as const).map(({ id, label, Icon }) => {
           const isActive = mode === id;
@@ -440,7 +500,9 @@ export default function EmissionsCountryPanel({
           ? 'Pick a country to see its annual, per-capita, and cumulative CO₂ emissions, its rank among ~200 reporting nations, and its share of today\u2019s global total.'
           : mode === 'continent'
             ? 'Pick a continent to see its OWID aggregate annual, per-capita, and cumulative CO₂ emissions and share of today\u2019s global total.'
-            : 'Pick a US state to see its energy-related CO₂ emissions compared against the US national total and the world.'}
+            : mode === 'us-region'
+              ? 'Pick a NOAA US climate region to see its energy-related CO₂ emissions aggregated from member states, ranked across all 9 regions and compared with the US national total and the world.'
+              : 'Pick a US state to see its energy-related CO₂ emissions compared against the US national total and the world.'}
       </p>
 
       {mode === 'continent' ? (
@@ -463,6 +525,26 @@ export default function EmissionsCountryPanel({
             );
           })}
         </div>
+      ) : mode === 'us-region' ? (
+        <div className="flex flex-wrap gap-2">
+          {US_CLIMATE_REGIONS.map((r) => {
+            const active = regionSlug === r.slug;
+            return (
+              <button
+                key={r.slug}
+                type="button"
+                onClick={() => selectRegion(r.slug)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                  active
+                    ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
+                    : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]'
+                }`}
+              >
+                {r.name}
+              </button>
+            );
+          })}
+        </div>
       ) : (
         <RegionSearch
           mode={mode === 'us-state' ? 'us-state' : 'country'}
@@ -477,14 +559,14 @@ export default function EmissionsCountryPanel({
         />
       )}
 
-      {mode !== 'us-state' && error && (
+      {(mode === 'country' || mode === 'continent') && error && (
         <div className="mt-4 rounded-lg border border-red-800/50 bg-red-950/30 p-3 text-sm text-red-400">{error}</div>
       )}
-      {mode === 'us-state' && stateError && (
+      {(mode === 'us-state' || mode === 'us-region') && stateError && (
         <div className="mt-4 rounded-lg border border-red-800/50 bg-red-950/30 p-3 text-sm text-red-400">{stateError}</div>
       )}
 
-      {mode !== 'us-state' && loading && !data && (
+      {(mode === 'country' || mode === 'continent') && loading && !data && (
         <div className="mt-6 flex items-center justify-center gap-2 text-gray-400 text-sm">
           <Loader2 className="h-5 w-5 animate-spin text-[#D0A65E]" />
           Loading {countryName}…
@@ -496,12 +578,18 @@ export default function EmissionsCountryPanel({
           Loading {stateSelection?.name}…
         </div>
       )}
+      {mode === 'us-region' && stateLoading && !stateData && (
+        <div className="mt-6 flex items-center justify-center gap-2 text-gray-400 text-sm">
+          <Loader2 className="h-5 w-5 animate-spin text-[#D0A65E]" />
+          Loading {US_CLIMATE_REGIONS.find(r => r.slug === regionSlug)?.name ?? regionSlug}…
+        </div>
+      )}
 
-      {mode === 'us-state' && stateData && (
+      {(mode === 'us-state' || mode === 'us-region') && stateData && (
         <USStateDeepDive data={stateData} worldAnnual={worldAnnual} />
       )}
 
-      {mode !== 'us-state' && country && (
+      {(mode === 'country' || mode === 'continent') && country && (
         <div className="mt-5 space-y-5">
           {/* Header with name + link to climate page */}
           <div className="flex items-baseline justify-between flex-wrap gap-2 border-b border-gray-800/60 pb-3">
@@ -756,7 +844,7 @@ function USStateDeepDive({
   const statePerCap = state.latest.ghgPerCapita;
   const usaPerCap = usa?.latest.ghgPerCapita ?? null;
 
-  const climateHref = `/climate/${state.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
+  const climateHref = `/climate/${state.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
     <div className="mt-5 space-y-5">
