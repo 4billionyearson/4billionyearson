@@ -18,7 +18,7 @@ interface ClimateRegionsBrowserProps {
   icon: React.ReactNode;
   regions: ClimateRegion[];
   /**
-   * 'country' uses continent groupings; 'us-state' uses US Census regions.
+   * 'country' uses NOAA's 7-continent groupings; 'us-state' uses NOAA's 9 US Climate Regions.
    */
   mode: 'country' | 'us-state';
   /** Optional preface text under the gold banner when expanded. */
