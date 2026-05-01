@@ -9,6 +9,8 @@ import { CONTINENT_BY_ISO } from '@/lib/climate/editorial';
 import GroupAnomalyChart, { type MonthlyPoint } from './GroupAnomalyChart';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import GroupSummaryPanel from './GroupSummaryPanel';
+import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
+import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
 
@@ -266,9 +268,10 @@ function ExploreCard() {
 // ─── Continent renderer ────────────────────────────────────────────────────
 
 async function ContinentBody({ region }: { region: ClimateRegion }) {
-  const [history, members] = await Promise.all([
+  const [history, members, absolutes] = await Promise.all([
     readJson<GlobalHistory>('global-history.json'),
     loadMembersForRegion(region),
+    readJson<{ monthlyAll: { year: number; month: number; value: number }[] }>(`continent-absolutes/${region.slug}.json`),
   ]);
   if (!history) {
     return <Card icon={<AlertTriangle className="h-5 w-5" />} title="Data unavailable">
@@ -347,6 +350,18 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
           <GroupAnomalyChart data={monthly} showNative={!isAgg} />
         </Card>
       )}
+
+      {/* Spaghetti chart + seasonal-shift cards (member-country aggregate absolutes) */}
+      {absolutes?.monthlyAll?.length ? (
+        <>
+          <TemperatureSpaghettiChart
+            monthlyAll={absolutes.monthlyAll}
+            regionName={region.name}
+            dataSource={`4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`}
+          />
+          <SeasonalShiftCard monthlyAll={absolutes.monthlyAll} regionName={region.name} dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures." />
+        </>
+      ) : null}
 
       {/* Members */}
       {isAgg && row.members && row.members.length > 0 && (
@@ -510,6 +525,22 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
           <GroupAnomalyChart data={monthly} />
         </Card>
       )}
+
+      {/* Spaghetti chart + seasonal-shift card (NOAA regional tavg monthlyAll) */}
+      {tavg.monthlyAll?.length ? (
+        <>
+          <TemperatureSpaghettiChart
+            monthlyAll={tavg.monthlyAll}
+            regionName={region.name}
+            dataSource="NOAA Climate at a Glance — regional tavg (monthly absolute °C)."
+          />
+          <SeasonalShiftCard
+            monthlyAll={tavg.monthlyAll}
+            regionName={region.name}
+            dataSource="NOAA Climate at a Glance — regional tavg."
+          />
+        </>
+      ) : null}
 
       {/* Precipitation */}
       {pcp && pcp.latestMonthStats && (
