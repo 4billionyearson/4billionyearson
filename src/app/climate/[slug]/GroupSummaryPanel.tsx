@@ -1,0 +1,125 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Sparkles, Loader2 } from 'lucide-react';
+import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
+
+interface SummaryResponse {
+  summary: string | null;
+  sources?: { title: string; uri: string }[];
+  message?: string;
+  retryable?: boolean;
+  source?: string;
+}
+
+function highlightRankings(text: string): string {
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const sup = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|most|least';
+  const supNoMost = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|least';
+  const wordOrd = 'first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth';
+  const w = `(?:\\s+(?!on\\s+record|in\\s+\\d|of\\s+\\d+\\s*year|of\\s+\\d+[.,°]|at\\s+\\d|with\\s+\\d|averaging\\s)(?:[a-zA-Z][a-zA-Z'\\u2019-]*|\\d+[-\\u2013]\\w+))*`;
+  const rec = '(?:\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?))?';
+  const p1 = `(?:\\d+(?:st|nd|rd|th)|${wordOrd})\\s+(?:${sup})\\b${w}${rec}`;
+  const p2 = `the\\s+(?:${supNoMost})\\b${w}\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?)`;
+  const re = new RegExp(`\\b(?:${p1}|${p2})`, 'gi');
+  return escaped.replace(re, (m) => `<strong class="text-white">${m}</strong>`);
+}
+
+export default function GroupSummaryPanel({ slug, regionName }: { slug: string; regionName: string }) {
+  const [summary, setSummary] = useState<string | null>(null);
+  const [sources, setSources] = useState<{ title: string; uri: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryable, setRetryable] = useState(false);
+
+  const load = async (forceFresh = false) => {
+    setLoading(true);
+    setSummary(null);
+    setSources([]);
+    setError(null);
+    setRetryable(false);
+    try {
+      const url = `/api/climate/summary/${slug}?_t=${Date.now()}${forceFresh ? '&nocache=1' : ''}`;
+      const res = await fetch(url);
+      const payload: SummaryResponse | null = await res.json().catch(() => null);
+      if (payload?.summary) {
+        setSummary(payload.summary);
+        setSources(payload.sources || []);
+        return;
+      }
+      setError(payload?.message || 'The AI-generated update is temporarily unavailable.');
+      setRetryable(payload?.retryable ?? payload?.source !== 'no-key');
+    } catch {
+      setError('The AI-generated update could not be loaded right now.');
+      setRetryable(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { void load(); }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-3 py-4 text-sm text-gray-400">
+        <Loader2 className="h-4 w-4 animate-spin text-[#D0A65E]" />
+        <span>Generating {regionName} climate update…</span>
+      </div>
+    );
+  }
+
+  if (!summary) {
+    return (
+      <div className="rounded-xl border border-gray-800 bg-gray-900/40 p-4 text-sm text-gray-300">
+        <p className="mb-2">{error}</p>
+        {retryable ? (
+          <button
+            onClick={() => void load(true)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#D0A65E]/55 bg-[#D0A65E]/10 px-3 py-1 text-xs font-medium text-[#FFF5E7] hover:bg-[#D0A65E]/20"
+          >
+            Try again
+          </button>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full border border-[#D0A65E]/40 bg-[#D0A65E]/10 mb-3">
+        <Sparkles className="h-3 w-3 text-[#D0A65E]" />
+        <span className="text-[10px] font-bold uppercase tracking-wider text-[#D0A65E]">AI Climate Update</span>
+      </div>
+      <div className="text-gray-300 text-sm leading-relaxed space-y-3">
+        {summary.split('\n\n').map((para, i) => {
+          const trimmed = para.trim();
+          const headingMatch = trimmed.match(/^##\s+(.+?)(?:\n([\s\S]*))?$/);
+          if (headingMatch) {
+            const heading = relabelSummaryHeading(headingMatch[1].trim());
+            const body = (headingMatch[2] || '').trim();
+            return (
+              <div key={i} className="space-y-1.5">
+                <h3 className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#D0A65E]">{heading}</h3>
+                {body && <p>{renderWithDriverTooltips(body, highlightRankings)}</p>}
+              </div>
+            );
+          }
+          return <p key={i}>{renderWithDriverTooltips(trimmed, highlightRankings)}</p>;
+        })}
+      </div>
+      {sources.length > 0 && (
+        <div className="mt-3 pt-2 border-t border-gray-800">
+          <p className="text-gray-600 text-xs mb-1">Sources:</p>
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {sources.map((s, i) => (
+              <a key={i} href={s.uri} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-[#D0A65E] transition-colors">
+                {s.title} ↗
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+      <p className="text-gray-600 text-xs mt-2 italic">Generated by Gemini from climate data and web sources</p>
+    </div>
+  );
+}

@@ -8,6 +8,7 @@ import { ALL_LOCATIONS } from '@/lib/climate/locations';
 import { CONTINENT_BY_ISO } from '@/lib/climate/editorial';
 import GroupAnomalyChart, { type MonthlyPoint } from './GroupAnomalyChart';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
+import GroupSummaryPanel from './GroupSummaryPanel';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
 
@@ -627,6 +628,9 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
               </p>
             ) : null}
             <ClimateRankPill slug={region.slug} />
+            <div className="mt-4 pt-4 border-t border-gray-800/60">
+              <GroupSummaryPanel slug={region.slug} regionName={region.name} />
+            </div>
           </div>
         </div>
 

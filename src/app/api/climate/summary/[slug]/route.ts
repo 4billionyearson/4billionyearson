@@ -882,6 +882,100 @@ async function callGemini(
 
 // ─── Global prompt builder ─────────────────────────────────────────────────
 
+function buildGroupPrompt(region: ClimateRegion, groupData: any, rankings: any, ensoData: any): string {
+  const lines: string[] = [];
+  const isContinent = region.groupKind === 'continent';
+  const groupTypeLabel = isContinent ? 'continent' : 'NOAA US climate region';
+  const memberLabel = isContinent ? 'country' : 'US state';
+  const memberLabelPlural = isContinent ? 'countries' : 'US states';
+
+  lines.push(`You are a climate journalist writing the monthly Climate Update for the ${region.name} ${groupTypeLabel} for a general audience.`);
+  lines.push(`This page summarises temperature anomalies across the ${memberLabelPlural} that make up ${region.name}, plus how the group sits in a global context.`);
+  lines.push('');
+  lines.push('TASK: Write 3–4 short paragraphs (total 180–240 words) telling a compelling, data-driven narrative.');
+  lines.push('');
+  lines.push('STRUCTURE - organise the update using these short sub-headings, each on its own line prefixed with "## " exactly (two hashes and a space). Omit a section only if truly nothing to say.');
+  lines.push(`  ## This month in numbers  - lead with the latest 1-month anomaly for ${region.name} vs 1961–1990, the 3-month and 12-month figures, and how the group sits within the cross-region rankings.`);
+  lines.push(`  ## Hottest & coolest ${memberLabelPlural} - name 2–3 specific ${memberLabelPlural} from the MEMBER RANKINGS section that are running unusually warm, and 1 cool one if striking. Always link the bare path /climate/{slug} for any ${memberLabel} you name.`);
+  lines.push('  ## What\'s driving change? - the CURRENT ENSO state from the ENSO LIVE STATE section, any major climate events, and 1–2 relevant WARMING DRIVERS from the vocabulary below using the exact canonical term.');
+  lines.push('Each sub-heading must be on its own line, immediately followed by the paragraph below it. Separate paragraphs with a blank line.');
+  lines.push('');
+  lines.push('RULES:');
+  lines.push('- British English spelling throughout.');
+  lines.push('- Plain text only - no markdown emphasis (no **bold**, no *italics*), no bullet points, no headings except the sub-headings specified above.');
+  lines.push('- Use the EXACT values from the DATA section below. Do NOT invent figures.');
+  lines.push('- Use numeric ordinals (1st, 2nd, 3rd) rather than written-out words.');
+  lines.push('- No policy recommendations.');
+  lines.push(`- This page is a ${groupTypeLabel} update, not a national one - keep the lens on the ${memberLabelPlural} and the group as a whole.`);
+  lines.push('- CRITICAL: Ensure you complete your final sentence. Do not abruptly truncate.');
+  lines.push('');
+  lines.push(buildDriverVocabularySection());
+  lines.push('');
+  lines.push(`═══ ${region.name.toUpperCase()} GROUP DATA ═══`);
+  if (groupData) {
+    lines.push(`Latest 1-month anomaly (${groupData.label1m ?? 'latest month'}): ${groupData.anomaly1m != null ? `${groupData.anomaly1m > 0 ? '+' : ''}${groupData.anomaly1m.toFixed(2)}°C` : 'n/a'} vs 1961–1990`);
+    if (groupData.anomaly3m != null) lines.push(`Latest 3-month anomaly: ${groupData.anomaly3m > 0 ? '+' : ''}${groupData.anomaly3m.toFixed(2)}°C`);
+    if (groupData.anomaly12m != null) lines.push(`12-month rolling anomaly (${groupData.label12m ?? 'last 12 months'}): ${groupData.anomaly12m > 0 ? '+' : ''}${groupData.anomaly12m.toFixed(2)}°C`);
+    if (groupData.aggregate) {
+      lines.push(`NOTE: ${region.name} is a 4BYO aggregate of ${groupData.memberCount ?? 'multiple'} member country snapshots (NOAA does not publish a standalone series here). Member ISO codes: ${(groupData.members || []).join(', ')}.`);
+    } else if (groupData.sourceUrl) {
+      lines.push(`Source: NOAA Climate at a Glance (${groupData.sourceUrl}).`);
+    }
+  }
+
+  // Member rankings table
+  if (rankings?.rows?.length) {
+    const rows: RankingRow[] = rankings.rows;
+    const meta = new Map<string, { apiCode: string; type: ClimateRegion['type'] }>();
+    for (const r of CLIMATE_REGIONS) meta.set(r.slug, { apiCode: r.apiCode, type: r.type });
+    let members: RankingRow[] = [];
+    if (isContinent) {
+      const contNameByKey: Record<string, string> = {
+        africa: 'Africa', asia: 'Asia', europe: 'Europe', oceania: 'Oceania',
+        northAmerica: 'North America', southAmerica: 'South America',
+      };
+      const target = contNameByKey[region.groupKey ?? ''];
+      const slugToIso = new Map<string, string>();
+      for (const r of CLIMATE_REGIONS) if (r.type === 'country') slugToIso.set(r.slug, r.apiCode);
+      members = rows.filter((row) => {
+        if (row.type !== 'country') return false;
+        const iso = slugToIso.get(row.slug);
+        return iso != null && CONTINENT_BY_ISO[iso] === target;
+      });
+    } else {
+      const memberSet = new Set(region.memberSlugs ?? []);
+      members = rows.filter((row) => row.type === 'us-state' && memberSet.has(row.slug));
+    }
+    if (members.length) {
+      const valid = members.filter((m) => typeof m.anomaly1m === 'number');
+      const sorted = [...valid].sort((a, b) => (b.anomaly1m as number) - (a.anomaly1m as number));
+      lines.push('');
+      lines.push(`══ MEMBER RANKINGS — 1-month anomaly across ${members.length} ${memberLabelPlural} in ${region.name} ══`);
+      lines.push('Use these names + slugs in the "Hottest & coolest" paragraph; always include the bare path /climate/{slug} so the site auto-links.');
+      sorted.slice(0, 8).forEach((m, i) => {
+        const v = m.anomaly1m as number;
+        lines.push(`  ${i + 1}. ${m.name} (slug: ${m.slug}): ${v > 0 ? '+' : ''}${v.toFixed(2)}°C`);
+      });
+      if (sorted.length > 5) {
+        lines.push('  …');
+        sorted.slice(-3).reverse().forEach((m, i) => {
+          const v = m.anomaly1m as number;
+          lines.push(`  coolest ${i + 1}. ${m.name} (slug: ${m.slug}): ${v > 0 ? '+' : ''}${v.toFixed(2)}°C`);
+        });
+      }
+    }
+  }
+
+  // Reuse the same cross-region rankings + ENSO blocks as the country prompt
+  const ensoSection = buildEnsoSection(ensoData);
+  if (ensoSection) lines.push(ensoSection);
+
+  const rankingsSection = buildRankingsInsights(rankings, region.slug);
+  if (rankingsSection) lines.push(rankingsSection);
+
+  return lines.join('\n');
+}
+
 function buildGlobalPrompt(globalData: any, rankings: any, ensoData: any): string {
   const lines: string[] = [];
 
@@ -1129,6 +1223,82 @@ export async function GET(
         source: 'error',
         retryable: true,
         message: 'The AI-generated global climate update could not be loaded right now. You can try again.',
+      }, { status: 503 });
+    }
+  }
+
+  // ─── Group branch: continents and US climate regions ─────────────────────
+  if (region.type === 'group') {
+    const [globalHistory, regionalSnapshot, rankings, ensoData] = await Promise.all([
+      fetchJSON(`${base}/data/climate/global-history.json`),
+      region.groupKind === 'us-climate-region'
+        ? fetchJSON(`${base}/data/climate/us-climate-region/${slug}.json`)
+        : Promise.resolve(null),
+      fetchJSON(`${base}/data/climate/rankings.json`),
+      fetchJSON(`${base}/api/climate/enso`),
+    ]);
+
+    let groupData: any = null;
+    if (region.groupKind === 'continent') {
+      const list: any[] = Array.isArray(globalHistory?.aggregatedContinents)
+        ? globalHistory.aggregatedContinents
+        : [];
+      groupData = list.find((g: any) => g.key === region.groupKey) ?? null;
+      // Fall back to NOAA continentStats if aggregated entry missing
+      if (!groupData && Array.isArray(globalHistory?.continentStats)) {
+        groupData = globalHistory.continentStats.find(
+          (g: any) => g.key === region.groupKey || g.slug === region.slug,
+        ) ?? null;
+      }
+    } else if (region.groupKind === 'us-climate-region') {
+      // Derive shape compatible with the prompt builder
+      const m1 = regionalSnapshot?.latestMonthStats;
+      const m3 = regionalSnapshot?.latestThreeMonthStats;
+      groupData = m1
+        ? {
+            label1m: m1.label,
+            anomaly1m: m1.diff,
+            anomaly3m: m3?.diff ?? null,
+            anomaly12m: regionalSnapshot?.latestTwelveMonthStats?.diff ?? null,
+            label12m: regionalSnapshot?.latestTwelveMonthStats?.label ?? null,
+            aggregate: false,
+            sourceUrl: regionalSnapshot?.sourceUrl ?? null,
+          }
+        : null;
+    }
+
+    const prompt = buildGroupPrompt(region, groupData, rankings, ensoData);
+    try {
+      let result = await callGemini(apiKey, prompt, true);
+      if (!result.summary || summaryLooksIncomplete(result.summary)) {
+        result = await callGemini(apiKey, prompt, false);
+      }
+      if (!result.summary || summaryLooksIncomplete(result.summary)) {
+        return NextResponse.json({
+          summary: null,
+          sources: [],
+          generatedAt: new Date().toISOString(),
+          source: 'failed',
+          retryable: true,
+          message: `The AI-generated update for ${region.name} could not be produced just now. You can try again.`,
+        }, { status: 503 });
+      }
+      const cacheResult = {
+        summary: result.summary,
+        sources: result.sources,
+        generatedAt: new Date().toISOString(),
+      };
+      await setShortTerm(cacheKey, cacheResult);
+      return NextResponse.json({ ...cacheResult, source: 'fresh' });
+    } catch (err: any) {
+      console.error(`Gemini group summary error for ${slug}:`, err);
+      return NextResponse.json({
+        summary: null,
+        sources: [],
+        generatedAt: new Date().toISOString(),
+        source: 'error',
+        retryable: true,
+        message: `The AI-generated update for ${region.name} could not be loaded right now. You can try again.`,
       }, { status: 503 });
     }
   }
