@@ -766,7 +766,7 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
               {combinedTitle}
             </h1>
           </div>
-          <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
+          <div className="bg-gray-950/90 backdrop-blur-md px-4 pt-2 pb-3 md:px-6 md:pt-3 md:pb-4">
             {region.isAggregate ? (
               <p className="mb-3 text-xs text-amber-200/80 flex items-start gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />
