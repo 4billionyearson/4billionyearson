@@ -230,7 +230,7 @@ export default function EmissionsPage() {
             className="relative z-20 rounded-2xl border-2 border-[#D0A65E] shadow-xl"
             style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 76px, transparent 76px)' }}
           >
-            <div className="px-4 py-3 md:px-6 md:py-4">
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 CO₂ Emissions
               </h1>
@@ -260,6 +260,9 @@ export default function EmissionsPage() {
 
           {data && (
             <>
+              {/* ─── Global Data divider ──────────────────────────── */}
+              <Divider icon={<Globe className="w-5 h-5" />} title="Global Data" />
+
               {/* ─── Stat Cards ───────────────────────────────────── */}
               <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
                 <div className="flex items-center gap-2 mb-4">

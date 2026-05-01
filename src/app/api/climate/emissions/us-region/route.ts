@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
-import { CURATED_CLIMATE_REGIONS, type ClimateRegion } from '@/lib/climate/regions';
+import { CLIMATE_REGIONS, type ClimateRegion } from '@/lib/climate/regions';
 
 export const maxDuration = 60;
 
@@ -69,7 +69,7 @@ function regionMemberStateCodes(region: ClimateRegion): string[] {
   if (!region.memberSlugs) return [];
   const codes: string[] = [];
   for (const slug of region.memberSlugs) {
-    const member = CURATED_CLIMATE_REGIONS.find((r) => r.slug === slug);
+    const member = CLIMATE_REGIONS.find((r) => r.slug === slug);
     if (!member || member.type !== 'us-state') continue;
     // apiCode is `us-xx` (lowercase)
     const m = member.apiCode.match(/^us-([a-z]{2})$/i);
@@ -127,7 +127,7 @@ function aggregateRows(
 }
 
 async function buildIndex(): Promise<RegionIndex> {
-  const usRegions = CURATED_CLIMATE_REGIONS.filter(
+  const usRegions = CLIMATE_REGIONS.filter(
     (r) => r.type === 'group' && r.groupKind === 'us-climate-region',
   );
 
