@@ -12,7 +12,8 @@ import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-c
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
-import { OverviewGrid, buildOverviewRow, type OverviewPanel, type OverviewRow } from '@/app/climate/_shared/overview-grid';
+import { OverviewGrid } from '@/app/climate/_shared/overview-grid';
+import { buildOverviewRow, type OverviewPanel, type OverviewRow } from '@/app/climate/_shared/overview-grid-types';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
 
