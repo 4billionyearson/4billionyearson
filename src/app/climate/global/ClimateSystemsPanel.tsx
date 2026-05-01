@@ -575,37 +575,64 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
 interface ContinentStat {
   key: string;
   label: string;
-  latest: { year: number; month: number; anomaly: number } | null;
+  // Rich shape (current build)
+  latestMonth?: { year: number; month: number; anomaly: number } | null;
+  anomaly1m?: number | null;
+  nativeAnomaly1m?: number | null;
+  // Legacy shape (kept until the next global-history.json is regenerated)
+  latest?: { year: number; month: number; anomaly: number } | null;
 }
 
 export function ContinentalBar({ continents }: { continents: ContinentStat[] | null }) {
   if (!continents?.length) return null;
-  const rows = continents
-    .filter((c) => c.latest && Number.isFinite(c.latest.anomaly))
-    .map((c) => ({ label: c.label, anom: c.latest!.anomaly, year: c.latest!.year, month: c.latest!.month }))
+  // Resolve from new or legacy shape so the panel keeps rendering across
+  // a build transition.
+  const resolved = continents
+    .map((c) => {
+      const lm = c.latestMonth ?? c.latest ?? null;
+      if (!lm || !Number.isFinite(lm.anomaly)) return null;
+      const nativeAnom = typeof c.nativeAnomaly1m === 'number' ? c.nativeAnomaly1m : lm.anomaly;
+      const compAnom = typeof c.anomaly1m === 'number' ? c.anomaly1m : null;
+      return {
+        label: c.label,
+        nativeAnom,
+        compAnom,
+        anom: compAnom ?? nativeAnom,
+        year: lm.year,
+        month: lm.month,
+      };
+    })
+    .filter((r): r is NonNullable<typeof r> => r !== null)
     .sort((a, b) => b.anom - a.anom);
-  if (!rows.length) return null;
-  const latest = rows[0];
+  if (!resolved.length) return null;
+  const latest = resolved[0];
+  const usingComparison = resolved.some((r) => r.compAnom != null);
   return (
     <Tile>
       <TileHeader
         icon={<Waves className="h-5 w-5 text-orange-300" />}
         title="Continental Land Anomalies - Latest Month"
-        subtitle={`${MONTH_NAMES[latest.month]} ${latest.year} vs 1901–2000 average (NOAA, land only)`}
+        subtitle={`${MONTH_NAMES[latest.month]} ${latest.year} · bars vs ${usingComparison ? '1961–1990' : '1901–2000'} (NOAA, land only)`}
       />
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={rows} layout="vertical" margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+          <BarChart data={resolved} layout="vertical" margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" horizontal={false} />
             <XAxis type="number" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}°C`} />
             <YAxis type="category" dataKey="label" stroke="#9CA3AF" fontSize={11} width={150} />
             <Tooltip
               contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12 }}
-              formatter={(v: any) => [typeof v === 'number' ? `${v > 0 ? '+' : ''}${v.toFixed(2)}°C` : '—', 'Anomaly']}
+              formatter={(v: any, _name: any, ctx: any) => {
+                const n = typeof v === 'number' ? `${v > 0 ? '+' : ''}${v.toFixed(2)}°C` : '—';
+                const r = ctx?.payload;
+                if (!r) return [n, 'Anomaly'];
+                const native = typeof r.nativeAnom === 'number' ? `${r.nativeAnom > 0 ? '+' : ''}${r.nativeAnom.toFixed(2)}°C` : '—';
+                return [n, usingComparison ? `vs 1961–1990 (NOAA-native ${native} vs 1901–2000)` : 'vs 1901–2000 (NOAA-native)'];
+              }}
             />
             <ReferenceLine x={0} stroke="#6B7280" />
             <Bar dataKey="anom" isAnimationActive={false}>
-              {rows.map((p, i) => (
+              {resolved.map((p, i) => (
                 <Cell key={i} fill={p.anom > 0 ? '#fb923c' : '#60a5fa'} />
               ))}
             </Bar>
@@ -613,7 +640,7 @@ export function ContinentalBar({ continents }: { continents: ContinentStat[] | n
         </ResponsiveContainer>
       </div>
       <p className="text-[11px] text-gray-400 mt-2">
-        Ranked warmest to coolest for the most recent complete month. Each bar shows the continent&apos;s land-surface temperature anomaly relative to its 20th-century average.
+        Ranked warmest to coolest for the most recent complete month. Bars use the {usingComparison ? '1961–1990 baseline shared across the site' : 'NOAA-native 1901–2000 baseline'}; hover to see both figures.
       </p>
       <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;

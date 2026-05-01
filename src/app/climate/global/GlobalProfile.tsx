@@ -95,7 +95,20 @@ interface GlobalData {
     totalYearsInMonth: number;
     recent60: { year: number; month: number; extent: number }[];
   } | null;
-  continentStats?: { key: string; label: string; latest: { year: number; month: number; anomaly: number } | null }[] | null;
+  continentStats?: Array<{
+    key: string;
+    label: string;
+    // New rich shape from build-global-snapshot.
+    latestMonth?: { year: number; month: number; anomaly: number } | null;
+    nativeBaseline?: string | null;
+    comparisonBaseline?: string | null;
+    anomaly1m?: number | null;
+    nativeAnomaly1m?: number | null;
+    label1m?: string | null;
+    sourceUrl?: string | null;
+    // Legacy shape kept for forward-compat until the next build runs.
+    latest?: { year: number; month: number; anomaly: number } | null;
+  }> | null;
   countryAnomalies?: {
     iso3: string;
     name: string;

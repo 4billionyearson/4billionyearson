@@ -6,6 +6,7 @@ import { Trophy, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Info } 
 import RankingsTable from './RankingsTable';
 import RankingsAnalysis from './RankingsAnalysis';
 import RollupsSection from './RollupsSection';
+import BaselineExplainer from '../_components/BaselineExplainer';
 import AnomalyMapCard, { type CountryAnomalyRow } from '../global/AnomalyMapCard';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
@@ -47,11 +48,33 @@ interface RankingRow {
   dataAsOf: string | null;
 }
 
+interface GroupRow {
+  key: string;
+  slug: string;
+  label: string;
+  kind: 'continent' | 'us-climate-region';
+  memberCount: number | null;
+  anomaly1m: number | null;
+  anomaly3m: number | null;
+  anomaly12m: number | null;
+  latestLabel: string | null;
+  nativeAnomaly1m: number | null;
+  nativeAnomaly12m: number | null;
+  nativeBaseline: string | null;
+  sourceUrl: string | null;
+  note: string | null;
+  aggregate: boolean;
+}
+
 interface RankingsResponse {
   generatedAt: string;
   cacheMonth: string;
   count: number;
   rows: RankingRow[];
+  groups?: {
+    continents: GroupRow[];
+    usClimateRegions: GroupRow[];
+  };
 }
 
 async function loadRankings(): Promise<RankingsResponse | null> {
@@ -140,6 +163,8 @@ interface RollupGroup {
   label: string;
   count: number;
   means: { anomaly1m: number | null; anomaly3m: number | null; anomaly12m: number | null };
+  note?: string | null;
+  aggregate?: boolean;
 }
 
 function meanOrNull(nums: (number | null)[]): number | null {
@@ -223,6 +248,22 @@ export default async function RankingsPage() {
   const latestLabel = sorted1m[0]?.latestLabel ?? '';
 
   const rollups = buildRollups(data.rows);
+
+  // Prefer NOAA-authoritative groups from build-rankings when present;
+  // fall back to the sample-mean rollups computed from the row table.
+  const groupRowToRollup = (g: GroupRow): RollupGroup => ({
+    label: g.label,
+    count: g.memberCount ?? 0,
+    means: { anomaly1m: g.anomaly1m, anomaly3m: g.anomaly3m, anomaly12m: g.anomaly12m },
+    note: g.note,
+    aggregate: g.aggregate,
+  });
+  const continentsForCard: RollupGroup[] = data.groups?.continents?.length
+    ? data.groups.continents.map(groupRowToRollup)
+    : rollups.continents;
+  const usRegionsForCard: RollupGroup[] = data.groups?.usClimateRegions?.length
+    ? data.groups.usClimateRegions.map(groupRowToRollup)
+    : rollups.usRegions;
   const movers = computeMovers(data, previous);
 
   return (
@@ -343,10 +384,13 @@ export default async function RankingsPage() {
 
           {/* Continent & region roll-ups */}
           <RollupsSection
-            continents={rollups.continents}
-            usRegions={rollups.usRegions}
+            continents={continentsForCard}
+            usRegions={usRegionsForCard}
             types={rollups.types}
           />
+
+          {/* Baseline disclosure shown alongside roll-ups */}
+          <BaselineExplainer variant="compact" />
 
           {/* Temperature anomaly map - geographic view of the same rankings */}
           {countryAnomalies && <AnomalyMapCard countryAnomalies={countryAnomalies} />}
@@ -357,7 +401,14 @@ export default async function RankingsPage() {
               <Trophy className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
               <span className="min-w-0 flex-1">Full League Table</span>
             </h2>
-            <RankingsTable rows={data.rows} generatedAt={data.generatedAt} />
+            <RankingsTable
+              rows={data.rows}
+              generatedAt={data.generatedAt}
+              groups={[
+                ...(data.groups?.continents ?? []),
+                ...(data.groups?.usClimateRegions ?? []),
+              ]}
+            />
           </section>
 
           {/* Footer */}

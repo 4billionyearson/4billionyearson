@@ -47,11 +47,36 @@ interface RankingRow {
   dataAsOf: string | null;
 }
 
+interface GroupRow {
+  key: string;
+  slug: string;
+  label: string;
+  kind: 'continent' | 'us-climate-region';
+  memberCount: number | null;
+  anomaly1m: number | null;
+  anomaly3m: number | null;
+  anomaly12m: number | null;
+  latestLabel: string | null;
+  // NOAA-native (source-native) anomalies for verification
+  nativeAnomaly1m: number | null;
+  nativeAnomaly12m: number | null;
+  nativeBaseline: string | null;
+  sourceUrl: string | null;
+  note: string | null;
+  aggregate: boolean;
+}
+
+interface RankingsGroups {
+  continents: GroupRow[];
+  usClimateRegions: GroupRow[];
+}
+
 interface RankingsResponse {
   generatedAt: string;
   cacheMonth: string;
   count: number;
   rows: RankingRow[];
+  groups?: RankingsGroups;
 }
 
 function round2(value: number): number {
@@ -159,6 +184,145 @@ function extractRow(region: ClimateRegion, data: any): RankingRow | null {
   };
 }
 
+// ----------------------------------------------------------------------
+// Groups (NOAA continents + NOAA US climate regions). These come from
+// global-history.json (continents) and the per-region us-climate-region
+// snapshots produced by build-us-climate-regions.mjs.
+// ----------------------------------------------------------------------
+
+const CONTINENT_DISPLAY_ORDER = [
+  'North America',
+  'South America',
+  'Europe',
+  'Asia',
+  'Africa',
+  'Oceania',
+  'Antarctica',
+];
+
+const US_CLIMATE_REGION_FILES: Array<{ slug: string; label: string }> = [
+  { slug: 'us-northeast', label: 'Northeast' },
+  { slug: 'us-upper-midwest', label: 'Upper Midwest' },
+  { slug: 'us-ohio-valley', label: 'Ohio Valley' },
+  { slug: 'us-southeast', label: 'Southeast' },
+  { slug: 'us-northern-rockies-plains', label: 'Northern Rockies and Plains' },
+  { slug: 'us-south', label: 'South' },
+  { slug: 'us-southwest', label: 'Southwest' },
+  { slug: 'us-northwest', label: 'Northwest' },
+  { slug: 'us-west', label: 'West' },
+];
+
+async function buildContinentGroups(): Promise<GroupRow[]> {
+  let global: any = null;
+  try {
+    const raw = await readFile(resolve(SNAPSHOT_ROOT, 'global-history.json'), 'utf8');
+    global = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  const continentStats: any[] = Array.isArray(global?.continentStats) ? global.continentStats : [];
+  const aggregated: any[] = Array.isArray(global?.aggregatedContinents) ? global.aggregatedContinents : [];
+
+  const rows: GroupRow[] = [];
+
+  for (const c of continentStats) {
+    if (!c?.label) continue;
+    // Skip hemispheres (we want continents only in this group panel).
+    if (c.key === 'northernHemisphere' || c.key === 'southernHemisphere') continue;
+    rows.push({
+      key: c.key ?? c.label,
+      slug: c.key ?? String(c.label).toLowerCase().replace(/\s+/g, '-'),
+      label: c.label,
+      kind: 'continent',
+      memberCount: null,
+      anomaly1m: typeof c.anomaly1m === 'number' ? round2(c.anomaly1m) : null,
+      anomaly3m: typeof c.anomaly3m === 'number' ? round2(c.anomaly3m) : null,
+      anomaly12m: typeof c.anomaly12m === 'number' ? round2(c.anomaly12m) : null,
+      latestLabel: c.label1m ?? c.latestMonth ?? null,
+      nativeAnomaly1m: typeof c.nativeAnomaly1m === 'number' ? round2(c.nativeAnomaly1m) : null,
+      nativeAnomaly12m: typeof c.nativeAnomaly12m === 'number' ? round2(c.nativeAnomaly12m) : null,
+      nativeBaseline: c.nativeBaseline ?? '1901-2000',
+      sourceUrl: c.sourceUrl ?? null,
+      note: null,
+      aggregate: false,
+    });
+  }
+
+  for (const c of aggregated) {
+    if (!c?.label) continue;
+    rows.push({
+      key: c.key ?? c.label,
+      slug: c.key ?? String(c.label).toLowerCase().replace(/\s+/g, '-'),
+      label: c.label,
+      kind: 'continent',
+      memberCount: typeof c.memberCount === 'number' ? c.memberCount : null,
+      anomaly1m: typeof c.anomaly1m === 'number' ? round2(c.anomaly1m) : null,
+      anomaly3m: typeof c.anomaly3m === 'number' ? round2(c.anomaly3m) : null,
+      anomaly12m: typeof c.anomaly12m === 'number' ? round2(c.anomaly12m) : null,
+      latestLabel: c.label1m ?? c.latestMonth ?? null,
+      nativeAnomaly1m: typeof c.nativeAnomaly1m === 'number' ? round2(c.nativeAnomaly1m) : null,
+      nativeAnomaly12m: typeof c.nativeAnomaly12m === 'number' ? round2(c.nativeAnomaly12m) : null,
+      nativeBaseline: null,
+      sourceUrl: null,
+      note: c.note ?? '4BYO aggregate (NOAA does not publish a standalone continental land series for this region)',
+      aggregate: true,
+    });
+  }
+
+  rows.sort((a, b) => CONTINENT_DISPLAY_ORDER.indexOf(a.label) - CONTINENT_DISPLAY_ORDER.indexOf(b.label));
+  return rows;
+}
+
+function toMonthlyPoints(arr: any): MonthlyPoint[] {
+  if (!Array.isArray(arr)) return [];
+  return arr.filter((p) => p && typeof p.year === 'number' && typeof p.month === 'number');
+}
+
+async function buildUsClimateRegionGroups(): Promise<GroupRow[]> {
+  const out: GroupRow[] = [];
+  for (const r of US_CLIMATE_REGION_FILES) {
+    let snap: any = null;
+    try {
+      const raw = await readFile(resolve(SNAPSHOT_ROOT, 'us-climate-region', `${r.slug}.json`), 'utf8');
+      snap = JSON.parse(raw);
+    } catch {
+      continue;
+    }
+    const tavg = snap?.paramData?.tavg;
+    if (!tavg) continue;
+    const points = toMonthlyPoints(tavg.monthlyAll);
+    const anomaly1m = typeof tavg.latestMonthStats?.diff === 'number' ? round2(tavg.latestMonthStats.diff) : null;
+    const anomaly3m = typeof tavg.latestThreeMonthStats?.diff === 'number' ? round2(tavg.latestThreeMonthStats.diff) : null;
+    const anomaly12m = compute12MonthAnomaly(points);
+    out.push({
+      key: r.slug,
+      slug: r.slug,
+      label: r.label,
+      kind: 'us-climate-region',
+      memberCount: null,
+      anomaly1m,
+      anomaly3m,
+      anomaly12m,
+      latestLabel: tavg.latestMonthStats?.label ?? null,
+      nativeAnomaly1m: typeof tavg.nativeStats?.nativeDiff === 'number' ? round2(tavg.nativeStats.nativeDiff) : null,
+      nativeAnomaly12m: typeof tavg.nativeStats?.nativeDiff12m === 'number' ? round2(tavg.nativeStats.nativeDiff12m) : null,
+      nativeBaseline: tavg.nativeStats?.baseline ?? '1901-2000',
+      sourceUrl: snap?.sourceUrl ?? null,
+      note: null,
+      aggregate: false,
+    });
+  }
+  return out;
+}
+
+async function buildGroups(): Promise<RankingsGroups> {
+  const [continents, usClimateRegions] = await Promise.all([
+    buildContinentGroups(),
+    buildUsClimateRegionGroups(),
+  ]);
+  return { continents, usClimateRegions };
+}
+
 async function main() {
   const regions = CLIMATE_REGIONS.filter((r) => r.type !== 'special');
   console.log(`Building rankings for ${regions.length} regions…`);
@@ -174,6 +338,8 @@ async function main() {
     else missing++;
   }
 
+  const groups = await buildGroups();
+
   const now = new Date();
   const cacheMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const response: RankingsResponse = {
@@ -181,6 +347,7 @@ async function main() {
     cacheMonth,
     count: rows.length,
     rows,
+    groups,
   };
 
   // Preserve the previous snapshot so the "biggest movers" card can compute

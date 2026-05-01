@@ -42,8 +42,18 @@ function groupFor(region: ClimateRegion, mode: 'country' | 'us-state'): string |
   return null;
 }
 
-const CONTINENT_ORDER: Continent[] = ['Americas', 'Europe', 'Asia', 'Africa', 'Oceania'];
-const US_REGION_ORDER: USRegion[] = ['Northeast', 'Midwest', 'South', 'West'];
+const CONTINENT_ORDER: Continent[] = ['North America', 'South America', 'Europe', 'Asia', 'Africa', 'Oceania', 'Antarctica'];
+const US_REGION_ORDER: USRegion[] = [
+  'Northeast',
+  'Upper Midwest',
+  'Ohio Valley',
+  'Southeast',
+  'South',
+  'Northern Rockies and Plains',
+  'Southwest',
+  'Northwest',
+  'West',
+];
 
 // ─── Region card ─────────────────────────────────────────────────────────────
 

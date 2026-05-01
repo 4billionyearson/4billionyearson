@@ -366,10 +366,28 @@ export function buildStubCopy(
 }
 
 // ─── Groupings used by the regions browser filters ──────────────────────────
+//
+// Continents follow NOAA's 7-continent split (matches NOAA Climate at a
+// Glance continental land series) — i.e. North America and South America
+// are reported separately, not lumped into "Americas". Antarctica is
+// included for completeness but currently has no countries we cover.
+//
+// US sub-national groupings use NOAA's 9 Climate Regions (codes 101–109
+// at https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/regional)
+// rather than the 4 US Census regions, so the rollups align with the
+// authoritative NOAA continental & regional series surfaced elsewhere on
+// the site.
 
-export type Continent = 'Africa' | 'Americas' | 'Asia' | 'Europe' | 'Oceania';
+export type Continent =
+  | 'Africa'
+  | 'Asia'
+  | 'Europe'
+  | 'North America'
+  | 'South America'
+  | 'Oceania'
+  | 'Antarctica';
 
-/** Country ISO alpha-3 → continent. Covers every country in locations.ts. */
+/** Country ISO alpha-3 → continent (NOAA 7-continent split). */
 export const CONTINENT_BY_ISO: Record<string, Continent> = {
   // Europe
   GBR: 'Europe', FRA: 'Europe', DEU: 'Europe', ITA: 'Europe', ESP: 'Europe',
@@ -377,11 +395,13 @@ export const CONTINENT_BY_ISO: Record<string, Continent> = {
   DNK: 'Europe', FIN: 'Europe', IRL: 'Europe', PRT: 'Europe', GRC: 'Europe',
   AUT: 'Europe', CHE: 'Europe', UKR: 'Europe', ROU: 'Europe', HUN: 'Europe',
   CZE: 'Europe', CYP: 'Europe', ISL: 'Europe',
-  // Americas
-  USA: 'Americas', CAN: 'Americas', MEX: 'Americas', BRA: 'Americas',
-  ARG: 'Americas', CHL: 'Americas', COL: 'Americas', PER: 'Americas',
-  BOL: 'Americas', CRI: 'Americas', GUY: 'Americas', NIC: 'Americas',
-  SUR: 'Americas', JAM: 'Americas',
+  // North America (incl. Central America & the Caribbean)
+  USA: 'North America', CAN: 'North America', MEX: 'North America',
+  CRI: 'North America', NIC: 'North America', JAM: 'North America',
+  // South America
+  BRA: 'South America', ARG: 'South America', CHL: 'South America',
+  COL: 'South America', PER: 'South America', BOL: 'South America',
+  GUY: 'South America', SUR: 'South America',
   // Asia
   JPN: 'Asia', KOR: 'Asia', PRK: 'Asia', IND: 'Asia', CHN: 'Asia',
   IDN: 'Asia', MYS: 'Asia', PHL: 'Asia', THA: 'Asia', VNM: 'Asia',
@@ -396,42 +416,96 @@ export const CONTINENT_BY_ISO: Record<string, Continent> = {
   AUS: 'Oceania', NZL: 'Oceania',
 };
 
-export type USRegion = 'Northeast' | 'Midwest' | 'South' | 'West';
+/**
+ * NOAA's 9 US Climate Regions. These are the authoritative groupings
+ * used by NCEI for monthly state-of-the-climate reporting (codes 101-109
+ * at climate-at-a-glance/regional/time-series/{code}/...).
+ *
+ * Alaska and Hawaii are intentionally excluded — NOAA reports them as
+ * standalone series outside the contiguous-US 9-region system.
+ */
+export type USClimateRegion =
+  | 'Northeast'
+  | 'Upper Midwest'
+  | 'Ohio Valley'
+  | 'Southeast'
+  | 'South'
+  | 'Northern Rockies and Plains'
+  | 'Southwest'
+  | 'Northwest'
+  | 'West';
 
-/** US Census Bureau regional groupings, keyed by location ID (us-xx). */
-export const US_REGION_BY_ID: Record<string, USRegion> = {
-  // Northeast
-  'us-ct': 'Northeast', 'us-me': 'Northeast', 'us-ma': 'Northeast',
-  'us-nh': 'Northeast', 'us-ri': 'Northeast', 'us-vt': 'Northeast',
-  'us-nj': 'Northeast', 'us-ny': 'Northeast', 'us-pa': 'Northeast',
-  // Midwest
-  'us-il': 'Midwest', 'us-in': 'Midwest', 'us-mi': 'Midwest',
-  'us-oh': 'Midwest', 'us-wi': 'Midwest', 'us-ia': 'Midwest',
-  'us-ks': 'Midwest', 'us-mn': 'Midwest', 'us-mo': 'Midwest',
-  'us-ne': 'Midwest', 'us-nd': 'Midwest', 'us-sd': 'Midwest',
-  // South
-  'us-de': 'South', 'us-fl': 'South', 'us-ga': 'South',
-  'us-md': 'South', 'us-nc': 'South', 'us-sc': 'South',
-  'us-va': 'South', 'us-wv': 'South', 'us-al': 'South',
-  'us-ky': 'South', 'us-ms': 'South', 'us-tn': 'South',
-  'us-ar': 'South', 'us-la': 'South', 'us-ok': 'South',
-  'us-tx': 'South',
-  // West
-  'us-az': 'West', 'us-co': 'West', 'us-id': 'West',
-  'us-mt': 'West', 'us-nv': 'West', 'us-nm': 'West',
-  'us-ut': 'West', 'us-wy': 'West', 'us-ak': 'West',
-  'us-ca': 'West', 'us-hi': 'West', 'us-or': 'West',
-  'us-wa': 'West',
+/** Numeric NOAA region code (101–109) for each climate region. */
+export const US_CLIMATE_REGION_CODE: Record<USClimateRegion, number> = {
+  'Northeast': 101,
+  'Upper Midwest': 102,
+  'Ohio Valley': 103,
+  'Southeast': 104,
+  'Northern Rockies and Plains': 105,
+  'South': 106,
+  'Southwest': 107,
+  'Northwest': 108,
+  'West': 109,
 };
+
+/** Stable URL slug used for /climate/{region} routes and JSON filenames. */
+export const US_CLIMATE_REGION_SLUG: Record<USClimateRegion, string> = {
+  'Northeast': 'us-northeast',
+  'Upper Midwest': 'us-upper-midwest',
+  'Ohio Valley': 'us-ohio-valley',
+  'Southeast': 'us-southeast',
+  'Northern Rockies and Plains': 'us-northern-rockies-plains',
+  'South': 'us-south',
+  'Southwest': 'us-southwest',
+  'Northwest': 'us-northwest',
+  'West': 'us-west',
+};
+
+/** State location-ID (us-xx) → NOAA climate region (contiguous US only). */
+export const US_REGION_BY_ID: Record<string, USClimateRegion> = {
+  // Northeast (101)
+  'us-ct': 'Northeast', 'us-de': 'Northeast', 'us-me': 'Northeast',
+  'us-md': 'Northeast', 'us-ma': 'Northeast', 'us-nh': 'Northeast',
+  'us-nj': 'Northeast', 'us-ny': 'Northeast', 'us-pa': 'Northeast',
+  'us-ri': 'Northeast', 'us-vt': 'Northeast',
+  // Upper Midwest (102)
+  'us-ia': 'Upper Midwest', 'us-mi': 'Upper Midwest',
+  'us-mn': 'Upper Midwest', 'us-wi': 'Upper Midwest',
+  // Ohio Valley / Central (103)
+  'us-il': 'Ohio Valley', 'us-in': 'Ohio Valley', 'us-ky': 'Ohio Valley',
+  'us-mo': 'Ohio Valley', 'us-oh': 'Ohio Valley', 'us-tn': 'Ohio Valley',
+  'us-wv': 'Ohio Valley',
+  // Southeast (104)
+  'us-al': 'Southeast', 'us-fl': 'Southeast', 'us-ga': 'Southeast',
+  'us-nc': 'Southeast', 'us-sc': 'Southeast', 'us-va': 'Southeast',
+  // Northern Rockies and Plains (105)
+  'us-mt': 'Northern Rockies and Plains', 'us-ne': 'Northern Rockies and Plains',
+  'us-nd': 'Northern Rockies and Plains', 'us-sd': 'Northern Rockies and Plains',
+  'us-wy': 'Northern Rockies and Plains',
+  // South (106)
+  'us-ar': 'South', 'us-ks': 'South', 'us-la': 'South',
+  'us-ms': 'South', 'us-ok': 'South', 'us-tx': 'South',
+  // Southwest (107)
+  'us-az': 'Southwest', 'us-co': 'Southwest',
+  'us-nm': 'Southwest', 'us-ut': 'Southwest',
+  // Northwest (108)
+  'us-id': 'Northwest', 'us-or': 'Northwest', 'us-wa': 'Northwest',
+  // West (109)
+  'us-ca': 'West', 'us-nv': 'West',
+  // Alaska and Hawaii: not in NOAA's 9 climate regions — left unbucketed.
+};
+
+/** Backwards-compatible alias for older imports. */
+export type USRegion = USClimateRegion;
 
 /**
  * Reverse lookup: apiCode (for countries this is the owid ISO code; for
- * US states this is the us-xx id) to continent / us-region.
+ * US states this is the us-xx id) to continent / us-climate-region.
  */
 export function continentForCountryApiCode(apiCode: string): Continent | null {
   return CONTINENT_BY_ISO[apiCode] ?? null;
 }
 
-export function usRegionForStateApiCode(apiCode: string): USRegion | null {
+export function usRegionForStateApiCode(apiCode: string): USClimateRegion | null {
   return US_REGION_BY_ID[apiCode] ?? null;
 }

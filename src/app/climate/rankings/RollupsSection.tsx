@@ -9,6 +9,10 @@ export interface RollupGroup {
   label: string;
   count: number;
   means: { anomaly1m: number | null; anomaly3m: number | null; anomaly12m: number | null };
+  /** Optional note shown as a tooltip/footnote (e.g. for 4BYO aggregates). */
+  note?: string | null;
+  /** True when the row is a 4BYO aggregate rather than a NOAA-native series. */
+  aggregate?: boolean;
 }
 
 function fmtSigned(v: number | null): string {
@@ -51,7 +55,18 @@ function RollupCard({ title, groups, windowKey }: { title: string; groups: Rollu
             <div key={g.label} className="text-xs">
               <div className="flex items-baseline justify-between mb-1">
                 <span className="font-semibold text-gray-200">
-                  {g.label} <span className="text-gray-500 font-normal">({g.count})</span>
+                  {g.label}{' '}
+                  {g.count > 0 && (
+                    <span className="text-gray-500 font-normal">({g.count})</span>
+                  )}
+                  {g.aggregate && (
+                    <span
+                      className="ml-1 text-[10px] uppercase tracking-wide text-gray-500"
+                      title={g.note ?? '4BYO aggregate'}
+                    >
+                      · agg
+                    </span>
+                  )}
                 </span>
                 <span className="font-mono text-gray-200">{fmtSigned(v)}</span>
               </div>
@@ -109,7 +124,7 @@ export default function RollupsSection({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <RollupCard title="By continent" groups={continents} windowKey={windowKey} />
-        <RollupCard title="By US Census region" groups={usRegions} windowKey={windowKey} />
+        <RollupCard title="By US climate region" groups={usRegions} windowKey={windowKey} />
         <RollupCard title="By region type" groups={types} windowKey={windowKey} />
       </div>
     </section>

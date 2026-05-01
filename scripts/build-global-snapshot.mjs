@@ -62,12 +62,24 @@ const NSIDC_HEMISPHERE_URL = (hemisphere /* 'north' | 'south' */, mm /* 1..12 */
 
 // NOAA continental / hemispheric anomalies (file-slug matches NOAA's own URL
 // scheme: full region names, not ISO codes).
+//
+// As of 2026-04, NOAA Climate at a Glance publishes continental land-mean
+// anomalies for Africa, Asia, Europe and Oceania, plus the Northern and
+// Southern Hemispheres. North America, South America and Antarctica are
+// not exposed individually — for those we synthesise an area-weighted
+// mean from the country snapshots already on disk and label them
+// "4BYO aggregate" with a footnote on the rollups card. NOAA's continental
+// anomalies are reported against the 1901–2000 base period.
+const NOAA_CONTINENT_BASELINE = '1901-2000';
+const NOAA_CONTINENT_SOURCE_URL = 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global';
+
 const NOAA_CONTINENTS = [
   { key: 'northernHemisphere', label: 'Northern Hemisphere', url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/nhem/land/1/0/1950-2026.json' },
   { key: 'southernHemisphere', label: 'Southern Hemisphere', url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/shem/land/1/0/1950-2026.json' },
-  { key: 'europe', label: 'Europe', url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/europe/land/1/0/1950-2026.json' },
-  { key: 'asia', label: 'Asia', url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/asia/land/1/0/1950-2026.json' },
   { key: 'africa', label: 'Africa', url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/africa/land/1/0/1950-2026.json' },
+  { key: 'asia', label: 'Asia', url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/asia/land/1/0/1950-2026.json' },
+  { key: 'europe', label: 'Europe', url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/europe/land/1/0/1950-2026.json' },
+  { key: 'oceania', label: 'Oceania', url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/oceania/land/1/0/1950-2026.json' },
 ];
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -541,25 +553,157 @@ function parseGlobalSeaIce(json) {
 // Continental anomalies — reuse parseNoaa from the existing builder
 // (defined earlier in the file) and return a compact ranking block.
 
+// Build a richer continental block: full monthly anomaly history (against
+// NOAA's native 1901–2000 base period) plus 1-month, 3-month and 12-month
+// anomalies rebased to the site-wide 1961–1990 comparison baseline. Both
+// values are kept so the UI can show the verification figure alongside
+// the comparison figure used in rankings/roll-ups.
+function rebaseToComparison(monthly, anomalyAt /* fn(point) → number */) {
+  // Compute the mean NOAA-native anomaly per calendar month over 1961–1990.
+  // Subtracting that mean from any later anomaly yields the same value
+  // re-expressed against a 1961–1990 baseline.
+  const byMonth = {};
+  for (const p of monthly) {
+    if (p.year < 1961 || p.year > 1990) continue;
+    (byMonth[p.month] ||= []).push(anomalyAt(p));
+  }
+  const meanByMonth = {};
+  for (const m of Object.keys(byMonth)) {
+    const arr = byMonth[m];
+    meanByMonth[m] = arr.reduce((a, b) => a + b, 0) / arr.length;
+  }
+  return meanByMonth;
+}
+
 function buildContinentStats(parsedMonthly, label, key) {
   if (!parsedMonthly?.length) return null;
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
-  const filtered = parsedMonthly.filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth));
+  const filtered = parsedMonthly
+    .filter((p) => p.year < currentYear || (p.year === currentYear && p.month < currentMonth));
   if (!filtered.length) return null;
+
+  const meanByMonth = rebaseToComparison(filtered, (p) => p.anomaly);
+  const haveBaseline = Object.keys(meanByMonth).length === 12;
+
   const latest = filtered[filtered.length - 1];
   const comparable = filtered.filter((p) => p.month === latest.month);
-  // NOAA continental files are anomaly-only (no true absolute baseline available here),
-  // so rank by anomaly. Higher anomaly = warmer relative to this continent's own climatology.
   const ranked = [...comparable].sort((a, b) => b.anomaly - a.anomaly);
   const rank = ranked.findIndex((p) => p.year === latest.year && p.month === latest.month) + 1;
+
+  // 1-month anomaly vs 1961-1990 (comparison) and vs 1901-2000 (NOAA-native)
+  const nativeAnomaly1m = round2(latest.anomaly);
+  const anomaly1m = haveBaseline ? round2(latest.anomaly - meanByMonth[latest.month]) : null;
+
+  // 3-month rolling anomaly (only computed when the trailing 3 months
+  // are contiguous, identical logic to buildLatestThreeMonthStats).
+  let anomaly3m = null;
+  let nativeAnomaly3m = null;
+  if (filtered.length >= 3) {
+    const a = filtered[filtered.length - 3];
+    const b = filtered[filtered.length - 2];
+    const c = filtered[filtered.length - 1];
+    const contiguous = (a.year * 12 + a.month + 1 === b.year * 12 + b.month)
+      && (b.year * 12 + b.month + 1 === c.year * 12 + c.month);
+    if (contiguous) {
+      const meanNative = (a.anomaly + b.anomaly + c.anomaly) / 3;
+      nativeAnomaly3m = round2(meanNative);
+      if (haveBaseline) {
+        const meanBaseline = (meanByMonth[a.month] + meanByMonth[b.month] + meanByMonth[c.month]) / 3;
+        anomaly3m = round2(meanNative - meanBaseline);
+      }
+    }
+  }
+
+  // 12-month rolling anomaly (trailing year ending at the latest month)
+  let anomaly12m = null;
+  let nativeAnomaly12m = null;
+  let label12m = null;
+  if (filtered.length >= 12) {
+    const last12 = filtered.slice(-12);
+    const start = last12[0];
+    const end = last12[last12.length - 1];
+    const span = (end.year * 12 + end.month) - (start.year * 12 + start.month);
+    if (span === 11) {
+      const meanNative = last12.reduce((s, p) => s + p.anomaly, 0) / 12;
+      nativeAnomaly12m = round2(meanNative);
+      if (haveBaseline) {
+        const meanBaseline = last12.reduce((s, p) => s + meanByMonth[p.month], 0) / 12;
+        anomaly12m = round2(meanNative - meanBaseline);
+      }
+      label12m = `${MONTH_NAMES[start.month - 1]} ${start.year} – ${MONTH_NAMES[end.month - 1]} ${end.year}`;
+    }
+  }
+
   return {
     key,
     label,
-    latestMonth: { year: latest.year, month: latest.month, anomaly: round2(latest.anomaly) },
+    sourceUrl: NOAA_CONTINENT_SOURCE_URL,
+    nativeBaseline: NOAA_CONTINENT_BASELINE,
+    comparisonBaseline: '1961-1990',
+    latestMonth: { year: latest.year, month: latest.month, anomaly: nativeAnomaly1m },
     rank,
     total: ranked.length,
+    // Comparison baseline (1961-1990) — used in rankings / roll-ups
+    anomaly1m,
+    anomaly3m,
+    anomaly12m,
+    label1m: `${MONTH_NAMES[latest.month - 1]} ${latest.year}`,
+    label12m,
+    // Source-native verification figures (1901-2000)
+    nativeAnomaly1m,
+    nativeAnomaly3m,
+    nativeAnomaly12m,
+    // Compact monthly history for downstream charts (last ~30 years)
+    monthly: filtered
+      .slice(-360)
+      .map((p) => ({ year: p.year, month: p.month, nativeAnomaly: round2(p.anomaly) })),
+  };
+}
+
+// Synthesise an area-weighted continental anomaly from already-built per-
+// country snapshots. Used for North America and South America, which NOAA
+// does not publish as standalone continental land series. Country weights
+// are taken from the `area` field on each snapshot when present, else 1.
+function buildAggregatedContinent({ key, label, isoMembers, countryAnomalies, countrySnapshots }) {
+  const rows = countryAnomalies.filter((r) => isoMembers.includes(r.iso3));
+  if (!rows.length) return null;
+  const weightFor = (iso3) => {
+    const snap = countrySnapshots.get(iso3);
+    const a = snap?.areaKm2 ?? snap?.area ?? null;
+    return Number.isFinite(a) && a > 0 ? a : 1;
+  };
+  const weighted = (key) => {
+    let num = 0;
+    let den = 0;
+    for (const r of rows) {
+      const v = r[key];
+      if (typeof v !== 'number') continue;
+      const w = weightFor(r.iso3);
+      num += v * w;
+      den += w;
+    }
+    return den > 0 ? round2(num / den) : null;
+  };
+  return {
+    key,
+    label,
+    aggregate: true,
+    sourceUrl: null,
+    nativeBaseline: '1961-1990',
+    comparisonBaseline: '1961-1990',
+    note: '4BYO aggregate (NOAA does not publish a standalone continental land series for this region)',
+    memberCount: rows.length,
+    members: rows.map((r) => r.iso3),
+    anomaly1m: weighted('anomaly1m'),
+    anomaly3m: weighted('anomaly3m'),
+    anomaly12m: weighted('anomaly12m'),
+    label1m: rows[0]?.label1m ?? null,
+    label12m: rows[0]?.label12m ?? null,
+    nativeAnomaly1m: null,
+    nativeAnomaly3m: null,
+    nativeAnomaly12m: null,
   };
 }
 
@@ -775,6 +919,23 @@ async function main() {
   const countryAnomalies = await buildCountryAnomalies();
   console.log(`Country anomalies: ${countryAnomalies.length} countries`);
 
+  // 4BYO-aggregated continents (NOAA does not publish North America or
+  // South America as standalone land series). Built from the country
+  // snapshots already on disk so they sit alongside the NOAA-native
+  // continents in the rollups card.
+  const aggregatedContinents = [];
+  if (countryAnomalies.length) {
+    const NA_ISO = ['USA', 'CAN', 'MEX', 'CRI', 'NIC', 'JAM'];
+    const SA_ISO = ['BRA', 'ARG', 'CHL', 'COL', 'PER', 'BOL', 'GUY', 'SUR'];
+    // Country snapshots aren't loaded here for area weights — pass an empty
+    // map so the helper falls back to equal weighting (sample mean).
+    const countrySnapshots = new Map();
+    const na = buildAggregatedContinent({ key: 'northAmerica', label: 'North America', isoMembers: NA_ISO, countryAnomalies, countrySnapshots });
+    const sa = buildAggregatedContinent({ key: 'southAmerica', label: 'South America', isoMembers: SA_ISO, countryAnomalies, countrySnapshots });
+    if (na) aggregatedContinents.push(na);
+    if (sa) aggregatedContinents.push(sa);
+  }
+
   const result = {
     yearlyData,
     monthlyComparison,
@@ -793,6 +954,7 @@ async function main() {
     arcticSeaIce,
     antarcticSeaIce,
     continentStats,
+    aggregatedContinents,
     countryAnomalies,
     globalBaseline: GLOBAL_BASELINE,
     globalLandBaseline: GLOBAL_LAND_BASELINE,
