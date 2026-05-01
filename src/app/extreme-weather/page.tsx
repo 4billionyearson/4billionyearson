@@ -838,7 +838,7 @@ function LiveEventsSection({
                     </div>
                   </button>
                   {isExpanded && (
-                    <div className="border-t border-current/10 px-3 pt-2 pb-3 space-y-1.5">
+                    <div className="border-t border-white/10 px-3 pt-2 pb-3 space-y-1.5">
                       {clusterEvents.map((e, j) => (
                         <a
                           key={j}
