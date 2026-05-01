@@ -3,7 +3,7 @@ import { getCached, setShortTerm } from '@/lib/climate/redis';
 
 export const maxDuration = 60;
 
-const BY_COUNTRY_CACHE_KEY = 'climate:emissions:byCountry:v1';
+const BY_COUNTRY_CACHE_KEY = 'climate:emissions:byCountry:v2';
 
 const INDICATORS = {
   annual: 1119906,       // Annual CO₂ emissions (tonnes)
@@ -210,7 +210,7 @@ async function buildIndex(): Promise<ByCountryIndex> {
   });
   for (const n of Object.keys(entries)) entries[n].perCapOf = perCapSortable.length;
 
-  // Continent aggregates from OWID — no rank, just the series.
+  // Continent aggregates from OWID — rank within the 6 continents (latest annual + per-capita).
   const continentEntries: Record<string, ByCountryEntry> = {};
   const allContNames = new Set<string>([
     ...Object.keys(annualByCont),
@@ -238,6 +238,18 @@ async function buildIndex(): Promise<ByCountryIndex> {
       perCapOf: 0,
     };
   }
+  // Within-continent ranks (1 = highest among the 6 continents).
+  const contAnnualSorted = Object.entries(continentEntries)
+    .filter(([, e]) => e.latestAnnual != null)
+    .sort((a, b) => (b[1].latestAnnual as number) - (a[1].latestAnnual as number));
+  contAnnualSorted.forEach(([n], i) => { continentEntries[n].annualRank = i + 1; });
+  for (const n of Object.keys(continentEntries)) continentEntries[n].annualOf = contAnnualSorted.length;
+
+  const contPerCapSorted = Object.entries(continentEntries)
+    .filter(([, e]) => e.latestPerCapita != null)
+    .sort((a, b) => (b[1].latestPerCapita as number) - (a[1].latestPerCapita as number));
+  contPerCapSorted.forEach(([n], i) => { continentEntries[n].perCapRank = i + 1; });
+  for (const n of Object.keys(continentEntries)) continentEntries[n].perCapOf = contPerCapSorted.length;
 
   return {
     countries: entries,

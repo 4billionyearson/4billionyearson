@@ -572,6 +572,12 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
       {/* Hottest / coolest member states this month */}
       <MemberRankingsCard members={members} regionName={region.name} />
 
+      {/* Aggregate fossil-fuel CO₂ emissions across the region's member states */}
+      <EmissionsCard
+        usClimateRegionSlug={region.slug}
+        usClimateRegionName={region.name}
+      />
+
       {/* Sources */}
       <Card icon={<FileText className="h-5 w-5" />} title="Data Sources">
         <ul className="space-y-1.5 text-sm text-gray-300">

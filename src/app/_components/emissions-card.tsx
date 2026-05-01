@@ -42,9 +42,15 @@ interface CountryApiResponse {
 interface EnergyLatest { year: number; ghgEmissions: number | null; ghgPerCapita: number | null }
 interface EnergyYearly { year: number; ghgEmissions: number | null; ghgPerCapita: number | null }
 interface EnergyApiEntity { name: string; yearly: EnergyYearly[]; latest: EnergyLatest }
+interface EnergyApiRegionEntity extends EnergyApiEntity {
+  annualRank?: number | null;
+  annualOf?: number;
+  perCapRank?: number | null;
+  perCapOf?: number;
+}
 interface StateEnergyApiResponse {
   country: EnergyApiEntity | null;   // USA totals
-  usState: EnergyApiEntity | null;   // the selected state
+  usState: EnergyApiRegionEntity | null;   // the selected state OR US climate region
   fetchedAt: string;
 }
 
@@ -203,7 +209,7 @@ function GlobalCard({ data, deepLinkHref }: { data: GlobalApiResponse; deepLinkH
   );
 }
 
-function CountryCard({ data, deepLinkHref }: { data: CountryApiResponse; deepLinkHref: string }) {
+function CountryCard({ data, deepLinkHref, rankLabel = 'Global rank' }: { data: CountryApiResponse; deepLinkHref: string; rankLabel?: string }) {
   const c = data.country;
   if (c.latestAnnual == null || c.annual.length === 0) {
     return (
@@ -245,7 +251,7 @@ function CountryCard({ data, deepLinkHref }: { data: CountryApiResponse; deepLin
           </div>
         </div>
         <div className="rounded-lg bg-gray-900/40 border border-gray-800/60 px-2 py-2">
-          <div className="text-[10px] uppercase tracking-wider text-gray-500">Global rank</div>
+          <div className="text-[10px] uppercase tracking-wider text-gray-500">{rankLabel}</div>
           <div className="text-sm font-mono font-semibold text-white mt-0.5">
             {c.annualRank != null ? `${ordinal(c.annualRank)}` : '—'}
             {c.annualOf > 0 && c.annualRank != null && <span className="text-gray-500 text-[11px]"> /{c.annualOf}</span>}
@@ -270,11 +276,13 @@ function CountryCard({ data, deepLinkHref }: { data: CountryApiResponse; deepLin
   );
 }
 
-export default function EmissionsCard({ countryName, usStateCode, usStateName, continentName, deepLinkHref }: {
+export default function EmissionsCard({ countryName, usStateCode, usStateName, continentName, usClimateRegionSlug, usClimateRegionName, deepLinkHref }: {
   countryName?: string;
   usStateCode?: string;
   usStateName?: string;
   continentName?: string;
+  usClimateRegionSlug?: string;
+  usClimateRegionName?: string;
   deepLinkHref?: string;
 }) {
   const [global, setGlobal] = useState<GlobalApiResponse | null>(null);
@@ -284,7 +292,12 @@ export default function EmissionsCard({ countryName, usStateCode, usStateName, c
 
   useEffect(() => {
     let cancelled = false;
-    if (usStateCode) {
+    if (usClimateRegionSlug) {
+      fetch(`/api/climate/emissions/us-region?slug=${encodeURIComponent(usClimateRegionSlug)}`)
+        .then(r => r.json())
+        .then(d => { if (!cancelled) { if (d.error) throw new Error(d.error); setStateData(d); } })
+        .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
+    } else if (usStateCode) {
       const name = usStateName || usStateCode;
       fetch(`/api/climate/energy?state=${encodeURIComponent(usStateCode)}&stateName=${encodeURIComponent(name)}`)
         .then(r => r.json())
@@ -307,21 +320,41 @@ export default function EmissionsCard({ countryName, usStateCode, usStateName, c
         .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); });
     }
     return () => { cancelled = true; };
-  }, [countryName, usStateCode, usStateName, continentName]);
+  }, [countryName, usStateCode, usStateName, continentName, usClimateRegionSlug]);
 
-  const href = deepLinkHref ?? (usStateCode
-    ? `/energy-dashboard?state=${encodeURIComponent(usStateCode)}`
-    : continentName
-      ? `/emissions`
-      : countryName
-        ? `/emissions?country=${encodeURIComponent(countryName)}`
-        : '/emissions');
+  const href = deepLinkHref ?? (usClimateRegionSlug
+    ? `/energy-rankings`
+    : usStateCode
+      ? `/energy-dashboard?state=${encodeURIComponent(usStateCode)}`
+      : continentName
+        ? `/emissions`
+        : countryName
+          ? `/emissions?country=${encodeURIComponent(countryName)}`
+          : '/emissions');
 
   if (error) {
     return (
       <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-5 text-sm text-gray-400">
         Emissions data unavailable.
       </div>
+    );
+  }
+
+  if (usClimateRegionSlug) {
+    if (!stateData) {
+      return (
+        <div className="bg-gray-950/90 rounded-2xl border-2 border-[#D0A65E] p-8 flex items-center justify-center">
+          <Loader2 className="h-5 w-5 animate-spin text-rose-400" />
+        </div>
+      );
+    }
+    return (
+      <USStateCard
+        data={stateData}
+        stateName={usClimateRegionName || usClimateRegionSlug}
+        deepLinkHref={href}
+        rankLabel="Among regions"
+      />
     );
   }
 
@@ -355,7 +388,7 @@ export default function EmissionsCard({ countryName, usStateCode, usStateName, c
         </div>
       );
     }
-    return <CountryCard data={country} deepLinkHref={href} />;
+    return <CountryCard data={country} deepLinkHref={href} rankLabel="Among continents" />;
   }
 
   if (!global) {
@@ -370,10 +403,12 @@ export default function EmissionsCard({ countryName, usStateCode, usStateName, c
 
 /* ─── US State Card ──────────────────────────────────────────────────────── */
 
-function USStateCard({ data, stateName, deepLinkHref }: {
+function USStateCard({ data, stateName, deepLinkHref, shareLabel = 'Share of US', rankLabel }: {
   data: StateEnergyApiResponse;
   stateName: string;
   deepLinkHref: string;
+  shareLabel?: string;
+  rankLabel?: string;
 }) {
   const state = data.usState;
   const usa = data.country;
@@ -418,15 +453,26 @@ function USStateCard({ data, stateName, deepLinkHref }: {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-center">
+      <div className={`grid ${rankLabel ? 'grid-cols-3' : 'grid-cols-2'} gap-2 text-center`}>
         <div className="rounded-lg bg-gray-900/40 border border-gray-800/60 px-2 py-2">
           <div className="text-[10px] uppercase tracking-wider text-gray-500">Per capita</div>
           <div className="text-sm font-mono font-semibold text-white mt-0.5">
             {state.latest.ghgPerCapita != null ? `${state.latest.ghgPerCapita.toFixed(1)} t` : '—'}
           </div>
         </div>
+        {rankLabel && (
+          <div className="rounded-lg bg-gray-900/40 border border-gray-800/60 px-2 py-2">
+            <div className="text-[10px] uppercase tracking-wider text-gray-500">{rankLabel}</div>
+            <div className="text-sm font-mono font-semibold text-white mt-0.5">
+              {state.annualRank != null ? `${ordinal(state.annualRank)}` : '—'}
+              {state.annualOf != null && state.annualOf > 0 && state.annualRank != null && (
+                <span className="text-gray-500 text-[11px]"> /{state.annualOf}</span>
+              )}
+            </div>
+          </div>
+        )}
         <div className="rounded-lg bg-gray-900/40 border border-gray-800/60 px-2 py-2">
-          <div className="text-[10px] uppercase tracking-wider text-gray-500">Share of US</div>
+          <div className="text-[10px] uppercase tracking-wider text-gray-500">{shareLabel}</div>
           <div className="text-sm font-mono font-semibold text-white mt-0.5">
             {shareOfUsPct != null ? `${shareOfUsPct.toFixed(shareOfUsPct < 1 ? 2 : 1)}%` : '—'}
           </div>
