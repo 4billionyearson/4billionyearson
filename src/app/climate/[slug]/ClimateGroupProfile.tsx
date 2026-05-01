@@ -1,11 +1,13 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import Link from 'next/link';
-import { ArrowLeft, BarChart3, ExternalLink, MapPin, Layers, Scale, AlertTriangle, FileText } from 'lucide-react';
+import { BarChart3, ExternalLink, MapPin, Layers, Scale, AlertTriangle, FileText, BookOpen, TrendingUp, TrendingDown } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { CLIMATE_REGIONS, getProfileSlugForLocation } from '@/lib/climate/regions';
 import { ALL_LOCATIONS } from '@/lib/climate/locations';
+import { CONTINENT_BY_ISO } from '@/lib/climate/editorial';
 import GroupAnomalyChart, { type MonthlyPoint } from './GroupAnomalyChart';
+import ClimateRankPill from '@/app/_components/climate-rank-pill';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
 
@@ -132,10 +134,141 @@ function StatTile({ label, value, sub }: { label: string; value: string; sub?: s
   );
 }
 
+// ─── Member rankings panel ─────────────────────────────────────────────────
+
+interface RankingRow {
+  slug: string;
+  name: string;
+  type: 'country' | 'us-state' | 'uk-region';
+  emoji?: string;
+  apiCode?: string;
+  anomaly1m: number | null;
+  anomaly3m: number | null;
+  anomaly12m: number | null;
+  latestLabel: string | null;
+}
+
+interface RankingsResponse { rows: RankingRow[] }
+
+const CONTINENT_KEY_TO_NAME: Record<string, string> = {
+  africa: 'Africa', asia: 'Asia', europe: 'Europe', oceania: 'Oceania',
+  northAmerica: 'North America', southAmerica: 'South America',
+};
+
+async function loadMembersForRegion(region: ClimateRegion): Promise<RankingRow[]> {
+  const rk = await readJson<RankingsResponse>('rankings.json');
+  if (!rk?.rows?.length) return [];
+
+  if (region.groupKind === 'continent') {
+    const targetContinent = CONTINENT_KEY_TO_NAME[region.groupKey ?? ''];
+    if (!targetContinent) return [];
+    // Build slug→ISO3 lookup from CLIMATE_REGIONS
+    const slugToIso = new Map<string, string>();
+    for (const r of CLIMATE_REGIONS) {
+      if (r.type === 'country') slugToIso.set(r.slug, r.apiCode);
+    }
+    return rk.rows.filter((row) => {
+      if (row.type !== 'country') return false;
+      const iso = slugToIso.get(row.slug);
+      if (!iso) return false;
+      return CONTINENT_BY_ISO[iso] === targetContinent;
+    });
+  }
+
+  if (region.groupKind === 'us-climate-region') {
+    const memberSlugs = new Set(region.memberSlugs ?? []);
+    return rk.rows.filter((row) => row.type === 'us-state' && memberSlugs.has(row.slug));
+  }
+
+  return [];
+}
+
+function MemberRankingsCard({ members, regionName }: { members: RankingRow[]; regionName: string }) {
+  const valid = members.filter((m) => typeof m.anomaly1m === 'number');
+  if (valid.length < 2) return null;
+  const sorted = [...valid].sort((a, b) => (b.anomaly1m as number) - (a.anomaly1m as number));
+  const top = sorted.slice(0, 5);
+  const bottom = sorted.slice(-5).reverse();
+  const slugForMember = (m: RankingRow): string => m.slug;
+  return (
+    <Card icon={<BarChart3 className="h-5 w-5" />} title={`Hottest & Coolest in ${regionName} this month`}>
+      <p className="text-sm text-gray-400 mb-3">
+        1-month anomaly vs 1961–1990 across the {valid.length} {regionName === 'United States' ? 'states' : 'members'} we cover. Click a name to open its profile.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="rounded-xl border border-red-900/40 bg-red-950/10 p-4">
+          <p className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-red-300 font-semibold mb-2">
+            <TrendingUp className="h-3.5 w-3.5" /> Warmest
+          </p>
+          <ol className="space-y-1 text-sm">
+            {top.map((m, i) => (
+              <li key={m.slug} className="flex items-center gap-2">
+                <span className="w-5 text-right font-mono text-gray-500">{i + 1}.</span>
+                {m.emoji && <span>{m.emoji}</span>}
+                <Link href={`/climate/${slugForMember(m)}`} className="flex-1 text-white hover:text-[#E8C97A] transition-colors">{m.name}</Link>
+                <span className="font-mono text-red-300">{(m.anomaly1m as number) > 0 ? '+' : ''}{(m.anomaly1m as number).toFixed(2)}°C</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div className="rounded-xl border border-sky-900/40 bg-sky-950/10 p-4">
+          <p className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-sky-300 font-semibold mb-2">
+            <TrendingDown className="h-3.5 w-3.5" /> Coolest
+          </p>
+          <ol className="space-y-1 text-sm">
+            {bottom.map((m, i) => (
+              <li key={m.slug} className="flex items-center gap-2">
+                <span className="w-5 text-right font-mono text-gray-500">{i + 1}.</span>
+                {m.emoji && <span>{m.emoji}</span>}
+                <Link href={`/climate/${slugForMember(m)}`} className="flex-1 text-white hover:text-[#E8C97A] transition-colors">{m.name}</Link>
+                <span className="font-mono text-sky-300">{(m.anomaly1m as number) > 0 ? '+' : ''}{(m.anomaly1m as number).toFixed(2)}°C</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// ─── Related links ─────────────────────────────────────────────────────────
+
+function RelatedLink({ href, label, desc }: { href: string; label: string; desc: string }) {
+  return (
+    <Link
+      href={href}
+      className="relative block rounded-xl border border-gray-700/50 bg-gray-900 hover:bg-gray-800 hover:border-gray-600 p-4 transition-all shadow-md"
+    >
+      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-cyan-400" />
+      <div className="font-semibold text-white text-sm pr-5">{label}</div>
+      <div className="text-xs text-gray-300 mt-1">{desc}</div>
+    </Link>
+  );
+}
+
+function ExploreCard() {
+  return (
+    <Card icon={<BookOpen className="h-5 w-5" />} title="Explore Climate Data">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <RelatedLink href="/climate/shifting-seasons" label="Shifting Seasons" desc="How the timing of the seasons is moving worldwide" />
+        <RelatedLink href="/climate/enso" label="El Niño / La Niña" desc="Live ENSO state, weekly Niño 3.4 SST and NOAA forecast" />
+        <RelatedLink href="/climate/rankings" label="Climate Rankings" desc="League table of anomalies across 144 regions" />
+        <RelatedLink href="/climate-dashboard" label="Climate Dashboard" desc="Headline global climate indicators in one view" />
+        <RelatedLink href="/emissions" label="CO₂ Emissions" desc="Global and per-country emissions" />
+        <RelatedLink href="/extreme-weather" label="Extreme Weather" desc="Live disaster and weather alerts" />
+        <RelatedLink href="/climate-explained" label="Climate Explained" desc="ENSO, greenhouse effect, glossary" />
+      </div>
+    </Card>
+  );
+}
+
 // ─── Continent renderer ────────────────────────────────────────────────────
 
 async function ContinentBody({ region }: { region: ClimateRegion }) {
-  const history = await readJson<GlobalHistory>('global-history.json');
+  const [history, members] = await Promise.all([
+    readJson<GlobalHistory>('global-history.json'),
+    loadMembersForRegion(region),
+  ]);
   if (!history) {
     return <Card icon={<AlertTriangle className="h-5 w-5" />} title="Data unavailable">
       <p className="text-sm text-gray-400">Global continent dataset could not be loaded.</p>
@@ -260,6 +393,9 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
         </Card>
       )}
 
+      {/* Hottest / coolest member countries this month */}
+      <MemberRankingsCard members={members} regionName={region.name} />
+
       {/* Sources */}
       <Card icon={<FileText className="h-5 w-5" />} title="Data source">
         <ul className="space-y-1.5 text-sm text-gray-300">
@@ -294,7 +430,10 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
 // ─── US climate region renderer ────────────────────────────────────────────
 
 async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
-  const data = await readJson<UsRegionData>(`us-climate-region/${region.slug}.json`);
+  const [data, members] = await Promise.all([
+    readJson<UsRegionData>(`us-climate-region/${region.slug}.json`),
+    loadMembersForRegion(region),
+  ]);
   if (!data) {
     return <Card icon={<AlertTriangle className="h-5 w-5" />} title="Data unavailable">
       <p className="text-sm text-gray-400">Region snapshot for <code>{region.slug}</code> could not be loaded.</p>
@@ -421,6 +560,9 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
         </Card>
       )}
 
+      {/* Hottest / coolest member states this month */}
+      <MemberRankingsCard members={members} regionName={region.name} />
+
       {/* Sources */}
       <Card icon={<FileText className="h-5 w-5" />} title="Data source">
         <ul className="space-y-1.5 text-sm text-gray-300">
@@ -454,14 +596,10 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
   const isContinent = region.groupKind === 'continent';
 
   return (
-    <main className="container mx-auto px-3 md:px-4 pt-2 pb-8 md:pt-4 md:pb-12 max-w-5xl font-sans text-gray-200">
-      <nav className="mb-3 text-xs text-gray-400">
-        <Link href="/climate" className="inline-flex items-center gap-1 hover:text-[#E8C97A]">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to Climate hub
-        </Link>
-      </nav>
+    <main>
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-8 md:pt-4 md:pb-10 font-sans text-gray-200">
+        <div className="max-w-7xl mx-auto space-y-6">
 
-      <div className="space-y-6">
         {/* Hero */}
         <div
           className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
@@ -488,11 +626,16 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
                 </span>
               </p>
             ) : null}
+            <ClimateRankPill slug={region.slug} />
           </div>
         </div>
 
         {/* Body */}
         {isContinent ? <ContinentBody region={region} /> : <UsClimateRegionBody region={region} />}
+
+        {/* Explore */}
+        <ExploreCard />
+        </div>
       </div>
     </main>
   );
