@@ -481,7 +481,26 @@ export default function EmissionsCountryPanel({
               type="button"
               role="tab"
               aria-selected={isActive}
-              onClick={() => setMode(id)}
+              onClick={() => {
+                if (id !== mode) {
+                  setMode(id);
+                  setCountryName(null);
+                  setData(null);
+                  setError(null);
+                  setStateSelection(null);
+                  setRegionSlug(null);
+                  setStateData(null);
+                  setStateError(null);
+                  if (typeof window !== 'undefined') {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('country');
+                    url.searchParams.delete('state');
+                    url.searchParams.delete('stateName');
+                    url.searchParams.delete('region');
+                    window.history.replaceState({}, '', url.toString());
+                  }
+                }
+              }}
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
                 isActive
                   ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
