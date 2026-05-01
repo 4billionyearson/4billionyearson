@@ -686,6 +686,66 @@ function buildAggregatedContinent({ key, label, isoMembers, countryAnomalies, co
     }
     return den > 0 ? round2(num / den) : null;
   };
+
+  // Build an area-weighted monthly anomaly history from each member country's
+  // monthlyAll series. For each member, derive the country's own 1961-1990
+  // climatology per calendar month, then average each (year, month)
+  // anomaly across members weighted by country area.
+  const perCountryAnomalies = new Map(); // iso3 -> Map<ymKey, anomaly>
+  for (const r of rows) {
+    const snap = countrySnapshots.get(r.iso3);
+    const monthlyAll = Array.isArray(snap?.monthlyAll) ? snap.monthlyAll : null;
+    if (!monthlyAll || monthlyAll.length < 12) continue;
+    // Per-month climatology over 1961-1990.
+    const sums = {};
+    for (const p of monthlyAll) {
+      if (p.year < 1961 || p.year > 1990) continue;
+      const v = p.value ?? p.temp;
+      if (!Number.isFinite(v)) continue;
+      (sums[p.month] ||= { s: 0, n: 0 });
+      sums[p.month].s += v;
+      sums[p.month].n += 1;
+    }
+    const clim = {};
+    let complete = true;
+    for (let m = 1; m <= 12; m++) {
+      if (!sums[m] || sums[m].n === 0) { complete = false; break; }
+      clim[m] = sums[m].s / sums[m].n;
+    }
+    if (!complete) continue;
+    const out = new Map();
+    for (const p of monthlyAll) {
+      const v = p.value ?? p.temp;
+      if (!Number.isFinite(v)) continue;
+      const ym = `${p.year}-${String(p.month).padStart(2, '0')}`;
+      out.set(ym, v - clim[p.month]);
+    }
+    perCountryAnomalies.set(r.iso3, out);
+  }
+
+  // Union of all (year, month) keys across members.
+  const allKeys = new Set();
+  for (const map of perCountryAnomalies.values()) {
+    for (const k of map.keys()) allKeys.add(k);
+  }
+  const monthly = [];
+  for (const ym of allKeys) {
+    const [yStr, mStr] = ym.split('-');
+    const year = Number(yStr);
+    const month = Number(mStr);
+    let num = 0;
+    let den = 0;
+    for (const [iso3, map] of perCountryAnomalies) {
+      const v = map.get(ym);
+      if (!Number.isFinite(v)) continue;
+      const w = weightFor(iso3);
+      num += v * w;
+      den += w;
+    }
+    if (den > 0) monthly.push({ year, month, anomaly: round2(num / den) });
+  }
+  monthly.sort((a, b) => (a.year * 12 + a.month) - (b.year * 12 + b.month));
+
   return {
     key,
     label,
@@ -704,6 +764,11 @@ function buildAggregatedContinent({ key, label, isoMembers, countryAnomalies, co
     nativeAnomaly1m: null,
     nativeAnomaly3m: null,
     nativeAnomaly12m: null,
+    // Last ~30 years of area-weighted monthly anomalies vs each country's own
+    // 1961-1990 climatology. Country snapshots are temperature in °C, so the
+    // anomaly is also in °C and aligns with the comparison baseline used
+    // across the rest of the climate hub.
+    monthly: monthly.slice(-360),
   };
 }
 
@@ -927,9 +992,19 @@ async function main() {
   if (countryAnomalies.length) {
     const NA_ISO = ['USA', 'CAN', 'MEX', 'CRI', 'NIC', 'JAM'];
     const SA_ISO = ['BRA', 'ARG', 'CHL', 'COL', 'PER', 'BOL', 'GUY', 'SUR'];
-    // Country snapshots aren't loaded here for area weights — pass an empty
-    // map so the helper falls back to equal weighting (sample mean).
+    // Load the per-country snapshots needed by NA/SA so we can compute
+    // a monthly anomaly history (and use area weights when available).
+    const { readFile } = await import('node:fs/promises');
+    const { resolve: pathResolve } = await import('node:path');
     const countrySnapshots = new Map();
+    for (const iso3 of [...NA_ISO, ...SA_ISO]) {
+      try {
+        const raw = await readFile(pathResolve(process.cwd(), 'public', 'data', 'climate', 'country', `${iso3}.json`), 'utf8');
+        countrySnapshots.set(iso3, JSON.parse(raw));
+      } catch {
+        // skip missing — buildAggregatedContinent handles partial coverage
+      }
+    }
     const na = buildAggregatedContinent({ key: 'northAmerica', label: 'North America', isoMembers: NA_ISO, countryAnomalies, countrySnapshots });
     const sa = buildAggregatedContinent({ key: 'southAmerica', label: 'South America', isoMembers: SA_ISO, countryAnomalies, countrySnapshots });
     if (na) aggregatedContinents.push(na);
