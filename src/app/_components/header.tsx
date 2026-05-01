@@ -229,6 +229,9 @@ const Header = () => {
                 </Link>
 
                 <div className="mt-1 px-4 pt-2 pb-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-[#D0A65E] bg-[#D0A65E]/10 border-y border-[#D0A65E]/20">Learn</div>
+                <Link href="/climate/methodology" className={desktopDropdownItemClass(pathname === '/climate/methodology', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
+                  Methodology &amp; Sources
+                </Link>
                 <Link href="/climate-explained" className={desktopDropdownItemClass(pathname === '/climate-explained', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
                   Explained
                 </Link>
@@ -451,6 +454,9 @@ const Header = () => {
                 </Link>
 
                 <div className="pl-6 pr-4 pt-2.5 pb-1.5 text-[11px] font-bold tracking-[0.18em] uppercase text-[#D0A65E] bg-[#D0A65E]/10 border-y border-[#D0A65E]/20">Learn</div>
+                <Link href="/climate/methodology" className={mobileDropdownItemClass(pathname === '/climate/methodology', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
+                  Methodology &amp; Sources
+                </Link>
                 <Link href="/climate-explained" className={mobileDropdownItemClass(pathname === '/climate-explained', 'text-sky-400', 'hover:text-sky-400')} onClick={closeMenu}>
                   Explained
                 </Link>

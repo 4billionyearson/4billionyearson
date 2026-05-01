@@ -75,6 +75,7 @@ const SECTIONS: Section[] = [
       { group: "Earth Systems", href: "/climate/enso", label: "El Niño / La Niña", icon: <Wind className="h-4 w-4" />, badge: "weekly", desc: "ENSO tracker: Niño 3.4, MEI, SOI & forecast" },
       { group: "Earth Systems", href: "/extreme-weather", label: "Extreme Weather", icon: <CloudLightning className="h-4 w-4" />, badge: "live", desc: "Active disasters worldwide" },
       { group: "Earth Systems", href: "/emissions", label: "CO₂ Emissions", icon: <Factory className="h-4 w-4" />, badge: "annual", desc: "Country rankings & trends" },
+      { group: "Learn", href: "/climate/methodology", label: "Methodology & Sources", icon: <BookOpen className="h-4 w-4" />, desc: "Baselines, data sources & timeline" },
       { group: "Learn", href: "/climate-explained", label: "Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
       { group: "Learn", href: "/climate-books", label: "Books", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on climate" },
       { group: "Learn", href: "/category/climate-change", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "climate-change", desc: "Latest articles" },

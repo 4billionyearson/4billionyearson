@@ -6,7 +6,6 @@ import { Trophy, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Info } 
 import RankingsTable from './RankingsTable';
 import RankingsAnalysis from './RankingsAnalysis';
 import RollupsSection from './RollupsSection';
-import BaselineExplainer from '../_components/BaselineExplainer';
 import AnomalyMapCard, { type CountryAnomalyRow } from '../global/AnomalyMapCard';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
@@ -389,9 +388,6 @@ export default async function RankingsPage() {
             types={rollups.types}
           />
 
-          {/* Baseline disclosure shown alongside roll-ups */}
-          <BaselineExplainer variant="compact" />
-
           {/* Temperature anomaly map - geographic view of the same rankings */}
           {countryAnomalies && <AnomalyMapCard countryAnomalies={countryAnomalies} />}
 
@@ -411,13 +407,16 @@ export default async function RankingsPage() {
             />
           </section>
 
-          {/* Footer */}
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] text-xs text-gray-400 space-y-1.5">
+          {/* Footer - methodology summary + link to full page */}
+          <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] text-xs text-gray-400 space-y-2">
             <h2 className="flex items-center gap-2 text-base font-semibold text-[#D0A65E]">
-              <Info className="h-4 w-4" /> Methodology
+              <Info className="h-4 w-4" /> Methodology &amp; baselines
             </h2>
             <p>
-              Anomaly = monthly mean temperature − 1961–1990 mean for the same calendar month. The 12-month figure is the trailing 12-month mean minus the 12-month baseline. Country data is from Our World in Data / NOAA; UK regions from the Met Office Regional Series; US states from NOAA Climate at a Glance.
+              Anomaly = monthly mean temperature − 1961–1990 mean for the same calendar month. The 12-month figure is the trailing 12-month mean minus the 12-month baseline. Country data is from Our World in Data / NOAA; UK regions from the Met Office Regional Series; US states &amp; climate regions from NOAA Climate at a Glance. NOAA values are re-baselined from their native 1901–2000 to 1961–1990 for cross-region comparison; the source-native figure is shown alongside for verification.
+            </p>
+            <p>
+              See the <Link href="/climate/methodology" className="text-[#E8C97A] underline hover:text-white">full methodology &amp; data sources</Link> page for the complete two-baseline model, source timeline and known caveats.
             </p>
             <p>Data snapshot: {new Date(data.generatedAt).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' })}.</p>
           </section>
