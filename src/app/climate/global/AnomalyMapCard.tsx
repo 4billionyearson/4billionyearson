@@ -32,12 +32,19 @@ export interface CountryAnomalyRow {
 }
 
 type AnomalyWindow = '1m' | '3m' | '12m';
+type MapLevel = 'countries' | 'continents' | 'us-regions';
 
 const WINDOW_OPTS = [
   { key: '1m', label: '1 month' },
   { key: '3m', label: '3 months' },
   { key: '12m', label: '12 months' },
 ] as const;
+
+const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [
+  { key: 'countries', label: 'Countries / states' },
+  { key: 'continents', label: 'Continents' },
+  { key: 'us-regions', label: 'US climate regions' },
+];
 
 const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors';
 const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#D0A65E]';
@@ -51,6 +58,7 @@ export default function AnomalyMapCard({
   initialWindow?: AnomalyWindow;
 }) {
   const [anomalyWindow, setAnomalyWindow] = useState<AnomalyWindow>(initialWindow);
+  const [level, setLevel] = useState<MapLevel>('countries');
 
   if (!countryAnomalies || countryAnomalies.length === 0) return null;
 
@@ -62,6 +70,19 @@ export default function AnomalyMapCard({
         <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
         <span className="min-w-0 flex-1">{cardTitle}</span>
       </h3>
+      <div className="flex flex-wrap items-center gap-2 mb-2">
+        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Level</span>
+        {LEVEL_OPTS.map((opt) => (
+          <button
+            key={opt.key}
+            type="button"
+            onClick={() => setLevel(opt.key)}
+            className={`${TOGGLE_BASE} ${level === opt.key ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Window</span>
         {WINDOW_OPTS.map((opt) => (
@@ -75,9 +96,9 @@ export default function AnomalyMapCard({
           </button>
         ))}
       </div>
-      <GlobalAnomalyMap countryAnomalies={countryAnomalies} window={anomalyWindow} />
+      <GlobalAnomalyMap countryAnomalies={countryAnomalies} window={anomalyWindow} level={level} />
       <p className="text-xs text-gray-500 mt-3">
-        Source: NOAA Climate at a Glance &middot; Met Office (UK) &middot; each region ranked against its own record, so colour reflects <em>relative</em> warming.
+        Source: NOAA Climate at a Glance &middot; Met Office (UK) &middot; each region ranked against its own record, so colour reflects <em>relative</em> warming. Continent and US climate region levels use 4BYO group rollups (see <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>).
       </p>
     </div>
   );

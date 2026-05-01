@@ -46,6 +46,82 @@ interface CountryAnomaly {
 }
 
 export type AnomalyWindow = '1m' | '3m' | '12m';
+export type MapLevel = 'countries' | 'continents' | 'us-regions';
+
+// Country ISO3 → continent group key used in rankings.json groups.continents.
+// Mirrors CONTINENT_BY_ISO in src/lib/climate/editorial.ts but kept inline
+// to avoid pulling Node-only types into this client bundle.
+const CONTINENT_GROUP_KEY: Record<string, string> = {
+  // Europe
+  GBR: 'europe', FRA: 'europe', DEU: 'europe', ITA: 'europe', ESP: 'europe',
+  POL: 'europe', NLD: 'europe', BEL: 'europe', SWE: 'europe', NOR: 'europe',
+  DNK: 'europe', FIN: 'europe', IRL: 'europe', PRT: 'europe', GRC: 'europe',
+  AUT: 'europe', CHE: 'europe', UKR: 'europe', ROU: 'europe', HUN: 'europe',
+  CZE: 'europe', CYP: 'europe', ISL: 'europe',
+  // North America
+  USA: 'northAmerica', CAN: 'northAmerica', MEX: 'northAmerica',
+  CRI: 'northAmerica', NIC: 'northAmerica', JAM: 'northAmerica',
+  // South America
+  BRA: 'southAmerica', ARG: 'southAmerica', CHL: 'southAmerica',
+  COL: 'southAmerica', PER: 'southAmerica', BOL: 'southAmerica',
+  GUY: 'southAmerica', SUR: 'southAmerica',
+  // Asia
+  JPN: 'asia', KOR: 'asia', PRK: 'asia', IND: 'asia', CHN: 'asia',
+  IDN: 'asia', MYS: 'asia', PHL: 'asia', THA: 'asia', VNM: 'asia',
+  PAK: 'asia', BGD: 'asia', LKA: 'asia', MMR: 'asia', IRN: 'asia',
+  IRQ: 'asia', ISR: 'asia', LBN: 'asia', PSE: 'asia', SAU: 'asia',
+  ARE: 'asia', SYR: 'asia', TUR: 'asia', SGP: 'asia',
+  // Africa
+  EGY: 'africa', NGA: 'africa', KEN: 'africa', ETH: 'africa', GHA: 'africa',
+  UGA: 'africa', TZA: 'africa', MAR: 'africa', DZA: 'africa', ZAF: 'africa',
+  MWI: 'africa', SOM: 'africa', COG: 'africa', COD: 'africa', SSD: 'africa',
+  // Oceania
+  AUS: 'oceania', NZL: 'oceania',
+};
+
+// US state name (lowercase) → NOAA US climate region group slug. Used when
+// the map level is 'us-regions' so the state overlay shows region-level anomaly.
+const US_STATE_NAME_TO_REGION_SLUG: Record<string, string> = {
+  // Northeast
+  connecticut: 'us-northeast', delaware: 'us-northeast', maine: 'us-northeast',
+  maryland: 'us-northeast', massachusetts: 'us-northeast', 'new hampshire': 'us-northeast',
+  'new jersey': 'us-northeast', 'new york': 'us-northeast', pennsylvania: 'us-northeast',
+  'rhode island': 'us-northeast', vermont: 'us-northeast',
+  // Upper Midwest
+  iowa: 'us-upper-midwest', michigan: 'us-upper-midwest',
+  minnesota: 'us-upper-midwest', wisconsin: 'us-upper-midwest',
+  // Ohio Valley
+  illinois: 'us-ohio-valley', indiana: 'us-ohio-valley', kentucky: 'us-ohio-valley',
+  missouri: 'us-ohio-valley', ohio: 'us-ohio-valley', tennessee: 'us-ohio-valley',
+  'west virginia': 'us-ohio-valley',
+  // Southeast
+  alabama: 'us-southeast', florida: 'us-southeast', georgia: 'us-southeast',
+  'north carolina': 'us-southeast', 'south carolina': 'us-southeast', virginia: 'us-southeast',
+  // Northern Rockies and Plains
+  montana: 'us-northern-rockies-plains', nebraska: 'us-northern-rockies-plains',
+  'north dakota': 'us-northern-rockies-plains', 'south dakota': 'us-northern-rockies-plains',
+  wyoming: 'us-northern-rockies-plains',
+  // South
+  arkansas: 'us-south', kansas: 'us-south', louisiana: 'us-south',
+  mississippi: 'us-south', oklahoma: 'us-south', texas: 'us-south',
+  // Southwest
+  arizona: 'us-southwest', colorado: 'us-southwest',
+  'new mexico': 'us-southwest', utah: 'us-southwest',
+  // Northwest
+  idaho: 'us-northwest', oregon: 'us-northwest', washington: 'us-northwest',
+  // West
+  california: 'us-west', nevada: 'us-west',
+};
+
+interface GroupRow {
+  slug: string;
+  key: string;
+  label: string;
+  anomaly1m: number | null;
+  anomaly3m: number | null;
+  anomaly12m: number | null;
+  latestLabel: string | null;
+}
 
 // Antimeridian fix (reused from emissions-choropleth-map).
 // Without this, Russia / Fiji / Antarctica render a giant horizontal
@@ -428,16 +504,26 @@ function USStatesOverlay({
   windowSel,
   onInfo,
   statesGeo,
+  level,
+  usRegionGroups,
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
   onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
   statesGeo: FeatureCollection | null;
+  level: MapLevel;
+  usRegionGroups: GroupRow[] | null;
 }) {
   const map = useMap();
-  const [visible, setVisible] = useState(map.getZoom() >= US_STATES_ZOOM);
+  // In us-regions mode, force the overlay to be visible at any zoom so the
+  // region tinting is the main story rather than a zoom-only enhancement.
+  const [visible, setVisible] = useState(level === 'us-regions' || map.getZoom() >= US_STATES_ZOOM);
 
-  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= US_STATES_ZOOM) });
+  useMapEvents({ zoomend: () => setVisible(level === 'us-regions' || map.getZoom() >= US_STATES_ZOOM) });
+
+  useEffect(() => {
+    setVisible(level === 'us-regions' || map.getZoom() >= US_STATES_ZOOM);
+  }, [level, map]);
 
   const byName = useMemo(() => {
     const m = new Map<string, RankingRow>();
@@ -449,39 +535,55 @@ function USStatesOverlay({
     return m;
   }, [rankings]);
 
+  const regionBySlug = useMemo(() => {
+    const m = new Map<string, GroupRow>();
+    if (usRegionGroups) for (const g of usRegionGroups) m.set(g.slug, g);
+    return m;
+  }, [usRegionGroups]);
+
+  const resolve = useCallback((featureName: string): { anomaly: number | null; label: string | null; displayName: string } => {
+    if (level === 'us-regions') {
+      const slug = US_STATE_NAME_TO_REGION_SLUG[featureName.toLowerCase()];
+      const g = slug ? regionBySlug.get(slug) : undefined;
+      if (!g) return { anomaly: null, label: null, displayName: featureName };
+      const anomaly = windowSel === '3m' ? g.anomaly3m : windowSel === '12m' ? g.anomaly12m : g.anomaly1m;
+      return { anomaly, label: g.latestLabel, displayName: `${g.label} (US climate region)` };
+    }
+    const row = byName.get(featureName.toLowerCase());
+    return { anomaly: rankingValue(row, windowSel), label: row?.latestLabel ?? null, displayName: featureName };
+  }, [level, windowSel, byName, regionBySlug]);
+
   const style = useCallback(
     (feature: Feature | undefined): PathOptions => {
       const name = ((feature?.properties as any)?.name as string) ?? '';
-      const row = byName.get(name.toLowerCase());
-      const v = rankingValue(row, windowSel);
+      const { anomaly } = resolve(name);
       return {
-        fillColor: v != null ? anomalyColor(v) : '#1f2937',
+        fillColor: anomaly != null ? anomalyColor(anomaly) : '#1f2937',
         fillOpacity: 0.9,
         weight: 0.6,
         color: '#0b1220',
       };
     },
-    [byName, windowSel],
+    [resolve],
   );
 
   const onEachFeature = useCallback(
     (feature: Feature, layer: Layer) => {
       const name = ((feature.properties as any)?.name as string) ?? '';
-      const row = byName.get(name.toLowerCase());
-      const v = rankingValue(row, windowSel);
-      const color = v != null ? anomalyColor(v) : '#1f2937';
-      const show = () => onInfo({ name, anomaly: v, label: row?.latestLabel ?? null, color });
+      const { anomaly, label, displayName } = resolve(name);
+      const color = anomaly != null ? anomalyColor(anomaly) : '#1f2937';
+      const show = () => onInfo({ name: displayName, anomaly, label, color });
       layer.on('mouseover', show);
       layer.on('click', show);
       layer.on('mouseout', () => onInfo(null));
     },
-    [byName, windowSel, onInfo],
+    [resolve, onInfo],
   );
 
   if (!visible || !statesGeo) return null;
   return (
     <GeoJSON
-      key={`us-states-${windowSel}-${byName.size}`}
+      key={`us-states-${level}-${windowSel}-${byName.size}-${regionBySlug.size}`}
       data={statesGeo}
       style={style}
       onEachFeature={onEachFeature}
@@ -492,12 +594,14 @@ function USStatesOverlay({
 // UKRegionsOverlay removed - the map now shows UK as a single country polygon to
 // avoid mismatched sub-polygon coverage. Re-introduce from git history if needed.
 
-export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow }) {
+export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m', level = 'countries' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow; level?: MapLevel }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
   const [ukGeo, setUkGeo] = useState<FeatureCollection | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [rankings, setRankings] = useState<RankingRow[] | null>(null);
+  const [continentGroups, setContinentGroups] = useState<GroupRow[] | null>(null);
+  const [usRegionGroups, setUsRegionGroups] = useState<GroupRow[] | null>(null);
   const [selected, setSelected] = useState<{
     name: string;
     anomaly: number | null;
@@ -524,7 +628,12 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
       .catch(() => {});
     fetch('/data/climate/rankings.json')
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (!cancelled && d?.rows) setRankings(d.rows as RankingRow[]); })
+      .then((d) => {
+        if (cancelled || !d) return;
+        if (d.rows) setRankings(d.rows as RankingRow[]);
+        if (d.groups?.continents) setContinentGroups(d.groups.continents as GroupRow[]);
+        if (d.groups?.usClimateRegions) setUsRegionGroups(d.groups.usClimateRegions as GroupRow[]);
+      })
       .catch(() => {});
     return () => { cancelled = true; };
   }, []);
@@ -541,12 +650,31 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
   // Resolve the anomaly/label for the chosen window. Falls back to the
   // legacy 1-month fields so this component still works against older
   // snapshots that don't yet have 3m/12m data.
-  const pick = useCallback((c: CountryAnomaly | undefined) => {
-    if (!c) return { anomaly: null as number | null, label: null as string | null };
+  const continentByKey = useMemo(() => {
+    const m = new Map<string, GroupRow>();
+    if (continentGroups) for (const g of continentGroups) m.set(g.key, g);
+    return m;
+  }, [continentGroups]);
+
+  const groupValue = useCallback((g: GroupRow | undefined): { anomaly: number | null; label: string | null } => {
+    if (!g) return { anomaly: null, label: null };
+    if (windowSel === '3m') return { anomaly: g.anomaly3m, label: g.latestLabel };
+    if (windowSel === '12m') return { anomaly: g.anomaly12m, label: g.latestLabel };
+    return { anomaly: g.anomaly1m, label: g.latestLabel };
+  }, [windowSel]);
+
+  const pick = useCallback((c: CountryAnomaly | undefined): { anomaly: number | null; label: string | null } => {
+    if (level === 'continents') {
+      if (!c) return { anomaly: null, label: null };
+      const groupKey = CONTINENT_GROUP_KEY[c.iso3];
+      if (!groupKey) return { anomaly: null, label: null };
+      return groupValue(continentByKey.get(groupKey));
+    }
+    if (!c) return { anomaly: null, label: null };
     if (windowSel === '3m') return { anomaly: c.anomaly3m ?? null, label: c.label3m ?? null };
     if (windowSel === '12m') return { anomaly: c.anomaly12m ?? null, label: c.label12m ?? null };
     return { anomaly: c.anomaly1m ?? c.anomaly ?? null, label: c.label1m ?? c.monthLabel ?? null };
-  }, [windowSel]);
+  }, [windowSel, level, continentByKey, groupValue]);
 
   const style = useCallback((feature: Feature | undefined): PathOptions => {
     if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
@@ -566,19 +694,27 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
     const rec = lookup.get(name.toLowerCase());
     const { anomaly, label } = pick(rec);
     const color = anomaly != null ? anomalyColor(anomaly) : '#1f2937';
+    // In continents mode, the displayed name is the continent group label,
+    // not the individual country, so the bottom info bar makes sense.
+    let displayName = name;
+    if (level === 'continents' && rec) {
+      const groupKey = CONTINENT_GROUP_KEY[rec.iso3];
+      const group = groupKey ? continentByKey.get(groupKey) : undefined;
+      if (group) displayName = `${group.label} (continent)`;
+    }
     const show = () => setSelected({
-      name,
+      name: displayName,
       anomaly,
       monthLabel: label ?? undefined,
-      value: rec?.value,
-      rank: rec?.rank,
-      total: rec?.total,
+      value: level === 'countries' ? rec?.value : undefined,
+      rank: level === 'countries' ? rec?.rank : undefined,
+      total: level === 'countries' ? rec?.total : undefined,
       color,
     });
     layer.on('mouseover', show);
     layer.on('click', show);
     layer.on('mouseout', () => setSelected(null));
-  }, [lookup, pick]);
+  }, [lookup, pick, level, continentByKey]);
 
   const headlineLabel = pick(countryAnomalies[0]).label ?? '';
   const windowPhrase = windowSel === '12m' ? '12-month rolling' : windowSel === '3m' ? '3-month rolling' : 'monthly';
@@ -620,7 +756,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
             opacity={0.55}
           />
           <GeoJSON
-            key={`anomaly-${windowSel}-${lookup.size}`}
+            key={`anomaly-${level}-${windowSel}-${lookup.size}-${continentByKey.size}`}
             data={geo}
             style={style}
             onEachFeature={onEachFeature}
@@ -629,6 +765,8 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
             rankings={rankings}
             windowSel={windowSel}
             statesGeo={statesGeo}
+            level={level}
+            usRegionGroups={usRegionGroups}
             onInfo={(info) =>
               setSelected(
                 info
