@@ -43,9 +43,9 @@ const WINDOW_OPTS = [
 const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [
   { key: 'continents', label: 'Continents' },
   { key: 'countries', label: 'Countries' },
-  { key: 'uk-regions', label: 'UK regions' },
-  { key: 'us-states', label: 'US states' },
-  { key: 'us-regions', label: 'US climate regions' },
+  { key: 'uk-regions', label: 'UK Regions' },
+  { key: 'us-states', label: 'US States' },
+  { key: 'us-regions', label: 'US Climate Regions' },
 ];
 
 const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors';

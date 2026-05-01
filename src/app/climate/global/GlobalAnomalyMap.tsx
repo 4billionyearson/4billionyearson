@@ -307,14 +307,30 @@ function featureCentroid(feature: Feature): [number, number] | null {
 const US_STATE_LABEL_ZOOM = 4;
 const UK_NATION_LABEL_ZOOM = 4;
 
+// Approximate centroids for the 9 NOAA US climate regions, used as map labels
+// when level === 'us-regions' so the choropleth reads as 9 regions, not 49 states.
+const US_REGION_LABELS: { name: string; pos: [number, number] }[] = [
+  { name: 'Northeast', pos: [42.5, -73.5] },
+  { name: 'Upper Midwest', pos: [44.5, -91.0] },
+  { name: 'Ohio Valley', pos: [38.5, -86.5] },
+  { name: 'Southeast', pos: [33.0, -82.0] },
+  { name: 'Northern Rockies and Plains', pos: [44.5, -103.0] },
+  { name: 'South', pos: [33.5, -97.5] },
+  { name: 'Southwest', pos: [36.5, -109.5] },
+  { name: 'Northwest', pos: [45.0, -118.0] },
+  { name: 'West', pos: [37.5, -118.5] },
+];
+
 function MapLabels({
   countriesGeo,
   statesGeo,
   ukGeo,
+  level,
 }: {
   countriesGeo: FeatureCollection | null;
   statesGeo: FeatureCollection | null;
   ukGeo: FeatureCollection | null;
+  level: MapLevel;
 }) {
   const map = useMap();
   const [ready, setReady] = useState(false);
@@ -372,6 +388,29 @@ function MapLabels({
 
   if (!ready) return null;
 
+  // Continents mode: only continent labels at every zoom; no country / state / UK labels.
+  if (level === 'continents') {
+    const fz = zoom <= 2 ? 13 : zoom <= 3 ? 14 : 15;
+    return (
+      <>
+        {CONTINENT_LABELS.map(({ name, pos }) => (
+          <Marker
+            key={`cont-${name}`}
+            position={pos}
+            pane="labels"
+            interactive={false}
+            icon={L.divIcon({
+              className: 'continent-label',
+              html: `<span style="font-size:${fz}px">${name}</span>`,
+              iconSize: [0, 0],
+              iconAnchor: [0, 0],
+            })}
+          />
+        ))}
+      </>
+    );
+  }
+
   const visibleCountries =
     zoom <= 2
       ? CONTINENT_LABELS
@@ -381,6 +420,13 @@ function MapLabels({
 
   const fontSize = zoom <= 2 ? 13 : 10;
   const cls = zoom <= 2 ? 'continent-label' : 'country-label';
+
+  // Whether to draw the per-state labels for the US. Suppressed in 'countries'
+  // mode (we don't want state labels on the world view) and in 'us-regions'
+  // mode (we draw 9-region labels instead).
+  const showStateLabels = level === 'us-states';
+  const showUkLabels = level === 'uk-regions';
+  const showRegionLabels = level === 'us-regions';
 
   return (
     <>
@@ -398,7 +444,7 @@ function MapLabels({
           })}
         />
       ))}
-      {zoom >= US_STATE_LABEL_ZOOM && stateLabels.map(({ name, pos }) => (
+      {showStateLabels && zoom >= US_STATE_LABEL_ZOOM && stateLabels.map(({ name, pos }) => (
         <Marker
           key={`s-${name}`}
           position={pos}
@@ -412,7 +458,21 @@ function MapLabels({
           })}
         />
       ))}
-      {zoom >= UK_NATION_LABEL_ZOOM && ukLabels.map(({ name, pos }) => (
+      {showRegionLabels && US_REGION_LABELS.map(({ name, pos }) => (
+        <Marker
+          key={`reg-${name}`}
+          position={pos}
+          pane="labels"
+          interactive={false}
+          icon={L.divIcon({
+            className: 'country-label',
+            html: `<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em">${name}</span>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0],
+          })}
+        />
+      ))}
+      {showUkLabels && zoom >= UK_NATION_LABEL_ZOOM && ukLabels.map(({ name, pos }) => (
         <Marker
           key={`uk-${name}`}
           position={pos}
@@ -472,13 +532,14 @@ function UKNationsOverlay({
 }) {
   const map = useMap();
   const forced = level === 'uk-regions';
-  const [visible, setVisible] = useState(forced || map.getZoom() >= UK_NATIONS_ZOOM);
+  const allowed = forced;
+  const [visible, setVisible] = useState(forced || (allowed && map.getZoom() >= UK_NATIONS_ZOOM));
 
-  useMapEvents({ zoomend: () => setVisible(forced || map.getZoom() >= UK_NATIONS_ZOOM) });
+  useMapEvents({ zoomend: () => setVisible(forced || (allowed && map.getZoom() >= UK_NATIONS_ZOOM)) });
 
   useEffect(() => {
-    setVisible(forced || map.getZoom() >= UK_NATIONS_ZOOM);
-  }, [forced, map]);
+    setVisible(forced || (allowed && map.getZoom() >= UK_NATIONS_ZOOM));
+  }, [forced, allowed, map]);
 
   const bySlug = useMemo(() => {
     const m = new Map<string, RankingRow>();
@@ -549,14 +610,17 @@ function USStatesOverlay({
   const map = useMap();
   // In us-states / us-regions mode the overlay is forced visible at any zoom
   // so the choropleth is the main story rather than a zoom-only enhancement.
+  // In continents / countries / uk-regions mode the overlay is hidden at all
+  // zooms so the user only ever sees the polygons that match the active level.
   const forced = level === 'us-states' || level === 'us-regions';
-  const [visible, setVisible] = useState(forced || map.getZoom() >= US_STATES_ZOOM);
+  const allowed = forced;
+  const [visible, setVisible] = useState(forced || (allowed && map.getZoom() >= US_STATES_ZOOM));
 
-  useMapEvents({ zoomend: () => setVisible(forced || map.getZoom() >= US_STATES_ZOOM) });
+  useMapEvents({ zoomend: () => setVisible(forced || (allowed && map.getZoom() >= US_STATES_ZOOM)) });
 
   useEffect(() => {
-    setVisible(forced || map.getZoom() >= US_STATES_ZOOM);
-  }, [forced, map]);
+    setVisible(forced || (allowed && map.getZoom() >= US_STATES_ZOOM));
+  }, [forced, allowed, map]);
 
   const byName = useMemo(() => {
     const m = new Map<string, RankingRow>();
@@ -827,7 +891,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
               )
             }
           />
-          <MapLabels countriesGeo={geo} statesGeo={statesGeo} ukGeo={ukGeo} />
+          <MapLabels countriesGeo={geo} statesGeo={statesGeo} ukGeo={ukGeo} level={level} />
           {/* UK nations overlay disabled - map is country-level; UK renders as a single polygon
               from world-countries.json to avoid mismatched sub-polygon coverage. */}
         </MapContainer>

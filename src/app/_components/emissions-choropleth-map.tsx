@@ -192,7 +192,7 @@ function SetMobileView() {
 
 /* ─── Country labels ────────────────────────────────────────────────────── */
 
-function CountryLabels({ geo }: { geo: FeatureCollection }) {
+function CountryLabels({ geo, level }: { geo: FeatureCollection; level: Level }) {
   const map = useMap();
   const [ready, setReady] = useState(false);
   const [zoom, setZoom] = useState(map.getZoom());
@@ -222,6 +222,29 @@ function CountryLabels({ geo }: { geo: FeatureCollection }) {
   }, [geo]);
 
   if (!ready) return null;
+
+  // Continents level: only the six continent labels at every zoom.
+  if (level === 'continents') {
+    const fz = zoom <= 2 ? 13 : zoom <= 3 ? 14 : 15;
+    return (
+      <>
+        {CONTINENT_LABELS.map(({ name, pos }) => (
+          <Marker
+            key={name}
+            position={pos}
+            pane="labels"
+            interactive={false}
+            icon={L.divIcon({
+              className: 'continent-label',
+              html: `<span style="font-size:${fz}px">${name}</span>`,
+              iconSize: [0, 0],
+              iconAnchor: [0, 0],
+            })}
+          />
+        ))}
+      </>
+    );
+  }
 
   const visibleLabels =
     zoom <= 2 ? CONTINENT_LABELS
@@ -260,6 +283,81 @@ function formatTonnes(v: number): string {
   return `${v.toFixed(0)} t`;
 }
 
+/* ─── Continent grouping ────────────────────────────────────────────────── */
+
+type Level = 'countries' | 'continents';
+const CONTINENTS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'] as const;
+type ContinentName = (typeof CONTINENTS)[number];
+
+// Country (OWID-style display name) → continent. Used to roll country polygons
+// up to the active continent when level === 'continents'. Mirrors the OWID
+// continent assignment exposed by /api/climate/emissions/country?continent=.
+const CONTINENT_OF: Record<string, ContinentName> = {
+  // Africa
+  'Algeria': 'Africa', 'Angola': 'Africa', 'Benin': 'Africa', 'Botswana': 'Africa',
+  'Burkina Faso': 'Africa', 'Burundi': 'Africa', 'Cameroon': 'Africa', 'Cape Verde': 'Africa',
+  'Central African Republic': 'Africa', 'Chad': 'Africa', 'Comoros': 'Africa',
+  'Democratic Republic of Congo': 'Africa', 'Congo': 'Africa', "Cote d'Ivoire": 'Africa',
+  'Djibouti': 'Africa', 'Egypt': 'Africa', 'Equatorial Guinea': 'Africa', 'Eritrea': 'Africa',
+  'Eswatini': 'Africa', 'Ethiopia': 'Africa', 'Gabon': 'Africa', 'Gambia': 'Africa',
+  'Ghana': 'Africa', 'Guinea': 'Africa', 'Guinea-Bissau': 'Africa', 'Kenya': 'Africa',
+  'Lesotho': 'Africa', 'Liberia': 'Africa', 'Libya': 'Africa', 'Madagascar': 'Africa',
+  'Malawi': 'Africa', 'Mali': 'Africa', 'Mauritania': 'Africa', 'Mauritius': 'Africa',
+  'Morocco': 'Africa', 'Mozambique': 'Africa', 'Namibia': 'Africa', 'Niger': 'Africa',
+  'Nigeria': 'Africa', 'Rwanda': 'Africa', 'Senegal': 'Africa', 'Sierra Leone': 'Africa',
+  'Somalia': 'Africa', 'South Africa': 'Africa', 'South Sudan': 'Africa', 'Sudan': 'Africa',
+  'Tanzania': 'Africa', 'Togo': 'Africa', 'Tunisia': 'Africa', 'Uganda': 'Africa',
+  'Western Sahara': 'Africa', 'Zambia': 'Africa', 'Zimbabwe': 'Africa',
+  // Asia
+  'Afghanistan': 'Asia', 'Armenia': 'Asia', 'Azerbaijan': 'Asia', 'Bahrain': 'Asia',
+  'Bangladesh': 'Asia', 'Bhutan': 'Asia', 'Brunei': 'Asia', 'Cambodia': 'Asia',
+  'China': 'Asia', 'Cyprus': 'Asia', 'Georgia': 'Asia', 'India': 'Asia',
+  'Indonesia': 'Asia', 'Iran': 'Asia', 'Iraq': 'Asia', 'Israel': 'Asia',
+  'Japan': 'Asia', 'Jordan': 'Asia', 'Kazakhstan': 'Asia', 'Kuwait': 'Asia',
+  'Kyrgyzstan': 'Asia', 'Laos': 'Asia', 'Lebanon': 'Asia', 'Malaysia': 'Asia',
+  'Maldives': 'Asia', 'Mongolia': 'Asia', 'Myanmar': 'Asia', 'Nepal': 'Asia',
+  'North Korea': 'Asia', 'Oman': 'Asia', 'Pakistan': 'Asia', 'Palestine': 'Asia',
+  'Philippines': 'Asia', 'Qatar': 'Asia', 'Saudi Arabia': 'Asia', 'Singapore': 'Asia',
+  'South Korea': 'Asia', 'Sri Lanka': 'Asia', 'Syria': 'Asia', 'Taiwan': 'Asia',
+  'Tajikistan': 'Asia', 'Thailand': 'Asia', 'Timor': 'Asia', 'Turkey': 'Asia',
+  'Turkmenistan': 'Asia', 'United Arab Emirates': 'Asia', 'Uzbekistan': 'Asia',
+  'Vietnam': 'Asia', 'Yemen': 'Asia',
+  // Europe
+  'Albania': 'Europe', 'Andorra': 'Europe', 'Austria': 'Europe', 'Belarus': 'Europe',
+  'Belgium': 'Europe', 'Bosnia and Herzegovina': 'Europe', 'Bulgaria': 'Europe',
+  'Croatia': 'Europe', 'Czechia': 'Europe', 'Denmark': 'Europe', 'Estonia': 'Europe',
+  'Finland': 'Europe', 'France': 'Europe', 'Germany': 'Europe', 'Greece': 'Europe',
+  'Hungary': 'Europe', 'Iceland': 'Europe', 'Ireland': 'Europe', 'Italy': 'Europe',
+  'Kosovo': 'Europe', 'Latvia': 'Europe', 'Liechtenstein': 'Europe', 'Lithuania': 'Europe',
+  'Luxembourg': 'Europe', 'Malta': 'Europe', 'Moldova': 'Europe', 'Monaco': 'Europe',
+  'Montenegro': 'Europe', 'Netherlands': 'Europe', 'North Cyprus': 'Europe',
+  'North Macedonia': 'Europe', 'Norway': 'Europe', 'Poland': 'Europe', 'Portugal': 'Europe',
+  'Romania': 'Europe', 'Russia': 'Europe', 'San Marino': 'Europe', 'Serbia': 'Europe',
+  'Slovakia': 'Europe', 'Slovenia': 'Europe', 'Spain': 'Europe', 'Sweden': 'Europe',
+  'Switzerland': 'Europe', 'Ukraine': 'Europe', 'United Kingdom': 'Europe', 'Vatican': 'Europe',
+  // North America
+  'Antigua and Barbuda': 'North America', 'Bahamas': 'North America', 'Barbados': 'North America',
+  'Belize': 'North America', 'Canada': 'North America', 'Costa Rica': 'North America',
+  'Cuba': 'North America', 'Dominica': 'North America', 'Dominican Republic': 'North America',
+  'El Salvador': 'North America', 'Greenland': 'North America', 'Grenada': 'North America',
+  'Guatemala': 'North America', 'Haiti': 'North America', 'Honduras': 'North America',
+  'Jamaica': 'North America', 'Mexico': 'North America', 'Nicaragua': 'North America',
+  'Panama': 'North America', 'Saint Kitts and Nevis': 'North America', 'Saint Lucia': 'North America',
+  'Saint Vincent and the Grenadines': 'North America', 'Trinidad and Tobago': 'North America',
+  'United States': 'North America',
+  // South America
+  'Argentina': 'South America', 'Bolivia': 'South America', 'Brazil': 'South America',
+  'Chile': 'South America', 'Colombia': 'South America', 'Ecuador': 'South America',
+  'Falkland Islands': 'South America', 'French Southern Territories': 'South America',
+  'Guyana': 'South America', 'Paraguay': 'South America', 'Peru': 'South America',
+  'Suriname': 'South America', 'Uruguay': 'South America', 'Venezuela': 'South America',
+  // Oceania
+  'Australia': 'Oceania', 'Fiji': 'Oceania', 'Kiribati': 'Oceania', 'Marshall Islands': 'Oceania',
+  'Micronesia': 'Oceania', 'Nauru': 'Oceania', 'New Zealand': 'Oceania', 'Palau': 'Oceania',
+  'Papua New Guinea': 'Oceania', 'Samoa': 'Oceania', 'Solomon Islands': 'Oceania',
+  'Tonga': 'Oceania', 'Tuvalu': 'Oceania', 'Vanuatu': 'Oceania',
+};
+
 /* ─── Main component ────────────────────────────────────────────────────── */
 
 interface CountryEmissions {
@@ -275,6 +373,8 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<MetricMode>("perCapita");
+  const [level, setLevel] = useState<Level>('countries');
+  const [continentData, setContinentData] = useState<Record<string, CountryEmissions> | null>(null);
   const [selectedInfo, setSelectedInfo] = useState<{ name: string; annual: number | null; perCapita: number | null; color: string } | null>(null);
 
   useEffect(() => {
@@ -285,6 +385,33 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
+  // Fetch the six OWID continent aggregates the first time the user picks
+  // the Continents level. Cached after first load.
+  useEffect(() => {
+    if (level !== 'continents' || continentData) return;
+    let cancelled = false;
+    (async () => {
+      const out: Record<string, CountryEmissions> = {};
+      const results = await Promise.all(
+        CONTINENTS.map((c) =>
+          fetch(`/api/climate/emissions/country?continent=${encodeURIComponent(c)}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null),
+        ),
+      );
+      results.forEach((r, i) => {
+        if (!r?.country) return;
+        const c = r.country;
+        out[CONTINENTS[i]] = {
+          annual: c.latestAnnual ?? 0,
+          perCapita: c.latestPerCapita ?? 0,
+        };
+      });
+      if (!cancelled) setContinentData(out);
+    })();
+    return () => { cancelled = true; };
+  }, [level, continentData]);
+
   const dataMap = useMemo(() => {
     const m = new Map<string, CountryEmissions>();
     for (const [name, vals] of Object.entries(countryMapData)) {
@@ -293,38 +420,51 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
     return m;
   }, [countryMapData]);
 
+  // Resolve the value to render for a given world-countries.json feature, taking
+  // the active level into account. In continents mode every country in the same
+  // continent gets tinted with the continent aggregate so the choropleth reads
+  // as six bands rather than ~190 polygons.
+  const resolveEntry = useCallback((owidName: string): { entry: CountryEmissions | undefined; displayName: string } => {
+    if (level === 'continents') {
+      const cont = CONTINENT_OF[owidName];
+      if (!cont || !continentData) return { entry: undefined, displayName: cont ?? owidName };
+      return { entry: continentData[cont], displayName: cont };
+    }
+    return { entry: dataMap.get(owidName), displayName: owidName };
+  }, [level, continentData, dataMap]);
+
   const style = useCallback(
     (feature: Feature | undefined): PathOptions => {
       if (!feature) return { fillColor: "#1e293b", fillOpacity: 0.7, weight: 0.5, color: "#475569" };
       const geoName = feature.properties?.name || "";
       const owidName = NAME_MAP[geoName] || geoName;
-      const entry = dataMap.get(owidName);
+      const { entry } = resolveEntry(owidName);
       const value = entry ? (mode === "perCapita" ? entry.perCapita : entry.annual) : undefined;
       return {
         fillColor: getColor(mode, value),
         fillOpacity: 0.8,
-        weight: 0.5,
+        weight: level === 'continents' ? 0.2 : 0.5,
         color: "#334155",
       };
     },
-    [dataMap, mode],
+    [resolveEntry, mode, level],
   );
 
   const onEachFeature = useCallback(
     (feature: Feature, layer: Layer) => {
       const geoName = feature.properties?.name || "";
       const owidName = NAME_MAP[geoName] || geoName;
-      const entry = dataMap.get(owidName);
+      const { entry, displayName } = resolveEntry(owidName);
       const annual = entry?.annual ?? null;
       const perCap = entry?.perCapita ?? null;
       const color = getColor(mode, mode === "perCapita" ? perCap ?? undefined : annual ?? undefined);
 
-      const showInfo = () => setSelectedInfo({ name: owidName, annual, perCapita: perCap, color });
+      const showInfo = () => setSelectedInfo({ name: displayName, annual, perCapita: perCap, color });
       layer.on("mouseover", showInfo);
       layer.on("click", showInfo);
       layer.on("mouseout", () => setSelectedInfo(null));
     },
-    [dataMap, mode],
+    [resolveEntry, mode],
   );
 
   if (loading) {
@@ -348,7 +488,28 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
   return (
     <div>
-      {/* Toggle */}
+      {/* Level toggle */}
+      <div className="flex flex-wrap items-center gap-2 mb-2">
+        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Level</span>
+        <button
+          onClick={() => setLevel('continents')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+            level === 'continents' ? 'bg-red-500/20 text-red-300 border border-red-500/40' : 'bg-gray-800/50 text-gray-400 hover:text-white border border-transparent'
+          }`}
+        >
+          Continents
+        </button>
+        <button
+          onClick={() => setLevel('countries')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+            level === 'countries' ? 'bg-red-500/20 text-red-300 border border-red-500/40' : 'bg-gray-800/50 text-gray-400 hover:text-white border border-transparent'
+          }`}
+        >
+          Countries
+        </button>
+      </div>
+
+      {/* Metric toggle */}
       <div className="flex gap-2 mb-3">
         <button
           onClick={() => setMode("perCapita")}
@@ -387,12 +548,12 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
           />
           <GeoJSON
-            key={`${mode}-${dataMap.size}`}
+            key={`${level}-${mode}-${dataMap.size}-${continentData ? Object.keys(continentData).length : 0}`}
             data={geoData}
             style={style}
             onEachFeature={onEachFeature}
           />
-          <CountryLabels geo={geoData} />
+          <CountryLabels geo={geoData} level={level} />
         </MapContainer>
 
         {/* Info bar */}

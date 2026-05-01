@@ -227,8 +227,8 @@ function buildRollups(rows: RankingRow[]): {
   const usRegions = Object.entries(usBuckets).map(([k, v]) => toGroup(k, v));
   const types = [
     toGroup('Countries', typeBuckets.country),
-    toGroup('US states', typeBuckets['us-state']),
-    toGroup('UK regions', typeBuckets['uk-region']),
+    toGroup('US States', typeBuckets['us-state']),
+    toGroup('UK Regions', typeBuckets['uk-region']),
   ].filter((g) => g.count > 0);
 
   return { continents, usRegions, types };

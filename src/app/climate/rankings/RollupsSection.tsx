@@ -107,7 +107,7 @@ export default function RollupsSection({
     <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <h2 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
         <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-        <span className="min-w-0 flex-1">Roll-ups by group</span>
+        <span className="min-w-0 flex-1">Roll-ups by Group</span>
       </h2>
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Window</span>
@@ -123,9 +123,9 @@ export default function RollupsSection({
         ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <RollupCard title="By continent" groups={continents} windowKey={windowKey} />
-        <RollupCard title="By US climate region" groups={usRegions} windowKey={windowKey} />
-        <RollupCard title="By region type" groups={types} windowKey={windowKey} />
+        <RollupCard title="By Continent" groups={continents} windowKey={windowKey} />
+        <RollupCard title="By US Climate Region" groups={usRegions} windowKey={windowKey} />
+        <RollupCard title="By Region Type" groups={types} windowKey={windowKey} />
       </div>
     </section>
   );

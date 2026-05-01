@@ -23,7 +23,7 @@ interface StateEnergyApiResponse {
   fetchedAt: string;
 }
 
-type Mode = 'country' | 'us-state';
+type Mode = 'country' | 'us-state' | 'continent';
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -104,7 +104,7 @@ const BRUSH_HEIGHT = 30;
 /* ─── Region Search (climate-hub styled) ─────────────────────────────────── */
 
 function RegionSearch({ mode, onSelect, loading }: {
-  mode: Mode;
+  mode: 'country' | 'us-state';
   onSelect: (value: { name: string; code?: string }) => void;
   loading: boolean;
 }) {
@@ -297,13 +297,17 @@ export default function EmissionsCountryPanel({
     }
   }, []);
 
-  // Fetch country data whenever name changes
+  // Fetch country data whenever name changes. The same endpoint serves
+  // continent aggregates via ?continent=Name when mode === 'continent'.
   useEffect(() => {
     if (!countryName) { setData(null); setError(null); return; }
     let cancelled = false;
     setLoading(true);
     setError(null);
-    fetch(`/api/climate/emissions/country?name=${encodeURIComponent(countryName)}`)
+    const url = mode === 'continent'
+      ? `/api/climate/emissions/country?continent=${encodeURIComponent(countryName)}`
+      : `/api/climate/emissions/country?name=${encodeURIComponent(countryName)}`;
+    fetch(url)
       .then(r => r.json())
       .then(d => {
         if (cancelled) return;
@@ -313,7 +317,7 @@ export default function EmissionsCountryPanel({
       .catch(e => { if (!cancelled) setError(e.message || 'Failed to load'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [countryName]);
+  }, [countryName, mode]);
 
   // Fetch state data whenever selection changes
   useEffect(() => {
@@ -386,7 +390,7 @@ export default function EmissionsCountryPanel({
     ? ''
     : 'bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl';
 
-  const hasSelection = mode === 'country' ? country != null : stateData?.usState != null;
+  const hasSelection = mode === 'us-state' ? stateData?.usState != null : country != null;
 
   return (
     <div id="emissions-country-panel" className={wrapperClass}>
@@ -407,6 +411,7 @@ export default function EmissionsCountryPanel({
       <div role="tablist" aria-label="Emissions region type" className="flex gap-2 overflow-x-auto mb-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {([
           { id: 'country', label: 'Countries', Icon: Globe2 },
+          { id: 'continent', label: 'Continents', Icon: Globe },
           { id: 'us-state', label: 'US States', Icon: Flag },
         ] as const).map(({ id, label, Icon }) => {
           const isActive = mode === id;
@@ -433,26 +438,53 @@ export default function EmissionsCountryPanel({
       <p className="text-xs text-gray-400 mb-3">
         {mode === 'country'
           ? 'Pick a country to see its annual, per-capita, and cumulative CO₂ emissions, its rank among ~200 reporting nations, and its share of today\u2019s global total.'
-          : 'Pick a US state to see its energy-related CO₂ emissions compared against the US national total and the world.'}
+          : mode === 'continent'
+            ? 'Pick a continent to see its OWID aggregate annual, per-capita, and cumulative CO₂ emissions and share of today\u2019s global total.'
+            : 'Pick a US state to see its energy-related CO₂ emissions compared against the US national total and the world.'}
       </p>
 
-      <RegionSearch
-        mode={mode}
-        onSelect={(v) => {
-          if (mode === 'country') selectCountry(v.name);
-          else if (v.code) selectState(v.name, v.code);
-        }}
-        loading={mode === 'country' ? loading : stateLoading}
-      />
+      {mode === 'continent' ? (
+        <div className="flex flex-wrap gap-2">
+          {(['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'] as const).map((c) => {
+            const active = countryName === c;
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => selectCountry(c)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                  active
+                    ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
+                    : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]'
+                }`}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <RegionSearch
+          mode={mode === 'us-state' ? 'us-state' : 'country'}
+          onSelect={(v) => {
+            if (mode === 'us-state') {
+              if (v.code) selectState(v.name, v.code);
+            } else {
+              selectCountry(v.name);
+            }
+          }}
+          loading={mode === 'us-state' ? stateLoading : loading}
+        />
+      )}
 
-      {mode === 'country' && error && (
+      {mode !== 'us-state' && error && (
         <div className="mt-4 rounded-lg border border-red-800/50 bg-red-950/30 p-3 text-sm text-red-400">{error}</div>
       )}
       {mode === 'us-state' && stateError && (
         <div className="mt-4 rounded-lg border border-red-800/50 bg-red-950/30 p-3 text-sm text-red-400">{stateError}</div>
       )}
 
-      {mode === 'country' && loading && !data && (
+      {mode !== 'us-state' && loading && !data && (
         <div className="mt-6 flex items-center justify-center gap-2 text-gray-400 text-sm">
           <Loader2 className="h-5 w-5 animate-spin text-[#D0A65E]" />
           Loading {countryName}…
@@ -469,7 +501,7 @@ export default function EmissionsCountryPanel({
         <USStateDeepDive data={stateData} worldAnnual={worldAnnual} />
       )}
 
-      {mode === 'country' && country && (
+      {mode !== 'us-state' && country && (
         <div className="mt-5 space-y-5">
           {/* Header with name + link to climate page */}
           <div className="flex items-baseline justify-between flex-wrap gap-2 border-b border-gray-800/60 pb-3">
