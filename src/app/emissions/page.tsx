@@ -224,10 +224,13 @@ export default function EmissionsPage() {
           {/* ─── Hero + Country Deep Dive (combined) ──────────────── */}
           {/* No overflow-hidden here — the search dropdown inside the
               EmissionsCountryPanel needs to escape the wrapper's bounds.
-              Rounded corners are applied to the inner header & body so the
-              hero still looks clipped. */}
-          <div className="relative z-20 rounded-2xl border-2 border-[#D0A65E] shadow-xl">
-            <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-2xl" style={{ backgroundColor: '#D0A65E' }}>
+              The gold band is painted via a linear-gradient on this wrapper
+              itself so it fills the rounded corners cleanly inside the border. */}
+          <div
+            className="relative z-20 rounded-2xl border-2 border-[#D0A65E] shadow-xl"
+            style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 76px, transparent 76px)' }}
+          >
+            <div className="px-4 py-3 md:px-6 md:py-4">
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 CO₂ Emissions
               </h1>

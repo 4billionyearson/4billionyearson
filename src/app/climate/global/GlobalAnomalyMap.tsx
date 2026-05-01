@@ -79,6 +79,78 @@ const CONTINENT_GROUP_KEY: Record<string, string> = {
   AUS: 'oceania', NZL: 'oceania',
 };
 
+// Geojson country name (lowercase) → continent group key. Covers every name
+// in public/data/world-countries.json so that, in 'continents' mode, every
+// country polygon resolves to a continent (not just the ones we have a
+// monthly snapshot for). Greenland is intentionally absent — NOAA does not
+// publish a continent-aggregated value that includes it.
+const NAME_TO_CONTINENT: Record<string, string> = {
+  // Africa
+  algeria: 'africa', angola: 'africa', benin: 'africa', botswana: 'africa',
+  'burkina faso': 'africa', burundi: 'africa', cameroon: 'africa',
+  'central african rep.': 'africa', chad: 'africa', congo: 'africa',
+  "côte d'ivoire": 'africa', 'dem. rep. congo': 'africa', djibouti: 'africa',
+  egypt: 'africa', 'eq. guinea': 'africa', eritrea: 'africa',
+  eswatini: 'africa', ethiopia: 'africa', gabon: 'africa', gambia: 'africa',
+  ghana: 'africa', guinea: 'africa', 'guinea-bissau': 'africa',
+  kenya: 'africa', lesotho: 'africa', liberia: 'africa', libya: 'africa',
+  madagascar: 'africa', malawi: 'africa', mali: 'africa',
+  mauritania: 'africa', morocco: 'africa', mozambique: 'africa',
+  namibia: 'africa', niger: 'africa', nigeria: 'africa', rwanda: 'africa',
+  's. sudan': 'africa', senegal: 'africa', 'sierra leone': 'africa',
+  somalia: 'africa', somaliland: 'africa', 'south africa': 'africa',
+  sudan: 'africa', tanzania: 'africa', togo: 'africa', tunisia: 'africa',
+  uganda: 'africa', 'w. sahara': 'africa', zambia: 'africa',
+  zimbabwe: 'africa',
+  // Asia
+  afghanistan: 'asia', armenia: 'asia', azerbaijan: 'asia',
+  bangladesh: 'asia', bhutan: 'asia', brunei: 'asia', cambodia: 'asia',
+  china: 'asia', cyprus: 'asia', georgia: 'asia', india: 'asia',
+  indonesia: 'asia', iran: 'asia', iraq: 'asia', israel: 'asia',
+  japan: 'asia', jordan: 'asia', kazakhstan: 'asia', kuwait: 'asia',
+  kyrgyzstan: 'asia', laos: 'asia', lebanon: 'asia', malaysia: 'asia',
+  mongolia: 'asia', myanmar: 'asia', 'n. cyprus': 'asia', nepal: 'asia',
+  'north korea': 'asia', oman: 'asia', pakistan: 'asia', palestine: 'asia',
+  philippines: 'asia', qatar: 'asia', 'saudi arabia': 'asia',
+  'south korea': 'asia', 'sri lanka': 'asia', syria: 'asia', taiwan: 'asia',
+  tajikistan: 'asia', thailand: 'asia', 'timor-leste': 'asia',
+  turkey: 'asia', turkmenistan: 'asia',
+  'united arab emirates': 'asia', uzbekistan: 'asia', vietnam: 'asia',
+  yemen: 'asia',
+  // Europe (Russia counted with Europe per NOAA convention)
+  albania: 'europe', austria: 'europe', belarus: 'europe', belgium: 'europe',
+  'bosnia and herz.': 'europe', bulgaria: 'europe', croatia: 'europe',
+  czechia: 'europe', denmark: 'europe', estonia: 'europe', finland: 'europe',
+  france: 'europe', germany: 'europe', greece: 'europe', hungary: 'europe',
+  iceland: 'europe', ireland: 'europe', italy: 'europe', kosovo: 'europe',
+  latvia: 'europe', lithuania: 'europe', luxembourg: 'europe',
+  moldova: 'europe', montenegro: 'europe', netherlands: 'europe',
+  norway: 'europe', poland: 'europe', portugal: 'europe', romania: 'europe',
+  russia: 'europe', serbia: 'europe', slovakia: 'europe', slovenia: 'europe',
+  spain: 'europe', sweden: 'europe', switzerland: 'europe', ukraine: 'europe',
+  'united kingdom': 'europe',
+  // North America
+  bahamas: 'northAmerica', belize: 'northAmerica', canada: 'northAmerica',
+  'costa rica': 'northAmerica', cuba: 'northAmerica',
+  'dominican rep.': 'northAmerica', 'el salvador': 'northAmerica',
+  guatemala: 'northAmerica', haiti: 'northAmerica', honduras: 'northAmerica',
+  jamaica: 'northAmerica', mexico: 'northAmerica',
+  nicaragua: 'northAmerica', panama: 'northAmerica',
+  'puerto rico': 'northAmerica',
+  'trinidad and tobago': 'northAmerica',
+  'united states of america': 'northAmerica',
+  // South America
+  argentina: 'southAmerica', bolivia: 'southAmerica', brazil: 'southAmerica',
+  chile: 'southAmerica', colombia: 'southAmerica', ecuador: 'southAmerica',
+  'falkland is.': 'southAmerica', guyana: 'southAmerica',
+  paraguay: 'southAmerica', peru: 'southAmerica', suriname: 'southAmerica',
+  uruguay: 'southAmerica', venezuela: 'southAmerica',
+  // Oceania
+  australia: 'oceania', fiji: 'oceania', 'new caledonia': 'oceania',
+  'new zealand': 'oceania', 'papua new guinea': 'oceania',
+  'solomon is.': 'oceania', vanuatu: 'oceania',
+};
+
 // US state name (lowercase) → NOAA US climate region group slug. Used when
 // the map level is 'us-regions' so the state overlay shows region-level anomaly.
 const US_STATE_NAME_TO_REGION_SLUG: Record<string, string> = {
@@ -416,7 +488,9 @@ function MapLabels({
       ? CONTINENT_LABELS
       : zoom <= 3
         ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
-        : countryLabels.filter(({ name }) => name !== 'United Kingdom');
+        : level === 'uk-regions'
+          ? countryLabels.filter(({ name }) => name !== 'United Kingdom')
+          : countryLabels;
 
   const fontSize = zoom <= 2 ? 13 : 10;
   const cls = zoom <= 2 ? 'continent-label' : 'country-label';
@@ -428,9 +502,14 @@ function MapLabels({
   const showUkLabels = level === 'uk-regions';
   const showRegionLabels = level === 'us-regions';
 
+  // In sub-national modes (uk-regions, us-states, us-regions) hide the
+  // country-name labels for OTHER countries — the user is focused on the
+  // active overlay so e.g. "Denmark" / "France" should not clutter the UK view.
+  const hideCountryLabels = level === 'uk-regions' || level === 'us-states' || level === 'us-regions';
+
   return (
     <>
-      {visibleCountries.map(({ name, pos }) => (
+      {!hideCountryLabels && visibleCountries.map(({ name, pos }) => (
         <Marker
           key={`c-${name}`}
           position={pos}
@@ -760,15 +839,19 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
     return { anomaly: g.anomaly1m, label: g.latestLabel };
   }, [windowSel]);
 
-  const pick = useCallback((c: CountryAnomaly | undefined): { anomaly: number | null; label: string | null } => {
+  const pick = useCallback((c: CountryAnomaly | undefined, name?: string): { anomaly: number | null; label: string | null } => {
     // In sub-national levels we don't tint country polygons - the overlay
     // (US states or UK nations) carries the data instead.
     if (level === 'us-states' || level === 'us-regions' || level === 'uk-regions') {
       return { anomaly: null, label: null };
     }
     if (level === 'continents') {
-      if (!c) return { anomaly: null, label: null };
-      const groupKey = CONTINENT_GROUP_KEY[c.iso3];
+      // Resolve continent by GEOJSON NAME so every polygon (incl. countries
+      // we don't have a snapshot for, e.g. Russia, small African states) gets
+      // its continent's anomaly rather than falling back to "no data".
+      const byName = name ? NAME_TO_CONTINENT[name.toLowerCase()] : undefined;
+      const byIso = c ? CONTINENT_GROUP_KEY[c.iso3] : undefined;
+      const groupKey = byName ?? byIso;
       if (!groupKey) return { anomaly: null, label: null };
       return groupValue(continentByKey.get(groupKey));
     }
@@ -782,7 +865,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
     if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
     const name = ((feature.properties as any)?.name as string) ?? '';
     const rec = lookup.get(name.toLowerCase());
-    const { anomaly } = pick(rec);
+    const { anomaly } = pick(rec, name);
     return {
       fillColor: anomaly != null ? anomalyColor(anomaly) : '#1f2937',
       fillOpacity: 0.85,
@@ -793,14 +876,19 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
 
   const onEachFeature = useCallback((feature: Feature, layer: Layer) => {
     const name = ((feature.properties as any)?.name as string) ?? '';
+    // In sub-national levels the country polygons are just a backdrop -
+    // suppress all hover/click interactions so users don't get a "no data"
+    // tooltip on, e.g. Denmark while looking at UK regions.
+    if (level === 'us-states' || level === 'us-regions' || level === 'uk-regions') {
+      return;
+    }
     const rec = lookup.get(name.toLowerCase());
-    const { anomaly, label } = pick(rec);
+    const { anomaly, label } = pick(rec, name);
     const color = anomaly != null ? anomalyColor(anomaly) : '#1f2937';
-    // In continents mode, the displayed name is the continent group label,
-    // not the individual country, so the bottom info bar makes sense.
+    // In continents mode the displayed name is the continent, not the country.
     let displayName = name;
-    if (level === 'continents' && rec) {
-      const groupKey = CONTINENT_GROUP_KEY[rec.iso3];
+    if (level === 'continents') {
+      const groupKey = NAME_TO_CONTINENT[name.toLowerCase()] ?? (rec ? CONTINENT_GROUP_KEY[rec.iso3] : undefined);
       const group = groupKey ? continentByKey.get(groupKey) : undefined;
       if (group) displayName = `${group.label} (continent)`;
     }
@@ -842,10 +930,10 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
         <MapContainer
           center={[20, 0]}
           zoom={2}
-          minZoom={1}
+          minZoom={2}
           maxZoom={8}
           scrollWheelZoom
-          maxBounds={[[-60, -180], [85, 180]]}
+          maxBounds={[[-85, -180], [85, 180]]}
           maxBoundsViscosity={1.0}
           worldCopyJump
           className="h-[320px] md:h-[500px] w-full z-0"
