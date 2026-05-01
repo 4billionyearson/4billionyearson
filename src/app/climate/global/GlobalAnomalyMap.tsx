@@ -448,12 +448,21 @@ function MapLabels({
 
   const ukLabels = useMemo(() => {
     if (!ukGeo) return [] as { name: string; pos: [number, number] }[];
+    // Some sub-regions (e.g. Midlands = E. Midlands + W. Midlands) consist of
+    // multiple ITL1 polygons sharing the same slug. Dedupe by slug so we don't
+    // print "Midlands" twice; pick the centroid of the first part.
+    const seen = new Set<string>();
     const result: { name: string; pos: [number, number] }[] = [];
     for (const f of ukGeo.features) {
-      const name = (f.properties as any)?.name as string | undefined;
-      if (!name) continue;
+      const props = f.properties as any;
+      const name = props?.name as string | undefined;
+      const slug = (props?.slug as string | undefined) ?? name;
+      if (!name || !slug || seen.has(slug)) continue;
       const pos = featureCentroid(f);
-      if (pos) result.push({ name, pos });
+      if (pos) {
+        seen.add(slug);
+        result.push({ name, pos });
+      }
     }
     return result;
   }, [ukGeo]);
@@ -574,6 +583,18 @@ function MapLabels({
 const US_STATES_ZOOM = 4;
 const UK_NATIONS_ZOOM = 4;
 const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
+// Met Office sub-region slugs that have polygons in /data/uk-regions.json.
+// (Sub-Welsh and sub-Scottish regions are not split — see the build script.)
+const UK_REGION_SLUGS = new Set([
+  'east-anglia',
+  'england-east-and-north-east',
+  'england-nw-and-north-wales',
+  'england-se-central-south',
+  'england-sw-and-south-wales',
+  'midlands',
+  'scotland',
+  'northern-ireland',
+]);
 
 interface RankingRow {
   slug: string;
@@ -623,12 +644,15 @@ function UKNationsOverlay({
   const bySlug = useMemo(() => {
     const m = new Map<string, RankingRow>();
     if (rankings) {
+      // In uk-regions level we filter by the Met Office sub-region slugs
+      // (east-anglia, midlands, etc.); otherwise the 4 UK nations.
+      const slugSet = level === 'uk-regions' ? UK_REGION_SLUGS : UK_NATION_SLUGS;
       for (const r of rankings) {
-        if (r.type === 'uk-region' && UK_NATION_SLUGS.has(r.slug)) m.set(r.slug, r);
+        if (r.type === 'uk-region' && slugSet.has(r.slug)) m.set(r.slug, r);
       }
     }
     return m;
-  }, [rankings]);
+  }, [rankings, level]);
 
   const style = useCallback(
     (feature: Feature | undefined): PathOptions => {
@@ -798,7 +822,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
       .then((r) => (r.ok ? r.json() : null))
       .then((g) => { if (!cancelled && g) setStatesGeo(g as FeatureCollection); })
       .catch(() => {});
-    fetch('/data/uk-nations.json')
+    fetch(level === 'uk-regions' ? '/data/uk-regions.json' : '/data/uk-nations.json')
       .then((r) => (r.ok ? r.json() : null))
       .then((g) => { if (!cancelled && g) setUkGeo(g as FeatureCollection); })
       .catch(() => {});
