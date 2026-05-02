@@ -130,7 +130,7 @@ function CardShell({ year, deepLinkHref, children }: { year: number; deepLinkHre
       <div className="flex justify-end px-4 pb-4">
         <Link
           href={deepLinkHref}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-teal-300 hover:text-teal-200 transition-colors"
         >
           See full emissions data <ArrowUpRight className="h-3.5 w-3.5" />
         </Link>

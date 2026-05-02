@@ -397,7 +397,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
         <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC probability outlook</a>.
       </p>
       <div className="flex justify-end mt-2">
-        <Link href="/climate/enso" className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1">
+        <Link href="/climate/enso" className="text-xs font-semibold text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
           Full ENSO tracker (Niño 3.4, MEI, SOI, forecast) <ArrowUpRight className="h-3 w-3" />
         </Link>
       </div>
@@ -473,10 +473,10 @@ export function GhgTile({ ghgStats }: { ghgStats: { co2: GhgStat | null; ch4: Gh
         </a>
       </p>
       <div className="mt-auto pt-2 flex flex-wrap justify-end gap-x-3 gap-y-1 text-[11px]">
-        <Link href="/greenhouse-gases" className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold">
+        <Link href="/greenhouse-gases" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
           Greenhouse gases dashboard <ArrowUpRight className="h-3 w-3" />
         </Link>
-        <Link href="/emissions" className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold">
+        <Link href="/emissions" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
           Emissions by country <ArrowUpRight className="h-3 w-3" />
         </Link>
       </div>
@@ -562,7 +562,7 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
         </a>
       </p>
       <div className="mt-auto pt-2 flex justify-end text-[11px]">
-        <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold">
+        <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
           Sea levels &amp; ice dashboard <ArrowUpRight className="h-3 w-3" />
         </Link>
       </div>

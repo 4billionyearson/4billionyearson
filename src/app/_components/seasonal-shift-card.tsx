@@ -137,7 +137,7 @@ export default function SeasonalShiftCard({
   };
 
   return (
-    <section className="bg-gray-950/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+    <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
       <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
@@ -514,7 +514,7 @@ export default function SeasonalShiftCard({
       <div className="mt-3 flex justify-end">
         <Link
           href="/climate/shifting-seasons"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-teal-300 hover:text-teal-200 hover:underline transition-colors"
         >
           Explore Shifting Seasons worldwide
           <ArrowRight className="h-4 w-4" />
