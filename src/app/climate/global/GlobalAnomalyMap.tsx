@@ -46,7 +46,7 @@ interface CountryAnomaly {
 }
 
 export type AnomalyWindow = '1m' | '3m' | '12m';
-export type MapLevel = 'continents' | 'countries' | 'uk-regions' | 'us-states' | 'us-regions';
+export type MapLevel = 'continents' | 'countries' | 'uk-countries' | 'uk-regions' | 'us-states' | 'us-regions';
 
 // Country ISO3 → continent group key used in rankings.json groups.continents.
 // Mirrors CONTINENT_BY_ISO in src/lib/climate/editorial.ts but kept inline
@@ -276,6 +276,7 @@ function InvalidateOnMount() {
 const LEVEL_BOUNDS: Partial<Record<string, [[number, number], [number, number]]>> = {
   'us-states': [[24.5, -125], [49.5, -66.5]],
   'us-regions': [[24.5, -125], [49.5, -66.5]],
+  'uk-countries': [[49.7, -8.7], [60.9, 1.9]],
   'uk-regions': [[49.7, -8.7], [60.9, 1.9]],
 };
 
@@ -497,7 +498,7 @@ function MapLabels({
       ? CONTINENT_LABELS
       : zoom <= 3
         ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
-        : level === 'uk-regions'
+        : level === 'uk-regions' || level === 'uk-countries'
           ? countryLabels.filter(({ name }) => name !== 'United Kingdom')
           : countryLabels;
 
@@ -508,13 +509,13 @@ function MapLabels({
   // mode (we don't want state labels on the world view) and in 'us-regions'
   // mode (we draw 9-region labels instead).
   const showStateLabels = level === 'us-states';
-  const showUkLabels = level === 'uk-regions';
+  const showUkLabels = level === 'uk-regions' || level === 'uk-countries';
   const showRegionLabels = level === 'us-regions';
 
   // In sub-national modes (uk-regions, us-states, us-regions) hide the
   // country-name labels for OTHER countries — the user is focused on the
   // active overlay so e.g. "Denmark" / "France" should not clutter the UK view.
-  const hideCountryLabels = level === 'uk-regions' || level === 'us-states' || level === 'us-regions';
+  const hideCountryLabels = level === 'uk-regions' || level === 'uk-countries' || level === 'us-states' || level === 'us-regions';
 
   return (
     <>
@@ -584,7 +585,6 @@ const US_STATES_ZOOM = 4;
 const UK_NATIONS_ZOOM = 4;
 const UK_NATION_SLUGS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
 // Met Office sub-region slugs that have polygons in /data/uk-regions.json.
-// (Sub-Welsh and sub-Scottish regions are not split — see the build script.)
 const UK_REGION_SLUGS = new Set([
   'east-anglia',
   'england-east-and-north-east',
@@ -592,8 +592,10 @@ const UK_REGION_SLUGS = new Set([
   'england-se-central-south',
   'england-sw-and-south-wales',
   'midlands',
-  'scotland',
   'northern-ireland',
+  'scotland-north',
+  'scotland-east',
+  'scotland-west',
 ]);
 
 interface RankingRow {
@@ -631,7 +633,7 @@ function UKNationsOverlay({
   level: MapLevel;
 }) {
   const map = useMap();
-  const forced = level === 'uk-regions';
+  const forced = level === 'uk-regions' || level === 'uk-countries';
   const allowed = forced;
   const [visible, setVisible] = useState(forced || (allowed && map.getZoom() >= UK_NATIONS_ZOOM));
 
@@ -644,8 +646,6 @@ function UKNationsOverlay({
   const bySlug = useMemo(() => {
     const m = new Map<string, RankingRow>();
     if (rankings) {
-      // In uk-regions level we filter by the Met Office sub-region slugs
-      // (east-anglia, midlands, etc.); otherwise the 4 UK nations.
       const slugSet = level === 'uk-regions' ? UK_REGION_SLUGS : UK_NATION_SLUGS;
       for (const r of rankings) {
         if (r.type === 'uk-region' && slugSet.has(r.slug)) m.set(r.slug, r);
@@ -687,7 +687,7 @@ function UKNationsOverlay({
   if (!visible || !ukGeo) return null;
   return (
     <GeoJSON
-      key={`uk-nations-${windowSel}-${bySlug.size}`}
+      key={`uk-overlay-${level}-${windowSel}-${bySlug.size}`}
       data={ukGeo}
       style={style}
       onEachFeature={onEachFeature}
@@ -797,7 +797,9 @@ function USStatesOverlay({
 export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m', level = 'countries' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow; level?: MapLevel }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
-  const [ukGeo, setUkGeo] = useState<FeatureCollection | null>(null);
+  const [ukNationsGeo, setUkNationsGeo] = useState<FeatureCollection | null>(null);
+  const [ukRegionsGeo, setUkRegionsGeo] = useState<FeatureCollection | null>(null);
+  const ukGeo = level === 'uk-regions' ? ukRegionsGeo : ukNationsGeo;
   const [loadError, setLoadError] = useState<string | null>(null);
   const [rankings, setRankings] = useState<RankingRow[] | null>(null);
   const [continentGroups, setContinentGroups] = useState<GroupRow[] | null>(null);
@@ -822,9 +824,13 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
       .then((r) => (r.ok ? r.json() : null))
       .then((g) => { if (!cancelled && g) setStatesGeo(g as FeatureCollection); })
       .catch(() => {});
-    fetch(level === 'uk-regions' ? '/data/uk-regions.json' : '/data/uk-nations.json')
+    fetch('/data/uk-nations.json')
       .then((r) => (r.ok ? r.json() : null))
-      .then((g) => { if (!cancelled && g) setUkGeo(g as FeatureCollection); })
+      .then((g) => { if (!cancelled && g) setUkNationsGeo(g as FeatureCollection); })
+      .catch(() => {});
+    fetch('/data/uk-regions.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((g) => { if (!cancelled && g) setUkRegionsGeo(g as FeatureCollection); })
       .catch(() => {});
     fetch('/data/climate/rankings.json')
       .then((r) => (r.ok ? r.json() : null))
@@ -866,7 +872,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
   const pick = useCallback((c: CountryAnomaly | undefined, name?: string): { anomaly: number | null; label: string | null } => {
     // In sub-national levels we don't tint country polygons - the overlay
     // (US states or UK nations) carries the data instead.
-    if (level === 'us-states' || level === 'us-regions' || level === 'uk-regions') {
+    if (level === 'us-states' || level === 'us-regions' || level === 'uk-regions' || level === 'uk-countries') {
       return { anomaly: null, label: null };
     }
     if (level === 'continents') {

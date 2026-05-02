@@ -32,7 +32,7 @@ export interface CountryAnomalyRow {
 }
 
 type AnomalyWindow = '1m' | '3m' | '12m';
-type MapLevel = 'continents' | 'countries' | 'uk-regions' | 'us-states' | 'us-regions';
+type MapLevel = 'continents' | 'countries' | 'uk-countries' | 'uk-regions' | 'us-states' | 'us-regions';
 
 const WINDOW_OPTS = [
   { key: '1m', label: '1 month' },
@@ -43,6 +43,7 @@ const WINDOW_OPTS = [
 const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [
   { key: 'continents', label: 'Continents' },
   { key: 'countries', label: 'Countries' },
+  { key: 'uk-countries', label: 'UK Countries' },
   { key: 'uk-regions', label: 'UK Regions' },
   { key: 'us-states', label: 'US States' },
   { key: 'us-regions', label: 'US Climate Regions' },
