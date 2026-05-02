@@ -14,6 +14,7 @@ import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
 import { OverviewGrid } from '@/app/climate/_shared/overview-grid';
 import { buildOverviewRow, type OverviewPanel, type OverviewRow, type RankedPeriodStat } from '@/app/climate/_shared/overview-grid-types';
+import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
 
@@ -433,6 +434,9 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
 
   return (
     <>
+      {/* At a Glance — climate map preview (continent groups use the global preset). */}
+      <ClimateMapCard countryAnomalies={[] as CountryAnomalyRow[]} preset="global" />
+
       {/* Temperature – Average panel (matches country / US-region update pages).
          Uses 4BYO continent-absolutes (CRU TS aggregate) so we get absolute °C +
          rank-within-record stats; falls back to the anomaly-only snapshot when
@@ -646,6 +650,9 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
 
   return (
     <>
+      {/* At a Glance — US states / climate-regions map. */}
+      <ClimateMapCard countryAnomalies={[] as CountryAnomalyRow[]} preset="usa" />
+
       {/* Temperature – Average (region + US national rows) */}
       {tempPanel ? <OverviewGrid panels={[tempPanel]} /> : null}
 

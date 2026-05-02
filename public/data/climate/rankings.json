@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-01T07:45:37.696Z",
+  "generatedAt": "2026-05-02T09:52:15.036Z",
   "cacheMonth": "2026-05",
   "count": 234,
   "rows": [
@@ -12,7 +12,20 @@
       "anomaly3m": 1.48,
       "anomaly12m": 1.34,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.17,
+          "actual3m": 5.26,
+          "actual12m": 9.89,
+          "anom1m": 2.37,
+          "anom3m": 1.48,
+          "anom12m": 1.34,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "usa",
@@ -23,7 +36,20 @@
       "anomaly3m": 1.93,
       "anomaly12m": 1.87,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.52,
+          "actual3m": 0.59,
+          "actual12m": 10.57,
+          "anom1m": 3.29,
+          "anom3m": 1.93,
+          "anom12m": 1.87,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "india",
@@ -34,7 +60,20 @@
       "anomaly3m": 1.11,
       "anomaly12m": 1.1,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.82,
+          "actual3m": 21.13,
+          "actual12m": 24.9,
+          "anom1m": 1.04,
+          "anom3m": 1.11,
+          "anom12m": 1.1,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "china",
@@ -45,7 +84,20 @@
       "anomaly3m": 1.78,
       "anomaly12m": 2.05,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 2.09,
+          "actual3m": -2.64,
+          "actual12m": 8.33,
+          "anom1m": 1.42,
+          "anom3m": 1.78,
+          "anom12m": 2.05,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "germany",
@@ -56,7 +108,20 @@
       "anomaly3m": 2.07,
       "anomaly12m": 2.07,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 6.08,
+          "actual3m": 3.21,
+          "actual12m": 10.45,
+          "anom1m": 2.46,
+          "anom3m": 2.07,
+          "anom12m": 2.07,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "ireland",
@@ -67,7 +132,20 @@
       "anomaly3m": 1.24,
       "anomaly12m": 0.88,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.1,
+          "actual3m": 6.6,
+          "actual12m": 10.3,
+          "anom1m": 1.9,
+          "anom3m": 1.24,
+          "anom12m": 0.88,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "australia",
@@ -78,7 +156,20 @@
       "anomaly3m": 1.94,
       "anomaly12m": 1.22,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.49,
+          "actual3m": 28.76,
+          "actual12m": 23,
+          "anom1m": 2.02,
+          "anom3m": 1.94,
+          "anom12m": 1.22,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "florida",
@@ -89,7 +180,31 @@
       "anomaly3m": 1.2,
       "anomaly12m": 1.25,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 20.72,
+          "actual3m": 16.7,
+          "actual12m": 22.42,
+          "anom1m": 2.79,
+          "anom3m": 1.2,
+          "anom12m": 1.25,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 58.93,
+          "actual3m": 44.88,
+          "actual12m": 88.99,
+          "anom1m": -35.94,
+          "anom3m": -43.66,
+          "anom12m": -26.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "california",
@@ -100,7 +215,31 @@
       "anomaly3m": 4.14,
       "anomaly12m": 2.32,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 16.33,
+          "actual3m": 11.85,
+          "actual12m": 16.55,
+          "anom1m": 7.01,
+          "anom3m": 4.14,
+          "anom12m": 2.32,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 4.83,
+          "actual3m": 58.84,
+          "actual12m": 43.22,
+          "anom1m": -77.42,
+          "anom3m": -30.16,
+          "anom12m": -3.91,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "texas",
@@ -111,7 +250,31 @@
       "anomaly3m": 4.28,
       "anomaly12m": 2.58,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 19.33,
+          "actual3m": 14.15,
+          "actual12m": 20.55,
+          "anom1m": 5.74,
+          "anom3m": 4.28,
+          "anom12m": 2.58,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 25.65,
+          "actual3m": 23.62,
+          "actual12m": 52.58,
+          "anom1m": -15.61,
+          "anom3m": -15.91,
+          "anom12m": -7.96,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "england",
@@ -122,7 +285,53 @@
       "anomaly3m": 2.19,
       "anomaly12m": 1.76,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.9,
+          "actual3m": 6.2,
+          "actual12m": 10.77,
+          "anom1m": 2.65,
+          "anom3m": 2.19,
+          "anom12m": 1.76,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 48.5,
+          "actual3m": 285.2,
+          "actual12m": 102.34,
+          "anom1m": -17.82,
+          "anom3m": 81.19,
+          "anom12m": 29.88,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 143.5,
+          "actual3m": 244.8,
+          "actual12m": 138.49,
+          "anom1m": 38.55,
+          "anom3m": 25.32,
+          "anom12m": 10.32,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 2.1,
+          "actual3m": 15.7,
+          "actual12m": null,
+          "anom1m": -6.58,
+          "anom3m": -17.46,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "wales",
@@ -133,7 +342,53 @@
       "anomaly3m": 2.02,
       "anomaly12m": 1.51,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.5,
+          "actual3m": 5.93,
+          "actual12m": 10.08,
+          "anom1m": 2.56,
+          "anom3m": 2.02,
+          "anom12m": 1.51,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 95.1,
+          "actual3m": 433.3,
+          "actual12m": 171.84,
+          "anom1m": -17.96,
+          "anom3m": 68.53,
+          "anom12m": 49.77,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 129.1,
+          "actual3m": 214.4,
+          "actual12m": 122.71,
+          "anom1m": 28.61,
+          "anom3m": 6.44,
+          "anom12m": 5.42,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 1.7,
+          "actual3m": 15.5,
+          "actual12m": null,
+          "anom1m": -6.84,
+          "anom3m": -16.17,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "scotland",
@@ -144,7 +399,53 @@
       "anomaly3m": 1.21,
       "anomaly12m": 1.18,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.4,
+          "actual3m": 3.77,
+          "actual12m": 8.14,
+          "anom1m": 1.85,
+          "anom3m": 1.21,
+          "anom12m": 1.18,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 148.6,
+          "actual3m": 420.3,
+          "actual12m": 156.25,
+          "anom1m": 22.09,
+          "anom3m": 38.04,
+          "anom12m": 25.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 117.8,
+          "actual3m": 190.3,
+          "actual12m": 104.23,
+          "anom1m": 26.06,
+          "anom3m": 1.51,
+          "anom12m": 4.26,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 8.9,
+          "actual3m": 31.3,
+          "actual12m": null,
+          "anom1m": -4.37,
+          "anom3m": -13.13,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "northern-ireland",
@@ -155,7 +456,53 @@
       "anomaly3m": 1.28,
       "anomaly12m": 1.2,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 6.8,
+          "actual3m": 5.47,
+          "actual12m": 9.61,
+          "anom1m": 1.63,
+          "anom3m": 1.28,
+          "anom12m": 1.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 81.9,
+          "actual3m": 396.9,
+          "actual12m": 139.2,
+          "anom1m": -8.44,
+          "anom3m": 111.23,
+          "anom12m": 42.84,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 115.2,
+          "actual3m": 192.4,
+          "actual12m": 103.43,
+          "anom1m": 17.69,
+          "anom3m": -13.32,
+          "anom12m": -1.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 3.8,
+          "actual3m": 18.3,
+          "actual12m": null,
+          "anom1m": -4.37,
+          "anom3m": -12.88,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "england-and-wales",
@@ -166,7 +513,53 @@
       "anomaly3m": 2.14,
       "anomaly12m": 1.7,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.8,
+          "actual3m": 6.13,
+          "actual12m": 10.66,
+          "anom1m": 2.6,
+          "anom3m": 2.14,
+          "anom12m": 1.7,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 54.9,
+          "actual3m": 305.5,
+          "actual12m": 111.83,
+          "anom1m": -17.81,
+          "anom3m": 79.54,
+          "anom12m": 32.59,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 141.6,
+          "actual3m": 240.7,
+          "actual12m": 136.34,
+          "anom1m": 37.25,
+          "anom3m": 22.79,
+          "anom12m": 9.66,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 2.1,
+          "actual3m": 15.8,
+          "actual12m": null,
+          "anom1m": -6.55,
+          "anom3m": -17.15,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "england-north",
@@ -177,7 +570,53 @@
       "anomaly3m": 1.86,
       "anomaly12m": 1.63,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.3,
+          "actual3m": 5.23,
+          "actual12m": 9.88,
+          "anom1m": 2.75,
+          "anom3m": 1.86,
+          "anom12m": 1.63,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 77,
+          "actual3m": 281.2,
+          "actual12m": 112.88,
+          "anom1m": 1.41,
+          "anom3m": 53.29,
+          "anom12m": 30.71,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 133,
+          "actual3m": 218.3,
+          "actual12m": 124.24,
+          "anom1m": 35.31,
+          "anom3m": 14.1,
+          "anom12m": 4.82,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 2.8,
+          "actual3m": 19.5,
+          "actual12m": null,
+          "anom1m": -7.22,
+          "anom3m": -17.41,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "england-south",
@@ -188,7 +627,53 @@
       "anomaly3m": 2.35,
       "anomaly12m": 1.81,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.2,
+          "actual3m": 6.7,
+          "actual12m": 11.22,
+          "anom1m": 2.58,
+          "anom3m": 2.35,
+          "anom12m": 1.81,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 33.4,
+          "actual3m": 287.3,
+          "actual12m": 96.77,
+          "anom1m": -28.02,
+          "anom3m": 95.96,
+          "anom12m": 29.44,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 149.1,
+          "actual3m": 258.8,
+          "actual12m": 146.02,
+          "anom1m": 40.3,
+          "anom3m": 31.22,
+          "anom12m": 13.22,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 1.8,
+          "actual3m": 13.8,
+          "actual12m": null,
+          "anom1m": -6.18,
+          "anom3m": -17.4,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "scotland-east",
@@ -199,7 +684,53 @@
       "anomaly3m": 1.42,
       "anomaly12m": 1.3,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.5,
+          "actual3m": 3.6,
+          "actual12m": 8.09,
+          "anom1m": 2.21,
+          "anom3m": 1.42,
+          "anom12m": 1.3,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 81.7,
+          "actual3m": 381.1,
+          "actual12m": 128.75,
+          "anom1m": -9.46,
+          "anom3m": 97.53,
+          "anom12m": 29.78,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 142.7,
+          "actual3m": 216.1,
+          "actual12m": 114.16,
+          "anom1m": 44.32,
+          "anom3m": 12.89,
+          "anom12m": 7.26,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 10.4,
+          "actual3m": 35.5,
+          "actual12m": null,
+          "anom1m": -4.24,
+          "anom3m": -13.5,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "scotland-north",
@@ -210,7 +741,53 @@
       "anomaly3m": 0.92,
       "anomaly12m": 1.05,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.1,
+          "actual3m": 3.37,
+          "actual12m": 7.73,
+          "anom1m": 1.72,
+          "anom3m": 0.92,
+          "anom12m": 1.05,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 191.2,
+          "actual3m": 422.5,
+          "actual12m": 155.8,
+          "anom1m": 47.49,
+          "anom3m": -0.42,
+          "anom12m": 14.02,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 104.6,
+          "actual3m": 172.7,
+          "actual12m": 95.71,
+          "anom1m": 17.32,
+          "anom3m": -2.69,
+          "anom12m": 3.78,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 9.2,
+          "actual3m": 34.3,
+          "actual12m": null,
+          "anom1m": -4.67,
+          "anom3m": -11.37,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "scotland-west",
@@ -221,7 +798,53 @@
       "anomaly3m": 1.35,
       "anomaly12m": 1.17,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.7,
+          "actual3m": 4.47,
+          "actual12m": 8.73,
+          "anom1m": 1.67,
+          "anom3m": 1.35,
+          "anom12m": 1.17,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 163.2,
+          "actual3m": 459.8,
+          "actual12m": 186.88,
+          "anom1m": 21.65,
+          "anom3m": 25.53,
+          "anom12m": 35.41,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 108.5,
+          "actual3m": 186,
+          "actual12m": 105.02,
+          "anom1m": 17.99,
+          "anom3m": -5.35,
+          "anom12m": 1.62,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 6.8,
+          "actual3m": 22.9,
+          "actual12m": null,
+          "anom1m": -4.17,
+          "anom3m": -14.95,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "england-east-and-north-east",
@@ -232,7 +855,53 @@
       "anomaly3m": 1.85,
       "anomaly12m": 1.72,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.3,
+          "actual3m": 5.23,
+          "actual12m": 9.99,
+          "anom1m": 2.7,
+          "anom3m": 1.85,
+          "anom12m": 1.72,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 48.8,
+          "actual3m": 229.6,
+          "actual12m": 87.16,
+          "anom1m": -12.11,
+          "anom3m": 49.42,
+          "anom12m": 21.07,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 141.9,
+          "actual3m": 232.1,
+          "actual12m": 130.09,
+          "anom1m": 40.57,
+          "anom3m": 18.42,
+          "anom12m": 5.69,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 3,
+          "actual3m": 20,
+          "actual12m": null,
+          "anom1m": -7.12,
+          "anom3m": -17.4,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "england-nw-and-north-wales",
@@ -243,7 +912,53 @@
       "anomaly3m": 1.81,
       "anomaly12m": 1.44,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.2,
+          "actual3m": 5.43,
+          "actual12m": 9.81,
+          "anom1m": 2.52,
+          "anom3m": 1.81,
+          "anom12m": 1.44,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 113.1,
+          "actual3m": 356.2,
+          "actual12m": 153.52,
+          "anom1m": 11.38,
+          "anom3m": 42.37,
+          "anom12m": 42.02,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 120.5,
+          "actual3m": 199.8,
+          "actual12m": 117.28,
+          "anom1m": 23.98,
+          "anom3m": -1.97,
+          "anom12m": 2.75,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 2.7,
+          "actual3m": 17.9,
+          "actual12m": null,
+          "anom1m": -6.39,
+          "anom3m": -15.78,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "midlands",
@@ -254,7 +969,53 @@
       "anomaly3m": 2.2,
       "anomaly12m": 1.8,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.9,
+          "actual3m": 6,
+          "actual12m": 10.66,
+          "anom1m": 2.8,
+          "anom3m": 2.2,
+          "anom12m": 1.8,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 43.4,
+          "actual3m": 270.8,
+          "actual12m": 95.28,
+          "anom1m": -18.74,
+          "anom3m": 83.31,
+          "anom12m": 27.79,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 139.7,
+          "actual3m": 234.8,
+          "actual12m": 133.48,
+          "anom1m": 39.14,
+          "anom3m": 26.42,
+          "anom12m": 9.73,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 1.5,
+          "actual3m": 16.2,
+          "actual12m": null,
+          "anom1m": -7.82,
+          "anom3m": -18.93,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "east-anglia",
@@ -265,7 +1026,53 @@
       "anomaly3m": 2.26,
       "anomaly12m": 1.85,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 8,
+          "actual3m": 6.43,
+          "actual12m": 11.32,
+          "anom1m": 2.43,
+          "anom3m": 2.26,
+          "anom12m": 1.85,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 24.2,
+          "actual3m": 177.7,
+          "actual12m": 62.2,
+          "anom1m": -21.55,
+          "anom3m": 43.87,
+          "anom12m": 9.95,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 155.5,
+          "actual3m": 262.2,
+          "actual12m": 149.6,
+          "anom1m": 48.5,
+          "anom3m": 34.71,
+          "anom12m": 14.89,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 3,
+          "actual3m": 16.4,
+          "actual12m": null,
+          "anom1m": -4.95,
+          "anom3m": -15.87,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "england-sw-and-south-wales",
@@ -276,7 +1083,53 @@
       "anomaly3m": 2.21,
       "anomaly12m": 1.63,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.2,
+          "actual3m": 6.8,
+          "actual12m": 10.88,
+          "anom1m": 2.59,
+          "anom3m": 2.21,
+          "anom12m": 1.63,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 67.5,
+          "actual3m": 456.5,
+          "actual12m": 163.53,
+          "anom1m": -31.34,
+          "anom3m": 126.68,
+          "anom12m": 57.08,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 141.5,
+          "actual3m": 250.6,
+          "actual12m": 138.73,
+          "anom1m": 32.51,
+          "anom3m": 25.23,
+          "anom12m": 11.17,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 1,
+          "actual3m": 11.7,
+          "actual12m": null,
+          "anom1m": -6.15,
+          "anom3m": -15.92,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "england-se-central-south",
@@ -287,7 +1140,53 @@
       "anomaly3m": 2.58,
       "anomaly12m": 1.85,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-04"
+      "dataAsOf": "2026-04",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.4,
+          "actual3m": 7.07,
+          "actual12m": 11.49,
+          "anom1m": 2.62,
+          "anom3m": 2.58,
+          "anom12m": 1.85,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "precip": {
+          "actual1m": 30.4,
+          "actual3m": 303.8,
+          "actual12m": 97.8,
+          "anom1m": -31.56,
+          "anom3m": 112.6,
+          "anom12m": 30.63,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "sunshine": {
+          "actual1m": 154.4,
+          "actual3m": 270.5,
+          "actual12m": 153.47,
+          "anom1m": 40.17,
+          "anom3m": 32.15,
+          "anom12m": 14.23,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "May 2025–Apr 2026"
+        },
+        "frost": {
+          "actual1m": 2.2,
+          "actual3m": 13.1,
+          "actual12m": null,
+          "anom1m": -5.84,
+          "anom3m": -18.09,
+          "anom12m": null,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": null
+        }
+      }
     },
     {
       "slug": "us-alabama",
@@ -298,7 +1197,31 @@
       "anomaly3m": 2.62,
       "anomaly12m": 1.51,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 16.89,
+          "actual3m": 11.58,
+          "actual12m": 18.4,
+          "anom1m": 4.18,
+          "anom3m": 2.62,
+          "anom12m": 1.51,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 83.57,
+          "actual3m": 96.01,
+          "actual12m": 106.34,
+          "anom1m": -80.51,
+          "anom3m": -48.37,
+          "anom12m": -14.05,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-arizona",
@@ -309,7 +1232,31 @@
       "anomaly3m": 4.87,
       "anomaly12m": 2.8,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 17.44,
+          "actual3m": 12.11,
+          "actual12m": 18.02,
+          "anom1m": 7.8,
+          "anom3m": 4.87,
+          "anom12m": 2.8,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 3.81,
+          "actual3m": 14.82,
+          "actual12m": 21.67,
+          "anom1m": -26.22,
+          "anom3m": -12.64,
+          "anom12m": -2.98,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-arkansas",
@@ -320,7 +1267,31 @@
       "anomaly3m": 3.42,
       "anomaly12m": 2.03,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 16.17,
+          "actual3m": 9.87,
+          "actual12m": 17.56,
+          "anom1m": 5.46,
+          "anom3m": 3.42,
+          "anom12m": 2.03,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 75.95,
+          "actual3m": 55.29,
+          "actual12m": 99.93,
+          "anom1m": -52.58,
+          "anom3m": -46.37,
+          "anom12m": -11.15,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-colorado",
@@ -331,7 +1302,31 @@
       "anomaly3m": 5.08,
       "anomaly12m": 2.74,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.22,
+          "actual3m": 3.04,
+          "actual12m": 9.79,
+          "anom1m": 7.21,
+          "anom3m": 5.08,
+          "anom12m": 2.74,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 11.43,
+          "actual3m": 16.43,
+          "actual12m": 32.09,
+          "anom1m": -26.99,
+          "anom3m": -13.13,
+          "anom12m": -6.03,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-connecticut",
@@ -342,7 +1337,31 @@
       "anomaly3m": 0.33,
       "anomaly12m": 0.87,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 4.39,
+          "actual3m": -1.31,
+          "actual12m": 9.88,
+          "anom1m": 2.18,
+          "anom3m": 0.33,
+          "anom12m": 0.87,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 119.38,
+          "actual3m": 73.24,
+          "actual12m": 90.13,
+          "anom1m": 20.2,
+          "anom3m": -18.69,
+          "anom12m": -13.05,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-delaware",
@@ -353,7 +1372,31 @@
       "anomaly3m": 0.61,
       "anomaly12m": 0.82,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.22,
+          "actual3m": 2.98,
+          "actual12m": 13.15,
+          "anom1m": 3.06,
+          "anom3m": 0.61,
+          "anom12m": 0.82,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 52.32,
+          "actual3m": 62.23,
+          "actual12m": 79.95,
+          "anom1m": -43.2,
+          "anom3m": -24.16,
+          "anom12m": -17.23,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-georgia",
@@ -364,7 +1407,31 @@
       "anomaly3m": 2.22,
       "anomaly12m": 1.37,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 16.78,
+          "actual3m": 11.78,
+          "actual12m": 18.57,
+          "anom1m": 3.7,
+          "anom3m": 2.22,
+          "anom12m": 1.37,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 52.58,
+          "actual3m": 66.89,
+          "actual12m": 88.62,
+          "anom1m": -78.98,
+          "anom3m": -56.6,
+          "anom12m": -18.01,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-idaho",
@@ -375,7 +1442,31 @@
       "anomaly3m": 3.94,
       "anomaly12m": 2.75,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.22,
+          "actual3m": 1.46,
+          "actual12m": 8.65,
+          "anom1m": 4.79,
+          "anom3m": 3.94,
+          "anom12m": 2.75,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 55.12,
+          "actual3m": 49.45,
+          "actual12m": 44.28,
+          "anom1m": -5.15,
+          "anom3m": -16.93,
+          "anom12m": -5.84,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-illinois",
@@ -386,7 +1477,31 @@
       "anomaly3m": 2.86,
       "anomaly12m": 1.59,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.22,
+          "actual3m": 2.13,
+          "actual12m": 12.37,
+          "anom1m": 4.72,
+          "anom3m": 2.86,
+          "anom12m": 1.59,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 116.84,
+          "actual3m": 51.65,
+          "actual12m": 71.97,
+          "anom1m": 32.51,
+          "anom3m": -6.47,
+          "anom12m": -14.27,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-indiana",
@@ -397,7 +1512,31 @@
       "anomaly3m": 2.19,
       "anomaly12m": 1.19,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.17,
+          "actual3m": 1.58,
+          "actual12m": 11.75,
+          "anom1m": 4.82,
+          "anom3m": 2.19,
+          "anom12m": 1.19,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 146.05,
+          "actual3m": 67.99,
+          "actual12m": 85.26,
+          "anom1m": 54.69,
+          "anom3m": 0.49,
+          "anom12m": -7.08,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-iowa",
@@ -408,7 +1547,31 @@
       "anomaly3m": 3.63,
       "anomaly12m": 1.82,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.89,
+          "actual3m": -0.43,
+          "actual12m": 10.36,
+          "anom1m": 4.32,
+          "anom3m": 3.63,
+          "anom12m": 1.82,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 50.04,
+          "actual3m": 27.09,
+          "actual12m": 70.63,
+          "anom1m": -5.52,
+          "anom3m": -6.2,
+          "anom12m": -4.61,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-kansas",
@@ -419,7 +1582,31 @@
       "anomaly3m": 4.5,
       "anomaly12m": 2.11,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 11.67,
+          "actual3m": 6,
+          "actual12m": 14.37,
+          "anom1m": 5.63,
+          "anom3m": 4.5,
+          "anom12m": 2.11,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 18.29,
+          "actual3m": 19.73,
+          "actual12m": 62.82,
+          "anom1m": -32.91,
+          "anom3m": -9.62,
+          "anom12m": 1.43,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-kentucky",
@@ -430,7 +1617,31 @@
       "anomaly3m": 2.19,
       "anomaly12m": 1.49,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 12.67,
+          "actual3m": 5.17,
+          "actual12m": 14.21,
+          "anom1m": 5.11,
+          "anom3m": 2.19,
+          "anom12m": 1.49,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 82.3,
+          "actual3m": 62.23,
+          "actual12m": 103.82,
+          "anom1m": -35.35,
+          "anom3m": -36.19,
+          "anom12m": -2.82,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-louisiana",
@@ -441,7 +1652,31 @@
       "anomaly3m": 3.27,
       "anomaly12m": 1.94,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 19,
+          "actual3m": 14.52,
+          "actual12m": 20.76,
+          "anom1m": 4.24,
+          "anom3m": 3.27,
+          "anom12m": 1.94,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 88.9,
+          "actual3m": 80.35,
+          "actual12m": 101.54,
+          "anom1m": -37.52,
+          "anom3m": -45.96,
+          "anom12m": -24.87,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-maine",
@@ -452,7 +1687,31 @@
       "anomaly3m": 0.89,
       "anomaly12m": 0.97,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -1.72,
+          "actual3m": -6.65,
+          "actual12m": 5.61,
+          "anom1m": 1.38,
+          "anom3m": 0.89,
+          "anom12m": 0.97,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 76.2,
+          "actual3m": 49.79,
+          "actual12m": 76.83,
+          "anom1m": -1.38,
+          "anom3m": -24.58,
+          "anom12m": -19.55,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-maryland",
@@ -463,7 +1722,31 @@
       "anomaly3m": 0.96,
       "anomaly12m": 0.96,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.56,
+          "actual3m": 3,
+          "actual12m": 13.01,
+          "anom1m": 3.55,
+          "anom3m": 0.96,
+          "anom12m": 0.96,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 57.66,
+          "actual3m": 60.54,
+          "actual12m": 81.01,
+          "anom1m": -33.51,
+          "anom3m": -21.79,
+          "anom12m": -14.73,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-massachusetts",
@@ -474,7 +1757,31 @@
       "anomaly3m": 0.27,
       "anomaly12m": 0.79,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 3.33,
+          "actual3m": -2.11,
+          "actual12m": 9.16,
+          "anom1m": 1.87,
+          "anom3m": 0.27,
+          "anom12m": 0.79,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 108.46,
+          "actual3m": 71.29,
+          "actual12m": 89.56,
+          "anom1m": 14.05,
+          "anom3m": -19.28,
+          "anom12m": -13.42,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-michigan",
@@ -485,7 +1792,31 @@
       "anomaly3m": 1.51,
       "anomaly12m": 1.08,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 1.17,
+          "actual3m": -3.94,
+          "actual12m": 7.59,
+          "anom1m": 2.42,
+          "anom3m": 1.51,
+          "anom12m": 1.08,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 97.54,
+          "actual3m": 66.63,
+          "actual12m": 70.57,
+          "anom1m": 42.64,
+          "anom3m": 21.69,
+          "anom12m": -1.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-minnesota",
@@ -496,7 +1827,31 @@
       "anomaly3m": 3.03,
       "anomaly12m": 1.83,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -0.5,
+          "actual3m": -6.44,
+          "actual12m": 6.45,
+          "anom1m": 2.8,
+          "anom3m": 3.03,
+          "anom12m": 1.83,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 23.88,
+          "actual3m": 17.53,
+          "actual12m": 55.5,
+          "anom1m": -12.38,
+          "anom3m": -6.94,
+          "anom12m": -4.97,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-mississippi",
@@ -507,7 +1862,31 @@
       "anomaly3m": 3.4,
       "anomaly12m": 2.11,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 18,
+          "actual3m": 12.45,
+          "actual12m": 19.32,
+          "anom1m": 5.1,
+          "anom3m": 3.4,
+          "anom12m": 2.11,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 96.27,
+          "actual3m": 86.36,
+          "actual12m": 102.49,
+          "anom1m": -59.22,
+          "anom3m": -53.15,
+          "anom12m": -21.32,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-missouri",
@@ -518,7 +1897,31 @@
       "anomaly3m": 3.48,
       "anomaly12m": 1.86,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 11.72,
+          "actual3m": 5.11,
+          "actual12m": 14.21,
+          "anom1m": 5.13,
+          "anom3m": 3.48,
+          "anom12m": 1.86,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 93.98,
+          "actual3m": 47.41,
+          "actual12m": 81.58,
+          "anom1m": 3.67,
+          "anom3m": -14.04,
+          "anom12m": -10.4,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-montana",
@@ -529,7 +1932,31 @@
       "anomaly3m": 4.72,
       "anomaly12m": 2.68,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 3.22,
+          "actual3m": 0.03,
+          "actual12m": 7.88,
+          "anom1m": 4.15,
+          "anom3m": 4.72,
+          "anom12m": 2.68,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 44.96,
+          "actual3m": 26.33,
+          "actual12m": 41.15,
+          "anom1m": 12.38,
+          "anom3m": -5.43,
+          "anom12m": 1.07,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-nebraska",
@@ -540,7 +1967,31 @@
       "anomaly3m": 5.1,
       "anomaly12m": 2.56,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.22,
+          "actual3m": 3.06,
+          "actual12m": 11.67,
+          "anom1m": 5.87,
+          "anom3m": 5.1,
+          "anom12m": 2.56,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 8.64,
+          "actual3m": 7.45,
+          "actual12m": 49.57,
+          "anom1m": -30.38,
+          "anom3m": -14.11,
+          "anom12m": -1.66,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-nevada",
@@ -551,7 +2002,31 @@
       "anomaly3m": 4.51,
       "anomaly12m": 2.83,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 11.33,
+          "actual3m": 6.18,
+          "actual12m": 12.62,
+          "anom1m": 7.18,
+          "anom3m": 4.51,
+          "anom12m": 2.83,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 8.13,
+          "actual3m": 16.09,
+          "actual12m": 17.93,
+          "anom1m": -19.5,
+          "anom3m": -10,
+          "anom12m": -3.65,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-new-hampshire",
@@ -562,7 +2037,31 @@
       "anomaly3m": 0.63,
       "anomaly12m": 0.95,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 0.56,
+          "actual3m": -5.13,
+          "actual12m": 6.78,
+          "anom1m": 1.98,
+          "anom3m": 0.63,
+          "anom12m": 0.95,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 73.41,
+          "actual3m": 55.54,
+          "actual12m": 81.07,
+          "anom1m": -10.62,
+          "anom3m": -24.34,
+          "anom12m": -20.26,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-new-jersey",
@@ -573,7 +2072,31 @@
       "anomaly3m": 0.59,
       "anomaly12m": 0.88,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.28,
+          "actual3m": 1.15,
+          "actual12m": 11.82,
+          "anom1m": 2.87,
+          "anom3m": 0.59,
+          "anom12m": 0.88,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 83.31,
+          "actual3m": 63.84,
+          "actual12m": 82.82,
+          "anom1m": -11.54,
+          "anom3m": -22.09,
+          "anom12m": -17.84,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-new-mexico",
@@ -584,7 +2107,31 @@
       "anomaly3m": 4.42,
       "anomaly12m": 2.69,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 13.11,
+          "actual3m": 7.76,
+          "actual12m": 14.2,
+          "anom1m": 6.79,
+          "anom3m": 4.42,
+          "anom12m": 2.69,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 1.78,
+          "actual3m": 11.18,
+          "actual12m": 27.73,
+          "anom1m": -15.26,
+          "anom3m": -4.94,
+          "anom12m": -1.38,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-new-york",
@@ -595,7 +2142,31 @@
       "anomaly3m": 0.77,
       "anomaly12m": 0.75,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 2.06,
+          "actual3m": -3.94,
+          "actual12m": 7.67,
+          "anom1m": 2.55,
+          "anom3m": 0.77,
+          "anom12m": 0.75,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 107.44,
+          "actual3m": 72.47,
+          "actual12m": 87.33,
+          "anom1m": 33.84,
+          "anom3m": 4.82,
+          "anom12m": -4.85,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-north-carolina",
@@ -606,7 +2177,31 @@
       "anomaly3m": 1.56,
       "anomaly12m": 1.07,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 13.78,
+          "actual3m": 7.61,
+          "actual12m": 15.59,
+          "anom1m": 4.12,
+          "anom3m": 1.56,
+          "anom12m": 1.07,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 46.99,
+          "actual3m": 56.05,
+          "actual12m": 90.81,
+          "anom1m": -64.95,
+          "anom3m": -48.23,
+          "anom12m": -16.66,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-north-dakota",
@@ -617,7 +2212,31 @@
       "anomaly3m": 3.79,
       "anomaly12m": 1.96,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -0.89,
+          "actual3m": -5.43,
+          "actual12m": 6.47,
+          "anom1m": 2.52,
+          "anom3m": 3.79,
+          "anom12m": 1.96,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 8.38,
+          "actual3m": 9.65,
+          "actual12m": 42.72,
+          "anom1m": -11.37,
+          "anom3m": -4.5,
+          "anom12m": 2.83,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-ohio",
@@ -628,7 +2247,31 @@
       "anomaly3m": 1.41,
       "anomaly12m": 1.02,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.17,
+          "actual3m": 0.63,
+          "actual12m": 11.1,
+          "anom1m": 4.36,
+          "anom3m": 1.41,
+          "anom12m": 1.02,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 133.6,
+          "actual3m": 66.21,
+          "actual12m": 83.42,
+          "anom1m": 50.44,
+          "anom3m": 1.64,
+          "anom12m": -3.56,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-oklahoma",
@@ -639,7 +2282,31 @@
       "anomaly3m": 4.5,
       "anomaly12m": 2.16,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 15.83,
+          "actual3m": 9.87,
+          "actual12m": 17.33,
+          "anom1m": 6.15,
+          "anom3m": 4.5,
+          "anom12m": 2.16,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 35.31,
+          "actual3m": 28.53,
+          "actual12m": 82.3,
+          "anom1m": -35.68,
+          "anom3m": -20.09,
+          "anom12m": 5.32,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-oregon",
@@ -650,7 +2317,31 @@
       "anomaly3m": 3.09,
       "anomaly12m": 2.35,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.67,
+          "actual3m": 4.78,
+          "actual12m": 10.57,
+          "anom1m": 3.99,
+          "anom3m": 3.09,
+          "anom12m": 2.35,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 57.66,
+          "actual3m": 66.89,
+          "actual12m": 51.27,
+          "anom1m": -34.41,
+          "anom3m": -33.92,
+          "anom12m": -16.74,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-pennsylvania",
@@ -661,7 +2352,31 @@
       "anomaly3m": 0.91,
       "anomaly12m": 0.84,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.89,
+          "actual3m": -0.96,
+          "actual12m": 9.69,
+          "anom1m": 3.58,
+          "anom3m": 0.91,
+          "anom12m": 0.84,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 125.73,
+          "actual3m": 71.97,
+          "actual12m": 89.47,
+          "anom1m": 42.58,
+          "anom3m": -0.56,
+          "anom12m": -5.84,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-rhode-island",
@@ -672,7 +2387,31 @@
       "anomaly3m": 0.06,
       "anomaly12m": 0.86,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 4.33,
+          "actual3m": -0.82,
+          "actual12m": 10.24,
+          "anom1m": 1.72,
+          "anom3m": 0.06,
+          "anom12m": 0.86,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 124.21,
+          "actual3m": 84.5,
+          "actual12m": 95.93,
+          "anom1m": 22.41,
+          "anom3m": -12.34,
+          "anom12m": -7.98,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-south-carolina",
@@ -683,7 +2422,31 @@
       "anomaly3m": 1.66,
       "anomaly12m": 1.09,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 15.78,
+          "actual3m": 10.3,
+          "actual12m": 17.76,
+          "anom1m": 3.57,
+          "anom3m": 1.66,
+          "anom12m": 1.09,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 31.5,
+          "actual3m": 51.56,
+          "actual12m": 88.67,
+          "anom1m": -86.47,
+          "anom3m": -56.57,
+          "anom12m": -13.49,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-south-dakota",
@@ -694,7 +2457,31 @@
       "anomaly3m": 4.77,
       "anomaly12m": 2.28,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 4.56,
+          "actual3m": -0.52,
+          "actual12m": 9.39,
+          "anom1m": 4.84,
+          "anom3m": 4.77,
+          "anom12m": 2.28,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 12.7,
+          "actual3m": 7.62,
+          "actual12m": 48.26,
+          "anom1m": -17.8,
+          "anom3m": -9.95,
+          "anom12m": 3.31,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-tennessee",
@@ -705,7 +2492,31 @@
       "anomaly3m": 2.71,
       "anomaly12m": 1.71,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 14.33,
+          "actual3m": 7.57,
+          "actual12m": 15.67,
+          "anom1m": 5.17,
+          "anom3m": 2.71,
+          "anom12m": 1.71,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 69.85,
+          "actual3m": 77.13,
+          "actual12m": 101.16,
+          "anom1m": -70.65,
+          "anom3m": -43.39,
+          "anom12m": -15.49,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-utah",
@@ -716,7 +2527,31 @@
       "anomaly3m": 5.43,
       "anomaly12m": 3.27,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 10.61,
+          "actual3m": 4.92,
+          "actual12m": 11.95,
+          "anom1m": 7.72,
+          "anom3m": 5.43,
+          "anom12m": 3.27,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 9.14,
+          "actual3m": 18.2,
+          "actual12m": 20.87,
+          "anom1m": -25.78,
+          "anom3m": -11.59,
+          "anom12m": -7.76,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-vermont",
@@ -727,7 +2562,31 @@
       "anomaly3m": 0.95,
       "anomaly12m": 0.99,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 0.28,
+          "actual3m": -5.83,
+          "actual12m": 6.25,
+          "anom1m": 2.57,
+          "anom3m": 0.95,
+          "anom12m": 0.99,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 78.49,
+          "actual3m": 56.05,
+          "actual12m": 85.94,
+          "anom1m": 1.77,
+          "anom3m": -15.08,
+          "anom12m": -11.48,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-virginia",
@@ -738,7 +2597,31 @@
       "anomaly3m": 1.62,
       "anomaly12m": 1.16,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 11.44,
+          "actual3m": 4.89,
+          "actual12m": 13.65,
+          "anom1m": 4.23,
+          "anom3m": 1.62,
+          "anom12m": 1.16,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 54.86,
+          "actual3m": 64.85,
+          "actual12m": 86.8,
+          "anom1m": -38.52,
+          "anom3m": -19.48,
+          "anom12m": -10.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-washington",
@@ -749,7 +2632,31 @@
       "anomaly3m": 1.84,
       "anomaly12m": 2,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.28,
+          "actual3m": 3.07,
+          "actual12m": 9.95,
+          "anom1m": 1.46,
+          "anom3m": 1.84,
+          "anom12m": 2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 159.26,
+          "actual3m": 115.32,
+          "actual12m": 87.27,
+          "anom1m": 50.44,
+          "anom3m": -13.28,
+          "anom12m": -4.13,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-west-virginia",
@@ -760,7 +2667,31 @@
       "anomaly3m": 1.56,
       "anomaly12m": 1.25,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.83,
+          "actual3m": 2.52,
+          "actual12m": 11.86,
+          "anom1m": 4.57,
+          "anom3m": 1.56,
+          "anom12m": 1.25,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 86.11,
+          "actual3m": 67.4,
+          "actual12m": 90.61,
+          "anom1m": -9.45,
+          "anom3m": -15.62,
+          "anom12m": -8.98,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-wisconsin",
@@ -771,7 +2702,31 @@
       "anomaly3m": 2.54,
       "anomaly12m": 1.43,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 1.5,
+          "actual3m": -4.65,
+          "actual12m": 7.19,
+          "anom1m": 3.2,
+          "anom3m": 2.54,
+          "anom12m": 1.43,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 64.26,
+          "actual3m": 42.42,
+          "actual12m": 66.04,
+          "anom1m": 14.15,
+          "anom3m": 8.64,
+          "anom12m": -6.04,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-wyoming",
@@ -782,7 +2737,31 @@
       "anomaly3m": 5.37,
       "anomaly12m": 3.08,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.39,
+          "actual3m": 0.8,
+          "actual12m": 8.02,
+          "anom1m": 6.69,
+          "anom3m": 5.37,
+          "anom12m": 3.08,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 18.8,
+          "actual3m": 16.77,
+          "actual12m": 30.46,
+          "anom1m": -11.72,
+          "anom3m": -9.78,
+          "anom12m": -3.45,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "us-alaska",
@@ -793,7 +2772,31 @@
       "anomaly3m": -2.21,
       "anomaly12m": 0.38,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -17.44,
+          "actual3m": -16.76,
+          "actual12m": -3.08,
+          "anom1m": -5.93,
+          "anom3m": -2.21,
+          "anom12m": 0.38,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        },
+        "precip": {
+          "actual1m": 29.21,
+          "actual3m": 61.38,
+          "actual12m": 80.52,
+          "anom1m": -25.6,
+          "anom3m": 1.88,
+          "anom12m": 0.86,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "france",
@@ -804,7 +2807,20 @@
       "anomaly3m": 1.46,
       "anomaly12m": 1.43,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 10.41,
+          "actual3m": 8.7,
+          "actual12m": 13.9,
+          "anom1m": 1.57,
+          "anom3m": 1.46,
+          "anom12m": 1.43,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "japan",
@@ -815,7 +2831,20 @@
       "anomaly3m": 1.37,
       "anomaly12m": 2.06,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.32,
+          "actual3m": 2.3,
+          "actual12m": 13.16,
+          "anom1m": 1.93,
+          "anom3m": 1.37,
+          "anom12m": 2.06,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "argentina",
@@ -826,7 +2855,20 @@
       "anomaly3m": 1.79,
       "anomaly12m": 0.87,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 18.69,
+          "actual3m": 21.46,
+          "actual12m": 15.23,
+          "anom1m": 0.82,
+          "anom3m": 1.79,
+          "anom12m": 0.87,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "bolivia",
@@ -837,7 +2879,20 @@
       "anomaly3m": 1.13,
       "anomaly12m": 1.71,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 21.25,
+          "actual3m": 21.85,
+          "actual12m": 21.24,
+          "anom1m": 0.81,
+          "anom3m": 1.13,
+          "anom12m": 1.71,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "brazil",
@@ -848,7 +2903,20 @@
       "anomaly3m": 0.9,
       "anomaly12m": 1.29,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.66,
+          "actual3m": 25.59,
+          "actual12m": 25.64,
+          "anom1m": 1.07,
+          "anom3m": 0.9,
+          "anom12m": 1.29,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "somalia",
@@ -859,7 +2927,20 @@
       "anomaly3m": 0.54,
       "anomaly12m": 1.25,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.64,
+          "actual3m": 26.12,
+          "actual12m": 27.34,
+          "anom1m": 0.98,
+          "anom3m": 0.54,
+          "anom12m": 1.25,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "peru",
@@ -870,7 +2951,20 @@
       "anomaly3m": 0.87,
       "anomaly12m": 1.53,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 19.54,
+          "actual3m": 19.66,
+          "actual12m": 19.74,
+          "anom1m": 0.82,
+          "anom3m": 0.87,
+          "anom12m": 1.53,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "pakistan",
@@ -881,7 +2975,20 @@
       "anomaly3m": 1.76,
       "anomaly12m": 1.51,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 18.01,
+          "actual3m": 13.51,
+          "actual12m": 21.34,
+          "anom1m": 1.85,
+          "anom3m": 1.76,
+          "anom12m": 1.51,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "nigeria",
@@ -892,7 +2999,20 @@
       "anomaly3m": 1.5,
       "anomaly12m": 1.23,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 30.92,
+          "actual3m": 28.41,
+          "actual12m": 27.78,
+          "anom1m": 1.97,
+          "anom3m": 1.5,
+          "anom12m": 1.23,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "nicaragua",
@@ -903,7 +3023,20 @@
       "anomaly3m": 1.2,
       "anomaly12m": 1.36,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.35,
+          "actual3m": 25.52,
+          "actual12m": 26.29,
+          "anom1m": 1.12,
+          "anom3m": 1.2,
+          "anom12m": 1.36,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "morocco",
@@ -914,7 +3047,20 @@
       "anomaly3m": 0.92,
       "anomaly12m": 1.97,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 14.12,
+          "actual3m": 12.4,
+          "actual12m": 19.38,
+          "anom1m": 0.59,
+          "anom3m": 0.92,
+          "anom12m": 1.97,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "malaysia",
@@ -925,7 +3071,20 @@
       "anomaly3m": 1.07,
       "anomaly12m": 1.45,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.88,
+          "actual3m": 25.51,
+          "actual12m": 26.21,
+          "anom1m": 1,
+          "anom3m": 1.07,
+          "anom12m": 1.45,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "malawi",
@@ -936,7 +3095,20 @@
       "anomaly3m": 0.94,
       "anomaly12m": 1.13,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.16,
+          "actual3m": 23.55,
+          "actual12m": 22.69,
+          "anom1m": 0.75,
+          "anom3m": 0.94,
+          "anom12m": 1.13,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "lebanon",
@@ -947,7 +3119,20 @@
       "anomaly3m": 1.74,
       "anomaly12m": 2.25,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 12.49,
+          "actual3m": 8.92,
+          "actual12m": 16.85,
+          "anom1m": 3.48,
+          "anom3m": 1.74,
+          "anom12m": 2.25,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "south-korea",
@@ -958,7 +3143,20 @@
       "anomaly3m": 1.45,
       "anomaly12m": 2.19,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.15,
+          "actual3m": 1.95,
+          "actual12m": 13.76,
+          "anom1m": 2.57,
+          "anom3m": 1.45,
+          "anom12m": 2.19,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "north-korea",
@@ -969,7 +3167,20 @@
       "anomaly3m": 2.25,
       "anomaly12m": 2.55,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 1.73,
+          "actual3m": -4.55,
+          "actual12m": 8.78,
+          "anom1m": 3.07,
+          "anom3m": 2.25,
+          "anom12m": 2.55,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "kenya",
@@ -980,7 +3191,20 @@
       "anomaly3m": 1.17,
       "anomaly12m": 1.45,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.02,
+          "actual3m": 26.85,
+          "actual12m": 25.89,
+          "anom1m": 1.05,
+          "anom3m": 1.17,
+          "anom12m": 1.45,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "israel",
@@ -991,7 +3215,20 @@
       "anomaly3m": 1.52,
       "anomaly12m": 2.05,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 17.54,
+          "actual3m": 14.27,
+          "actual12m": 21.41,
+          "anom1m": 2.72,
+          "anom3m": 1.52,
+          "anom12m": 2.05,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "indonesia",
@@ -1002,7 +3239,20 @@
       "anomaly3m": 1.29,
       "anomaly12m": 1.51,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.65,
+          "actual3m": 25.55,
+          "actual12m": 25.86,
+          "anom1m": 1.24,
+          "anom3m": 1.29,
+          "anom12m": 1.51,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "palestine",
@@ -1013,7 +3263,20 @@
       "anomaly3m": 1.42,
       "anomaly12m": 1.89,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 17.21,
+          "actual3m": 14.01,
+          "actual12m": 21.23,
+          "anom1m": 2.75,
+          "anom3m": 1.42,
+          "anom12m": 1.89,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "guyana",
@@ -1024,7 +3287,20 @@
       "anomaly3m": 0.62,
       "anomaly12m": 1.4,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.35,
+          "actual3m": 25.06,
+          "actual12m": 26.12,
+          "anom1m": 0.46,
+          "anom3m": 0.62,
+          "anom12m": 1.4,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "ethiopia",
@@ -1035,7 +3311,20 @@
       "anomaly3m": 1.56,
       "anomaly12m": 1.64,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.56,
+          "actual3m": 24.59,
+          "actual12m": 24.16,
+          "anom1m": 1.55,
+          "anom3m": 1.56,
+          "anom12m": 1.64,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "cyprus",
@@ -1046,7 +3335,20 @@
       "anomaly3m": 1.12,
       "anomaly12m": 1.64,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 15.7,
+          "actual3m": 12.94,
+          "actual12m": 20.39,
+          "anom1m": 2.62,
+          "anom3m": 1.12,
+          "anom12m": 1.64,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "costa-rica",
@@ -1057,7 +3359,20 @@
       "anomaly3m": 0.72,
       "anomaly12m": 1,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.73,
+          "actual3m": 23.11,
+          "actual12m": 23.61,
+          "anom1m": 0.74,
+          "anom3m": 0.72,
+          "anom12m": 1,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "congo",
@@ -1068,7 +3383,20 @@
       "anomaly3m": 1.51,
       "anomaly12m": 1.67,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.34,
+          "actual3m": 26.11,
+          "actual12m": 25.68,
+          "anom1m": 1.47,
+          "anom3m": 1.51,
+          "anom12m": 1.67,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "chile",
@@ -1079,7 +3407,20 @@
       "anomaly3m": 0.98,
       "anomaly12m": 0.58,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 12.14,
+          "actual3m": 13.3,
+          "actual12m": 9.24,
+          "anom1m": 0.63,
+          "anom3m": 0.98,
+          "anom12m": 0.58,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "suriname",
@@ -1090,7 +3431,20 @@
       "anomaly3m": 0.51,
       "anomaly12m": 1.34,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.61,
+          "actual3m": 25.37,
+          "actual12m": 26.67,
+          "anom1m": 0.42,
+          "anom3m": 0.51,
+          "anom12m": 1.34,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "south-sudan",
@@ -1101,7 +3455,20 @@
       "anomaly3m": 2.42,
       "anomaly12m": 2.43,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 31.05,
+          "actual3m": 30.7,
+          "actual12m": 29.04,
+          "anom1m": 1.85,
+          "anom3m": 2.42,
+          "anom12m": 2.43,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "italy",
@@ -1112,7 +3479,20 @@
       "anomaly3m": 2.42,
       "anomaly12m": 2.2,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.39,
+          "actual3m": 7.46,
+          "actual12m": 14.24,
+          "anom1m": 2.31,
+          "anom3m": 2.42,
+          "anom12m": 2.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "spain",
@@ -1123,7 +3503,20 @@
       "anomaly3m": 1.42,
       "anomaly12m": 1.76,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.21,
+          "actual3m": 8.46,
+          "actual12m": 14.82,
+          "anom1m": 0.5,
+          "anom3m": 1.42,
+          "anom12m": 1.76,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "canada",
@@ -1134,7 +3527,20 @@
       "anomaly3m": 2.47,
       "anomaly12m": 2.83,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -13.89,
+          "actual3m": -16.97,
+          "actual12m": -1.92,
+          "anom1m": 1.4,
+          "anom3m": 2.47,
+          "anom12m": 2.83,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "mexico",
@@ -1145,7 +3551,20 @@
       "anomaly3m": 1.87,
       "anomaly12m": 2.04,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 20.29,
+          "actual3m": 17.95,
+          "actual12m": 22,
+          "anom1m": 2.04,
+          "anom3m": 1.87,
+          "anom12m": 2.04,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "russia",
@@ -1156,7 +3575,20 @@
       "anomaly3m": 3.93,
       "anomaly12m": 2.97,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -11.05,
+          "actual3m": -16.25,
+          "actual12m": -1.8,
+          "anom1m": 3.25,
+          "anom3m": 3.93,
+          "anom12m": 2.97,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "south-africa",
@@ -1167,7 +3599,20 @@
       "anomaly3m": 1.2,
       "anomaly12m": 1.48,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 21.84,
+          "actual3m": 23.14,
+          "actual12m": 18.79,
+          "anom1m": 1.15,
+          "anom3m": 1.2,
+          "anom12m": 1.48,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "egypt",
@@ -1178,7 +3623,20 @@
       "anomaly3m": 1.73,
       "anomaly12m": 2.08,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 20.07,
+          "actual3m": 16.65,
+          "actual12m": 24.07,
+          "anom1m": 1.97,
+          "anom3m": 1.73,
+          "anom12m": 2.08,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "turkey",
@@ -1189,7 +3647,20 @@
       "anomaly3m": 2.09,
       "anomaly12m": 2.18,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.48,
+          "actual3m": 3.66,
+          "actual12m": 13.02,
+          "anom1m": 4.09,
+          "anom3m": 2.09,
+          "anom12m": 2.18,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "thailand",
@@ -1200,7 +3671,20 @@
       "anomaly3m": 0.37,
       "anomaly12m": 1.3,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.59,
+          "actual3m": 25.15,
+          "actual12m": 26.97,
+          "anom1m": 0.61,
+          "anom3m": 0.37,
+          "anom12m": 1.3,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "vietnam",
@@ -1211,7 +3695,20 @@
       "anomaly3m": 0.28,
       "anomaly12m": 1.19,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 22.71,
+          "actual3m": 20.62,
+          "actual12m": 24.45,
+          "anom1m": 0.29,
+          "anom3m": 0.28,
+          "anom12m": 1.19,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "philippines",
@@ -1222,7 +3719,20 @@
       "anomaly3m": 1.29,
       "anomaly12m": 1.4,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.14,
+          "actual3m": 25.62,
+          "actual12m": 26.71,
+          "anom1m": 1.11,
+          "anom3m": 1.29,
+          "anom12m": 1.4,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "colombia",
@@ -1233,7 +3743,20 @@
       "anomaly3m": 0.68,
       "anomaly12m": 1.34,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.77,
+          "actual3m": 24.7,
+          "actual12m": 24.76,
+          "anom1m": 0.71,
+          "anom3m": 0.68,
+          "anom12m": 1.34,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "poland",
@@ -1244,7 +3767,20 @@
       "anomaly3m": 3.49,
       "anomaly12m": 2.88,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 6.01,
+          "actual3m": 2.41,
+          "actual12m": 10.55,
+          "anom1m": 4.07,
+          "anom3m": 3.49,
+          "anom12m": 2.88,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "netherlands",
@@ -1255,7 +3791,20 @@
       "anomaly3m": 1.48,
       "anomaly12m": 1.74,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.02,
+          "actual3m": 4.74,
+          "actual12m": 11.21,
+          "anom1m": 2.09,
+          "anom3m": 1.48,
+          "anom12m": 1.74,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "belgium",
@@ -1266,7 +3815,20 @@
       "anomaly3m": 1.54,
       "anomaly12m": 1.67,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.47,
+          "actual3m": 4.68,
+          "actual12m": 10.92,
+          "anom1m": 2.43,
+          "anom3m": 1.54,
+          "anom12m": 1.67,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "sweden",
@@ -1277,7 +3839,20 @@
       "anomaly3m": 4.18,
       "anomaly12m": 2.61,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 0.5,
+          "actual3m": -2.51,
+          "actual12m": 5.2,
+          "anom1m": 4.33,
+          "anom3m": 4.18,
+          "anom12m": 2.61,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "norway",
@@ -1288,7 +3863,20 @@
       "anomaly3m": 4.94,
       "anomaly12m": 3.49,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -2.81,
+          "actual3m": -4.43,
+          "actual12m": 2.51,
+          "anom1m": 4.34,
+          "anom3m": 4.94,
+          "anom12m": 3.49,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "denmark",
@@ -1299,7 +3887,20 @@
       "anomaly3m": 2.58,
       "anomaly12m": 1.99,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.44,
+          "actual3m": 3.44,
+          "actual12m": 9.84,
+          "anom1m": 3.23,
+          "anom3m": 2.58,
+          "anom12m": 1.99,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "finland",
@@ -1310,7 +3911,20 @@
       "anomaly3m": 4.75,
       "anomaly12m": 3.07,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -1.57,
+          "actual3m": -4.35,
+          "actual12m": 4.77,
+          "anom1m": 4.02,
+          "anom3m": 4.75,
+          "anom12m": 3.07,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "portugal",
@@ -1321,7 +3935,20 @@
       "anomaly3m": 1.26,
       "anomaly12m": 1.35,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 11.38,
+          "actual3m": 10.88,
+          "actual12m": 15.95,
+          "anom1m": 0.43,
+          "anom3m": 1.26,
+          "anom12m": 1.35,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "greece",
@@ -1332,7 +3959,20 @@
       "anomaly3m": 1.99,
       "anomaly12m": 2.12,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 11.58,
+          "actual3m": 8.86,
+          "actual12m": 16.44,
+          "anom1m": 2.93,
+          "anom3m": 1.99,
+          "anom12m": 2.12,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "austria",
@@ -1343,7 +3983,20 @@
       "anomaly3m": 3.02,
       "anomaly12m": 2.75,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 4.18,
+          "actual3m": 0.82,
+          "actual12m": 8.3,
+          "anom1m": 3.34,
+          "anom3m": 3.02,
+          "anom12m": 2.75,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "switzerland",
@@ -1354,7 +4007,20 @@
       "anomaly3m": 2.83,
       "anomaly12m": 2.34,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 2.66,
+          "actual3m": -0.02,
+          "actual12m": 6.64,
+          "anom1m": 2.94,
+          "anom3m": 2.83,
+          "anom12m": 2.34,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "new-zealand",
@@ -1365,7 +4031,20 @@
       "anomaly3m": 0.65,
       "anomaly12m": 0.9,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 14.13,
+          "actual3m": 15,
+          "actual12m": 10.94,
+          "anom1m": 0.63,
+          "anom3m": 0.65,
+          "anom12m": 0.9,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "saudi-arabia",
@@ -1376,7 +4055,20 @@
       "anomaly3m": 1.13,
       "anomaly12m": 2.22,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 21.94,
+          "actual3m": 18.01,
+          "actual12m": 26.76,
+          "anom1m": 1.4,
+          "anom3m": 1.13,
+          "anom12m": 2.22,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "united-arab-emirates",
@@ -1387,7 +4079,20 @@
       "anomaly3m": 1.67,
       "anomaly12m": 2.04,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.23,
+          "actual3m": 21.1,
+          "actual12m": 28.87,
+          "anom1m": 1.77,
+          "anom3m": 1.67,
+          "anom12m": 2.04,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "iraq",
@@ -1398,7 +4103,20 @@
       "anomaly3m": 1.31,
       "anomaly12m": 1.96,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 17.62,
+          "actual3m": 12.61,
+          "actual12m": 23.64,
+          "anom1m": 2.64,
+          "anom3m": 1.31,
+          "anom12m": 1.96,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "iran",
@@ -1409,7 +4127,20 @@
       "anomaly3m": 2.24,
       "anomaly12m": 2.13,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 13.9,
+          "actual3m": 9.1,
+          "actual12m": 19.13,
+          "anom1m": 3.09,
+          "anom3m": 2.24,
+          "anom12m": 2.13,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "bangladesh",
@@ -1420,7 +4151,20 @@
       "anomaly3m": 0.7,
       "anomaly12m": 1.34,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.22,
+          "actual3m": 22.32,
+          "actual12m": 26.34,
+          "anom1m": 0.73,
+          "anom3m": 0.7,
+          "anom12m": 1.34,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "sri-lanka",
@@ -1431,7 +4175,20 @@
       "anomaly3m": 0.82,
       "anomaly12m": 0.97,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.78,
+          "actual3m": 25.94,
+          "actual12m": 27.09,
+          "anom1m": 0.48,
+          "anom3m": 0.82,
+          "anom12m": 0.97,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "myanmar",
@@ -1442,7 +4199,20 @@
       "anomaly3m": 1.55,
       "anomaly12m": 1.57,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.09,
+          "actual3m": 22.08,
+          "actual12m": 24.54,
+          "anom1m": 1.51,
+          "anom3m": 1.55,
+          "anom12m": 1.57,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "ukraine",
@@ -1453,7 +4223,20 @@
       "anomaly3m": 4.57,
       "anomaly12m": 3.46,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 6.94,
+          "actual3m": 1.71,
+          "actual12m": 11.44,
+          "anom1m": 6.26,
+          "anom3m": 4.57,
+          "anom12m": 3.46,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "romania",
@@ -1464,7 +4247,20 @@
       "anomaly3m": 3.1,
       "anomaly12m": 2.6,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.94,
+          "actual3m": 2.79,
+          "actual12m": 11.64,
+          "anom1m": 4.53,
+          "anom3m": 3.1,
+          "anom12m": 2.6,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "hungary",
@@ -1475,7 +4271,20 @@
       "anomaly3m": 2.14,
       "anomaly12m": 1.98,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.19,
+          "actual3m": 3.78,
+          "actual12m": 12.45,
+          "anom1m": 2.58,
+          "anom3m": 2.14,
+          "anom12m": 1.98,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "czechia",
@@ -1486,7 +4295,20 @@
       "anomaly3m": 2.33,
       "anomaly12m": 2.36,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.62,
+          "actual3m": 1.84,
+          "actual12m": 9.92,
+          "anom1m": 3.02,
+          "anom3m": 2.33,
+          "anom12m": 2.36,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "tanzania",
@@ -1497,7 +4319,20 @@
       "anomaly3m": 1.58,
       "anomaly12m": 1.27,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.78,
+          "actual3m": 23.98,
+          "actual12m": 23.3,
+          "anom1m": 1.41,
+          "anom3m": 1.58,
+          "anom12m": 1.27,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "ghana",
@@ -1508,7 +4343,20 @@
       "anomaly3m": 1.56,
       "anomaly12m": 1.53,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 30.52,
+          "actual3m": 29.69,
+          "actual12m": 28.2,
+          "anom1m": 1.56,
+          "anom3m": 1.56,
+          "anom12m": 1.53,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "uganda",
@@ -1519,7 +4367,20 @@
       "anomaly3m": 2.4,
       "anomaly12m": 2.06,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.34,
+          "actual3m": 25.61,
+          "actual12m": 24.22,
+          "anom1m": 2.16,
+          "anom3m": 2.4,
+          "anom12m": 2.06,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "dr-congo",
@@ -1530,7 +4391,20 @@
       "anomaly3m": 2.08,
       "anomaly12m": 2.12,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.63,
+          "actual3m": 25.57,
+          "actual12m": 25.42,
+          "anom1m": 1.98,
+          "anom3m": 2.08,
+          "anom12m": 2.12,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "algeria",
@@ -1541,7 +4415,20 @@
       "anomaly3m": 2.03,
       "anomaly12m": 2.6,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 21.43,
+          "actual3m": 16.6,
+          "actual12m": 25.18,
+          "anom1m": 3.52,
+          "anom3m": 2.03,
+          "anom12m": 2.6,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "syria",
@@ -1552,7 +4439,20 @@
       "anomaly3m": 2.01,
       "anomaly12m": 2.38,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 15.81,
+          "actual3m": 10.75,
+          "actual12m": 20.27,
+          "anom1m": 4.05,
+          "anom3m": 2.01,
+          "anom12m": 2.38,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "jamaica",
@@ -1563,7 +4463,20 @@
       "anomaly3m": 1.72,
       "anomaly12m": 1.73,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.66,
+          "actual3m": 25.37,
+          "actual12m": 26.71,
+          "anom1m": 1.58,
+          "anom3m": 1.72,
+          "anom12m": 1.73,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "iceland",
@@ -1574,7 +4487,20 @@
       "anomaly3m": 2.95,
       "anomaly12m": 1.37,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -0.57,
+          "actual3m": -1.67,
+          "actual12m": 1.31,
+          "anom1m": 3.51,
+          "anom3m": 2.95,
+          "anom12m": 1.37,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "afghanistan",
@@ -1585,7 +4511,20 @@
       "anomaly3m": 1.22,
       "anomaly12m": 1.56,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 6.92,
+          "actual3m": 2.28,
+          "actual12m": 13.22,
+          "anom1m": 1.39,
+          "anom3m": 1.22,
+          "anom12m": 1.56,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "albania",
@@ -1596,7 +4535,20 @@
       "anomaly3m": 2.7,
       "anomaly12m": 2.3,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.89,
+          "actual3m": 7.22,
+          "actual12m": 14.34,
+          "anom1m": 3.08,
+          "anom3m": 2.7,
+          "anom12m": 2.3,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "angola",
@@ -1607,7 +4559,20 @@
       "anomaly3m": 1.15,
       "anomaly12m": 1.34,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.07,
+          "actual3m": 22.96,
+          "actual12m": 22.8,
+          "anom1m": 1.28,
+          "anom3m": 1.15,
+          "anom12m": 1.34,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "armenia",
@@ -1618,7 +4583,20 @@
       "anomaly3m": 2.62,
       "anomaly12m": 1.84,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 3.88,
+          "actual3m": -1.72,
+          "actual12m": 7.57,
+          "anom1m": 4.71,
+          "anom3m": 2.62,
+          "anom12m": 1.84,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "azerbaijan",
@@ -1629,7 +4607,20 @@
       "anomaly3m": 2.16,
       "anomaly12m": 1.63,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.27,
+          "actual3m": 3.61,
+          "actual12m": 12.98,
+          "anom1m": 3.91,
+          "anom3m": 2.16,
+          "anom12m": 1.63,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "bahamas",
@@ -1640,7 +4631,20 @@
       "anomaly3m": 0.96,
       "anomaly12m": 1.09,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.74,
+          "actual3m": 23.62,
+          "actual12m": 26.14,
+          "anom1m": 0.71,
+          "anom3m": 0.96,
+          "anom12m": 1.09,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "belarus",
@@ -1651,7 +4655,20 @@
       "anomaly3m": 5.41,
       "anomaly12m": 3.63,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 5.26,
+          "actual3m": 0.69,
+          "actual12m": 9.62,
+          "anom1m": 6.52,
+          "anom3m": 5.41,
+          "anom12m": 3.63,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "belize",
@@ -1662,7 +4679,20 @@
       "anomaly3m": 1.59,
       "anomaly12m": 1.78,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.9,
+          "actual3m": 24.75,
+          "actual12m": 26.5,
+          "anom1m": 1.45,
+          "anom3m": 1.59,
+          "anom12m": 1.78,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "benin",
@@ -1673,7 +4703,20 @@
       "anomaly3m": 1.8,
       "anomaly12m": 1.42,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 31.86,
+          "actual3m": 29.83,
+          "actual12m": 28.28,
+          "anom1m": 2.13,
+          "anom3m": 1.8,
+          "anom12m": 1.42,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "bhutan",
@@ -1684,7 +4727,20 @@
       "anomaly3m": 2.69,
       "anomaly12m": 2.08,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 6.29,
+          "actual3m": 4.23,
+          "actual12m": 9.64,
+          "anom1m": 2.17,
+          "anom3m": 2.69,
+          "anom12m": 2.08,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "bosnia-and-herzegovina",
@@ -1695,7 +4751,20 @@
       "anomaly3m": 3.6,
       "anomaly12m": 3.13,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.33,
+          "actual3m": 4.72,
+          "actual12m": 12.29,
+          "anom1m": 4.13,
+          "anom3m": 3.6,
+          "anom12m": 3.13,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "botswana",
@@ -1706,7 +4775,20 @@
       "anomaly3m": 0.01,
       "anomaly12m": 1.27,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.26,
+          "actual3m": 24.86,
+          "actual12m": 22.73,
+          "anom1m": 0.27,
+          "anom3m": 0.01,
+          "anom12m": 1.27,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "brunei",
@@ -1717,7 +4799,20 @@
       "anomaly3m": 1.3,
       "anomaly12m": 1.56,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.84,
+          "actual3m": 26.5,
+          "actual12m": 27.14,
+          "anom1m": 1.29,
+          "anom3m": 1.3,
+          "anom12m": 1.56,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "bulgaria",
@@ -1728,7 +4823,20 @@
       "anomaly3m": 2.39,
       "anomaly12m": 2.25,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.3,
+          "actual3m": 4.16,
+          "actual12m": 12.86,
+          "anom1m": 4.47,
+          "anom3m": 2.39,
+          "anom12m": 2.25,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "burkina-faso",
@@ -1739,7 +4847,20 @@
       "anomaly3m": 2.08,
       "anomaly12m": 1.32,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 33.41,
+          "actual3m": 29.66,
+          "actual12m": 29.26,
+          "anom1m": 2.97,
+          "anom3m": 2.08,
+          "anom12m": 1.32,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "burundi",
@@ -1750,7 +4871,20 @@
       "anomaly3m": 1.83,
       "anomaly12m": 1.94,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 21.45,
+          "actual3m": 21.47,
+          "actual12m": 21.74,
+          "anom1m": 1.73,
+          "anom3m": 1.83,
+          "anom12m": 1.94,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "cambodia",
@@ -1761,7 +4895,20 @@
       "anomaly3m": 0.4,
       "anomaly12m": 1.37,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 28.79,
+          "actual3m": 27,
+          "actual12m": 27.97,
+          "anom1m": 0.56,
+          "anom3m": 0.4,
+          "anom12m": 1.37,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "cameroon",
@@ -1772,7 +4919,20 @@
       "anomaly3m": 1.81,
       "anomaly12m": 1.64,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.82,
+          "actual3m": 26.66,
+          "actual12m": 25.53,
+          "anom1m": 2.07,
+          "anom3m": 1.81,
+          "anom12m": 1.64,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "central-african-republic",
@@ -1783,7 +4943,20 @@
       "anomaly3m": 2.01,
       "anomaly12m": 1.81,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 29.92,
+          "actual3m": 28.86,
+          "actual12m": 27.13,
+          "anom1m": 2.42,
+          "anom3m": 2.01,
+          "anom12m": 1.81,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "chad",
@@ -1794,7 +4967,20 @@
       "anomaly3m": 2.03,
       "anomaly12m": 1.67,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 28.3,
+          "actual3m": 24.81,
+          "actual12m": 27.94,
+          "anom1m": 1.88,
+          "anom3m": 2.03,
+          "anom12m": 1.67,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "croatia",
@@ -1805,7 +4991,20 @@
       "anomaly3m": 2.94,
       "anomaly12m": 2.64,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.48,
+          "actual3m": 5.96,
+          "actual12m": 13.72,
+          "anom1m": 3.24,
+          "anom3m": 2.94,
+          "anom12m": 2.64,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "cuba",
@@ -1816,7 +5015,20 @@
       "anomaly3m": 1.03,
       "anomaly12m": 1.19,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.49,
+          "actual3m": 24.01,
+          "actual12m": 26.19,
+          "anom1m": 0.7,
+          "anom3m": 1.03,
+          "anom12m": 1.19,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "cote-d-ivoire",
@@ -1827,7 +5039,20 @@
       "anomaly3m": 1.43,
       "anomaly12m": 1.36,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 28.83,
+          "actual3m": 28.31,
+          "actual12m": 27.09,
+          "anom1m": 1.23,
+          "anom3m": 1.43,
+          "anom12m": 1.36,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "djibouti",
@@ -1838,7 +5063,20 @@
       "anomaly3m": 1.2,
       "anomaly12m": 1.7,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.05,
+          "actual3m": 25.3,
+          "actual12m": 29.47,
+          "anom1m": 1.31,
+          "anom3m": 1.2,
+          "anom12m": 1.7,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "dominican-republic",
@@ -1849,7 +5087,20 @@
       "anomaly3m": 1.43,
       "anomaly12m": 1.54,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.24,
+          "actual3m": 23.78,
+          "actual12m": 25.3,
+          "anom1m": 1.47,
+          "anom3m": 1.43,
+          "anom12m": 1.54,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "ecuador",
@@ -1860,7 +5111,20 @@
       "anomaly3m": 0.98,
       "anomaly12m": 1.43,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 21.77,
+          "actual3m": 21.69,
+          "actual12m": 21.61,
+          "anom1m": 1,
+          "anom3m": 0.98,
+          "anom12m": 1.43,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "el-salvador",
@@ -1871,7 +5135,20 @@
       "anomaly3m": 1.87,
       "anomaly12m": 1.45,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.93,
+          "actual3m": 27.31,
+          "actual12m": 26.9,
+          "anom1m": 1.63,
+          "anom3m": 1.87,
+          "anom12m": 1.45,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "equatorial-guinea",
@@ -1882,7 +5159,20 @@
       "anomaly3m": 1.67,
       "anomaly12m": 1.72,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.33,
+          "actual3m": 25.22,
+          "actual12m": 24.7,
+          "anom1m": 1.51,
+          "anom3m": 1.67,
+          "anom12m": 1.72,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "eritrea",
@@ -1893,7 +5183,20 @@
       "anomaly3m": 1.05,
       "anomaly12m": 1.36,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.57,
+          "actual3m": 24.8,
+          "actual12m": 27.5,
+          "anom1m": 1.13,
+          "anom3m": 1.05,
+          "anom12m": 1.36,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "estonia",
@@ -1904,7 +5207,20 @@
       "anomaly3m": 5.23,
       "anomaly12m": 3.48,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 3,
+          "actual3m": 0.15,
+          "actual12m": 8.55,
+          "anom1m": 5.51,
+          "anom3m": 5.23,
+          "anom12m": 3.48,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "fiji",
@@ -1915,7 +5231,20 @@
       "anomaly3m": 0.73,
       "anomaly12m": 1.03,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.96,
+          "actual3m": 26.09,
+          "actual12m": 25.01,
+          "anom1m": 0.71,
+          "anom3m": 0.73,
+          "anom12m": 1.03,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "gabon",
@@ -1926,7 +5255,20 @@
       "anomaly3m": 1.42,
       "anomaly12m": 1.54,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.88,
+          "actual3m": 25.8,
+          "actual12m": 25.32,
+          "anom1m": 1.27,
+          "anom3m": 1.42,
+          "anom12m": 1.54,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "gambia",
@@ -1937,7 +5279,20 @@
       "anomaly3m": 0.73,
       "anomaly12m": 1.01,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 28.44,
+          "actual3m": 26.91,
+          "actual12m": 28.03,
+          "anom1m": 0.65,
+          "anom3m": 0.73,
+          "anom12m": 1.01,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "georgia",
@@ -1948,7 +5303,20 @@
       "anomaly3m": 1.66,
       "anomaly12m": 1.54,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 4.78,
+          "actual3m": 0.02,
+          "actual12m": 8.88,
+          "anom1m": 3.61,
+          "anom3m": 1.66,
+          "anom12m": 1.54,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "greenland",
@@ -1959,7 +5327,20 @@
       "anomaly3m": 2.1,
       "anomaly12m": 1.52,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -24.85,
+          "actual3m": -26.05,
+          "actual12m": -17.69,
+          "anom1m": 3.13,
+          "anom3m": 2.1,
+          "anom12m": 1.52,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "guatemala",
@@ -1970,7 +5351,20 @@
       "anomaly3m": 1.93,
       "anomaly12m": 2.09,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.08,
+          "actual3m": 22.76,
+          "actual12m": 24.09,
+          "anom1m": 1.84,
+          "anom3m": 1.93,
+          "anom12m": 2.09,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "guinea",
@@ -1981,7 +5375,20 @@
       "anomaly3m": 1.35,
       "anomaly12m": 1.37,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 29.76,
+          "actual3m": 27.91,
+          "actual12m": 26.79,
+          "anom1m": 1.71,
+          "anom3m": 1.35,
+          "anom12m": 1.37,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "guinea-bissau",
@@ -1992,7 +5399,20 @@
       "anomaly3m": 0.65,
       "anomaly12m": 0.99,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 28.84,
+          "actual3m": 27.49,
+          "actual12m": 27.87,
+          "anom1m": 0.69,
+          "anom3m": 0.65,
+          "anom12m": 0.99,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "haiti",
@@ -2003,7 +5423,20 @@
       "anomaly3m": 1.53,
       "anomaly12m": 1.57,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.73,
+          "actual3m": 24.55,
+          "actual12m": 25.97,
+          "anom1m": 1.3,
+          "anom3m": 1.53,
+          "anom12m": 1.57,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "honduras",
@@ -2014,7 +5447,20 @@
       "anomaly3m": 1.63,
       "anomaly12m": 1.76,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.8,
+          "actual3m": 23.53,
+          "actual12m": 24.7,
+          "anom1m": 1.66,
+          "anom3m": 1.63,
+          "anom12m": 1.76,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "jordan",
@@ -2025,7 +5471,20 @@
       "anomaly3m": 1.18,
       "anomaly12m": 1.95,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 15.72,
+          "actual3m": 11.58,
+          "actual12m": 20.38,
+          "anom1m": 2.45,
+          "anom3m": 1.18,
+          "anom12m": 1.95,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "kazakhstan",
@@ -2036,7 +5495,20 @@
       "anomaly3m": 4.7,
       "anomaly12m": 2.3,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 0.75,
+          "actual3m": -4.61,
+          "actual12m": 8.24,
+          "anom1m": 4.78,
+          "anom3m": 4.7,
+          "anom12m": 2.3,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "kosovo",
@@ -2047,7 +5519,20 @@
       "anomaly3m": 2.45,
       "anomaly12m": 2.32,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.45,
+          "actual3m": 3.87,
+          "actual12m": 11.96,
+          "anom1m": 3.84,
+          "anom3m": 2.45,
+          "anom12m": 2.32,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "kuwait",
@@ -2058,7 +5543,20 @@
       "anomaly3m": 0.49,
       "anomaly12m": 1.54,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 19.49,
+          "actual3m": 15.33,
+          "actual12m": 26.59,
+          "anom1m": 0.77,
+          "anom3m": 0.49,
+          "anom12m": 1.54,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "kyrgyzstan",
@@ -2069,7 +5567,20 @@
       "anomaly3m": 2.21,
       "anomaly12m": 1.59,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -3.96,
+          "actual3m": -7.76,
+          "actual12m": 1.39,
+          "anom1m": 1.44,
+          "anom3m": 2.21,
+          "anom12m": 1.59,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "laos",
@@ -2080,7 +5591,20 @@
       "anomaly3m": 0.27,
       "anomaly12m": 1.34,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.43,
+          "actual3m": 20.68,
+          "actual12m": 23.78,
+          "anom1m": 0.5,
+          "anom3m": 0.27,
+          "anom12m": 1.34,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "latvia",
@@ -2091,7 +5615,20 @@
       "anomaly3m": 5.2,
       "anomaly12m": 3.48,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 3.92,
+          "actual3m": 0.79,
+          "actual12m": 9.04,
+          "anom1m": 5.5,
+          "anom3m": 5.2,
+          "anom12m": 3.48,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "lesotho",
@@ -2102,7 +5639,20 @@
       "anomaly3m": 1.51,
       "anomaly12m": 1.78,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 15.4,
+          "actual3m": 16.87,
+          "actual12m": 12.43,
+          "anom1m": 1.4,
+          "anom3m": 1.51,
+          "anom12m": 1.78,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "liberia",
@@ -2113,7 +5663,20 @@
       "anomaly3m": 1.51,
       "anomaly12m": 1.39,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.06,
+          "actual3m": 27.1,
+          "actual12m": 26.12,
+          "anom1m": 1.18,
+          "anom3m": 1.51,
+          "anom12m": 1.39,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "libya",
@@ -2124,7 +5687,20 @@
       "anomaly3m": 2.57,
       "anomaly12m": 2.64,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 21.11,
+          "actual3m": 16.58,
+          "actual12m": 24.04,
+          "anom1m": 3.63,
+          "anom3m": 2.57,
+          "anom12m": 2.64,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "lithuania",
@@ -2135,7 +5711,20 @@
       "anomaly3m": 4.98,
       "anomaly12m": 3.41,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 4.63,
+          "actual3m": 1.31,
+          "actual12m": 9.55,
+          "anom1m": 5.4,
+          "anom3m": 4.98,
+          "anom12m": 3.41,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "luxembourg",
@@ -2146,7 +5735,20 @@
       "anomaly3m": 1.73,
       "anomaly12m": 1.67,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 6.84,
+          "actual3m": 3.82,
+          "actual12m": 10.22,
+          "anom1m": 2.5,
+          "anom3m": 1.73,
+          "anom12m": 1.67,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "madagascar",
@@ -2157,7 +5759,20 @@
       "anomaly3m": 1.29,
       "anomaly12m": 1.51,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.64,
+          "actual3m": 25.05,
+          "actual12m": 23.45,
+          "anom1m": 1.06,
+          "anom3m": 1.29,
+          "anom12m": 1.51,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "mali",
@@ -2168,7 +5783,20 @@
       "anomaly3m": 2.14,
       "anomaly12m": 1.8,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 30.81,
+          "actual3m": 25.59,
+          "actual12m": 29.61,
+          "anom1m": 4.08,
+          "anom3m": 2.14,
+          "anom12m": 1.8,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "mauritania",
@@ -2179,7 +5807,20 @@
       "anomaly3m": 0.77,
       "anomaly12m": 1.47,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.55,
+          "actual3m": 21.87,
+          "actual12m": 28.18,
+          "anom1m": 1.61,
+          "anom3m": 0.77,
+          "anom12m": 1.47,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "moldova",
@@ -2190,7 +5831,20 @@
       "anomaly3m": 4.13,
       "anomaly12m": 3.15,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.47,
+          "actual3m": 2.98,
+          "actual12m": 12.39,
+          "anom1m": 6.08,
+          "anom3m": 4.13,
+          "anom12m": 3.15,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "mongolia",
@@ -2201,7 +5855,20 @@
       "anomaly3m": 2.35,
       "anomaly12m": 2.57,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -4.43,
+          "actual3m": -11.75,
+          "actual12m": 2.97,
+          "anom1m": 2.75,
+          "anom3m": 2.35,
+          "anom12m": 2.57,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "montenegro",
@@ -2212,7 +5879,20 @@
       "anomaly3m": 2.71,
       "anomaly12m": 2.58,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.01,
+          "actual3m": 3.78,
+          "actual12m": 11.32,
+          "anom1m": 3.51,
+          "anom3m": 2.71,
+          "anom12m": 2.58,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "mozambique",
@@ -2223,7 +5903,20 @@
       "anomaly3m": 1.22,
       "anomaly12m": 1.52,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.48,
+          "actual3m": 26.19,
+          "actual12m": 24.86,
+          "anom1m": 0.86,
+          "anom3m": 1.22,
+          "anom12m": 1.52,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "namibia",
@@ -2234,7 +5927,20 @@
       "anomaly3m": 1.02,
       "anomaly12m": 1.65,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.78,
+          "actual3m": 24.63,
+          "actual12m": 22.33,
+          "anom1m": 0.73,
+          "anom3m": 1.02,
+          "anom12m": 1.65,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "nepal",
@@ -2245,7 +5951,20 @@
       "anomaly3m": 1.97,
       "anomaly12m": 1.86,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 11.3,
+          "actual3m": 8.24,
+          "actual12m": 14.47,
+          "anom1m": 1.67,
+          "anom3m": 1.97,
+          "anom12m": 1.86,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "new-caledonia",
@@ -2256,7 +5975,20 @@
       "anomaly3m": 0.67,
       "anomaly12m": 0.99,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.11,
+          "actual3m": 25.21,
+          "actual12m": 22.93,
+          "anom1m": 0.87,
+          "anom3m": 0.67,
+          "anom12m": 0.99,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "niger",
@@ -2267,7 +5999,20 @@
       "anomaly3m": 2.99,
       "anomaly12m": 1.8,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 29.07,
+          "actual3m": 24.09,
+          "actual12m": 28.33,
+          "anom1m": 3.89,
+          "anom3m": 2.99,
+          "anom12m": 1.8,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "oman",
@@ -2278,7 +6023,20 @@
       "anomaly3m": 1.25,
       "anomaly12m": 1.38,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.69,
+          "actual3m": 22.58,
+          "actual12m": 28.5,
+          "anom1m": 1.25,
+          "anom3m": 1.25,
+          "anom12m": 1.38,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "panama",
@@ -2289,7 +6047,20 @@
       "anomaly3m": 0.68,
       "anomaly12m": 1.06,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.44,
+          "actual3m": 25.11,
+          "actual12m": 25.43,
+          "anom1m": 0.61,
+          "anom3m": 0.68,
+          "anom12m": 1.06,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "papua-new-guinea",
@@ -2300,7 +6071,20 @@
       "anomaly3m": 1.53,
       "anomaly12m": 1.47,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.55,
+          "actual3m": 24.62,
+          "actual12m": 24.28,
+          "anom1m": 1.52,
+          "anom3m": 1.53,
+          "anom12m": 1.47,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "paraguay",
@@ -2311,7 +6095,20 @@
       "anomaly3m": 2.03,
       "anomaly12m": 1.78,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.76,
+          "actual3m": 28.64,
+          "actual12m": 25.09,
+          "anom1m": 1.04,
+          "anom3m": 2.03,
+          "anom12m": 1.78,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "puerto-rico",
@@ -2322,7 +6119,20 @@
       "anomaly3m": 1.2,
       "anomaly12m": 1.49,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.7,
+          "actual3m": 24.75,
+          "actual12m": 26.38,
+          "anom1m": 0.94,
+          "anom3m": 1.2,
+          "anom12m": 1.49,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "qatar",
@@ -2333,7 +6143,20 @@
       "anomaly3m": 0.83,
       "anomaly12m": 1.55,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 22.06,
+          "actual3m": 19.2,
+          "actual12m": 27.98,
+          "anom1m": 0.84,
+          "anom3m": 0.83,
+          "anom12m": 1.55,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "rwanda",
@@ -2344,7 +6167,20 @@
       "anomaly3m": 2.13,
       "anomaly12m": 2.22,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 20.62,
+          "actual3m": 20.71,
+          "actual12m": 20.79,
+          "anom1m": 1.94,
+          "anom3m": 2.13,
+          "anom12m": 2.22,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "senegal",
@@ -2355,7 +6191,20 @@
       "anomaly3m": 0.28,
       "anomaly12m": 0.87,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 29.53,
+          "actual3m": 26.99,
+          "actual12m": 28.8,
+          "anom1m": 0.78,
+          "anom3m": 0.28,
+          "anom12m": 0.87,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "serbia",
@@ -2366,7 +6215,20 @@
       "anomaly3m": 2.76,
       "anomaly12m": 2.43,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 9.27,
+          "actual3m": 4.34,
+          "actual12m": 12.69,
+          "anom1m": 3.99,
+          "anom3m": 2.76,
+          "anom12m": 2.43,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "sierra-leone",
@@ -2377,7 +6239,20 @@
       "anomaly3m": 1.5,
       "anomaly12m": 1.37,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 28.91,
+          "actual3m": 28.43,
+          "actual12m": 26.77,
+          "anom1m": 1.28,
+          "anom3m": 1.5,
+          "anom12m": 1.37,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "slovakia",
@@ -2388,7 +6263,20 @@
       "anomaly3m": 3.06,
       "anomaly12m": 2.66,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 6.16,
+          "actual3m": 1.99,
+          "actual12m": 10.18,
+          "anom1m": 3.64,
+          "anom3m": 3.06,
+          "anom12m": 2.66,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "slovenia",
@@ -2399,7 +6287,20 @@
       "anomaly3m": 2.96,
       "anomaly12m": 2.33,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 7.1,
+          "actual3m": 3.84,
+          "actual12m": 11.22,
+          "anom1m": 3.01,
+          "anom3m": 2.96,
+          "anom12m": 2.33,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "solomon-islands",
@@ -2410,7 +6311,20 @@
       "anomaly3m": 1.08,
       "anomaly12m": 1.2,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.84,
+          "actual3m": 27.05,
+          "actual12m": 26.84,
+          "anom1m": 0.92,
+          "anom3m": 1.08,
+          "anom12m": 1.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "sudan",
@@ -2421,7 +6335,20 @@
       "anomaly3m": 1.36,
       "anomaly12m": 1.56,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.09,
+          "actual3m": 23.58,
+          "actual12m": 27.78,
+          "anom1m": 0.77,
+          "anom3m": 1.36,
+          "anom12m": 1.56,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "tajikistan",
@@ -2432,7 +6359,20 @@
       "anomaly3m": 1.59,
       "anomaly12m": 1.7,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": -4.82,
+          "actual3m": -8.94,
+          "actual12m": 0.92,
+          "anom1m": 1.52,
+          "anom3m": 1.59,
+          "anom12m": 1.7,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "east-timor",
@@ -2443,7 +6383,20 @@
       "anomaly3m": 1.07,
       "anomaly12m": 0.84,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 25.4,
+          "actual3m": 25.37,
+          "actual12m": 24.94,
+          "anom1m": 1.13,
+          "anom3m": 1.07,
+          "anom12m": 0.84,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "togo",
@@ -2454,7 +6407,20 @@
       "anomaly3m": 1.7,
       "anomaly12m": 1.51,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 30.31,
+          "actual3m": 29.45,
+          "actual12m": 27.74,
+          "anom1m": 1.62,
+          "anom3m": 1.7,
+          "anom12m": 1.51,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "trinidad-and-tobago",
@@ -2465,7 +6431,20 @@
       "anomaly3m": 1,
       "anomaly12m": 1.41,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.25,
+          "actual3m": 25.97,
+          "actual12m": 27.04,
+          "anom1m": 0.95,
+          "anom3m": 1,
+          "anom12m": 1.41,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "tunisia",
@@ -2476,7 +6455,20 @@
       "anomaly3m": 2.38,
       "anomaly12m": 2.57,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 17.96,
+          "actual3m": 14.25,
+          "actual12m": 21.55,
+          "anom1m": 4.06,
+          "anom3m": 2.38,
+          "anom12m": 2.57,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "turkmenistan",
@@ -2487,7 +6479,20 @@
       "anomaly3m": 2.49,
       "anomaly12m": 1.55,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 12.43,
+          "actual3m": 6.43,
+          "actual12m": 17.24,
+          "anom1m": 3.89,
+          "anom3m": 2.49,
+          "anom12m": 1.55,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "uruguay",
@@ -2498,7 +6503,20 @@
       "anomaly3m": 1,
       "anomaly12m": 0.49,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 22.03,
+          "actual3m": 23.56,
+          "actual12m": 17.65,
+          "anom1m": 1.01,
+          "anom3m": 1,
+          "anom12m": 0.49,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "uzbekistan",
@@ -2509,7 +6527,20 @@
       "anomaly3m": 3.23,
       "anomaly12m": 1.82,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 8.95,
+          "actual3m": 3.15,
+          "actual12m": 14.38,
+          "anom1m": 4.03,
+          "anom3m": 3.23,
+          "anom12m": 1.82,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "vanuatu",
@@ -2520,7 +6551,20 @@
       "anomaly3m": 0.69,
       "anomaly12m": 0.84,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 26.3,
+          "actual3m": 26.55,
+          "actual12m": 25.49,
+          "anom1m": 0.52,
+          "anom3m": 0.69,
+          "anom12m": 0.84,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "venezuela",
@@ -2531,7 +6575,20 @@
       "anomaly3m": 1.45,
       "anomaly12m": 1.58,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 27.36,
+          "actual3m": 26.72,
+          "actual12m": 26.44,
+          "anom1m": 1.53,
+          "anom3m": 1.45,
+          "anom12m": 1.58,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "yemen",
@@ -2542,7 +6599,20 @@
       "anomaly3m": 1.52,
       "anomaly12m": 2.31,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 24.76,
+          "actual3m": 21.93,
+          "actual12m": 26.8,
+          "anom1m": 1.67,
+          "anom3m": 1.52,
+          "anom12m": 2.31,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "zambia",
@@ -2553,7 +6623,20 @@
       "anomaly3m": 1.18,
       "anomaly12m": 1.18,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.05,
+          "actual3m": 22.83,
+          "actual12m": 22.54,
+          "anom1m": 1.43,
+          "anom3m": 1.18,
+          "anom12m": 1.18,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "zimbabwe",
@@ -2564,7 +6647,20 @@
       "anomaly3m": 0.83,
       "anomaly12m": 1.76,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.18,
+          "actual3m": 23.67,
+          "actual12m": 22.59,
+          "anom1m": 0.72,
+          "anom3m": 0.83,
+          "anom12m": 1.76,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     },
     {
       "slug": "eswatini",
@@ -2575,7 +6671,20 @@
       "anomaly3m": 0.89,
       "anomaly12m": 1.2,
       "latestLabel": "Mar 2026",
-      "dataAsOf": "2026-03"
+      "dataAsOf": "2026-03",
+      "metrics": {
+        "temp": {
+          "actual1m": 23.04,
+          "actual3m": 23.62,
+          "actual12m": 20.58,
+          "anom1m": 0.99,
+          "anom3m": 0.89,
+          "anom12m": 1.2,
+          "label1m": "Mar 2026",
+          "label3m": "Jan–Mar 2026",
+          "label12m": "Apr 2025–Mar 2026"
+        }
+      }
     }
   ],
   "groups": {

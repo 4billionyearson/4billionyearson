@@ -35,16 +35,40 @@ interface MonthlyPoint {
   temp?: number;
 }
 
+interface MetricWindow {
+  actual1m: number | null;
+  actual3m: number | null;
+  actual12m: number | null;
+  anom1m: number | null;
+  anom3m: number | null;
+  anom12m: number | null;
+  label1m: string | null;
+  label3m: string | null;
+  label12m: string | null;
+}
+
 interface RankingRow {
   slug: string;
   name: string;
   type: ClimateRegion['type'];
   emoji: string;
+  // Temperature anomaly (kept at top level for backward compatibility with
+  // existing rankings panel consumers).
   anomaly1m: number | null;
   anomaly3m: number | null;
   anomaly12m: number | null;
   latestLabel: string | null;
   dataAsOf: string | null;
+  // Multi-metric block consumed by the Climate Map. Optional per region:
+  // - temp: countries / us-states / uk-regions (anomaly + actual)
+  // - precip: us-states / uk-regions (no current global country precip)
+  // - sunshine / frost: UK regions only
+  metrics?: {
+    temp?: MetricWindow;
+    precip?: MetricWindow;
+    sunshine?: MetricWindow;
+    frost?: MetricWindow;
+  };
 }
 
 interface GroupRow {
@@ -99,6 +123,17 @@ async function loadSnapshot(region: ClimateRegion): Promise<any | null> {
 }
 
 function compute12MonthAnomaly(points: MonthlyPoint[]): number | null {
+  return compute12mAnom(points, 1961, 1990);
+}
+
+// Generalised: returns { recentAvg, baselineAvg } over the last full 12 months
+// (excluding any in-progress current month) using `bStart`–`bEnd` as the
+// monthly climatology baseline. Returns null if any input month is missing.
+function compute12m(
+  points: MonthlyPoint[],
+  bStart: number,
+  bEnd: number,
+): { recentAvg: number; baselineAvg: number } | null {
   if (points.length < 12) return null;
   const now = new Date();
   const yNow = now.getFullYear();
@@ -115,7 +150,7 @@ function compute12MonthAnomaly(points: MonthlyPoint[]): number | null {
   const recentAvg = last12.reduce((sum, p) => sum + (toVal(p) ?? 0), 0) / 12;
   const baselineByMonth: Record<number, number[]> = {};
   for (const p of sorted) {
-    if (p.year < 1961 || p.year > 1990) continue;
+    if (p.year < bStart || p.year > bEnd) continue;
     const v = toVal(p);
     if (v == null) continue;
     (baselineByMonth[p.month] ||= []).push(v);
@@ -127,7 +162,78 @@ function compute12MonthAnomaly(points: MonthlyPoint[]): number | null {
     baselineMonthAvgs.push(arr.reduce((a, b) => a + b, 0) / arr.length);
   }
   const baselineAvg = baselineMonthAvgs.reduce((a, b) => a + b, 0) / 12;
-  return round2(recentAvg - baselineAvg);
+  return { recentAvg, baselineAvg };
+}
+
+function compute12mAnom(points: MonthlyPoint[], bStart: number, bEnd: number): number | null {
+  const r = compute12m(points, bStart, bEnd);
+  return r ? round2(r.recentAvg - r.baselineAvg) : null;
+}
+
+function compute12mActual(points: MonthlyPoint[]): number | null {
+  const r = compute12m(points, 1961, 1990);
+  return r ? round2(r.recentAvg) : null;
+}
+
+function compute12mLabel(points: MonthlyPoint[]): string | null {
+  if (points.length < 12) return null;
+  const now = new Date();
+  const yNow = now.getFullYear();
+  const mNow = now.getMonth() + 1;
+  const filtered = points
+    .filter((p) => p.year < yNow || (p.year === yNow && p.month < mNow))
+    .sort((a, b) => (a.year * 12 + a.month) - (b.year * 12 + b.month));
+  if (filtered.length < 12) return null;
+  const last12 = filtered.slice(-12);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const s = last12[0];
+  const e = last12[last12.length - 1];
+  return `${months[s.month - 1]} ${s.year}–${months[e.month - 1]} ${e.year}`;
+}
+
+// Pull the actual/anomaly for the latest 1m / 3m / 12m windows from a metric
+// node that follows the standard {latestMonthStats,latestThreeMonthStats,monthlyAll}
+// shape used by the country/us-state/uk-region snapshots.
+function buildMetricWindow(node: any, baselineStart: number, baselineEnd: number): MetricWindow | null {
+  if (!node) return null;
+  const latest1m = node.latestMonthStats ?? null;
+  const latest3m = node.latestThreeMonthStats ?? null;
+  const monthlyAll: MonthlyPoint[] = Array.isArray(node.monthlyAll) ? node.monthlyAll : [];
+
+  const actual1m = numOrNull(latest1m?.recent ?? latest1m?.recentTemp ?? latest1m?.value);
+  const actual3m = numOrNull(latest3m?.recent ?? latest3m?.recentTemp ?? latest3m?.value);
+  const anom1m = numOrNull(latest1m?.diff);
+  const anom3m = numOrNull(latest3m?.diff);
+  const label1m = latest1m?.label ?? null;
+  const label3m = latest3m?.label ?? null;
+
+  const actual12m = monthlyAll.length ? compute12mActual(monthlyAll) : null;
+  const anom12m = monthlyAll.length ? compute12mAnom(monthlyAll, baselineStart, baselineEnd) : null;
+  const label12m = monthlyAll.length ? compute12mLabel(monthlyAll) : null;
+
+  // If no window has any data we drop the metric entirely.
+  if (
+    actual1m == null && actual3m == null && actual12m == null &&
+    anom1m == null && anom3m == null && anom12m == null
+  ) {
+    return null;
+  }
+
+  return {
+    actual1m: actual1m == null ? null : round2(actual1m),
+    actual3m: actual3m == null ? null : round2(actual3m),
+    actual12m,
+    anom1m: anom1m == null ? null : round2(anom1m),
+    anom3m: anom3m == null ? null : round2(anom3m),
+    anom12m,
+    label1m,
+    label3m,
+    label12m,
+  };
+}
+
+function numOrNull(v: unknown): number | null {
+  return typeof v === 'number' && Number.isFinite(v) ? v : null;
 }
 
 function extractRow(region: ClimateRegion, data: any): RankingRow | null {
@@ -136,20 +242,42 @@ function extractRow(region: ClimateRegion, data: any): RankingRow | null {
   let latestThreeMonthStats: any = null;
   let monthlyAll: MonthlyPoint[] | null = null;
 
+  // Per-metric source nodes (each follows the standard
+  // {latestMonthStats,latestThreeMonthStats,monthlyAll} shape).
+  let tempNode: any = null;
+  let precipNode: any = null;
+  let sunshineNode: any = null;
+  let frostNode: any = null;
+
   if (region.type === 'country') {
     latestMonthStats = data.latestMonthStats;
     latestThreeMonthStats = data.latestThreeMonthStats;
     monthlyAll = Array.isArray(data.monthlyAll) ? data.monthlyAll : null;
+    // Country snapshots ARE the temperature node (top-level fields).
+    tempNode = {
+      latestMonthStats: data.latestMonthStats,
+      latestThreeMonthStats: data.latestThreeMonthStats,
+      monthlyAll: data.monthlyAll,
+    };
+    // Country precip data lives in country-precip/ but the World Bank CKP
+    // series ends in 2023 - too stale for a "this month" map view, so we
+    // intentionally skip it here.
   } else if (region.type === 'us-state') {
     const tavg = data?.paramData?.tavg;
     latestMonthStats = tavg?.latestMonthStats;
     latestThreeMonthStats = tavg?.latestThreeMonthStats;
     monthlyAll = Array.isArray(tavg?.monthlyAll) ? tavg.monthlyAll : null;
+    tempNode = tavg ?? null;
+    precipNode = data?.paramData?.pcp ?? null;
   } else if (region.type === 'uk-region') {
     const tmean = data?.varData?.Tmean;
     latestMonthStats = tmean?.latestMonthStats;
     latestThreeMonthStats = tmean?.latestThreeMonthStats;
     monthlyAll = Array.isArray(tmean?.monthlyAll) ? tmean.monthlyAll : null;
+    tempNode = tmean ?? null;
+    precipNode = data?.varData?.Rainfall ?? null;
+    sunshineNode = data?.varData?.Sunshine ?? null;
+    frostNode = data?.varData?.AirFrost ?? null;
   }
 
   const anomaly1m = typeof latestMonthStats?.diff === 'number' ? round2(latestMonthStats.diff) : null;
@@ -171,6 +299,21 @@ function extractRow(region: ClimateRegion, data: any): RankingRow | null {
 
   if (anomaly1m == null && anomaly3m == null && anomaly12m == null) return null;
 
+  // Build per-metric windows. Temp uses the 1961-1990 baseline; precip,
+  // sunshine and frost use 1991-2020 (Met Office / WMO standard climate
+  // normal). For temp we already have anomaly1m/3m/12m at the top level so
+  // the temp window mainly contributes the absolute values.
+  const tempW = buildMetricWindow(tempNode, 1961, 1990);
+  const precipW = buildMetricWindow(precipNode, 1991, 2020);
+  const sunshineW = buildMetricWindow(sunshineNode, 1991, 2020);
+  const frostW = buildMetricWindow(frostNode, 1991, 2020);
+
+  const metrics: NonNullable<RankingRow['metrics']> = {};
+  if (tempW) metrics.temp = tempW;
+  if (precipW) metrics.precip = precipW;
+  if (sunshineW) metrics.sunshine = sunshineW;
+  if (frostW) metrics.frost = frostW;
+
   return {
     slug: region.slug,
     name: region.name,
@@ -181,6 +324,7 @@ function extractRow(region: ClimateRegion, data: any): RankingRow | null {
     anomaly12m,
     latestLabel,
     dataAsOf,
+    ...(Object.keys(metrics).length ? { metrics } : {}),
   };
 }
 

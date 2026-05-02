@@ -6,6 +6,12 @@ import type { FeatureCollection, Feature } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import {
+  METRICS,
+  type MetricKey,
+  colorForMetric,
+  formatMetricValue,
+} from './climate-map-metrics';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -229,34 +235,13 @@ function fixAntimeridian(geo: FeatureCollection): FeatureCollection {
 }
 
 // Color ramp: anomaly (°C) → hex. Blue below 0, orange/red above.
+// Now delegates to colorForMetric(metric, value) so the same map can render
+// temp / precip / sunshine / frost using the metric-specific ramps defined
+// in climate-map-metrics.ts. The local helper kept for backward compat
+// with overlay code paths that still call it directly (US/UK overlays in
+// pure temp-anomaly mode).
 function anomalyColor(anom: number | null | undefined): string {
-  if (anom == null || !Number.isFinite(anom)) return '#1f2937';
-  const v = Math.max(-5, Math.min(5, anom));
-  if (v >= 0) {
-    if (v < 1) return lerp('#fef3c7', '#fde68a', v);
-    if (v < 2) return lerp('#fde68a', '#fb923c', v - 1);
-    if (v < 3) return lerp('#fb923c', '#ea580c', v - 2);
-    if (v < 4) return lerp('#ea580c', '#b91c1c', v - 3);
-    return lerp('#b91c1c', '#7f1d1d', v - 4);
-  } else {
-    const a = -v;
-    if (a < 1) return lerp('#e0f2fe', '#bae6fd', a);
-    if (a < 2) return lerp('#bae6fd', '#60a5fa', a - 1);
-    if (a < 3) return lerp('#60a5fa', '#2563eb', a - 2);
-    return lerp('#2563eb', '#1e3a8a', Math.min(1, a - 3));
-  }
-}
-
-function lerp(a: string, b: string, t: number): string {
-  const ta = Math.max(0, Math.min(1, t));
-  const ah = a.replace('#', '');
-  const bh = b.replace('#', '');
-  const ar = parseInt(ah.slice(0, 2), 16), ag = parseInt(ah.slice(2, 4), 16), ab = parseInt(ah.slice(4, 6), 16);
-  const br = parseInt(bh.slice(0, 2), 16), bg = parseInt(bh.slice(2, 4), 16), bb = parseInt(bh.slice(4, 6), 16);
-  const r = Math.round(ar + (br - ar) * ta);
-  const g = Math.round(ag + (bg - ag) * ta);
-  const b2 = Math.round(ab + (bb - ab) * ta);
-  return `rgb(${r},${g},${b2})`;
+  return colorForMetric('temp-anomaly', anom);
 }
 
 function normalizeName(s: string): string {
@@ -600,6 +585,18 @@ const UK_REGION_SLUGS = new Set([
   'scotland-west',
 ]);
 
+interface MetricWindowRow {
+  actual1m: number | null;
+  actual3m: number | null;
+  actual12m: number | null;
+  anom1m: number | null;
+  anom3m: number | null;
+  anom12m: number | null;
+  label1m: string | null;
+  label3m: string | null;
+  label12m: string | null;
+}
+
 interface RankingRow {
   slug: string;
   name: string;
@@ -608,6 +605,38 @@ interface RankingRow {
   anomaly3m: number | null;
   anomaly12m: number | null;
   latestLabel: string | null;
+  metrics?: {
+    temp?: MetricWindowRow;
+    precip?: MetricWindowRow;
+    sunshine?: MetricWindowRow;
+    frost?: MetricWindowRow;
+  };
+}
+
+// Pull the value for the requested metric + window from a ranking row.
+// Returns { value, label } or { value: null, label: null } if the row
+// either lacks the metric block or has no data for that window.
+function metricFromRow(
+  row: RankingRow | undefined,
+  metric: MetricKey,
+  win: AnomalyWindow,
+): { value: number | null; label: string | null } {
+  if (!row) return { value: null, label: null };
+  // Temperature anomaly is kept at top-level for backward compat - look there
+  // first so we still show data for legacy rows that pre-date the metrics block.
+  if (metric === 'temp-anomaly') {
+    const value = win === '3m' ? row.anomaly3m : win === '12m' ? row.anomaly12m : row.anomaly1m;
+    return { value, label: row.latestLabel };
+  }
+  const domain = metric.startsWith('temp') ? 'temp'
+    : metric.startsWith('precip') ? 'precip'
+    : metric.startsWith('sunshine') ? 'sunshine' : 'frost';
+  const node = row.metrics?.[domain];
+  if (!node) return { value: null, label: null };
+  const isAnom = metric.endsWith('-anomaly');
+  if (win === '3m') return { value: isAnom ? node.anom3m : node.actual3m, label: node.label3m };
+  if (win === '12m') return { value: isAnom ? node.anom12m : node.actual12m, label: node.label12m };
+  return { value: isAnom ? node.anom1m : node.actual1m, label: node.label1m };
 }
 
 function rankingValue(row: RankingRow | undefined, win: AnomalyWindow): number | null {
@@ -624,13 +653,15 @@ function rankingValue(row: RankingRow | undefined, win: AnomalyWindow): number |
 function UKNationsOverlay({
   rankings,
   windowSel,
+  metric,
   onInfo,
   ukGeo,
   level,
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
-  onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
+  metric: MetricKey;
+  onInfo: (info: { name: string; value: number | null; label: string | null; color: string } | null) => void;
   ukGeo: FeatureCollection | null;
   level: MapLevel;
 }) {
@@ -660,15 +691,15 @@ function UKNationsOverlay({
     (feature: Feature | undefined): PathOptions => {
       const slug = ((feature?.properties as any)?.slug as string) ?? '';
       const row = bySlug.get(slug);
-      const v = rankingValue(row, windowSel);
+      const { value } = metricFromRow(row, metric, windowSel);
       return {
-        fillColor: v != null ? anomalyColor(v) : '#2d3748',
-        fillOpacity: v != null ? 0.9 : 0.45,
+        fillColor: value != null ? colorForMetric(metric, value) : '#2d3748',
+        fillOpacity: value != null ? 0.9 : 0.45,
         weight: 1.2,
         color: '#374151',
       };
     },
-    [bySlug, windowSel],
+    [bySlug, windowSel, metric],
   );
 
   const onEachFeature = useCallback(
@@ -676,20 +707,20 @@ function UKNationsOverlay({
       const slug = ((feature.properties as any)?.slug as string) ?? '';
       const name = ((feature.properties as any)?.name as string) ?? slug;
       const row = bySlug.get(slug);
-      const v = rankingValue(row, windowSel);
-      const color = v != null ? anomalyColor(v) : '#1f2937';
-      const show = () => onInfo({ name, anomaly: v, label: row?.latestLabel ?? null, color });
+      const { value, label } = metricFromRow(row, metric, windowSel);
+      const color = value != null ? colorForMetric(metric, value) : '#1f2937';
+      const show = () => onInfo({ name, value, label, color });
       layer.on('mouseover', show);
       layer.on('click', show);
       layer.on('mouseout', () => onInfo(null));
     },
-    [bySlug, windowSel, onInfo],
+    [bySlug, windowSel, metric, onInfo],
   );
 
   if (!visible || !ukGeo) return null;
   return (
     <GeoJSON
-      key={`uk-overlay-${level}-${windowSel}-${bySlug.size}`}
+      key={`uk-overlay-${level}-${windowSel}-${metric}-${bySlug.size}`}
       data={ukGeo}
       style={style}
       onEachFeature={onEachFeature}
@@ -700,6 +731,7 @@ function UKNationsOverlay({
 function USStatesOverlay({
   rankings,
   windowSel,
+  metric,
   onInfo,
   statesGeo,
   level,
@@ -707,7 +739,8 @@ function USStatesOverlay({
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
-  onInfo: (info: { name: string; anomaly: number | null; label: string | null; color: string } | null) => void;
+  metric: MetricKey;
+  onInfo: (info: { name: string; value: number | null; label: string | null; color: string } | null) => void;
   statesGeo: FeatureCollection | null;
   level: MapLevel;
   usRegionGroups: GroupRow[] | null;
@@ -743,49 +776,54 @@ function USStatesOverlay({
     return m;
   }, [usRegionGroups]);
 
-  const resolve = useCallback((featureName: string): { anomaly: number | null; label: string | null; displayName: string } => {
+  const resolve = useCallback((featureName: string): { value: number | null; label: string | null; displayName: string } => {
     if (level === 'us-regions') {
+      // US climate region groups only carry temperature anomaly. For any other
+      // metric we mark the polygon as no-data so the toggle can't show stale
+      // info.
+      if (metric !== 'temp-anomaly') return { value: null, label: null, displayName: featureName };
       const slug = US_STATE_NAME_TO_REGION_SLUG[featureName.toLowerCase()];
       const g = slug ? regionBySlug.get(slug) : undefined;
-      if (!g) return { anomaly: null, label: null, displayName: featureName };
-      const anomaly = windowSel === '3m' ? g.anomaly3m : windowSel === '12m' ? g.anomaly12m : g.anomaly1m;
-      return { anomaly, label: g.latestLabel, displayName: `${g.label} (US climate region)` };
+      if (!g) return { value: null, label: null, displayName: featureName };
+      const value = windowSel === '3m' ? g.anomaly3m : windowSel === '12m' ? g.anomaly12m : g.anomaly1m;
+      return { value, label: g.latestLabel, displayName: `${g.label} (US climate region)` };
     }
     const row = byName.get(featureName.toLowerCase());
-    return { anomaly: rankingValue(row, windowSel), label: row?.latestLabel ?? null, displayName: featureName };
-  }, [level, windowSel, byName, regionBySlug]);
+    const { value, label } = metricFromRow(row, metric, windowSel);
+    return { value, label, displayName: featureName };
+  }, [level, windowSel, metric, byName, regionBySlug]);
 
   const style = useCallback(
     (feature: Feature | undefined): PathOptions => {
       const name = ((feature?.properties as any)?.name as string) ?? '';
-      const { anomaly } = resolve(name);
+      const { value } = resolve(name);
       return {
-        fillColor: anomaly != null ? anomalyColor(anomaly) : '#1f2937',
+        fillColor: value != null ? colorForMetric(metric, value) : '#1f2937',
         fillOpacity: 0.9,
         weight: 0.6,
         color: '#0b1220',
       };
     },
-    [resolve],
+    [resolve, metric],
   );
 
   const onEachFeature = useCallback(
     (feature: Feature, layer: Layer) => {
       const name = ((feature.properties as any)?.name as string) ?? '';
-      const { anomaly, label, displayName } = resolve(name);
-      const color = anomaly != null ? anomalyColor(anomaly) : '#1f2937';
-      const show = () => onInfo({ name: displayName, anomaly, label, color });
+      const { value, label, displayName } = resolve(name);
+      const color = value != null ? colorForMetric(metric, value) : '#1f2937';
+      const show = () => onInfo({ name: displayName, value, label, color });
       layer.on('mouseover', show);
       layer.on('click', show);
       layer.on('mouseout', () => onInfo(null));
     },
-    [resolve, onInfo],
+    [resolve, metric, onInfo],
   );
 
   if (!visible || !statesGeo) return null;
   return (
     <GeoJSON
-      key={`us-states-${level}-${windowSel}-${byName.size}-${regionBySlug.size}`}
+      key={`us-states-${level}-${windowSel}-${metric}-${byName.size}-${regionBySlug.size}`}
       data={statesGeo}
       style={style}
       onEachFeature={onEachFeature}
@@ -796,7 +834,17 @@ function USStatesOverlay({
 // UKRegionsOverlay removed - the map now shows UK as a single country polygon to
 // avoid mismatched sub-polygon coverage. Re-introduce from git history if needed.
 
-export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel = '1m', level = 'countries' }: { countryAnomalies: CountryAnomaly[]; window?: AnomalyWindow; level?: MapLevel }) {
+export default function ClimateMap({
+  countryAnomalies,
+  window: windowSel = '1m',
+  level = 'countries',
+  metric = 'temp-anomaly',
+}: {
+  countryAnomalies: CountryAnomaly[];
+  window?: AnomalyWindow;
+  level?: MapLevel;
+  metric?: MetricKey;
+}) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
   const [ukNationsGeo, setUkNationsGeo] = useState<FeatureCollection | null>(null);
@@ -808,11 +856,9 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
   const [usRegionGroups, setUsRegionGroups] = useState<GroupRow[] | null>(null);
   const [selected, setSelected] = useState<{
     name: string;
-    anomaly: number | null;
-    monthLabel?: string;
-    value?: number;
-    rank?: number;
-    total?: number;
+    value: number | null;
+    label?: string;
+    extra?: string;
     color: string;
   } | null>(null);
 
@@ -846,7 +892,9 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
     return () => { cancelled = true; };
   }, []);
 
-  // Build lookup: normalized geojson name → anomaly record
+  // Country-level lookup: countryAnomalies (rich, used for the temp-anomaly
+  // tooltip) and a parallel rankings-row lookup that carries the metrics
+  // block needed for temp-actual / precip / sunshine / frost.
   const lookup = useMemo(() => {
     const map = new Map<string, CountryAnomaly>();
     for (const c of countryAnomalies) {
@@ -855,91 +903,114 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
     return map;
   }, [countryAnomalies]);
 
-  // Resolve the anomaly/label for the chosen window. Falls back to the
-  // legacy 1-month fields so this component still works against older
-  // snapshots that don't yet have 3m/12m data.
+  const countryRowByName = useMemo(() => {
+    const map = new Map<string, RankingRow>();
+    if (rankings) {
+      for (const r of rankings) {
+        if (r.type === 'country') map.set(normalizeName(r.name), r);
+      }
+    }
+    return map;
+  }, [rankings]);
+
   const continentByKey = useMemo(() => {
     const m = new Map<string, GroupRow>();
     if (continentGroups) for (const g of continentGroups) m.set(g.key, g);
     return m;
   }, [continentGroups]);
 
-  const groupValue = useCallback((g: GroupRow | undefined): { anomaly: number | null; label: string | null } => {
-    if (!g) return { anomaly: null, label: null };
-    if (windowSel === '3m') return { anomaly: g.anomaly3m, label: g.latestLabel };
-    if (windowSel === '12m') return { anomaly: g.anomaly12m, label: g.latestLabel };
-    return { anomaly: g.anomaly1m, label: g.latestLabel };
+  const groupValue = useCallback((g: GroupRow | undefined): { value: number | null; label: string | null } => {
+    if (!g) return { value: null, label: null };
+    if (windowSel === '3m') return { value: g.anomaly3m, label: g.latestLabel };
+    if (windowSel === '12m') return { value: g.anomaly12m, label: g.latestLabel };
+    return { value: g.anomaly1m, label: g.latestLabel };
   }, [windowSel]);
 
-  const pick = useCallback((c: CountryAnomaly | undefined, name?: string): { anomaly: number | null; label: string | null } => {
-    // In sub-national levels we don't tint country polygons - the overlay
-    // (US states or UK nations) carries the data instead.
+  // Resolve the value for a polygon at the active level + metric. Returns
+  // { value: null } for combinations that have no data (e.g. continent
+  // polygons in precip-actual mode, since NOAA doesn't publish a continent
+  // precip rollup).
+  const pick = useCallback((c: CountryAnomaly | undefined, name?: string): { value: number | null; label: string | null } => {
+    // Sub-national levels: country polygons are just a backdrop.
     if (level === 'us-states' || level === 'us-regions' || level === 'uk-regions' || level === 'uk-countries') {
-      return { anomaly: null, label: null };
+      return { value: null, label: null };
     }
     if (level === 'continents') {
-      // Resolve continent by GEOJSON NAME so every polygon (incl. countries
-      // we don't have a snapshot for, e.g. Russia, small African states) gets
-      // its continent's anomaly rather than falling back to "no data".
-      const byName = name ? NAME_TO_CONTINENT[name.toLowerCase()] : undefined;
+      // Only temp anomaly is supported for continent rollups; other metrics
+      // have no continent-aggregated source.
+      if (metric !== 'temp-anomaly') return { value: null, label: null };
+      const byContinent = name ? NAME_TO_CONTINENT[name.toLowerCase()] : undefined;
       const byIso = c ? CONTINENT_GROUP_KEY[c.iso3] : undefined;
-      const groupKey = byName ?? byIso;
-      if (!groupKey) return { anomaly: null, label: null };
+      const groupKey = byContinent ?? byIso;
+      if (!groupKey) return { value: null, label: null };
       return groupValue(continentByKey.get(groupKey));
     }
-    if (!c) return { anomaly: null, label: null };
-    if (windowSel === '3m') return { anomaly: c.anomaly3m ?? null, label: c.label3m ?? null };
-    if (windowSel === '12m') return { anomaly: c.anomaly12m ?? null, label: c.label12m ?? null };
-    return { anomaly: c.anomaly1m ?? c.anomaly ?? null, label: c.label1m ?? c.monthLabel ?? null };
-  }, [windowSel, level, continentByKey, groupValue]);
+    // level === 'countries'.
+    // Temp-anomaly: prefer the rich countryAnomalies source for tooltip parity.
+    if (metric === 'temp-anomaly') {
+      if (!c) return { value: null, label: null };
+      if (windowSel === '3m') return { value: c.anomaly3m ?? null, label: c.label3m ?? null };
+      if (windowSel === '12m') return { value: c.anomaly12m ?? null, label: c.label12m ?? null };
+      return { value: c.anomaly1m ?? c.anomaly ?? null, label: c.label1m ?? c.monthLabel ?? null };
+    }
+    // Other metrics: pull from rankings rows (the only source that carries
+    // the multi-metric block at country level).
+    const row = name ? countryRowByName.get(normalizeName(name)) : undefined;
+    return metricFromRow(row, metric, windowSel);
+  }, [windowSel, level, metric, continentByKey, groupValue, countryRowByName]);
 
   const style = useCallback((feature: Feature | undefined): PathOptions => {
     if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
     const name = ((feature.properties as any)?.name as string) ?? '';
     const rec = lookup.get(normalizeName(name));
-    const { anomaly } = pick(rec, name);
+    const { value } = pick(rec, name);
     return {
-      fillColor: anomaly != null ? anomalyColor(anomaly) : '#1f2937',
+      fillColor: value != null ? colorForMetric(metric, value) : '#1f2937',
       fillOpacity: 0.85,
       weight: 0.4,
       color: '#0b1220',
     };
-  }, [lookup, pick]);
+  }, [lookup, pick, metric]);
 
   const onEachFeature = useCallback((feature: Feature, layer: Layer) => {
     const name = ((feature.properties as any)?.name as string) ?? '';
-    // In sub-national levels the country polygons are just a backdrop -
-    // suppress all hover/click interactions so users don't get a "no data"
-    // tooltip on, e.g. Denmark while looking at UK regions.
     if (level === 'us-states' || level === 'us-regions' || level === 'uk-regions') {
       return;
     }
     const rec = lookup.get(normalizeName(name));
-    const { anomaly, label } = pick(rec, name);
-    const color = anomaly != null ? anomalyColor(anomaly) : '#1f2937';
-    // In continents mode the displayed name is the continent, not the country.
+    const { value, label } = pick(rec, name);
+    const color = value != null ? colorForMetric(metric, value) : '#1f2937';
     let displayName = name;
     if (level === 'continents') {
       const groupKey = NAME_TO_CONTINENT[name.toLowerCase()] ?? (rec ? CONTINENT_GROUP_KEY[rec.iso3] : undefined);
       const group = groupKey ? continentByKey.get(groupKey) : undefined;
       if (group) displayName = `${group.label} (continent)`;
     }
+    // The "extra" line shows rich country tooltip context only when we're
+    // actually viewing temp-anomaly at country level (where countryAnomalies
+    // gives us absolute temp + global rank).
+    let extra: string | undefined;
+    if (level === 'countries' && metric === 'temp-anomaly' && rec) {
+      const parts: string[] = [];
+      if (typeof rec.value === 'number') parts.push(`${rec.value.toFixed(2)}°C absolute`);
+      if (rec.rank && rec.total) parts.push(`Rank ${rec.rank} of ${rec.total}`);
+      if (parts.length) extra = parts.join(' · ');
+    }
     const show = () => setSelected({
       name: displayName,
-      anomaly,
-      monthLabel: label ?? undefined,
-      value: level === 'countries' ? rec?.value : undefined,
-      rank: level === 'countries' ? rec?.rank : undefined,
-      total: level === 'countries' ? rec?.total : undefined,
+      value,
+      label: label ?? undefined,
+      extra,
       color,
     });
     layer.on('mouseover', show);
     layer.on('click', show);
     layer.on('mouseout', () => setSelected(null));
-  }, [lookup, pick, level, continentByKey]);
+  }, [lookup, pick, level, metric, continentByKey]);
 
-  const headlineLabel = pick(countryAnomalies[0]).label ?? '';
+  const cfg = METRICS[metric];
   const windowPhrase = windowSel === '12m' ? '12-month rolling' : windowSel === '3m' ? '3-month rolling' : 'monthly';
+  const baselineCopy = cfg.isAnomaly ? cfg.baseline : '';
 
   if (loadError) {
     return (
@@ -979,7 +1050,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
             opacity={0.55}
           />
           <GeoJSON
-            key={`anomaly-${level}-${windowSel}-${lookup.size}-${continentByKey.size}`}
+            key={`base-${level}-${windowSel}-${metric}-${lookup.size}-${countryRowByName.size}-${continentByKey.size}`}
             data={geo}
             style={style}
             onEachFeature={onEachFeature}
@@ -987,13 +1058,14 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
           <USStatesOverlay
             rankings={rankings}
             windowSel={windowSel}
+            metric={metric}
             statesGeo={statesGeo}
             level={level}
             usRegionGroups={usRegionGroups}
             onInfo={(info) =>
               setSelected(
                 info
-                  ? { name: info.name, anomaly: info.anomaly, monthLabel: info.label ?? undefined, color: info.color }
+                  ? { name: info.name, value: info.value, label: info.label ?? undefined, color: info.color }
                   : null,
               )
             }
@@ -1001,39 +1073,35 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
           <UKNationsOverlay
             rankings={rankings}
             windowSel={windowSel}
+            metric={metric}
             ukGeo={ukGeo}
             level={level}
             onInfo={(info) =>
               setSelected(
                 info
-                  ? { name: info.name, anomaly: info.anomaly, monthLabel: info.label ?? undefined, color: info.color }
+                  ? { name: info.name, value: info.value, label: info.label ?? undefined, color: info.color }
                   : null,
               )
             }
           />
           <MapLabels countriesGeo={geo} statesGeo={statesGeo} ukGeo={ukGeo} level={level} />
-          {/* UK nations overlay disabled - map is country-level; UK renders as a single polygon
-              from world-countries.json to avoid mismatched sub-polygon coverage. */}
         </MapContainer>
 
         {selected && (
           <div className="absolute bottom-0 left-0 right-0 z-[1001] bg-gray-950/95 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm pointer-events-none">
             <span className="font-bold text-gray-100">{selected.name}</span>
-            {selected.anomaly != null ? (
+            {selected.value != null ? (
               <>
                 <span className="font-mono font-semibold" style={{ color: selected.color }}>
-                  {selected.anomaly > 0 ? '+' : ''}{selected.anomaly.toFixed(2)}°C vs 1961–1990
+                  {formatMetricValue(metric, selected.value)}{baselineCopy ? ` ${baselineCopy}` : ''}
                 </span>
                 <span className="text-gray-300">
-                  {selected.value != null ? `${selected.value.toFixed(2)}°C absolute` : ''}
-                  {selected.monthLabel ? ` · ${selected.monthLabel}` : ''}
+                  {selected.extra ? `${selected.extra}` : ''}
+                  {selected.label ? `${selected.extra ? ' · ' : ''}${selected.label}` : ''}
                 </span>
-                {selected.rank && selected.total ? (
-                  <span className="text-gray-300">Rank {selected.rank} of {selected.total}</span>
-                ) : null}
               </>
             ) : (
-              <span className="text-gray-300">No monthly data on this site</span>
+              <span className="text-gray-300">No data on this site</span>
             )}
           </div>
         )}
@@ -1042,18 +1110,15 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
       {/* Legend */}
       <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-300">
         <span className="font-semibold text-gray-200">
-          {headlineLabel ? `${headlineLabel} land anomaly (${windowPhrase}) vs 1961–1990` : `Land anomaly (${windowPhrase}) vs 1961–1990`}
+          {`${cfg.longLabel} (${windowPhrase})${baselineCopy ? ` ${baselineCopy}` : ''}`}
         </span>
         <div className="flex items-center gap-2">
-          <span>-5°C</span>
+          <span>{cfg.legendMin}</span>
           <div
             className="h-3 w-40 rounded"
-            style={{
-              background:
-                'linear-gradient(to right, #1e3a8a 0%, #2563eb 20%, #60a5fa 35%, #bae6fd 48%, #fef3c7 52%, #fde68a 58%, #fb923c 70%, #ea580c 78%, #b91c1c 88%, #7f1d1d 100%)',
-            }}
+            style={{ background: cfg.legendGradient }}
           />
-          <span>+5°C</span>
+          <span>{cfg.legendMax}</span>
         </div>
         <span className="text-gray-400">Grey = no data · scroll / pinch to zoom, drag to pan</span>
       </div>

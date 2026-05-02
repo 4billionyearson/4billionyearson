@@ -6,7 +6,7 @@ import { Trophy, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Info } 
 import RankingsTable from './RankingsTable';
 import RankingsAnalysis from './RankingsAnalysis';
 import RollupsSection from './RollupsSection';
-import AnomalyMapCard, { type CountryAnomalyRow } from '../global/AnomalyMapCard';
+import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 
@@ -401,7 +401,7 @@ export default async function RankingsPage() {
           />
 
           {/* Temperature anomaly map - geographic view of the same rankings */}
-          {countryAnomalies && <AnomalyMapCard countryAnomalies={countryAnomalies} />}
+          {countryAnomalies && <ClimateMapCard countryAnomalies={countryAnomalies} />}
 
           {/* Table */}
           <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">

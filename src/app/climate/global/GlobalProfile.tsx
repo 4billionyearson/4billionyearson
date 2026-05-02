@@ -17,7 +17,7 @@ import {
 } from '../_shared/overview-grid';
 import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar } from './ClimateSystemsPanel';
 import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
-import AnomalyMapCard from './AnomalyMapCard';
+import ClimateMapCard from './ClimateMapCard';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
@@ -660,7 +660,7 @@ export default function GlobalProfile() {
                   see where the current warming is concentrated before diving
                   into longer time-series charts below. */}
               {data.countryAnomalies && data.countryAnomalies.length > 0 && (
-                <AnomalyMapCard countryAnomalies={data.countryAnomalies} />
+                <ClimateMapCard countryAnomalies={data.countryAnomalies} />
               )}
 
               {/* Spaghetti charts - Land+Ocean headline and Land-only comparison.

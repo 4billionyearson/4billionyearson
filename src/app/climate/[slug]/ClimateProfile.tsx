@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory, Globe2 } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
+import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard';
+import type { ClimateMapPreset } from '../global/ClimateMapCard';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
@@ -819,6 +821,23 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
           {data && !loading && (
             <>
+              {/* ─── At a Glance: climate map for USA / UK and any of their
+                  sub-national regions. Other countries / continents skip the
+                  map (no country-level data to highlight on those pages). ─── */}
+              {(() => {
+                const mapPreset: ClimateMapPreset | null =
+                  region.slug === 'usa' || region.type === 'us-state' ? 'usa' :
+                  region.slug === 'uk' || region.type === 'uk-region' ? 'uk' :
+                  null;
+                if (!mapPreset) return null;
+                return (
+                  <>
+                    <Divider icon={<Globe2 className="h-5 w-5 text-[#D0A65E]" />} title="At a Glance" />
+                    <ClimateMapCard countryAnomalies={[] as CountryAnomalyRow[]} preset={mapPreset} />
+                  </>
+                );
+              })()}
+
               {/* ─── Sections with dividers ─── */}
               {(() => {
                 const tempPanels = overviewPanels.filter(p => p.title.startsWith('Temperature'));
@@ -848,7 +867,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                     {/* Temperature */}
                     {tempPanels.length > 0 && (
                       <>
-                        <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature" />
+                        <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature History" />
                         <OverviewGrid panels={tempPanels} />
                       </>
                     )}
