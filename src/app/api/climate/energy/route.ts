@@ -65,6 +65,7 @@ interface LatestStats {
   carbonIntensity: number | null;
   electricityGeneration: number | null;
   ghgEmissions: number | null;
+  ghgPerCapita: number | null;
 }
 
 interface CountryEnergy {
@@ -170,6 +171,7 @@ function extractLatest(yearly: EnergyYearlyPoint[]): LatestStats | null {
         carbonIntensity: y.carbonIntensity,
         electricityGeneration: y.electricityGeneration,
         ghgEmissions: y.ghgEmissions,
+        ghgPerCapita: y.ghgPerCapita,
       };
     }
   }
@@ -448,7 +450,7 @@ function buildEIACountryEnergy(name: string, rows: EIARow[]): CountryEnergy {
 }
 
 async function fetchStateResponse(stateCode: string, stateName: string, worldData: EnergyData) {
-  const cacheKey = `climate:energy:v2:state:${stateCode.toLowerCase()}`;
+  const cacheKey = `climate:energy:v3:state:${stateCode.toLowerCase()}`;
   const cached = await getCached<{ state: CountryEnergy; usa: CountryEnergy }>(cacheKey);
   if (cached) {
     return NextResponse.json({
