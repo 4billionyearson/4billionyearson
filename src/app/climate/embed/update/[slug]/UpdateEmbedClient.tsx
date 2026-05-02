@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Loader2, MapPin } from 'lucide-react';
+import ClimateRankPill from '@/app/_components/climate-rank-pill';
+import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
+import { getRegionBySlug } from '@/lib/climate/regions';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 
 interface SummaryResponse {
@@ -30,6 +33,23 @@ export default function UpdateEmbedClient({ slug, regionName }: { slug: string; 
   const [sources, setSources] = useState<{ title: string; uri: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isGlobal = slug === 'global';
+
+  const { coverageLine, coverageLabel } = useMemo(() => {
+    const region = isGlobal ? null : getRegionBySlug(slug);
+    if (!region) return { coverageLine: null as string | null, coverageLabel: null as string | null };
+    const places = region.coveragePlaces;
+    const line = places?.length
+      ? places.slice(0, -1).join(', ') + (places.length > 1 ? `${places.length > 2 ? ',' : ''} and ${places[places.length - 1]}` : '')
+      : null;
+    const label =
+      region.slug === 'uk' ? 'Coverage:' :
+      region.slug === 'usa' ? 'Key States:' :
+      region.type === 'country' ? 'Top 5 Cities:' :
+      region.type === 'us-state' ? 'Top 5 Cities:' :
+      'City Coverage:';
+    return { coverageLine: line, coverageLabel: label };
+  }, [slug, isGlobal]);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,6 +76,18 @@ export default function UpdateEmbedClient({ slug, regionName }: { slug: string; 
   return (
     <div className="rounded-2xl border-2 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md p-4 md:p-5 shadow-xl">
       <h2 className="text-base md:text-lg font-bold font-mono text-[#FFF5E7] mb-3">{regionName} Climate Update</h2>
+      {coverageLine && (
+        <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
+          <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
+          <p className="text-xs md:text-sm font-medium text-[#D0A65E]">
+            {coverageLabel ? <span className="font-semibold">{coverageLabel} </span> : null}
+            {coverageLine}
+          </p>
+        </div>
+      )}
+      <div className="mb-3">
+        {isGlobal ? <GlobalRankingsTeaser /> : <ClimateRankPill slug={slug} />}
+      </div>
       {loading && (
         <div className="flex items-center gap-3 py-4 text-sm text-gray-400">
           <Loader2 className="h-4 w-4 animate-spin text-[#D0A65E]" />

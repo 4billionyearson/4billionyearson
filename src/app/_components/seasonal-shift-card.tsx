@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Leaf, CloudRain, Thermometer, Sun, ArrowRight } from 'lucide-react';
 import InfoTooltip from '@/app/_components/info-tooltip';
@@ -59,6 +59,16 @@ export default function SeasonalShiftCard({
 
   const [view, setView] = useState<View | null>(null);
   const effectiveView: View = view ?? defaultView;
+
+  // Scroll-to-anchor when the URL hash matches our section id but the card
+  // mounted later (async profile pages).
+  useEffect(() => {
+    if (!share?.sectionId) return;
+    if (typeof window === 'undefined') return;
+    if (window.location.hash !== '#' + share.sectionId) return;
+    const el = document.getElementById(share.sectionId);
+    if (el) el.scrollIntoView({ block: 'start' });
+  }, [share?.sectionId]);
 
   if (!stats) return null;
 
