@@ -660,10 +660,10 @@ function UKNationsOverlay({
       const row = bySlug.get(slug);
       const v = rankingValue(row, windowSel);
       return {
-        fillColor: v != null ? anomalyColor(v) : '#1f2937',
-        fillOpacity: 0.9,
-        weight: 0.8,
-        color: '#0b1220',
+        fillColor: v != null ? anomalyColor(v) : '#2d3748',
+        fillOpacity: v != null ? 0.9 : 0.45,
+        weight: 1.2,
+        color: '#374151',
       };
     },
     [bySlug, windowSel],
