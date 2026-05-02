@@ -14,6 +14,8 @@ export interface MonthlyPoint {
   year: number;
   month: number;
   value: number;
+  /** Source flagged the value as provisional (Met Office / NOAA latest month). */
+  provisional?: boolean;
 }
 
 interface ChartRow {
@@ -138,8 +140,8 @@ export default function MonthlySpaghettiChart({
   hideTitle = false,
 }: SpaghettiChartProps) {
   const cfg = METRIC_CONFIG[metric];
-  const { chartData, backgroundYears, recordYear, currentYear, currentIsLatestFallback, yMin, yMax, startYear, latestMonthIdx } = useMemo(() => {
-    const empty = { chartData: [] as ChartRow[], backgroundYears: [] as number[], recordYear: 0, currentYear: 0, currentIsLatestFallback: false, yMin: 0, yMax: 0, startYear: 0, latestMonthIdx: -1 };
+  const { chartData, backgroundYears, recordYear, currentYear, currentIsLatestFallback, yMin, yMax, startYear, latestMonthIdx, provisionalFromMonthIdx } = useMemo(() => {
+    const empty = { chartData: [] as ChartRow[], backgroundYears: [] as number[], recordYear: 0, currentYear: 0, currentIsLatestFallback: false, yMin: 0, yMax: 0, startYear: 0, latestMonthIdx: -1, provisionalFromMonthIdx: -1 };
     if (!monthlyAll?.length) return empty;
 
     const now = new Date();
@@ -148,10 +150,15 @@ export default function MonthlySpaghettiChart({
 
     // Group by year, excluding the current calendar year's incomplete months.
     const byYear = new Map<number, Map<number, number>>();
+    const provByYear = new Map<number, Set<number>>();
     for (const p of monthlyAll) {
       if (p.year === calendarYear && p.month >= currentMonth) continue;
       if (!byYear.has(p.year)) byYear.set(p.year, new Map());
       byYear.get(p.year)!.set(p.month, p.value);
+      if (p.provisional) {
+        if (!provByYear.has(p.year)) provByYear.set(p.year, new Set());
+        provByYear.get(p.year)!.add(p.month);
+      }
     }
 
     // Years to display: 6+ months for the background (so partial historical
@@ -198,15 +205,32 @@ export default function MonthlySpaghettiChart({
     let globalMin = Infinity;
     let globalMax = -Infinity;
     const rows: ChartRow[] = [];
+
+    // Compute the earliest provisional month (1-12) for the highlight year, if any.
+    const highlightProv = provByYear.get(highlightCurrent);
+    const firstProvMonth = highlightProv?.size ? Math.min(...highlightProv) : -1;
+
     for (let m = 1; m <= 12; m++) {
       const row: ChartRow = { month: m, monthLabel: MONTH_LABELS[m - 1] };
       for (const yr of displayYears) {
         const val = byYear.get(yr)?.get(m) ?? null;
-        row[`y${yr}`] = val !== null ? Math.round(val * 100) / 100 : null;
+        // For the highlight year, blank out provisional months in the main
+        // series so the solid line ends cleanly at the last confirmed month.
+        const isProvHighlight = yr === highlightCurrent && firstProvMonth > 0 && m >= firstProvMonth;
+        row[`y${yr}`] = !isProvHighlight && val !== null ? Math.round(val * 100) / 100 : null;
         if (val !== null) {
           if (val < globalMin) globalMin = val;
           if (val > globalMax) globalMax = val;
         }
+      }
+      // Provisional series for the highlight year: include the month *before*
+      // the first provisional one (so the dashed segment joins the solid line)
+      // and every provisional month thereafter.
+      if (firstProvMonth > 0 && (m === firstProvMonth - 1 || m >= firstProvMonth)) {
+        const provVal = byYear.get(highlightCurrent)?.get(m) ?? null;
+        row[`y${highlightCurrent}_prov`] = provVal !== null ? Math.round(provVal * 100) / 100 : null;
+      } else {
+        row[`y${highlightCurrent}_prov`] = null;
       }
       rows.push(row);
     }
@@ -230,6 +254,7 @@ export default function MonthlySpaghettiChart({
         if (!cm?.size) return -1;
         return Math.max(...cm.keys()) - 1;
       })(),
+      provisionalFromMonthIdx: firstProvMonth > 0 ? firstProvMonth - 1 : -1,
     };
   }, [monthlyAll, cfg]);
 
@@ -289,6 +314,8 @@ export default function MonthlySpaghettiChart({
               strokeWidth={2.5}
               dot={(props: { cx?: number; cy?: number; index?: number; payload?: ChartRow }) => {
                 const { cx, cy, index, payload } = props;
+                // If we have a provisional segment, the dot+label belong on the dashed line, not here.
+                if (provisionalFromMonthIdx >= 0) return <g key={index ?? 'd'} />;
                 if (index !== latestMonthIdx || cy == null || cx == null || !payload) {
                   return <g key={index ?? 'd'} />;
                 }
@@ -307,6 +334,35 @@ export default function MonthlySpaghettiChart({
               isAnimationActive={false}
               connectNulls
             />
+
+            {provisionalFromMonthIdx >= 0 && (
+              <Line
+                type="monotone"
+                dataKey={`y${currentYear}_prov`}
+                stroke={cfg.currentColor}
+                strokeWidth={2.5}
+                strokeDasharray="6 4"
+                dot={(props: { cx?: number; cy?: number; index?: number; payload?: ChartRow }) => {
+                  const { cx, cy, index, payload } = props;
+                  if (index !== latestMonthIdx || cy == null || cx == null || !payload) {
+                    return <g key={index ?? 'd'} />;
+                  }
+                  const raw = payload[`y${currentYear}_prov`];
+                  if (raw == null || typeof raw !== 'number') return <g key={index} />;
+                  return (
+                    <g key={index}>
+                      <circle cx={cx} cy={cy} r={5} fill={cfg.currentColor} stroke="#fff" strokeWidth={1.5} />
+                      <text x={cx} y={cy - 12} textAnchor="middle" fill={cfg.currentColor} fontSize={11} fontWeight="bold">
+                        {MONTH_LABELS[latestMonthIdx]} {currentYear}: {formatValue(cfg, raw)} (provisional)
+                      </text>
+                    </g>
+                  );
+                }}
+                activeDot={{ r: 4, fill: cfg.currentColor }}
+                isAnimationActive={false}
+                connectNulls
+              />
+            )}
 
             {recordYear !== currentYear && (
               <Line
@@ -351,7 +407,21 @@ export default function MonthlySpaghettiChart({
             {currentYear} ({currentIsLatestFallback ? 'latest available' : 'current year'})
           </span>
         </span>
+        {provisionalFromMonthIdx >= 0 && (
+          <span className="flex items-center gap-1.5">
+            <svg width="24" height="3" className="overflow-visible">
+              <line x1="0" y1="1.5" x2="24" y2="1.5" stroke={cfg.currentColor} strokeWidth="3" strokeDasharray="6 4" />
+            </svg>
+            <span className={`${cfg.currentTextClass} font-semibold`}>provisional</span>
+          </span>
+        )}
       </div>
+
+      {provisionalFromMonthIdx >= 0 && (
+        <p className="text-[11px] text-gray-500 mt-2 italic">
+          Latest month is provisional and may be revised by the data provider in the next update cycle.
+        </p>
+      )}
 
       {dataSource && (
         <p className="text-[10px] text-gray-500 mt-2">{dataSource}</p>
@@ -383,7 +453,9 @@ function SpaghettiTooltip({
   if (!active || !payload?.length) return null;
 
   const recordEntry = payload.find((p) => p.dataKey === `y${recordYear}`);
-  const currentEntry = payload.find((p) => p.dataKey === `y${currentYear}`);
+  const currentEntry =
+    payload.find((p) => p.dataKey === `y${currentYear}_prov` && p.value != null)
+    ?? payload.find((p) => p.dataKey === `y${currentYear}`);
 
   const numericPayloads = payload.filter((p) => p.value != null) as Array<{ value: number }>;
   const allValues = numericPayloads.map((p) => p.value);

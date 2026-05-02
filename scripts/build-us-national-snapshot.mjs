@@ -124,6 +124,19 @@ async function fetchNationalParam(param) {
   return { data: parseNoaa(json, param), units: param === 'pcp' ? 'mm' : '°C' };
 }
 
+// Mark the latest monthly data point as provisional. NOAA NClimDiv values
+// published mid-cycle are subject to QC adjustments for roughly one update
+// cycle before being finalised; flagging the last point lets the chart
+// render it dashed and label it clearly.
+function tagLatestProvisional(points) {
+  if (!points.length) return points;
+  const sorted = [...points].sort((a, b) => a.year - b.year || a.month - b.month);
+  const last = sorted[sorted.length - 1];
+  return sorted.map((p) =>
+    p.year === last.year && p.month === last.month ? { ...p, provisional: true } : p,
+  );
+}
+
 async function main() {
   console.log(`Build started ${new Date().toISOString()}`);
   await mkdir(dirname(OUT_PATH), { recursive: true });
@@ -145,7 +158,7 @@ async function main() {
       monthlyComparison: buildComparisonFromNoaa(result.data),
       latestMonthStats: buildLatestMonthStats(points),
       latestThreeMonthStats: buildLatestThreeMonthStats(points),
-      ...(['tavg', 'pcp'].includes(param) ? { monthlyAll: points } : {}),
+      ...(['tavg', 'pcp'].includes(param) ? { monthlyAll: tagLatestProvisional(points) } : {}),
     };
   }
 

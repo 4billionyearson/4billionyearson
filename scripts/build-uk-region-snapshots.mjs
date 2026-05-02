@@ -73,6 +73,20 @@ function parseArgs(argv) {
   return { onlyList };
 }
 
+// Mark the latest monthly data point as provisional. Met Office time-series
+// .txt files publish each month's value within a few days of month-end, but
+// those values stay "provisional" (subject to QC revision) for roughly one
+// month before being treated as final. Flagging the last point lets the
+// chart render it dashed and label it clearly.
+function tagLatestProvisional(points) {
+  if (!points.length) return points;
+  const sorted = [...points].sort((a, b) => a.year - b.year || a.month - b.month);
+  const last = sorted[sorted.length - 1];
+  return sorted.map((p) =>
+    p.year === last.year && p.month === last.month ? { ...p, provisional: true } : p,
+  );
+}
+
 function parseMetOfficeText(text) {
   // Met Office monthly time-series files are column-aligned (fixed-width):
   //   Year (cols 0-3)  +  12 monthly columns (7 chars each, right-aligned)
@@ -152,7 +166,7 @@ async function main() {
           monthlyComparison: buildMonthlyComparison(points),
           latestMonthStats: buildLatestMonthStats(points, { lowerIsBetter }),
           latestThreeMonthStats: buildLatestThreeMonthStats(points, { lowerIsBetter, isSum }),
-          ...(keepMonthlyAll ? { monthlyAll: points.map((p) => ({ year: p.year, month: p.month, value: p.value })) } : {}),
+          ...(keepMonthlyAll ? { monthlyAll: tagLatestProvisional(points.map((p) => ({ year: p.year, month: p.month, value: p.value }))) } : {}),
         };
       }
 
