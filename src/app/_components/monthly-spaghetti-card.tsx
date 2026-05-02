@@ -107,6 +107,10 @@ export default function MonthlySpaghettiCard({
 
   return (
     <div id={share?.sectionId} className={`${wrapperClass} scroll-mt-24`}>
+      <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+        <span className="shrink-0 mt-1 text-[#D0A65E]">{cfg.icon}</span>
+        <span className="min-w-0 flex-1">{cardTitle}</span>
+      </h3>
       {available.length > 1 && (
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Metric</span>
@@ -130,6 +134,7 @@ export default function MonthlySpaghettiCard({
         regionName={regionName}
         metric={metric}
         dataSource={dataSource}
+        hideTitle
       />
 
       {footer && (

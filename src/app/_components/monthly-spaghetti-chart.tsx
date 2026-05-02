@@ -240,16 +240,14 @@ export default function MonthlySpaghettiChart({
   return (
     <div>
       {!hideTitle && (
-        <>
-          <h2 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
-            {cfg.icon}
-            <span className="min-w-0 flex-1">{headingTitle}</span>
-          </h2>
-          <p className="text-xs text-gray-400 mb-3">
-            Each line represents one year of monthly {cfg.longLabel.replace('Monthly ', '').toLowerCase()}.
-          </p>
-        </>
+        <h2 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
+          {cfg.icon}
+          <span className="min-w-0 flex-1">{headingTitle}</span>
+        </h2>
       )}
+      <p className="text-xs text-gray-400 mb-3">
+        Each line represents one year of monthly {cfg.longLabel.replace('Monthly ', '').toLowerCase()}.
+      </p>
 
       <div className="w-full h-[360px] md:h-[480px]">
         <ResponsiveContainer width="100%" height="100%">
