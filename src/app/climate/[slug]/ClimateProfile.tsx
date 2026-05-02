@@ -833,7 +833,11 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                 return (
                   <>
                     <Divider icon={<Globe2 className="h-5 w-5 text-[#D0A65E]" />} title="At a Glance" />
-                    <ClimateMapCard countryAnomalies={[] as CountryAnomalyRow[]} preset={mapPreset} />
+                    <ClimateMapCard
+                      countryAnomalies={[] as CountryAnomalyRow[]}
+                      preset={mapPreset}
+                      share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-map' }}
+                    />
                   </>
                 );
               })()}

@@ -217,7 +217,7 @@ export const ALL_METRICS: MetricKey[] = [
 
 // Convenience: which metrics have global country-level coverage?
 // (No precip/sunshine/frost data at country level - country-precip is too stale.)
-export const GLOBAL_METRICS: MetricKey[] = ['temp-anomaly', 'temp-actual'];
+export const GLOBAL_METRICS: MetricKey[] = ['temp-anomaly', 'temp-actual', 'precip-anomaly', 'precip-actual'];
 
 // US national page: NOAA tavg + pcp at state level.
 export const USA_METRICS: MetricKey[] = ['temp-anomaly', 'temp-actual', 'precip-anomaly', 'precip-actual'];

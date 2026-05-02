@@ -207,9 +207,33 @@ function buildMetricWindow(node: any, baselineStart: number, baselineEnd: number
   const label1m = latest1m?.label ?? null;
   const label3m = latest3m?.label ?? null;
 
-  const actual12m = monthlyAll.length ? compute12mActual(monthlyAll) : null;
-  const anom12m = monthlyAll.length ? compute12mAnom(monthlyAll, baselineStart, baselineEnd) : null;
-  const label12m = monthlyAll.length ? compute12mLabel(monthlyAll) : null;
+  const actual12mFromMonthly = monthlyAll.length ? compute12mActual(monthlyAll) : null;
+  const anom12mFromMonthly = monthlyAll.length ? compute12mAnom(monthlyAll, baselineStart, baselineEnd) : null;
+  const label12mFromMonthly = monthlyAll.length ? compute12mLabel(monthlyAll) : null;
+
+  // Fallback: some snapshot vars (e.g. Met Office AirFrost) only publish a
+  // `yearly` series, not month-by-month. In that case use the latest full
+  // calendar year as the "12-month" window vs the annual mean over the
+  // baseline range.
+  let actual12m = actual12mFromMonthly;
+  let anom12m = anom12mFromMonthly;
+  let label12m = label12mFromMonthly;
+  if ((actual12m == null || anom12m == null) && Array.isArray(node.yearly) && node.yearly.length) {
+    const yNow = new Date().getFullYear();
+    const yearly: { year: number; value: number }[] = node.yearly
+      .map((p: any) => ({ year: p.year, value: numOrNull(p.value ?? p.avgTemp ?? p.temp) }))
+      .filter((p: any) => p.year < yNow && p.value != null);
+    if (yearly.length) {
+      const latest = yearly[yearly.length - 1];
+      const baseline = yearly.filter((p) => p.year >= baselineStart && p.year <= baselineEnd);
+      if (actual12m == null) actual12m = round2(latest.value);
+      if (label12m == null) label12m = String(latest.year);
+      if (anom12m == null && baseline.length >= 20) {
+        const bMean = baseline.reduce((s, p) => s + p.value, 0) / baseline.length;
+        anom12m = round2(latest.value - bMean);
+      }
+    }
+  }
 
   // If no window has any data we drop the metric entirely.
   if (

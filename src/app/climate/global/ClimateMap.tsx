@@ -272,8 +272,16 @@ function ZoomToLevel({ level }: { level: MapLevel }) {
   // Track whether this is the first run so we don't fight the initial center/zoom.
   const firstRef = React.useRef(true);
   useEffect(() => {
-    if (firstRef.current) { firstRef.current = false; return; }
     const b = LEVEL_BOUNDS[level];
+    if (firstRef.current) {
+      // On mount: snap (no animation) to the right region for the chosen
+      // level so e.g. the UK page opens already zoomed into the UK.
+      firstRef.current = false;
+      if (b) {
+        map.fitBounds(b, { padding: [20, 20], animate: false });
+      }
+      return;
+    }
     if (b) {
       map.flyToBounds(b, { duration: 0.6, padding: [20, 20] });
     } else {

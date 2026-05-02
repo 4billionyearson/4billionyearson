@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import type { ComponentType } from 'react';
 import { Globe2 } from 'lucide-react';
 import type { default as ClimateMapType } from './ClimateMap';
+import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import {
   METRICS,
   GLOBAL_METRICS,
@@ -80,22 +81,39 @@ const PRESET_INITIAL_LEVEL: Record<ClimateMapPreset, MapLevel> = {
   uk: 'uk-countries',
 };
 
+const PRESET_TITLE: Record<ClimateMapPreset, string> = {
+  global: 'Climate Map – Global',
+  usa: 'Climate Map – USA',
+  uk: 'Climate Map – UK',
+};
+
 export default function ClimateMapCard({
   countryAnomalies,
   initialWindow = '1m',
+  initialLevel,
+  initialMetric = 'temp-anomaly',
   preset = 'global',
-  title = 'Climate Map',
+  title,
+  share,
+  hideShare = false,
 }: {
   countryAnomalies: CountryAnomalyRow[];
   initialWindow?: AnomalyWindow;
+  initialLevel?: MapLevel;
+  initialMetric?: MetricKey;
   preset?: ClimateMapPreset;
   title?: string;
+  /** When provided, render a ShareBar that links to the given page anchor. */
+  share?: { pageUrl: string; sectionId: string };
+  /** Used by the embed route to suppress the ShareBar. */
+  hideShare?: boolean;
 }) {
+  const cardTitle = title ?? PRESET_TITLE[preset];
   const availableLevels = PRESET_LEVELS[preset];
   const availableMetrics = PRESET_METRICS[preset];
   const [anomalyWindow, setAnomalyWindow] = useState<AnomalyWindow>(initialWindow);
-  const [level, setLevel] = useState<MapLevel>(PRESET_INITIAL_LEVEL[preset]);
-  const [metric, setMetric] = useState<MetricKey>('temp-anomaly');
+  const [level, setLevel] = useState<MapLevel>(initialLevel ?? PRESET_INITIAL_LEVEL[preset]);
+  const [metric, setMetric] = useState<MetricKey>(initialMetric);
 
   // For the global preset we need countryAnomalies to power the headline
   // tooltip; for usa/uk presets the data comes from rankings.json so an
@@ -104,11 +122,16 @@ export default function ClimateMapCard({
 
   const visibleLevels = LEVEL_OPTS.filter((opt) => availableLevels.includes(opt.key));
 
+  // Build embed URL reflecting the current toggle state so embedded copies
+  // open with the same view the user is sharing.
+  const embedUrl = `https://4billionyearson.org/climate/embed/map/${preset}?metric=${encodeURIComponent(metric)}&level=${encodeURIComponent(level)}&window=${encodeURIComponent(anomalyWindow)}`;
+  const embedCode = `<iframe\n  src="${embedUrl}"\n  width="100%" height="640"\n  style="border:none;"\n  title="${cardTitle} - 4 Billion Years On"\n></iframe>`;
+
   return (
-    <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+    <div id={share?.sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
       <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
         <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-        <span className="min-w-0 flex-1">{title}</span>
+        <span className="min-w-0 flex-1">{cardTitle}</span>
       </h3>
       {visibleLevels.length > 1 && (
         <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -153,8 +176,23 @@ export default function ClimateMapCard({
       </div>
       <ClimateMap countryAnomalies={countryAnomalies} window={anomalyWindow} level={level} metric={metric} />
       <p className="text-xs text-gray-500 mt-3">
-        Source: NOAA Climate at a Glance &middot; Met Office (UK) &middot; World Bank CKP / CRU TS 4.08 (precipitation). Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall, sunshine, frost). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.
+        {preset === 'uk' ? (
+          <>Source: Met Office UK Regional &amp; National series (Tmean, Rainfall, Sunshine, Air Frost) &copy; Crown copyright. Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall, sunshine, frost). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
+        ) : preset === 'usa' ? (
+          <>Source: NOAA Climate at a Glance &mdash; US states &amp; climate regions (tavg, pcp). Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
+        ) : (
+          <>Source: NOAA Climate at a Glance (countries &amp; continents) &middot; Met Office (UK) &middot; US states &amp; climate regions. Temperature anomalies are vs the 1961&ndash;1990 baseline. See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
+        )}
       </p>
+      {share && !hideShare && (
+        <ShareBar
+          pageUrl={`${share.pageUrl}#${share.sectionId}`}
+          shareText={encodeURIComponent(`${cardTitle} - live temperature, rainfall and more on 4 Billion Years On`)}
+          emailSubject={`${cardTitle} - 4 Billion Years On`}
+          embedUrl={embedUrl}
+          embedCode={embedCode}
+        />
+      )}
     </div>
   );
 }

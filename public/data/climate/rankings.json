@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-02T09:52:15.036Z",
+  "generatedAt": "2026-05-02T11:09:47.315Z",
   "cacheMonth": "2026-05",
   "count": 234,
   "rows": [
@@ -323,13 +323,13 @@
         "frost": {
           "actual1m": 2.1,
           "actual3m": 15.7,
-          "actual12m": null,
+          "actual12m": 38,
           "anom1m": -6.58,
           "anom3m": -17.46,
-          "anom12m": null,
+          "anom12m": -7.17,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -380,13 +380,13 @@
         "frost": {
           "actual1m": 1.7,
           "actual3m": 15.5,
-          "actual12m": null,
+          "actual12m": 37.9,
           "anom1m": -6.84,
           "anom3m": -16.17,
-          "anom12m": null,
+          "anom12m": -7.05,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -437,13 +437,13 @@
         "frost": {
           "actual1m": 8.9,
           "actual3m": 31.3,
-          "actual12m": null,
+          "actual12m": 62.8,
           "anom1m": -4.37,
           "anom3m": -13.13,
-          "anom12m": null,
+          "anom12m": -8.87,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -494,13 +494,13 @@
         "frost": {
           "actual1m": 3.8,
           "actual3m": 18.3,
-          "actual12m": null,
+          "actual12m": 28.4,
           "anom1m": -4.37,
           "anom3m": -12.88,
-          "anom12m": null,
+          "anom12m": -12.82,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -551,13 +551,13 @@
         "frost": {
           "actual1m": 2.1,
           "actual3m": 15.8,
-          "actual12m": null,
+          "actual12m": 38.2,
           "anom1m": -6.55,
           "anom3m": -17.15,
-          "anom12m": null,
+          "anom12m": -6.94,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -608,13 +608,13 @@
         "frost": {
           "actual1m": 2.8,
           "actual3m": 19.5,
-          "actual12m": null,
+          "actual12m": 40.2,
           "anom1m": -7.22,
           "anom3m": -17.41,
-          "anom12m": null,
+          "anom12m": -11.11,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -665,13 +665,13 @@
         "frost": {
           "actual1m": 1.8,
           "actual3m": 13.8,
-          "actual12m": null,
+          "actual12m": 36.8,
           "anom1m": -6.18,
           "anom3m": -17.4,
-          "anom12m": null,
+          "anom12m": -5.08,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -722,13 +722,13 @@
         "frost": {
           "actual1m": 10.4,
           "actual3m": 35.5,
-          "actual12m": null,
+          "actual12m": 70.2,
           "anom1m": -4.24,
           "anom3m": -13.5,
-          "anom12m": null,
+          "anom12m": -11.67,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -779,13 +779,13 @@
         "frost": {
           "actual1m": 9.2,
           "actual3m": 34.3,
-          "actual12m": null,
+          "actual12m": 67,
           "anom1m": -4.67,
           "anom3m": -11.37,
-          "anom12m": null,
+          "anom12m": -7.12,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -836,13 +836,13 @@
         "frost": {
           "actual1m": 6.8,
           "actual3m": 22.9,
-          "actual12m": null,
+          "actual12m": 49.2,
           "anom1m": -4.17,
           "anom3m": -14.95,
-          "anom12m": null,
+          "anom12m": -8.35,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -893,13 +893,13 @@
         "frost": {
           "actual1m": 3,
           "actual3m": 20,
-          "actual12m": null,
+          "actual12m": 40.9,
           "anom1m": -7.12,
           "anom3m": -17.4,
-          "anom12m": null,
+          "anom12m": -11.1,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -950,13 +950,13 @@
         "frost": {
           "actual1m": 2.7,
           "actual3m": 17.9,
-          "actual12m": null,
+          "actual12m": 38.8,
           "anom1m": -6.39,
           "anom3m": -15.78,
-          "anom12m": null,
+          "anom12m": -8.9,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -1007,13 +1007,13 @@
         "frost": {
           "actual1m": 1.5,
           "actual3m": 16.2,
-          "actual12m": null,
+          "actual12m": 40.9,
           "anom1m": -7.82,
           "anom3m": -18.93,
-          "anom12m": null,
+          "anom12m": -7.1,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -1064,13 +1064,13 @@
         "frost": {
           "actual1m": 3,
           "actual3m": 16.4,
-          "actual12m": null,
+          "actual12m": 37.4,
           "anom1m": -4.95,
           "anom3m": -15.87,
-          "anom12m": null,
+          "anom12m": -4.73,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -1121,13 +1121,13 @@
         "frost": {
           "actual1m": 1,
           "actual3m": 11.7,
-          "actual12m": null,
+          "actual12m": 30.7,
           "anom1m": -6.15,
           "anom3m": -15.92,
-          "anom12m": null,
+          "anom12m": -6.49,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },
@@ -1178,13 +1178,13 @@
         "frost": {
           "actual1m": 2.2,
           "actual3m": 13.1,
-          "actual12m": null,
+          "actual12m": 38.6,
           "anom1m": -5.84,
           "anom3m": -18.09,
-          "anom12m": null,
+          "anom12m": -4.36,
           "label1m": "Mar 2026",
           "label3m": "Jan–Mar 2026",
-          "label12m": null
+          "label12m": "2025"
         }
       }
     },

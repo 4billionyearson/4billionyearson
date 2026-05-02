@@ -401,7 +401,12 @@ export default async function RankingsPage() {
           />
 
           {/* Temperature anomaly map - geographic view of the same rankings */}
-          {countryAnomalies && <ClimateMapCard countryAnomalies={countryAnomalies} />}
+          {countryAnomalies && (
+            <ClimateMapCard
+              countryAnomalies={countryAnomalies}
+              share={{ pageUrl: 'https://4billionyearson.org/climate/rankings', sectionId: 'climate-map' }}
+            />
+          )}
 
           {/* Table */}
           <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">

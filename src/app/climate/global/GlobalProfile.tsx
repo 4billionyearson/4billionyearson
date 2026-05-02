@@ -660,7 +660,10 @@ export default function GlobalProfile() {
                   see where the current warming is concentrated before diving
                   into longer time-series charts below. */}
               {data.countryAnomalies && data.countryAnomalies.length > 0 && (
-                <ClimateMapCard countryAnomalies={data.countryAnomalies} />
+                <ClimateMapCard
+                  countryAnomalies={data.countryAnomalies}
+                  share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'climate-map' }}
+                />
               )}
 
               {/* Spaghetti charts - Land+Ocean headline and Land-only comparison.

@@ -435,7 +435,11 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
   return (
     <>
       {/* At a Glance — climate map preview (continent groups use the global preset). */}
-      <ClimateMapCard countryAnomalies={[] as CountryAnomalyRow[]} preset="global" />
+      <ClimateMapCard
+        countryAnomalies={[] as CountryAnomalyRow[]}
+        preset="global"
+        share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-map' }}
+      />
 
       {/* Temperature – Average panel (matches country / US-region update pages).
          Uses 4BYO continent-absolutes (CRU TS aggregate) so we get absolute °C +
@@ -651,7 +655,11 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
   return (
     <>
       {/* At a Glance — US states / climate-regions map. */}
-      <ClimateMapCard countryAnomalies={[] as CountryAnomalyRow[]} preset="usa" />
+      <ClimateMapCard
+        countryAnomalies={[] as CountryAnomalyRow[]}
+        preset="usa"
+        share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-map' }}
+      />
 
       {/* Temperature – Average (region + US national rows) */}
       {tempPanel ? <OverviewGrid panels={[tempPanel]} /> : null}
