@@ -174,7 +174,7 @@ function RelatedLink({ href, label, desc }: { href: string; label: string; desc:
       href={href}
       className="relative block rounded-xl border border-gray-700/50 bg-gray-900 hover:bg-gray-800 hover:border-gray-600 p-4 transition-all shadow-md"
     >
-      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-cyan-400" />
+      <ExternalLink className="absolute top-3 right-3 w-3.5 h-3.5 text-teal-300" />
       <div className="font-semibold text-white text-sm pr-5">{label}</div>
       <div className="text-xs text-gray-300 mt-1">{desc}</div>
     </Link>

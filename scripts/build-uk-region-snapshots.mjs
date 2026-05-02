@@ -74,16 +74,24 @@ function parseArgs(argv) {
 }
 
 function parseMetOfficeText(text) {
+  // Met Office monthly time-series files are column-aligned (fixed-width):
+  //   Year (cols 0-3)  +  12 monthly columns (7 chars each, right-aligned)
+  //   +  4 seasonal columns (Win/Spr/Sum/Aut) + Annual.
+  // We MUST NOT split on whitespace - if a recent month is missing
+  // (e.g. April 2026 not yet published), runs of spaces collapse and
+  // the seasonal "Win" total bleeds into the April slot.
   const points = [];
-  for (const line of text.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('Month') || trimmed.startsWith('Year') || trimmed.includes('---')) continue;
-    const parts = trimmed.split(/\s+/);
-    if (parts.length < 2) continue;
-    const year = parseInt(parts[0], 10);
-    if (Number.isNaN(year) || year < 1900) continue;
+  for (const rawLine of text.split('\n')) {
+    if (!rawLine.trim()) continue;
+    if (/^\s*(Year|Month|---)/i.test(rawLine)) continue;
+    const yearStr = rawLine.slice(0, 4).trim();
+    const year = parseInt(yearStr, 10);
+    if (Number.isNaN(year) || year < 1900 || year > 2200) continue;
     for (let m = 0; m < 12; m++) {
-      const val = parseFloat(parts[m + 1]);
+      const start = 4 + m * 7;
+      const cell = rawLine.slice(start, start + 7).trim();
+      if (!cell) continue;
+      const val = parseFloat(cell);
       if (!Number.isNaN(val)) {
         points.push({ year, month: m + 1, value: round2(val) });
       }
