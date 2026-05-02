@@ -124,16 +124,23 @@ async function fetchNationalParam(param) {
   return { data: parseNoaa(json, param), units: param === 'pcp' ? 'mm' : '°C' };
 }
 
-// Mark the latest monthly data point as provisional. NOAA NClimDiv values
-// published mid-cycle are subject to QC adjustments for roughly one update
-// cycle before being finalised; flagging the last point lets the chart
-// render it dashed and label it clearly.
+// Mark the latest monthly data point as provisional, but only if it falls in
+// the previous calendar month - i.e. it was just published by NOAA and hasn't
+// yet been QC-revised in a subsequent monthly update. Older points are
+// treated as final.
 function tagLatestProvisional(points) {
   if (!points.length) return points;
   const sorted = [...points].sort((a, b) => a.year - b.year || a.month - b.month);
   const last = sorted[sorted.length - 1];
+  const now = new Date();
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevYear = prev.getFullYear();
+  const prevMonth = prev.getMonth() + 1;
+  const isProvisional = last.year === prevYear && last.month === prevMonth;
   return sorted.map((p) =>
-    p.year === last.year && p.month === last.month ? { ...p, provisional: true } : p,
+    isProvisional && p.year === last.year && p.month === last.month
+      ? { ...p, provisional: true }
+      : p,
   );
 }
 
