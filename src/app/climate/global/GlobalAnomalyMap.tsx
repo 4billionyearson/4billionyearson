@@ -26,6 +26,8 @@ const NAME_ALIAS: Record<string, string> = {
   'east timor': 'timor-leste',
   'western sahara': 'w. sahara',
   'eswatini': 'eswatini',
+  // Territories whose stats are counted under their sovereign state
+  'french guiana': 'france',
 };
 
 interface CountryAnomaly {
@@ -894,7 +896,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
   const style = useCallback((feature: Feature | undefined): PathOptions => {
     if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
     const name = ((feature.properties as any)?.name as string) ?? '';
-    const rec = lookup.get(name.toLowerCase());
+    const rec = lookup.get(normalizeName(name));
     const { anomaly } = pick(rec, name);
     return {
       fillColor: anomaly != null ? anomalyColor(anomaly) : '#1f2937',
@@ -912,7 +914,7 @@ export default function GlobalAnomalyMap({ countryAnomalies, window: windowSel =
     if (level === 'us-states' || level === 'us-regions' || level === 'uk-regions') {
       return;
     }
-    const rec = lookup.get(name.toLowerCase());
+    const rec = lookup.get(normalizeName(name));
     const { anomaly, label } = pick(rec, name);
     const color = anomaly != null ? anomalyColor(anomaly) : '#1f2937';
     // In continents mode the displayed name is the continent, not the country.

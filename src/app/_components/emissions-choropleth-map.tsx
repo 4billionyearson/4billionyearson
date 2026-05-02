@@ -74,6 +74,7 @@ const NAME_MAP: Record<string, string> = {
   "W. Sahara": "Western Sahara",
   "Falkland Is.": "Falkland Islands",
   "Fr. S. Antarctic Lands": "French Southern Territories",
+  "French Guiana": "France",
   "Eq. Guinea": "Equatorial Guinea",
   eSwatini: "Eswatini",
   "Solomon Is.": "Solomon Islands",
