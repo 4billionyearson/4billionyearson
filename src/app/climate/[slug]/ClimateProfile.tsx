@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory, Globe2 } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
-import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
+import MonthlySpaghettiCard, { type SeriesMap } from '@/app/_components/monthly-spaghetti-card';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import EmissionsCard from '@/app/_components/emissions-card';
@@ -860,6 +860,14 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                   || data.countryPrecipData?.monthlyAll;
                 const sunshineMonthly = data.ukRegionData?.varData?.Sunshine?.monthlyAll
                   || data.nationalData?.varData?.Sunshine?.monthlyAll;
+                const frostMonthly = data.ukRegionData?.varData?.AirFrost?.monthlyAll
+                  || data.nationalData?.varData?.AirFrost?.monthlyAll;
+                const spaghettiSeries: SeriesMap = {
+                  temp: monthlyAll,
+                  precip: rainfallMonthly,
+                  sunshine: sunshineMonthly,
+                  frost: frostMonthly,
+                };
                 const chartSource = (data.ukRegionData || data.nationalData?.varData)
                   ? 'Data: Met Office UK Regional Series © Crown copyright'
                   : (data.usStateData || data.nationalData?.paramData)
@@ -875,10 +883,14 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                         <OverviewGrid panels={tempPanels} />
                       </>
                     )}
-                    {monthlyAll?.length ? (
-                      <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                        <TemperatureSpaghettiChart monthlyAll={monthlyAll} regionName={pageTitle} dataSource={chartSource} />
-                      </section>
+                    {monthlyAll?.length || rainfallMonthly?.length || sunshineMonthly?.length || frostMonthly?.length ? (
+                      <MonthlySpaghettiCard
+                        series={spaghettiSeries}
+                        regionName={pageTitle}
+                        dataSource={chartSource}
+                        embedSlug={slug}
+                        share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'monthly-history' }}
+                      />
                     ) : null}
 
                     {monthlyAll?.length ? (

@@ -132,10 +132,10 @@ async function main() {
         const isSum = ['Rainfall', 'Sunshine', 'AirFrost', 'Raindays1mm'].includes(varName);
         const lowerIsBetter = varName === 'AirFrost';
 
-        // Keep full monthlyAll for variables the SeasonalShiftCard can overlay
-        // (temperature, rainfall, sunshine). Drop for the others to keep the
-        // payload reasonable.
-        const keepMonthlyAll = ['Tmean', 'Rainfall', 'Sunshine'].includes(varName);
+        // Keep full monthlyAll for variables the SeasonalShiftCard / spaghetti
+        // chart can plot (temperature, rainfall, sunshine, frost). Drop for the
+        // others to keep the payload reasonable.
+        const keepMonthlyAll = ['Tmean', 'Rainfall', 'Sunshine', 'AirFrost'].includes(varName);
 
         varData[varName] = {
           label: VAR_LABELS[varName],

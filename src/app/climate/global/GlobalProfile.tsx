@@ -6,7 +6,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell, ComposedChart,
 } from 'recharts';
 import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, Wind, Info, BookOpen, Scale, Factory, Leaf, Ruler } from 'lucide-react';
-import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
+import MonthlySpaghettiCard from '@/app/_components/monthly-spaghetti-card';
 import GlobalSeasonalSummary from '@/app/_components/global-seasonal-summary';
 import { getRegionBySlug } from '@/lib/climate/regions';
 import {
@@ -673,28 +673,24 @@ export default function GlobalProfile() {
                   <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Temperature" />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (
-                      <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                        <TemperatureSpaghettiChart
-                          monthlyAll={data.landOceanMonthlyAll}
-                          regionName="Global Land + Ocean"
-                          dataSource="NOAA Climate at a Glance - Global Land+Ocean"
-                        />
-                        <p className="text-xs text-gray-400 mt-3">
-                          The headline global series (land + ocean) - the dataset Copernicus, WMO and NOAA report against. Source: NOAA Climate at a Glance.
-                        </p>
-                      </div>
+                      <MonthlySpaghettiCard
+                        series={{ temp: data.landOceanMonthlyAll }}
+                        regionName="Global Land + Ocean"
+                        dataSource="NOAA Climate at a Glance - Global Land+Ocean"
+                        embedSlug="global-land-ocean"
+                        share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'monthly-history-land-ocean' }}
+                        footer={<>The headline global series (land + ocean) - the dataset Copernicus, WMO and NOAA report against. Source: NOAA Climate at a Glance.</>}
+                      />
                     )}
                     {data.landMonthlyAll?.length > 0 && (
-                      <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-                        <TemperatureSpaghettiChart
-                          monthlyAll={data.landMonthlyAll}
-                          regionName="Global Land"
-                          dataSource="Our World in Data / ERA5"
-                        />
-                        <p className="text-xs text-gray-400 mt-3">
-                          Land-only equivalent, on the same scale as the country, state and region climate pages (which have no ocean inside their borders). Source: Our World in Data / ERA5.
-                        </p>
-                      </div>
+                      <MonthlySpaghettiCard
+                        series={{ temp: data.landMonthlyAll }}
+                        regionName="Global Land"
+                        dataSource="Our World in Data / ERA5"
+                        embedSlug="global-land"
+                        share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'monthly-history-land' }}
+                        footer={<>Land-only equivalent, on the same scale as the country, state and region climate pages (which have no ocean inside their borders). Source: Our World in Data / ERA5.</>}
+                      />
                     )}
                   </div>
                 </>

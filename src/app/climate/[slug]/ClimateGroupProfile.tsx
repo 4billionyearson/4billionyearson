@@ -8,7 +8,7 @@ import { ALL_LOCATIONS } from '@/lib/climate/locations';
 import { CONTINENT_BY_ISO } from '@/lib/climate/editorial';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import GroupSummaryPanel from './GroupSummaryPanel';
-import TemperatureSpaghettiChart from '@/app/_components/temperature-spaghetti-chart';
+import MonthlySpaghettiCard from '@/app/_components/monthly-spaghetti-card';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
@@ -495,13 +495,13 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
       {/* Spaghetti chart + seasonal-shift cards (member-country aggregate absolutes) */}
       {absolutes?.monthlyAll?.length ? (
         <>
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <TemperatureSpaghettiChart
-              monthlyAll={absolutes.monthlyAll}
-              regionName={region.name}
-              dataSource={`4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`}
-            />
-          </section>
+          <MonthlySpaghettiCard
+            series={{ temp: absolutes.monthlyAll }}
+            regionName={region.name}
+            dataSource={`4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`}
+            embedSlug={region.slug}
+            share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'monthly-history' }}
+          />
           <SeasonalShiftCard monthlyAll={absolutes.monthlyAll} regionName={region.name} dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures." />
         </>
       ) : null}
@@ -667,13 +667,13 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
       {/* Spaghetti chart + seasonal-shift card (NOAA regional tavg monthlyAll) */}
       {tavg.monthlyAll?.length ? (
         <>
-          <section className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-            <TemperatureSpaghettiChart
-              monthlyAll={tavg.monthlyAll}
-              regionName={region.name}
-              dataSource="NOAA Climate at a Glance — regional tavg (monthly absolute °C)."
-            />
-          </section>
+          <MonthlySpaghettiCard
+            series={{ temp: tavg.monthlyAll, precip: pcp?.monthlyAll }}
+            regionName={region.name}
+            dataSource="NOAA Climate at a Glance — regional tavg / pcp (monthly absolutes)."
+            embedSlug={region.slug}
+            share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'monthly-history' }}
+          />
           <SeasonalShiftCard
             monthlyAll={tavg.monthlyAll}
             regionName={region.name}
