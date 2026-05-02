@@ -19,6 +19,7 @@ import {
   type SeasonalityKind,
 } from '@/lib/climate/shift-analysis';
 import CalendarTimeline, { type TimelineRow } from '@/app/_components/calendar-timeline';
+import ShareBar from '@/app/climate/enso/_components/ShareBar';
 
 interface SeasonalShiftCardProps {
   monthlyAll: MonthlyPoint[];
@@ -26,6 +27,8 @@ interface SeasonalShiftCardProps {
   sunshineMonthly?: MonthlyPoint[];
   regionName: string;
   dataSource?: string;
+  /** Anchor + canonical URL for the ShareBar. When omitted the share button is hidden. */
+  share?: { pageUrl: string; sectionId: string };
 }
 
 type View = 'length' | 'monthly' | 'rainfall' | 'sunshine' | 'wet-season';
@@ -36,6 +39,7 @@ export default function SeasonalShiftCard({
   sunshineMonthly,
   regionName,
   dataSource,
+  share,
 }: SeasonalShiftCardProps) {
   const stats = useMemo(() => {
     const res = analyseTemperature(monthlyAll ?? []);
@@ -137,7 +141,7 @@ export default function SeasonalShiftCard({
   };
 
   return (
-    <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+    <section id={share?.sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
       <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
@@ -511,7 +515,16 @@ export default function SeasonalShiftCard({
 
       {dataSource && <p className="text-[11px] text-gray-500 mt-3 font-mono">{dataSource}</p>}
 
-      <div className="mt-3 flex justify-end">
+      <div className="mt-3 flex items-center justify-between gap-3 flex-wrap">
+        {share ? (
+          <ShareBar
+            pageUrl={`${share.pageUrl}#${share.sectionId}`}
+            shareText={encodeURIComponent(`Shifting Seasons in ${regionName} - 4 Billion Years On`)}
+            emailSubject={`Shifting Seasons in ${regionName} - 4 Billion Years On`}
+            wrapperClassName="relative"
+            align="left"
+          />
+        ) : <span />}
         <Link
           href="/climate/shifting-seasons"
           className="inline-flex items-center gap-1 text-sm font-semibold text-teal-300 hover:text-teal-200 hover:underline transition-colors"

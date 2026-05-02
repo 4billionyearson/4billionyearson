@@ -8,6 +8,7 @@ import { ALL_LOCATIONS } from '@/lib/climate/locations';
 import { CONTINENT_BY_ISO } from '@/lib/climate/editorial';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import GroupSummaryPanel from './GroupSummaryPanel';
+import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import MonthlySpaghettiCard from '@/app/_components/monthly-spaghetti-card';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
@@ -502,7 +503,12 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             embedSlug={region.slug}
             share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'monthly-history' }}
           />
-          <SeasonalShiftCard monthlyAll={absolutes.monthlyAll} regionName={region.name} dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures." />
+          <SeasonalShiftCard
+            monthlyAll={absolutes.monthlyAll}
+            regionName={region.name}
+            dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures."
+            share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'shifting-seasons' }}
+          />
         </>
       ) : null}
 
@@ -678,6 +684,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
             monthlyAll={tavg.monthlyAll}
             regionName={region.name}
             dataSource="NOAA Climate at a Glance — regional tavg."
+            share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'shifting-seasons' }}
           />
         </>
       ) : null}
@@ -770,7 +777,8 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
 
         {/* Hero */}
         <div
-          className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
+          id="climate-update"
+          className="scroll-mt-24 rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
           style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}
         >
           <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
@@ -796,6 +804,15 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
               <ClimateRankPill slug={region.slug} />
             </div>
             <GroupSummaryPanel slug={region.slug} regionName={region.name} />
+            <div className="mt-3 flex justify-start">
+              <ShareBar
+                pageUrl={`https://4billionyearson.org/climate/${region.slug}#climate-update`}
+                shareText={encodeURIComponent(`${region.name} climate update - 4 Billion Years On`)}
+                emailSubject={`${region.name} climate update - 4 Billion Years On`}
+                wrapperClassName="relative"
+                align="left"
+              />
+            </div>
           </div>
         </div>
 

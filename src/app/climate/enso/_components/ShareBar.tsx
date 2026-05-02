@@ -13,9 +13,13 @@ interface ShareBarProps {
   /** If provided the dropdown shows an Embed code option. */
   embedUrl?: string;
   embedCode?: string;
+  /** Which side the dropdown opens from. Default 'right'. */
+  align?: 'left' | 'right';
+  /** Override the default outer wrapper class (must keep `relative`). */
+  wrapperClassName?: string;
 }
 
-export default function ShareBar({ pageUrl, shareText, emailSubject, embedUrl, embedCode }: ShareBarProps) {
+export default function ShareBar({ pageUrl, shareText, emailSubject, embedUrl, embedCode, align = 'right', wrapperClassName }: ShareBarProps) {
   const [open, setOpen]               = useState(false);
   const [copied, setCopied]           = useState(false);
   const [showEmbed, setShowEmbed]     = useState(false);
@@ -111,8 +115,12 @@ export default function ShareBar({ pageUrl, shareText, emailSubject, embedUrl, e
     },
   ];
 
+  const outerClass =
+    wrapperClassName ?? `mt-4 flex ${align === 'left' ? 'justify-start' : 'justify-end'} relative`;
+  const dropdownAnchor = align === 'left' ? 'left-0' : 'right-0';
+
   return (
-    <div className="mt-4 flex justify-end relative" ref={wrapperRef}>
+    <div className={outerClass} ref={wrapperRef}>
       {/* Trigger button */}
       <button
         onClick={() => setOpen((v) => !v)}
@@ -125,7 +133,7 @@ export default function ShareBar({ pageUrl, shareText, emailSubject, embedUrl, e
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute bottom-full mb-2 right-0 z-50 w-56 rounded-xl border border-gray-700 bg-gray-900/95 backdrop-blur-sm shadow-2xl overflow-hidden">
+        <div className={`absolute bottom-full mb-2 ${dropdownAnchor} z-50 w-56 rounded-xl border border-gray-700 bg-gray-900/95 backdrop-blur-sm shadow-2xl overflow-hidden`}>
           {/* Copy direct link */}
           <div className="p-1.5">
             <button

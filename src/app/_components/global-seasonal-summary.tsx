@@ -27,6 +27,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { GlobalShiftRecord } from '@/app/_components/global-shift-map';
 import CalendarTimeline, { dayOfYear, doyToLabel, type TimelineRow } from '@/app/_components/calendar-timeline';
+import ShareBar from '@/app/climate/enso/_components/ShareBar';
 
 type GlobalShiftData = {
   generatedAt: string;
@@ -95,7 +96,13 @@ type WetCohort = {
   meanRainPct: number;
 };
 
-export default function GlobalSeasonalSummary({ hideExploreLink = false }: { hideExploreLink?: boolean } = {}) {
+export default function GlobalSeasonalSummary({
+  hideExploreLink = false,
+  share,
+}: {
+  hideExploreLink?: boolean;
+  share?: { pageUrl: string; sectionId: string };
+} = {}) {
   const [data, setData] = useState<GlobalShiftData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -326,7 +333,16 @@ export default function GlobalSeasonalSummary({ hideExploreLink = false }: { hid
         EPA frost-free growing season; Aono &amp; Kazui 2008 Kyoto peak-bloom record; NOAA Rutgers Global Snow Lab. Warm-season metrics use 1951–1980 vs 2001–2024.
       </p>
 
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        {share ? (
+          <ShareBar
+            pageUrl={`${share.pageUrl}#${share.sectionId}`}
+            shareText={encodeURIComponent('Shifting Seasons worldwide - 4 Billion Years On')}
+            emailSubject={'Shifting Seasons worldwide - 4 Billion Years On'}
+            wrapperClassName="relative"
+            align="left"
+          />
+        ) : <span />}
         {!hideExploreLink && (
           <Link
             href="/climate/shifting-seasons"
