@@ -97,11 +97,13 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
     // Dim→bright: blue (cloudy) → white → amber (sunnier)
     legendGradient:
       'linear-gradient(to right, #1e3a8a, #3b82f6, #93c5fd, #f8fafc, #fde68a, #f59e0b, #b45309, #78350f)',
-    legendMin: '-50 hrs', legendMax: '+50 hrs',
-    scale: { min: -50, max: 50 },
+    legendMin: '-100 hrs', legendMax: '+100 hrs',
+    // Monthly UK sunshine anomalies routinely exceed ±50 hrs in sunny / dull
+    // months, so widen the default scale to ±100 to keep variation visible.
+    scale: { min: -100, max: 100 },
     scaleByWindow: {
-      '3m': { min: -120, max: 120, legendMin: '-120 hrs', legendMax: '+120 hrs' },
-      '12m': { min: -250, max: 250, legendMin: '-250 hrs', legendMax: '+250 hrs' },
+      '3m': { min: -200, max: 200, legendMin: '-200 hrs', legendMax: '+200 hrs' },
+      '12m': { min: -400, max: 400, legendMin: '-400 hrs', legendMax: '+400 hrs' },
     },
   },
   'sunshine-actual': {
@@ -110,11 +112,14 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
     unit: 'hrs', baseline: 'observed',
     legendGradient:
       'linear-gradient(to right, #1e293b, #475569, #cbd5e1, #fde68a, #f59e0b, #d97706)',
-    legendMin: '0 hrs', legendMax: '300 hrs',
-    scale: { min: 0, max: 300 },
+    legendMin: '0 hrs', legendMax: '250 hrs',
+    // UK monthly sunshine totals span ~20-250 hrs (winter to peak summer);
+    // the previous 0-300 default left winter regions all in the dark-grey
+    // bucket. 0-250 spreads the typical range across the ramp.
+    scale: { min: 0, max: 250 },
     scaleByWindow: {
       '3m': { min: 0, max: 700, legendMin: '0 hrs', legendMax: '700 hrs' },
-      '12m': { min: 800, max: 2200, legendMin: '800 hrs', legendMax: '2200 hrs' },
+      '12m': { min: 800, max: 2000, legendMin: '800 hrs', legendMax: '2000 hrs' },
     },
   },
   'frost-anomaly': {
