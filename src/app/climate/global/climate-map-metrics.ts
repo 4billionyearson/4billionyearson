@@ -229,3 +229,33 @@ export const UK_METRICS: MetricKey[] = [
   'sunshine-anomaly', 'sunshine-actual',
   'frost-anomaly', 'frost-actual',
 ];
+
+// Map levels supported by each metric. Used to disable toggle buttons whose
+// (metric, level) combination has no data, instead of the user clicking and
+// landing on an empty map.
+export type MapLevel =
+  | 'continents'
+  | 'countries'
+  | 'us-states'
+  | 'us-regions'
+  | 'uk-countries'
+  | 'uk-regions';
+
+export const METRIC_LEVELS: Record<MetricKey, MapLevel[]> = {
+  // Temperature anomaly is the broadest series - we have it for every level.
+  'temp-anomaly':     ['continents', 'countries', 'us-states', 'us-regions', 'uk-countries', 'uk-regions'],
+  // Absolute temperature: no continent rollup.
+  'temp-actual':      ['countries', 'us-states', 'us-regions', 'uk-countries', 'uk-regions'],
+  // Precipitation: NOAA US states/regions + Met Office UK only (country-precip is stale).
+  'precip-anomaly':   ['us-states', 'us-regions', 'uk-countries', 'uk-regions'],
+  'precip-actual':    ['us-states', 'us-regions', 'uk-countries', 'uk-regions'],
+  // Sunshine + air-frost: Met Office UK only.
+  'sunshine-anomaly': ['uk-countries', 'uk-regions'],
+  'sunshine-actual':  ['uk-countries', 'uk-regions'],
+  'frost-anomaly':    ['uk-countries', 'uk-regions'],
+  'frost-actual':     ['uk-countries', 'uk-regions'],
+};
+
+export function metricSupportsLevel(metric: MetricKey, level: MapLevel): boolean {
+  return METRIC_LEVELS[metric].includes(level);
+}

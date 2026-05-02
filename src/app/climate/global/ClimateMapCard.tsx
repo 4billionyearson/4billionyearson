@@ -11,6 +11,8 @@ import {
   GLOBAL_METRICS,
   USA_METRICS,
   UK_METRICS,
+  METRIC_LEVELS,
+  metricSupportsLevel,
   type MetricKey,
 } from './climate-map-metrics';
 
@@ -60,6 +62,7 @@ const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [
 const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors';
 const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#D0A65E]';
 const TOGGLE_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
+const TOGGLE_DISABLED = 'border-gray-900 bg-gray-950/40 text-gray-600 cursor-not-allowed opacity-60';
 
 export type ClimateMapPreset = 'global' | 'usa' | 'uk';
 
@@ -136,30 +139,52 @@ export default function ClimateMapCard({
       {visibleLevels.length > 1 && (
         <div className="flex flex-wrap items-center gap-2 mb-2">
           <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Level</span>
-          {visibleLevels.map((opt) => (
-            <button
-              key={opt.key}
-              type="button"
-              onClick={() => setLevel(opt.key)}
-              className={`${TOGGLE_BASE} ${level === opt.key ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-            >
-              {opt.label}
-            </button>
-          ))}
+          {visibleLevels.map((opt) => {
+            const supported = metricSupportsLevel(metric, opt.key);
+            const cls = level === opt.key
+              ? TOGGLE_ACTIVE
+              : supported
+                ? TOGGLE_INACTIVE
+                : TOGGLE_DISABLED;
+            return (
+              <button
+                key={opt.key}
+                type="button"
+                disabled={!supported}
+                aria-disabled={!supported}
+                title={supported ? undefined : `${METRICS[metric].shortLabel} has no data at this level`}
+                onClick={() => { if (supported) setLevel(opt.key); }}
+                className={`${TOGGLE_BASE} ${cls}`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
       )}
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Metric</span>
-        {availableMetrics.map((key) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setMetric(key)}
-            className={`${TOGGLE_BASE} ${metric === key ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-          >
-            {METRICS[key].shortLabel}
-          </button>
-        ))}
+        {availableMetrics.map((key) => {
+          const supported = METRIC_LEVELS[key].includes(level);
+          const cls = metric === key
+            ? TOGGLE_ACTIVE
+            : supported
+              ? TOGGLE_INACTIVE
+              : TOGGLE_DISABLED;
+          return (
+            <button
+              key={key}
+              type="button"
+              disabled={!supported}
+              aria-disabled={!supported}
+              title={supported ? undefined : `No ${METRICS[key].shortLabel.toLowerCase()} data at the current level`}
+              onClick={() => { if (supported) setMetric(key); }}
+              className={`${TOGGLE_BASE} ${cls}`}
+            >
+              {METRICS[key].shortLabel}
+            </button>
+          );
+        })}
       </div>
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Window</span>
