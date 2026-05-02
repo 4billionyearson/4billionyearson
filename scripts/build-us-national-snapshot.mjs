@@ -145,7 +145,7 @@ async function main() {
       monthlyComparison: buildComparisonFromNoaa(result.data),
       latestMonthStats: buildLatestMonthStats(points),
       latestThreeMonthStats: buildLatestThreeMonthStats(points),
-      ...(param === 'tavg' ? { monthlyAll: points } : {}),
+      ...(['tavg', 'pcp'].includes(param) ? { monthlyAll: points } : {}),
     };
   }
 

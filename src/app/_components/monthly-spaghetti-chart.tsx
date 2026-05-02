@@ -69,10 +69,10 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
     aggregate: 'sum',
     recordBy: 'max',
     recordWord: 'wettest',
-    recordColor: '#1E3A8A',
-    recordTextClass: 'text-sky-300',
-    currentColor: '#38BDF8',
-    currentTextClass: 'text-sky-400',
+    recordColor: '#3B82F6',
+    recordTextClass: 'text-blue-300',
+    currentColor: '#7DD3FC',
+    currentTextClass: 'text-sky-200',
     yLower: 'zero',
     icon: <CloudRain className="h-5 w-5 shrink-0 text-sky-400 mt-1" />,
   },
@@ -84,10 +84,10 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
     aggregate: 'sum',
     recordBy: 'max',
     recordWord: 'sunniest',
-    recordColor: '#B45309',
+    recordColor: '#D97706',
     recordTextClass: 'text-amber-300',
-    currentColor: '#FACC15',
-    currentTextClass: 'text-yellow-300',
+    currentColor: '#FDE047',
+    currentTextClass: 'text-yellow-200',
     yLower: 'zero',
     icon: <Sun className="h-5 w-5 shrink-0 text-amber-300 mt-1" />,
   },
@@ -99,10 +99,10 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
     aggregate: 'sum',
     recordBy: 'max',
     recordWord: 'frostiest',
-    recordColor: '#1E40AF',
+    recordColor: '#3B82F6',
     recordTextClass: 'text-blue-300',
-    currentColor: '#67E8F9',
-    currentTextClass: 'text-cyan-300',
+    currentColor: '#A5F3FC',
+    currentTextClass: 'text-cyan-200',
     yLower: 'zero',
     icon: <Snowflake className="h-5 w-5 shrink-0 text-cyan-300 mt-1" />,
   },
@@ -138,8 +138,8 @@ export default function MonthlySpaghettiChart({
   hideTitle = false,
 }: SpaghettiChartProps) {
   const cfg = METRIC_CONFIG[metric];
-  const { chartData, backgroundYears, recordYear, currentYear, yMin, yMax, startYear, latestMonthIdx } = useMemo(() => {
-    const empty = { chartData: [] as ChartRow[], backgroundYears: [] as number[], recordYear: 0, currentYear: 0, yMin: 0, yMax: 0, startYear: 0, latestMonthIdx: -1 };
+  const { chartData, backgroundYears, recordYear, currentYear, currentIsLatestFallback, yMin, yMax, startYear, latestMonthIdx } = useMemo(() => {
+    const empty = { chartData: [] as ChartRow[], backgroundYears: [] as number[], recordYear: 0, currentYear: 0, currentIsLatestFallback: false, yMin: 0, yMax: 0, startYear: 0, latestMonthIdx: -1 };
     if (!monthlyAll?.length) return empty;
 
     const now = new Date();
@@ -164,11 +164,19 @@ export default function MonthlySpaghettiChart({
 
     if (allValidYears.length === 0) return empty;
 
+    // Datasets that lag (e.g. CRU TS country precip ends ~2 years ago) won't
+    // have any data for the calendar year - in that case we fall back to the
+    // latest year that has data so the chart still has a "current" line.
+    const calendarHasAny = byYear.has(calendarYear) && (byYear.get(calendarYear)?.size ?? 0) > 0;
+    const fallbackLatest = allValidYears[allValidYears.length - 1];
+    const highlightCurrent = calendarHasAny ? calendarYear : fallbackLatest;
+    const usingFallback = !calendarHasAny;
+
     // Find the "record" year using the metric's aggregate + direction.
     let bestYear = allValidYears[0];
     let bestScore = cfg.recordBy === 'max' ? -Infinity : Infinity;
     for (const yr of allValidYears) {
-      if (yr === calendarYear) continue;
+      if (yr === highlightCurrent) continue;
       const months = byYear.get(yr)!;
       if (months.size < 12) continue;
       const vals = [...months.values()];
@@ -184,8 +192,8 @@ export default function MonthlySpaghettiChart({
     // Background limited to last ~40 years; always keep the record year and
     // the current calendar year regardless of cutoff.
     const cutoffYear = calendarYear - 39;
-    const displayYears = allValidYears.filter((y) => y >= cutoffYear || y === bestYear || y === calendarYear);
-    const bgYears = displayYears.filter((y) => y !== bestYear && y !== calendarYear);
+    const displayYears = allValidYears.filter((y) => y >= cutoffYear || y === bestYear || y === highlightCurrent);
+    const bgYears = displayYears.filter((y) => y !== bestYear && y !== highlightCurrent);
 
     let globalMin = Infinity;
     let globalMax = -Infinity;
@@ -212,12 +220,13 @@ export default function MonthlySpaghettiChart({
       chartData: rows,
       backgroundYears: bgYears,
       recordYear: bestYear,
-      currentYear: calendarYear,
+      currentYear: highlightCurrent,
+      currentIsLatestFallback: usingFallback,
       yMin: yLowerBound,
       yMax: Math.ceil(globalMax + headroom),
       startYear: Math.min(...displayYears),
       latestMonthIdx: (() => {
-        const cm = byYear.get(calendarYear);
+        const cm = byYear.get(highlightCurrent);
         if (!cm?.size) return -1;
         return Math.max(...cm.keys()) - 1;
       })(),
@@ -340,7 +349,9 @@ export default function MonthlySpaghettiChart({
         )}
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-6 h-[3px] rounded" style={{ background: cfg.currentColor }} />
-          <span className={`${cfg.currentTextClass} font-semibold`}>{currentYear} (current year)</span>
+          <span className={`${cfg.currentTextClass} font-semibold`}>
+            {currentYear} ({currentIsLatestFallback ? 'latest available' : 'current year'})
+          </span>
         </span>
       </div>
 

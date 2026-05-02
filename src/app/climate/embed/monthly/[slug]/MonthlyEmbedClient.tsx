@@ -149,14 +149,12 @@ export default function MonthlyEmbedClient({
   const initial = initialMetric && VALID_METRICS.includes(initialMetric) ? initialMetric : undefined;
 
   return (
-    <div className="p-3">
-      <MonthlySpaghettiCard
-        series={series}
-        regionName={regionName || ''}
-        dataSource={dataSource}
-        initialMetric={initial}
-        hideShare
-      />
-    </div>
+    <MonthlySpaghettiCard
+      series={series}
+      regionName={regionName || ''}
+      dataSource={dataSource}
+      initialMetric={initial}
+      hideShare
+    />
   );
 }
