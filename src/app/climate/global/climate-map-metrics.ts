@@ -71,10 +71,11 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
     legendGradient:
       'linear-gradient(to right, #78350f, #b45309, #d97706, #fde68a, #f8fafc, #99f6e4, #14b8a6, #0f766e, #134e4a)',
     legendMin: '-100 mm', legendMax: '+100 mm',
+    // Monthly anomalies (1m and 12m monthly-mean) are in mm; 3m is a sum so
+    // its diff is roughly 3× larger.
     scale: { min: -100, max: 100 },
     scaleByWindow: {
       '3m': { min: -200, max: 200, legendMin: '-200 mm', legendMax: '+200 mm' },
-      '12m': { min: -600, max: 600, legendMin: '-600 mm', legendMax: '+600 mm' },
     },
   },
   'precip-actual': {
@@ -83,27 +84,25 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
     unit: 'mm', baseline: 'observed',
     legendGradient:
       'linear-gradient(to right, #fef3c7, #fde68a, #bef264, #34d399, #14b8a6, #0ea5e9, #1d4ed8, #1e3a8a)',
-    legendMin: '0 mm', legendMax: '300 mm',
-    scale: { min: 0, max: 300 },
+    legendMin: '0 mm', legendMax: '200 mm',
+    // 1m = monthly value; 12m window is a monthly mean over the last 12
+    // months, so it lives on the same monthly scale. 3m is a 3-month sum
+    // (UK Met Office) and needs a wider range.
+    scale: { min: 0, max: 200 },
     scaleByWindow: {
-      '3m': { min: 0, max: 700, legendMin: '0 mm', legendMax: '700 mm' },
-      '12m': { min: 0, max: 2500, legendMin: '0 mm', legendMax: '2500 mm' },
+      '3m': { min: 0, max: 500, legendMin: '0 mm', legendMax: '500 mm' },
     },
   },
   'sunshine-anomaly': {
     key: 'sunshine-anomaly', domain: 'sunshine', isAnomaly: true,
     shortLabel: 'Sunshine anomaly', longLabel: 'Sunshine anomaly',
     unit: 'hrs', baseline: 'vs 1991–2020',
-    // Dim→bright: blue (cloudy) → white → amber (sunnier)
     legendGradient:
       'linear-gradient(to right, #1e3a8a, #3b82f6, #93c5fd, #f8fafc, #fde68a, #f59e0b, #b45309, #78350f)',
-    legendMin: '-100 hrs', legendMax: '+100 hrs',
-    // Monthly UK sunshine anomalies routinely exceed ±50 hrs in sunny / dull
-    // months, so widen the default scale to ±100 to keep variation visible.
-    scale: { min: -100, max: 100 },
+    legendMin: '-80 hrs', legendMax: '+80 hrs',
+    scale: { min: -80, max: 80 },
     scaleByWindow: {
-      '3m': { min: -200, max: 200, legendMin: '-200 hrs', legendMax: '+200 hrs' },
-      '12m': { min: -400, max: 400, legendMin: '-400 hrs', legendMax: '+400 hrs' },
+      '3m': { min: -150, max: 150, legendMin: '-150 hrs', legendMax: '+150 hrs' },
     },
   },
   'sunshine-actual': {
@@ -113,13 +112,10 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
     legendGradient:
       'linear-gradient(to right, #1e293b, #475569, #cbd5e1, #fde68a, #f59e0b, #d97706)',
     legendMin: '0 hrs', legendMax: '250 hrs',
-    // UK monthly sunshine totals span ~20-250 hrs (winter to peak summer);
-    // the previous 0-300 default left winter regions all in the dark-grey
-    // bucket. 0-250 spreads the typical range across the ramp.
+    // Monthly value; 12m is monthly-mean so same scale. 3m is a sum.
     scale: { min: 0, max: 250 },
     scaleByWindow: {
       '3m': { min: 0, max: 700, legendMin: '0 hrs', legendMax: '700 hrs' },
-      '12m': { min: 800, max: 2000, legendMin: '800 hrs', legendMax: '2000 hrs' },
     },
   },
   'frost-anomaly': {
@@ -132,6 +128,7 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
     legendMin: '-15 days', legendMax: '+15 days',
     scale: { min: -15, max: 15 },
     scaleByWindow: {
+      '3m': { min: -30, max: 30, legendMin: '-30 days', legendMax: '+30 days' },
       '12m': { min: -30, max: 30, legendMin: '-30 days', legendMax: '+30 days' },
     },
   },
@@ -144,8 +141,9 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
     legendMin: '0 days', legendMax: '30 days',
     scale: { min: 0, max: 30 },
     scaleByWindow: {
-      // Annual frost-day totals (UK regions) span roughly 30-100 days, so
-      // the monthly 0-30 ramp would saturate; widen for the 12-month window.
+      '3m': { min: 0, max: 60, legendMin: '0 days', legendMax: '60 days' },
+      // 12m comes from the yearly fallback (annual frost-day total) so it's
+      // on a different scale to the monthly value.
       '12m': { min: 0, max: 100, legendMin: '0 days', legendMax: '100 days' },
     },
   },
@@ -298,11 +296,11 @@ export type MapLevel =
 export const METRIC_LEVELS: Record<MetricKey, MapLevel[]> = {
   // Temperature anomaly is the broadest series - we have it for every level.
   'temp-anomaly':     ['continents', 'countries', 'us-states', 'us-regions', 'uk-countries', 'uk-regions'],
-  // Absolute temperature: no continent rollup.
-  'temp-actual':      ['countries', 'us-states', 'us-regions', 'uk-countries', 'uk-regions'],
-  // Precipitation: NOAA US states/regions + Met Office UK only (country-precip is stale).
-  'precip-anomaly':   ['us-states', 'us-regions', 'uk-countries', 'uk-regions'],
-  'precip-actual':    ['us-states', 'us-regions', 'uk-countries', 'uk-regions'],
+  // US climate-region rollups only carry temp anomaly (no `actual`,
+  // no precip/sunshine/frost), so suppress us-regions for everything else.
+  'temp-actual':      ['countries', 'us-states', 'uk-countries', 'uk-regions'],
+  'precip-anomaly':   ['us-states', 'uk-countries', 'uk-regions'],
+  'precip-actual':    ['us-states', 'uk-countries', 'uk-regions'],
   // Sunshine + air-frost: Met Office UK only.
   'sunshine-anomaly': ['uk-countries', 'uk-regions'],
   'sunshine-actual':  ['uk-countries', 'uk-regions'],

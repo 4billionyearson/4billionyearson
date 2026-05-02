@@ -131,6 +131,16 @@ export default function ClimateMapCard({
     if (el) el.scrollIntoView({ block: 'start' });
   }, [share?.sectionId]);
 
+  // If the current (metric, level) combination has no data (e.g. user
+  // switches Metric to one not supported at the active Level), pick the
+  // first supported level for that metric within this preset's allowed
+  // levels so the map never renders empty.
+  useEffect(() => {
+    if (metricSupportsLevel(metric, level)) return;
+    const fallback = METRIC_LEVELS[metric].find((l) => availableLevels.includes(l));
+    if (fallback && fallback !== level) setLevel(fallback);
+  }, [metric, level, availableLevels]);
+
   // For the global preset we need countryAnomalies to power the headline
   // tooltip; for usa/uk presets the data comes from rankings.json so an
   // empty array is fine (we still pass it through to ClimateMap).
