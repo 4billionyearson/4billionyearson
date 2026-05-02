@@ -788,6 +788,8 @@ function LiveEventsSection({
               const pctOfFeed = Math.round((h.count / events.length) * 100);
               const dominantAlert =
                 (h.alerts.Red || 0) > 0 ? "Red" : (h.alerts.Orange || 0) > 0 ? "Orange" : "Green";
+              const dividerColor =
+                dominantAlert === "Red" ? "border-red-500/40" : dominantAlert === "Orange" ? "border-orange-500/40" : "border-emerald-500/40";
               const dateRange =
                 h.earliest && h.latest && h.earliest !== h.latest
                   ? `${fmtShort(h.earliest)} → ${fmtShort(h.latest)}`
@@ -838,7 +840,7 @@ function LiveEventsSection({
                     </div>
                   </button>
                   {isExpanded && (
-                    <div className="border-t border-current/30 px-3 pt-2 pb-3 space-y-1.5">
+                    <div className={`border-t ${dividerColor} px-3 pt-2 pb-3 space-y-1.5`}>
                       {clusterEvents.map((e, j) => (
                         <a
                           key={j}
