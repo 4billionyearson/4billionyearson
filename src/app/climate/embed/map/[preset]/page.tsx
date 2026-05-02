@@ -60,6 +60,7 @@ export default async function ClimateMapEmbedPage({
   const metricRaw = typeof sp.metric === 'string' ? sp.metric : undefined;
   const levelRaw = typeof sp.level === 'string' ? sp.level : undefined;
   const windowRaw = typeof sp.window === 'string' ? sp.window : undefined;
+  const stretchRaw = typeof sp.stretch === 'string' ? sp.stretch : undefined;
 
   const allowed = PRESET_METRICS[preset];
   const initialMetric: MetricKey =
@@ -68,6 +69,7 @@ export default async function ClimateMapEmbedPage({
     levelRaw && (VALID_LEVELS as string[]).includes(levelRaw) ? (levelRaw as MapLevel) : undefined;
   const initialWindow: AnomalyWindow =
     windowRaw && (VALID_WINDOWS as string[]).includes(windowRaw) ? (windowRaw as AnomalyWindow) : '1m';
+  const initialAutoStretch = stretchRaw === '1' || stretchRaw === 'true';
 
   const countryAnomalies = preset === 'global' ? await loadCountryAnomalies() : [];
 
@@ -79,6 +81,7 @@ export default async function ClimateMapEmbedPage({
         initialMetric={initialMetric}
         initialLevel={initialLevel}
         initialWindow={initialWindow}
+        initialAutoStretch={initialAutoStretch}
         hideShare
       />
       <div className="mt-2 flex justify-end">

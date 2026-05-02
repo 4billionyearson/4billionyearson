@@ -679,6 +679,7 @@ function UKNationsOverlay({
   onInfo,
   ukGeo,
   level,
+  customScale,
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
@@ -686,6 +687,7 @@ function UKNationsOverlay({
   onInfo: (info: { name: string; value: number | null; label: string | null; color: string } | null) => void;
   ukGeo: FeatureCollection | null;
   level: MapLevel;
+  customScale?: { min: number; max: number };
 }) {
   const map = useMap();
   const forced = level === 'uk-regions' || level === 'uk-countries';
@@ -715,13 +717,13 @@ function UKNationsOverlay({
       const row = bySlug.get(slug);
       const { value } = metricFromRow(row, metric, windowSel);
       return {
-        fillColor: value != null ? colorForMetric(metric, value, windowSel) : '#2d3748',
+        fillColor: value != null ? colorForMetric(metric, value, windowSel, customScale) : '#2d3748',
         fillOpacity: value != null ? 0.9 : 0.45,
         weight: 1.2,
         color: '#374151',
       };
     },
-    [bySlug, windowSel, metric],
+    [bySlug, windowSel, metric, customScale],
   );
 
   const onEachFeature = useCallback(
@@ -730,19 +732,19 @@ function UKNationsOverlay({
       const name = ((feature.properties as any)?.name as string) ?? slug;
       const row = bySlug.get(slug);
       const { value, label } = metricFromRow(row, metric, windowSel);
-      const color = value != null ? colorForMetric(metric, value, windowSel) : '#1f2937';
+      const color = value != null ? colorForMetric(metric, value, windowSel, customScale) : '#1f2937';
       const show = () => onInfo({ name, value, label, color });
       layer.on('mouseover', show);
       layer.on('click', show);
       layer.on('mouseout', () => onInfo(null));
     },
-    [bySlug, windowSel, metric, onInfo],
+    [bySlug, windowSel, metric, onInfo, customScale],
   );
 
   if (!visible || !ukGeo) return null;
   return (
     <GeoJSON
-      key={`uk-overlay-${level}-${windowSel}-${metric}-${bySlug.size}`}
+      key={`uk-overlay-${level}-${windowSel}-${metric}-${bySlug.size}-${customScale ? `${customScale.min}-${customScale.max}` : 'fixed'}`}
       data={ukGeo}
       style={style}
       onEachFeature={onEachFeature}
@@ -758,6 +760,7 @@ function USStatesOverlay({
   statesGeo,
   level,
   usRegionGroups,
+  customScale,
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
@@ -766,6 +769,7 @@ function USStatesOverlay({
   statesGeo: FeatureCollection | null;
   level: MapLevel;
   usRegionGroups: GroupRow[] | null;
+  customScale?: { min: number; max: number };
 }) {
   const map = useMap();
   // In us-states / us-regions mode the overlay is forced visible at any zoom
@@ -820,32 +824,32 @@ function USStatesOverlay({
       const name = ((feature?.properties as any)?.name as string) ?? '';
       const { value } = resolve(name);
       return {
-        fillColor: value != null ? colorForMetric(metric, value, windowSel) : '#1f2937',
+        fillColor: value != null ? colorForMetric(metric, value, windowSel, customScale) : '#1f2937',
         fillOpacity: 0.9,
         weight: 0.6,
         color: '#0b1220',
       };
     },
-    [resolve, metric],
+    [resolve, metric, windowSel, customScale],
   );
 
   const onEachFeature = useCallback(
     (feature: Feature, layer: Layer) => {
       const name = ((feature.properties as any)?.name as string) ?? '';
       const { value, label, displayName } = resolve(name);
-      const color = value != null ? colorForMetric(metric, value, windowSel) : '#1f2937';
+      const color = value != null ? colorForMetric(metric, value, windowSel, customScale) : '#1f2937';
       const show = () => onInfo({ name: displayName, value, label, color });
       layer.on('mouseover', show);
       layer.on('click', show);
       layer.on('mouseout', () => onInfo(null));
     },
-    [resolve, metric, onInfo],
+    [resolve, metric, windowSel, onInfo, customScale],
   );
 
   if (!visible || !statesGeo) return null;
   return (
     <GeoJSON
-      key={`us-states-${level}-${windowSel}-${metric}-${byName.size}-${regionBySlug.size}`}
+      key={`us-states-${level}-${windowSel}-${metric}-${byName.size}-${regionBySlug.size}-${customScale ? `${customScale.min}-${customScale.max}` : 'fixed'}`}
       data={statesGeo}
       style={style}
       onEachFeature={onEachFeature}
@@ -861,11 +865,13 @@ export default function ClimateMap({
   window: windowSel = '1m',
   level = 'countries',
   metric = 'temp-anomaly',
+  autoStretch = false,
 }: {
   countryAnomalies: CountryAnomaly[];
   window?: AnomalyWindow;
   level?: MapLevel;
   metric?: MetricKey;
+  autoStretch?: boolean;
 }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
@@ -981,18 +987,79 @@ export default function ClimateMap({
     return metricFromRow(row, metric, windowSel);
   }, [windowSel, level, metric, continentByKey, groupValue, countryRowByName]);
 
+  // When the user enables Auto-stretch, derive the colour domain from the
+  // values actually being shown on the map at the active level + metric +
+  // window. Returns null when the toggle is off (use the fixed legend
+  // domain), or when there's not enough data to stretch meaningfully.
+  const customScale = useMemo<{ min: number; max: number } | null>(() => {
+    if (!autoStretch) return null;
+    const values: number[] = [];
+    const push = (v: number | null | undefined) => {
+      if (v != null && Number.isFinite(v)) values.push(v);
+    };
+    if (level === 'continents') {
+      if (metric === 'temp-anomaly' && continentGroups) {
+        for (const g of continentGroups) push(groupValue(g).value);
+      }
+    } else if (level === 'countries') {
+      if (metric === 'temp-anomaly') {
+        for (const c of countryAnomalies) {
+          push(windowSel === '3m' ? c.anomaly3m : windowSel === '12m' ? c.anomaly12m : (c.anomaly1m ?? c.anomaly));
+        }
+      } else if (rankings) {
+        for (const r of rankings) {
+          if (r.type !== 'country') continue;
+          push(metricFromRow(r, metric, windowSel).value);
+        }
+      }
+    } else if (level === 'us-states') {
+      if (rankings) {
+        for (const r of rankings) {
+          if (r.type !== 'us-state') continue;
+          push(metricFromRow(r, metric, windowSel).value);
+        }
+      }
+    } else if (level === 'us-regions') {
+      if (metric === 'temp-anomaly' && usRegionGroups) {
+        for (const g of usRegionGroups) {
+          push(windowSel === '3m' ? g.anomaly3m : windowSel === '12m' ? g.anomaly12m : g.anomaly1m);
+        }
+      }
+    } else if (level === 'uk-countries' || level === 'uk-regions') {
+      if (rankings) {
+        const slugSet = level === 'uk-regions' ? UK_REGION_SLUGS : UK_NATION_SLUGS;
+        for (const r of rankings) {
+          if (r.type !== 'uk-region' || !slugSet.has(r.slug)) continue;
+          push(metricFromRow(r, metric, windowSel).value);
+        }
+      }
+    }
+    if (values.length < 2) return null;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    if (!(max - min > 1e-9)) return null;
+    // For diverging anomaly metrics, force the domain to be symmetric around
+    // zero so the white midpoint still represents the baseline.
+    const cfg = METRICS[metric];
+    if (cfg.isAnomaly) {
+      const m = Math.max(Math.abs(min), Math.abs(max));
+      return { min: -m, max: m };
+    }
+    return { min, max };
+  }, [autoStretch, level, metric, windowSel, countryAnomalies, rankings, continentGroups, usRegionGroups, groupValue]);
+
   const style = useCallback((feature: Feature | undefined): PathOptions => {
     if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
     const name = ((feature.properties as any)?.name as string) ?? '';
     const rec = lookup.get(normalizeName(name));
     const { value } = pick(rec, name);
     return {
-      fillColor: value != null ? colorForMetric(metric, value, windowSel) : '#1f2937',
+      fillColor: value != null ? colorForMetric(metric, value, windowSel, customScale ?? undefined) : '#1f2937',
       fillOpacity: 0.85,
       weight: 0.4,
       color: '#0b1220',
     };
-  }, [lookup, pick, metric]);
+  }, [lookup, pick, metric, windowSel, customScale]);
 
   const onEachFeature = useCallback((feature: Feature, layer: Layer) => {
     const name = ((feature.properties as any)?.name as string) ?? '';
@@ -1001,7 +1068,7 @@ export default function ClimateMap({
     }
     const rec = lookup.get(normalizeName(name));
     const { value, label } = pick(rec, name);
-    const color = value != null ? colorForMetric(metric, value, windowSel) : '#1f2937';
+    const color = value != null ? colorForMetric(metric, value, windowSel, customScale ?? undefined) : '#1f2937';
     let displayName = name;
     if (level === 'continents') {
       const groupKey = NAME_TO_CONTINENT[name.toLowerCase()] ?? (rec ? CONTINENT_GROUP_KEY[rec.iso3] : undefined);
@@ -1031,7 +1098,7 @@ export default function ClimateMap({
   }, [lookup, pick, level, metric, continentByKey]);
 
   const cfg = METRICS[metric];
-  const legend = legendForWindow(metric, windowSel);
+  const legend = legendForWindow(metric, windowSel, customScale ?? undefined);
   const windowPhrase = windowSel === '12m' ? '12-month rolling' : windowSel === '3m' ? '3-month rolling' : 'monthly';
   const baselineCopy = cfg.isAnomaly ? cfg.baseline : '';
 
@@ -1073,7 +1140,7 @@ export default function ClimateMap({
             opacity={0.55}
           />
           <GeoJSON
-            key={`base-${level}-${windowSel}-${metric}-${lookup.size}-${countryRowByName.size}-${continentByKey.size}`}
+            key={`base-${level}-${windowSel}-${metric}-${lookup.size}-${countryRowByName.size}-${continentByKey.size}-${customScale ? `${customScale.min}-${customScale.max}` : 'fixed'}`}
             data={geo}
             style={style}
             onEachFeature={onEachFeature}
@@ -1085,6 +1152,7 @@ export default function ClimateMap({
             statesGeo={statesGeo}
             level={level}
             usRegionGroups={usRegionGroups}
+            customScale={customScale ?? undefined}
             onInfo={(info) =>
               setSelected(
                 info
@@ -1099,6 +1167,7 @@ export default function ClimateMap({
             metric={metric}
             ukGeo={ukGeo}
             level={level}
+            customScale={customScale ?? undefined}
             onInfo={(info) =>
               setSelected(
                 info
@@ -1134,6 +1203,11 @@ export default function ClimateMap({
       <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-300">
         <span className="font-semibold text-gray-200">
           {`${cfg.longLabel} (${windowPhrase})${baselineCopy ? ` ${baselineCopy}` : ''}`}
+          {customScale && (
+            <span className="ml-2 inline-flex items-center rounded-full bg-[#D0A65E]/15 border border-[#D0A65E]/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#D0A65E]">
+              Stretched to view
+            </span>
+          )}
         </span>
         <div className="flex items-center gap-2">
           <span>{legend.legendMin}</span>

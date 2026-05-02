@@ -95,6 +95,7 @@ export default function ClimateMapCard({
   initialWindow = '1m',
   initialLevel,
   initialMetric = 'temp-anomaly',
+  initialAutoStretch = false,
   preset = 'global',
   title,
   share,
@@ -104,6 +105,7 @@ export default function ClimateMapCard({
   initialWindow?: AnomalyWindow;
   initialLevel?: MapLevel;
   initialMetric?: MetricKey;
+  initialAutoStretch?: boolean;
   preset?: ClimateMapPreset;
   title?: string;
   /** When provided, render a ShareBar that links to the given page anchor. */
@@ -117,6 +119,7 @@ export default function ClimateMapCard({
   const [anomalyWindow, setAnomalyWindow] = useState<AnomalyWindow>(initialWindow);
   const [level, setLevel] = useState<MapLevel>(initialLevel ?? PRESET_INITIAL_LEVEL[preset]);
   const [metric, setMetric] = useState<MetricKey>(initialMetric);
+  const [autoStretch, setAutoStretch] = useState<boolean>(initialAutoStretch);
 
   // When the page is opened with a hash that targets this card (e.g.
   // /climate/usa#climate-map from a Share link), the browser tries to scroll
@@ -150,7 +153,7 @@ export default function ClimateMapCard({
 
   // Build embed URL reflecting the current toggle state so embedded copies
   // open with the same view the user is sharing.
-  const embedUrl = `https://4billionyearson.org/climate/embed/map/${preset}?metric=${encodeURIComponent(metric)}&level=${encodeURIComponent(level)}&window=${encodeURIComponent(anomalyWindow)}`;
+  const embedUrl = `https://4billionyearson.org/climate/embed/map/${preset}?metric=${encodeURIComponent(metric)}&level=${encodeURIComponent(level)}&window=${encodeURIComponent(anomalyWindow)}${autoStretch ? '&stretch=1' : ''}`;
   const embedCode = `<iframe\n  src="${embedUrl}"\n  width="100%" height="640"\n  style="border:none;"\n  title="${cardTitle} - 4 Billion Years On"\n></iframe>`;
 
   return (
@@ -221,8 +224,19 @@ export default function ClimateMapCard({
             {opt.label}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => setAutoStretch((v) => !v)}
+          aria-pressed={autoStretch}
+          title={autoStretch
+            ? 'Showing the full canonical scale across all maps. Click to fit colours to the values currently visible.'
+            : 'Showing colours fitted to the values currently visible. Click to switch back to the canonical scale.'}
+          className={`${TOGGLE_BASE} ml-auto ${autoStretch ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+        >
+          {autoStretch ? 'Auto-stretch: on' : 'Auto-stretch: off'}
+        </button>
       </div>
-      <ClimateMap countryAnomalies={countryAnomalies} window={anomalyWindow} level={level} metric={metric} />
+      <ClimateMap countryAnomalies={countryAnomalies} window={anomalyWindow} level={level} metric={metric} autoStretch={autoStretch} />
       <p className="text-xs text-gray-500 mt-3">
         {preset === 'uk' ? (
           <>Source: Met Office UK Regional &amp; National series (Tmean, Rainfall, Sunshine, Air Frost) &copy; Crown copyright. Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall, sunshine, frost). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>

@@ -177,6 +177,9 @@ function rampAt(stops: string[], t: number): string {
 }
 
 const RAMP_TEMP_ACTUAL = ['#1e3a8a', '#2563eb', '#60a5fa', '#f8fafc', '#fde68a', '#fb923c', '#ea580c', '#b91c1c'];
+// Stops equivalent of ANOMALY_GRADIENT, used when a custom (auto-stretched)
+// scale overrides the bespoke segment-based colorFromAnomaly() ramp.
+const RAMP_TEMP_ANOMALY = ['#1e3a8a', '#2563eb', '#60a5fa', '#bae6fd', '#fef3c7', '#fde68a', '#fb923c', '#ea580c', '#b91c1c', '#7f1d1d'];
 const RAMP_PRECIP_ACTUAL = ['#fef3c7', '#fde68a', '#bef264', '#34d399', '#14b8a6', '#0ea5e9', '#1d4ed8', '#1e3a8a'];
 const RAMP_SUNSHINE_ACTUAL = ['#1e293b', '#475569', '#cbd5e1', '#fde68a', '#f59e0b', '#d97706'];
 const RAMP_FROST_ACTUAL = ['#f8fafc', '#bae6fd', '#60a5fa', '#2563eb', '#1e3a8a'];
@@ -198,8 +201,30 @@ export function scaleForWindow(metric: MetricKey, windowSel?: AnomalyWindow): { 
   return cfg.scale;
 }
 
-export function legendForWindow(metric: MetricKey, windowSel?: AnomalyWindow): { legendMin: string; legendMax: string; legendGradient: string } {
+// Format a numeric scale bound for legend display, matching the unit string
+// used elsewhere (°C, mm, hrs, days). Used when an auto-stretched legend
+// needs to render its derived min/max with no static copy to fall back on.
+function formatScaleBound(metric: MetricKey, v: number, isMax: boolean): string {
   const cfg = METRICS[metric];
+  const decimals = cfg.unit === '°C' ? 1 : 0;
+  const sign = cfg.isAnomaly && isMax && v > 0 ? '+' : '';
+  const unit = cfg.unit === '°C' ? '°C' : ` ${cfg.unit}`;
+  return `${sign}${v.toFixed(decimals)}${unit}`;
+}
+
+export function legendForWindow(
+  metric: MetricKey,
+  windowSel?: AnomalyWindow,
+  customScale?: { min: number; max: number },
+): { legendMin: string; legendMax: string; legendGradient: string } {
+  const cfg = METRICS[metric];
+  if (customScale) {
+    return {
+      legendMin: formatScaleBound(metric, customScale.min, false),
+      legendMax: formatScaleBound(metric, customScale.max, true),
+      legendGradient: cfg.legendGradient,
+    };
+  }
   const w = windowSel ? cfg.scaleByWindow?.[windowSel] : undefined;
   return {
     legendMin: w?.legendMin ?? cfg.legendMin,
@@ -208,13 +233,27 @@ export function legendForWindow(metric: MetricKey, windowSel?: AnomalyWindow): {
   };
 }
 
-export function colorForMetric(metric: MetricKey, value: number | null | undefined, windowSel?: AnomalyWindow): string {
+export function colorForMetric(
+  metric: MetricKey,
+  value: number | null | undefined,
+  windowSel?: AnomalyWindow,
+  customScale?: { min: number; max: number },
+): string {
   if (value == null || !Number.isFinite(value)) return NO_DATA;
-  const { min, max } = scaleForWindow(metric, windowSel);
-  const t = (value - min) / (max - min);
+  const scale = customScale ?? scaleForWindow(metric, windowSel);
+  // Guard against degenerate auto-stretch domains (single value or NaN);
+  // fall back to the fixed scale so the legend shows a usable ramp.
+  const span = scale.max - scale.min;
+  const usable = Number.isFinite(span) && span > 1e-9
+    ? scale
+    : scaleForWindow(metric, windowSel);
+  const t = (value - usable.min) / (usable.max - usable.min);
   switch (metric) {
     case 'temp-anomaly':
-      return colorFromAnomaly(value);
+      // When the user opts into auto-stretch we want a ramp keyed to the
+      // visible domain; otherwise keep the bespoke segment-based ramp that
+      // matches the prior anomaly-only map exactly at integer °C breaks.
+      return customScale ? rampAt(RAMP_TEMP_ANOMALY, t) : colorFromAnomaly(value);
     case 'temp-actual':
       return rampAt(RAMP_TEMP_ACTUAL, t);
     case 'precip-anomaly':
