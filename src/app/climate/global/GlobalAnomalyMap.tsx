@@ -124,7 +124,7 @@ const NAME_TO_CONTINENT: Record<string, string> = {
   france: 'europe', germany: 'europe', greece: 'europe', hungary: 'europe',
   iceland: 'europe', ireland: 'europe', italy: 'europe', kosovo: 'europe',
   latvia: 'europe', lithuania: 'europe', luxembourg: 'europe',
-  moldova: 'europe', montenegro: 'europe', netherlands: 'europe',
+  moldova: 'europe', montenegro: 'europe', netherlands: 'europe', 'north macedonia': 'europe',
   norway: 'europe', poland: 'europe', portugal: 'europe', romania: 'europe',
   russia: 'europe', serbia: 'europe', slovakia: 'europe', slovenia: 'europe',
   spain: 'europe', sweden: 'europe', switzerland: 'europe', ukraine: 'europe',
@@ -142,7 +142,7 @@ const NAME_TO_CONTINENT: Record<string, string> = {
   // South America
   argentina: 'southAmerica', bolivia: 'southAmerica', brazil: 'southAmerica',
   chile: 'southAmerica', colombia: 'southAmerica', ecuador: 'southAmerica',
-  'falkland is.': 'southAmerica', guyana: 'southAmerica',
+  'falkland is.': 'southAmerica', 'french guiana': 'southAmerica', guyana: 'southAmerica',
   paraguay: 'southAmerica', peru: 'southAmerica', suriname: 'southAmerica',
   uruguay: 'southAmerica', venezuela: 'southAmerica',
   // Oceania
