@@ -669,7 +669,7 @@ export default function EmissionsCountryPanel({
           {country.annual.length > 0 && (
             <div>
               <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
-                <Factory className="h-4 w-4 text-red-400" /> Annual CO₂ emissions - {country.name}
+                <Factory className="h-4 w-4 text-red-400" /> Annual CO₂ Emissions - {country.name}
               </h3>
               <div className="h-[320px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -703,7 +703,7 @@ export default function EmissionsCountryPanel({
             {country.perCapita.length > 0 && (
               <div>
                 <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
-                  <Users className="h-4 w-4 text-amber-400" /> Per-capita CO₂
+                  <Users className="h-4 w-4 text-amber-400" /> Per-Capita CO₂
                 </h3>
                 <div className="h-[280px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -928,7 +928,7 @@ function USStateDeepDive({
       {/* Absolute emissions over time */}
       <div>
         <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
-          <Factory className="h-4 w-4 text-red-400" /> Annual CO₂ emissions - {state.name}
+          <Factory className="h-4 w-4 text-red-400" /> Annual CO₂ Emissions - {state.name}
         </h3>
         <div className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -952,11 +952,39 @@ function USStateDeepDive({
           </ResponsiveContainer>
         </div>
       </div>
-
+      {/* Per-Capita CO₂ over time */}
+      {(() => {
+        const perCapSeries = stateSeriesMt.filter(y => y.ghgPerCapita != null).map(y => ({ year: y.year, value: y.ghgPerCapita as number }));
+        if (!perCapSeries.length) return null;
+        return (
+          <div>
+            <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
+              <Users className="h-4 w-4 text-amber-400" /> Per-Capita CO₂
+            </h3>
+            <div className="h-[220px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={perCapSeries} margin={CHART_MARGIN}>
+                  <defs>
+                    <linearGradient id="emit-state-percap" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#A99B8D' }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}`} />
+                  <Tooltip content={<DarkTooltip unit="perCapita" />} />
+                  <Area type="monotone" dataKey="value" name={`${state.name} (t/person)`} stroke="#fbbf24" strokeWidth={2} fill="url(#emit-state-percap)" dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      })()}
       {/* Indexed trajectory: state vs USA vs world */}
       <div>
         <h3 className="text-sm font-mono text-white mb-2 inline-flex items-center gap-1.5">
-          <TrendingUp className="h-4 w-4 text-[#D0A65E]" /> Trajectory vs US &amp; world (1990 = 100)
+          <TrendingUp className="h-4 w-4 text-[#D0A65E]" /> Trajectory vs US &amp; World (1990 = 100)
         </h3>
         <div className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
