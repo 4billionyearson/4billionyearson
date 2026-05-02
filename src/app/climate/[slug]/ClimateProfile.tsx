@@ -823,36 +823,27 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
           {data && !loading && (
             <>
-              {/* ─── Temperature panels (latest month, year, record, rank).
-                  Shown before the map so the headline numbers come first. ─── */}
+              {/* ─── At a Glance: Temperature panels + (USA/UK) climate map.
+                  Headline numbers come first; the map adds geographic context
+                  for USA / UK pages and any of their sub-national regions. ─── */}
               {(() => {
                 const tempPanels = overviewPanels.filter(p => p.title.startsWith('Temperature'));
-                if (tempPanels.length === 0) return null;
-                return (
-                  <>
-                    <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature" />
-                    <OverviewGrid panels={tempPanels} />
-                  </>
-                );
-              })()}
-
-              {/* ─── At a Glance: climate map for USA / UK and any of their
-                  sub-national regions. Other countries / continents skip the
-                  map (no country-level data to highlight on those pages). ─── */}
-              {(() => {
                 const mapPreset: ClimateMapPreset | null =
                   region.slug === 'usa' || region.type === 'us-state' ? 'usa' :
                   region.slug === 'uk' || region.type === 'uk-region' ? 'uk' :
                   null;
-                if (!mapPreset) return null;
+                if (tempPanels.length === 0 && !mapPreset) return null;
                 return (
                   <>
                     <Divider icon={<Globe2 className="h-5 w-5 text-[#D0A65E]" />} title="At a Glance" />
-                    <ClimateMapCard
-                      countryAnomalies={[] as CountryAnomalyRow[]}
-                      preset={mapPreset}
-                      share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-map' }}
-                    />
+                    {tempPanels.length > 0 && <OverviewGrid panels={tempPanels} />}
+                    {mapPreset && (
+                      <ClimateMapCard
+                        countryAnomalies={[] as CountryAnomalyRow[]}
+                        preset={mapPreset}
+                        share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-map' }}
+                      />
+                    )}
                   </>
                 );
               })()}
