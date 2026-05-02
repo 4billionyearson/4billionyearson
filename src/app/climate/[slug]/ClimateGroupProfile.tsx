@@ -814,7 +814,7 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
               <ClimateRankPill slug={region.slug} />
             </div>
             <GroupSummaryPanel slug={region.slug} regionName={region.name} />
-            <div className="mt-3 flex justify-start">
+            <div className="mt-3 flex items-center justify-between gap-3 flex-wrap">
               <ShareBar
                 pageUrl={`https://4billionyearson.org/climate/${region.slug}#climate-update`}
                 shareText={encodeURIComponent(`${region.name} climate update - 4 Billion Years On`)}
@@ -824,6 +824,12 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
                 wrapperClassName="relative"
                 align="left"
               />
+              <Link
+                href={`/climate-dashboard?q=${encodeURIComponent(region.name)}`}
+                className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors"
+              >
+                Full Climate Data for {region.name} →
+              </Link>
             </div>
           </div>
         </div>
