@@ -20,6 +20,7 @@
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
+import { union } from '@turf/union';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = resolve(__dirname, '../public/data/uk-regions.json');
@@ -119,46 +120,14 @@ const UK_LADS_URL = (countryPrefix) =>
   `?where=LAD23CD+LIKE+%27${countryPrefix}%25%27&outFields=LAD23CD,LAD23NM&returnGeometry=true&outSR=4326&f=geojson&${PRECISION}`;
 
 // ─── Geometry helpers ─────────────────────────────────────────────────────────
-function featureToRings(feature) {
-  const geom = feature.geometry;
-  if (!geom) return [];
-  const rings = [];
-  if (geom.type === 'Polygon') {
-    rings.push(...geom.coordinates);
-  } else if (geom.type === 'MultiPolygon') {
-    for (const poly of geom.coordinates) rings.push(...poly);
-  }
-  return rings;
-}
 
-function buildMultiPolygon(features) {
-  const coords = [];
-  for (const f of features) {
-    for (const ring of featureToRings(f)) {
-      coords.push([ring]);
-    }
-  }
-  if (coords.length === 0) {
-    throw new Error('buildMultiPolygon called with no geometry');
-  }
-  return { type: 'MultiPolygon', coordinates: coords };
-}
-
-function makeFeature(slug, features) {
-  return {
-    type: 'Feature',
-    properties: { slug, name: REGION_NAMES[slug] },
-    geometry: buildMultiPolygon(features),
-  };
-}
-
-// Append rings from additional features into an existing MultiPolygon feature
-function appendRings(existingFeature, additionalFeatures) {
-  for (const f of additionalFeatures) {
-    for (const ring of featureToRings(f)) {
-      existingFeature.geometry.coordinates.push([ring]);
-    }
-  }
+// Dissolve an array of GeoJSON Features into a single Feature using turf/union.
+// This removes all internal shared boundaries, giving clean region outlines.
+// @turf/union v7 takes a FeatureCollection and dissolves all features in it.
+function dissolveFeatures(features) {
+  if (features.length === 0) throw new Error('dissolveFeatures called with empty array');
+  if (features.length === 1) return features[0];
+  return union({ type: 'FeatureCollection', features });
 }
 
 // ─── Fetch helper ─────────────────────────────────────────────────────────────
@@ -180,7 +149,7 @@ async function main() {
   console.log('England regions:');
   const englandFeatures = await fetchONS(ENGLAND_REGIONS_URL, 'England ONS Regions');
 
-  // Group by Met Office slug and build MultiPolygon features
+  // Group by Met Office slug and dissolve
   const englandGroups = {};
   for (const f of englandFeatures) {
     const code = f.properties.RGN23CD;
@@ -193,11 +162,16 @@ async function main() {
     englandGroups[slug].push(f);
   }
 
-  // Build England features (North Wales and South Wales will be appended later)
+  // Build England features via proper dissolve
   const englandResultFeatures = {};
   for (const [slug, feats] of Object.entries(englandGroups)) {
     console.log(`    ${REGION_NAMES[slug]}: ${feats.length} ONS region(s)`);
-    englandResultFeatures[slug] = makeFeature(slug, feats);
+    const dissolved = dissolveFeatures(feats);
+    englandResultFeatures[slug] = {
+      type: 'Feature',
+      properties: { slug, name: REGION_NAMES[slug] },
+      geometry: dissolved.geometry,
+    };
   }
 
   // ── 2. Wales: LADs split into North / South ────────────────────────────────
@@ -209,14 +183,27 @@ async function main() {
   console.log(`    North Wales (→ NW & N Wales): ${northWalesLADs.length} LADs`);
   console.log(`    South Wales (→ SW & S Wales): ${southWalesLADs.length} LADs`);
 
-  // Append Wales rings into the relevant England features
-  appendRings(englandResultFeatures['england-nw-and-north-wales'], northWalesLADs);
-  appendRings(englandResultFeatures['england-sw-and-south-wales'], southWalesLADs);
+  // Dissolve Wales LADs into the relevant England features
+  const nwDissolvedAll = dissolveFeatures([englandResultFeatures['england-nw-and-north-wales'], ...northWalesLADs]);
+  englandResultFeatures['england-nw-and-north-wales'] = {
+    type: 'Feature',
+    properties: { slug: 'england-nw-and-north-wales', name: REGION_NAMES['england-nw-and-north-wales'] },
+    geometry: nwDissolvedAll.geometry,
+  };
+  const swDissolvedAll = dissolveFeatures([englandResultFeatures['england-sw-and-south-wales'], ...southWalesLADs]);
+  englandResultFeatures['england-sw-and-south-wales'] = {
+    type: 'Feature',
+    properties: { slug: 'england-sw-and-south-wales', name: REGION_NAMES['england-sw-and-south-wales'] },
+    geometry: swDissolvedAll.geometry,
+  };
 
   // ── 3. Northern Ireland: all NI LADs merged ────────────────────────────────
   console.log('\nNorthern Ireland:');
   const niFeatures = await fetchONS(UK_LADS_URL('N'), 'Northern Ireland LADs');
-  const niResultFeature = makeFeature('northern-ireland', niFeatures);
+  const niResultFeature = (() => {
+    const dissolved = dissolveFeatures(niFeatures);
+    return { type: 'Feature', properties: { slug: 'northern-ireland', name: REGION_NAMES['northern-ireland'] }, geometry: dissolved.geometry };
+  })();
   console.log(`    Northern Ireland: ${niFeatures.length} LADs`);
 
   // ── 4. Scotland: LADs dissolved into N/E/W sub-regions ────────────────────
@@ -239,7 +226,12 @@ async function main() {
   const scotlandResultFeatures = {};
   for (const [slug, feats] of Object.entries(scotGroups)) {
     console.log(`    ${REGION_NAMES[slug]}: ${feats.length} council areas`);
-    scotlandResultFeatures[slug] = makeFeature(slug, feats);
+    const dissolved = dissolveFeatures(feats);
+    scotlandResultFeatures[slug] = {
+      type: 'Feature',
+      properties: { slug, name: REGION_NAMES[slug] },
+      geometry: dissolved.geometry,
+    };
   }
 
   // ── 5. Assemble in display order ───────────────────────────────────────────
