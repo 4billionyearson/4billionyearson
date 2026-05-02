@@ -823,6 +823,19 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
           {data && !loading && (
             <>
+              {/* ─── Temperature panels (latest month, year, record, rank).
+                  Shown before the map so the headline numbers come first. ─── */}
+              {(() => {
+                const tempPanels = overviewPanels.filter(p => p.title.startsWith('Temperature'));
+                if (tempPanels.length === 0) return null;
+                return (
+                  <>
+                    <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature" />
+                    <OverviewGrid panels={tempPanels} />
+                  </>
+                );
+              })()}
+
               {/* ─── At a Glance: climate map for USA / UK and any of their
                   sub-national regions. Other countries / continents skip the
                   map (no country-level data to highlight on those pages). ─── */}
@@ -846,7 +859,6 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
               {/* ─── Sections with dividers ─── */}
               {(() => {
-                const tempPanels = overviewPanels.filter(p => p.title.startsWith('Temperature'));
                 const sunshinePanels = overviewPanels.filter(p => p.title.startsWith('Sunshine'));
                 const rainfallPanels = overviewPanels.filter(p => p.title.startsWith('Rainfall'));
                 const frostPanels = overviewPanels.filter(p => p.title.startsWith('Frost'));
@@ -878,21 +890,18 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
 
                 return (
                   <>
-                    {/* Temperature */}
-                    {tempPanels.length > 0 && (
+                    {/* Year-on-year multi-metric chart + Shifting Seasons card. */}
+                    {(monthlyAll?.length || rainfallMonthly?.length || sunshineMonthly?.length || frostMonthly?.length) ? (
                       <>
-                        <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Temperature History" />
-                        <OverviewGrid panels={tempPanels} />
+                        <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Trends" />
+                        <MonthlySpaghettiCard
+                          series={spaghettiSeries}
+                          regionName={pageTitle}
+                          dataSource={chartSource}
+                          embedSlug={slug}
+                          share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'monthly-history' }}
+                        />
                       </>
-                    )}
-                    {monthlyAll?.length || rainfallMonthly?.length || sunshineMonthly?.length || frostMonthly?.length ? (
-                      <MonthlySpaghettiCard
-                        series={spaghettiSeries}
-                        regionName={pageTitle}
-                        dataSource={chartSource}
-                        embedSlug={slug}
-                        share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'monthly-history' }}
-                      />
                     ) : null}
 
                     {monthlyAll?.length ? (
