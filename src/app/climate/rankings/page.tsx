@@ -13,7 +13,7 @@ import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 export const metadata: Metadata = {
   title: 'Climate Rankings & Monthly Trends - 144 Regions Compared',
   description:
-    'Sortable league table and monthly trend analysis for every country, US state and UK region we track. See who is warmest this month, the biggest rank movers since last month, continent-level roll-ups, and how your region compares against its climate peers - all against the 1961–1990 baseline.',
+    'Sortable league table and monthly trend analysis for every country, US state and UK region we track. See where is warmest this month, the biggest rank movers since last month, continent-level roll-ups, and how your region compares against its climate peers - all against the 1961–1990 baseline.',
   alternates: { canonical: 'https://4billionyearson.org/climate/rankings' },
   keywords: [
     'climate rankings',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     'continent temperature anomaly',
   ],
   openGraph: {
-    title: 'Climate Rankings & Monthly Trends - Who is warmest this month?',
+    title: 'Climate Rankings & Monthly Trends - Where is warmest this month?',
     description:
       'Live league table and trend analysis across 144 countries, US states and UK regions - anomalies, movers, peers and continent roll-ups, updated monthly.',
     url: 'https://4billionyearson.org/climate/rankings',
