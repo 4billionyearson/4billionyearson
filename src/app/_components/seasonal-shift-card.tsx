@@ -28,7 +28,7 @@ interface SeasonalShiftCardProps {
   regionName: string;
   dataSource?: string;
   /** Anchor + canonical URL for the ShareBar. When omitted the share button is hidden. */
-  share?: { pageUrl: string; sectionId: string };
+  share?: { pageUrl: string; sectionId: string; embedUrl?: string; embedCode?: string };
 }
 
 type View = 'length' | 'monthly' | 'rainfall' | 'sunshine' | 'wet-season';
@@ -521,6 +521,8 @@ export default function SeasonalShiftCard({
             pageUrl={`${share.pageUrl}#${share.sectionId}`}
             shareText={encodeURIComponent(`Shifting Seasons in ${regionName} - 4 Billion Years On`)}
             emailSubject={`Shifting Seasons in ${regionName} - 4 Billion Years On`}
+            embedUrl={share.embedUrl}
+            embedCode={share.embedCode}
             wrapperClassName="relative"
             align="left"
           />

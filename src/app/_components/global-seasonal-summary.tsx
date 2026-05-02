@@ -101,7 +101,7 @@ export default function GlobalSeasonalSummary({
   share,
 }: {
   hideExploreLink?: boolean;
-  share?: { pageUrl: string; sectionId: string };
+  share?: { pageUrl: string; sectionId: string; embedUrl?: string; embedCode?: string };
 } = {}) {
   const [data, setData] = useState<GlobalShiftData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -339,6 +339,8 @@ export default function GlobalSeasonalSummary({
             pageUrl={`${share.pageUrl}#${share.sectionId}`}
             shareText={encodeURIComponent('Shifting Seasons worldwide - 4 Billion Years On')}
             emailSubject={'Shifting Seasons worldwide - 4 Billion Years On'}
+            embedUrl={share.embedUrl}
+            embedCode={share.embedCode}
             wrapperClassName="relative"
             align="left"
           />

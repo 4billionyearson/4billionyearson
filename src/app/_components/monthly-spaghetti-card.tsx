@@ -129,13 +129,15 @@ export default function MonthlySpaghettiCard({
         </div>
       )}
 
-      <MonthlySpaghettiChart
-        monthlyAll={data}
-        regionName={regionName}
-        metric={metric}
-        dataSource={dataSource}
-        hideTitle
-      />
+      <div key={metric} className="animate-metric-swap">
+        <MonthlySpaghettiChart
+          monthlyAll={data}
+          regionName={regionName}
+          metric={metric}
+          dataSource={dataSource}
+          hideTitle
+        />
+      </div>
 
       {footer && (
         <div className="text-xs text-gray-400 mt-3">{footer}</div>

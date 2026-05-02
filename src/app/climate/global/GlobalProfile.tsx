@@ -424,6 +424,8 @@ export default function GlobalProfile() {
                       pageUrl={'https://4billionyearson.org/climate/global#climate-update'}
                       shareText={encodeURIComponent('Global climate update - 4 Billion Years On')}
                       emailSubject={'Global climate update - 4 Billion Years On'}
+                      embedUrl={'https://4billionyearson.org/climate/embed/update/global'}
+                      embedCode={'<iframe\n  src="https://4billionyearson.org/climate/embed/update/global"\n  width="100%" height="640"\n  style="border:none;"\n  title="Global climate update - 4 Billion Years On"\n></iframe>'}
                       wrapperClassName="relative"
                       align="left"
                     />
@@ -715,7 +717,12 @@ export default function GlobalProfile() {
                   <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
                   <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons Worldwide</h3>
                 </div>
-                <GlobalSeasonalSummary share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'shifting-seasons' }} />
+                <GlobalSeasonalSummary share={{
+                  pageUrl: 'https://4billionyearson.org/climate/global',
+                  sectionId: 'shifting-seasons',
+                  embedUrl: 'https://4billionyearson.org/climate/embed/seasons/global',
+                  embedCode: '<iframe\n  src="https://4billionyearson.org/climate/embed/seasons/global"\n  width="100%" height="720"\n  style="border:none;"\n  title="Shifting Seasons Worldwide - 4 Billion Years On"\n></iframe>',
+                }} />
               </section>
 
               {/* Long-view charts: yearly trend + last-12-months anomaly comparison */}

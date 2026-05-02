@@ -767,6 +767,8 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                       pageUrl={`https://4billionyearson.org/climate/${slug}#climate-update`}
                       shareText={encodeURIComponent(`${pageTitle} climate update - 4 Billion Years On`)}
                       emailSubject={`${pageTitle} climate update - 4 Billion Years On`}
+                      embedUrl={`https://4billionyearson.org/climate/embed/update/${encodeURIComponent(slug)}`}
+                      embedCode={`<iframe\n  src="https://4billionyearson.org/climate/embed/update/${encodeURIComponent(slug)}"\n  width="100%" height="640"\n  style="border:none;"\n  title="${pageTitle} climate update - 4 Billion Years On"\n></iframe>`}
                       wrapperClassName="relative"
                       align="left"
                     />
@@ -910,7 +912,12 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
                         sunshineMonthly={sunshineMonthly}
                         regionName={pageTitle}
                         dataSource={chartSource}
-                        share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'shifting-seasons' }}
+                        share={{
+                          pageUrl: `https://4billionyearson.org/climate/${slug}`,
+                          sectionId: 'shifting-seasons',
+                          embedUrl: `https://4billionyearson.org/climate/embed/seasons/${encodeURIComponent(slug)}`,
+                          embedCode: `<iframe\n  src="https://4billionyearson.org/climate/embed/seasons/${encodeURIComponent(slug)}"\n  width="100%" height="720"\n  style="border:none;"\n  title="Shifting Seasons - ${pageTitle} - 4 Billion Years On"\n></iframe>`,
+                        }}
                       />
                     ) : null}
 
