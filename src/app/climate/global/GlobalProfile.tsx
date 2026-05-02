@@ -700,7 +700,7 @@ export default function GlobalProfile() {
                   hemisphere and Köppen climate zone, since global mean temperature
                   is too flat to run the standard warm/cold analysis on its own. */}
               <Divider icon={<Leaf className="h-5 w-5 text-emerald-400" />} title="Shifting Seasons" />
-              <section className="bg-gray-950/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
+              <section className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
                   <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons Worldwide</h3>
