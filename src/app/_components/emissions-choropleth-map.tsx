@@ -425,9 +425,9 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
   // the active level into account. In continents mode every country in the same
   // continent gets tinted with the continent aggregate so the choropleth reads
   // as six bands rather than ~190 polygons.
-  const resolveEntry = useCallback((owidName: string): { entry: CountryEmissions | undefined; displayName: string } => {
+  const resolveEntry = useCallback((owidName: string, geoName?: string): { entry: CountryEmissions | undefined; displayName: string } => {
     if (level === 'continents') {
-      const cont = CONTINENT_OF[owidName];
+      const cont = (geoName ? CONTINENT_OF[geoName] : undefined) ?? CONTINENT_OF[owidName];
       if (!cont || !continentData) return { entry: undefined, displayName: cont ?? owidName };
       return { entry: continentData[cont], displayName: cont };
     }
@@ -439,7 +439,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
       if (!feature) return { fillColor: "#1e293b", fillOpacity: 0.7, weight: 0.5, color: "#475569" };
       const geoName = feature.properties?.name || "";
       const owidName = NAME_MAP[geoName] || geoName;
-      const { entry } = resolveEntry(owidName);
+      const { entry } = resolveEntry(owidName, geoName);
       const value = entry ? (mode === "perCapita" ? entry.perCapita : entry.annual) : undefined;
       return {
         fillColor: getColor(mode, value),
@@ -455,7 +455,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
     (feature: Feature, layer: Layer) => {
       const geoName = feature.properties?.name || "";
       const owidName = NAME_MAP[geoName] || geoName;
-      const { entry, displayName } = resolveEntry(owidName);
+      const { entry, displayName } = resolveEntry(owidName, geoName);
       const annual = entry?.annual ?? null;
       const perCap = entry?.perCapita ?? null;
       const color = getColor(mode, mode === "perCapita" ? perCap ?? undefined : annual ?? undefined);
