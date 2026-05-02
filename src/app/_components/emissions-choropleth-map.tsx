@@ -348,7 +348,7 @@ const CONTINENT_OF: Record<string, ContinentName> = {
   // South America
   'Argentina': 'South America', 'Bolivia': 'South America', 'Brazil': 'South America',
   'Chile': 'South America', 'Colombia': 'South America', 'Ecuador': 'South America',
-  'Falkland Islands': 'South America',
+  'Falkland Islands': 'South America', 'French Guiana': 'South America',
   'Guyana': 'South America', 'Paraguay': 'South America', 'Peru': 'South America',
   'Suriname': 'South America', 'Uruguay': 'South America', 'Venezuela': 'South America',
   // Oceania
