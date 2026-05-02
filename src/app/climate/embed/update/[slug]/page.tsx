@@ -5,11 +5,15 @@ export default async function UpdateEmbedPage({ params }: { params: Promise<{ sl
   const { slug } = await params;
   const region = getRegionBySlug(slug);
   const regionName = slug === 'global' ? 'Global' : (region?.name ?? slug);
+  // Settled climate month = previous calendar month
+  const now = new Date();
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const monthLabel = prev.toLocaleString('en-US', { month: 'long', year: 'numeric' });
   const backUrl = `https://4billionyearson.org/climate/${encodeURIComponent(slug)}#climate-update`;
 
   return (
     <div className="p-3">
-      <UpdateEmbedClient slug={slug} regionName={regionName} />
+      <UpdateEmbedClient slug={slug} regionName={regionName} monthLabel={monthLabel} />
       <div className="mt-2 flex justify-end">
         <a
           href={backUrl}

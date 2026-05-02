@@ -28,7 +28,7 @@ function highlightRankings(text: string): string {
   return escaped.replace(re, (m) => `<strong class="text-white">${m}</strong>`);
 }
 
-export default function UpdateEmbedClient({ slug, regionName }: { slug: string; regionName: string }) {
+export default function UpdateEmbedClient({ slug, regionName, monthLabel }: { slug: string; regionName: string; monthLabel?: string }) {
   const [summary, setSummary] = useState<string | null>(null);
   const [sources, setSources] = useState<{ title: string; uri: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,20 +74,28 @@ export default function UpdateEmbedClient({ slug, regionName }: { slug: string; 
   }, [slug]);
 
   return (
-    <div className="rounded-2xl border-2 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md p-4 md:p-5 shadow-xl">
-      <h2 className="text-base md:text-lg font-bold font-mono text-[#FFF5E7] mb-3">{regionName} Climate Update</h2>
-      {coverageLine && (
-        <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
-          <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
-          <p className="text-xs md:text-sm font-medium text-[#D0A65E]">
-            {coverageLabel ? <span className="font-semibold">{coverageLabel} </span> : null}
-            {coverageLine}
-          </p>
-        </div>
-      )}
-      <div className="mb-3">
-        {isGlobal ? <GlobalRankingsTeaser /> : <ClimateRankPill slug={slug} />}
+    <div
+      className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden"
+      style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}
+    >
+      <div className="px-4 py-3 md:px-5 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+        <h1 className="text-xl md:text-2xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+          {regionName} Climate{monthLabel ? ` – ${monthLabel} Update` : ' Update'}
+        </h1>
       </div>
+      <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-5">
+        {coverageLine && (
+          <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
+            <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
+            <p className="text-xs md:text-sm font-medium text-[#D0A65E]">
+              {coverageLabel ? <span className="font-semibold">{coverageLabel} </span> : null}
+              {coverageLine}
+            </p>
+          </div>
+        )}
+        <div className="mb-3">
+          {isGlobal ? <GlobalRankingsTeaser /> : <ClimateRankPill slug={slug} />}
+        </div>
       {loading && (
         <div className="flex items-center gap-3 py-4 text-sm text-gray-400">
           <Loader2 className="h-4 w-4 animate-spin text-[#D0A65E]" />
