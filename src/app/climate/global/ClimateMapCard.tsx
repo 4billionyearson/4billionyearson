@@ -60,7 +60,7 @@ const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [
 ];
 
 const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors';
-const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#D0A65E]';
+const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
 const TOGGLE_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 const TOGGLE_DISABLED = 'border-gray-900 bg-gray-950/40 text-gray-600 cursor-not-allowed opacity-60';
 

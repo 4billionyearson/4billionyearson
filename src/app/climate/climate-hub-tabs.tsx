@@ -102,8 +102,8 @@ export function ClimateTabsBar() {
             onClick={() => setActive(tab.id)}
             className={`inline-flex items-center gap-1.5 rounded-full border px-3 h-8 text-[12px] sm:text-[13px] font-medium transition-colors ${
               isActive
-                ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
-                : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:bg-gray-900 hover:text-[#FFF5E7]'
+                ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
+                : 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
             }`}
           >
             <Icon className="h-3.5 w-3.5" />
@@ -111,7 +111,7 @@ export function ClimateTabsBar() {
             {count != null && (
               <span
                 className={`hidden sm:inline rounded-full px-1.5 text-[10px] font-semibold ${
-                  isActive ? 'bg-[#1A0E00]/15 text-[#1A0E00]' : 'bg-gray-800 text-gray-400'
+                  isActive ? 'bg-[#D0A65E]/20 text-[#FFF5E7]' : 'bg-gray-800 text-gray-400'
                 }`}
               >
                 {count}
