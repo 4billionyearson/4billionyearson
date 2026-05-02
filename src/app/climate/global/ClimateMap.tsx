@@ -11,6 +11,7 @@ import {
   type MetricKey,
   colorForMetric,
   formatMetricValue,
+  legendForWindow,
 } from './climate-map-metrics';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -235,7 +236,7 @@ function fixAntimeridian(geo: FeatureCollection): FeatureCollection {
 }
 
 // Color ramp: anomaly (°C) → hex. Blue below 0, orange/red above.
-// Now delegates to colorForMetric(metric, value) so the same map can render
+// Now delegates to colorForMetric(metric, value, windowSel) so the same map can render
 // temp / precip / sunshine / frost using the metric-specific ramps defined
 // in climate-map-metrics.ts. The local helper kept for backward compat
 // with overlay code paths that still call it directly (US/UK overlays in
@@ -404,7 +405,20 @@ function MapLabels({
   const [ready, setReady] = useState(false);
   const [zoom, setZoom] = useState(map.getZoom());
 
-  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+  // `zoomend` covers user-driven zoom; `moveend` also fires after fitBounds
+  // (including the synchronous animate:false snap on first mount), so we
+  // catch the post-mount zoom change reliably.
+  useMapEvents({
+    zoomend: () => setZoom(map.getZoom()),
+    moveend: () => setZoom(map.getZoom()),
+  });
+
+  // When the level changes (or the map mounts and ZoomToLevel snaps the
+  // viewport) re-read the zoom so the level-conditional labels (US states,
+  // UK nations) appear immediately rather than waiting for a user zoom.
+  useEffect(() => {
+    setZoom(map.getZoom());
+  }, [map, level]);
 
   useEffect(() => {
     if (!map.getPane('labels')) {
@@ -701,7 +715,7 @@ function UKNationsOverlay({
       const row = bySlug.get(slug);
       const { value } = metricFromRow(row, metric, windowSel);
       return {
-        fillColor: value != null ? colorForMetric(metric, value) : '#2d3748',
+        fillColor: value != null ? colorForMetric(metric, value, windowSel) : '#2d3748',
         fillOpacity: value != null ? 0.9 : 0.45,
         weight: 1.2,
         color: '#374151',
@@ -716,7 +730,7 @@ function UKNationsOverlay({
       const name = ((feature.properties as any)?.name as string) ?? slug;
       const row = bySlug.get(slug);
       const { value, label } = metricFromRow(row, metric, windowSel);
-      const color = value != null ? colorForMetric(metric, value) : '#1f2937';
+      const color = value != null ? colorForMetric(metric, value, windowSel) : '#1f2937';
       const show = () => onInfo({ name, value, label, color });
       layer.on('mouseover', show);
       layer.on('click', show);
@@ -806,7 +820,7 @@ function USStatesOverlay({
       const name = ((feature?.properties as any)?.name as string) ?? '';
       const { value } = resolve(name);
       return {
-        fillColor: value != null ? colorForMetric(metric, value) : '#1f2937',
+        fillColor: value != null ? colorForMetric(metric, value, windowSel) : '#1f2937',
         fillOpacity: 0.9,
         weight: 0.6,
         color: '#0b1220',
@@ -819,7 +833,7 @@ function USStatesOverlay({
     (feature: Feature, layer: Layer) => {
       const name = ((feature.properties as any)?.name as string) ?? '';
       const { value, label, displayName } = resolve(name);
-      const color = value != null ? colorForMetric(metric, value) : '#1f2937';
+      const color = value != null ? colorForMetric(metric, value, windowSel) : '#1f2937';
       const show = () => onInfo({ name: displayName, value, label, color });
       layer.on('mouseover', show);
       layer.on('click', show);
@@ -973,7 +987,7 @@ export default function ClimateMap({
     const rec = lookup.get(normalizeName(name));
     const { value } = pick(rec, name);
     return {
-      fillColor: value != null ? colorForMetric(metric, value) : '#1f2937',
+      fillColor: value != null ? colorForMetric(metric, value, windowSel) : '#1f2937',
       fillOpacity: 0.85,
       weight: 0.4,
       color: '#0b1220',
@@ -987,7 +1001,7 @@ export default function ClimateMap({
     }
     const rec = lookup.get(normalizeName(name));
     const { value, label } = pick(rec, name);
-    const color = value != null ? colorForMetric(metric, value) : '#1f2937';
+    const color = value != null ? colorForMetric(metric, value, windowSel) : '#1f2937';
     let displayName = name;
     if (level === 'continents') {
       const groupKey = NAME_TO_CONTINENT[name.toLowerCase()] ?? (rec ? CONTINENT_GROUP_KEY[rec.iso3] : undefined);
@@ -1017,6 +1031,7 @@ export default function ClimateMap({
   }, [lookup, pick, level, metric, continentByKey]);
 
   const cfg = METRICS[metric];
+  const legend = legendForWindow(metric, windowSel);
   const windowPhrase = windowSel === '12m' ? '12-month rolling' : windowSel === '3m' ? '3-month rolling' : 'monthly';
   const baselineCopy = cfg.isAnomaly ? cfg.baseline : '';
 
@@ -1121,12 +1136,12 @@ export default function ClimateMap({
           {`${cfg.longLabel} (${windowPhrase})${baselineCopy ? ` ${baselineCopy}` : ''}`}
         </span>
         <div className="flex items-center gap-2">
-          <span>{cfg.legendMin}</span>
+          <span>{legend.legendMin}</span>
           <div
             className="h-3 w-40 rounded"
-            style={{ background: cfg.legendGradient }}
+            style={{ background: legend.legendGradient }}
           />
-          <span>{cfg.legendMax}</span>
+          <span>{legend.legendMax}</span>
         </div>
         <span className="text-gray-400">Grey = no data · scroll / pinch to zoom, drag to pan</span>
       </div>

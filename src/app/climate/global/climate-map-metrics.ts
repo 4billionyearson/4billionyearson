@@ -31,6 +31,11 @@ export interface MetricConfig {
   legendMax: string;        // copy for the right tick
   // Anomaly metrics: clip ±5; sequential: scaled to its own min/max.
   scale: { min: number; max: number };
+  // Optional per-window overrides. 1m = monthly value, 3m = 3-month sum/avg,
+  // 12m = 12-month rolling. We override the scale + legend labels for windows
+  // whose magnitude differs significantly from the 1-month default
+  // (e.g. 12-month rainfall sums that would otherwise saturate the ramp).
+  scaleByWindow?: Partial<Record<'1m' | '3m' | '12m', { min: number; max: number; legendMin?: string; legendMax?: string }>>;
 }
 
 // Diverging blue↔red ramp shared by all anomaly metrics where positive = warmer / wetter / sunnier / less-frosty.
@@ -67,6 +72,10 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
       'linear-gradient(to right, #78350f, #b45309, #d97706, #fde68a, #f8fafc, #99f6e4, #14b8a6, #0f766e, #134e4a)',
     legendMin: '-100 mm', legendMax: '+100 mm',
     scale: { min: -100, max: 100 },
+    scaleByWindow: {
+      '3m': { min: -200, max: 200, legendMin: '-200 mm', legendMax: '+200 mm' },
+      '12m': { min: -600, max: 600, legendMin: '-600 mm', legendMax: '+600 mm' },
+    },
   },
   'precip-actual': {
     key: 'precip-actual', domain: 'precip', isAnomaly: false,
@@ -76,6 +85,10 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
       'linear-gradient(to right, #fef3c7, #fde68a, #bef264, #34d399, #14b8a6, #0ea5e9, #1d4ed8, #1e3a8a)',
     legendMin: '0 mm', legendMax: '300 mm',
     scale: { min: 0, max: 300 },
+    scaleByWindow: {
+      '3m': { min: 0, max: 700, legendMin: '0 mm', legendMax: '700 mm' },
+      '12m': { min: 0, max: 2500, legendMin: '0 mm', legendMax: '2500 mm' },
+    },
   },
   'sunshine-anomaly': {
     key: 'sunshine-anomaly', domain: 'sunshine', isAnomaly: true,
@@ -86,6 +99,10 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
       'linear-gradient(to right, #1e3a8a, #3b82f6, #93c5fd, #f8fafc, #fde68a, #f59e0b, #b45309, #78350f)',
     legendMin: '-50 hrs', legendMax: '+50 hrs',
     scale: { min: -50, max: 50 },
+    scaleByWindow: {
+      '3m': { min: -120, max: 120, legendMin: '-120 hrs', legendMax: '+120 hrs' },
+      '12m': { min: -250, max: 250, legendMin: '-250 hrs', legendMax: '+250 hrs' },
+    },
   },
   'sunshine-actual': {
     key: 'sunshine-actual', domain: 'sunshine', isAnomaly: false,
@@ -95,6 +112,10 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
       'linear-gradient(to right, #1e293b, #475569, #cbd5e1, #fde68a, #f59e0b, #d97706)',
     legendMin: '0 hrs', legendMax: '300 hrs',
     scale: { min: 0, max: 300 },
+    scaleByWindow: {
+      '3m': { min: 0, max: 700, legendMin: '0 hrs', legendMax: '700 hrs' },
+      '12m': { min: 800, max: 2200, legendMin: '800 hrs', legendMax: '2200 hrs' },
+    },
   },
   'frost-anomaly': {
     key: 'frost-anomaly', domain: 'frost', isAnomaly: true,
@@ -105,6 +126,9 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
       'linear-gradient(to right, #b91c1c, #fb923c, #fef3c7, #f8fafc, #bae6fd, #60a5fa, #1e3a8a)',
     legendMin: '-15 days', legendMax: '+15 days',
     scale: { min: -15, max: 15 },
+    scaleByWindow: {
+      '12m': { min: -30, max: 30, legendMin: '-30 days', legendMax: '+30 days' },
+    },
   },
   'frost-actual': {
     key: 'frost-actual', domain: 'frost', isAnomaly: false,
@@ -114,6 +138,11 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
       'linear-gradient(to right, #f8fafc, #bae6fd, #60a5fa, #2563eb, #1e3a8a)',
     legendMin: '0 days', legendMax: '30 days',
     scale: { min: 0, max: 30 },
+    scaleByWindow: {
+      // Annual frost-day totals (UK regions) span roughly 30-100 days, so
+      // the monthly 0-30 ramp would saturate; widen for the 12-month window.
+      '12m': { min: 0, max: 100, legendMin: '0 days', legendMax: '100 days' },
+    },
   },
 };
 
@@ -155,10 +184,30 @@ const RAMP_SUNSHINE_ANOMALY = ['#1e3a8a', '#3b82f6', '#93c5fd', '#f8fafc', '#fde
 
 const NO_DATA = '#1f2937';
 
-export function colorForMetric(metric: MetricKey, value: number | null | undefined): string {
-  if (value == null || !Number.isFinite(value)) return NO_DATA;
+export type AnomalyWindow = '1m' | '3m' | '12m';
+
+export function scaleForWindow(metric: MetricKey, windowSel?: AnomalyWindow): { min: number; max: number } {
   const cfg = METRICS[metric];
-  const { min, max } = cfg.scale;
+  if (windowSel && cfg.scaleByWindow?.[windowSel]) {
+    const w = cfg.scaleByWindow[windowSel]!;
+    return { min: w.min, max: w.max };
+  }
+  return cfg.scale;
+}
+
+export function legendForWindow(metric: MetricKey, windowSel?: AnomalyWindow): { legendMin: string; legendMax: string; legendGradient: string } {
+  const cfg = METRICS[metric];
+  const w = windowSel ? cfg.scaleByWindow?.[windowSel] : undefined;
+  return {
+    legendMin: w?.legendMin ?? cfg.legendMin,
+    legendMax: w?.legendMax ?? cfg.legendMax,
+    legendGradient: cfg.legendGradient,
+  };
+}
+
+export function colorForMetric(metric: MetricKey, value: number | null | undefined, windowSel?: AnomalyWindow): string {
+  if (value == null || !Number.isFinite(value)) return NO_DATA;
+  const { min, max } = scaleForWindow(metric, windowSel);
   const t = (value - min) / (max - min);
   switch (metric) {
     case 'temp-anomaly':

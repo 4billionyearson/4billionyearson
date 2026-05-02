@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { ComponentType } from 'react';
 import { Globe2 } from 'lucide-react';
@@ -117,6 +117,19 @@ export default function ClimateMapCard({
   const [anomalyWindow, setAnomalyWindow] = useState<AnomalyWindow>(initialWindow);
   const [level, setLevel] = useState<MapLevel>(initialLevel ?? PRESET_INITIAL_LEVEL[preset]);
   const [metric, setMetric] = useState<MetricKey>(initialMetric);
+
+  // When the page is opened with a hash that targets this card (e.g.
+  // /climate/usa#climate-map from a Share link), the browser tries to scroll
+  // to the anchor at parse time, but on async-rendered pages the card
+  // doesn't exist yet. Re-run scrollIntoView once the card mounts so the
+  // user lands on the map regardless of when the parent finishes loading.
+  useEffect(() => {
+    if (!share?.sectionId) return;
+    if (typeof window === 'undefined') return;
+    if (window.location.hash !== '#' + share.sectionId) return;
+    const el = document.getElementById(share.sectionId);
+    if (el) el.scrollIntoView({ block: 'start' });
+  }, [share?.sectionId]);
 
   // For the global preset we need countryAnomalies to power the headline
   // tooltip; for usa/uk presets the data comes from rankings.json so an
