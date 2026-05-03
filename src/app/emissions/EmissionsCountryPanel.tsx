@@ -222,7 +222,7 @@ function RegionSearch({ mode, onSelect, loading }: {
         onChange={(e) => handleInputChange(e.target.value)}
         onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-[#D0A65E]/35 bg-gray-900/50 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#FFF5E7]/35 outline-none transition-all focus:border-[#D0A65E]/55 focus:ring-2 focus:ring-[#D0A65E]/20"
+        className="w-full pl-9 pr-10 py-1.5 rounded-lg border border-[#D0A65E]/50 bg-gray-900/60 text-sm text-white placeholder-[#D0A65E]/60 focus:ring-2 focus:ring-[#D0A65E] focus:border-[#D0A65E] outline-none transition-all"
         autoComplete="off"
       />
       {loading ? (

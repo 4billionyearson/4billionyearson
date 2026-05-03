@@ -8,6 +8,7 @@ import type { GeoJSON as LeafletGeoJSON, Layer, LatLngExpression, PathOptions } 
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import InfoTooltip from "./info-tooltip";
+import { ResponsiveSegmentedControl } from "@/app/_components/responsive-segmented-control";
 import type {
   KoppenGroup,
   KoppenResult,
@@ -781,27 +782,16 @@ export default function GlobalShiftMap() {
               <span className="text-[11px] uppercase tracking-wider text-gray-500 font-mono sm:w-36 sm:shrink-0">
                 {group.label}
               </span>
-              <div role="tablist" aria-label={group.label} className="flex gap-2 flex-wrap">
-                {metrics.map((id) => {
-                  const active = metric === id;
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => setMetric(id)}
-                      className={`inline-flex items-center rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
-                        active
-                          ? "border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]"
-                          : "border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]"
-                      }`}
-                    >
-                      {METRIC_META[id].short}
-                    </button>
-                  );
-                })}
-              </div>
+              <ResponsiveSegmentedControl
+                forcePills
+                ariaLabel={group.label}
+                value={metric}
+                onChange={(id) => setMetric(id as MetricId)}
+                options={metrics.map((id) => ({
+                  key: id,
+                  label: METRIC_META[id].short,
+                }))}
+              />
             </div>
           );
         })}
