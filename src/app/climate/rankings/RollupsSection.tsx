@@ -83,14 +83,17 @@ function RollupCard({ title, groups, windowKey }: { title: string; groups: Rollu
 }
 
 const WINDOW_OPTS = [
-  { key: 'anomaly1m' as const, label: '1 month' },
-  { key: 'anomaly3m' as const, label: '3 months' },
-  { key: 'anomaly12m' as const, label: '12 months' },
+  { key: 'anomaly1m' as const, label: '1 Month' },
+  { key: 'anomaly3m' as const, label: '3 Months' },
+  { key: 'anomaly12m' as const, label: '12 Months' },
 ];
 
 const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors';
-const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#D0A65E]';
-const TOGGLE_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
+// Cream active text matches the rest of the site (Climate Map, Emissions
+// Deep Dive, Seasons map). The previous gold-on-tinted-gold combo had
+// poor contrast against the bg-[#D0A65E]/12 fill.
+const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
+const TOGGLE_INACTIVE = 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 
 export default function RollupsSection({
   continents,

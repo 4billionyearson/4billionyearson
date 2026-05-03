@@ -8,7 +8,7 @@ import type { GeoJSON as LeafletGeoJSON, Layer, LatLngExpression, PathOptions } 
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import InfoTooltip from "./info-tooltip";
-import { ResponsiveSegmentedControl } from "@/app/_components/responsive-segmented-control";
+import { ChipDropdown } from "@/app/_components/responsive-segmented-control";
 import type {
   KoppenGroup,
   KoppenResult,
@@ -127,7 +127,7 @@ const KOPPEN_GROUP_LABEL: Record<KoppenGroup, string> = {
 const METRIC_META: Record<MetricId, MetricMeta> = {
   spring: {
     label: "Spring arriving earlier",
-    short: "Spring shift",
+    short: "Spring Shift",
     group: "warm-cold",
     unit: "days",
     domain: [-30, 30],
@@ -139,7 +139,7 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
   },
   autumn: {
     label: "Autumn arriving later",
-    short: "Autumn shift",
+    short: "Autumn Shift",
     group: "warm-cold",
     unit: "days",
     domain: [-30, 30],
@@ -150,7 +150,7 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
   },
   net: {
     label: "Warm-season length change",
-    short: "Warm-season",
+    short: "Warm-Season",
     group: "warm-cold",
     unit: "months/yr",
     domain: [-1.5, 1.5],
@@ -161,7 +161,7 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
   },
   "wet-onset": {
     label: "Wet-season onset shift",
-    short: "Wet onset",
+    short: "Wet Onset",
     group: "wet-dry",
     unit: "days",
     domain: [-30, 30],
@@ -175,7 +175,7 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
   },
   "wet-peak": {
     label: "Peak-rain month shift",
-    short: "Peak-rain",
+    short: "Peak-Rain",
     group: "wet-dry",
     unit: "months",
     domain: [-3, 3],
@@ -189,7 +189,7 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
   },
   "wet-length": {
     label: "Wet-season length change",
-    short: "Wet length",
+    short: "Wet Length",
     group: "wet-dry",
     unit: "months",
     domain: [-3, 3],
@@ -203,7 +203,7 @@ const METRIC_META: Record<MetricId, MetricMeta> = {
   },
   "annual-rain": {
     label: "Annual rainfall change",
-    short: "Annual rain",
+    short: "Annual Rain",
     group: "wet-dry",
     unit: "%",
     domain: [-25, 25],
@@ -763,38 +763,32 @@ export default function GlobalShiftMap() {
   const equator: LatLngExpression[] = [[0, -180], [0, 180]];
   const tropicCapricorn: LatLngExpression[] = [[-23.4368, -180], [-23.4368, 180]];
 
-  const metricGroups: { id: "warm-cold" | "wet-dry" | "classification"; label: string }[] = [
-    { id: "warm-cold", label: "Warm / cold season" },
-    { id: "wet-dry", label: "Wet / dry season" },
-    { id: "classification", label: "Classification" },
-  ];
+  // Metric chooser groups all eight metrics under three eyebrow headings,
+  // exposed via a single ChipDropdown so the trigger always fits on one line
+  // (mirrors the Climate Map's Level / Metric / Window chips).
+  const metricGroupHeadings: Record<"warm-cold" | "wet-dry" | "classification", string> = {
+    "warm-cold": "Warm / cold season",
+    "wet-dry": "Wet / dry season",
+    classification: "Classification",
+  };
+  const metricOptions = (Object.keys(METRIC_META) as MetricId[]).map((id) => ({
+    key: id,
+    label: `${metricGroupHeadings[METRIC_META[id].group]} · ${METRIC_META[id].short}`,
+  }));
 
   return (
     <div className="global-shift-map relative rounded-xl border border-gray-800/60 bg-gray-900/50">
       {/* Controls */}
       <div className="p-3 border-b border-gray-800/60 space-y-2">
-        {metricGroups.map((group) => {
-          const metrics = (Object.keys(METRIC_META) as MetricId[]).filter(
-            (id) => METRIC_META[id].group === group.id,
-          );
-          return (
-            <div key={group.id} className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-              <span className="text-[11px] uppercase tracking-wider text-gray-500 font-mono sm:w-36 sm:shrink-0">
-                {group.label}
-              </span>
-              <ResponsiveSegmentedControl
-                forcePills
-                ariaLabel={group.label}
-                value={metric}
-                onChange={(id) => setMetric(id as MetricId)}
-                options={metrics.map((id) => ({
-                  key: id,
-                  label: METRIC_META[id].short,
-                }))}
-              />
-            </div>
-          );
-        })}
+        <div className="flex flex-wrap items-center gap-2">
+          <ChipDropdown
+            label="Metric"
+            ariaLabel="Map metric"
+            value={metric}
+            onChange={(id) => setMetric(id as MetricId)}
+            options={metricOptions}
+          />
+        </div>
         {shifts && (
           <div className="text-[11px] text-gray-400 pt-1">
             {shifts.globalStats.countriesAnalysed} countries · {shifts.globalStats.usStatesAnalysed}{" "}

@@ -49,14 +49,14 @@ const ANOMALY_GRADIENT =
 export const METRICS: Record<MetricKey, MetricConfig> = {
   'temp-anomaly': {
     key: 'temp-anomaly', domain: 'temp', isAnomaly: true,
-    shortLabel: 'Temp anomaly', longLabel: 'Temperature anomaly',
+    shortLabel: 'Temp Anomaly', longLabel: 'Temperature anomaly',
     unit: '°C', baseline: 'vs 1961–1990',
     legendGradient: ANOMALY_GRADIENT, legendMin: '-5°C', legendMax: '+5°C',
     scale: { min: -5, max: 5 },
   },
   'temp-actual': {
     key: 'temp-actual', domain: 'temp', isAnomaly: false,
-    shortLabel: 'Temp actual', longLabel: 'Average temperature',
+    shortLabel: 'Temp Actual', longLabel: 'Average temperature',
     unit: '°C', baseline: 'observed',
     legendGradient:
       'linear-gradient(to right, #1e3a8a, #2563eb, #60a5fa, #f8fafc, #fde68a, #fb923c, #ea580c, #b91c1c)',
@@ -65,7 +65,7 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
   },
   'precip-anomaly': {
     key: 'precip-anomaly', domain: 'precip', isAnomaly: true,
-    shortLabel: 'Precip anomaly', longLabel: 'Rainfall anomaly',
+    shortLabel: 'Precip Anomaly', longLabel: 'Rainfall anomaly',
     unit: 'mm', baseline: 'vs 1991–2020',
     // Brown→white→teal: drier than normal = brown, wetter = teal/blue
     legendGradient:
@@ -80,7 +80,7 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
   },
   'precip-actual': {
     key: 'precip-actual', domain: 'precip', isAnomaly: false,
-    shortLabel: 'Precip actual', longLabel: 'Rainfall',
+    shortLabel: 'Precip Actual', longLabel: 'Rainfall',
     unit: 'mm', baseline: 'observed',
     legendGradient:
       'linear-gradient(to right, #fef3c7, #fde68a, #bef264, #34d399, #14b8a6, #0ea5e9, #1d4ed8, #1e3a8a)',
@@ -95,7 +95,7 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
   },
   'sunshine-anomaly': {
     key: 'sunshine-anomaly', domain: 'sunshine', isAnomaly: true,
-    shortLabel: 'Sunshine anomaly', longLabel: 'Sunshine anomaly',
+    shortLabel: 'Sunshine Anomaly', longLabel: 'Sunshine anomaly',
     unit: 'hrs', baseline: 'vs 1991–2020',
     legendGradient:
       'linear-gradient(to right, #1e3a8a, #3b82f6, #93c5fd, #f8fafc, #fde68a, #f59e0b, #b45309, #78350f)',
@@ -107,7 +107,7 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
   },
   'sunshine-actual': {
     key: 'sunshine-actual', domain: 'sunshine', isAnomaly: false,
-    shortLabel: 'Sunshine actual', longLabel: 'Sunshine',
+    shortLabel: 'Sunshine Actual', longLabel: 'Sunshine',
     unit: 'hrs', baseline: 'observed',
     legendGradient:
       'linear-gradient(to right, #1e293b, #475569, #cbd5e1, #fde68a, #f59e0b, #d97706)',
@@ -120,7 +120,7 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
   },
   'frost-anomaly': {
     key: 'frost-anomaly', domain: 'frost', isAnomaly: true,
-    shortLabel: 'Frost anomaly', longLabel: 'Frost-day anomaly',
+    shortLabel: 'Frost Anomaly', longLabel: 'Frost-day anomaly',
     unit: 'days', baseline: 'vs 1991–2020',
     // Diverging: more frost = blue, fewer frost = red (warming signal).
     legendGradient:
@@ -134,7 +134,7 @@ export const METRICS: Record<MetricKey, MetricConfig> = {
   },
   'frost-actual': {
     key: 'frost-actual', domain: 'frost', isAnomaly: false,
-    shortLabel: 'Frost actual', longLabel: 'Frost days',
+    shortLabel: 'Frost Actual', longLabel: 'Frost days',
     unit: 'days', baseline: 'observed',
     legendGradient:
       'linear-gradient(to right, #f8fafc, #bae6fd, #60a5fa, #2563eb, #1e3a8a)',

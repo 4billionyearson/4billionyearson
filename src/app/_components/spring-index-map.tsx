@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
+import { ChipDropdown } from "@/app/_components/responsive-segmented-control";
 
 // Dynamic imports so Leaflet never loads on the server.
 const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
@@ -75,28 +76,16 @@ export default function SpringIndexMap() {
     <div className="rounded-xl border border-gray-800/60 bg-gray-900/50 overflow-hidden">
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 p-3 border-b border-gray-800/60">
-        <div role="tablist" aria-label="USA-NPN layer" className="flex gap-2">
-          {(Object.keys(LAYER_META) as LayerId[]).map((id) => {
-            const active = layerId === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setLayerId(id)}
-                className={`inline-flex items-center rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
-                  active
-                    ? "border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]"
-                    : "border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]"
-                }`}
-              >
-                <span className="sm:hidden">{LAYER_META[id].short}</span>
-                <span className="hidden sm:inline">{LAYER_META[id].title}</span>
-              </button>
-            );
-          })}
-        </div>
+        <ChipDropdown
+          label="Layer"
+          ariaLabel="USA-NPN layer"
+          value={layerId}
+          onChange={(id) => setLayerId(id as LayerId)}
+          options={(Object.keys(LAYER_META) as LayerId[]).map((id) => ({
+            key: id,
+            label: LAYER_META[id].title,
+          }))}
+        />
         <div className="ml-auto flex items-center gap-2">
           <label className="text-[11px] uppercase tracking-wider text-gray-400">Date</label>
           <input

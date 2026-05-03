@@ -746,7 +746,7 @@ export default function GlobalProfile() {
                     <Link
                       key={c.slug}
                       href={`/climate/${c.slug}`}
-                      className="inline-flex items-center h-8 rounded-full border border-gray-800 bg-gray-900/45 px-3 text-[13px] text-gray-300 transition-colors hover:border-[#D0A65E]/45 hover:bg-white/[0.03] hover:text-[#FFF5E7]"
+                      className="inline-flex items-center h-8 rounded-full border border-gray-700 bg-gray-900/45 px-3 text-[13px] text-gray-300 transition-colors hover:border-[#D0A65E]/45 hover:bg-white/[0.03] hover:text-[#FFF5E7]"
                     >
                       {c.label} →
                     </Link>

@@ -12,7 +12,7 @@ export interface SegmentedOption {
 
 const PILL_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap';
 const DEFAULT_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
-const DEFAULT_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
+const DEFAULT_INACTIVE = 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 // Lighter grey for disabled state — gray-600 + 60% opacity was failing AA
 // contrast against the very dark surface.
 const DEFAULT_DISABLED = 'border-gray-800/60 bg-gray-900/30 text-gray-500 cursor-not-allowed';
@@ -233,7 +233,7 @@ function ListboxTrigger({
   // Two visual styles share the same popover and key handling.
   const triggerClass = variant === 'select'
     ? 'w-full h-10 inline-flex items-center justify-between rounded-lg border border-[#D0A65E]/30 bg-gray-900/60 text-sm text-[#FFF5E7] pl-3 pr-2.5 font-medium hover:border-[#D0A65E]/55 focus:outline-none focus:ring-2 focus:ring-[#D0A65E] focus:border-[#D0A65E] transition-colors'
-    : 'inline-flex items-center gap-2 h-7 rounded-full border border-gray-800 bg-gray-900/45 pl-2.5 pr-1.5 text-[12px] text-[#FFF5E7] hover:border-[#D0A65E]/45 hover:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-[#D0A65E] transition-colors';
+    : 'inline-flex items-center gap-2 h-7 rounded-full border border-gray-700 bg-gray-900/45 pl-2.5 pr-1.5 text-[12px] text-[#FFF5E7] hover:border-[#D0A65E]/45 hover:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-[#D0A65E] transition-colors';
 
   return (
     <div ref={rootRef} className={variant === 'chip' ? 'relative inline-block' : 'relative'}>

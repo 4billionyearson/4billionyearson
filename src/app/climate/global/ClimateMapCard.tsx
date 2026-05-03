@@ -46,9 +46,9 @@ type AnomalyWindow = '1m' | '3m' | '12m';
 type MapLevel = 'continents' | 'countries' | 'uk-countries' | 'uk-regions' | 'us-states' | 'us-regions';
 
 const WINDOW_OPTS = [
-  { key: '1m', label: '1 month' },
-  { key: '3m', label: '3 months' },
-  { key: '12m', label: '12 months' },
+  { key: '1m', label: '1 Month' },
+  { key: '3m', label: '3 Months' },
+  { key: '12m', label: '12 Months' },
 ] as const;
 
 const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [

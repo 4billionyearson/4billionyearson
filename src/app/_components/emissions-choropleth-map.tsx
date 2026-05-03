@@ -6,6 +6,7 @@ import type { FeatureCollection, Feature } from "geojson";
 import type { Layer, PathOptions } from "leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { ChipDropdown } from "@/app/_components/responsive-segmented-control";
 
 /* ─── Geometry helpers ──────────────────────────────────────────────────── */
 
@@ -487,40 +488,30 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
   const legend = mode === "perCapita" ? PER_CAPITA_LEGEND : ANNUAL_LEGEND;
   const legendLabel = mode === "perCapita" ? "CO₂ per capita (t/person):" : "Annual CO₂ emissions:";
 
-  const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors';
-  const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#D0A65E]';
-  const TOGGLE_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
-
   return (
     <div>
-      {/* Level toggle */}
-      <div className="flex flex-wrap items-center gap-2 mb-2">
-        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Level</span>
-        {(['continents', 'countries'] as const).map((l) => (
-          <button
-            key={l}
-            type="button"
-            onClick={() => setLevel(l)}
-            className={`${TOGGLE_BASE} ${level === l ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-          >
-            {l === 'continents' ? 'Continents' : 'Countries'}
-          </button>
-        ))}
-      </div>
-
-      {/* Metric toggle */}
+      {/* Level + Metric chips */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Metric</span>
-        {([['perCapita', 'Per Capita'], ['annual', 'Total Annual']] as const).map(([m, label]) => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => setMode(m)}
-            className={`${TOGGLE_BASE} ${mode === m ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-          >
-            {label}
-          </button>
-        ))}
+        <ChipDropdown
+          label="Level"
+          ariaLabel="Map level"
+          value={level}
+          onChange={(v) => setLevel(v as Level)}
+          options={[
+            { key: 'continents', label: 'Continents' },
+            { key: 'countries', label: 'Countries' },
+          ]}
+        />
+        <ChipDropdown
+          label="Metric"
+          ariaLabel="Emissions metric"
+          value={mode}
+          onChange={(v) => setMode(v as MetricMode)}
+          options={[
+            { key: 'perCapita', label: 'Per Capita' },
+            { key: 'annual', label: 'Total Annual' },
+          ]}
+        />
       </div>
 
       {/* Map */}

@@ -511,10 +511,10 @@ export default function EmissionsCountryPanel({
                 key={c}
                 type="button"
                 onClick={() => selectCountry(c)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                className={`inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap ${
                   active
-                    ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
-                    : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]'
+                    ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
+                    : 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
                 }`}
               >
                 {c}
@@ -531,10 +531,10 @@ export default function EmissionsCountryPanel({
                 key={r.slug}
                 type="button"
                 onClick={() => selectRegion(r.slug)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                className={`inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap ${
                   active
-                    ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
-                    : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:text-[#FFF5E7]'
+                    ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
+                    : 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
                 }`}
               >
                 {r.name}

@@ -103,7 +103,7 @@ export function ClimateTabsBar() {
             className={`inline-flex items-center gap-1.5 rounded-full border px-3 h-8 text-[12px] sm:text-[13px] font-medium transition-colors ${
               isActive
                 ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
-                : 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
+                : 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
             }`}
           >
             <Icon className="h-3.5 w-3.5" />
