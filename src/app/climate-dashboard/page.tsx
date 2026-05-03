@@ -629,25 +629,35 @@ function ClimateDashboard() {
     // ── Pick yearly + monthly stat sources for each tier ─────────────────
     // Each "source" is `{ yearly, latestMonthStats, latestThreeMonthStats }`
     // and exists for both temperature and rainfall.
-    const lastVal = (yearly?: any[]): { year: number; value: number } | null => {
-      if (!yearly?.length) return null;
-      for (let i = yearly.length - 1; i >= 0; i--) {
-        const p = yearly[i];
-        const v = typeof p.value === 'number' ? p.value
-          : typeof p.avgTemp === 'number' ? p.avgTemp
-          : typeof p.absoluteTemp === 'number' ? p.absoluteTemp
-          : null;
-        if (v != null) return { year: p.year, value: v };
-      }
+    const pointVal = (p: any): number | null => {
+      if (typeof p?.value === 'number') return p.value;
+      if (typeof p?.avgTemp === 'number') return p.avgTemp;
+      if (typeof p?.absoluteTemp === 'number') return p.absoluteTemp;
       return null;
+    };
+    // Returns the latest yearly value AND its anomaly vs the 1961-1990 baseline.
+    const lastVal = (yearly?: any[]): { year: number; value: number; diff: number | null } | null => {
+      if (!yearly?.length) return null;
+      let latest: { year: number; value: number } | null = null;
+      for (let i = yearly.length - 1; i >= 0; i--) {
+        const v = pointVal(yearly[i]);
+        if (v != null) { latest = { year: yearly[i].year, value: v }; break; }
+      }
+      if (!latest) return null;
+      const baseline = yearly.filter((p) => p.year >= 1961 && p.year <= 1990);
+      const baselineVals = baseline.map(pointVal).filter((v): v is number => typeof v === 'number');
+      const baselineAvg = baselineVals.length
+        ? baselineVals.reduce((s, v) => s + v, 0) / baselineVals.length
+        : null;
+      return { ...latest, diff: baselineAvg == null ? null : latest.value - baselineAvg };
     };
 
     type Tier = {
       name: string;
       tempMonth?: { value: number; diff?: number; label: string };
       rainMonth?: { value: number; diff?: number; label: string };
-      tempYear?: { value: number; year: number };
-      rainYear?: { value: number; year: number };
+      tempYear?: { value: number; year: number; diff: number | null };
+      rainYear?: { value: number; year: number; diff: number | null };
     };
 
     const tiers: Tier[] = [];
@@ -885,23 +895,33 @@ function ClimateDashboard() {
                 />
                 <ClimateStatCard
                   label={`Avg Temperature${yearHdr}`}
-                  subtitle="Latest annual mean."
+                  subtitle="Anomaly vs 1961–1990 baseline (actual value in brackets)."
                   color="text-red-400"
-                  tiers={keyFactsTiers.map((t) => ({
-                    name: t.name,
-                    primary: fmt(t.tempYear?.value, 1),
-                    primaryUnit: '°C',
-                  }))}
+                  tiers={keyFactsTiers.map((t) => {
+                    const anom = fmtSigned(t.tempYear?.diff ?? undefined, 1);
+                    const val = fmt(t.tempYear?.value, 1);
+                    return {
+                      name: t.name,
+                      primary: anom ?? val,
+                      primaryUnit: '°C',
+                      secondary: anom && val ? `${val}°C` : null,
+                    };
+                  })}
                 />
                 <ClimateStatCard
                   label={`Rainfall${yearHdr}`}
-                  subtitle="Latest annual total."
+                  subtitle="Anomaly vs 1961–1990 baseline (actual value in brackets)."
                   color="text-cyan-400"
-                  tiers={keyFactsTiers.map((t) => ({
-                    name: t.name,
-                    primary: fmt(t.rainYear?.value, 0),
-                    primaryUnit: 'mm',
-                  }))}
+                  tiers={keyFactsTiers.map((t) => {
+                    const anom = fmtSigned(t.rainYear?.diff ?? undefined, 0);
+                    const val = fmt(t.rainYear?.value, 0);
+                    return {
+                      name: t.name,
+                      primary: anom ?? val,
+                      primaryUnit: 'mm',
+                      secondary: anom && val ? `${val}mm` : null,
+                    };
+                  })}
                 />
               </div>
               <p className="text-xs text-gray-400 mt-3">
