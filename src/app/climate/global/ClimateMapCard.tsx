@@ -205,7 +205,7 @@ export default function ClimateMapCard({
           title={autoStretch
             ? 'Showing the full canonical scale across all maps. Click to fit colours to the values currently visible.'
             : 'Showing colours fitted to the values currently visible. Click to switch back to the canonical scale.'}
-          className={`${TOGGLE_BASE} ml-auto ${autoStretch ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+          className={`${TOGGLE_BASE} md:ml-auto ${autoStretch ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
         >
           {autoStretch ? 'Auto-stretch: on' : 'Auto-stretch: off'}
         </button>

@@ -11,7 +11,7 @@ import { countryFlag } from '@/lib/climate/locations';
 import { CountryFuelChart } from './_components/fuel-chart';
 import { CountryConsumptionChart } from './_components/consumption-chart';
 import { CountryGhgPanel } from './_components/ghg-budget';
-import { ResponsiveSegmentedControl } from '@/app/_components/responsive-segmented-control';
+import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 
 /* ─── State deep-dive types ──────────────────────────────────────────────── */
 
@@ -467,9 +467,10 @@ export default function EmissionsCountryPanel({
         )}
       </div>
 
-      {/* ─── Region-type selector (responsive: pills on md+, dropdown on mobile) ── */}
+      {/* ─── Region-type selector (compact filter chip at every width) ── */}
       <div className="mb-3">
-        <ResponsiveSegmentedControl
+        <ChipDropdown
+          label="Region"
           ariaLabel="Region type"
           value={mode}
           onChange={(id) => {
@@ -492,8 +493,6 @@ export default function EmissionsCountryPanel({
               }
             }
           }}
-          activePillClass="border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]"
-          inactivePillClass="border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]"
           options={[
             { key: 'continent', label: 'Continents' },
             { key: 'country', label: 'Countries' },

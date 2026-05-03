@@ -233,7 +233,7 @@ function ListboxTrigger({
   // Two visual styles share the same popover and key handling.
   const triggerClass = variant === 'select'
     ? 'w-full h-10 inline-flex items-center justify-between rounded-lg border border-[#D0A65E]/30 bg-gray-900/60 text-sm text-[#FFF5E7] pl-3 pr-2.5 font-medium hover:border-[#D0A65E]/55 focus:outline-none focus:ring-2 focus:ring-[#D0A65E] focus:border-[#D0A65E] transition-colors'
-    : 'inline-flex items-center gap-2 h-9 rounded-full border border-gray-800 bg-gray-900/45 pl-3 pr-2 text-sm text-[#FFF5E7] hover:border-[#D0A65E]/45 hover:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-[#D0A65E] transition-colors';
+    : 'inline-flex items-center gap-2 h-7 rounded-full border border-gray-800 bg-gray-900/45 pl-2.5 pr-1.5 text-[12px] text-[#FFF5E7] hover:border-[#D0A65E]/45 hover:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-[#D0A65E] transition-colors';
 
   return (
     <div ref={rootRef} className={variant === 'chip' ? 'relative inline-block' : 'relative'}>
@@ -250,13 +250,13 @@ function ListboxTrigger({
       >
         {variant === 'chip' && label ? (
           <span className="flex items-baseline gap-1.5">
-            <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-gray-500">{label}</span>
+            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-gray-500">{label}</span>
             <span className="font-medium truncate max-w-[14rem]">{current?.label ?? '—'}</span>
           </span>
         ) : (
           <span className="truncate text-left">{current?.label ?? '—'}</span>
         )}
-        <ChevronDown className={`ml-1 h-4 w-4 text-[#D0A65E] transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-3.5 w-3.5 text-[#D0A65E] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (

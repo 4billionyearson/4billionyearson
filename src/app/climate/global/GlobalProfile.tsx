@@ -364,7 +364,7 @@ export default function GlobalProfile() {
     if (landOceanRow) rows.push(landOceanRow);
     if (!rows.length) return [];
     return [{
-      title: 'Temperature - Average (NOAA)',
+      title: 'Temperature - Average',
       icon: <Thermometer className="text-orange-400" />,
       accentClass: 'bg-orange-600',
       accentBg: 'bg-orange-600/50',
