@@ -264,7 +264,7 @@ function StatBlock({ label, value, unit, sub, color = 'text-orange-300' }: {
   label: string; value: string; unit?: string; sub?: string; color?: string;
 }) {
   return (
-    <div className="rounded-xl border border-gray-700/50 bg-gray-800/90 p-4">
+    <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-4">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className="flex items-baseline gap-1 flex-wrap">
         <span className={`text-2xl font-bold font-mono ${color}`}>{value}</span>
