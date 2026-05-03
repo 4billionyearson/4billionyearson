@@ -471,7 +471,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
   if (loading) {
     return (
-      <div className="h-[400px] md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center">
+      <div className="h-[260px] md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-red-400 border-t-transparent rounded-full" />
       </div>
     );
@@ -479,7 +479,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
   if (!geoData) {
     return (
-      <div className="h-[400px] md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-500">
+      <div className="h-[260px] md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-500">
         Failed to load map data
       </div>
     );
@@ -524,7 +524,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
           scrollWheelZoom={true}
           maxBounds={[[-85, -180], [85, 180]]}
           maxBoundsViscosity={1.0}
-          className="h-[280px] md:h-[500px] w-full rounded-xl z-0"
+          className="h-[260px] md:h-[500px] w-full rounded-xl z-0"
           style={{ background: "#BEEEF9" }}
         >
           <SetMobileView />

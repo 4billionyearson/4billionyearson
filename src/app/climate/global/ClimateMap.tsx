@@ -253,7 +253,11 @@ function normalizeName(s: string): string {
 function InvalidateOnMount() {
   const map = useMap();
   useEffect(() => {
-    const t = setTimeout(() => map.invalidateSize(), 250);
+    const t = setTimeout(() => {
+      map.invalidateSize();
+      // On narrow screens zoom out so the whole world fits without scrolling.
+      if (map.getContainer().clientWidth < 500) map.setView([20, 0], 1);
+    }, 250);
     return () => clearTimeout(t);
   }, [map]);
   return null;
@@ -1115,7 +1119,7 @@ export default function ClimateMap({
   }
   if (!geo) {
     return (
-      <div className="h-[320px] md:h-[500px] w-full rounded-xl bg-gray-900/40 flex items-center justify-center">
+      <div className="h-[260px] md:h-[500px] w-full rounded-xl bg-gray-900/40 flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-[#D0A65E] border-t-transparent rounded-full" />
       </div>
     );
@@ -1133,7 +1137,7 @@ export default function ClimateMap({
           maxBounds={[[-85, -180], [85, 180]]}
           maxBoundsViscosity={1.0}
           worldCopyJump
-          className="h-[320px] md:h-[500px] w-full z-0"
+          className="h-[260px] md:h-[500px] w-full z-0"
           style={{ background: '#0b1220' }}
         >
           <InvalidateOnMount />

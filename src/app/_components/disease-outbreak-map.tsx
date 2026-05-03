@@ -246,7 +246,7 @@ const InnerMap = dynamic(
             minZoom={1}
             maxZoom={8}
             scrollWheelZoom={true}
-            className="h-[280px] md:h-[420px] w-full rounded-xl z-0"
+          className="h-[260px] md:h-[420px] w-full rounded-xl z-0"
             style={{ background: "#BEEEF9" }}
           >
             <TileLayer
@@ -317,7 +317,7 @@ const InnerMap = dynamic(
         );
       };
     }),
-  { ssr: false, loading: () => <div className="h-[280px] md:h-[420px] w-full rounded-xl bg-gray-900 animate-pulse" /> },
+  { ssr: false, loading: () => <div className="h-[260px] md:h-[420px] w-full rounded-xl bg-gray-900 animate-pulse" /> },
 );
 
 /* ─── Exported wrapper ────────────────────────────────────────────────────── */

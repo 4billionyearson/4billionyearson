@@ -4,12 +4,26 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { ChipDropdown } from "@/app/_components/responsive-segmented-control";
+import { useMap } from "react-leaflet";
 
 // Dynamic imports so Leaflet never loads on the server.
 const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
 const WMSTileLayer = dynamic(() => import("react-leaflet").then((m) => m.WMSTileLayer), { ssr: false });
 const GeoJSON = dynamic(() => import("react-leaflet").then((m) => m.GeoJSON), { ssr: false });
+
+/** On mobile, reduce zoom so the full CONUS is visible in the smaller container. */
+function SetMobileView() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+      if (map.getContainer().clientWidth < 500) map.setView([39.5, -98], 3);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
 
 type LayerId = "leaf_anomaly" | "bloom_anomaly";
 
@@ -100,17 +114,18 @@ export default function SpringIndexMap() {
       </div>
 
       {/* Map */}
-      <div className="h-[460px] w-full relative z-0">
+      <div className="h-[300px] md:h-[460px] w-full relative z-0">
         {date && (
           <MapContainer
             center={[39.5, -98]}
             zoom={4}
-            minZoom={3}
+            minZoom={2}
             maxZoom={7}
             scrollWheelZoom={false}
             className="h-full w-full"
             style={{ background: "#0a0f1a" }}
           >
+            <SetMobileView />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://carto.com/attributions">CARTO</a>'
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"

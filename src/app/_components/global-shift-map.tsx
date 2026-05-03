@@ -515,6 +515,19 @@ function MapLabels({
   );
 }
 
+/** Zoom out to 1 on narrow screens so the whole world is visible. */
+function SetMobileView() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+      if (map.getContainer().clientWidth < 500) map.setView([20, 10], 1);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
 /**
  * Subregional overlay for US states. Visible only when the map is zoomed to
  * `US_STATES_ZOOM` or closer; below that threshold the country polygon from
@@ -785,18 +798,19 @@ export default function GlobalShiftMap() {
       </div>
 
       {/* Map */}
-      <div className="h-[500px] w-full relative z-0 overflow-hidden rounded-b-xl">
+      <div className="h-[260px] md:h-[500px] w-full relative z-0 overflow-hidden rounded-b-xl">
         {world && shifts && (
           <MapContainer
             center={[20, 10]}
             zoom={2}
-            minZoom={2}
+            minZoom={1}
             maxZoom={7}
             scrollWheelZoom={false}
             worldCopyJump
             className="h-full w-full"
             style={{ background: "#0a0f1a" }}
           >
+            <SetMobileView />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://carto.com/attributions">CARTO</a>'
               url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"

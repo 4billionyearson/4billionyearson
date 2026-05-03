@@ -519,7 +519,7 @@ export default function ShiftingSeasonsPage() {
                 >
                   <p className="text-sm text-gray-300 leading-relaxed mb-4">
                     Each region&apos;s first 30 years on record are compared with the
-                    most recent 10 — tracking when monthly temperatures cross the
+                    most recent 10 - tracking when monthly temperatures cross the
                     baseline annual mean to reveal earlier springs, later autumns
                     and shifting wet seasons.
                   </p>
