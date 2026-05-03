@@ -472,7 +472,7 @@ export function GhgTile({ ghgStats }: { ghgStats: { co2: GhgStat | null; ch4: Gh
           NOAA GML Trends
         </a>
       </p>
-      <div className="mt-auto pt-2 flex flex-wrap justify-end gap-x-3 gap-y-1 text-[11px]">
+      <div className="mt-auto pt-2 flex flex-wrap justify-end gap-x-3 gap-y-1 text-xs">
         <Link href="/greenhouse-gases" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
           Greenhouse gases dashboard <ArrowUpRight className="h-3 w-3" />
         </Link>
@@ -562,7 +562,7 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
         </a>
       </p>
       {!isSection && (
-        <div className="mt-auto pt-2 flex justify-end text-[11px]">
+        <div className="mt-auto pt-2 flex justify-end text-xs">
           <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
             Sea levels &amp; ice dashboard <ArrowUpRight className="h-3 w-3" />
           </Link>
