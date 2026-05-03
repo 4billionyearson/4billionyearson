@@ -10,20 +10,21 @@ export interface SegmentedOption {
   title?: string;
 }
 
+const PILL_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap';
+const DEFAULT_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
+const DEFAULT_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
+// Lighter grey for disabled state — gray-600 + 60% opacity was failing AA
+// contrast against the very dark surface.
+const DEFAULT_DISABLED = 'border-gray-800/60 bg-gray-900/30 text-gray-500 cursor-not-allowed';
+
 /**
- * Responsive segmented control.
+ * Pill row + responsive in-app dropdown.
  *
- * - On `md+` (≥768px): renders as the project-standard pill row used across
- *   the site (rounded-full toggles in the gold/cream palette), preceded by a
- *   small uppercase eyebrow `label` when provided.
- * - On `<md`: renders as a fully in-app custom dropdown (button + popover
- *   listbox) — *not* a native `<select>` — so the menu inherits the dark
- *   gold/cream palette across all platforms instead of falling back to the
- *   browser/OS native picker.
- *
- * Custom listbox semantics: `role="listbox"` on the popover, `role="option"`
- * on each item, arrow-key navigation, Enter/Space to select, ESC to close,
- * click-outside to dismiss.
+ * - `md+`: rounded-pill segmented control with eyebrow label.
+ * - `<md`: in-app listbox popover (no native `<select>`) so the menu inherits
+ *   the dark gold/cream palette across all platforms.
+ * - `forcePills`: keep the pill row at every width (use for ≤3 short options
+ *   that fit on a phone, e.g. "1 month / 3 months / 12 months").
  */
 export function ResponsiveSegmentedControl({
   label,
@@ -35,6 +36,7 @@ export function ResponsiveSegmentedControl({
   inactivePillClass,
   activePillClass,
   disabledPillClass,
+  forcePills = false,
 }: {
   label?: string;
   options: SegmentedOption[];
@@ -45,53 +47,56 @@ export function ResponsiveSegmentedControl({
   inactivePillClass?: string;
   activePillClass?: string;
   disabledPillClass?: string;
+  forcePills?: boolean;
 }) {
-  // Default pill styling matches the rest of the site (gold-tinted active,
-  // dark inactive). Callers can override per-instance if they need a bolder
-  // accent, but all existing surfaces now share the same palette.
-  const PILL_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap';
-  const ACTIVE = activePillClass ?? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
-  const INACTIVE = inactivePillClass ?? 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
-  // Disabled options use a lighter grey (gray-500) for legibility — gray-600
-  // at 60% opacity reads as nearly black on the very dark surface and was
-  // failing AA contrast in QA screenshots.
-  const DISABLED = disabledPillClass ?? 'border-gray-800/60 bg-gray-900/30 text-gray-500 cursor-not-allowed';
+  const ACTIVE = activePillClass ?? DEFAULT_ACTIVE;
+  const INACTIVE = inactivePillClass ?? DEFAULT_INACTIVE;
+  const DISABLED = disabledPillClass ?? DEFAULT_DISABLED;
+
+  const pillRow = (
+    <div className="flex flex-wrap items-center gap-2">
+      {label && (
+        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">{label}</span>
+      )}
+      {options.map((opt) => {
+        const isActive = opt.key === value;
+        const cls = isActive ? ACTIVE : opt.disabled ? DISABLED : INACTIVE;
+        return (
+          <button
+            key={opt.key}
+            type="button"
+            disabled={opt.disabled}
+            aria-disabled={opt.disabled}
+            aria-pressed={isActive}
+            title={opt.title}
+            onClick={() => { if (!opt.disabled) onChange(opt.key); }}
+            className={`${PILL_BASE} ${cls}`}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  if (forcePills) {
+    return <div className={className}>{pillRow}</div>;
+  }
 
   return (
     <div className={className}>
-      {/* ── Desktop pill row ─────────────────────────────────────────── */}
-      <div className="hidden md:flex flex-wrap items-center gap-2">
-        {label && (
-          <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">{label}</span>
-        )}
-        {options.map((opt) => {
-          const isActive = opt.key === value;
-          const cls = isActive ? ACTIVE : opt.disabled ? DISABLED : INACTIVE;
-          return (
-            <button
-              key={opt.key}
-              type="button"
-              disabled={opt.disabled}
-              aria-disabled={opt.disabled}
-              aria-pressed={isActive}
-              title={opt.title}
-              onClick={() => { if (!opt.disabled) onChange(opt.key); }}
-              className={`${PILL_BASE} ${cls}`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
+      {/* Desktop pill row */}
+      <div className="hidden md:block">{pillRow}</div>
 
-      {/* ── Mobile in-app dropdown ───────────────────────────────────── */}
+      {/* Mobile in-app dropdown */}
       <div className="md:hidden">
         {label && (
           <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mb-1">
             {label}
           </div>
         )}
-        <InAppListbox
+        <ListboxTrigger
+          variant="select"
           options={options}
           value={value}
           onChange={onChange}
@@ -103,15 +108,58 @@ export function ResponsiveSegmentedControl({
 }
 
 /**
- * Headless listbox — keyboard-accessible custom dropdown that renders inside
- * the React tree (no native `<select>` chrome on iOS/Android).
+ * Compact "summary chip" trigger — shows `Label: Value ▾` and opens the same
+ * in-app listbox popover at every width. Useful for filter rows where the
+ * option set is too long to live as visible pills (e.g. 6 map levels) but
+ * the active value should always be on screen.
  */
-function InAppListbox({
+export function ChipDropdown({
+  label,
+  options,
+  value,
+  onChange,
+  ariaLabel,
+  className = '',
+}: {
+  label?: string;
+  options: SegmentedOption[];
+  value: string;
+  onChange: (key: string) => void;
+  ariaLabel?: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <ListboxTrigger
+        variant="chip"
+        label={label}
+        options={options}
+        value={value}
+        onChange={onChange}
+        ariaLabel={ariaLabel ?? label}
+      />
+    </div>
+  );
+}
+
+/**
+ * Headless listbox — a keyboard-accessible custom dropdown that renders
+ * inside the React tree (no native `<select>` chrome on iOS/Android).
+ *
+ * `variant="select"` produces a full-width field button (mobile dropdowns).
+ * `variant="chip"`   produces a compact pill-style chip with eyebrow label
+ *                    above the current value (filter chips at every width).
+ */
+function ListboxTrigger({
+  variant,
+  label,
   options,
   value,
   onChange,
   ariaLabel,
 }: {
+  variant: 'select' | 'chip';
+  label?: string;
   options: SegmentedOption[];
   value: string;
   onChange: (key: string) => void;
@@ -129,13 +177,12 @@ function InAppListbox({
 
   const current = options.find((o) => o.key === value);
 
-  // Sync the highlighted index whenever the value changes externally.
   React.useEffect(() => {
     const i = options.findIndex((o) => o.key === value);
     if (i >= 0) setActiveIndex(i);
   }, [value, options]);
 
-  // Click-outside to dismiss.
+  // Click-outside dismisses the popover.
   React.useEffect(() => {
     if (!open) return;
     function onDocClick(e: MouseEvent) {
@@ -145,7 +192,6 @@ function InAppListbox({
     return () => document.removeEventListener('mousedown', onDocClick);
   }, [open]);
 
-  // When the popover opens, scroll the active option into view.
   React.useEffect(() => {
     if (!open) return;
     const el = listRef.current?.querySelector<HTMLElement>(`[data-idx="${activeIndex}"]`);
@@ -184,8 +230,13 @@ function InAppListbox({
     else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); commit(activeIndex); }
   }
 
+  // Two visual styles share the same popover and key handling.
+  const triggerClass = variant === 'select'
+    ? 'w-full h-10 inline-flex items-center justify-between rounded-lg border border-[#D0A65E]/30 bg-gray-900/60 text-sm text-[#FFF5E7] pl-3 pr-2.5 font-medium hover:border-[#D0A65E]/55 focus:outline-none focus:ring-2 focus:ring-[#D0A65E] focus:border-[#D0A65E] transition-colors'
+    : 'inline-flex items-center gap-2 h-9 rounded-full border border-gray-800 bg-gray-900/45 pl-3 pr-2 text-sm text-[#FFF5E7] hover:border-[#D0A65E]/45 hover:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-[#D0A65E] transition-colors';
+
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className={variant === 'chip' ? 'relative inline-block' : 'relative'}>
       <button
         type="button"
         id={fieldId}
@@ -195,10 +246,17 @@ function InAppListbox({
         aria-label={ariaLabel}
         onClick={() => setOpen((o) => !o)}
         onKeyDown={onKeyDown}
-        className="w-full h-10 inline-flex items-center justify-between rounded-lg border border-[#D0A65E]/30 bg-gray-900/60 text-sm text-[#FFF5E7] pl-3 pr-2.5 font-medium hover:border-[#D0A65E]/55 focus:outline-none focus:ring-2 focus:ring-[#D0A65E] focus:border-[#D0A65E] transition-colors"
+        className={triggerClass}
       >
-        <span className="truncate text-left">{current?.label ?? '—'}</span>
-        <ChevronDown className={`ml-2 h-4 w-4 text-[#D0A65E] transition-transform ${open ? 'rotate-180' : ''}`} />
+        {variant === 'chip' && label ? (
+          <span className="flex items-baseline gap-1.5">
+            <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-gray-500">{label}</span>
+            <span className="font-medium truncate max-w-[14rem]">{current?.label ?? '—'}</span>
+          </span>
+        ) : (
+          <span className="truncate text-left">{current?.label ?? '—'}</span>
+        )}
+        <ChevronDown className={`ml-1 h-4 w-4 text-[#D0A65E] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
@@ -209,7 +267,10 @@ function InAppListbox({
           aria-label={ariaLabel}
           tabIndex={-1}
           onKeyDown={onKeyDown}
-          className="absolute z-50 left-0 right-0 mt-1 max-h-64 overflow-auto rounded-lg border border-[#D0A65E]/40 bg-gray-950/95 backdrop-blur-md py-1 shadow-2xl ring-1 ring-black/40"
+          className={[
+            'absolute z-50 mt-1 max-h-64 overflow-auto rounded-lg border border-[#D0A65E]/40 bg-gray-950/95 backdrop-blur-md py-1 shadow-2xl ring-1 ring-black/40',
+            variant === 'select' ? 'left-0 right-0' : 'left-0 min-w-full whitespace-nowrap',
+          ].join(' ')}
         >
           {options.map((opt, idx) => {
             const isActive = opt.key === value;

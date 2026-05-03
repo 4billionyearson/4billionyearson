@@ -6,7 +6,7 @@ import type { ComponentType } from 'react';
 import { Globe2 } from 'lucide-react';
 import type { default as ClimateMapType } from './ClimateMap';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
-import { ResponsiveSegmentedControl } from '@/app/_components/responsive-segmented-control';
+import { ResponsiveSegmentedControl, ChipDropdown } from '@/app/_components/responsive-segmented-control';
 import {
   METRICS,
   GLOBAL_METRICS,
@@ -163,9 +163,9 @@ export default function ClimateMapCard({
         <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
         <span className="min-w-0 flex-1">{cardTitle}</span>
       </h3>
-      <div className="flex flex-col md:flex-row md:flex-wrap md:items-center gap-3 md:gap-x-4 md:gap-y-2 mb-3">
+      <div className="flex flex-wrap items-center gap-2 mb-3">
         {visibleLevels.length > 1 && (
-          <ResponsiveSegmentedControl
+          <ChipDropdown
             label="Level"
             ariaLabel="Map level"
             value={level}
@@ -178,7 +178,7 @@ export default function ClimateMapCard({
             }))}
           />
         )}
-        <ResponsiveSegmentedControl
+        <ChipDropdown
           label="Metric"
           ariaLabel="Map metric"
           value={metric}
@@ -191,6 +191,7 @@ export default function ClimateMapCard({
           }))}
         />
         <ResponsiveSegmentedControl
+          forcePills
           label="Window"
           ariaLabel="Anomaly window"
           value={anomalyWindow}
@@ -204,7 +205,7 @@ export default function ClimateMapCard({
           title={autoStretch
             ? 'Showing the full canonical scale across all maps. Click to fit colours to the values currently visible.'
             : 'Showing colours fitted to the values currently visible. Click to switch back to the canonical scale.'}
-          className={`${TOGGLE_BASE} md:ml-auto self-start md:self-auto ${autoStretch ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+          className={`${TOGGLE_BASE} ml-auto ${autoStretch ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
         >
           {autoStretch ? 'Auto-stretch: on' : 'Auto-stretch: off'}
         </button>
