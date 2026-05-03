@@ -86,12 +86,16 @@ const StackTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-/* ─── Fuel colours (sequential fossil → cement → flaring) ───────────────── */
+/* ─── Fuel colours ───────────────────────────────────────────────────────
+   Aligned with the energy / renewables dashboard palette so Coal, Oil and
+   Gas read consistently across emissions and energy charts. The original
+   #1f2937 coal was unreadable against the dark surface — gray-400 here is
+   the same tone the renewables dashboard uses. */
 
 const FUEL_CONFIG: { key: keyof YearlyCompact; label: string; color: string }[] = [
-  { key: 'coal_co2',    label: 'Coal',    color: '#1f2937' },
-  { key: 'oil_co2',     label: 'Oil',     color: '#7c2d12' },
-  { key: 'gas_co2',     label: 'Gas',     color: '#ea580c' },
+  { key: 'coal_co2',    label: 'Coal',    color: '#9ca3af' },
+  { key: 'oil_co2',     label: 'Oil',     color: '#78716c' },
+  { key: 'gas_co2',     label: 'Gas',     color: '#d97706' },
   { key: 'cement_co2',  label: 'Cement',  color: '#f59e0b' },
   { key: 'flaring_co2', label: 'Flaring', color: '#facc15' },
 ];

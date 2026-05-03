@@ -32,15 +32,18 @@ interface EnergyApiResponse {
   fetchedAt: string;
 }
 
+// Aligned with the renewables / energy-dashboard palette so Coal, Oil and
+// Gas read consistently across the site. The previous #1f2937 coal was
+// unreadable against the dark surface.
 const MIX_COLORS: Record<string, string> = {
-  coal: '#1f2937',
-  gas: '#9a3412',
-  oil: '#7c2d12',
-  nuclear: '#a78bfa',
-  hydro: '#0ea5e9',
-  wind: '#22d3ee',
-  solar: '#fbbf24',
-  bio: '#84cc16',
+  coal: '#9ca3af',
+  gas: '#d97706',
+  oil: '#78716c',
+  nuclear: '#a855f7',
+  hydro: '#3b82f6',
+  wind: '#06b6d4',
+  solar: '#eab308',
+  bio: '#92400e',
   other: '#6b7280',
 };
 
