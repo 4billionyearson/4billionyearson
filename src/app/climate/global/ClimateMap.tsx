@@ -10,7 +10,6 @@ import {
   MapMobileFit,
   MAP_MOBILE_PRESETS,
   isMobileMap,
-  type MapMobilePreset,
 } from '../../_components/map-mobile-fit';
 import {
   METRICS,
@@ -258,7 +257,7 @@ function normalizeName(s: string): string {
 
 // Per-level mobile preset for <MapMobileFit>. Continents/countries show the
 // whole world; the regional levels snap to CONUS or the British Isles.
-const LEVEL_MOBILE_PRESET: Record<MapLevel, MapMobilePreset> = {
+const LEVEL_MOBILE_PRESET: Record<MapLevel, 'world' | 'usa' | 'uk'> = {
   continents: 'world',
   countries: 'world',
   'us-states': 'usa',
