@@ -763,17 +763,9 @@ export default function GlobalShiftMap() {
   const equator: LatLngExpression[] = [[0, -180], [0, 180]];
   const tropicCapricorn: LatLngExpression[] = [[-23.4368, -180], [-23.4368, 180]];
 
-  // Metric chooser groups all eight metrics under three eyebrow headings,
-  // exposed via a single ChipDropdown so the trigger always fits on one line
-  // (mirrors the Climate Map's Level / Metric / Window chips).
-  const metricGroupHeadings: Record<"warm-cold" | "wet-dry" | "classification", string> = {
-    "warm-cold": "Warm / cold season",
-    "wet-dry": "Wet / dry season",
-    classification: "Classification",
-  };
   const metricOptions = (Object.keys(METRIC_META) as MetricId[]).map((id) => ({
     key: id,
-    label: `${metricGroupHeadings[METRIC_META[id].group]} · ${METRIC_META[id].short}`,
+    label: METRIC_META[id].short,
   }));
 
   return (
