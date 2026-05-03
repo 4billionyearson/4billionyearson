@@ -518,13 +518,10 @@ export default function ShiftingSeasonsPage() {
                   title="How Seasons Have Shifted"
                 >
                   <p className="text-sm text-gray-300 leading-relaxed mb-4">
-                    We&apos;ve applied the same month-crossing analysis used on every
-                    country, US state and UK region profile to their long-term monthly
-                    temperature records: Berkeley Earth / OWID for countries, NOAA for
-                    US states, Met Office for UK regions. For each region we compare
-                    the first 30 complete years on record with the most recent 10,
-                    asking when the monthly average crosses the region&apos;s own
-                    baseline annual mean in spring and autumn.
+                    Each region&apos;s first 30 years on record are compared with the
+                    most recent 10 — tracking when monthly temperatures cross the
+                    baseline annual mean to reveal earlier springs, later autumns
+                    and shifting wet seasons.
                   </p>
 
                   <SubSection title="World Map: Pick a Metric">

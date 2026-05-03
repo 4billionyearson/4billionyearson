@@ -781,14 +781,7 @@ export default function GlobalShiftMap() {
             options={metricOptions}
           />
         </div>
-        {shifts && (
-          <div className="text-[11px] text-gray-400 pt-1">
-            {shifts.globalStats.countriesAnalysed} countries · {shifts.globalStats.usStatesAnalysed}{" "}
-            US states · {shifts.globalStats.ukRegionsAnalysed} UK regions · zoom in on the USA or UK
-            for sub-national detail · baseline first 30 complete years vs recent 10 · rainfall
-            data: World Bank CCKP (CRU TS 4.08, 1901–2023)
-          </div>
-        )}
+
       </div>
 
       {/* Map */}
