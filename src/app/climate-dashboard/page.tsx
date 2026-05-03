@@ -6,9 +6,10 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
 } from 'recharts';
-import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe, ExternalLink } from 'lucide-react';
+import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe, ExternalLink, Activity, Thermometer, CloudRain } from 'lucide-react';
 import { countryFlag } from '@/lib/climate/locations';
 import { getProfileSlugForLocation } from '@/lib/climate/regions';
+import { OverviewGrid, buildOverviewRow, type OverviewPanel, type OverviewRow } from '@/app/climate/_shared/overview-grid';
 import Link from 'next/link';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -572,6 +573,150 @@ function ClimateDashboard() {
 
   const hasData = countryData || usStateData || ukRegionData;
 
+  // ─── Key Facts panels ──────────────────────────────────────────────────
+  // Build the same OverviewGrid panels used by /climate/global and
+  // /climate/{slug}, but populated from the dashboard's local + national +
+  // global data layers. Falls back to a single global row when no location
+  // is selected so the page never opens without a Key Facts headline.
+  const { keyFactsPanels, keyFactsMonthLabel } = useMemo(() => {
+    // ── Identify the "national" layer (NOAA / Met Office) for each scope ──
+    // Mirrors how the slug pages decide whether to use national data as the
+    // primary row (country selections on USA / UK).
+    const isUsState = selectedLocation?.type === 'us-state';
+    const isUkSubReg = selectedLocation?.type === 'uk-region' && selectedLocation?.id !== 'uk-uk';
+    const isCountryUSA = selectedLocation?.type === 'country' && selectedLocation?.owidCode === 'USA';
+    const isCountryGBR = selectedLocation?.type === 'country' && selectedLocation?.owidCode === 'GBR';
+
+    const nd: any = isUsState
+      ? usNationalData
+      : isUkSubReg
+        ? ukCountryData
+        : isCountryUSA
+          ? usNationalData
+          : isCountryGBR
+            ? ukRegionData
+            : null;
+    const useNationalAsPrimary = (isCountryUSA || isCountryGBR) && !!(nd?.varData || nd?.paramData);
+
+    const primaryLabel = isUsState
+      ? (usStateData?.state || selectedLocation?.name || 'State')
+      : isUkSubReg
+        ? (ukRegionData?.region || selectedLocation?.name || 'Region')
+        : (countryData?.country || selectedLocation?.name || '');
+    const nationalLabel = isUsState
+      ? 'United States'
+      : isUkSubReg
+        ? (ukCountryData?.region || 'United Kingdom')
+        : '';
+
+    // ── Latest data month for the divider title ──
+    const monthLabel = (
+      usStateData?.paramData?.tavg?.latestMonthStats?.label
+      || ukRegionData?.varData?.Tmean?.latestMonthStats?.label
+      || nd?.varData?.Tmean?.latestMonthStats?.label
+      || nd?.paramData?.tavg?.latestMonthStats?.label
+      || countryData?.latestMonthStats?.label
+      || globalData?.landLatestMonthStats?.label
+      || globalData?.noaaStats?.landOcean?.latestMonthStats?.label
+      || null
+    ) as string | null;
+
+    // ── Temperature panel ──
+    const tempRows: (OverviewRow | null)[] = [];
+    if (hasData) {
+      tempRows.push(buildOverviewRow(
+        primaryLabel,
+        useNationalAsPrimary
+          ? (nd!.varData?.Tmean?.yearly || nd!.paramData?.tavg?.yearly)
+          : (ukRegionData?.varData?.Tmean?.yearly || usStateData?.paramData?.tavg?.yearly || countryData?.yearlyData),
+        useNationalAsPrimary
+          ? (nd!.varData?.Tmean?.latestMonthStats || nd!.paramData?.tavg?.latestMonthStats)
+          : (ukRegionData?.varData?.Tmean?.latestMonthStats || usStateData?.paramData?.tavg?.latestMonthStats || countryData?.latestMonthStats),
+        useNationalAsPrimary
+          ? (nd!.varData?.Tmean?.latestThreeMonthStats || nd!.paramData?.tavg?.latestThreeMonthStats)
+          : (ukRegionData?.varData?.Tmean?.latestThreeMonthStats || usStateData?.paramData?.tavg?.latestThreeMonthStats || countryData?.latestThreeMonthStats),
+        '°C', 1, false, true,
+      ));
+      // National row when a sub-national region is selected, or when a non-USA/GBR
+      // country has a NOAA/Met Office aggregate (rare) – we keep it consistent
+      // with the slug pages by skipping when national was promoted to primary.
+      if (!useNationalAsPrimary && (isUsState || isUkSubReg)) {
+        tempRows.push(buildOverviewRow(
+          nationalLabel || 'National',
+          nd?.varData?.Tmean?.yearly || nd?.paramData?.tavg?.yearly || (isUsState ? countryData?.yearlyData : undefined) || (isUkSubReg ? countryData?.yearlyData : undefined),
+          nd?.varData?.Tmean?.latestMonthStats || nd?.paramData?.tavg?.latestMonthStats || (isUsState ? countryData?.latestMonthStats : undefined) || (isUkSubReg ? countryData?.latestMonthStats : undefined),
+          nd?.varData?.Tmean?.latestThreeMonthStats || nd?.paramData?.tavg?.latestThreeMonthStats || (isUsState ? countryData?.latestThreeMonthStats : undefined) || (isUkSubReg ? countryData?.latestThreeMonthStats : undefined),
+          '°C', 1,
+        ));
+      }
+    }
+    // Global row (always shown when we have global data, even with no selection)
+    if (globalData) {
+      const globalRow = buildOverviewRow(
+        'Global',
+        globalData.noaaStats?.landOcean?.yearly ?? globalData.landYearlyData,
+        globalData.noaaStats?.landOcean?.latestMonthStats ?? globalData.landLatestMonthStats,
+        globalData.noaaStats?.landOcean?.latestThreeMonthStats ?? globalData.landLatestThreeMonthStats,
+        '°C', 1,
+        false,
+        !hasData, // primary row when there's nothing else
+      );
+      if (globalRow) tempRows.push({ ...globalRow, sublabel: 'Land + Ocean' });
+    }
+    const temperatureRows = tempRows.filter((r): r is OverviewRow => Boolean(r));
+
+    // ── Rainfall / precipitation panel ──
+    const rainRows: (OverviewRow | null)[] = [];
+    if (hasData) {
+      rainRows.push(buildOverviewRow(
+        primaryLabel,
+        useNationalAsPrimary
+          ? (nd!.varData?.Rainfall?.yearly || nd!.paramData?.pcp?.yearly)
+          : (ukRegionData?.varData?.Rainfall?.yearly || usStateData?.paramData?.pcp?.yearly || countryData?.precipYearly),
+        useNationalAsPrimary
+          ? (nd!.varData?.Rainfall?.latestMonthStats || nd!.paramData?.pcp?.latestMonthStats)
+          : (ukRegionData?.varData?.Rainfall?.latestMonthStats || usStateData?.paramData?.pcp?.latestMonthStats || countryData?.precipMonthly?.latestMonthStats),
+        useNationalAsPrimary
+          ? (nd!.varData?.Rainfall?.latestThreeMonthStats || nd!.paramData?.pcp?.latestThreeMonthStats)
+          : (ukRegionData?.varData?.Rainfall?.latestThreeMonthStats || usStateData?.paramData?.pcp?.latestThreeMonthStats || countryData?.precipMonthly?.latestThreeMonthStats),
+        ' mm', 0, false, true,
+      ));
+      if (!useNationalAsPrimary && (isUsState || isUkSubReg)) {
+        rainRows.push(buildOverviewRow(
+          nationalLabel || 'National',
+          nd?.varData?.Rainfall?.yearly || nd?.paramData?.pcp?.yearly,
+          nd?.varData?.Rainfall?.latestMonthStats || nd?.paramData?.pcp?.latestMonthStats,
+          nd?.varData?.Rainfall?.latestThreeMonthStats || nd?.paramData?.pcp?.latestThreeMonthStats,
+          ' mm', 0,
+        ));
+      }
+    }
+    const rainfallRows = rainRows.filter((r): r is OverviewRow => Boolean(r));
+
+    const panels: OverviewPanel[] = [];
+    if (temperatureRows.length) {
+      panels.push({
+        title: 'Temperature – Average',
+        icon: <Thermometer className="text-orange-400" />,
+        accentClass: 'bg-orange-600',
+        accentBg: 'bg-orange-600/50',
+        accentBorder: 'border-orange-400/80',
+        sections: [{ rows: temperatureRows }],
+      });
+    }
+    if (rainfallRows.length) {
+      panels.push({
+        title: 'Rainfall – Total',
+        icon: <CloudRain className="text-blue-400" />,
+        accentClass: 'bg-blue-600',
+        accentBg: 'bg-blue-950/50',
+        accentBorder: 'border-blue-400/80',
+        sections: [{ rows: rainfallRows }],
+      });
+    }
+    return { keyFactsPanels: panels, keyFactsMonthLabel: monthLabel };
+  }, [selectedLocation, countryData, usStateData, ukRegionData, ukCountryData, usNationalData, globalData, hasData]);
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -688,6 +833,14 @@ function ClimateDashboard() {
             <Loader2 className="h-10 w-10 animate-spin text-blue-400" />
             <p className="text-gray-400">Loading climate data – this may take a moment for first-time locations...</p>
           </div>
+        )}
+
+        {/* ─── Key Facts ────────────────────────────────────────────── */}
+        {!loading && keyFactsPanels.length > 0 && (
+          <>
+            <Divider icon={<Activity className="h-5 w-5" />} title={`Key Facts${keyFactsMonthLabel ? ` – ${keyFactsMonthLabel}` : ''}`} />
+            <OverviewGrid panels={keyFactsPanels} />
+          </>
         )}
 
         {/* ─── Data Display ─────────────────────────────────────────── */}
