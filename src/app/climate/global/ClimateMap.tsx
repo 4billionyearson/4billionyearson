@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { MapContainer, TileLayer, GeoJSON, Marker, useMap, useMapEvents } from 'react-leaflet';
+import { GeoJSON, Marker, useMap, useMapEvents } from 'react-leaflet';
 import type { FeatureCollection, Feature } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { WorldMapShell } from '../../_components/world-map-shell';
 import {
-  MapMobileFit,
   MAP_MOBILE_PRESETS,
   isMobileMap,
 } from '../../_components/map-mobile-fit';
@@ -1133,7 +1133,7 @@ export default function ClimateMap({
   }
   if (!geo) {
     return (
-      <div className="h-[260px] md:h-[500px] w-full rounded-xl bg-gray-900/40 flex items-center justify-center">
+      <div className="aspect-[2/1] max-h-[360px] md:aspect-auto md:max-h-none md:h-[500px] w-full rounded-xl bg-gray-900/40 flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-[#D0A65E] border-t-transparent rounded-full" />
       </div>
     );
@@ -1141,26 +1141,14 @@ export default function ClimateMap({
 
   return (
     <div>
-      <div className="relative rounded-xl overflow-hidden border border-gray-800">
-        <MapContainer
-          center={[20, 0]}
-          zoom={2}
-          minZoom={1}
+      <div className="relative">
+        <WorldMapShell
+          preset={LEVEL_MOBILE_PRESET[level]}
+          theme="dark"
+          tileOpacity={0.55}
           maxZoom={8}
-          scrollWheelZoom
-          maxBounds={[[-85, -180], [85, 180]]}
-          maxBoundsViscosity={1.0}
-          worldCopyJump
-          className="h-[260px] md:h-[500px] w-full z-0"
-          style={{ background: '#0b1220' }}
         >
-          <MapMobileFit preset={LEVEL_MOBILE_PRESET[level]} />
           <ZoomToLevel level={level} />
-          <TileLayer
-            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
-            opacity={0.55}
-          />
           <GeoJSON
             key={`base-${level}-${windowSel}-${metric}-${lookup.size}-${countryRowByName.size}-${continentByKey.size}-${customScale ? `${customScale.min}-${customScale.max}` : 'fixed'}`}
             data={geo}
@@ -1199,7 +1187,7 @@ export default function ClimateMap({
             }
           />
           <MapLabels countriesGeo={geo} statesGeo={statesGeo} ukGeo={ukGeo} level={level} />
-        </MapContainer>
+        </WorldMapShell>
 
         {selected && (
           <div className="absolute bottom-0 left-0 right-0 z-[1001] bg-gray-950/95 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm pointer-events-none">

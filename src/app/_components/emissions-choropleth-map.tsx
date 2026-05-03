@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Marker } from "react-leaflet";
+import { GeoJSON, useMap, useMapEvents, Marker } from "react-leaflet";
 import type { FeatureCollection, Feature } from "geojson";
 import type { Layer, PathOptions } from "leaflet";
 import L from "leaflet";
-import { MapMobileFit } from "./map-mobile-fit";
+import { WorldMapShell } from "./world-map-shell";
 import "leaflet/dist/leaflet.css";
 import { ChipDropdown } from "@/app/_components/responsive-segmented-control";
 
@@ -454,7 +454,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
   if (loading) {
     return (
-      <div className="h-[260px] md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center">
+      <div className="aspect-[2/1] max-h-[360px] md:aspect-auto md:max-h-none md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-red-400 border-t-transparent rounded-full" />
       </div>
     );
@@ -462,7 +462,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
   if (!geoData) {
     return (
-      <div className="h-[260px] md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-500">
+      <div className="aspect-[2/1] max-h-[360px] md:aspect-auto md:max-h-none md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-500">
         Failed to load map data
       </div>
     );
@@ -498,23 +498,8 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
       </div>
 
       {/* Map */}
-      <div className="relative rounded-xl overflow-hidden">
-        <MapContainer
-          center={[20, 0]}
-          zoom={2}
-          minZoom={1}
-          maxZoom={10}
-          scrollWheelZoom={true}
-          maxBounds={[[-85, -180], [85, 180]]}
-          maxBoundsViscosity={1.0}
-          className="h-[260px] md:h-[500px] w-full rounded-xl z-0"
-          style={{ background: "#BEEEF9" }}
-        >
-          <MapMobileFit preset="world" />
-          <TileLayer
-            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
-          />
+      <div className="relative">
+        <WorldMapShell preset="world" theme="light" maxZoom={10}>
           <GeoJSON
             key={`${level}-${mode}-${dataMap.size}-${continentData ? Object.keys(continentData).length : 0}`}
             data={geoData}
@@ -522,7 +507,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
             onEachFeature={onEachFeature}
           />
           <CountryLabels geo={geoData} level={level} />
-        </MapContainer>
+        </WorldMapShell>
 
         {/* Info bar */}
         {selectedInfo && (

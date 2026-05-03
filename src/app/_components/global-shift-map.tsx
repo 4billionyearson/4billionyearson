@@ -8,6 +8,7 @@ import type { GeoJSON as LeafletGeoJSON, Layer, LatLngExpression, PathOptions } 
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import "leaflet/dist/leaflet.css";
 import InfoTooltip from "./info-tooltip";
+import { WorldMapShell } from "./world-map-shell";
 import { ChipDropdown } from "@/app/_components/responsive-segmented-control";
 import type {
   KoppenGroup,
@@ -17,8 +18,8 @@ import type {
   RainShift,
 } from "@/lib/climate/shift-analysis";
 
-const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
+// MapContainer / TileLayer are owned by <WorldMapShell>. Other react-leaflet
+// helpers we use directly are dynamic-imported below.
 const GeoJSON = dynamic(() => import("react-leaflet").then((m) => m.GeoJSON), { ssr: false });
 const Polyline = dynamic(() => import("react-leaflet").then((m) => m.Polyline), { ssr: false });
 const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), { ssr: false });
@@ -515,18 +516,7 @@ function MapLabels({
   );
 }
 
-/** Zoom out to 1 on narrow screens so the whole world is visible. */
-function SetMobileView() {
-  const map = useMap();
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-      if (map.getContainer().clientWidth < 500) map.setView([20, 10], 1);
-    }, 250);
-    return () => clearTimeout(timer);
-  }, [map]);
-  return null;
-}
+/** (Mobile initial view is now handled by <WorldMapShell> via <MapMobileFit>.) */
 
 /**
  * Subregional overlay for US states. Visible only when the map is zoomed to
@@ -798,23 +788,15 @@ export default function GlobalShiftMap() {
       </div>
 
       {/* Map */}
-      <div className="h-[260px] md:h-[500px] w-full relative z-0 overflow-hidden rounded-b-xl">
+      <div className="w-full relative z-0 overflow-hidden rounded-b-xl">
         {world && shifts && (
-          <MapContainer
+          <WorldMapShell
+            preset="world"
+            theme="dark"
             center={[20, 10]}
-            zoom={2}
-            minZoom={1}
             maxZoom={7}
             scrollWheelZoom={false}
-            worldCopyJump
-            className="h-full w-full"
-            style={{ background: "#0a0f1a" }}
           >
-            <SetMobileView />
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
-            />
             <GeoJSON
               key={metric}
               data={world as FeatureCollection}
@@ -850,7 +832,7 @@ export default function GlobalShiftMap() {
               pathOptions={{ color: "#D0A65E", weight: 1, opacity: 0.45, dashArray: "4 6" }}
             />
             <MapLabels world={world} statesGeo={statesGeo} ukGeo={ukGeo} />
-          </MapContainer>
+          </WorldMapShell>
         )}
 
         {/* Hover info panel pinned to the bottom of the map (replaces popups). */}
