@@ -502,16 +502,6 @@ export default function EmissionsCountryPanel({
         />
       </div>
 
-      <p className="text-xs text-gray-400 mb-3">
-        {mode === 'country'
-          ? 'Pick a country to see its annual, per-capita, and cumulative CO₂ emissions, its rank among ~200 reporting nations, and its share of today\u2019s global total.'
-          : mode === 'continent'
-            ? 'Pick a continent to see its OWID aggregate annual, per-capita, and cumulative CO₂ emissions and share of today\u2019s global total.'
-            : mode === 'us-region'
-              ? 'Pick a NOAA US climate region to see its energy-related CO₂ emissions aggregated from member states, ranked across all 9 regions and compared with the US national total and the world.'
-              : 'Pick a US state to see its energy-related CO₂ emissions compared against the US national total and the world.'}
-      </p>
-
       {mode === 'continent' ? (
         <div className="flex flex-wrap gap-2">
           {(['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'] as const).map((c) => {

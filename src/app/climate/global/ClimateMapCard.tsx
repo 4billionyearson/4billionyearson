@@ -60,11 +60,6 @@ const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [
   { key: 'us-regions', label: 'US Climate Regions' },
 ];
 
-const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap';
-const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
-const TOGGLE_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
-const TOGGLE_DISABLED = 'border-gray-800/60 bg-gray-900/30 text-gray-500 cursor-not-allowed';
-
 export type ClimateMapPreset = 'global' | 'usa' | 'uk';
 
 const PRESET_LEVELS: Record<ClimateMapPreset, MapLevel[]> = {
@@ -198,19 +193,15 @@ export default function ClimateMapCard({
           onChange={(k) => setAnomalyWindow(k as AnomalyWindow)}
           options={WINDOW_OPTS.map((o) => ({ key: o.key, label: o.label }))}
         />
-        <button
-          type="button"
-          onClick={() => setAutoStretch((v) => !v)}
-          aria-pressed={autoStretch}
-          title={autoStretch
-            ? 'Showing the full canonical scale across all maps. Click to fit colours to the values currently visible.'
-            : 'Showing colours fitted to the values currently visible. Click to switch back to the canonical scale.'}
-          className={`${TOGGLE_BASE} md:ml-auto ${autoStretch ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-        >
-          {autoStretch ? 'Auto-stretch: on' : 'Auto-stretch: off'}
-        </button>
       </div>
-      <ClimateMap countryAnomalies={countryAnomalies} window={anomalyWindow} level={level} metric={metric} autoStretch={autoStretch} />
+      <ClimateMap
+        countryAnomalies={countryAnomalies}
+        window={anomalyWindow}
+        level={level}
+        metric={metric}
+        autoStretch={autoStretch}
+        onToggleAutoStretch={() => setAutoStretch((v) => !v)}
+      />
       <p className="text-xs text-gray-500 mt-3">
         {preset === 'uk' ? (
           <>Source: Met Office UK Regional &amp; National series (Tmean, Rainfall, Sunshine, Air Frost) &copy; Crown copyright. Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall, sunshine, frost). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>

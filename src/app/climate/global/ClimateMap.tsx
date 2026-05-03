@@ -866,12 +866,17 @@ export default function ClimateMap({
   level = 'countries',
   metric = 'temp-anomaly',
   autoStretch = false,
+  onToggleAutoStretch,
 }: {
   countryAnomalies: CountryAnomaly[];
   window?: AnomalyWindow;
   level?: MapLevel;
   metric?: MetricKey;
   autoStretch?: boolean;
+  /** When provided, renders an Auto-stretch toggle inside the legend row.
+   *  Card hosts pass this so the toggle lives next to the gradient it
+   *  controls instead of in the controls row at the top. */
+  onToggleAutoStretch?: () => void;
 }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
@@ -1099,7 +1104,6 @@ export default function ClimateMap({
 
   const cfg = METRICS[metric];
   const legend = legendForWindow(metric, windowSel, customScale ?? undefined);
-  const windowPhrase = windowSel === '12m' ? '12-month rolling' : windowSel === '3m' ? '3-month rolling' : 'monthly';
   const baselineCopy = cfg.isAnomaly ? cfg.baseline : '';
 
   if (loadError) {
@@ -1199,25 +1203,43 @@ export default function ClimateMap({
         )}
       </div>
 
-      {/* Legend */}
-      <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-300">
-        <span className="font-semibold text-gray-200">
-          {`${cfg.longLabel} (${windowPhrase})${baselineCopy ? ` ${baselineCopy}` : ''}`}
-          {customScale && (
-            <span className="ml-2 inline-flex items-center rounded-full bg-[#D0A65E]/15 border border-[#D0A65E]/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#D0A65E]">
-              Stretched to view
-            </span>
-          )}
-        </span>
-        <div className="flex items-center gap-2">
-          <span>{legend.legendMin}</span>
+      {/* Legend — gradient + (optional) auto-stretch toggle on one row.
+          The verbose "Temperature anomaly (monthly) vs 1961-1990" header
+          and "Grey = no data · scroll / pinch to zoom..." helper text were
+          removed: the controls above already say which metric/window is
+          active, the source line below names the baseline, and grey/zoom
+          behaviour is self-evident on the map itself. */}
+      <div className="mt-3 flex items-center gap-3 text-xs text-gray-300">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="shrink-0 tabular-nums text-gray-400">{legend.legendMin}</span>
           <div
-            className="h-3 w-40 rounded"
+            className="h-3 flex-1 min-w-[80px] max-w-[180px] rounded"
             style={{ background: legend.legendGradient }}
           />
-          <span>{legend.legendMax}</span>
+          <span className="shrink-0 tabular-nums text-gray-400">{legend.legendMax}</span>
         </div>
-        <span className="text-gray-400">Grey = no data · scroll / pinch to zoom, drag to pan</span>
+        {customScale && (
+          <span className="hidden sm:inline-flex items-center rounded-full bg-[#D0A65E]/15 border border-[#D0A65E]/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#D0A65E]">
+            Stretched
+          </span>
+        )}
+        {onToggleAutoStretch && (
+          <button
+            type="button"
+            onClick={onToggleAutoStretch}
+            aria-pressed={autoStretch}
+            title={autoStretch
+              ? 'Showing colours fitted to the values currently visible. Click to switch back to the canonical scale.'
+              : 'Showing the full canonical scale across all maps. Click to fit colours to the values currently visible.'}
+            className={`ml-auto inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap ${
+              autoStretch
+                ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
+                : 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
+            }`}
+          >
+            {autoStretch ? 'Auto-stretch: on' : 'Auto-stretch: off'}
+          </button>
+        )}
       </div>
     </div>
   );
