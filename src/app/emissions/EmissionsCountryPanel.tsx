@@ -492,8 +492,8 @@ export default function EmissionsCountryPanel({
               }
             }
           }}
-          activePillClass="border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]"
-          inactivePillClass="border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:bg-gray-900 hover:text-[#FFF5E7]"
+          activePillClass="border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]"
+          inactivePillClass="border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]"
           options={[
             { key: 'continent', label: 'Continents' },
             { key: 'country', label: 'Countries' },
