@@ -299,9 +299,9 @@ function ClimateStatCard({ label, subtitle, color, tiers }: {
   label: string;
   subtitle?: string;
   color: string;
-  tiers: { name: string; value: string | null; unit: string; anomaly?: string | null }[];
+  tiers: { name: string; primary: string | null; primaryUnit: string; secondary?: string | null }[];
 }) {
-  const visible = tiers.filter((t) => t.value != null);
+  const visible = tiers.filter((t) => t.primary != null);
   return (
     <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
       <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">{label}</div>
@@ -311,9 +311,9 @@ function ClimateStatCard({ label, subtitle, color, tiers }: {
         visible.map((t, i) => (
           <div key={t.name + i} className={i > 0 ? 'mt-2' : ''}>
             <div className="flex items-baseline gap-1">
-              <span className={`text-2xl font-bold font-mono ${color}`}>{t.value}</span>
-              {t.unit && <span className="text-sm text-gray-400">{t.unit}</span>}
-              {t.anomaly && <span className="text-xs text-gray-400 ml-1">({t.anomaly})</span>}
+              <span className={`text-2xl font-bold font-mono ${color}`}>{t.primary}</span>
+              {t.primaryUnit && <span className="text-sm text-gray-400">{t.primaryUnit}</span>}
+              {t.secondary && <span className="text-xs text-gray-400 ml-1">({t.secondary})</span>}
             </div>
             <div className="text-xs text-gray-400 mt-0.5">{t.name}</div>
           </div>
@@ -855,25 +855,33 @@ function ClimateDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 <ClimateStatCard
                   label={`Avg Temperature${monthHdr}`}
-                  subtitle="Anomaly vs 1961–1990 baseline."
+                  subtitle="Anomaly vs 1961–1990 baseline (actual value in brackets)."
                   color="text-orange-400"
-                  tiers={keyFactsTiers.map((t) => ({
-                    name: t.name,
-                    value: fmt(t.tempMonth?.value, 1),
-                    unit: '°C',
-                    anomaly: fmtSigned(t.tempMonth?.diff, 1) ? `${fmtSigned(t.tempMonth?.diff, 1)}°C` : null,
-                  }))}
+                  tiers={keyFactsTiers.map((t) => {
+                    const anom = fmtSigned(t.tempMonth?.diff, 1);
+                    const val = fmt(t.tempMonth?.value, 1);
+                    return {
+                      name: t.name,
+                      primary: anom,
+                      primaryUnit: '°C',
+                      secondary: val ? `${val}°C` : null,
+                    };
+                  })}
                 />
                 <ClimateStatCard
                   label={`Rainfall${monthHdr}`}
-                  subtitle="Anomaly vs 1961–1990 baseline."
+                  subtitle="Anomaly vs 1961–1990 baseline (actual value in brackets)."
                   color="text-blue-400"
-                  tiers={keyFactsTiers.map((t) => ({
-                    name: t.name,
-                    value: fmt(t.rainMonth?.value, 0),
-                    unit: 'mm',
-                    anomaly: fmtSigned(t.rainMonth?.diff, 0) ? `${fmtSigned(t.rainMonth?.diff, 0)}mm` : null,
-                  }))}
+                  tiers={keyFactsTiers.map((t) => {
+                    const anom = fmtSigned(t.rainMonth?.diff, 0);
+                    const val = fmt(t.rainMonth?.value, 0);
+                    return {
+                      name: t.name,
+                      primary: anom,
+                      primaryUnit: 'mm',
+                      secondary: val ? `${val}mm` : null,
+                    };
+                  })}
                 />
                 <ClimateStatCard
                   label={`Avg Temperature${yearHdr}`}
@@ -881,8 +889,8 @@ function ClimateDashboard() {
                   color="text-red-400"
                   tiers={keyFactsTiers.map((t) => ({
                     name: t.name,
-                    value: fmt(t.tempYear?.value, 1),
-                    unit: '°C',
+                    primary: fmt(t.tempYear?.value, 1),
+                    primaryUnit: '°C',
                   }))}
                 />
                 <ClimateStatCard
@@ -891,8 +899,8 @@ function ClimateDashboard() {
                   color="text-cyan-400"
                   tiers={keyFactsTiers.map((t) => ({
                     name: t.name,
-                    value: fmt(t.rainYear?.value, 0),
-                    unit: 'mm',
+                    primary: fmt(t.rainYear?.value, 0),
+                    primaryUnit: 'mm',
                   }))}
                 />
               </div>
