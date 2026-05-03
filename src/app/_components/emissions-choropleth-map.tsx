@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Marker } from "
 import type { FeatureCollection, Feature } from "geojson";
 import type { Layer, PathOptions } from "leaflet";
 import L from "leaflet";
+import { MapMobileFit } from "./map-mobile-fit";
 import "leaflet/dist/leaflet.css";
 import { ChipDropdown } from "@/app/_components/responsive-segmented-control";
 
@@ -173,24 +174,6 @@ const ANNUAL_LEGEND = [
   { color: "#991b1b", label: "1–5B" },
   { color: "#7f1d1d", label: "5B+" },
 ];
-
-/* ─── Mobile zoom adjustment ────────────────────────────────────────────── */
-
-function SetMobileView() {
-  const map = useMap();
-  React.useEffect(() => {
-    const container = map.getContainer();
-    if (container.clientWidth < 500) map.setView([20, 30], 1);
-    
-    // Explicitly tell Leaflet to remeasure its container after the DOM settles.
-    // Fixes the "stale cache / delayed render" issue where tiles only half-load.
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 250);
-    return () => clearTimeout(timer);
-  }, [map]);
-  return null;
-}
 
 /* ─── Country labels ────────────────────────────────────────────────────── */
 
@@ -519,7 +502,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
         <MapContainer
           center={[20, 0]}
           zoom={2}
-          minZoom={2}
+          minZoom={1}
           maxZoom={10}
           scrollWheelZoom={true}
           maxBounds={[[-85, -180], [85, 180]]}
@@ -527,7 +510,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
           className="h-[260px] md:h-[500px] w-full rounded-xl z-0"
           style={{ background: "#BEEEF9" }}
         >
-          <SetMobileView />
+          <MapMobileFit preset="world" />
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"

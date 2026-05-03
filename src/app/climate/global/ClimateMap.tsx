@@ -6,6 +6,7 @@ import type { FeatureCollection, Feature } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { MapMobileFit, type MapMobilePreset } from '../../_components/map-mobile-fit';
 import {
   METRICS,
   type MetricKey,
@@ -250,27 +251,16 @@ function normalizeName(s: string): string {
   return NAME_ALIAS[lower] ?? lower;
 }
 
-function InvalidateOnMount({ level }: { level: MapLevel }) {
-  const map = useMap();
-  useEffect(() => {
-    const t = setTimeout(() => {
-      map.invalidateSize();
-      // On narrow screens apply the correct starting view for the level.
-      // For regional levels (UK/US) honour the same bounds as ZoomToLevel;
-      // for world-level views snap to a world-fit zoom.
-      if (map.getContainer().clientWidth < 500) {
-        const b = LEVEL_BOUNDS[level];
-        if (b) {
-          map.fitBounds(b, { padding: [20, 20], animate: false });
-        } else {
-          map.setView([20, 0], 1);
-        }
-      }
-    }, 250);
-    return () => clearTimeout(t);
-  }, [map, level]);
-  return null;
-}
+// Per-level mobile preset for <MapMobileFit>. Continents/countries show the
+// whole world; the regional levels snap to CONUS or the British Isles.
+const LEVEL_MOBILE_PRESET: Record<MapLevel, MapMobilePreset> = {
+  continents: 'world',
+  countries: 'world',
+  'us-states': 'usa',
+  'us-regions': 'usa',
+  'uk-countries': 'uk',
+  'uk-regions': 'uk',
+};
 
 // Bounds presets for the level toggle so e.g. selecting "US states" zooms
 // the map into the contiguous US instead of leaving the user on the world view.
@@ -1140,7 +1130,7 @@ export default function ClimateMap({
         <MapContainer
           center={[20, 0]}
           zoom={2}
-          minZoom={2}
+          minZoom={1}
           maxZoom={8}
           scrollWheelZoom
           maxBounds={[[-85, -180], [85, 180]]}
@@ -1149,7 +1139,7 @@ export default function ClimateMap({
           className="h-[260px] md:h-[500px] w-full z-0"
           style={{ background: '#0b1220' }}
         >
-          <InvalidateOnMount level={level} />
+          <MapMobileFit preset={LEVEL_MOBILE_PRESET[level]} />
           <ZoomToLevel level={level} />
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
