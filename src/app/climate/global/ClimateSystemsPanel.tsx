@@ -561,11 +561,13 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
           NSIDC via global-warming.org
         </a>
       </p>
-      <div className="mt-auto pt-2 flex justify-end text-[11px]">
-        <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
-          Sea levels &amp; ice dashboard <ArrowUpRight className="h-3 w-3" />
-        </Link>
-      </div>
+      {!isSection && (
+        <div className="mt-auto pt-2 flex justify-end text-[11px]">
+          <Link href="/sea-levels-ice" className="inline-flex items-center gap-1 text-teal-300 hover:text-teal-200 font-semibold">
+            Sea levels &amp; ice dashboard <ArrowUpRight className="h-3 w-3" />
+          </Link>
+        </div>
+      )}
     </Tile>
   );
 }
