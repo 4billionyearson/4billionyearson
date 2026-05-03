@@ -11,6 +11,7 @@ import { countryFlag } from '@/lib/climate/locations';
 import { CountryFuelChart } from './_components/fuel-chart';
 import { CountryConsumptionChart } from './_components/consumption-chart';
 import { CountryGhgPanel } from './_components/ghg-budget';
+import { ResponsiveSegmentedControl } from '@/app/_components/responsive-segmented-control';
 
 /* ─── State deep-dive types ──────────────────────────────────────────────── */
 
@@ -455,7 +456,7 @@ export default function EmissionsCountryPanel({
     <div id="emissions-country-panel" className={wrapperClass}>
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <Factory className="h-5 w-5 text-[#D0A65E]" />
-        <h2 className="text-lg font-bold font-mono text-white">Continent, Country, US Climate Region &amp; State Deep Dive</h2>
+        <h2 className="text-lg font-bold font-mono text-white">Deep Dive</h2>
         {hasSelection && (
           <button
             onClick={clearSelection}
@@ -466,52 +467,40 @@ export default function EmissionsCountryPanel({
         )}
       </div>
 
-      {/* ─── Tabs (climate-hub styled) ──────────────────────────────────── */}
-      <div role="tablist" aria-label="Emissions region type" className="flex gap-2 overflow-x-auto mb-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        {([
-          { id: 'continent', label: 'Continents', Icon: Globe },
-          { id: 'country', label: 'Countries', Icon: Globe2 },
-          { id: 'us-region', label: 'US Climate Regions', Icon: MapPin },
-          { id: 'us-state', label: 'US States', Icon: Flag },
-        ] as const).map(({ id, label, Icon }) => {
-          const isActive = mode === id;
-          return (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => {
-                if (id !== mode) {
-                  setMode(id);
-                  setCountryName(null);
-                  setData(null);
-                  setError(null);
-                  setStateSelection(null);
-                  setRegionSlug(null);
-                  setStateData(null);
-                  setStateError(null);
-                  if (typeof window !== 'undefined') {
-                    const url = new URL(window.location.href);
-                    url.searchParams.delete('country');
-                    url.searchParams.delete('state');
-                    url.searchParams.delete('stateName');
-                    url.searchParams.delete('region');
-                    window.history.replaceState({}, '', url.toString());
-                  }
-                }
-              }}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 h-8 text-[13px] font-medium transition-colors ${
-                isActive
-                  ? 'border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]'
-                  : 'border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:bg-gray-900 hover:text-[#FFF5E7]'
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              <span>{label}</span>
-            </button>
-          );
-        })}
+      {/* ─── Region-type selector (responsive: pills on md+, dropdown on mobile) ── */}
+      <div className="mb-3">
+        <ResponsiveSegmentedControl
+          ariaLabel="Region type"
+          value={mode}
+          onChange={(id) => {
+            if (id !== mode) {
+              setMode(id as Mode);
+              setCountryName(null);
+              setData(null);
+              setError(null);
+              setStateSelection(null);
+              setRegionSlug(null);
+              setStateData(null);
+              setStateError(null);
+              if (typeof window !== 'undefined') {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('country');
+                url.searchParams.delete('state');
+                url.searchParams.delete('stateName');
+                url.searchParams.delete('region');
+                window.history.replaceState({}, '', url.toString());
+              }
+            }
+          }}
+          activePillClass="border-[#D0A65E] bg-[#D0A65E] text-[#1A0E00]"
+          inactivePillClass="border-gray-700 bg-gray-900/70 text-gray-300 hover:border-[#D0A65E]/45 hover:bg-gray-900 hover:text-[#FFF5E7]"
+          options={[
+            { key: 'continent', label: 'Continents' },
+            { key: 'country', label: 'Countries' },
+            { key: 'us-region', label: 'US Climate Regions' },
+            { key: 'us-state', label: 'US States' },
+          ]}
+        />
       </div>
 
       <p className="text-xs text-gray-400 mb-3">

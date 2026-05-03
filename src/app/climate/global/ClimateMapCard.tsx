@@ -6,6 +6,7 @@ import type { ComponentType } from 'react';
 import { Globe2 } from 'lucide-react';
 import type { default as ClimateMapType } from './ClimateMap';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
+import { ResponsiveSegmentedControl } from '@/app/_components/responsive-segmented-control';
 import {
   METRICS,
   GLOBAL_METRICS,
@@ -162,70 +163,40 @@ export default function ClimateMapCard({
         <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
         <span className="min-w-0 flex-1">{cardTitle}</span>
       </h3>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-3">
+      <div className="flex flex-col md:flex-row md:flex-wrap md:items-center gap-3 md:gap-x-4 md:gap-y-2 mb-3">
         {visibleLevels.length > 1 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Level</span>
-            {visibleLevels.map((opt) => {
-              const supported = metricSupportsLevel(metric, opt.key);
-              const cls = level === opt.key
-                ? TOGGLE_ACTIVE
-                : supported
-                  ? TOGGLE_INACTIVE
-                  : TOGGLE_DISABLED;
-              return (
-                <button
-                  key={opt.key}
-                  type="button"
-                  disabled={!supported}
-                  aria-disabled={!supported}
-                  title={supported ? undefined : `${METRICS[metric].shortLabel} has no data at this level`}
-                  onClick={() => { if (supported) setLevel(opt.key); }}
-                  className={`${TOGGLE_BASE} ${cls}`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
+          <ResponsiveSegmentedControl
+            label="Level"
+            ariaLabel="Map level"
+            value={level}
+            onChange={(k) => setLevel(k as MapLevel)}
+            options={visibleLevels.map((opt) => ({
+              key: opt.key,
+              label: opt.label,
+              disabled: !metricSupportsLevel(metric, opt.key),
+              title: metricSupportsLevel(metric, opt.key) ? undefined : `${METRICS[metric].shortLabel} has no data at this level`,
+            }))}
+          />
         )}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Metric</span>
-          {availableMetrics.map((key) => {
-            const supported = METRIC_LEVELS[key].includes(level);
-            const cls = metric === key
-              ? TOGGLE_ACTIVE
-              : supported
-                ? TOGGLE_INACTIVE
-                : TOGGLE_DISABLED;
-            return (
-              <button
-                key={key}
-                type="button"
-                disabled={!supported}
-                aria-disabled={!supported}
-                title={supported ? undefined : `No ${METRICS[key].shortLabel.toLowerCase()} data at the current level`}
-                onClick={() => { if (supported) setMetric(key); }}
-                className={`${TOGGLE_BASE} ${cls}`}
-              >
-                {METRICS[key].shortLabel}
-              </button>
-            );
-          })}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Window</span>
-          {WINDOW_OPTS.map((opt) => (
-            <button
-              key={opt.key}
-              type="button"
-              onClick={() => setAnomalyWindow(opt.key)}
-              className={`${TOGGLE_BASE} ${anomalyWindow === opt.key ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        <ResponsiveSegmentedControl
+          label="Metric"
+          ariaLabel="Map metric"
+          value={metric}
+          onChange={(k) => setMetric(k as MetricKey)}
+          options={availableMetrics.map((key) => ({
+            key,
+            label: METRICS[key].shortLabel,
+            disabled: !METRIC_LEVELS[key].includes(level),
+            title: METRIC_LEVELS[key].includes(level) ? undefined : `No ${METRICS[key].shortLabel.toLowerCase()} data at the current level`,
+          }))}
+        />
+        <ResponsiveSegmentedControl
+          label="Window"
+          ariaLabel="Anomaly window"
+          value={anomalyWindow}
+          onChange={(k) => setAnomalyWindow(k as AnomalyWindow)}
+          options={WINDOW_OPTS.map((o) => ({ key: o.key, label: o.label }))}
+        />
         <button
           type="button"
           onClick={() => setAutoStretch((v) => !v)}
@@ -233,7 +204,7 @@ export default function ClimateMapCard({
           title={autoStretch
             ? 'Showing the full canonical scale across all maps. Click to fit colours to the values currently visible.'
             : 'Showing colours fitted to the values currently visible. Click to switch back to the canonical scale.'}
-          className={`${TOGGLE_BASE} ml-auto ${autoStretch ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+          className={`${TOGGLE_BASE} md:ml-auto self-start md:self-auto ${autoStretch ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
         >
           {autoStretch ? 'Auto-stretch: on' : 'Auto-stretch: off'}
         </button>
