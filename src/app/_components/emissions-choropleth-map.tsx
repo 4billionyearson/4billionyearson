@@ -499,7 +499,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
       {/* Map */}
       <div className="relative">
-        <WorldMapShell preset="world" theme="light" maxZoom={10}>
+        <WorldMapShell preset="world" theme="light">
           <GeoJSON
             key={`${level}-${mode}-${dataMap.size}-${continentData ? Object.keys(continentData).length : 0}`}
             data={geoData}

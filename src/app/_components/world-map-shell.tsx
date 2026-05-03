@@ -86,7 +86,8 @@ export interface WorldMapShellProps {
   zoom?: number;
   /** Min zoom. Default `1` so users can fully zoom out on wide screens. */
   minZoom?: number;
-  /** Max zoom. Default `8`. */
+  /** Max zoom. Default `10`. CARTO tiles render up to z18 so 10 is
+   * generous; lower values just hide detail without benefit. */
   maxZoom?: number;
   /** Allow scroll-wheel zoom. Default `true`. */
   scrollWheelZoom?: boolean;
@@ -126,7 +127,7 @@ export function WorldMapShell({
   center = [20, 0],
   zoom = 2,
   minZoom = 1,
-  maxZoom = 8,
+  maxZoom = 10,
   scrollWheelZoom = true,
   className = '',
   children,

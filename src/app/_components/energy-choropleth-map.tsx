@@ -469,7 +469,7 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
   return (
     <div>
       <div className="relative">
-        <WorldMapShell preset="world" theme="light" maxZoom={10}>
+        <WorldMapShell preset="world" theme="light">
           <GeoJSON
             ref={geoRef}
             key={energyData.size}

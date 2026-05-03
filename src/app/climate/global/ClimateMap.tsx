@@ -1146,7 +1146,6 @@ export default function ClimateMap({
           preset={LEVEL_MOBILE_PRESET[level]}
           theme="dark"
           tileOpacity={0.55}
-          maxZoom={8}
         >
           <ZoomToLevel level={level} />
           <GeoJSON

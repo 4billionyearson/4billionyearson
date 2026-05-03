@@ -794,7 +794,6 @@ export default function GlobalShiftMap() {
             preset="world"
             theme="dark"
             center={[20, 10]}
-            maxZoom={7}
             scrollWheelZoom={false}
           >
             <GeoJSON
