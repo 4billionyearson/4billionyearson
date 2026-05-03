@@ -616,10 +616,10 @@ export function ContinentalBar({ continents }: { continents: ContinentStat[] | n
       />
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={resolved} layout="vertical" margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+          <BarChart data={resolved} layout="vertical" margin={{ top: 8, right: 16, left: 4, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" horizontal={false} />
             <XAxis type="number" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}°C`} />
-            <YAxis type="category" dataKey="label" stroke="#9CA3AF" fontSize={11} width={150} />
+            <YAxis type="category" dataKey="label" stroke="#9CA3AF" fontSize={11} width={118} />
             <Tooltip
               contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12 }}
               formatter={(v: any, _name: any, ctx: any) => {
