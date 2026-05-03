@@ -96,7 +96,7 @@ export default function ParisTrackerCard({
   return (
     <div
       id={share?.sectionId}
-      className={`bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]${share?.sectionId ? ' scroll-mt-24' : ''}`}
+      className={`bg-gray-950/90 backdrop-blur-md p-5 pb-4 md:p-6 md:pb-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]${share?.sectionId ? ' scroll-mt-24' : ''}`}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:flex-wrap">
         <div className="min-w-0 flex-1">

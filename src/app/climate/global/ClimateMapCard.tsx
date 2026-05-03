@@ -59,7 +59,7 @@ const LEVEL_OPTS: Array<{ key: MapLevel; label: string }> = [
   { key: 'us-regions', label: 'US Climate Regions' },
 ];
 
-const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors';
+const TOGGLE_BASE = 'inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap';
 const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
 const TOGGLE_INACTIVE = 'border-gray-800 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 const TOGGLE_DISABLED = 'border-gray-900 bg-gray-950/40 text-gray-600 cursor-not-allowed opacity-60';
@@ -164,7 +164,7 @@ export default function ClimateMapCard({
       </h3>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-3">
         {visibleLevels.length > 1 && (
-          <div className="flex flex-nowrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Level</span>
             {visibleLevels.map((opt) => {
               const supported = metricSupportsLevel(metric, opt.key);
@@ -189,7 +189,7 @@ export default function ClimateMapCard({
             })}
           </div>
         )}
-        <div className="flex flex-nowrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Metric</span>
           {availableMetrics.map((key) => {
             const supported = METRIC_LEVELS[key].includes(level);
@@ -213,7 +213,7 @@ export default function ClimateMapCard({
             );
           })}
         </div>
-        <div className="flex flex-nowrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">Window</span>
           {WINDOW_OPTS.map((opt) => (
             <button
