@@ -250,16 +250,25 @@ function normalizeName(s: string): string {
   return NAME_ALIAS[lower] ?? lower;
 }
 
-function InvalidateOnMount() {
+function InvalidateOnMount({ level }: { level: MapLevel }) {
   const map = useMap();
   useEffect(() => {
     const t = setTimeout(() => {
       map.invalidateSize();
-      // On narrow screens zoom out so the whole world fits without scrolling.
-      if (map.getContainer().clientWidth < 500) map.setView([20, 0], 1);
+      // On narrow screens apply the correct starting view for the level.
+      // For regional levels (UK/US) honour the same bounds as ZoomToLevel;
+      // for world-level views snap to a world-fit zoom.
+      if (map.getContainer().clientWidth < 500) {
+        const b = LEVEL_BOUNDS[level];
+        if (b) {
+          map.fitBounds(b, { padding: [20, 20], animate: false });
+        } else {
+          map.setView([20, 0], 1);
+        }
+      }
     }, 250);
     return () => clearTimeout(t);
-  }, [map]);
+  }, [map, level]);
   return null;
 }
 
@@ -1140,7 +1149,7 @@ export default function ClimateMap({
           className="h-[260px] md:h-[500px] w-full z-0"
           style={{ background: '#0b1220' }}
         >
-          <InvalidateOnMount />
+          <InvalidateOnMount level={level} />
           <ZoomToLevel level={level} />
           <TileLayer
             attribution='&copy; <a href="https://carto.com/">CARTO</a>'
