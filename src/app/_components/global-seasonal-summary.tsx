@@ -116,6 +116,18 @@ export default function GlobalSeasonalSummary({
       .catch((e) => setError(e.message));
   }, []);
 
+  // If the page was opened with a hash that targets this section (e.g.
+  // /climate/global#shifting-seasons from a Share link), the browser scrolls
+  // to the section before our async data has rendered, so the user lands
+  // mid-page once the section grows. Re-anchor once data is in.
+  useEffect(() => {
+    if (!data || !share?.sectionId) return;
+    if (typeof window === 'undefined') return;
+    if (window.location.hash !== '#' + share.sectionId) return;
+    const el = document.getElementById(share.sectionId);
+    if (el) el.scrollIntoView({ block: 'start' });
+  }, [data, share?.sectionId]);
+
   const cohorts = useMemo(() => {
     if (!data) return null;
     const all: GlobalShiftRecord[] = [...data.countries, ...data.usStates, ...data.ukRegions];

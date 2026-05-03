@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Scale } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -51,6 +51,18 @@ export default function ParisTrackerCard({
   const latestYearly = data.yearlyData?.length ? data.yearlyData[data.yearlyData.length - 1] : null;
   const rolling10yr = latestYearly?.rollingAvg ?? null;
   const vsPreIndustrial = rolling10yr != null ? rolling10yr - data.preIndustrialBaseline : null;
+
+  // Re-anchor when the page is opened with a hash that targets this card,
+  // because GlobalProfile fetches data async and the card mounts after the
+  // browser's initial scroll. Same pattern as ClimateMapCard.
+  useEffect(() => {
+    if (!share?.sectionId) return;
+    if (typeof window === 'undefined') return;
+    if (window.location.hash !== '#' + share.sectionId) return;
+    const el = document.getElementById(share.sectionId);
+    if (el) el.scrollIntoView({ block: 'start' });
+  }, [share?.sectionId]);
+
   if (rolling10yr == null || vsPreIndustrial == null || latestYearly == null) return null;
 
   const pct15 = Math.min(100, Math.max(0, (vsPreIndustrial / 1.5) * 100));
@@ -227,16 +239,13 @@ export default function ParisTrackerCard({
       </div>
 
       {!hideShare && share && (
-        <div className="mt-4 pt-3 border-t border-gray-800 flex justify-end">
-          <ShareBar
-            pageUrl={share.pageUrl + '#' + share.sectionId}
-            shareText={encodeURIComponent('Paris Agreement Tracker - 4 Billion Years On')}
-            emailSubject="Paris Agreement Tracker - 4 Billion Years On"
-            embedUrl={share.embedUrl}
-            embedCode={share.embedCode}
-            align="right"
-          />
-        </div>
+        <ShareBar
+          pageUrl={share.pageUrl + '#' + share.sectionId}
+          shareText={encodeURIComponent('Paris Agreement Tracker - 4 Billion Years On')}
+          emailSubject="Paris Agreement Tracker - 4 Billion Years On"
+          embedUrl={share.embedUrl}
+          embedCode={share.embedCode}
+        />
       )}
     </div>
   );

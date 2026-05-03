@@ -501,6 +501,7 @@ export default function GlobalProfile() {
                     pageUrl: 'https://4billionyearson.org/climate/global',
                     sectionId: 'paris-tracker',
                     embedUrl: 'https://4billionyearson.org/climate/embed/paris',
+                    embedCode: '<iframe\n  src="https://4billionyearson.org/climate/embed/paris"\n  width="100%" height="720"\n  style="border:none;"\n  title="Paris Agreement Tracker - 4 Billion Years On"\n></iframe>',
                   }}
                 />
               )}
