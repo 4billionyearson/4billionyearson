@@ -6,7 +6,12 @@ import type { FeatureCollection, Feature } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapMobileFit, type MapMobilePreset } from '../../_components/map-mobile-fit';
+import {
+  MapMobileFit,
+  MAP_MOBILE_PRESETS,
+  isMobileMap,
+  type MapMobilePreset,
+} from '../../_components/map-mobile-fit';
 import {
   METRICS,
   type MetricKey,
@@ -276,16 +281,27 @@ function ZoomToLevel({ level }: { level: MapLevel }) {
   // Track whether this is the first run so we don't fight the initial center/zoom.
   const firstRef = React.useRef(true);
   useEffect(() => {
-    const b = LEVEL_BOUNDS[level];
+    const mobile = isMobileMap(map);
     if (firstRef.current) {
-      // On mount: snap (no animation) to the right region for the chosen
-      // level so e.g. the UK page opens already zoomed into the UK.
       firstRef.current = false;
-      if (b) {
-        map.fitBounds(b, { padding: [20, 20], animate: false });
+      // Initial mount on mobile is handled by <MapMobileFit>. On desktop we
+      // snap (no animation) to the right region for the chosen level so e.g.
+      // the UK page opens already zoomed into the UK.
+      if (!mobile) {
+        const b = LEVEL_BOUNDS[level];
+        if (b) map.fitBounds(b, { padding: [20, 20], animate: false });
       }
       return;
     }
+    if (mobile) {
+      // On mobile, level changes snap to the matching mobile preset. Using
+      // setView (not flyToBounds) avoids fitBounds picking a too-low zoom on
+      // narrow viewports and keeps every level consistent with mount-time.
+      const v = MAP_MOBILE_PRESETS[LEVEL_MOBILE_PRESET[level]];
+      map.setView(v.center, v.zoom);
+      return;
+    }
+    const b = LEVEL_BOUNDS[level];
     if (b) {
       map.flyToBounds(b, { duration: 0.6, padding: [20, 20] });
     } else {
