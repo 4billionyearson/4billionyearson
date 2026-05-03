@@ -8,10 +8,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { WorldMapShell } from '../../_components/world-map-shell';
 import {
-  MAP_MOBILE_PRESETS,
-  isMobileMap,
-} from '../../_components/map-mobile-fit';
-import {
   METRICS,
   type MetricKey,
   colorForMetric,
@@ -265,51 +261,6 @@ const LEVEL_MOBILE_PRESET: Record<MapLevel, 'world' | 'usa' | 'uk'> = {
   'uk-countries': 'uk',
   'uk-regions': 'uk',
 };
-
-// Bounds presets for the level toggle so e.g. selecting "US states" zooms
-// the map into the contiguous US instead of leaving the user on the world view.
-const LEVEL_BOUNDS: Partial<Record<string, [[number, number], [number, number]]>> = {
-  'us-states': [[24.5, -125], [49.5, -66.5]],
-  'us-regions': [[24.5, -125], [49.5, -66.5]],
-  'uk-countries': [[49.7, -8.7], [60.9, 1.9]],
-  'uk-regions': [[49.7, -8.7], [60.9, 1.9]],
-};
-
-function ZoomToLevel({ level }: { level: MapLevel }) {
-  const map = useMap();
-  // Track whether this is the first run so we don't fight the initial center/zoom.
-  const firstRef = React.useRef(true);
-  useEffect(() => {
-    const mobile = isMobileMap(map);
-    if (firstRef.current) {
-      firstRef.current = false;
-      // Initial mount on mobile is handled by <MapMobileFit>. On desktop we
-      // snap (no animation) to the right region for the chosen level so e.g.
-      // the UK page opens already zoomed into the UK.
-      if (!mobile) {
-        const b = LEVEL_BOUNDS[level];
-        if (b) map.fitBounds(b, { padding: [20, 20], animate: false });
-      }
-      return;
-    }
-    if (mobile) {
-      // On mobile, level changes snap to the matching mobile preset. Using
-      // setView (not flyToBounds) avoids fitBounds picking a too-low zoom on
-      // narrow viewports and keeps every level consistent with mount-time.
-      const v = MAP_MOBILE_PRESETS[LEVEL_MOBILE_PRESET[level]];
-      map.setView(v.center, v.zoom);
-      return;
-    }
-    const b = LEVEL_BOUNDS[level];
-    if (b) {
-      map.flyToBounds(b, { duration: 0.6, padding: [20, 20] });
-    } else {
-      // continents / countries: return to a world view
-      map.flyTo([20, 0], 2, { duration: 0.6 });
-    }
-  }, [level, map]);
-  return null;
-}
 
 /* ─── Zoom-aware labels (continent → country → US state) ─────────────── */
 
@@ -1147,7 +1098,6 @@ export default function ClimateMap({
           theme="dark"
           tileOpacity={0.55}
         >
-          <ZoomToLevel level={level} />
           <GeoJSON
             key={`base-${level}-${windowSel}-${metric}-${lookup.size}-${countryRowByName.size}-${continentByKey.size}-${customScale ? `${customScale.min}-${customScale.max}` : 'fixed'}`}
             data={geo}

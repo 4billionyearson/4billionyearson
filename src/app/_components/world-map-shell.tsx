@@ -3,19 +3,21 @@
 /**
  * WorldMapShell — single source of truth for every world choropleth on the site.
  *
+ * Strategy: rather than picking a fixed integer zoom (which only fits the
+ * world correctly at one specific container width — wider containers get sea
+ * margins, narrower containers crop the edges), we let Leaflet compute a
+ * *fractional* zoom that fits a fixed world rectangle into whatever container
+ * size we have. fitBounds re-runs on every resize, so rotating the device,
+ * dragging the browser window, or opening DevTools all keep the whole world
+ * visible at the right size with no margins or cropping.
+ *
  * Owns:
- *   - <MapContainer> with the standard projection / interaction config.
- *   - <TileLayer> with the standard CARTO basemap (light or dark variant).
- *   - Mobile aspect-ratio container so the world fits at every viewport
- *     (portrait / landscape / desktop / ultrawide) without horizontal repeats
- *     or polar-tile bands.
- *   - Initial mobile view (via <MapMobileFit>): preset = 'world' | 'usa' | 'uk'.
- *   - ResizeObserver that calls invalidateSize() whenever the container
- *     resizes (drag the window, rotate the device, open DevTools, etc.)
- *     so tiles stay correctly laid out.
- *   - noWrap on the basemap: kills the horizontal world repeats that
- *     happen at low zoom on wide viewports.
- *   - maxBounds slightly inside the world (no white bands top/bottom).
+ *   - <MapContainer> with fractional-zoom support (zoomSnap=0, zoomDelta=0.5).
+ *   - <TileLayer> (CARTO light or dark, with noWrap to kill horizontal repeats).
+ *   - WorldFitter: on mount and on container resize, fitBounds to WORLD_BOUNDS.
+ *   - Mobile-friendly aspect-ratio container (2:1 on phones, fixed 500px desktop).
+ *   - Initial regional-preset override (preset='usa' | 'uk') that switches
+ *     the fit target to USA / UK bounds. Continents/countries use 'world'.
  *
  * Per-map customisation is done with props, not by re-implementing the shell.
  *
@@ -26,26 +28,40 @@
  *   </WorldMapShell>
  */
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import type { LatLngBoundsExpression } from 'leaflet';
-import {
-  MapMobileFit,
-  type MapMobilePreset,
-} from './map-mobile-fit';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants — change these in one place to affect every world map on the site.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * The world clipped to ±60° latitude top, ±75° bottom (Antarctica visible
- * but not stretched into a band) and a touch outside ±180 longitude so
- * users can pan a few degrees past the dateline without snapping back.
+/** Latitude/longitude rectangles we fit the map to.
+ *
+ *  - World: ±58° lat trims Antarctica's straggly bottom edge so it doesn't
+ *    bleed into a green band on wide containers; ±180° lon is the full
+ *    width with `noWrap` killing horizontal repeats.
+ *  - USA: contiguous United States (CONUS) bounding box.
+ *  - UK:  British Isles bounding box.
  */
+const WORLD_FIT_BOUNDS: LatLngBoundsExpression = [
+  [-58, -180],
+  [84, 180],
+];
+const USA_FIT_BOUNDS: LatLngBoundsExpression = [
+  [24.5, -125],
+  [49.5, -66.5],
+];
+const UK_FIT_BOUNDS: LatLngBoundsExpression = [
+  [49.7, -8.7],
+  [60.9, 1.9],
+];
+
+/** Pan-restriction: a touch outside the fit bounds so users can drag a few
+ *  degrees past the edge without snapping back instantly. */
 const WORLD_MAX_BOUNDS: LatLngBoundsExpression = [
-  [-60, -190],
-  [85, 190],
+  [-65, -190],
+  [88, 190],
 ];
 
 const TILE_LIGHT_URL =
@@ -55,39 +71,38 @@ const TILE_DARK_URL =
 const TILE_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>';
 
-/** Sea/space colour shown in gaps between tiles. Light theme = ocean blue,
- * dark theme = near-black to match the rest of the dark UI. */
 const BG_LIGHT = '#BEEEF9';
 const BG_DARK = '#0b1220';
 
 /**
- * Mobile uses 2:1 aspect ratio (Web Mercator world is ~2:1, so the whole
- * planet fits without bands or cropping at every phone width AND every
- * orientation). Capped at 360px so it never dominates a tablet in landscape.
+ * Mobile uses 2:1 aspect ratio (matches the world Mercator rectangle once
+ * it's clipped to ±58° latitude → ~360°/142° ≈ 2.5:1, but 2:1 leaves a
+ * little extra height for the controls to sit comfortably).
+ *
+ * Capped at 360px so it never dominates a tablet in landscape.
  *
  * Desktop (md+) uses fixed 500px because the card width is bounded by the
- * page max-width, giving a predictable ~2.4:1 aspect.
+ * page max-width, so the aspect stays in a predictable ~2:1–3:1 range
+ * which `fitBounds` handles correctly via fractional zoom.
  */
 const SHELL_HEIGHT_CLASS =
   'aspect-[2/1] max-h-[360px] md:aspect-auto md:max-h-none md:h-[500px]';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type WorldMapPreset = 'world' | 'usa' | 'uk';
+
 export interface WorldMapShellProps {
-  /** Initial mobile view preset. Pass via state for level-toggling maps. */
-  preset?: MapMobilePreset;
+  /** Initial-fit preset. 'world' = whole globe; 'usa' / 'uk' = regional fit. */
+  preset?: WorldMapPreset;
   /** 'light' = CARTO voyager (default), 'dark' = CARTO dark_nolabels. */
   theme?: 'light' | 'dark';
   /** Tile layer opacity. Climate Map dims its tiles to let choropleth pop. */
   tileOpacity?: number;
-  /** Initial center on desktop (mobile uses preset). Default `[20, 0]`. */
-  center?: [number, number];
-  /** Initial zoom on desktop. Default `2`. */
-  zoom?: number;
-  /** Min zoom. Default `1` so users can fully zoom out on wide screens. */
+  /** Min zoom. Default `0` (allows fractional zoom below 1 on wide-short
+   *  containers where the world wouldn't otherwise fit). */
   minZoom?: number;
-  /** Max zoom. Default `10`. CARTO tiles render up to z18 so 10 is
-   * generous; lower values just hide detail without benefit. */
+  /** Max zoom. Default `10`. */
   maxZoom?: number;
   /** Allow scroll-wheel zoom. Default `true`. */
   scrollWheelZoom?: boolean;
@@ -97,26 +112,74 @@ export interface WorldMapShellProps {
   children?: ReactNode;
 }
 
+const PRESET_BOUNDS: Record<WorldMapPreset, LatLngBoundsExpression> = {
+  world: WORLD_FIT_BOUNDS,
+  usa: USA_FIT_BOUNDS,
+  uk: UK_FIT_BOUNDS,
+};
+
 /**
- * Resize observer that calls invalidateSize whenever the map's container
- * changes width or height. Without this, dragging the browser window or
- * rotating a device leaves stale tiles laid out at the wrong dimensions.
+ * Width-first fit for the world preset: compute a (fractional) zoom such
+ * that the world is exactly as wide as the container. This guarantees the
+ * world *fills the width* on every device — no sea margins on the sides
+ * (which the old "fixed zoom 1" approach gave on wide containers) and no
+ * cropped continents (which it gave on narrow ones).
+ *
+ * On mount and on preset change we re-fit. On simple resize we only
+ * invalidateSize (so a user who has manually zoomed to a region doesn't
+ * get yanked back to the world view every time the address bar collapses
+ * on iOS or the user opens DevTools).
+ *
+ * We also lock minZoom to the width-fit zoom: the user cannot zoom out
+ * beyond "world fills width", which prevents the strange Antarctica /
+ * polar-region band that appeared at very low zooms.
  */
-function ResizeWatcher() {
+function WorldFitter({ preset }: { preset: WorldMapPreset }) {
   const map = useMap();
   useEffect(() => {
-    const el = map.getContainer();
+    const fit = () => {
+      map.invalidateSize();
+      if (preset === 'world') {
+        const w = map.getContainer().clientWidth;
+        // Mercator world is 256 px wide at zoom 0. Find fractional zoom
+        // where 256 × 2^z = container width → z = log2(w / 256).
+        const z = Math.max(0, Math.log2(Math.max(64, w) / 256));
+        map.setMinZoom(z);
+        map.setView([20, 0], z, { animate: false });
+      } else {
+        const bounds = PRESET_BOUNDS[preset];
+        // Reset min zoom for regional presets — the user may legitimately
+        // want to zoom out from a regional fit to see context.
+        map.setMinZoom(0);
+        map.fitBounds(bounds, { animate: false, padding: [10, 10] });
+      }
+    };
+
     let raf = 0;
+    const fitDeferred = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(fit);
+    };
+
+    // Initial fit (preset change also triggers this).
+    fitDeferred();
+
+    // Resize: only invalidateSize. Preserves the user's current view.
+    let firstObservation = true;
     const ro = new ResizeObserver(() => {
+      if (firstObservation) {
+        firstObservation = false; // ignore the synthetic initial observe
+        return;
+      }
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => map.invalidateSize());
     });
-    ro.observe(el);
+    ro.observe(map.getContainer());
     return () => {
       ro.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, [map]);
+  }, [map, preset]);
   return null;
 }
 
@@ -124,9 +187,7 @@ export function WorldMapShell({
   preset = 'world',
   theme = 'light',
   tileOpacity = 1,
-  center = [20, 0],
-  zoom = 2,
-  minZoom = 1,
+  minZoom = 0,
   maxZoom = 10,
   scrollWheelZoom = true,
   className = '',
@@ -137,10 +198,13 @@ export function WorldMapShell({
   return (
     <div className={`relative w-full overflow-hidden rounded-xl ${SHELL_HEIGHT_CLASS} ${className}`}>
       <MapContainer
-        center={center}
-        zoom={zoom}
+        // Initial center/zoom are placeholders — WorldFitter overrides on mount.
+        center={[20, 0]}
+        zoom={2}
         minZoom={minZoom}
         maxZoom={maxZoom}
+        zoomSnap={0}
+        zoomDelta={0.5}
         scrollWheelZoom={scrollWheelZoom}
         maxBounds={WORLD_MAX_BOUNDS}
         maxBoundsViscosity={1}
@@ -148,8 +212,7 @@ export function WorldMapShell({
         className="h-full w-full z-0"
         style={{ background: bg }}
       >
-        <MapMobileFit preset={preset} />
-        <ResizeWatcher />
+        <WorldFitter preset={preset} />
         <TileLayer
           attribution={TILE_ATTRIBUTION}
           url={tileUrl}
@@ -161,3 +224,4 @@ export function WorldMapShell({
     </div>
   );
 }
+

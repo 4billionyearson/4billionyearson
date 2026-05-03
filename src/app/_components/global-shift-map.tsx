@@ -793,7 +793,6 @@ export default function GlobalShiftMap() {
           <WorldMapShell
             preset="world"
             theme="dark"
-            center={[20, 10]}
             scrollWheelZoom={false}
           >
             <GeoJSON
