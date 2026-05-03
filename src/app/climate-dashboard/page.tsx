@@ -6,10 +6,9 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
 } from 'recharts';
-import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe, ExternalLink, Activity, Thermometer, CloudRain } from 'lucide-react';
+import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe, ExternalLink, Activity } from 'lucide-react';
 import { countryFlag } from '@/lib/climate/locations';
 import { getProfileSlugForLocation } from '@/lib/climate/regions';
-import { OverviewGrid, buildOverviewRow, type OverviewPanel, type OverviewRow } from '@/app/climate/_shared/overview-grid';
 import Link from 'next/link';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -295,6 +294,36 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
+// ─── Climate Stat Card (3-tier: primary / national / global) ────────────────
+function ClimateStatCard({ label, subtitle, color, tiers }: {
+  label: string;
+  subtitle?: string;
+  color: string;
+  tiers: { name: string; value: string | null; unit: string; anomaly?: string | null }[];
+}) {
+  const visible = tiers.filter((t) => t.value != null);
+  return (
+    <div className="bg-gray-800/90 rounded-xl p-4 border border-gray-700/50">
+      <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">{label}</div>
+      {visible.length === 0 ? (
+        <div className="text-sm text-gray-500">n/a</div>
+      ) : (
+        visible.map((t, i) => (
+          <div key={t.name + i} className={i > 0 ? 'mt-2' : ''}>
+            <div className="flex items-baseline gap-1">
+              <span className={`text-2xl font-bold font-mono ${color}`}>{t.value}</span>
+              {t.unit && <span className="text-sm text-gray-400">{t.unit}</span>}
+              {t.anomaly && <span className="text-xs text-gray-400 ml-1">({t.anomaly})</span>}
+            </div>
+            <div className="text-xs text-gray-400 mt-0.5">{t.name}</div>
+          </div>
+        ))
+      )}
+      {subtitle && <div className="text-xs text-gray-400 mt-2">{subtitle}</div>}
+    </div>
+  );
+}
+
 // ─── Main Dashboard ──────────────────────────────────────────────────────────
 
 const CLIMATE_CACHE_KEY = 'climate-dashboard-cache-v3';
@@ -573,20 +602,19 @@ function ClimateDashboard() {
 
   const hasData = countryData || usStateData || ukRegionData;
 
-  // ─── Key Facts panels ──────────────────────────────────────────────────
-  // Build the same OverviewGrid panels used by /climate/global and
-  // /climate/{slug}, but populated from the dashboard's local + national +
-  // global data layers. Falls back to a single global row when no location
-  // is selected so the page never opens without a Key Facts headline.
-  const { keyFactsPanels, keyFactsMonthLabel } = useMemo(() => {
-    // ── Identify the "national" layer (NOAA / Met Office) for each scope ──
-    // Mirrors how the slug pages decide whether to use national data as the
-    // primary row (country selections on USA / UK).
+  // ─── Key Facts (stat tiles) ────────────────────────────────────────────
+  // Build 4 simple stat tiles (Latest Month Temp, Latest Month Rainfall,
+  // Year-to-date Temp, Year-to-date Rainfall) styled to match the other
+  // dashboards (Energy / AI / Biotech). Each tile stacks up to 3 tiers –
+  // primary location, national parent (if any) and Global – so a US state
+  // selection shows e.g. Texas / United States / Global.
+  const { keyFactsTiers, keyFactsMonthLabel, keyFactsAnnualYear } = useMemo(() => {
     const isUsState = selectedLocation?.type === 'us-state';
     const isUkSubReg = selectedLocation?.type === 'uk-region' && selectedLocation?.id !== 'uk-uk';
     const isCountryUSA = selectedLocation?.type === 'country' && selectedLocation?.owidCode === 'USA';
     const isCountryGBR = selectedLocation?.type === 'country' && selectedLocation?.owidCode === 'GBR';
 
+    // Identify the "national" data layer for each scope
     const nd: any = isUsState
       ? usNationalData
       : isUkSubReg
@@ -598,123 +626,100 @@ function ClimateDashboard() {
             : null;
     const useNationalAsPrimary = (isCountryUSA || isCountryGBR) && !!(nd?.varData || nd?.paramData);
 
-    const primaryLabel = isUsState
-      ? (usStateData?.state || selectedLocation?.name || 'State')
-      : isUkSubReg
-        ? (ukRegionData?.region || selectedLocation?.name || 'Region')
-        : (countryData?.country || selectedLocation?.name || '');
-    const nationalLabel = isUsState
-      ? 'United States'
-      : isUkSubReg
-        ? (ukCountryData?.region || 'United Kingdom')
-        : '';
-
-    // ── Latest data month for the divider title ──
-    const monthLabel = (
-      usStateData?.paramData?.tavg?.latestMonthStats?.label
-      || ukRegionData?.varData?.Tmean?.latestMonthStats?.label
-      || nd?.varData?.Tmean?.latestMonthStats?.label
-      || nd?.paramData?.tavg?.latestMonthStats?.label
-      || countryData?.latestMonthStats?.label
-      || globalData?.landLatestMonthStats?.label
-      || globalData?.noaaStats?.landOcean?.latestMonthStats?.label
-      || null
-    ) as string | null;
-
-    // ── Temperature panel ──
-    const tempRows: (OverviewRow | null)[] = [];
-    if (hasData) {
-      tempRows.push(buildOverviewRow(
-        primaryLabel,
-        useNationalAsPrimary
-          ? (nd!.varData?.Tmean?.yearly || nd!.paramData?.tavg?.yearly)
-          : (ukRegionData?.varData?.Tmean?.yearly || usStateData?.paramData?.tavg?.yearly || countryData?.yearlyData),
-        useNationalAsPrimary
-          ? (nd!.varData?.Tmean?.latestMonthStats || nd!.paramData?.tavg?.latestMonthStats)
-          : (ukRegionData?.varData?.Tmean?.latestMonthStats || usStateData?.paramData?.tavg?.latestMonthStats || countryData?.latestMonthStats),
-        useNationalAsPrimary
-          ? (nd!.varData?.Tmean?.latestThreeMonthStats || nd!.paramData?.tavg?.latestThreeMonthStats)
-          : (ukRegionData?.varData?.Tmean?.latestThreeMonthStats || usStateData?.paramData?.tavg?.latestThreeMonthStats || countryData?.latestThreeMonthStats),
-        '°C', 1, false, true,
-      ));
-      // National row when a sub-national region is selected, or when a non-USA/GBR
-      // country has a NOAA/Met Office aggregate (rare) – we keep it consistent
-      // with the slug pages by skipping when national was promoted to primary.
-      if (!useNationalAsPrimary && (isUsState || isUkSubReg)) {
-        tempRows.push(buildOverviewRow(
-          nationalLabel || 'National',
-          nd?.varData?.Tmean?.yearly || nd?.paramData?.tavg?.yearly || (isUsState ? countryData?.yearlyData : undefined) || (isUkSubReg ? countryData?.yearlyData : undefined),
-          nd?.varData?.Tmean?.latestMonthStats || nd?.paramData?.tavg?.latestMonthStats || (isUsState ? countryData?.latestMonthStats : undefined) || (isUkSubReg ? countryData?.latestMonthStats : undefined),
-          nd?.varData?.Tmean?.latestThreeMonthStats || nd?.paramData?.tavg?.latestThreeMonthStats || (isUsState ? countryData?.latestThreeMonthStats : undefined) || (isUkSubReg ? countryData?.latestThreeMonthStats : undefined),
-          '°C', 1,
-        ));
+    // ── Pick yearly + monthly stat sources for each tier ─────────────────
+    // Each "source" is `{ yearly, latestMonthStats, latestThreeMonthStats }`
+    // and exists for both temperature and rainfall.
+    const lastVal = (yearly?: any[]): { year: number; value: number } | null => {
+      if (!yearly?.length) return null;
+      for (let i = yearly.length - 1; i >= 0; i--) {
+        const p = yearly[i];
+        const v = typeof p.value === 'number' ? p.value
+          : typeof p.avgTemp === 'number' ? p.avgTemp
+          : typeof p.absoluteTemp === 'number' ? p.absoluteTemp
+          : null;
+        if (v != null) return { year: p.year, value: v };
       }
+      return null;
+    };
+
+    type Tier = {
+      name: string;
+      tempMonth?: { value: number; diff?: number; label: string };
+      rainMonth?: { value: number; diff?: number; label: string };
+      tempYear?: { value: number; year: number };
+      rainYear?: { value: number; year: number };
+    };
+
+    const tiers: Tier[] = [];
+
+    // ── Primary tier ─────────────────────────────────────────────────────
+    if (hasData || useNationalAsPrimary) {
+      const primaryName = isUsState
+        ? (usStateData?.state || selectedLocation?.name || 'State')
+        : isUkSubReg
+          ? (ukRegionData?.region || selectedLocation?.name || 'Region')
+          : (countryData?.country || selectedLocation?.name || 'Selected');
+
+      const tempYearly = useNationalAsPrimary
+        ? (nd!.varData?.Tmean?.yearly || nd!.paramData?.tavg?.yearly)
+        : (ukRegionData?.varData?.Tmean?.yearly || usStateData?.paramData?.tavg?.yearly || countryData?.yearlyData);
+      const tempMonth = useNationalAsPrimary
+        ? (nd!.varData?.Tmean?.latestMonthStats || nd!.paramData?.tavg?.latestMonthStats)
+        : (ukRegionData?.varData?.Tmean?.latestMonthStats || usStateData?.paramData?.tavg?.latestMonthStats || countryData?.latestMonthStats);
+      const rainYearly = useNationalAsPrimary
+        ? (nd!.varData?.Rainfall?.yearly || nd!.paramData?.pcp?.yearly)
+        : (ukRegionData?.varData?.Rainfall?.yearly || usStateData?.paramData?.pcp?.yearly || countryData?.precipYearly);
+      const rainMonth = useNationalAsPrimary
+        ? (nd!.varData?.Rainfall?.latestMonthStats || nd!.paramData?.pcp?.latestMonthStats)
+        : (ukRegionData?.varData?.Rainfall?.latestMonthStats || usStateData?.paramData?.pcp?.latestMonthStats || countryData?.precipMonthly?.latestMonthStats);
+
+      tiers.push({
+        name: primaryName,
+        tempMonth: tempMonth ? { value: tempMonth.value, diff: tempMonth.diff, label: tempMonth.label } : undefined,
+        rainMonth: rainMonth ? { value: rainMonth.value, diff: rainMonth.diff, label: rainMonth.label } : undefined,
+        tempYear: lastVal(tempYearly) || undefined,
+        rainYear: lastVal(rainYearly) || undefined,
+      });
     }
-    // Global row (always shown when we have global data, even with no selection)
+
+    // ── National tier (only when sub-national region selected) ───────────
+    if (!useNationalAsPrimary && (isUsState || isUkSubReg) && nd) {
+      const nationalName = isUsState ? 'United States' : (ukCountryData?.region || 'United Kingdom');
+      const tempYearly = nd.varData?.Tmean?.yearly || nd.paramData?.tavg?.yearly || countryData?.yearlyData;
+      const tempMonth = nd.varData?.Tmean?.latestMonthStats || nd.paramData?.tavg?.latestMonthStats || countryData?.latestMonthStats;
+      const rainYearly = nd.varData?.Rainfall?.yearly || nd.paramData?.pcp?.yearly || countryData?.precipYearly;
+      const rainMonth = nd.varData?.Rainfall?.latestMonthStats || nd.paramData?.pcp?.latestMonthStats || countryData?.precipMonthly?.latestMonthStats;
+
+      tiers.push({
+        name: nationalName,
+        tempMonth: tempMonth ? { value: tempMonth.value, diff: tempMonth.diff, label: tempMonth.label } : undefined,
+        rainMonth: rainMonth ? { value: rainMonth.value, diff: rainMonth.diff, label: rainMonth.label } : undefined,
+        tempYear: lastVal(tempYearly) || undefined,
+        rainYear: lastVal(rainYearly) || undefined,
+      });
+    }
+
+    // ── Global tier ──────────────────────────────────────────────────────
     if (globalData) {
-      const globalRow = buildOverviewRow(
-        'Global',
-        globalData.noaaStats?.landOcean?.yearly ?? globalData.landYearlyData,
-        globalData.noaaStats?.landOcean?.latestMonthStats ?? globalData.landLatestMonthStats,
-        globalData.noaaStats?.landOcean?.latestThreeMonthStats ?? globalData.landLatestThreeMonthStats,
-        '°C', 1,
-        false,
-        !hasData, // primary row when there's nothing else
-      );
-      if (globalRow) tempRows.push({ ...globalRow, sublabel: 'Land + Ocean' });
-    }
-    const temperatureRows = tempRows.filter((r): r is OverviewRow => Boolean(r));
-
-    // ── Rainfall / precipitation panel ──
-    const rainRows: (OverviewRow | null)[] = [];
-    if (hasData) {
-      rainRows.push(buildOverviewRow(
-        primaryLabel,
-        useNationalAsPrimary
-          ? (nd!.varData?.Rainfall?.yearly || nd!.paramData?.pcp?.yearly)
-          : (ukRegionData?.varData?.Rainfall?.yearly || usStateData?.paramData?.pcp?.yearly || countryData?.precipYearly),
-        useNationalAsPrimary
-          ? (nd!.varData?.Rainfall?.latestMonthStats || nd!.paramData?.pcp?.latestMonthStats)
-          : (ukRegionData?.varData?.Rainfall?.latestMonthStats || usStateData?.paramData?.pcp?.latestMonthStats || countryData?.precipMonthly?.latestMonthStats),
-        useNationalAsPrimary
-          ? (nd!.varData?.Rainfall?.latestThreeMonthStats || nd!.paramData?.pcp?.latestThreeMonthStats)
-          : (ukRegionData?.varData?.Rainfall?.latestThreeMonthStats || usStateData?.paramData?.pcp?.latestThreeMonthStats || countryData?.precipMonthly?.latestThreeMonthStats),
-        ' mm', 0, false, true,
-      ));
-      if (!useNationalAsPrimary && (isUsState || isUkSubReg)) {
-        rainRows.push(buildOverviewRow(
-          nationalLabel || 'National',
-          nd?.varData?.Rainfall?.yearly || nd?.paramData?.pcp?.yearly,
-          nd?.varData?.Rainfall?.latestMonthStats || nd?.paramData?.pcp?.latestMonthStats,
-          nd?.varData?.Rainfall?.latestThreeMonthStats || nd?.paramData?.pcp?.latestThreeMonthStats,
-          ' mm', 0,
-        ));
-      }
-    }
-    const rainfallRows = rainRows.filter((r): r is OverviewRow => Boolean(r));
-
-    const panels: OverviewPanel[] = [];
-    if (temperatureRows.length) {
-      panels.push({
-        title: 'Temperature – Average',
-        icon: <Thermometer className="text-orange-400" />,
-        accentClass: 'bg-orange-600',
-        accentBg: 'bg-orange-600/50',
-        accentBorder: 'border-orange-400/80',
-        sections: [{ rows: temperatureRows }],
+      const tempMonth = globalData.noaaStats?.landOcean?.latestMonthStats ?? globalData.landLatestMonthStats;
+      const tempYearly = globalData.noaaStats?.landOcean?.yearly ?? globalData.landYearlyData;
+      tiers.push({
+        name: 'Global',
+        tempMonth: tempMonth ? { value: tempMonth.value, diff: tempMonth.diff, label: tempMonth.label } : undefined,
+        tempYear: lastVal(tempYearly) || undefined,
+        // Rainfall has no clean global aggregate – leave blank.
       });
     }
-    if (rainfallRows.length) {
-      panels.push({
-        title: 'Rainfall – Total',
-        icon: <CloudRain className="text-blue-400" />,
-        accentClass: 'bg-blue-600',
-        accentBg: 'bg-blue-950/50',
-        accentBorder: 'border-blue-400/80',
-        sections: [{ rows: rainfallRows }],
-      });
-    }
-    return { keyFactsPanels: panels, keyFactsMonthLabel: monthLabel };
+
+    // Latest data month label – prefer primary tier, fall back through
+    const monthLabel = tiers.find((t) => t.tempMonth)?.tempMonth?.label
+      || tiers.find((t) => t.rainMonth)?.rainMonth?.label
+      || null;
+    const annualYear = tiers.find((t) => t.tempYear)?.tempYear?.year
+      || tiers.find((t) => t.rainYear)?.rainYear?.year
+      || null;
+
+    return { keyFactsTiers: tiers, keyFactsMonthLabel: monthLabel, keyFactsAnnualYear: annualYear };
   }, [selectedLocation, countryData, usStateData, ukRegionData, ukCountryData, usNationalData, globalData, hasData]);
 
   return (
@@ -836,12 +841,73 @@ function ClimateDashboard() {
         )}
 
         {/* ─── Key Facts ────────────────────────────────────────────── */}
-        {!loading && keyFactsPanels.length > 0 && (
-          <>
-            <Divider icon={<Activity className="h-5 w-5" />} title={`Key Facts${keyFactsMonthLabel ? ` – ${keyFactsMonthLabel}` : ''}`} />
-            <OverviewGrid panels={keyFactsPanels} />
-          </>
-        )}
+        {!loading && keyFactsTiers.length > 0 && (() => {
+          const fmt = (v: number | undefined, digits: number) => v == null ? null : v.toFixed(digits);
+          const fmtSigned = (v: number | undefined, digits: number) => v == null ? null : `${v >= 0 ? '+' : ''}${v.toFixed(digits)}`;
+          const monthHdr = keyFactsMonthLabel ? ` (${keyFactsMonthLabel})` : '';
+          const yearHdr = keyFactsAnnualYear ? ` (${keyFactsAnnualYear})` : '';
+          return (
+            <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
+              <div className="flex items-center gap-2 mb-4">
+                <Activity className="h-5 w-5 text-[#D0A65E]" />
+                <h2 className="text-lg font-bold font-mono text-white">Key Facts</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <ClimateStatCard
+                  label={`Avg Temperature${monthHdr}`}
+                  subtitle="Anomaly vs 1961–1990 baseline."
+                  color="text-orange-400"
+                  tiers={keyFactsTiers.map((t) => ({
+                    name: t.name,
+                    value: fmt(t.tempMonth?.value, 1),
+                    unit: '°C',
+                    anomaly: fmtSigned(t.tempMonth?.diff, 1) ? `${fmtSigned(t.tempMonth?.diff, 1)}°C` : null,
+                  }))}
+                />
+                <ClimateStatCard
+                  label={`Rainfall${monthHdr}`}
+                  subtitle="Anomaly vs 1961–1990 baseline."
+                  color="text-blue-400"
+                  tiers={keyFactsTiers.map((t) => ({
+                    name: t.name,
+                    value: fmt(t.rainMonth?.value, 0),
+                    unit: 'mm',
+                    anomaly: fmtSigned(t.rainMonth?.diff, 0) ? `${fmtSigned(t.rainMonth?.diff, 0)}mm` : null,
+                  }))}
+                />
+                <ClimateStatCard
+                  label={`Avg Temperature${yearHdr}`}
+                  subtitle="Latest annual mean."
+                  color="text-red-400"
+                  tiers={keyFactsTiers.map((t) => ({
+                    name: t.name,
+                    value: fmt(t.tempYear?.value, 1),
+                    unit: '°C',
+                  }))}
+                />
+                <ClimateStatCard
+                  label={`Rainfall${yearHdr}`}
+                  subtitle="Latest annual total."
+                  color="text-cyan-400"
+                  tiers={keyFactsTiers.map((t) => ({
+                    name: t.name,
+                    value: fmt(t.rainYear?.value, 0),
+                    unit: 'mm',
+                  }))}
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-3">
+                Sources:{' '}
+                <a href="https://www.ncei.noaa.gov/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA NCEI</a>
+                {' · '}
+                <a href="https://www.metoffice.gov.uk/research/climate/maps-and-data" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">UK Met Office</a>
+                {' · '}
+                <a href="https://berkeleyearth.org/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Berkeley Earth</a>{' '}
+                (country temperatures).
+              </p>
+            </div>
+          );
+        })()}
 
         {/* ─── Data Display ─────────────────────────────────────────── */}
         {hasData && !loading && (
