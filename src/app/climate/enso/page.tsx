@@ -507,7 +507,7 @@ export default function EnsoPage() {
           <HeroPanel />
 
       {/* ─── Hero state + Niño-region map ──────────────────────── */}
-      <div id="current-state" className="scroll-mt-6">
+      <div id="current-state" className="scroll-mt-24">
       {oni && (() => {
         // Anomaly → text-class for headline numbers
         const anomColor = (a: number) =>
@@ -651,7 +651,7 @@ export default function EnsoPage() {
       </div>
 
       {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
-      <div id="forecast" className="scroll-mt-6">
+      <div id="forecast" className="scroll-mt-24">
       <Divider icon={<TrendingUp className="h-5 w-5" />} title={`Prediction (${ensoForecastYearLabel()})`} />
       <ForecastSection data={data} />
       </div>
@@ -882,7 +882,7 @@ export default function EnsoPage() {
       })()}
 
       {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
-      <div id="impacts" className="scroll-mt-6">
+      <div id="impacts" className="scroll-mt-24">
         <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impacts" />
       </div>
 
@@ -1037,7 +1037,7 @@ export default function EnsoPage() {
           drives the forecast curve in the hero past+future chart. */}
 
       {/* ═══ PAST EVENTS ═════════════════════════ */}
-      <div id="past-events" className="scroll-mt-6">
+      <div id="past-events" className="scroll-mt-24">
         <Divider icon={<History className="h-5 w-5" />} title={`Past Major Events (${pastEventsRangeLabel()})`} />
       </div>
 
