@@ -1135,7 +1135,7 @@ export default function EnsoPage() {
       </SectionCard>
 
       {/* ═══ CLIMATE CHANGE ══════════════════════ */}
-      <Divider icon={<Wind className="h-5 w-5" />} title="How does climate change affect El Niño and La Niña?" />
+      <Divider icon={<Wind className="h-5 w-5" />} title="How does Climate Change affect El Niño and La Niña?" />
 
       <SectionCard
         icon={<Wind className="text-[#D0A65E]" />}
