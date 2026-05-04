@@ -234,16 +234,28 @@ function highlightRankings(text: string): string {
 
 // ─── Main component ──────────────────────────────────────────────────────────
 
-export default function GlobalProfile() {
+interface GlobalProfileProps {
+  /** Pre-fetched Gemini summary read from Redis at request time on the server.
+   *  When provided, the client component skips the auto-fetch on mount so the
+   *  raw SSR HTML already contains the summary paragraph (good for AI / search
+   *  crawlers). When null, the client falls back to the existing fetch flow. */
+  initialSummary?: string | null;
+  initialSources?: { title: string; uri: string }[];
+}
+
+export default function GlobalProfile({
+  initialSummary = null,
+  initialSources = [],
+}: GlobalProfileProps = {}) {
   const region = getRegionBySlug('global')!;
   const [data, setData] = useState<GlobalData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Gemini summary state
-  const [summary, setSummary] = useState<string | null>(null);
-  const [summaryLoading, setSummaryLoading] = useState(true);
-  const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>([]);
+  // Gemini summary state — pre-seeded from server-side Redis read when available.
+  const [summary, setSummary] = useState<string | null>(initialSummary);
+  const [summaryLoading, setSummaryLoading] = useState(initialSummary == null);
+  const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>(initialSources);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [summaryRetryable, setSummaryRetryable] = useState(false);
 
@@ -291,8 +303,12 @@ export default function GlobalProfile() {
         if (!cancelled) setLoading(false);
       });
 
-    void fetchSummary();
+    // Only fetch the Gemini summary client-side if it wasn't pre-seeded by SSR.
+    if (initialSummary == null) {
+      void fetchSummary();
+    }
     return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Derived values

@@ -5,10 +5,35 @@ import {
   getClimateMetadataDescription,
   getClimatePageUrl,
 } from '@/lib/climate/regions';
+import { getCached } from '@/lib/climate/redis';
 import GlobalProfile from './GlobalProfile';
 
-// ISR: regenerate a few times a day so the month-updated title stays fresh
-export const revalidate = 21600;
+// ISR: regenerate every 30 minutes so a freshly cached Gemini summary surfaces
+// in the SSR'd HTML soon after it is generated.
+export const revalidate = 1800;
+
+interface CachedSummary {
+  summary: string | null;
+  sources?: { title: string; uri: string }[];
+}
+
+async function readCachedGlobalSummary(): Promise<CachedSummary | null> {
+  const now = new Date();
+  const dayOfMonth = now.getDate();
+  const cacheMonth = dayOfMonth >= 21
+    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    : (() => {
+        const prev = new Date(now);
+        prev.setMonth(prev.getMonth() - 1);
+        return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
+      })();
+  const cacheKey = `climate:summary:global:${cacheMonth}-v27`;
+  try {
+    return await getCached<CachedSummary>(cacheKey);
+  } catch {
+    return null;
+  }
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const region = getRegionBySlug('global');
@@ -96,11 +121,15 @@ function DatasetSchema() {
   );
 }
 
-export default function ClimateGlobalPage() {
+export default async function ClimateGlobalPage() {
+  const cached = await readCachedGlobalSummary();
   return (
     <>
       <DatasetSchema />
-      <GlobalProfile />
+      <GlobalProfile
+        initialSummary={cached?.summary ?? null}
+        initialSources={cached?.sources ?? []}
+      />
     </>
   );
 }
