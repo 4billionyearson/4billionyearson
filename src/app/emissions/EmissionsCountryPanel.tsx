@@ -458,6 +458,16 @@ export default function EmissionsCountryPanel({
         <div className="flex items-center gap-2 flex-wrap">
           <Factory className="h-5 w-5 text-[#D0A65E]" />
           <h2 className="text-lg font-bold font-mono text-white">Deep Dive</h2>
+          {hasSelection && (
+            <button
+              onClick={clearSelection}
+              className="ml-auto md:ml-2 text-xs text-gray-400 hover:text-white inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 transition-colors"
+            >
+              <X className="h-3 w-3" /> Clear
+            </button>
+          )}
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 md:ml-auto md:flex-1 md:justify-end">
           <ChipDropdown
             label="Region"
             ariaLabel="Region type"
@@ -489,30 +499,22 @@ export default function EmissionsCountryPanel({
               { key: 'us-state', label: 'US States' },
             ]}
           />
-          {hasSelection && (
-            <button
-              onClick={clearSelection}
-              className="ml-auto md:ml-2 text-xs text-gray-400 hover:text-white inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 transition-colors"
-            >
-              <X className="h-3 w-3" /> Clear
-            </button>
+          {(mode === 'country' || mode === 'us-state') && (
+            <div className="w-full sm:flex-1 sm:max-w-md">
+              <RegionSearch
+                mode={mode === 'us-state' ? 'us-state' : 'country'}
+                onSelect={(v) => {
+                  if (mode === 'us-state') {
+                    if (v.code) selectState(v.name, v.code);
+                  } else {
+                    selectCountry(v.name);
+                  }
+                }}
+                loading={mode === 'us-state' ? stateLoading : loading}
+              />
+            </div>
           )}
         </div>
-        {(mode === 'country' || mode === 'us-state') && (
-          <div className="md:flex-1 md:max-w-md md:ml-auto w-full">
-            <RegionSearch
-              mode={mode === 'us-state' ? 'us-state' : 'country'}
-              onSelect={(v) => {
-                if (mode === 'us-state') {
-                  if (v.code) selectState(v.name, v.code);
-                } else {
-                  selectCountry(v.name);
-                }
-              }}
-              loading={mode === 'us-state' ? stateLoading : loading}
-            />
-          </div>
-        )}
       </div>
 
       {mode === 'continent' ? (
