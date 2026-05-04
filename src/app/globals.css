@@ -185,6 +185,32 @@ html[data-embed] .relative.z-10 {
   filter: saturate(3);
 }
 
+/* Mobile: shrink the Leaflet/CARTO attribution so it doesn't eat the corner
+   of the map, and shrink in-map country/continent labels so they remain
+   legible without crowding the now-square mobile map.
+   !important is needed to beat the inline font-size set by divIcon. */
+@media (max-width: 500px) {
+  .leaflet-control-attribution {
+    font-size: 9px !important;
+    padding: 0 4px !important;
+    line-height: 1.35 !important;
+  }
+  .leaflet-control-attribution svg {
+    width: 9px !important;
+    height: 8px !important;
+  }
+  .country-label span,
+  .country-label-dark span {
+    font-size: 8px !important;
+    letter-spacing: 0.2px !important;
+  }
+  .continent-label span,
+  .continent-label-dark span {
+    font-size: 10px !important;
+    letter-spacing: 1px !important;
+  }
+}
+
 /* Restore ordered list numbering in post HTML bodies
    (Tailwind preflight strips list-style; @tailwindcss/typography is not installed) */
 .prose ol {

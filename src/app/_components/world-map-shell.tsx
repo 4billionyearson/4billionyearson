@@ -75,18 +75,19 @@ const BG_LIGHT = '#BEEEF9';
 const BG_DARK = '#0b1220';
 
 /**
- * Mobile uses 2:1 aspect ratio (matches the world Mercator rectangle once
- * it's clipped to ±58° latitude → ~360°/142° ≈ 2.5:1, but 2:1 leaves a
- * little extra height for the controls to sit comfortably).
+ * Aspect-ratio strategy: at width-fit zoom (z = log2(w/256)) the world is
+ * exactly the container width. Container HEIGHT therefore controls how
+ * much of the Mercator north/south is visible. A square container shows
+ * the entire ±85° Mercator map; a 2:1 wide-short container shows only
+ * the central band, hiding Greenland and Antarctica.
  *
- * Capped at 360px so it never dominates a tablet in landscape.
- *
- * Desktop (md+) uses fixed 500px because the card width is bounded by the
- * page max-width, so the aspect stays in a predictable ~2:1–3:1 range
- * which `fitBounds` handles correctly via fractional zoom.
+ * So we use:
+ *  - mobile: aspect-square — full Mercator visible (Greenland to Antarctic).
+ *  - desktop: aspect-[4/3] — 75% of Mercator height visible (~±67° lat),
+ *    a balanced trade-off between showing top/bottom and not making the
+ *    map dominate the page on big screens.
  */
-const SHELL_HEIGHT_CLASS =
-  'aspect-[2/1] max-h-[360px] md:aspect-auto md:max-h-none md:h-[500px]';
+const SHELL_HEIGHT_CLASS = 'aspect-square md:aspect-[4/3]';
 
 // ─────────────────────────────────────────────────────────────────────────────
 

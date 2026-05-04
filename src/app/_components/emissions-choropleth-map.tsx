@@ -153,6 +153,42 @@ function getColor(mode: MetricMode, v: number | undefined): string {
   return mode === "perCapita" ? getPerCapitaColor(v) : getAnnualColor(v);
 }
 
+/** 8-step palette used by both legends, light → dark. */
+const PALETTE = [
+  "#a3e635", "#facc15", "#fbbf24", "#f97316",
+  "#ef4444", "#dc2626", "#991b1b", "#7f1d1d",
+];
+
+/**
+ * Quantile thresholds from a list of values. Returns 7 thresholds that
+ * divide the values into 8 equal-population buckets, matching PALETTE.
+ * Returns null if there are fewer than 2 distinct values.
+ */
+function quantileThresholds(values: number[]): number[] | null {
+  const sorted = [...values].filter((v) => Number.isFinite(v) && v > 0).sort((a, b) => a - b);
+  if (sorted.length < 2) return null;
+  const ts: number[] = [];
+  for (let i = 1; i <= 7; i++) {
+    const idx = Math.min(sorted.length - 1, Math.floor((i / 8) * sorted.length));
+    ts.push(sorted[idx]);
+  }
+  // De-dup — if many ties, fall back to even split between min and max.
+  if (new Set(ts).size < 2) {
+    const min = sorted[0];
+    const max = sorted[sorted.length - 1];
+    if (max <= min) return null;
+    return [1, 2, 3, 4, 5, 6, 7].map((i) => min + ((max - min) * i) / 8);
+  }
+  return ts;
+}
+
+function colorFromThresholds(v: number | undefined, ts: number[]): string {
+  if (v == null) return "#1e293b";
+  let i = 0;
+  while (i < ts.length && v >= ts[i]) i++;
+  return PALETTE[Math.min(i, PALETTE.length - 1)];
+}
+
 const PER_CAPITA_LEGEND = [
   { color: "#a3e635", label: "<1" },
   { color: "#facc15", label: "1–3" },
@@ -359,6 +395,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<MetricMode>("perCapita");
   const [level, setLevel] = useState<Level>('countries');
+  const [stretch, setStretch] = useState(false);
   const [continentData, setContinentData] = useState<Record<string, CountryEmissions> | null>(null);
   const [selectedInfo, setSelectedInfo] = useState<{ name: string; annual: number | null; perCapita: number | null; color: string } | null>(null);
 
@@ -418,6 +455,35 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
     return { entry: dataMap.get(owidName), displayName: owidName };
   }, [level, continentData, dataMap]);
 
+  // Derive quantile thresholds from the values currently being rendered.
+  // When `stretch` is on we colour by these thresholds instead of the fixed
+  // legend buckets — this is the only way the Continents × Total Annual
+  // view shows any colour variation, since every continent falls in the
+  // same top bucket of the fixed scale.
+  const stretchThresholds = useMemo(() => {
+    if (!stretch) return null;
+    const values: number[] = [];
+    if (level === 'continents') {
+      if (!continentData) return null;
+      for (const v of Object.values(continentData)) {
+        const x = mode === 'perCapita' ? v.perCapita : v.annual;
+        if (Number.isFinite(x) && x > 0) values.push(x);
+      }
+    } else {
+      for (const v of dataMap.values()) {
+        const x = mode === 'perCapita' ? v.perCapita : v.annual;
+        if (Number.isFinite(x) && x > 0) values.push(x);
+      }
+    }
+    return quantileThresholds(values);
+  }, [stretch, level, mode, dataMap, continentData]);
+
+  const colorFor = useCallback(
+    (v: number | undefined) =>
+      stretchThresholds ? colorFromThresholds(v, stretchThresholds) : getColor(mode, v),
+    [stretchThresholds, mode],
+  );
+
   const style = useCallback(
     (feature: Feature | undefined): PathOptions => {
       if (!feature) return { fillColor: "#1e293b", fillOpacity: 0.7, weight: 0.5, color: "#475569" };
@@ -426,13 +492,13 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
       const { entry } = resolveEntry(owidName, geoName);
       const value = entry ? (mode === "perCapita" ? entry.perCapita : entry.annual) : undefined;
       return {
-        fillColor: getColor(mode, value),
+        fillColor: colorFor(value),
         fillOpacity: 0.8,
         weight: level === 'continents' ? 0.2 : 0.5,
         color: "#334155",
       };
     },
-    [resolveEntry, mode, level],
+    [resolveEntry, mode, level, colorFor],
   );
 
   const onEachFeature = useCallback(
@@ -442,19 +508,19 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
       const { entry, displayName } = resolveEntry(owidName, geoName);
       const annual = entry?.annual ?? null;
       const perCap = entry?.perCapita ?? null;
-      const color = getColor(mode, mode === "perCapita" ? perCap ?? undefined : annual ?? undefined);
+      const color = colorFor(mode === "perCapita" ? perCap ?? undefined : annual ?? undefined);
 
       const showInfo = () => setSelectedInfo({ name: displayName, annual, perCapita: perCap, color });
       layer.on("mouseover", showInfo);
       layer.on("click", showInfo);
       layer.on("mouseout", () => setSelectedInfo(null));
     },
-    [resolveEntry, mode],
+    [resolveEntry, mode, colorFor],
   );
 
   if (loading) {
     return (
-      <div className="aspect-[2/1] max-h-[360px] md:aspect-auto md:max-h-none md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center">
+      <div className="aspect-square md:aspect-[4/3] w-full rounded-xl bg-gray-900/50 flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-red-400 border-t-transparent rounded-full" />
       </div>
     );
@@ -462,7 +528,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
   if (!geoData) {
     return (
-      <div className="aspect-[2/1] max-h-[360px] md:aspect-auto md:max-h-none md:h-[500px] w-full rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-500">
+      <div className="aspect-square md:aspect-[4/3] w-full rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-500">
         Failed to load map data
       </div>
     );
@@ -529,13 +595,28 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
         {legend.map(({ color, label }) => (
           <span key={label} className="flex items-center gap-1">
             <span className="w-3 h-3 rounded-sm" style={{ background: color }} />
-            {label}
+            {stretch ? '' : label}
           </span>
         ))}
         <span className="flex items-center gap-1">
           <span className="w-3 h-3 rounded-sm bg-gray-800 border border-gray-600" />
           No data
         </span>
+        <button
+          type="button"
+          onClick={() => setStretch((s) => !s)}
+          aria-pressed={stretch}
+          title={stretch
+            ? 'Showing colours stretched to the actual data range. Click to return to fixed thresholds.'
+            : 'Stretch colours to the actual data range — useful when every region falls in the same fixed bucket (e.g. continent totals).'}
+          className={`ml-2 px-2 py-0.5 rounded-full border text-[11px] font-semibold transition-colors ${
+            stretch
+              ? 'bg-amber-500/20 border-amber-500/50 text-amber-200'
+              : 'bg-gray-800/60 border-gray-600 text-gray-300 hover:bg-gray-700/60'
+          }`}
+        >
+          {stretch ? 'Stretch: On' : 'Stretch: Off'}
+        </button>
       </div>
     </div>
   );

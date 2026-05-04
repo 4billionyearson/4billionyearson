@@ -1084,7 +1084,7 @@ export default function ClimateMap({
   }
   if (!geo) {
     return (
-      <div className="aspect-[2/1] max-h-[360px] md:aspect-auto md:max-h-none md:h-[500px] w-full rounded-xl bg-gray-900/40 flex items-center justify-center">
+      <div className="aspect-square md:aspect-[4/3] w-full rounded-xl bg-gray-900/40 flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-[#D0A65E] border-t-transparent rounded-full" />
       </div>
     );
