@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Globe2, Flag } from 'lucide-react';
+import { Globe2, Flag, BookOpen } from 'lucide-react';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import UKRegionsBrowser from './uk-regions-browser';
 import ClimateRegionsBrowser from './climate-regions-browser';
@@ -8,6 +8,8 @@ import GroupsBrowserPanel from './groups-browser-panel';
 import { ClimateTabsProvider, ClimateTabsBar, ClimateTabsPanels } from './climate-hub-tabs';
 import EditorsPicksPanel from './editors-picks-panel';
 import ClimateRankingsPanel from './climate-rankings-panel';
+import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
+import { CLIMATE_HUB_FAQ } from './climate-hub-faq';
 
 const REGION_COUNT = CLIMATE_REGIONS.length;
 const HUB_URL = 'https://4billionyearson.org/climate';
@@ -152,6 +154,18 @@ export default function ClimateProfilesIndex() {
               </div>
             </section>
           </ClimateTabsProvider>
+
+          {/* Frequently Asked Questions */}
+          <div className="flex items-center gap-4 my-6">
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+            <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+              <BookOpen className="h-5 w-5" />
+              <span>Frequently Asked Questions</span>
+            </h2>
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+          </div>
+          <StaticFAQPanel headingId="climate-hub-faq-heading" qa={CLIMATE_HUB_FAQ} />
+          <FaqJsonLd qa={CLIMATE_HUB_FAQ} />
         </div>
       </div>
     </main>

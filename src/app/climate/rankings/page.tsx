@@ -2,13 +2,15 @@ import type { Metadata } from 'next';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import Link from 'next/link';
-import { Trophy, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Info } from 'lucide-react';
+import { Trophy, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Info, BookOpen } from 'lucide-react';
 import RankingsTable from './RankingsTable';
 import RankingsAnalysis from './RankingsAnalysis';
 import RollupsSection from './RollupsSection';
 import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
+import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
+import { RANKINGS_FAQ } from './rankings-faq';
 
 export const metadata: Metadata = {
   title: 'Climate Rankings & Monthly Trends - 144 Regions Compared',
@@ -437,6 +439,18 @@ export default async function RankingsPage() {
               See the <Link href="/climate/methodology" className="text-[#E8C97A] underline hover:text-white">full methodology &amp; data sources</Link> page for the complete two-baseline model, source timeline and known caveats.
             </p>
           </section>
+
+          {/* Frequently Asked Questions */}
+          <div className="flex items-center gap-4 my-6">
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+            <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+              <BookOpen className="h-5 w-5" />
+              <span>Frequently Asked Questions</span>
+            </h2>
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+          </div>
+          <StaticFAQPanel headingId="rankings-faq-heading" qa={RANKINGS_FAQ} />
+          <FaqJsonLd qa={RANKINGS_FAQ} />
         </div>
       </div>
     </main>
