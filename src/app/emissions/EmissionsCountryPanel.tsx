@@ -454,47 +454,64 @@ export default function EmissionsCountryPanel({
 
   return (
     <div id="emissions-country-panel" className={wrapperClass}>
-      <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <Factory className="h-5 w-5 text-[#D0A65E]" />
-        <h2 className="text-lg font-bold font-mono text-white">Deep Dive</h2>
-        <ChipDropdown
-          label="Region"
-          ariaLabel="Region type"
-          value={mode}
-          onChange={(id) => {
-            if (id !== mode) {
-              setMode(id as Mode);
-              setCountryName(null);
-              setData(null);
-              setError(null);
-              setStateSelection(null);
-              setRegionSlug(null);
-              setStateData(null);
-              setStateError(null);
-              if (typeof window !== 'undefined') {
-                const url = new URL(window.location.href);
-                url.searchParams.delete('country');
-                url.searchParams.delete('state');
-                url.searchParams.delete('stateName');
-                url.searchParams.delete('region');
-                window.history.replaceState({}, '', url.toString());
+      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Factory className="h-5 w-5 text-[#D0A65E]" />
+          <h2 className="text-lg font-bold font-mono text-white">Deep Dive</h2>
+          <ChipDropdown
+            label="Region"
+            ariaLabel="Region type"
+            value={mode}
+            onChange={(id) => {
+              if (id !== mode) {
+                setMode(id as Mode);
+                setCountryName(null);
+                setData(null);
+                setError(null);
+                setStateSelection(null);
+                setRegionSlug(null);
+                setStateData(null);
+                setStateError(null);
+                if (typeof window !== 'undefined') {
+                  const url = new URL(window.location.href);
+                  url.searchParams.delete('country');
+                  url.searchParams.delete('state');
+                  url.searchParams.delete('stateName');
+                  url.searchParams.delete('region');
+                  window.history.replaceState({}, '', url.toString());
+                }
               }
-            }
-          }}
-          options={[
-            { key: 'continent', label: 'Continents' },
-            { key: 'country', label: 'Countries' },
-            { key: 'us-region', label: 'US Climate Regions' },
-            { key: 'us-state', label: 'US States' },
-          ]}
-        />
-        {hasSelection && (
-          <button
-            onClick={clearSelection}
-            className="ml-auto text-xs text-gray-400 hover:text-white inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 transition-colors"
-          >
-            <X className="h-3 w-3" /> Clear
-          </button>
+            }}
+            options={[
+              { key: 'continent', label: 'Continents' },
+              { key: 'country', label: 'Countries' },
+              { key: 'us-region', label: 'US Climate Regions' },
+              { key: 'us-state', label: 'US States' },
+            ]}
+          />
+          {hasSelection && (
+            <button
+              onClick={clearSelection}
+              className="ml-auto md:ml-2 text-xs text-gray-400 hover:text-white inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 transition-colors"
+            >
+              <X className="h-3 w-3" /> Clear
+            </button>
+          )}
+        </div>
+        {(mode === 'country' || mode === 'us-state') && (
+          <div className="md:flex-1 md:max-w-md md:ml-auto w-full">
+            <RegionSearch
+              mode={mode === 'us-state' ? 'us-state' : 'country'}
+              onSelect={(v) => {
+                if (mode === 'us-state') {
+                  if (v.code) selectState(v.name, v.code);
+                } else {
+                  selectCountry(v.name);
+                }
+              }}
+              loading={mode === 'us-state' ? stateLoading : loading}
+            />
+          </div>
         )}
       </div>
 
@@ -538,19 +555,7 @@ export default function EmissionsCountryPanel({
             );
           })}
         </div>
-      ) : (
-        <RegionSearch
-          mode={mode === 'us-state' ? 'us-state' : 'country'}
-          onSelect={(v) => {
-            if (mode === 'us-state') {
-              if (v.code) selectState(v.name, v.code);
-            } else {
-              selectCountry(v.name);
-            }
-          }}
-          loading={mode === 'us-state' ? stateLoading : loading}
-        />
-      )}
+      ) : null}
 
       {(mode === 'country' || mode === 'continent') && error && (
         <div className="mt-4 rounded-lg border border-red-800/50 bg-red-950/30 p-3 text-sm text-red-400">{error}</div>

@@ -235,32 +235,6 @@ function HeroPanel() {
 }
 
 /**
- * Compact TL;DR shown directly under the hero. Gives users (and AI search
- * snippet extractors) the one-paragraph answer without pushing the live
- * tracker below the fold. Full Q&A list lives at the bottom of the page.
- */
-function QuickTLDR() {
-  return (
-    <aside
-      aria-label="Quick summary"
-      className="rounded-2xl border border-[#D0A65E]/40 bg-gray-950/80 backdrop-blur-md p-4 md:p-5 shadow-lg"
-    >
-      <div className="text-[11px] font-mono uppercase tracking-wider text-[#D0A65E] mb-1">
-        Quick Summary
-      </div>
-      <p className="text-sm md:text-base text-gray-200 leading-relaxed">
-        <strong className="text-white">El Niño</strong> typically brings
-        <strong> heavier rain and floods to Peru, Ecuador, the southern US and East Africa</strong>,
-        and <strong>drought to Indonesia, Australia, the Philippines, southern Africa and the Amazon</strong>.
-        <strong className="text-white"> La Niña</strong> flips most of these patterns. Both phases shift
-        global temperatures by roughly ±0.1–0.2 °C on top of the long-term climate-change warming
-        trend. <a href="#enso-faq-heading" className="text-[#D0A65E] hover:underline">Full Q&amp;A below ↓</a>
-      </p>
-    </aside>
-  );
-}
-
-/**
  * Static FAQ panel — visible HTML mirror of the FAQPage JSON-LD in
  * layout.tsx. AI crawlers (Claude, Perplexity, ChatGPT search) typically
  * don't execute JS, so this is the page text they will index and quote.
@@ -481,7 +455,6 @@ export default function EnsoPage() {
         <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
           <div className="max-w-7xl mx-auto space-y-6">
             <HeroPanel />
-            <QuickTLDR />
             <div className="flex flex-col items-center gap-3 py-10">
               <Loader2 className="h-8 w-8 animate-spin text-sky-300" />
               <p className="text-gray-400 text-sm">Loading live ENSO indicators…</p>
@@ -532,10 +505,6 @@ export default function EnsoPage() {
         <div className="max-w-7xl mx-auto space-y-6">
           {/* ─── Hero ───────────────────────────────────────────────── */}
           <HeroPanel />
-
-          {/* ─── Quick TL;DR (snippet bait for AI search; full FAQ at
-                bottom of page so the live tracker is above the fold) ─ */}
-          <QuickTLDR />
 
       {/* ─── Hero state + Niño-region map ──────────────────────── */}
       <div id="current-state" className="scroll-mt-6">

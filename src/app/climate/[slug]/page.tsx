@@ -160,17 +160,6 @@ export default async function ClimateProfilePage(
   const region = getRegionBySlug(slug);
   if (!region) notFound();
 
-  // Group/aggregate slugs (continents, US climate regions) get their own
-  // server-rendered template that reads continent / region snapshots directly.
-  if (region.type === 'group') {
-    return (
-      <>
-        <DatasetSchema region={region} />
-        <ClimateGroupProfile region={region} />
-      </>
-    );
-  }
-
   const cached = await readCachedSummary(slug);
   const cacheMiss = !cached?.summary;
 
@@ -178,6 +167,22 @@ export default async function ClimateProfilePage(
   // to this slug will SSR with the fresh summary baked in.
   if (cacheMiss) {
     await warmRegionSummary(slug);
+  }
+
+  // Group/aggregate slugs (continents, US climate regions) get their own
+  // server-rendered template that reads continent / region snapshots directly.
+  if (region.type === 'group') {
+    return (
+      <>
+        <DatasetSchema region={region} />
+        <ClimateGroupProfile
+          region={region}
+          initialSummary={cached?.summary ?? null}
+          initialSources={cached?.sources ?? []}
+          summaryCacheMiss={cacheMiss}
+        />
+      </>
+    );
   }
 
   return (

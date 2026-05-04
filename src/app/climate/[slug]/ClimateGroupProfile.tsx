@@ -769,7 +769,17 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
 
 // ─── Public component ──────────────────────────────────────────────────────
 
-export default async function ClimateGroupProfile({ region }: { region: ClimateRegion }) {
+export default async function ClimateGroupProfile({
+  region,
+  initialSummary = null,
+  initialSources = [],
+  summaryCacheMiss = false,
+}: {
+  region: ClimateRegion;
+  initialSummary?: string | null;
+  initialSources?: { title: string; uri: string }[];
+  summaryCacheMiss?: boolean;
+}) {
   const isContinent = region.groupKind === 'continent';
 
   // Title parity with country / global pages: "<Region> Climate – <Month Year> Update"
@@ -808,14 +818,20 @@ export default async function ClimateGroupProfile({ region }: { region: ClimateR
                 <span>
                   This is a 4BYO aggregate. NOAA does not publish a standalone continental land series for {region.name},
                   so we average country anomalies in our coverage. See{' '}
-                  <Link href="/climate/methodology" className="text-[#E8C97A] hover:underline">methodology</Link>.
+                  <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">methodology</Link>.
                 </span>
               </p>
             ) : null}
             <div className="mb-3">
               <ClimateRankPill slug={region.slug} />
             </div>
-            <GroupSummaryPanel slug={region.slug} regionName={region.name} />
+            <GroupSummaryPanel
+              slug={region.slug}
+              regionName={region.name}
+              initialSummary={initialSummary}
+              initialSources={initialSources}
+              summaryCacheMiss={summaryCacheMiss}
+            />
             <div className="mt-3 flex items-center justify-between gap-3 flex-wrap">
               <ShareBar
                 pageUrl={`https://4billionyearson.org/climate/${region.slug}#climate-update`}

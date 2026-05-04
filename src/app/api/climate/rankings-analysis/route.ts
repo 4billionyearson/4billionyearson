@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
@@ -381,6 +382,9 @@ export async function GET(request: Request) {
       generatedAt: new Date().toISOString(),
     };
     await setShortTerm(cacheKey, cacheResult);
+    // Bust the rankings page so the next request SSRs with the fresh
+    // analysis baked in (matches the per-region summary pattern).
+    try { revalidatePath('/climate/rankings'); } catch {}
     return NextResponse.json({ ...cacheResult, source: 'fresh' });
   } catch (err) {
     console.error('Gemini rankings-analysis error:', err);

@@ -394,7 +394,11 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
         <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC ONI</a>,{' '}
         <a href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC weekly Niño 3.4</a>,{' '}
         <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">IRI/CCSR plume forecast</a>,{' '}
-        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC probability outlook</a>.
+        <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC probability outlook</a>,{' '}
+        <a href="https://aiclimate.snu.ac.kr/enso/" target="_blank" rel="noopener noreferrer" className="underline text-violet-300/80 hover:text-violet-200">SNU ACE Lab CNN forecast</a>.
+      </p>
+      <p className="text-[11px] text-violet-300/80 mt-2 leading-snug">
+        <strong className="text-violet-200">SNU AI forecast:</strong> Seoul National University’s deep-learning model (Ham et al. 2019) skilfully predicts ENSO out to ~1.5 years - far beyond NOAA’s 9-month plume window. See the multi-year view on the full tracker.
       </p>
       <div className="flex justify-end mt-2">
         <Link href="/climate/enso" className="text-xs font-semibold text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">

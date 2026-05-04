@@ -337,15 +337,17 @@ export default function ClimateDashboardPage() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* SSR Hero — rendered outside Suspense so AI / non-JS crawlers see
-              the H1 and intro copy in raw HTML. The interactive dashboard
-              below is bailed to client rendering via useSearchParams(). */}
-          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E] overflow-hidden" style={{ background: "linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)" }}>
+              the H1 and intro copy in raw HTML. The search form below is in
+              client-rendered ClimateDashboard but visually shares the same
+              gold-bordered panel (open at the bottom, closed by the search
+              form's matching open-top wrapper). */}
+          <div className="relative z-10 rounded-t-2xl shadow-xl border-2 border-b-0 border-[#D0A65E] overflow-hidden" style={{ background: "linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)" }}>
             <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
               <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
                 Local &amp; Global Climate Change
               </h1>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4">
+            <div className="bg-gray-950/90 backdrop-blur-md px-4 pt-4 pb-3">
               <p className="text-sm md:text-base text-gray-300 leading-relaxed">
                 Search for any country, US state or UK region (England, Scotland, Wales, Northern Ireland,
                 South East, Midlands, London and more) to see how its climate has changed since
@@ -777,17 +779,11 @@ function ClimateDashboard() {
       <div className="font-sans text-gray-200">
       <div className="max-w-7xl mx-auto space-y-6">
 
-        {/* ─── Search panel ──────────────────────────────────────── */}
-        <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E]" style={{ background: "linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)" }}>
-          <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-[14px]" style={{ backgroundColor: '#D0A65E' }}>
-            <h2 className="text-2xl md:text-3xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-              Search by Location
-            </h2>
-          </div>
-          <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-b-[14px]">
-          <p className="text-sm md:text-base mb-4 font-medium" style={{ color: '#D0A65E' }}>
-            Search for any country, US state, or UK city/region.
-          </p>
+        {/* ─── Search form (merged into the SSR hero panel above; no
+            separate gold-bordered box of its own — keeps the title and
+            search visually as a single panel like before) ───────── */}
+        <div className="-mt-6">
+          <div className="relative z-10 rounded-b-2xl border-2 border-t-0 border-[#D0A65E] bg-gray-950/90 backdrop-blur-md px-4 pt-0 pb-4 shadow-xl">
 
           {!(hasData && !loading) && (
             <div className="relative w-full">

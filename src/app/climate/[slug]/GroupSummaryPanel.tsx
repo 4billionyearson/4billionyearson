@@ -25,12 +25,25 @@ function highlightRankings(text: string): string {
   return escaped.replace(re, (m) => `<strong class="text-white">${m}</strong>`);
 }
 
-export default function GroupSummaryPanel({ slug, regionName }: { slug: string; regionName: string }) {
-  const [summary, setSummary] = useState<string | null>(null);
-  const [sources, setSources] = useState<{ title: string; uri: string }[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function GroupSummaryPanel({
+  slug,
+  regionName,
+  initialSummary = null,
+  initialSources = [],
+  summaryCacheMiss = false,
+}: {
+  slug: string;
+  regionName: string;
+  initialSummary?: string | null;
+  initialSources?: { title: string; uri: string }[];
+  summaryCacheMiss?: boolean;
+}) {
+  const [summary, setSummary] = useState<string | null>(initialSummary);
+  const [sources, setSources] = useState<{ title: string; uri: string }[]>(initialSources);
+  const [loading, setLoading] = useState(initialSummary == null && !summaryCacheMiss);
   const [error, setError] = useState<string | null>(null);
   const [retryable, setRetryable] = useState(false);
+  const [regenerating, setRegenerating] = useState(summaryCacheMiss);
 
   const load = async (forceFresh = false) => {
     setLoading(true);
@@ -57,7 +70,33 @@ export default function GroupSummaryPanel({ slug, regionName }: { slug: string; 
     }
   };
 
-  useEffect(() => { void load(); }, [slug]);
+  useEffect(() => {
+    // Already SSR'd a cached summary - nothing to do.
+    if (initialSummary != null) return;
+    // Cache miss path: warmRegionSummary() in the page already kicked off
+    // a background fetch + revalidatePath. Show a friendly "regenerating"
+    // banner instead of blocking the user with a spinner.
+    if (summaryCacheMiss) return;
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
+
+  if (regenerating) {
+    return (
+      <div className="rounded-xl border border-[#D0A65E]/35 bg-[#D0A65E]/5 p-4 text-sm text-gray-200">
+        <p className="mb-2">
+          <strong className="text-[#FFF5E7]">Generating fresh {regionName} climate update…</strong> This refreshes
+          monthly when new data lands. Reload in a minute to see the latest analysis.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-1.5 rounded-full border border-[#D0A65E]/55 bg-[#D0A65E]/10 px-3 py-1 text-xs font-medium text-[#FFF5E7] hover:bg-[#D0A65E]/20"
+        >
+          Refresh
+        </button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

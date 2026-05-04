@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import Link from 'next/link';
@@ -11,6 +12,11 @@ import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { RANKINGS_FAQ } from './rankings-faq';
+import { getCached } from '@/lib/climate/redis';
+
+// 24-hour ISR safety net; cache invalidation is event-driven via
+// revalidatePath() inside /api/climate/rankings-analysis.
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Climate Rankings & Monthly Trends - 144 Regions Compared',
@@ -236,12 +242,61 @@ function buildRollups(rows: RankingRow[]): {
   return { continents, usRegions, types };
 }
 
+interface CachedAnalysis {
+  summary: string | null;
+  sources?: { title: string; uri: string }[];
+  generatedAt?: string;
+}
+
+async function readCachedAnalysis(): Promise<CachedAnalysis | null> {
+  const now = new Date();
+  const dayOfMonth = now.getDate();
+  const cacheMonth = dayOfMonth >= 21
+    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    : (() => {
+        const prev = new Date(now);
+        prev.setMonth(prev.getMonth() - 1);
+        return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
+      })();
+  const cacheKey = `climate:rankings-analysis:${cacheMonth}-v3`;
+  try {
+    return await getCached<CachedAnalysis>(cacheKey);
+  } catch {
+    return null;
+  }
+}
+
+async function getRequestBaseUrl(): Promise<string> {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  try {
+    const h = await headers();
+    const host = h.get('host');
+    const proto = h.get('x-forwarded-proto') || 'https';
+    if (host) return `${proto}://${host}`;
+  } catch {}
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+}
+
+async function warmRankingsAnalysis(): Promise<void> {
+  try {
+    const base = await getRequestBaseUrl();
+    void fetch(`${base}/api/climate/rankings-analysis`, { cache: 'no-store' }).catch(() => {});
+  } catch {}
+}
+
 export default async function RankingsPage() {
-  const [data, previous, countryAnomalies] = await Promise.all([
+  const [data, previous, countryAnomalies, cachedAnalysis] = await Promise.all([
     loadRankings(),
     loadPreviousRankings(),
     loadCountryAnomalies(),
+    readCachedAnalysis(),
   ]);
+
+  const analysisCacheMiss = !cachedAnalysis?.summary;
+  if (analysisCacheMiss) {
+    await warmRankingsAnalysis();
+  }
 
   if (!data?.rows?.length) {
     return (
@@ -340,7 +395,12 @@ export default async function RankingsPage() {
           </div>
 
           {/* Monthly cross-region analysis (Gemini, web-grounded) */}
-          <RankingsAnalysis />
+          <RankingsAnalysis
+            initialSummary={cachedAnalysis?.summary ?? null}
+            initialSources={cachedAnalysis?.sources ?? []}
+            initialGeneratedAt={cachedAnalysis?.generatedAt ?? null}
+            cacheMiss={analysisCacheMiss}
+          />
 
           {/* Biggest movers (only shown when a previous snapshot exists) */}
           {(movers.climbers.length || movers.fallers.length) ? (
