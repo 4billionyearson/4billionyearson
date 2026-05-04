@@ -1,45 +1,44 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
+// Meta / methodology only — never include concrete numbers, percentages or
+// dates that go stale. Live figures belong in the SSR'd page content.
+
 export const SHIFTING_SEASONS_FAQ: FAQItem[] = [
   {
-    q: 'Is spring really arriving earlier than it used to?',
+    q: 'What does the shifting seasons page show?',
     aText:
-      'Yes. Across the Northern Hemisphere, spring leaf-out and bloom dates have moved earlier by ' +
-      'roughly 1–3 days per decade since the mid-20th century, with stronger shifts at higher latitudes. ' +
-      'Kyoto, Japan, has the longest direct record — its cherry-blossom peak-bloom date now arrives a week or ' +
-      'more earlier than the long-term medieval average, and recent years have set the earliest blooms in ' +
-      'over 1,200 years of records.',
+      'How the timing and length of meteorological seasons have changed under climate change — when ' +
+      'spring now begins, how long summer lasts, when winter snow cover starts and ends, and how ' +
+      'these shifts vary by hemisphere and by country. The live charts and the country comparison ' +
+      'panel above carry the current values.',
   },
   {
-    q: 'How much earlier does spring arrive in the United States?',
+    q: 'How are season-shift indicators measured?',
     aText:
-      'The US National Phenology Network\'s Spring Leaf Index shows spring arriving days to weeks earlier ' +
-      'than the 1991–2020 average across most of the contiguous US in recent years, with the strongest ' +
-      'early-spring signal in the Southeast, Mid-Atlantic and parts of the West. The national growing season ' +
-      'has lengthened by about two weeks since 1895 according to EPA / Kunkel data.',
+      'Spring onset uses the USA-NPN Spring Leaf and Bloom Index (USA) and equivalent phenological ' +
+      'and temperature-threshold indicators elsewhere. Growing-season length uses the first and last ' +
+      'date with daily mean temperature above a region-appropriate threshold. Snow cover uses the ' +
+      'Northern Hemisphere snow-cover extent series from Rutgers University Global Snow Lab.',
   },
   {
-    q: 'Is Northern Hemisphere snow disappearing faster?',
+    q: 'Where does the seasonal data come from?',
     aText:
-      'Spring snow cover in the Northern Hemisphere has shrunk markedly since 1967. June snow cover is now ' +
-      'around 50% of its 1971–2000 mean, and average spring (March–May) snow extent has fallen by roughly ' +
-      '2–3 million km² compared with the late 20th century. Winter snow extent has shifted less, but the ' +
-      'window in which snow is on the ground keeps closing earlier in the year.',
+      'USA: NOAA NCEI nClimDiv, USA-NPN, EPA Climate Change Indicators. Northern-Hemisphere snow: ' +
+      'Rutgers Global Snow Lab. Country-level seasonal anomalies: Berkeley Earth, Copernicus C3S / ' +
+      'ERA5. UK seasonal anomalies: Met Office HadUK-Grid.',
   },
   {
-    q: 'Which countries have seen the biggest seasonal shifts?',
+    q: 'What baseline is used?',
     aText:
-      'Mid- and high-latitude Northern Hemisphere countries — including Canada, Russia, the Nordic ' +
-      'countries, the United Kingdom, Germany, Poland, the United States and Japan — show the strongest ' +
-      'shifts in spring onset and growing-season length. Tropical countries see smaller seasonal-timing ' +
-      'shifts but bigger changes in the timing and intensity of monsoon rainfall.',
+      'Anomalies are calculated against the 1991–2020 climate normal where available (WMO standard). ' +
+      'Some indicators (snow cover, US growing season) use longer reference periods set by the ' +
+      'source agency; the baseline is labelled on each chart.',
   },
   {
-    q: 'Where does the seasonal shift data on this page come from?',
+    q: 'How often is this page updated?',
     aText:
-      'The page combines Copernicus ERA5 reanalysis (global temperature-based seasonal-shift analysis), ' +
-      'the Kyoto cherry-blossom phenology record, the Rutgers Northern Hemisphere snow extent climatology, ' +
-      'the US National Phenology Network Spring Leaf Index, and the US EPA Climate Change Indicator ' +
-      '(Length of Growing Season, based on Kunkel 2021). Sources are linked beside each chart.',
+      'Annual indicators (growing-season length, snow-season length) refresh once a year as the source ' +
+      'agencies publish them. Monthly indicators refresh on the same monthly cadence as the rest of the ' +
+      'site, typically in the first half of each month.',
   },
 ];

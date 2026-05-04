@@ -1,46 +1,44 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
+// Meta / methodology only — never include concrete numbers, percentages or
+// dates that go stale. Live figures belong in the SSR'd page content.
+
 export const EXTREME_WEATHER_FAQ: FAQItem[] = [
   {
-    q: 'Are extreme weather events becoming more frequent?',
+    q: 'What does the extreme weather page show?',
     aText:
-      'Yes. The IPCC AR6 report (2023) found with high confidence that human-caused climate change has ' +
-      'made heatwaves, heavy rainfall and droughts more frequent and more intense across most land ' +
-      'regions. Tropical cyclone rainfall and the proportion of category 4–5 hurricanes are also ' +
-      'increasing. The EM-DAT international disaster database shows the number of recorded climate-related ' +
-      'disasters per decade has roughly tripled since the 1970s.',
+      'Live alerts for extreme weather events and disease outbreaks happening right now, plus ' +
+      'long-term trend charts showing how the frequency, deaths, people affected and economic damage ' +
+      'from climate-related disasters have changed over decades. The current alerts and most recent ' +
+      'totals are shown in the live panels above.',
   },
   {
-    q: 'Which countries are most affected by extreme weather?',
+    q: 'What counts as an extreme weather event?',
     aText:
-      'Disaster risk depends on both hazard exposure and population vulnerability. The countries with the ' +
-      'highest counts of climate-related disasters since 1970 include the United States, China, India, the ' +
-      'Philippines, Indonesia, Bangladesh, Mexico, Vietnam, Japan and Pakistan. Small island developing ' +
-      'states (Caribbean nations, Pacific atolls) and Sub-Saharan African countries face the highest ' +
-      'per-capita losses from cyclones, floods and droughts.',
+      'The page tracks the categories used by the international disaster databases: floods, storms ' +
+      '(including tropical cyclones), droughts, heatwaves, wildfires, landslides and extreme cold. ' +
+      'Earthquakes and volcanic eruptions are not climate-related and are excluded from the trend ' +
+      'charts.',
   },
   {
-    q: 'What is causing the increase in extreme weather?',
+    q: 'Where does the extreme weather data come from?',
     aText:
-      'A warmer atmosphere holds about 7% more water vapour per °C of warming, which intensifies ' +
-      'rainfall and increases flood risk. Warmer ocean temperatures fuel stronger tropical cyclones. ' +
-      'Higher land temperatures shift heatwaves further toward record-breaking territory and worsen ' +
-      'drought through increased evaporation. The Arctic is warming roughly four times faster than the ' +
-      'global average, which is altering the jet stream and causing more persistent weather patterns at ' +
-      'mid-latitudes.',
+      'Live extreme-weather alerts: Global Disaster Alert and Coordination System (GDACS), a joint ' +
+      'initiative of the United Nations and the European Commission. Live disease-outbreak alerts: ' +
+      'World Health Organization (WHO Disease Outbreak News). Long-term disaster trend data: EM-DAT ' +
+      'international disaster database, presented via Our World in Data.',
   },
   {
-    q: 'Where does the extreme weather data on this page come from?',
+    q: 'How often is this page updated?',
     aText:
-      'Live disease-outbreak alerts come from the World Health Organization (WHO Disease Outbreak News). ' +
-      'Live extreme-weather events come from the Global Disaster Alert and Coordination System (GDACS), ' +
-      'a joint initiative of the United Nations and the European Commission. Long-term disaster trend ' +
-      'data come from the EM-DAT international disaster database via Our World in Data.',
+      'Live alert feeds (GDACS, WHO) refresh several times per day. Historical disaster trend charts ' +
+      'refresh on the same monthly cadence as the rest of the site.',
   },
   {
-    q: 'How often is the extreme weather page updated?',
+    q: 'Where can I see climate-change attribution for individual events?',
     aText:
-      'Live alerts (GDACS, WHO) refresh several times per day. The historical disaster trend charts ' +
-      '(EM-DAT / OWID) refresh on each monthly site update.',
+      'For attribution of specific events to climate change see World Weather Attribution ' +
+      '(worldweatherattribution.org) and Climameter (climameter.org). The IPCC AR6 Working Group I ' +
+      'report (2021) covers attribution methodology in detail.',
   },
 ];

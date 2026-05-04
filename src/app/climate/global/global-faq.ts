@@ -1,54 +1,43 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
+// Meta / methodology only — never include concrete numbers, percentages or
+// dates that go stale. Live figures belong in the SSR'd page content.
+
 export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
   {
-    q: 'How warm is the Earth right now compared to pre-industrial times?',
+    q: 'What does this global climate update show?',
     aText:
-      'The 10-year running mean global temperature is currently around 1.3 °C above the 1850–1900 ' +
-      'pre-industrial baseline, the figure used to track the Paris Agreement targets. Single calendar ' +
-      'years now regularly cross 1.5 °C above pre-industrial — 2024 was the first to do so for an entire ' +
-      'year — but the long-term Paris benchmark is the 10- or 20-year average, not any single year.',
+      'A monthly snapshot of the global climate: surface temperature anomalies relative to ' +
+      'pre-industrial levels, ocean and land warming, sea ice extent, atmospheric CO₂, methane and ' +
+      'nitrous oxide concentrations, ENSO phase and the latest position against the 1.5°C and 2°C ' +
+      'Paris Agreement targets. The current month\'s numbers are shown in the live data panels above.',
   },
   {
-    q: 'Are we on track for the 1.5 °C and 2 °C Paris Agreement targets?',
+    q: 'Which baselines are used to measure global warming?',
     aText:
-      'On the 10-year mean used by the IPCC and the Paris Agreement, the world is closing in on the ' +
-      '1.5 °C threshold and is currently on track to cross it in the late 2020s or early 2030s. The 2 °C ' +
-      'target is still avoidable but only with rapid, sustained reductions in greenhouse-gas emissions. ' +
-      'Current policies place us on a trajectory closer to 2.5–2.8 °C of warming by 2100.',
+      'The headline figure compares the trailing 10-year mean to the 1850–1900 pre-industrial baseline, ' +
+      'in line with the IPCC. Shorter-term anomalies are calculated against the 1991–2020 climate ' +
+      'normal, the WMO standard. Both baselines are labelled directly on each chart.',
   },
   {
-    q: 'When will global warming pass 1.5 °C?',
+    q: 'Where does the global climate data come from?',
     aText:
-      'Single years have already crossed 1.5 °C — 2024 was the first calendar year fully above 1.5 °C, ' +
-      'helped by a strong El Niño on top of the long-term warming trend. The Paris-relevant 20-year ' +
-      'average is projected to cross 1.5 °C in the early 2030s on current emissions, and possibly ' +
-      'earlier under continued high emissions.',
+      'Surface temperature: NOAA NCEI, NASA GISS and Hadley Centre HadCRUT5. Greenhouse gases: NOAA ' +
+      'Global Monitoring Laboratory. Sea ice: NSIDC. Ocean heat content: Copernicus / NOAA. ENSO: ' +
+      'NOAA Climate Prediction Center. Pre-industrial baselines and emission pathways: IPCC AR6.',
   },
   {
-    q: 'What is the climate baseline used on this page?',
+    q: 'How often is this page updated?',
     aText:
-      'Anomalies are shown against three baselines depending on the dataset: the 1850–1900 pre-industrial ' +
-      'baseline used for Paris-Agreement targets and IPCC reporting; the 1961–1990 baseline used by the ' +
-      'Met Office, NOAA Climate at a Glance and most national climate services; and the 1991–2020 ' +
-      'baseline used by the WMO for current weather context. The page labels each panel with its ' +
-      'baseline.',
+      'The live data panels refresh on each page request from a monthly cache that rebuilds within ' +
+      'days of the underlying datasets being released (typically the first half of each month). The ' +
+      'AI-written narrative summary refreshes on the same monthly cadence.',
   },
   {
-    q: 'Where does the global climate data on this page come from?',
+    q: 'Where can I see country, regional or city-level climate data?',
     aText:
-      'Temperature data comes from NOAA Climate at a Glance (Global Land+Ocean) and the HadCRUT5 / ' +
-      'Copernicus ERA5 reanalyses via Our World in Data. Greenhouse-gas concentrations come from the ' +
-      'NOAA Global Monitoring Laboratory. Sea-ice extent comes from NSIDC. ENSO indicators come from ' +
-      'NOAA Climate Prediction Center. CO₂ emissions come from the Global Carbon Project via Our World ' +
-      'in Data, and the global electricity mix from Ember. The page is refreshed monthly when the ' +
-      'upstream providers publish their updates.',
-  },
-  {
-    q: 'How often is the global climate update refreshed?',
-    aText:
-      'The global climate update on this page is refreshed every month, typically a few days after the ' +
-      'previous month closes and NOAA, the Met Office, NOAA GML, NSIDC and the Global Carbon Project ' +
-      'have published their monthly updates.',
+      'See the climate hub at /climate for every country, US state and UK region we track, the ' +
+      'rankings page at /climate/rankings for sortable cross-region anomalies, and the methodology ' +
+      'page at /climate/methodology for the complete data-source and baseline reference.',
   },
 ];

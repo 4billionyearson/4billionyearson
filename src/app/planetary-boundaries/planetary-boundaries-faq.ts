@@ -1,5 +1,8 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
+// Meta / methodology only — never include concrete numbers, percentages or
+// dates that go stale. Live figures belong in the SSR'd page content.
+
 export const PLANETARY_BOUNDARIES_FAQ: FAQItem[] = [
   {
     q: 'What are the planetary boundaries?',
@@ -12,34 +15,34 @@ export const PLANETARY_BOUNDARIES_FAQ: FAQItem[] = [
       'stratospheric ozone depletion and novel entities (e.g. plastics, synthetic chemicals).',
   },
   {
-    q: 'How many planetary boundaries have been crossed?',
+    q: 'How is the status of each boundary judged?',
     aText:
-      'According to the 2025 Planetary Health Check, six of the nine planetary boundaries are now ' +
-      'transgressed: climate change, biosphere integrity, biogeochemical flows, land system change, ' +
-      'freshwater change and novel entities. Ocean acidification crossed its boundary in 2024 making ' +
-      'it the seventh. Only stratospheric ozone (recovering) and atmospheric aerosols remain within ' +
-      'safe limits, while ocean acidification is now in the high-risk zone.',
-  },
-  {
-    q: 'Which boundary is most at risk?',
-    aText:
-      'Biosphere integrity (genetic diversity / extinction rate) and biogeochemical flows (nitrogen ' +
-      'cycle disruption from synthetic fertilisers) are the two boundaries that are most deeply in the ' +
-      'high-risk zone. Both are far beyond their proposed safe limits and continue to deteriorate.',
+      'Each boundary has a "safe operating space" defined by one or more measurable indicators. The ' +
+      'Stockholm Resilience Centre and the Potsdam Institute for Climate Impact Research jointly ' +
+      'publish an annual Planetary Health Check that classifies every boundary as safe, increasing ' +
+      'risk or high risk. The current status of each boundary is shown in the live panels above.',
   },
   {
     q: 'Is crossing a planetary boundary the same as a tipping point?',
     aText:
-      'No. A planetary boundary marks the edge of the "safe operating space" — beyond it, the risk of ' +
+      'No. A planetary boundary marks the edge of the safe operating space — beyond it, the risk of ' +
       'destabilising the Earth system rises. Tipping points are specific thresholds where a system ' +
-      'undergoes abrupt, often irreversible change (e.g. ice sheet collapse, Amazon dieback). Crossing ' +
-      'a boundary makes triggering tipping points more likely but does not in itself constitute one.',
+      'undergoes abrupt, often irreversible change (for example, ice-sheet collapse or Amazon ' +
+      'dieback). Crossing a boundary makes triggering tipping points more likely but does not in ' +
+      'itself constitute one.',
   },
   {
     q: 'Where does the data on this page come from?',
     aText:
-      'Live indicators (CO₂, methane, N₂O, Arctic sea ice, ocean heat content) come from NOAA, NSIDC and ' +
-      'Copernicus. Boundary status assessments are from the Stockholm Resilience Centre and the Potsdam ' +
-      'Institute for Climate Impact Research (Sakschewski et al., Planetary Health Check 2025).',
+      'Live indicators (CO₂, methane, N₂O, Arctic sea ice, ocean heat content) come from NOAA, NSIDC ' +
+      'and Copernicus. Boundary status assessments are from the Stockholm Resilience Centre and the ' +
+      'Potsdam Institute for Climate Impact Research (Sakschewski et al., Planetary Health Check).',
+  },
+  {
+    q: 'How often is this page updated?',
+    aText:
+      'Live indicator feeds refresh on the same monthly cadence as the rest of the site. The ' +
+      'boundary status assessments refresh once a year when the Planetary Health Check is published, ' +
+      'typically in autumn.',
   },
 ];
