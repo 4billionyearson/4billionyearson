@@ -20,6 +20,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 import {
   Activity,
   BookOpen,
@@ -812,26 +813,26 @@ export default function EnsoPage() {
           </span>
         </div>
 
-        {/* Continent filter pills */}
+        {/* Continent filter dropdown */}
         <div className="border-t border-gray-800/80 pt-4 mb-5">
           <div className="flex flex-wrap items-center gap-2">
-            {['All', 'Africa', 'Asia', 'Europe', 'N. America', 'C. America', 'S. America', 'Oceania', 'Pacific Is.'].map((c) => {
-              const active = continentFilter === c;
-              return (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setContinentFilter(c)}
-                  className={`inline-flex h-8 items-center rounded-full border px-3 text-[13px] font-medium transition-colors ${
-                    active
-                      ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
-                      : 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
-                  }`}
-                >
-                  {c}
-                </button>
-              );
-            })}
+            <ChipDropdown
+              label="Continent"
+              ariaLabel="Filter by continent"
+              value={continentFilter}
+              onChange={setContinentFilter}
+              options={[
+                { key: 'All', label: 'All' },
+                { key: 'Africa', label: 'Africa' },
+                { key: 'Asia', label: 'Asia' },
+                { key: 'Europe', label: 'Europe' },
+                { key: 'N. America', label: 'N. America' },
+                { key: 'C. America', label: 'C. America' },
+                { key: 'S. America', label: 'S. America' },
+                { key: 'Oceania', label: 'Oceania' },
+                { key: 'Pacific Is.', label: 'Pacific Is.' },
+              ]}
+            />
           </div>
         </div>
 
