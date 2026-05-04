@@ -457,18 +457,6 @@ export default function EmissionsCountryPanel({
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <Factory className="h-5 w-5 text-[#D0A65E]" />
         <h2 className="text-lg font-bold font-mono text-white">Deep Dive</h2>
-        {hasSelection && (
-          <button
-            onClick={clearSelection}
-            className="ml-auto text-xs text-gray-400 hover:text-white inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 transition-colors"
-          >
-            <X className="h-3 w-3" /> Clear
-          </button>
-        )}
-      </div>
-
-      {/* ─── Region-type selector (compact filter chip at every width) ── */}
-      <div className="mb-3">
         <ChipDropdown
           label="Region"
           ariaLabel="Region type"
@@ -500,6 +488,14 @@ export default function EmissionsCountryPanel({
             { key: 'us-state', label: 'US States' },
           ]}
         />
+        {hasSelection && (
+          <button
+            onClick={clearSelection}
+            className="ml-auto text-xs text-gray-400 hover:text-white inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 transition-colors"
+          >
+            <X className="h-3 w-3" /> Clear
+          </button>
+        )}
       </div>
 
       {mode === 'continent' ? (
