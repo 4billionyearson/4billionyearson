@@ -8,12 +8,40 @@ import {
   getClimateMetadataDescription,
   getClimatePageUrl,
 } from '@/lib/climate/regions';
+import { getCached } from '@/lib/climate/redis';
 import ClimateProfile from './ClimateProfile';
 import ClimateGroupProfile from './ClimateGroupProfile';
 
 // Build curated pages eagerly; stub (auto-generated) pages render
 // on-demand and are then cached, so builds stay fast.
 export const dynamicParams = true;
+
+// ISR: regenerate every 30 minutes so a freshly cached Gemini summary surfaces
+// in raw SSR HTML soon after it is generated.
+export const revalidate = 1800;
+
+interface CachedSummary {
+  summary: string | null;
+  sources?: { title: string; uri: string }[];
+}
+
+async function readCachedSummary(slug: string): Promise<CachedSummary | null> {
+  const now = new Date();
+  const dayOfMonth = now.getDate();
+  const cacheMonth = dayOfMonth >= 21
+    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    : (() => {
+        const prev = new Date(now);
+        prev.setMonth(prev.getMonth() - 1);
+        return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
+      })();
+  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v27`;
+  try {
+    return await getCached<CachedSummary>(cacheKey);
+  } catch {
+    return null;
+  }
+}
 
 export async function generateStaticParams() {
   return CURATED_CLIMATE_REGIONS.map(region => ({ slug: region.slug }));
@@ -113,10 +141,17 @@ export default async function ClimateProfilePage(
     );
   }
 
+  const cached = await readCachedSummary(slug);
+
   return (
     <>
       <DatasetSchema region={region} />
-      <ClimateProfile slug={slug} region={region} />
+      <ClimateProfile
+        slug={slug}
+        region={region}
+        initialSummary={cached?.summary ?? null}
+        initialSources={cached?.sources ?? []}
+      />
     </>
   );
 }

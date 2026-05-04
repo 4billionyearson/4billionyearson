@@ -13,7 +13,6 @@ import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard
 import type { ClimateMapPreset } from '../global/ClimateMapCard';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
-import { QuickTLDR } from '@/app/_components/seo/QuickTLDR';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { buildRegionFAQ } from '@/lib/climate/region-faq';
 
@@ -606,13 +605,27 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
-export default function ClimateProfile({ slug, region }: { slug: string; region: ClimateRegion }) {
+export default function ClimateProfile({
+  slug,
+  region,
+  initialSummary = null,
+  initialSources = [],
+}: {
+  slug: string;
+  region: ClimateRegion;
+  /** Pre-fetched Gemini summary read from Redis at request time on the server.
+   *  When provided, the client component skips the auto-fetch on mount so the
+   *  raw SSR HTML already contains the summary paragraph (good for AI / search
+   *  crawlers). When null, the client falls back to the existing fetch flow. */
+  initialSummary?: string | null;
+  initialSources?: { title: string; uri: string }[];
+}) {
   const [data, setData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [summary, setSummary] = useState<string | null>(null);
-  const [summaryLoading, setSummaryLoading] = useState(true);
-  const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>([]);
+  const [summary, setSummary] = useState<string | null>(initialSummary);
+  const [summaryLoading, setSummaryLoading] = useState(initialSummary == null);
+  const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>(initialSources);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [summaryRetryable, setSummaryRetryable] = useState(false);
 
@@ -657,8 +670,10 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
 
-    // Fetch Gemini summary (non-blocking)
-    void fetchSummary();
+    // Only fetch the Gemini summary client-side if it wasn't pre-seeded by SSR.
+    if (initialSummary == null) {
+      void fetchSummary();
+    }
   }, [slug]);
 
   // Derived labels
@@ -821,16 +836,12 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
             </div>
           </div>
 
-          {/* ─── Quick TL;DR + static FAQ ─ rendered unconditionally so AI
-              crawlers and Google's first crawl see region-named
-              content in raw SSR HTML even before the live data loads. ── */}
-          <QuickTLDR>
-            {region.tagline}{region.tagline.endsWith('.') ? ' ' : '. '}
-            Anomalies are calculated against the 1961–1990 climatological
-            baseline used by the Met Office, NOAA and the IPCC. Refreshed
-            monthly from {region.dataSources.includes('met-office') ? 'Met Office HadUK-Grid' : region.dataSources.includes('noaa-state') || region.dataSources.includes('noaa-national') ? 'NOAA Climate at a Glance' : 'authoritative national climate datasets'}.{' '}
-            <a href="#climate-faq-heading" className="text-[#D0A65E] hover:underline">Full Q&amp;A below ↓</a>
-          </QuickTLDR>
+          {/* ─── Static FAQ ─ rendered unconditionally so AI crawlers and
+              Google's first crawl see region-named content in raw SSR
+              HTML even before the live data loads. The Gemini summary
+              (when available in the Redis cache) is also pre-seeded
+              from page.tsx and rendered server-side without a
+              placeholder. ── */}
 
           {/* Loading / Error */}
           {loading && (
