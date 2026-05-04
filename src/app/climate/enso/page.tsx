@@ -206,6 +206,152 @@ function RelatedLink({ href, label, desc }: { href: string; label: string; desc:
   );
 }
 
+/* ─── SEO scaffold (rendered in BOTH loading and loaded states so the static
+       hero, Quick Answer and Q&A prose appear in raw SSR HTML for AI / non-JS
+       crawlers — they don't execute the useEffect that fetches the live
+       indicators). ───────────────────────────────────────────────────── */
+
+function HeroPanel() {
+  return (
+    <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
+      <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+        <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+          El Niño / La Niña - ENSO Tracker
+        </h1>
+      </div>
+      <div className="bg-gray-950/90 backdrop-blur-md p-4">
+        <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
+          The El Niño-Southern Oscillation (ENSO) is the single biggest year-to-year driver of
+          global temperature and rainfall after the long-term warming trend itself. It is also a
+          <span className="text-[#FFF5E7] font-semibold"> natural amplifier of climate change</span>
+          {' '}- elevated tropical-ocean heat now stacks on top of every El Niño, fuelling stronger
+          droughts, heavier floods and record-breaking global temperatures. This page combines the
+          four most-watched indicators - Niño 3.4 SST, the Oceanic Niño Index, the Multivariate
+          ENSO Index and the Southern Oscillation Index - with the official NOAA forecast.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function QuickAnswerPanel() {
+  return (
+    <aside
+      aria-label="Quick answer"
+      className="rounded-2xl border border-[#D0A65E]/40 bg-gray-950/80 backdrop-blur-md p-4 md:p-5 shadow-lg"
+    >
+      <div className="text-[11px] font-mono uppercase tracking-wider text-[#D0A65E] mb-1">Quick Answer</div>
+      <p className="text-sm md:text-base text-gray-200 leading-relaxed">
+        <strong className="text-white">El Niño</strong> is a Pacific climate pattern that
+        typically brings <strong>heavier rain and floods to the western coast of South America</strong>
+        {' '}(Peru, Ecuador), the southern United States and parts of East Africa, while causing
+        <strong> drought across Indonesia, Australia, the Philippines, southern Africa and the Amazon</strong>.
+        <strong className="text-white"> La Niña</strong> flips most of these:
+        wetter conditions in Australia, Indonesia and southern Africa, drier conditions in the
+        southern US and the Horn of Africa. Both phases shift <strong>global average temperatures</strong>
+        {' '}by roughly ±0.1-0.2 °C and now sit on top of the long-term climate-change warming trend.
+      </p>
+    </aside>
+  );
+}
+
+/**
+ * Static FAQ panel — visible HTML mirror of the FAQPage JSON-LD in
+ * layout.tsx. AI crawlers (Claude, Perplexity, ChatGPT search) typically
+ * don't execute JS, so this is the page text they will index and quote.
+ */
+function StaticFAQPanel() {
+  const qa: { q: string; a: React.ReactNode }[] = [
+    {
+      q: 'Which countries are most affected by El Niño?',
+      a: (
+        <>
+          El Niño typically brings heavier rainfall and flooding to{' '}
+          <strong>Peru, Ecuador, the southern United States and parts of East Africa</strong>
+          {' '}(Kenya, Tanzania, Somalia). It causes drought across{' '}
+          <strong>Indonesia, Australia, the Philippines, Papua New Guinea, southern Africa</strong>
+          {' '}(Zimbabwe, South Africa, Mozambique) and the <strong>Amazon basin</strong>. Northern
+          South America (Colombia, Venezuela) and the Caribbean tend to be drier than average.
+        </>
+      ),
+    },
+    {
+      q: 'Which countries are most affected by La Niña?',
+      a: (
+        <>
+          La Niña broadly flips the El Niño pattern. It brings wetter conditions to{' '}
+          <strong>Australia, Indonesia, the Philippines, southern Africa</strong> and the{' '}
+          <strong>Amazon</strong>, but drought to the <strong>Horn of Africa</strong> (Somalia,
+          Ethiopia, Kenya), the <strong>southern United States, Argentina, Uruguay</strong> and
+          <strong> southern Brazil</strong>. La Niña also boosts Atlantic hurricane activity and
+          tends to suppress eastern-Pacific hurricanes.
+        </>
+      ),
+    },
+    {
+      q: 'Why does El Niño cause floods in some places and drought in others?',
+      a: (
+        <>
+          During El Niño the warm pool of water that normally sits in the western Pacific shifts
+          eastward toward South America. Atmospheric convection — the rising air that produces
+          rain — follows it. So Indonesia and Australia, which usually sit under that rising air,
+          lose their rainfall, while Peru and Ecuador get downpours from convection that has moved
+          over them. The shift also rearranges global jet streams, which is why effects show up as
+          far away as East Africa and the southern US.
+        </>
+      ),
+    },
+    {
+      q: 'What is the difference between El Niño and La Niña?',
+      a: (
+        <>
+          They are opposite phases of the same Pacific climate cycle (ENSO). <strong>El Niño</strong>
+          {' '}is the warm phase: equatorial Pacific surface waters are 0.5 °C or more above average,
+          trade winds weaken, and global average temperatures briefly rise. <strong>La Niña</strong>
+          {' '}is the cool phase: Pacific waters are 0.5 °C or more below average, trade winds
+          strengthen and global temperatures briefly dip. Each phase lasts roughly 9–18 months and
+          they alternate (with Neutral years) on a 2–7 year cycle.
+        </>
+      ),
+    },
+    {
+      q: 'When was the last major El Niño?',
+      a: (
+        <>
+          The most recent El Niño peaked in <strong>late 2023 / early 2024</strong> with a peak ONI
+          around +2.0 °C, classed as a strong event. Combined with long-term warming it helped push
+          2023 and 2024 to record-warm globally. Other recent strong El Niños were{' '}
+          <strong>2015–16</strong> and <strong>1997–98</strong> (the strongest in the modern
+          record). The most recent prolonged La Niña was the rare triple-dip event of 2020–23.
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <section
+      aria-labelledby="enso-faq-heading"
+      className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D0A65E]"
+    >
+      <h2
+        id="enso-faq-heading"
+        className="text-xl font-bold font-mono text-white mb-4 flex items-start gap-2"
+      >
+        <BookOpen className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+        <span className="min-w-0 flex-1">El Niño &amp; La Niña: Common Questions</span>
+      </h2>
+      <div className="space-y-4">
+        {qa.map((item, i) => (
+          <div key={i} className="border-l-2 border-[#D0A65E]/40 pl-4">
+            <h3 className="text-sm md:text-base font-semibold text-[#FFF5E7] mb-1">{item.q}</h3>
+            <p className="text-sm text-gray-300 leading-relaxed">{item.a}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
 const ENSO_COLORS: Record<EnsoState, string> = {
@@ -290,9 +436,18 @@ export default function EnsoPage() {
 
   if (!data) {
     return (
-      <main className="max-w-6xl mx-auto px-4 py-20 flex flex-col items-center gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-sky-300" />
-        <p className="text-gray-400 text-sm">Loading ENSO data…</p>
+      <main>
+        <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <HeroPanel />
+            <QuickAnswerPanel />
+            <div className="flex flex-col items-center gap-3 py-10">
+              <Loader2 className="h-8 w-8 animate-spin text-sky-300" />
+              <p className="text-gray-400 text-sm">Loading live ENSO indicators…</p>
+            </div>
+            <StaticFAQPanel />
+          </div>
+        </div>
       </main>
     );
   }
@@ -335,45 +490,14 @@ export default function EnsoPage() {
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* ─── Hero ───────────────────────────────────────────────── */}
-      <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
-        <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-          <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-            El Niño / La Niña - ENSO Tracker
-          </h1>
-        </div>
-        <div className="bg-gray-950/90 backdrop-blur-md p-4">
-          <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-            The El Niño-Southern Oscillation (ENSO) is the single biggest year-to-year driver of
-            global temperature and rainfall after the long-term warming trend itself. It is also a
-            <span className="text-[#FFF5E7] font-semibold"> natural amplifier of climate change</span>
-            {' '}- elevated tropical-ocean heat now stacks on top of every El Niño, fuelling stronger
-            droughts, heavier floods and record-breaking global temperatures. This page combines the
-            four most-watched indicators - Niño 3.4 SST, the Oceanic Niño Index, the Multivariate
-            ENSO Index and the Southern Oscillation Index - with the official NOAA forecast.
-          </p>
-        </div>
-      </div>
+          <HeroPanel />
 
-      {/* ─── Quick Answer (TL;DR) ──────────────────────────────── */}
-      <aside
-        aria-label="Quick answer"
-        className="rounded-2xl border border-[#D0A65E]/40 bg-gray-950/80 backdrop-blur-md p-4 md:p-5 shadow-lg"
-      >
-        <div className="text-[11px] font-mono uppercase tracking-wider text-[#D0A65E] mb-1">
-          Quick Answer
-        </div>
-        <p className="text-sm md:text-base text-gray-200 leading-relaxed">
-          <strong className="text-white">El Niño</strong> is a Pacific climate pattern that
-          typically brings <strong>heavier rain and floods to the western coast of South America</strong>
-          {' '}(Peru, Ecuador), the southern United States and parts of East Africa, while causing
-          <strong> drought across Indonesia, Australia, the Philippines, southern Africa and the Amazon</strong>.
-          <strong className="text-white"> La Niña</strong> flips most of these:
-          wetter conditions in Australia, Indonesia and southern Africa, drier conditions in
-          the southern US and the Horn of Africa. Both phases shift <strong>global average
-          temperatures</strong> by roughly ±0.1-0.2 °C and now sit on top of the long-term
-          climate-change warming trend.
-        </p>
-      </aside>
+          {/* ─── Quick Answer (TL;DR) ──────────────────────────────── */}
+          <QuickAnswerPanel />
+
+          {/* ─── Static FAQ (mirrors FAQPage JSON-LD; rendered in SSR
+                HTML so AI / non-JS crawlers can extract it) ───────── */}
+          <StaticFAQPanel />
 
       {/* ─── Hero state + Niño-region map ──────────────────────── */}
       <div id="current-state" className="scroll-mt-6">
