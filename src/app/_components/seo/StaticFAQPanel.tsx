@@ -17,14 +17,14 @@ export interface FAQItem {
  * Usage:
  *   <StaticFAQPanel
  *     headingId="enso-faq-heading"
- *     title="Frequently Asked Questions"
+ *     title="FAQs"
  *     qa={ENSO_FAQ}
  *   />
  *   <FaqJsonLd qa={ENSO_FAQ} />
  */
 export function StaticFAQPanel({
   headingId,
-  title = 'Frequently Asked Questions',
+  title = 'FAQs',
   qa,
   className,
 }: {

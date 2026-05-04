@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
 // Meta / methodology only — never include concrete numbers, percentages or
@@ -40,5 +41,15 @@ export const CLIMATE_DASHBOARD_FAQ: FAQItem[] = [
     aText:
       'The methodology page at /climate/methodology gives the complete data-source, baseline and ' +
       'refresh-cadence reference for every dataset used on the site.',
+    a: (
+      <>
+        The{' '}
+        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
+          methodology page
+        </Link>{' '}
+        gives the complete data-source, baseline and refresh-cadence reference for every dataset
+        used on the site.
+      </>
+    ),
   },
 ];

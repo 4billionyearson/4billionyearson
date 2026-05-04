@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
 // Meta / methodology only — never include concrete numbers, percentages or
@@ -25,6 +26,17 @@ export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
       'Surface temperature: NOAA NCEI, NASA GISS and Hadley Centre HadCRUT5. Greenhouse gases: NOAA ' +
       'Global Monitoring Laboratory. Sea ice: NSIDC. Ocean heat content: Copernicus / NOAA. ENSO: ' +
       'NOAA Climate Prediction Center. Pre-industrial baselines and emission pathways: IPCC AR6.',
+    a: (
+      <>
+        Surface temperature: NOAA NCEI, NASA GISS and Hadley Centre HadCRUT5. Greenhouse gases: NOAA
+        Global Monitoring Laboratory. Sea ice: NSIDC. Ocean heat content: Copernicus / NOAA. ENSO:
+        NOAA Climate Prediction Center. Pre-industrial baselines and emission pathways: IPCC AR6.
+        Full source list at{' '}
+        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
+          /climate/methodology
+        </Link>.
+      </>
+    ),
   },
   {
     q: 'How often is this page updated?',
@@ -39,5 +51,22 @@ export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
       'See the climate hub at /climate for every country, US state and UK region we track, the ' +
       'rankings page at /climate/rankings for sortable cross-region anomalies, and the methodology ' +
       'page at /climate/methodology for the complete data-source and baseline reference.',
+    a: (
+      <>
+        See the{' '}
+        <Link href="/climate" className="text-[#D0A65E] hover:underline">
+          climate hub
+        </Link>{' '}
+        for every country, US state and UK region we track, the{' '}
+        <Link href="/climate/rankings" className="text-[#D0A65E] hover:underline">
+          rankings page
+        </Link>{' '}
+        for sortable cross-region anomalies, and the{' '}
+        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
+          methodology page
+        </Link>{' '}
+        for the complete data-source and baseline reference.
+      </>
+    ),
   },
 ];

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
 // Meta / methodology only — never include concrete numbers, percentages or
@@ -38,5 +39,14 @@ export const RANKINGS_FAQ: FAQItem[] = [
     aText:
       'The methodology page at /climate/methodology gives the complete two-baseline model, source ' +
       'timeline and known caveats.',
+    a: (
+      <>
+        The{' '}
+        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
+          methodology page
+        </Link>{' '}
+        gives the complete two-baseline model, source timeline and known caveats.
+      </>
+    ),
   },
 ];

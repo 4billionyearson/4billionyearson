@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
@@ -6,9 +7,9 @@ import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
  * /climate/[slug] template (countries, US states, UK nations & regions,
  * continents and US climate regions).
  *
- * Plain-text answers only — these are static SEO scaffolding meant to put
- * region-named content into raw SSR HTML for AI crawlers. Live numeric
- * details are still rendered in the dynamic data section above.
+ * Plain-text answers (aText) drive the FAQPage JSON-LD; the optional `a`
+ * field carries an enriched JSX answer with internal links for the
+ * visible HTML.
  */
 export function buildRegionFAQ(region: ClimateRegion): FAQItem[] {
   const name = region.name;
@@ -39,7 +40,18 @@ export function buildRegionFAQ(region: ClimateRegion): FAQItem[] {
         `Anomalies on this page are calculated against the ${baselineText} climatological baseline, ` +
         `which is the standard reference period used by the Met Office, NOAA, IPCC and most national ` +
         `climate services. Some panels also show the source-native 1901–2000 (NOAA) or 1991–2020 (WMO) ` +
-        `baselines for verification.`,
+        `baselines for verification. Full methodology at /climate/methodology.`,
+      a: (
+        <>
+          Anomalies on this page are calculated against the {baselineText} climatological baseline,
+          which is the standard reference period used by the Met Office, NOAA, IPCC and most
+          national climate services. Some panels also show the source-native 1901–2000 (NOAA) or
+          1991–2020 (WMO) baselines for verification. Full methodology at{' '}
+          <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
+            /climate/methodology
+          </Link>.
+        </>
+      ),
     },
     {
       q: `Which areas does the ${name} climate data cover?`,
@@ -52,7 +64,19 @@ export function buildRegionFAQ(region: ClimateRegion): FAQItem[] {
       aText:
         `The ${name} climate update is refreshed monthly, typically a few days after the previous ` +
         `month closes and the upstream provider (Met Office HadUK-Grid, NOAA Climate at a Glance, ` +
-        `Copernicus ERA5 or the Global Carbon Project) publishes its update.`,
+        `Copernicus ERA5 or the Global Carbon Project) publishes its update. See ` +
+        `/climate/rankings for cross-region comparisons.`,
+      a: (
+        <>
+          The {name} climate update is refreshed monthly, typically a few days after the previous
+          month closes and the upstream provider (Met Office HadUK-Grid, NOAA Climate at a Glance,
+          Copernicus ERA5 or the Global Carbon Project) publishes its update. See the{' '}
+          <Link href="/climate/rankings" className="text-[#D0A65E] hover:underline">
+            climate rankings
+          </Link>{' '}
+          for cross-region comparisons.
+        </>
+      ),
     },
   ];
 

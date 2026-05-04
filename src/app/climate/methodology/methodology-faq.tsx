@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
 // Meta / methodology only — never include concrete numbers, percentages or
@@ -33,6 +34,17 @@ export const METHODOLOGY_FAQ: FAQItem[] = [
       'The /climate/rankings page sorts every supported country, US state, UK nation and UK region ' +
       'by their 1-month, 3-month or 12-month temperature anomaly versus the 1961–1990 baseline ' +
       '(chosen for cross-region comparison). Tie-breaks use the longer time horizon.',
+    a: (
+      <>
+        The{' '}
+        <Link href="/climate/rankings" className="text-[#D0A65E] hover:underline">
+          rankings page
+        </Link>{' '}
+        sorts every supported country, US state, UK nation and UK region by their 1-month, 3-month
+        or 12-month temperature anomaly versus the 1961–1990 baseline (chosen for cross-region
+        comparison). Tie-breaks use the longer time horizon.
+      </>
+    ),
   },
   {
     q: 'How are AI-written summaries generated?',

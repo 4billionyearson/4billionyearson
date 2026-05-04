@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
 // Meta / methodology only — never include concrete numbers, percentages or
@@ -46,5 +47,15 @@ export const CLIMATE_EXPLAINED_FAQ: FAQItem[] = [
       'temperature to well below 2°C above pre-industrial levels and pursuing efforts to limit ' +
       'warming to 1.5°C. Live progress against these targets is tracked on the global climate page ' +
       'at /climate/global.',
+    a: (
+      <>
+        The 2015 Paris Agreement commits its parties to holding the increase in global average
+        temperature to well below 2°C above pre-industrial levels and pursuing efforts to limit
+        warming to 1.5°C. Live progress against these targets is tracked on the{' '}
+        <Link href="/climate/global#paris-tracker" className="text-[#D0A65E] hover:underline">
+          global climate page
+        </Link>.
+      </>
+    ),
   },
 ];

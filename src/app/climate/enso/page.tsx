@@ -1216,7 +1216,7 @@ export default function EnsoPage() {
       </SectionCard>
 
       {/* ─── Frequently Asked Questions ─────────────────────── */}
-      <Divider icon={<BookOpen className="h-5 w-5" />} title="Frequently Asked Questions" />
+      <Divider icon={<BookOpen className="h-5 w-5" />} title="FAQs" />
       <StaticFAQPanel />
 
       {/* ─── Explore More ───────────────────────────────────── */}

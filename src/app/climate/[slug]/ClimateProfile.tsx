@@ -1025,7 +1025,7 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
           {/* ─── Frequently Asked Questions ─ always rendered so AI search
               engines and non-JS crawlers can extract region-tailored
               Q&A from raw SSR HTML. Mirrors FAQPage JSON-LD below. ────── */}
-          <Divider icon={<BookOpen className="h-5 w-5" />} title="Frequently Asked Questions" />
+          <Divider icon={<BookOpen className="h-5 w-5" />} title="FAQs" />
           <StaticFAQPanel
             headingId="climate-faq-heading"
             qa={buildRegionFAQ(region)}
