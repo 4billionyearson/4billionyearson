@@ -10,7 +10,10 @@ import {
 import {
   Loader2, AlertTriangle, CloudLightning, Flame, Waves,
   Thermometer, Wind, Activity, ExternalLink, Link2, MapPin,
+  BookOpen,
 } from "lucide-react";
+import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
+import { EXTREME_WEATHER_FAQ } from './extreme-weather-faq';
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 
@@ -1027,6 +1030,19 @@ export default function ExtremeWeatherPage() {
               <Top10Countries />
             </>
           )}
+
+          {/* Frequently Asked Questions — always rendered for AI / non-JS
+              crawlers; mirrors FAQPage JSON-LD below. */}
+          <div className="flex items-center gap-4 my-6">
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+            <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+              <BookOpen className="h-5 w-5" />
+              <span>Frequently Asked Questions</span>
+            </h2>
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+          </div>
+          <StaticFAQPanel headingId="extreme-weather-faq-heading" qa={EXTREME_WEATHER_FAQ} />
+          <FaqJsonLd qa={EXTREME_WEATHER_FAQ} />
         </div>
       </div>
     </main>
