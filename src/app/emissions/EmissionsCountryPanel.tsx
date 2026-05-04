@@ -454,7 +454,7 @@ export default function EmissionsCountryPanel({
 
   return (
     <div id="emissions-country-panel" className={wrapperClass}>
-      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-3">
+      <div className="flex flex-col md:flex-row md:items-center gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           <Factory className="h-5 w-5 text-[#D0A65E]" />
           <h2 className="text-lg font-bold font-mono text-white">Deep Dive</h2>
@@ -518,7 +518,7 @@ export default function EmissionsCountryPanel({
       </div>
 
       {mode === 'continent' ? (
-        <div className="flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           {(['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'] as const).map((c) => {
             const active = countryName === c;
             return (
@@ -538,7 +538,7 @@ export default function EmissionsCountryPanel({
           })}
         </div>
       ) : mode === 'us-region' ? (
-        <div className="flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           {US_CLIMATE_REGIONS.map((r) => {
             const active = regionSlug === r.slug;
             return (
@@ -590,7 +590,7 @@ export default function EmissionsCountryPanel({
       )}
 
       {(mode === 'country' || mode === 'continent') && country && (
-        <div className="mt-5 space-y-5">
+        <div className="mt-4 space-y-5">
           {/* Header with name + link to climate page */}
           <div className="flex items-baseline justify-between flex-wrap gap-2 border-b border-gray-800/60 pb-3">
             <div>
@@ -847,7 +847,7 @@ function USStateDeepDive({
   const climateHref = `/climate/${state.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
-    <div className="mt-5 space-y-5">
+    <div className="mt-4 space-y-5">
       {/* Header */}
       <div className="flex items-baseline justify-between flex-wrap gap-2 border-b border-gray-800/60 pb-3">
         <div>
