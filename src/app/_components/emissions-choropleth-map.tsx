@@ -534,8 +534,27 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
     );
   }
 
-  const legend = mode === "perCapita" ? PER_CAPITA_LEGEND : ANNUAL_LEGEND;
   const legendLabel = mode === "perCapita" ? "CO₂ per capita (t/person):" : "Annual CO₂ emissions:";
+
+  // CSS gradient string built from PALETTE — matches the Climate Map style.
+  const gradientCss = `linear-gradient(to right, ${PALETTE.join(', ')})`;
+
+  // Min/max labels under the gradient bar.
+  let legendMin: string;
+  let legendMax: string;
+  if (stretch && stretchThresholds && stretchThresholds.length > 0) {
+    // Stretched: show the range derived from the visible data.
+    const lo = stretchThresholds[0];
+    const hi = stretchThresholds[stretchThresholds.length - 1];
+    legendMin = mode === 'perCapita' ? `${lo.toFixed(1)} t` : formatTonnes(lo);
+    legendMax = mode === 'perCapita' ? `${hi.toFixed(1)}+ t` : `${formatTonnes(hi)}+`;
+  } else if (mode === 'perCapita') {
+    legendMin = '<1 t';
+    legendMax = '20+ t';
+  } else {
+    legendMin = '<10 Mt';
+    legendMax = '5+ Bt';
+  }
 
   return (
     <div>
@@ -589,33 +608,37 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
         )}
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap items-center justify-center gap-3 mt-3 text-xs text-gray-400">
-        <span className="font-semibold text-gray-300">{legendLabel}</span>
-        {legend.map(({ color, label }) => (
-          <span key={label} className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-sm" style={{ background: color }} />
-            {stretch ? '' : label}
+      {/* Legend — gradient bar + right-justified Stretch pill. Mirrors the
+          Climate Map legend so the controls feel consistent across maps. */}
+      <div className="mt-3 flex items-center gap-3 text-xs text-gray-300">
+        <span className="hidden sm:inline shrink-0 font-semibold text-gray-300">{legendLabel}</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="shrink-0 tabular-nums text-gray-400">{legendMin}</span>
+          <div
+            className="h-3 flex-1 min-w-[80px] max-w-[180px] rounded"
+            style={{ background: gradientCss }}
+          />
+          <span className="shrink-0 tabular-nums text-gray-400">{legendMax}</span>
+        </div>
+        {stretch && (
+          <span className="hidden sm:inline-flex items-center rounded-full bg-[#D0A65E]/15 border border-[#D0A65E]/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#D0A65E]">
+            Stretched
           </span>
-        ))}
-        <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-sm bg-gray-800 border border-gray-600" />
-          No data
-        </span>
+        )}
         <button
           type="button"
           onClick={() => setStretch((s) => !s)}
           aria-pressed={stretch}
           title={stretch
-            ? 'Showing colours stretched to the actual data range. Click to return to fixed thresholds.'
-            : 'Stretch colours to the actual data range — useful when every region falls in the same fixed bucket (e.g. continent totals).'}
-          className={`ml-2 px-2 py-0.5 rounded-full border text-[11px] font-semibold transition-colors ${
+            ? 'Showing colours fitted to the values currently visible. Click to switch back to the canonical scale.'
+            : 'Showing the full canonical scale. Click to fit colours to the values currently visible (useful for the Continents view).'}
+          className={`ml-auto inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap ${
             stretch
-              ? 'bg-amber-500/20 border-amber-500/50 text-amber-200'
-              : 'bg-gray-800/60 border-gray-600 text-gray-300 hover:bg-gray-700/60'
+              ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
+              : 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
           }`}
         >
-          {stretch ? 'Stretch: On' : 'Stretch: Off'}
+          {stretch ? 'Auto-Stretch: On' : 'Auto-Stretch: Off'}
         </button>
       </div>
     </div>

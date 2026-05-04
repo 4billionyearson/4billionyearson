@@ -342,8 +342,14 @@ function featureCentroid(feature: Feature): [number, number] | null {
   return null;
 }
 
-const US_STATE_LABEL_ZOOM = 4;
-const UK_NATION_LABEL_ZOOM = 4;
+// State / UK-nation labels: shown whenever the user has explicitly selected
+// the matching `level`, regardless of zoom. (We previously gated these at
+// zoom>=4 to avoid them appearing during a world-view animation, but the
+// current shell only renders them when level matches, and on mobile the
+// USA/UK preset settles at fractional zoom ~3.3 — below the old gate —
+// which made the labels invisible.)
+const US_STATE_LABEL_ZOOM = 0;
+const UK_NATION_LABEL_ZOOM = 0;
 
 // Approximate centroids for the 9 NOAA US climate regions, used as map labels
 // when level === 'us-regions' so the choropleth reads as 9 regions, not 49 states.
