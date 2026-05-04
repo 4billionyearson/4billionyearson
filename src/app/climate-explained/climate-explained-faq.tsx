@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const CLIMATE_EXPLAINED_FAQ: FAQItem[] = [
@@ -9,8 +9,8 @@ export const CLIMATE_EXPLAINED_FAQ: FAQItem[] = [
     q: 'What is climate change in simple terms?',
     aText:
       'Climate change is the long-term shift in average weather patterns on Earth. Since the ' +
-      'Industrial Revolution, human activity — chiefly burning fossil fuels (coal, oil, gas), ' +
-      'deforestation and cement production — has released large amounts of carbon dioxide and other ' +
+      'Industrial Revolution, human activity - chiefly burning fossil fuels (coal, oil, gas), ' +
+      'deforestation and cement production - has released large amounts of carbon dioxide and other ' +
       'greenhouse gases into the atmosphere. These gases trap extra heat from the sun, warming the ' +
       'planet and altering rainfall, ice cover, sea levels and the frequency of extreme weather.',
   },
@@ -18,7 +18,7 @@ export const CLIMATE_EXPLAINED_FAQ: FAQItem[] = [
     q: 'What is the difference between climate change and global warming?',
     aText:
       'Global warming refers specifically to the rise in Earth\'s average surface temperature caused ' +
-      'by human-emitted greenhouse gases. Climate change is the broader term — it covers global ' +
+      'by human-emitted greenhouse gases. Climate change is the broader term - it covers global ' +
       'warming plus all the downstream effects: changing rainfall patterns, melting ice, rising sea ' +
       'levels, shifting seasons, ocean acidification and more frequent extreme weather.',
   },

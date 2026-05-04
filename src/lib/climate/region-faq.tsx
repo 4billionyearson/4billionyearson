@@ -18,7 +18,7 @@ export function buildRegionFAQ(region: ClimateRegion): FAQItem[] {
     : null;
 
   const dataSourceText = describeDataSources(region);
-  const baselineText = '1961–1990';
+  const baselineText = '1961-1990';
   const updateLabel = 'every month, when the upstream temperature and rainfall data are refreshed.';
 
   const qa: FAQItem[] = [
@@ -39,14 +39,14 @@ export function buildRegionFAQ(region: ClimateRegion): FAQItem[] {
       aText:
         `Anomalies on this page are calculated against the ${baselineText} climatological baseline, ` +
         `which is the standard reference period used by the Met Office, NOAA, IPCC and most national ` +
-        `climate services. Some panels also show the source-native 1901–2000 (NOAA) or 1991–2020 (WMO) ` +
+        `climate services. Some panels also show the source-native 1901-2000 (NOAA) or 1991-2020 (WMO) ` +
         `baselines for verification. Full methodology at /climate/methodology.`,
       a: (
         <>
           Anomalies on this page are calculated against the {baselineText} climatological baseline,
           which is the standard reference period used by the Met Office, NOAA, IPCC and most
-          national climate services. Some panels also show the source-native 1901–2000 (NOAA) or
-          1991–2020 (WMO) baselines for verification. See{' '}
+          national climate services. Some panels also show the source-native 1901-2000 (NOAA) or
+          1991-2020 (WMO) baselines for verification. See{' '}
           <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">
             Methodology &amp; Sources
           </Link>{' '}

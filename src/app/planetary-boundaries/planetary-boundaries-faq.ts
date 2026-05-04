@@ -1,6 +1,6 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const PLANETARY_BOUNDARIES_FAQ: FAQItem[] = [
@@ -25,7 +25,7 @@ export const PLANETARY_BOUNDARIES_FAQ: FAQItem[] = [
   {
     q: 'Is crossing a planetary boundary the same as a tipping point?',
     aText:
-      'No. A planetary boundary marks the edge of the safe operating space — beyond it, the risk of ' +
+      'No. A planetary boundary marks the edge of the safe operating space - beyond it, the risk of ' +
       'destabilising the Earth system rises. Tipping points are specific thresholds where a system ' +
       'undergoes abrupt, often irreversible change (for example, ice-sheet collapse or Amazon ' +
       'dieback). Crossing a boundary makes triggering tipping points more likely but does not in ' +

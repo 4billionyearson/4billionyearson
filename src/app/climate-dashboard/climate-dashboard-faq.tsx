@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const CLIMATE_DASHBOARD_FAQ: FAQItem[] = [
@@ -32,8 +32,8 @@ export const CLIMATE_DASHBOARD_FAQ: FAQItem[] = [
   {
     q: 'What baseline is used to measure change?',
     aText:
-      'Anomalies are calculated against the 1991–2020 climate normal where available, in line with ' +
-      'WMO standard practice. Long-term comparisons against pre-industrial baselines (1850–1900) are ' +
+      'Anomalies are calculated against the 1991-2020 climate normal where available, in line with ' +
+      'WMO standard practice. Long-term comparisons against pre-industrial baselines (1850-1900) are ' +
       'shown where the source data supports it (for example, global mean temperature).',
   },
   {

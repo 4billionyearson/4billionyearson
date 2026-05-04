@@ -1,6 +1,6 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const SEA_LEVELS_ICE_FAQ: FAQItem[] = [
@@ -17,7 +17,7 @@ export const SEA_LEVELS_ICE_FAQ: FAQItem[] = [
       'Sea ice is frozen sea water floating on the ocean (Arctic and Antarctic). Its extent changes ' +
       'each year between summer and winter, and shrinking sea ice does not directly raise sea level ' +
       'because it is already displacing water. Land ice (the Greenland and Antarctic ice sheets, plus ' +
-      'mountain glaciers) sits on land — when it melts it adds new water to the ocean and is the main ' +
+      'mountain glaciers) sits on land - when it melts it adds new water to the ocean and is the main ' +
       'driver of long-term sea level rise alongside thermal expansion.',
   },
   {
@@ -31,8 +31,8 @@ export const SEA_LEVELS_ICE_FAQ: FAQItem[] = [
   {
     q: 'What baseline is used for the anomalies?',
     aText:
-      'Sea ice anomalies use the 1981–2010 reference period (NSIDC standard). Sea level anomalies ' +
-      'use a 1993–2008 satellite-altimetry reference. Ice-mass change is reported as cumulative ' +
+      'Sea ice anomalies use the 1981-2010 reference period (NSIDC standard). Sea level anomalies ' +
+      'use a 1993-2008 satellite-altimetry reference. Ice-mass change is reported as cumulative ' +
       'gigatonnes lost since the start of each satellite record. The baseline is labelled on each chart.',
   },
   {

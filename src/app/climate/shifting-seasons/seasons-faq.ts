@@ -1,13 +1,13 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const SHIFTING_SEASONS_FAQ: FAQItem[] = [
   {
     q: 'What does the shifting seasons page show?',
     aText:
-      'How the timing and length of meteorological seasons have changed under climate change — when ' +
+      'How the timing and length of meteorological seasons have changed under climate change - when ' +
       'spring now begins, how long summer lasts, when winter snow cover starts and ends, and how ' +
       'these shifts vary by hemisphere and by country. The live charts and the country comparison ' +
       'panel above carry the current values.',
@@ -30,7 +30,7 @@ export const SHIFTING_SEASONS_FAQ: FAQItem[] = [
   {
     q: 'What baseline is used?',
     aText:
-      'Anomalies are calculated against the 1991–2020 climate normal where available (WMO standard). ' +
+      'Anomalies are calculated against the 1991-2020 climate normal where available (WMO standard). ' +
       'Some indicators (snow cover, US growing season) use longer reference periods set by the ' +
       'source agency; the baseline is labelled on each chart.',
   },

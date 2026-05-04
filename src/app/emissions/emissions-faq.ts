@@ -1,6 +1,6 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const EMISSIONS_FAQ: FAQItem[] = [
@@ -14,9 +14,9 @@ export const EMISSIONS_FAQ: FAQItem[] = [
   {
     q: 'What is the difference between annual, per-capita and cumulative emissions?',
     aText:
-      'Annual emissions are the total CO₂ a country emitted in a single year — useful for tracking ' +
-      'current trends. Per-capita emissions divide that by population — useful for comparing the ' +
-      'climate footprint of an average resident. Cumulative emissions sum every year since 1850 — ' +
+      'Annual emissions are the total CO₂ a country emitted in a single year - useful for tracking ' +
+      'current trends. Per-capita emissions divide that by population - useful for comparing the ' +
+      'climate footprint of an average resident. Cumulative emissions sum every year since 1850 - ' +
       'useful for measuring historical responsibility, since CO₂ stays in the atmosphere for ' +
       'centuries and long-term warming is driven by total cumulative emissions.',
   },

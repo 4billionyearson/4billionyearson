@@ -1,14 +1,14 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const GREENHOUSE_GASES_FAQ: FAQItem[] = [
   {
     q: 'What does the greenhouse gases page show?',
     aText:
-      'Live atmospheric concentrations of the three main long-lived greenhouse gases — carbon dioxide ' +
-      '(CO₂), methane (CH₄) and nitrous oxide (N₂O) — alongside their long-term ice-core records ' +
+      'Live atmospheric concentrations of the three main long-lived greenhouse gases - carbon dioxide ' +
+      '(CO₂), methane (CH₄) and nitrous oxide (N₂O) - alongside their long-term ice-core records ' +
       'stretching back hundreds of thousands of years. Current values and recent monthly trends are in ' +
       'the live panels above.',
   },

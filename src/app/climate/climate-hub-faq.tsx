@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const CLIMATE_HUB_FAQ: FAQItem[] = [
@@ -31,7 +31,7 @@ export const CLIMATE_HUB_FAQ: FAQItem[] = [
     q: 'How often is it updated?',
     aText:
       'Most underlying datasets refresh on a monthly cadence, and the climate hub refreshes at the ' +
-      'same cadence — typically within days of the previous month\'s figures being released. Live ' +
+      'same cadence - typically within days of the previous month\'s figures being released. Live ' +
       'indicators (CO₂, methane, sea ice, ENSO state) update more frequently from their source APIs.',
   },
   {

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const METHODOLOGY_FAQ: FAQItem[] = [
@@ -15,24 +15,24 @@ export const METHODOLOGY_FAQ: FAQItem[] = [
   {
     q: 'How is the climate baseline calculated?',
     aText:
-      'Anomalies are calculated against the 1991–2020 climate normal where available, in line with ' +
-      'WMO standard practice. NOAA datasets that natively use a 1901–2000 baseline are re-baselined ' +
-      'to 1991–2020 (or 1961–1990 for cross-region rankings) so different sources can be compared on ' +
-      'equal terms. Pre-industrial comparisons (1850–1900) are used for global mean temperature where ' +
+      'Anomalies are calculated against the 1991-2020 climate normal where available, in line with ' +
+      'WMO standard practice. NOAA datasets that natively use a 1901-2000 baseline are re-baselined ' +
+      'to 1991-2020 (or 1961-1990 for cross-region rankings) so different sources can be compared on ' +
+      'equal terms. Pre-industrial comparisons (1850-1900) are used for global mean temperature where ' +
       'the source data supports it. The exact baseline is shown on each chart.',
   },
   {
     q: 'How often is the data updated?',
     aText:
       'Most underlying datasets refresh on a monthly cadence, and the site is rebuilt on the same ' +
-      'cadence — typically within days of the previous month\'s figures being released. Live ' +
+      'cadence - typically within days of the previous month\'s figures being released. Live ' +
       'indicators (CO₂, methane, sea ice, ENSO state) refresh more frequently from their source APIs.',
   },
   {
     q: 'How are countries and regions ranked?',
     aText:
       'The /climate/rankings page sorts every supported country, US state, UK nation and UK region ' +
-      'by their 1-month, 3-month or 12-month temperature anomaly versus the 1961–1990 baseline ' +
+      'by their 1-month, 3-month or 12-month temperature anomaly versus the 1961-1990 baseline ' +
       '(chosen for cross-region comparison). Tie-breaks use the longer time horizon.',
     a: (
       <>
@@ -41,7 +41,7 @@ export const METHODOLOGY_FAQ: FAQItem[] = [
           Climate Rankings
         </Link>{' '}
         sorts every supported country, US state, UK nation and UK region by their 1-month, 3-month
-        or 12-month temperature anomaly versus the 1961–1990 baseline (chosen for cross-region
+        or 12-month temperature anomaly versus the 1961-1990 baseline (chosen for cross-region
         comparison). Tie-breaks use the longer time horizon.
       </>
     ),

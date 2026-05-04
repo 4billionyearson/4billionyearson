@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
 
-// Meta / methodology only — never include concrete numbers, percentages or
+// Meta / methodology only - never include concrete numbers, percentages or
 // dates that go stale. Live figures belong in the SSR'd page content.
 
 export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
@@ -16,8 +16,8 @@ export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
   {
     q: 'Which baselines are used to measure global warming?',
     aText:
-      'The headline figure compares the trailing 10-year mean to the 1850–1900 pre-industrial baseline, ' +
-      'in line with the IPCC. Shorter-term anomalies are calculated against the 1991–2020 climate ' +
+      'The headline figure compares the trailing 10-year mean to the 1850-1900 pre-industrial baseline, ' +
+      'in line with the IPCC. Shorter-term anomalies are calculated against the 1991-2020 climate ' +
       'normal, the WMO standard. Both baselines are labelled directly on each chart.',
   },
   {
@@ -42,7 +42,7 @@ export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
     q: 'Has Earth already passed the 1.5°C warming limit?',
     aText:
       'The 1.5°C target in the Paris Agreement refers to a long-term mean - usually a 10- to 20-year ' +
-      'average versus the 1850–1900 pre-industrial baseline. Individual years can briefly exceed ' +
+      'average versus the 1850-1900 pre-industrial baseline. Individual years can briefly exceed ' +
       '1.5°C without the long-term threshold being crossed; 2024 was the first calendar year above ' +
       'that line. The Paris Tracker on this page shows the trailing 10-year mean (the official ' +
       'WMO/IPCC interpretation) and the 12-month running mean side-by-side, so you can read both ' +
@@ -59,13 +59,13 @@ export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
       'continues - a useful early-warning indicator, not a forecast.',
   },
   {
-    q: 'What is the pre-industrial baseline and why 1850–1900?',
+    q: 'What is the pre-industrial baseline and why 1850-1900?',
     aText:
-      '1850–1900 is the earliest 50-year window with broad, reliable instrumental coverage of ' +
+      '1850-1900 is the earliest 50-year window with broad, reliable instrumental coverage of ' +
       'global temperature. Earlier periods rely on sparser proxy records. The IPCC and WMO ' +
       'standardised on this window so every assessment uses the same starting point when reporting ' +
       'how much the planet has warmed. All Paris-Agreement-relevant warming figures on 4 Billion ' +
-      'Years On are quoted against 1850–1900.',
+      'Years On are quoted against 1850-1900.',
   },
   {
     q: 'How much have CO₂, methane and nitrous oxide concentrations changed?',
