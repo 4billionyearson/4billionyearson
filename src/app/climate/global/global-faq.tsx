@@ -32,8 +32,8 @@ export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
         Global Monitoring Laboratory. Sea ice: NSIDC. Ocean heat content: Copernicus / NOAA. ENSO:
         NOAA Climate Prediction Center. Pre-industrial baselines and emission pathways: IPCC AR6.
         Full source list at{' '}
-        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
-          /climate/methodology
+        <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Methodology &amp; Sources
         </Link>.
       </>
     ),
@@ -54,16 +54,16 @@ export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
     a: (
       <>
         See the{' '}
-        <Link href="/climate" className="text-[#D0A65E] hover:underline">
-          climate hub
+        <Link href="/climate" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Climate Hub
         </Link>{' '}
         for every country, US state and UK region we track, the{' '}
-        <Link href="/climate/rankings" className="text-[#D0A65E] hover:underline">
-          rankings page
+        <Link href="/climate/rankings" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Climate Rankings
         </Link>{' '}
         for sortable cross-region anomalies, and the{' '}
-        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
-          methodology page
+        <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Methodology &amp; Sources
         </Link>{' '}
         for the complete data-source and baseline reference.
       </>

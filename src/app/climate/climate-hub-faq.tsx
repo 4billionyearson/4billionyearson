@@ -43,12 +43,12 @@ export const CLIMATE_HUB_FAQ: FAQItem[] = [
     a: (
       <>
         The full league table is on the{' '}
-        <Link href="/climate/rankings" className="text-[#D0A65E] hover:underline">
-          rankings page
+        <Link href="/climate/rankings" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Climate Rankings
         </Link>{' '}
         (sortable 1-month, 3-month and 12-month anomaly for every region we track). The{' '}
-        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
-          methodology page
+        <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Methodology &amp; Sources
         </Link>{' '}
         details every data source, baseline and refresh cadence used on the site.
       </>

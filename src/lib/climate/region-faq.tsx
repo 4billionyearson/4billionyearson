@@ -47,7 +47,7 @@ export function buildRegionFAQ(region: ClimateRegion): FAQItem[] {
           which is the standard reference period used by the Met Office, NOAA, IPCC and most
           national climate services. Some panels also show the source-native 1901–2000 (NOAA) or
           1991–2020 (WMO) baselines for verification. Full methodology at{' '}
-          <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
+          <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">
             /climate/methodology
           </Link>.
         </>
@@ -71,8 +71,8 @@ export function buildRegionFAQ(region: ClimateRegion): FAQItem[] {
           The {name} climate update is refreshed monthly, typically a few days after the previous
           month closes and the upstream provider (Met Office HadUK-Grid, NOAA Climate at a Glance,
           Copernicus ERA5 or the Global Carbon Project) publishes its update. See the{' '}
-          <Link href="/climate/rankings" className="text-[#D0A65E] hover:underline">
-            climate rankings
+          <Link href="/climate/rankings" className="text-teal-300 hover:text-teal-200 transition-colors">
+            Climate Rankings
           </Link>{' '}
           for cross-region comparisons.
         </>

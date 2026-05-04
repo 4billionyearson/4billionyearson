@@ -52,8 +52,8 @@ export const CLIMATE_EXPLAINED_FAQ: FAQItem[] = [
         The 2015 Paris Agreement commits its parties to holding the increase in global average
         temperature to well below 2°C above pre-industrial levels and pursuing efforts to limit
         warming to 1.5°C. Live progress against these targets is tracked on the{' '}
-        <Link href="/climate/global#paris-tracker" className="text-[#D0A65E] hover:underline">
-          global climate page
+        <Link href="/climate/global#paris-tracker" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Paris Agreement tracker
         </Link>.
       </>
     ),

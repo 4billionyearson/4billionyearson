@@ -37,8 +37,8 @@ export const METHODOLOGY_FAQ: FAQItem[] = [
     a: (
       <>
         The{' '}
-        <Link href="/climate/rankings" className="text-[#D0A65E] hover:underline">
-          rankings page
+        <Link href="/climate/rankings" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Climate Rankings
         </Link>{' '}
         sorts every supported country, US state, UK nation and UK region by their 1-month, 3-month
         or 12-month temperature anomaly versus the 1961–1990 baseline (chosen for cross-region

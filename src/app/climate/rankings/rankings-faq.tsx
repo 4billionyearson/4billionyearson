@@ -42,8 +42,8 @@ export const RANKINGS_FAQ: FAQItem[] = [
     a: (
       <>
         The{' '}
-        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
-          methodology page
+        <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Methodology &amp; Sources
         </Link>{' '}
         gives the complete two-baseline model, source timeline and known caveats.
       </>

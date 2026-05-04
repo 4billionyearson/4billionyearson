@@ -44,8 +44,8 @@ export const CLIMATE_DASHBOARD_FAQ: FAQItem[] = [
     a: (
       <>
         The{' '}
-        <Link href="/climate/methodology" className="text-[#D0A65E] hover:underline">
-          methodology page
+        <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">
+          Methodology &amp; Sources
         </Link>{' '}
         gives the complete data-source, baseline and refresh-cadence reference for every dataset
         used on the site.

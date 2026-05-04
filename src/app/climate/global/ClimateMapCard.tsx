@@ -75,7 +75,7 @@ const PRESET_METRICS: Record<ClimateMapPreset, MetricKey[]> = {
 };
 
 const PRESET_INITIAL_LEVEL: Record<ClimateMapPreset, MapLevel> = {
-  global: 'continents',
+  global: 'countries',
   usa: 'us-states',
   uk: 'uk-countries',
 };
