@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import {
   getRegionBySlug,
   getClimateMetadataTitle,
@@ -8,9 +9,10 @@ import {
 import { getCached } from '@/lib/climate/redis';
 import GlobalProfile from './GlobalProfile';
 
-// ISR: regenerate every 30 minutes so a freshly cached Gemini summary surfaces
-// in the SSR'd HTML soon after it is generated.
-export const revalidate = 1800;
+// ISR: 24-hour safety net. Cache invalidation is event-driven via
+// revalidatePath() inside the summary API route, so a fresh Gemini run
+// surfaces in raw SSR HTML on the next request without waiting for ISR.
+export const revalidate = 86400;
 
 interface CachedSummary {
   summary: string | null;
@@ -32,6 +34,35 @@ async function readCachedGlobalSummary(): Promise<CachedSummary | null> {
     return await getCached<CachedSummary>(cacheKey);
   } catch {
     return null;
+  }
+}
+
+async function getRequestBaseUrl(): Promise<string> {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  try {
+    const h = await headers();
+    const host = h.get('host');
+    const proto = h.get('x-forwarded-proto') || 'https';
+    if (host) return `${proto}://${host}`;
+  } catch {}
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+}
+
+/**
+ * Fire-and-forget warm-up: when the Gemini summary cache is empty, kick
+ * off the API route so it runs Gemini, writes the cache, and calls
+ * revalidatePath. The current request still returns immediately - we
+ * don't await. The very next request to /climate/global will SSR with
+ * the fresh summary baked in.
+ */
+async function warmGlobalSummary(): Promise<void> {
+  try {
+    const base = await getRequestBaseUrl();
+    // Fire-and-forget; do not await the response.
+    void fetch(`${base}/api/climate/summary/global`, { cache: 'no-store' }).catch(() => {});
+  } catch {
+    // Swallow - warm-up is best-effort.
   }
 }
 
@@ -123,12 +154,22 @@ function DatasetSchema() {
 
 export default async function ClimateGlobalPage() {
   const cached = await readCachedGlobalSummary();
+  const cacheMiss = !cached?.summary;
+
+  // On cache miss, kick off Gemini in the background. Subsequent requests
+  // will SSR with the fresh summary (revalidatePath fires inside the API
+  // route once the cache is populated).
+  if (cacheMiss) {
+    await warmGlobalSummary();
+  }
+
   return (
     <>
       <DatasetSchema />
       <GlobalProfile
         initialSummary={cached?.summary ?? null}
         initialSources={cached?.sources ?? []}
+        summaryCacheMiss={cacheMiss}
       />
     </>
   );

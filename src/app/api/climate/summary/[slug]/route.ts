@@ -1,6 +1,7 @@
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { getRegionBySlug, type ClimateRegion, CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { buildDriverVocabularySection } from '@/lib/climate/warming-drivers';
@@ -1239,6 +1240,9 @@ export async function GET(
         generatedAt: new Date().toISOString(),
       };
       await setShortTerm(cacheKey, cacheResult);
+      // Invalidate the SSR'd HTML so the next request bakes in the fresh
+      // summary (cache-miss self-healing for AI / non-JS crawlers).
+      try { revalidatePath('/climate/global'); } catch {}
       return NextResponse.json({ ...cacheResult, source: 'fresh' });
     } catch (err: any) {
       console.error('Gemini global summary error:', err);
@@ -1315,6 +1319,7 @@ export async function GET(
         generatedAt: new Date().toISOString(),
       };
       await setShortTerm(cacheKey, cacheResult);
+      try { revalidatePath(`/climate/${slug}`); } catch {}
       return NextResponse.json({ ...cacheResult, source: 'fresh' });
     } catch (err: any) {
       console.error(`Gemini group summary error for ${slug}:`, err);
@@ -1384,6 +1389,7 @@ export async function GET(
       generatedAt: new Date().toISOString(),
     };
     await setShortTerm(cacheKey, cacheResult);
+    try { revalidatePath(`/climate/${slug}`); } catch {}
 
     return NextResponse.json({ ...cacheResult, source: 'fresh' });
   } catch (err: any) {

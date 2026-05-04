@@ -610,6 +610,7 @@ export default function ClimateProfile({
   region,
   initialSummary = null,
   initialSources = [],
+  summaryCacheMiss = false,
 }: {
   slug: string;
   region: ClimateRegion;
@@ -619,6 +620,11 @@ export default function ClimateProfile({
    *  crawlers). When null, the client falls back to the existing fetch flow. */
   initialSummary?: string | null;
   initialSources?: { title: string; uri: string }[];
+  /** True when the SSR cache lookup missed and the server has fired off a
+   *  background warm-up call to Gemini. The client renders a friendly
+   *  "summary is being generated, refresh in a moment" panel instead of
+   *  duplicating the fetch. */
+  summaryCacheMiss?: boolean;
 }) {
   const [data, setData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -670,8 +676,11 @@ export default function ClimateProfile({
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
 
-    // Only fetch the Gemini summary client-side if it wasn't pre-seeded by SSR.
-    if (initialSummary == null) {
+    // Only fetch the Gemini summary client-side if it wasn't pre-seeded by SSR
+    // and the server didn't already kick off a background warm-up. When
+    // summaryCacheMiss is true, the user sees a friendly "regenerating"
+    // panel and a Refresh button - the client doesn't duplicate the fetch.
+    if (initialSummary == null && !summaryCacheMiss) {
       void fetchSummary();
     }
   }, [slug]);
@@ -796,6 +805,35 @@ export default function ClimateProfile({
                     >
                       Full Climate Data for {pageTitle} →
                     </Link>
+                  </div>
+                </div>
+              ) : summaryCacheMiss ? (
+                <div>
+                  {coverageLine && (
+                    <div className="inline-flex items-start gap-2 mb-3 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
+                      <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
+                      <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
+                    </div>
+                  )}
+                  <div className="mb-3">
+                    <ClimateRankPill slug={slug} />
+                  </div>
+                  <div className="rounded-xl border border-[#D0A65E]/40 bg-[#D0A65E]/5 px-4 py-3">
+                    <p className="text-sm font-medium text-[#FFF5E7]">A fresh climate update for {region.name} is being generated…</p>
+                    <p className="mt-1 text-sm text-gray-300">
+                      The new monthly summary is being written by Gemini in the
+                      background. This usually takes 5–10 seconds. The live
+                      climate data below is already up to date.
+                    </p>
+                    <div className="mt-3">
+                      <button
+                        type="button"
+                        onClick={() => { if (typeof window !== 'undefined') window.location.reload(); }}
+                        className="inline-flex items-center gap-2 rounded-lg border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-3 py-2 text-sm font-semibold text-[#D0A65E] transition-colors hover:bg-[#D0A65E]/20 hover:text-[#E8C97A]"
+                      >
+                        Refresh page
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : summaryLoading ? (

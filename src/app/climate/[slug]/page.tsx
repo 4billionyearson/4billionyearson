@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import {
   getRegionBySlug,
@@ -16,9 +17,10 @@ import ClimateGroupProfile from './ClimateGroupProfile';
 // on-demand and are then cached, so builds stay fast.
 export const dynamicParams = true;
 
-// ISR: regenerate every 30 minutes so a freshly cached Gemini summary surfaces
-// in raw SSR HTML soon after it is generated.
-export const revalidate = 1800;
+// ISR: 24-hour safety net. Cache invalidation is event-driven via
+// revalidatePath() inside the summary API route, so a fresh Gemini run
+// surfaces in raw SSR HTML on the next request without waiting for ISR.
+export const revalidate = 86400;
 
 interface CachedSummary {
   summary: string | null;
@@ -40,6 +42,34 @@ async function readCachedSummary(slug: string): Promise<CachedSummary | null> {
     return await getCached<CachedSummary>(cacheKey);
   } catch {
     return null;
+  }
+}
+
+async function getRequestBaseUrl(): Promise<string> {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  try {
+    const h = await headers();
+    const host = h.get('host');
+    const proto = h.get('x-forwarded-proto') || 'https';
+    if (host) return `${proto}://${host}`;
+  } catch {}
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+}
+
+/**
+ * Fire-and-forget warm-up: when the Gemini summary cache is empty for a
+ * region, kick off the API route so it runs Gemini, writes the cache, and
+ * calls revalidatePath. The current request still returns immediately -
+ * we don't await. The next request to /climate/{slug} will SSR with the
+ * fresh summary baked in.
+ */
+async function warmRegionSummary(slug: string): Promise<void> {
+  try {
+    const base = await getRequestBaseUrl();
+    void fetch(`${base}/api/climate/summary/${slug}`, { cache: 'no-store' }).catch(() => {});
+  } catch {
+    // Swallow - warm-up is best-effort.
   }
 }
 
@@ -142,6 +172,13 @@ export default async function ClimateProfilePage(
   }
 
   const cached = await readCachedSummary(slug);
+  const cacheMiss = !cached?.summary;
+
+  // On cache miss, kick off Gemini in the background. Subsequent requests
+  // to this slug will SSR with the fresh summary baked in.
+  if (cacheMiss) {
+    await warmRegionSummary(slug);
+  }
 
   return (
     <>
@@ -151,6 +188,7 @@ export default async function ClimateProfilePage(
         region={region}
         initialSummary={cached?.summary ?? null}
         initialSources={cached?.sources ?? []}
+        summaryCacheMiss={cacheMiss}
       />
     </>
   );
