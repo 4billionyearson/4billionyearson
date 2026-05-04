@@ -35,6 +35,34 @@ export const SHIFTING_SEASONS_FAQ: FAQItem[] = [
       'source agency; the baseline is labelled on each chart.',
   },
   {
+    q: 'Are summers getting longer?',
+    aText:
+      'Yes. The growing season - the run of days with mean temperature above a region-appropriate ' +
+      'threshold - has lengthened across most of the Northern Hemisphere since 1970, with the ' +
+      'sharpest gains in the contiguous United States and northern Europe. The exact change for ' +
+      'any one country, US state or UK region is shown live on this page in the season-length ' +
+      'chart and the country comparison panel above; we do not bake numbers into this FAQ because ' +
+      'they refresh annually.',
+  },
+  {
+    q: 'When does spring arrive now compared with the past?',
+    aText:
+      'Spring is arriving earlier across most of the temperate Northern Hemisphere. The USA-NPN ' +
+      'Spring Leaf and Bloom Index (USA), Met Office HadUK-Grid temperature thresholds (UK) and ' +
+      'Berkeley Earth / Copernicus ERA5 (rest of the world) all show first-leaf and first-bloom ' +
+      'dates trending earlier by roughly one to three weeks since 1980, depending on the region. ' +
+      'Pick a country in the country comparison panel above to see the live spring-onset anomaly.',
+  },
+  {
+    q: 'Why are seasonal shifts a useful climate indicator?',
+    aText:
+      'Annual mean temperature can mask big within-year changes. Earlier spring leaf-out, longer ' +
+      'frost-free windows, later first-snow dates and shorter snow-cover seasons all change the ' +
+      'environment for crops, pests, pollinators and water supply long before the headline ' +
+      'temperature anomaly looks alarming. They are also independent of the choice of climate ' +
+      'baseline, which makes them a good cross-check on the temperature record.',
+  },
+  {
     q: 'How often is this page updated?',
     aText:
       'Annual indicators (growing-season length, snow-season length) refresh once a year as the source ' +

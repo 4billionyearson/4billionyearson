@@ -38,6 +38,7 @@ export async function GET() {
           weekly: ensoData.weekly ?? null,
           forecast: ensoData.forecast ?? null,
           plume: ensoData.plume ?? null,
+          cnnForecast: ensoData.cnnForecast ?? null,
         };
       }
     } catch {

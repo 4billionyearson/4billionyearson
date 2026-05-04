@@ -14,6 +14,7 @@ import type { ClimateMapPreset } from '../global/ClimateMapCard';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
+import { RegionDataSourcesCard } from './RegionDataSourcesCard';
 import { buildRegionFAQ } from '@/lib/climate/region-faq';
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
@@ -1070,6 +1071,11 @@ export default function ClimateProfile({
               </section>
             </>
           )}
+
+          {/* ─── Data Sources ─ static, always-visible card listing the
+              authoritative datasets that drive every figure on this page. */}
+          <Divider icon={<BookOpen className="h-5 w-5" />} title="Data Sources" />
+          <RegionDataSourcesCard region={region} />
 
           {/* ─── Frequently Asked Questions ─ always rendered so AI search
               engines and non-JS crawlers can extract region-tailored

@@ -17,6 +17,7 @@ import { OverviewGrid } from '@/app/climate/_shared/overview-grid';
 import { buildOverviewRow, type OverviewPanel, type OverviewRow, type RankedPeriodStat } from '@/app/climate/_shared/overview-grid-types';
 import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
+import { RegionDataSourcesCard } from './RegionDataSourcesCard';
 import { buildRegionFAQ } from '@/lib/climate/region-faq';
 
 // ─── Server-side data loaders ───────────────────────────────────────────────
@@ -854,6 +855,18 @@ export default async function ClimateGroupProfile({
 
         {/* Body */}
         {isContinent ? <ContinentBody region={region} /> : <UsClimateRegionBody region={region} />}
+
+        {/* Data Sources — static, always-visible card listing the
+            authoritative datasets that drive every figure on this page. */}
+        <div className="flex items-center gap-4 my-6">
+          <div className="h-px bg-[#D0A65E]/30 flex-1" />
+          <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+            <BookOpen className="h-5 w-5" />
+            <span>Data Sources</span>
+          </h2>
+          <div className="h-px bg-[#D0A65E]/30 flex-1" />
+        </div>
+        <RegionDataSourcesCard region={region} />
 
         {/* Frequently Asked Questions — region-tailored, surfaces in raw
             SSR HTML for AI / non-JS crawlers; mirrors FAQPage JSON-LD. */}

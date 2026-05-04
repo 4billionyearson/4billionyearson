@@ -39,6 +39,45 @@ export const GLOBAL_CLIMATE_FAQ: FAQItem[] = [
     ),
   },
   {
+    q: 'Has Earth already passed the 1.5°C warming limit?',
+    aText:
+      'The 1.5°C target in the Paris Agreement refers to a long-term mean - usually a 10- to 20-year ' +
+      'average versus the 1850–1900 pre-industrial baseline. Individual years can briefly exceed ' +
+      '1.5°C without the long-term threshold being crossed; 2024 was the first calendar year above ' +
+      'that line. The Paris Tracker on this page shows the trailing 10-year mean (the official ' +
+      'WMO/IPCC interpretation) and the 12-month running mean side-by-side, so you can read both ' +
+      'figures at a glance and see how close the long-term mean now sits to 1.5°C.',
+  },
+  {
+    q: 'When will Earth reach 2°C of warming above pre-industrial levels?',
+    aText:
+      'There is no fixed calendar date - it depends on the global emissions pathway over the next ' +
+      'two decades. IPCC AR6 projects the trailing 20-year mean reaches 2°C in the early-to-mid ' +
+      '2040s under intermediate emissions (SSP2-4.5) and could be delayed to the 2050s under deep ' +
+      'mitigation (SSP1-2.6). The chart on this page extrapolates the current observed trend to ' +
+      'flag the year the trailing 10-year mean is on track to cross 2°C if the present rate ' +
+      'continues - a useful early-warning indicator, not a forecast.',
+  },
+  {
+    q: 'What is the pre-industrial baseline and why 1850–1900?',
+    aText:
+      '1850–1900 is the earliest 50-year window with broad, reliable instrumental coverage of ' +
+      'global temperature. Earlier periods rely on sparser proxy records. The IPCC and WMO ' +
+      'standardised on this window so every assessment uses the same starting point when reporting ' +
+      'how much the planet has warmed. All Paris-Agreement-relevant warming figures on 4 Billion ' +
+      'Years On are quoted against 1850–1900.',
+  },
+  {
+    q: 'How much have CO₂, methane and nitrous oxide concentrations changed?',
+    aText:
+      'CO₂ has risen from a pre-industrial ~280 ppm to a current monthly value shown live in the ' +
+      'greenhouse-gas panel above (NOAA Mauna Loa series). Methane and nitrous oxide are tracked ' +
+      'in the same panel using NOAA Global Monitoring Laboratory marine boundary-layer averages. ' +
+      'Each tile shows the current monthly mean, the year-on-year change and the long-run growth ' +
+      'rate - we deliberately do not bake the live numbers into this FAQ so the answer never goes ' +
+      'stale.',
+  },
+  {
     q: 'How often is this page updated?',
     aText:
       'The live data panels refresh on each page request from a monthly cache that rebuilds within ' +

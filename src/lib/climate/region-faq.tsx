@@ -46,10 +46,11 @@ export function buildRegionFAQ(region: ClimateRegion): FAQItem[] {
           Anomalies on this page are calculated against the {baselineText} climatological baseline,
           which is the standard reference period used by the Met Office, NOAA, IPCC and most
           national climate services. Some panels also show the source-native 1901–2000 (NOAA) or
-          1991–2020 (WMO) baselines for verification. Full methodology at{' '}
+          1991–2020 (WMO) baselines for verification. See{' '}
           <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 transition-colors">
-            /climate/methodology
-          </Link>.
+            Methodology &amp; Sources
+          </Link>{' '}
+          for the full reference.
         </>
       ),
     },

@@ -652,7 +652,7 @@ export default function EnsoPage() {
 
       {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
       <div id="forecast" className="scroll-mt-6">
-      <Divider icon={<TrendingUp className="h-5 w-5" />} title={`Will there be an El Niño or La Niña in ${ensoForecastYearLabel()}?`} />
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title={`Prediction (${ensoForecastYearLabel()})`} />
       <ForecastSection data={data} />
       </div>
 
@@ -883,7 +883,7 @@ export default function EnsoPage() {
 
       {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
       <div id="impacts" className="scroll-mt-6">
-        <Divider icon={<Globe2 className="h-5 w-5" />} title="Which countries are affected by El Niño and La Niña?" />
+        <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impacts" />
       </div>
 
       <SectionCard
@@ -1038,7 +1038,7 @@ export default function EnsoPage() {
 
       {/* ═══ PAST EVENTS ═════════════════════════ */}
       <div id="past-events" className="scroll-mt-6">
-        <Divider icon={<History className="h-5 w-5" />} title={`Past Major El Niño and La Niña events (${pastEventsRangeLabel()})`} />
+        <Divider icon={<History className="h-5 w-5" />} title={`Past Major Events (${pastEventsRangeLabel()})`} />
       </div>
 
       <SectionCard
@@ -1104,7 +1104,7 @@ export default function EnsoPage() {
       </SectionCard>
 
       {/* ═══ CLIMATE CHANGE ══════════════════════ */}
-      <Divider icon={<Wind className="h-5 w-5" />} title="How does Climate Change affect El Niño and La Niña?" />
+      <Divider icon={<Wind className="h-5 w-5" />} title="ENSO and Climate Change" />
 
       <SectionCard
         icon={<Wind className="text-[#D0A65E]" />}

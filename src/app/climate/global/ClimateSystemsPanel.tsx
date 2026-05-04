@@ -53,6 +53,16 @@ interface PlumePeriod {
   modelCount: number;
 }
 
+interface CnnForecastPoint {
+  yyyymm: number;
+  nino34: number;
+}
+
+interface CnnForecast {
+  issueYearMonth: number;
+  points: CnnForecastPoint[];
+}
+
 interface EnsoData {
   state: 'El Niño' | 'La Niña' | 'Neutral';
   strength: string;
@@ -63,6 +73,7 @@ interface EnsoData {
   weekly?: { weekly: WeeklyRow[]; lastWeek: string } | null;
   forecast?: { seasons: ForecastSeason[] } | null;
   plume?: { issueYear: number; issueMonth: number; periods: PlumePeriod[] } | null;
+  cnnForecast?: CnnForecast | null;
 }
 
 const ENSO_SEASON_LABELS = ['DJF', 'JFM', 'FMA', 'MAM', 'AMJ', 'MJJ', 'JJA', 'JAS', 'ASO', 'SON', 'OND', 'NDJ'];
@@ -138,7 +149,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
     return y + (new Date(y, m - 1, d).getTime() - start) / (end - start);
   };
 
-  type ChartPoint = { x: number; anom?: number; pos?: number; neg?: number; fcAnom?: number; fcPos?: number; dateLabel?: string };
+  type ChartPoint = { x: number; anom?: number; pos?: number; neg?: number; fcAnom?: number; fcPos?: number; cnnAnom?: number; dateLabel?: string };
 
   const observedPoints: ChartPoint[] = (enso.weekly?.weekly || [])
     .filter((w) => {
@@ -202,11 +213,51 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
   const elNinoEnd = lastPlume ? ensoSeasonWindow(lastPlume.label, lastPlume.seasonAnchorYear)[1] : null;
   const peakX = plumePeakPeriod ? ensoSeasonCentre(plumePeakPeriod.label, plumePeakPeriod.seasonAnchorYear) : null;
 
-  const xMax = Math.max(currentYear + 1.5, (elNinoEnd ?? currentYear + 1) + 0.5);
+  // ── SNU ACE Lab CNN forecast (Ham et al. 2019) ─────────────────────────
+  // Monthly Niño 3.4 prediction out to ~1.5 years - extends the chart
+  // horizon beyond NOAA's 9-month plume window. Anchor the line to today's
+  // weekly observation so it leaves the observed series cleanly.
+  const cnnPoints: { x: number; cnnAnom: number }[] = [];
+  const cnnPeriods = enso.cnnForecast?.points || [];
+  if (cnnPeriods.length > 0) {
+    for (const pt of cnnPeriods) {
+      const yyyy = Math.floor(pt.yyyymm / 100);
+      const mm = pt.yyyymm % 100;
+      const x = decimalYearFromYMD(yyyy, mm, 15);
+      if (x > todayX) cnnPoints.push({ x, cnnAnom: pt.nino34 });
+    }
+    if (cnnPoints.length > 0) {
+      cnnPoints.unshift({ x: todayX, cnnAnom: currentOni });
+    }
+  }
+
+  const cnnXMax = cnnPoints.length > 0 ? cnnPoints[cnnPoints.length - 1].x + 0.1 : 0;
+  const xMax = Math.max(
+    currentYear + 1.5,
+    (elNinoEnd ?? currentYear + 1) + 0.5,
+    Math.min(cnnXMax, currentYear + 2.5),
+  );
   const yearTicks: number[] = [];
   for (let y = currentYear - yearsBack + 1; y <= Math.ceil(xMax); y++) yearTicks.push(y);
 
   const chartData: ChartPoint[] = [...observedPoints, ...forecastPoints];
+
+  // Merge CNN values into chartData by x-coordinate proximity, or append
+  // extra points beyond the existing chartData range.
+  for (const cp of cnnPoints) {
+    let closest: ChartPoint | null = null;
+    let minDist = Infinity;
+    for (const dp of chartData) {
+      const d = Math.abs(dp.x - cp.x);
+      if (d < minDist) { minDist = d; closest = dp; }
+    }
+    if (closest && minDist < 0.015) {
+      closest.cnnAnom = cp.cnnAnom;
+    } else {
+      chartData.push({ x: cp.x, cnnAnom: cp.cnnAnom });
+    }
+  }
+  chartData.sort((a, b) => a.x - b.x);
 
   // ── Past event labels (same logic as the full ENSO tracker page) ─────────
   type EnsoEvent = { phase: 'el-nino' | 'la-nina'; weak: boolean; startX: number; endX: number; peak: number };
@@ -254,7 +305,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
       <TileHeader
         icon={<Wind className="h-5 w-5 text-sky-300" />}
         title={cardTitle}
-        subtitle="NOAA CPC Oceanic Niño Index · Weekly Niño 3.4 SST · IRI/CCSR forecast plume"
+        subtitle="NOAA CPC Oceanic Niño Index · Weekly Niño 3.4 SST · IRI/CCSR plume + SNU AI/CNN forecast"
       />
 
       {/* Description */}
@@ -310,7 +361,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
                 contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12, color: '#f3f4f6' }}
                 formatter={(value: any, name: any) => {
                   if (value == null) return ['', ''];
-                  const labels: Record<string, string> = { anom: 'Niño 3.4 observed', fcAnom: 'Forecast' };
+                  const labels: Record<string, string> = { anom: 'Niño 3.4 observed', fcAnom: 'NOAA forecast', cnnAnom: 'SNU CNN forecast' };
                   return [`${fmtSigned(Number(value), 2)}°C`, labels[name] || name];
                 }}
                 labelFormatter={(v: any, p: any) => p?.[0]?.payload?.dateLabel || `${Math.floor(v)}-${String(Math.floor((v - Math.floor(v)) * 12) + 1).padStart(2, '0')}`}
@@ -326,6 +377,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
               <Area type="monotone" dataKey="fcPos" stroke="none" fill="#f43f5e" fillOpacity={0.35} isAnimationActive={false} connectNulls={false} />
               <Line type="monotone" dataKey="anom" stroke="#fef3c7" strokeWidth={1.5} dot={false} isAnimationActive={false} connectNulls={false} />
               <Line type="monotone" dataKey="fcAnom" stroke="#f43f5e" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} connectNulls={false} />
+              <Line type="monotone" dataKey="cnnAnom" stroke="#a78bfa" strokeWidth={1.6} strokeDasharray="4 3" dot={false} isAnimationActive={false} connectNulls={true} />
               {isForecastingElNino && peakX !== null && (
                 <ReferenceDot x={peakX} y={predictedPeakOni} r={4} fill="#f43f5e" stroke="#0f172a" strokeWidth={2} />
               )}
@@ -365,7 +417,10 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
           <span className="inline-flex items-center gap-1.5"><span className="inline-block w-5 h-0.5 bg-[#fef3c7]" /> Weekly Niño 3.4</span>
           <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(244,63,94,0.55)' }} /> El Niño shading</span>
           <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(14,165,233,0.55)' }} /> La Niña shading</span>
-          <span className="inline-flex items-center gap-1.5"><span className="inline-block w-5 h-0.5" style={{ background: 'repeating-linear-gradient(90deg,#f43f5e 0 4px,transparent 4px 8px)' }} /> Forecast</span>
+          <span className="inline-flex items-center gap-1.5"><span className="inline-block w-5 h-0.5" style={{ background: 'repeating-linear-gradient(90deg,#f43f5e 0 4px,transparent 4px 8px)' }} /> NOAA forecast</span>
+          {cnnPoints.length > 1 && (
+            <span className="inline-flex items-center gap-1.5"><span className="inline-block w-5 h-0.5" style={{ background: 'repeating-linear-gradient(90deg,#a78bfa 0 3px,transparent 3px 6px)' }} /> SNU CNN forecast</span>
+          )}
           <span className="inline-flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 rounded-full bg-[#D0A65E]" /> Now / Today</span>
         </div>
       )}
