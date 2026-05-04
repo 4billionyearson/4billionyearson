@@ -452,7 +452,11 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
       if (!cont || !continentData) return { entry: undefined, displayName: cont ?? owidName };
       return { entry: continentData[cont], displayName: cont };
     }
-    return { entry: dataMap.get(owidName), displayName: owidName };
+    let entry = dataMap.get(owidName);
+    // OWID has no separate row for Western Sahara — fall back to Morocco
+    // (de-facto administrator) so the polygon doesn't render as no-data grey.
+    if (!entry && owidName === "Western Sahara") entry = dataMap.get("Morocco");
+    return { entry, displayName: owidName };
   }, [level, continentData, dataMap]);
 
   // Derive quantile thresholds from the values currently being rendered.

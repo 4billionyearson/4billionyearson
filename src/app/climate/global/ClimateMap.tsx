@@ -963,7 +963,11 @@ export default function ClimateMap({
     }
     // Other metrics: pull from rankings rows (the only source that carries
     // the multi-metric block at country level).
-    const row = name ? countryRowByName.get(normalizeName(name)) : undefined;
+    let row = name ? countryRowByName.get(normalizeName(name)) : undefined;
+    // Western Sahara has no source row — fall back to Morocco.
+    if (!row && name && normalizeName(name) === 'w. sahara') {
+      row = countryRowByName.get('morocco');
+    }
     return metricFromRow(row, metric, windowSel);
   }, [windowSel, level, metric, continentByKey, groupValue, countryRowByName]);
 
@@ -1031,7 +1035,11 @@ export default function ClimateMap({
   const style = useCallback((feature: Feature | undefined): PathOptions => {
     if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
     const name = ((feature.properties as any)?.name as string) ?? '';
-    const rec = lookup.get(normalizeName(name));
+    const norm = normalizeName(name);
+    let rec = lookup.get(norm);
+    // HadCRUT/Berkeley have no Western Sahara row — fall back to Morocco
+    // (de-facto administrator) so the polygon doesn't render as no-data grey.
+    if (!rec && norm === 'w. sahara') rec = lookup.get('morocco');
     const { value } = pick(rec, name);
     return {
       fillColor: value != null ? colorForMetric(metric, value, windowSel, customScale ?? undefined) : '#1f2937',
