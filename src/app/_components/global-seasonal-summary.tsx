@@ -360,7 +360,7 @@ export default function GlobalSeasonalSummary({
         {!hideExploreLink && (
           <Link
             href="/climate/shifting-seasons"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-teal-300 hover:text-teal-200 hover:underline transition-colors"
+            className="ml-auto inline-flex items-center gap-1 text-sm font-semibold text-teal-300 hover:text-teal-200 hover:underline transition-colors"
           >
             Explore Shifting Seasons worldwide
             <ArrowRight className="h-4 w-4" />
