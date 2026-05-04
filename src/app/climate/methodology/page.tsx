@@ -14,12 +14,12 @@ import DataSourceTimeline, {
 const PAGE_URL = 'https://4billionyearson.org/climate/methodology';
 
 export const metadata: Metadata = {
-  title: 'Climate Data Methodology — Sources, Baselines & Timeline | 4 Billion Years On',
+  title: 'Climate Data Methodology - Sources, Baselines & Timeline | 4 Billion Years On',
   description:
     'How 4 Billion Years On builds its climate dataset: full source inventory, native and comparison baselines, the two-baseline model, and a timeline of when each source\'s data starts.',
   alternates: { canonical: PAGE_URL },
   openGraph: {
-    title: 'Climate Data Methodology — Sources, Baselines & Timeline',
+    title: 'Climate Data Methodology - Sources, Baselines & Timeline',
     description:
       'Full source inventory, baselines, and a timeline of data coverage from 1850 to today.',
     type: 'article',

@@ -87,21 +87,21 @@ export function getClimateMetadataTitle(region: ClimateRegion, updateLabel = get
 function featureSuffixForRegion(region: ClimateRegion): string {
   switch (region.type) {
     case 'special':
-      return 'Covers land-and-ocean anomalies vs the 1961–1990 baseline, Paris 1.5°C and 2.0°C progress (10-year mean), ENSO state, atmospheric CO₂/methane/N₂O, sea-ice extent, continental comparison, seasonal timing shifts, and global emissions & energy outlook.';
+      return 'Covers land-and-ocean anomalies vs the 1961-1990 baseline, Paris 1.5°C and 2.0°C progress (10-year mean), ENSO state, atmospheric CO₂/methane/N₂O, sea-ice extent, continental comparison, seasonal timing shifts, and global emissions & energy outlook.';
     case 'uk-region':
-      return 'Covers Met Office temperature, rainfall, rain-days, sunshine and air-frost series vs the 1961–1990 baseline, plus spring/autumn shift analysis.';
+      return 'Covers Met Office temperature, rainfall, rain-days, sunshine and air-frost series vs the 1961-1990 baseline, plus spring/autumn shift analysis.';
     case 'us-state':
-      return 'Covers NOAA temperature and precipitation vs the 1961–1990 baseline, monthly rank-in-record, seasonal shifts, and state-level emissions and electricity generation mix where available.';
+      return 'Covers NOAA temperature and precipitation vs the 1961-1990 baseline, monthly rank-in-record, seasonal shifts, and state-level emissions and electricity generation mix where available.';
     case 'group':
       if (region.groupKind === 'us-climate-region') {
-        return 'Covers NOAA Climate at a Glance regional temperature and precipitation vs the 1961–1990 baseline, with the source-native 1901–2000 anomaly shown for verification, member-state league table and 30-year trend.';
+        return 'Covers NOAA Climate at a Glance regional temperature and precipitation vs the 1961-1990 baseline, with the source-native 1901-2000 anomaly shown for verification, member-state league table and 30-year trend.';
       }
       return region.isAggregate
-        ? 'Aggregated from the country snapshots in our coverage (NOAA does not publish a standalone continental land series for this region) — temperature and rainfall vs the 1961–1990 baseline, ranked alongside the four NOAA-native continents.'
-        : 'NOAA Climate at a Glance continental temperature vs the 1961–1990 baseline, with the source-native 1901–2000 anomaly shown for verification, plus member countries and rolling trend.';
+        ? 'Aggregated from the country snapshots in our coverage (NOAA does not publish a standalone continental land series for this region) - temperature and rainfall vs the 1961-1990 baseline, ranked alongside the four NOAA-native continents.'
+        : 'NOAA Climate at a Glance continental temperature vs the 1961-1990 baseline, with the source-native 1901-2000 anomaly shown for verification, plus member countries and rolling trend.';
     case 'country':
     default:
-      return 'Covers country-scale temperature, rainfall (CRU TS), warm/wet-season shifts, CO₂ emissions (Our World in Data) and electricity generation mix — each vs the 1961–1990 baseline and ranked in record.';
+      return 'Covers country-scale temperature, rainfall (CRU TS), warm/wet-season shifts, CO₂ emissions (Our World in Data) and electricity generation mix - each vs the 1961-1990 baseline and ranked in record.';
   }
 }
 
@@ -126,7 +126,7 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     groupKey: 'africa',
     apiCode: 'africa',
     tagline: 'Continental temperature trends from NOAA Climate at a Glance',
-    description: 'Africa climate update with NOAA Climate at a Glance continental land temperature anomaly vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    description: 'Africa climate update with NOAA Climate at a Glance continental land temperature anomaly vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌍',
     dataSources: ['noaa-continent'],
     keywords: ['Africa climate data', 'Africa temperature anomaly', 'NOAA continental data', 'African heatwave', 'African drought'],
@@ -138,8 +138,8 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     groupKind: 'continent',
     groupKey: 'asia',
     apiCode: 'asia',
-    tagline: 'The world\'s largest landmass — temperature trends across the continent',
-    description: 'Asia climate update with NOAA Climate at a Glance continental land temperature anomaly vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'The world\'s largest landmass - temperature trends across the continent',
+    description: 'Asia climate update with NOAA Climate at a Glance continental land temperature anomaly vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌏',
     dataSources: ['noaa-continent'],
     keywords: ['Asia climate data', 'Asia temperature anomaly', 'Asian heatwave', 'Asian monsoon', 'NOAA continental data'],
@@ -152,7 +152,7 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     groupKey: 'europe',
     apiCode: 'europe',
     tagline: 'The fastest-warming continent in the NOAA record',
-    description: 'Europe climate update with NOAA Climate at a Glance continental land temperature anomaly vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    description: 'Europe climate update with NOAA Climate at a Glance continental land temperature anomaly vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🇪🇺',
     dataSources: ['noaa-continent'],
     keywords: ['Europe climate data', 'European temperature', 'Europe heatwave', 'European warming', 'NOAA continental data'],
@@ -164,8 +164,8 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     groupKind: 'continent',
     groupKey: 'oceania',
     apiCode: 'oceania',
-    tagline: 'Australia, New Zealand and the Pacific — continental temperature trends',
-    description: 'Oceania climate update with NOAA Climate at a Glance continental land temperature anomaly vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'Australia, New Zealand and the Pacific - continental temperature trends',
+    description: 'Oceania climate update with NOAA Climate at a Glance continental land temperature anomaly vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌏',
     dataSources: ['noaa-continent'],
     keywords: ['Oceania climate data', 'Australia New Zealand temperature', 'Pacific climate', 'NOAA continental data'],
@@ -178,8 +178,8 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     groupKey: 'northAmerica',
     isAggregate: true,
     apiCode: 'north-america',
-    tagline: 'Aggregated from country snapshots — NOAA does not publish a NA continental series',
-    description: 'North America climate update — a 4BYO aggregate of country temperature anomalies vs the 1961–1990 baseline. NOAA does not publish a standalone North America continental land series, so we average the country anomalies in our coverage. Updated monthly.',
+    tagline: 'Aggregated from country snapshots - NOAA does not publish a NA continental series',
+    description: 'North America climate update - a 4BYO aggregate of country temperature anomalies vs the 1961-1990 baseline. NOAA does not publish a standalone North America continental land series, so we average the country anomalies in our coverage. Updated monthly.',
     emoji: '🌎',
     dataSources: ['owid-temp'],
     keywords: ['North America climate data', 'North American temperature', 'continental climate', 'aggregate temperature anomaly'],
@@ -192,8 +192,8 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     groupKey: 'southAmerica',
     isAggregate: true,
     apiCode: 'south-america',
-    tagline: 'Aggregated from country snapshots — NOAA does not publish a SA continental series',
-    description: 'South America climate update — a 4BYO aggregate of country temperature anomalies vs the 1961–1990 baseline. NOAA does not publish a standalone South America continental land series, so we average the country anomalies in our coverage. Updated monthly.',
+    tagline: 'Aggregated from country snapshots - NOAA does not publish a SA continental series',
+    description: 'South America climate update - a 4BYO aggregate of country temperature anomalies vs the 1961-1990 baseline. NOAA does not publish a standalone South America continental land series, so we average the country anomalies in our coverage. Updated monthly.',
     emoji: '🌎',
     dataSources: ['owid-temp'],
     keywords: ['South America climate data', 'South American temperature', 'continental climate', 'Amazon temperature trends'],
@@ -208,8 +208,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-northeast',
     apiCode: 'us-northeast',
-    tagline: 'NOAA Northeast climate region — CT, DE, ME, MA, MD, NH, NJ, NY, PA, RI, VT',
-    description: 'NOAA Northeast climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA Northeast climate region - CT, DE, ME, MA, MD, NH, NJ, NY, PA, RI, VT',
+    description: 'NOAA Northeast climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌲',
     dataSources: ['noaa-region'],
     keywords: ['Northeast US climate', 'NOAA climate region', 'Northeast temperature', 'Northeast precipitation'],
@@ -222,8 +222,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-upper-midwest',
     apiCode: 'us-upper-midwest',
-    tagline: 'NOAA Upper Midwest — IA, MI, MN, WI',
-    description: 'NOAA Upper Midwest climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA Upper Midwest - IA, MI, MN, WI',
+    description: 'NOAA Upper Midwest climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌾',
     dataSources: ['noaa-region'],
     keywords: ['Upper Midwest US climate', 'NOAA climate region', 'Upper Midwest temperature', 'Great Lakes climate'],
@@ -236,8 +236,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-ohio-valley',
     apiCode: 'us-ohio-valley',
-    tagline: 'NOAA Ohio Valley — IL, IN, KY, MO, OH, TN, WV',
-    description: 'NOAA Ohio Valley climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA Ohio Valley - IL, IN, KY, MO, OH, TN, WV',
+    description: 'NOAA Ohio Valley climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌳',
     dataSources: ['noaa-region'],
     keywords: ['Ohio Valley climate', 'NOAA climate region', 'Ohio Valley temperature', 'Midwest climate'],
@@ -250,8 +250,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-southeast',
     apiCode: 'us-southeast',
-    tagline: 'NOAA Southeast — AL, FL, GA, NC, SC, VA',
-    description: 'NOAA Southeast climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA Southeast - AL, FL, GA, NC, SC, VA',
+    description: 'NOAA Southeast climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌴',
     dataSources: ['noaa-region'],
     keywords: ['Southeast US climate', 'NOAA climate region', 'Southeast temperature', 'Atlantic hurricane region'],
@@ -264,8 +264,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-northern-rockies-plains',
     apiCode: 'us-northern-rockies-plains',
-    tagline: 'NOAA Northern Rockies and Plains — MT, NE, ND, SD, WY',
-    description: 'NOAA Northern Rockies and Plains climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA Northern Rockies and Plains - MT, NE, ND, SD, WY',
+    description: 'NOAA Northern Rockies and Plains climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🏔️',
     dataSources: ['noaa-region'],
     keywords: ['Northern Rockies Plains climate', 'NOAA climate region', 'Northern Plains temperature'],
@@ -278,8 +278,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-south',
     apiCode: 'us-south',
-    tagline: 'NOAA South — AR, KS, LA, MS, OK, TX',
-    description: 'NOAA South climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA South - AR, KS, LA, MS, OK, TX',
+    description: 'NOAA South climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🤠',
     dataSources: ['noaa-region'],
     keywords: ['South US climate', 'NOAA climate region', 'Southern Plains temperature', 'Texas climate'],
@@ -292,8 +292,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-southwest',
     apiCode: 'us-southwest',
-    tagline: 'NOAA Southwest — AZ, CO, NM, UT',
-    description: 'NOAA Southwest climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA Southwest - AZ, CO, NM, UT',
+    description: 'NOAA Southwest climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌵',
     dataSources: ['noaa-region'],
     keywords: ['Southwest US climate', 'NOAA climate region', 'Southwest temperature', 'desert climate'],
@@ -306,8 +306,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-northwest',
     apiCode: 'us-northwest',
-    tagline: 'NOAA Northwest — ID, OR, WA',
-    description: 'NOAA Northwest climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA Northwest - ID, OR, WA',
+    description: 'NOAA Northwest climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '🌲',
     dataSources: ['noaa-region'],
     keywords: ['Northwest US climate', 'NOAA climate region', 'Pacific Northwest temperature'],
@@ -320,8 +320,8 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     groupKind: 'us-climate-region',
     groupKey: 'us-west',
     apiCode: 'us-west',
-    tagline: 'NOAA West — CA, NV',
-    description: 'NOAA West climate region update with regional temperature and precipitation vs the 1961–1990 comparison baseline and the source-native 1901–2000 baseline. Updated monthly.',
+    tagline: 'NOAA West - CA, NV',
+    description: 'NOAA West climate region update with regional temperature and precipitation vs the 1961-1990 comparison baseline and the source-native 1901-2000 baseline. Updated monthly.',
     emoji: '☀️',
     dataSources: ['noaa-region'],
     keywords: ['West US climate', 'NOAA climate region', 'California climate', 'Nevada climate'],
@@ -337,7 +337,7 @@ export const CURATED_CLIMATE_REGIONS: ClimateRegion[] = [
     name: 'Global',
     type: 'special',
     apiCode: 'global',
-    tagline: 'The whole-planet temperature record — how the world is warming',
+    tagline: 'The whole-planet temperature record - how the world is warming',
     description: 'Global climate update with NOAA land-and-ocean temperature anomaly, ERA5 land surface temperature, Paris Agreement 1.5°C and 2.0°C progress (10-year mean), ENSO state, atmospheric CO₂, methane and N₂O, Arctic and Antarctic sea ice, continental temperature comparison, seasonal timing shifts and global emissions and electricity mix. Updated monthly.',
     emoji: '🌍',
     dataSources: ['noaa-global', 'owid-temp'],
