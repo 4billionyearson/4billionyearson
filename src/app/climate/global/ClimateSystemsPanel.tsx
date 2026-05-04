@@ -402,10 +402,6 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
               <ReferenceLine x={todayX} stroke="#D0A65E" strokeDasharray="4 4" label={{ value: 'Today', fill: '#D0A65E', fontSize: 10, position: 'top' }} />
               <ReferenceDot x={todayX} y={currentOni} r={5} fill="#D0A65E" stroke="#0f172a" strokeWidth={2}
                 label={{ value: `Now ${fmtSigned(currentOni, 2)}°C`, fill: '#D0A65E', fontSize: 10, fontWeight: 600, position: 'left', offset: 10 }} />
-              {forecastPoints.length > 0 && (() => {
-                const lastFc = forecastPoints[forecastPoints.length - 1];
-                return <ReferenceLine x={lastFc.x} stroke="#f43f5e" strokeDasharray="2 4" strokeOpacity={0.55} label={{ value: 'End of forecasts', fill: '#fda4af', fontSize: 9, position: 'insideTopLeft', offset: 4 }} />;
-              })()}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -425,35 +421,63 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
         </div>
       )}
 
-      {/* Forecast narrative */}
-      {isForecastingElNino && first50 && (
-        <div className="mt-3 rounded-xl border border-rose-500/30 bg-gradient-to-br from-rose-950/30 to-gray-900/30 p-3">
-          <p className="text-[10px] uppercase tracking-wider text-rose-300/80 font-mono mb-1">NOAA forecast - what&apos;s coming</p>
-          <p className="text-xs text-gray-100 leading-relaxed">
-            A new <span className="font-semibold text-rose-300">El Niño</span> looks increasingly likely.{' '}
-            Probability first crosses <span className="font-mono font-semibold text-rose-200">50%</span> in{' '}
-            <span className="font-mono">{first50.label}</span> ({first50.pElNino}% chance)
-            {first90 && <> — climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in <span className="font-mono">{first90.label}</span></>}
-            {peakSeason && <> and peaks at <span className="font-mono font-semibold text-rose-200">{peakSeason.pElNino}%</span> in <span className="font-mono">{peakSeason.label}</span></>}
-            {last90 && first90 && (last90 as ForecastSeason).season !== first90.season && <>, staying above 90% through <span className="font-mono">{(last90 as ForecastSeason).label}</span></>}
-            {'. '}
-            {enso.plume && <>The dashed red curve traces the multi-model <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="text-rose-300 underline decoration-rose-400/40 underline-offset-2 hover:decoration-rose-300">IRI/CCSR plume forecast</a>{' '}
-            (issued {enso.plume.issueMonth}/{enso.plume.issueYear}, {enso.plume.periods[0]?.modelCount ?? 0} dynamical &amp; statistical models).</>}
-            {plumePeakPeriod && <> Peak intensity reaches <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span> in <span className="font-mono">{plumePeakPeriod.label} {plumePeakPeriod.seasonAnchorYear}</span> — the dynamical-model average, which currently signals a strong-to-super El Niño.</>}
-          </p>
+      {/* Forecast narratives — NOAA (rose) + SNU (violet) side by side */}
+      {(isForecastingElNino && first50) || cnnPoints.length > 1 ? (
+        <div className={`mt-3 grid grid-cols-1 ${cnnPoints.length > 1 && isForecastingElNino && first50 ? 'md:grid-cols-2' : ''} gap-3`}>
+          {isForecastingElNino && first50 && (
+            <div className="rounded-xl border border-rose-500/30 bg-gradient-to-br from-rose-950/30 to-gray-900/30 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-rose-300/80 font-mono mb-1">NOAA forecast - what&apos;s coming</p>
+              <p className="text-xs text-gray-100 leading-relaxed">
+                A new <span className="font-semibold text-rose-300">El Niño</span> looks increasingly likely.{' '}
+                Probability first crosses <span className="font-mono font-semibold text-rose-200">50%</span> in{' '}
+                <span className="font-mono">{first50.label}</span> ({first50.pElNino}% chance)
+                {first90 && <> — climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in <span className="font-mono">{first90.label}</span></>}
+                {peakSeason && <> and peaks at <span className="font-mono font-semibold text-rose-200">{peakSeason.pElNino}%</span> in <span className="font-mono">{peakSeason.label}</span></>}
+                {last90 && first90 && (last90 as ForecastSeason).season !== first90.season && <>, staying above 90% through <span className="font-mono">{(last90 as ForecastSeason).label}</span></>}
+                {'. '}
+                {enso.plume && <>The dashed red curve traces the multi-model <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="text-rose-300 underline decoration-rose-400/40 underline-offset-2 hover:decoration-rose-300">IRI/CCSR plume forecast</a>{' '}
+                (issued {enso.plume.issueMonth}/{enso.plume.issueYear}, {enso.plume.periods[0]?.modelCount ?? 0} dynamical &amp; statistical models).</>}
+                {plumePeakPeriod && <> Peak intensity reaches <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span> in <span className="font-mono">{plumePeakPeriod.label} {plumePeakPeriod.seasonAnchorYear}</span> — the dynamical-model average, which currently signals a strong-to-super El Niño.</>}
+              </p>
+            </div>
+          )}
+          {cnnPoints.length > 1 && (
+            <div className="rounded-xl border border-violet-500/30 bg-gradient-to-br from-violet-950/30 to-gray-900/30 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-violet-300/80 font-mono mb-1">SNU AI forecast — the multi-year view</p>
+              <p className="text-xs text-gray-100 leading-relaxed">
+                The dashed purple curve is an experimental deep-learning model from{' '}
+                <a href="https://aiclimate.snu.ac.kr/enso/" target="_blank" rel="noopener noreferrer" className="text-violet-300 underline decoration-violet-400/40 underline-offset-2 hover:decoration-violet-300">Seoul National University</a>{' '}
+                (<a href="https://www.nature.com/articles/s41586-019-1559-7" target="_blank" rel="noopener noreferrer" className="text-violet-300 underline decoration-violet-400/40 underline-offset-2 hover:decoration-violet-300">Ham et al. 2019, <em>Nature</em></a>).
+                Unlike physics-based plumes that struggle beyond ~9 months, this CNN is designed for long-lead predictions of up to 18&ndash;24 months.
+                {enso.cnnForecast && (() => {
+                  const iy = String(enso.cnnForecast.issueYearMonth);
+                  const issuedMonth = parseInt(iy.slice(4), 10);
+                  const issuedYear = iy.slice(0, 4);
+                  const last = enso.cnnForecast.points[enso.cnnForecast.points.length - 1];
+                  const lm = last.yyyymm % 100;
+                  const ly = Math.floor(last.yyyymm / 100);
+                  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                  return (
+                    <>
+                      {' '}Current forecast issued{' '}
+                      <span className="font-mono text-violet-200">{issuedMonth}/{issuedYear}</span>, extending to{' '}
+                      <span className="font-mono text-violet-200">{monthNames[lm-1]} {ly}</span>.
+                    </>
+                  );
+                })()}
+              </p>
+            </div>
+          )}
         </div>
-      )}
+      ) : null}
 
-      <p className="text-[11px] text-gray-400 mt-2">
+      <p className="text-[11px] text-gray-400 mt-3">
         Sources:{' '}
         <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC ONI</a>,{' '}
         <a href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC weekly Niño 3.4</a>,{' '}
         <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">IRI/CCSR plume forecast</a>,{' '}
         <a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">NOAA CPC probability outlook</a>,{' '}
         <a href="https://aiclimate.snu.ac.kr/enso/" target="_blank" rel="noopener noreferrer" className="underline text-violet-300/80 hover:text-violet-200">SNU ACE Lab CNN forecast</a>.
-      </p>
-      <p className="text-[11px] text-violet-300/80 mt-2 leading-snug">
-        <strong className="text-violet-200">SNU AI forecast:</strong> Seoul National University’s deep-learning model (Ham et al. 2019) skilfully predicts ENSO out to ~1.5 years - far beyond NOAA’s 9-month plume window. See the multi-year view on the full tracker.
       </p>
       <div className="flex justify-end mt-2">
         <Link href="/climate/enso" className="text-xs font-semibold text-teal-300 hover:text-teal-200 inline-flex items-center gap-1">
