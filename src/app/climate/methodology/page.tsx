@@ -327,7 +327,7 @@ export default function MethodologyPage() {
                         href={s.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#E8C97A] hover:underline"
+                        className="text-teal-300 hover:text-teal-200 hover:underline transition-colors"
                       >
                         Open
                       </a>
@@ -406,16 +406,16 @@ export default function MethodologyPage() {
           </h2>
           <ul className="list-disc pl-5 text-sm text-gray-300 space-y-1.5">
             <li>
-              <Link href="/climate/rankings" className="text-[#E8C97A] hover:underline">Climate rankings &amp; league table</Link> — every region we track, sortable by 1m / 3m / 12m anomaly.
+              <Link href="/climate/rankings" className="text-teal-300 hover:text-teal-200 hover:underline transition-colors">Climate rankings &amp; league table</Link> — every region we track, sortable by 1m / 3m / 12m anomaly.
             </li>
             <li>
-              <Link href="/climate/global" className="text-[#E8C97A] hover:underline">Global climate update</Link> — Paris tracker, continental bars, ENSO state, GHG, sea ice.
+              <Link href="/climate/global" className="text-teal-300 hover:text-teal-200 hover:underline transition-colors">Global climate update</Link> — Paris tracker, continental bars, ENSO state, GHG, sea ice.
             </li>
             <li>
-              <Link href="/climate" className="text-[#E8C97A] hover:underline">Climate updates</Link> — country, US state and UK region detail pages.
+              <Link href="/climate" className="text-teal-300 hover:text-teal-200 hover:underline transition-colors">Climate updates</Link> — country, US state and UK region detail pages.
             </li>
             <li>
-              <Link href="/climate-explained" className="text-[#E8C97A] hover:underline">Climate, explained</Link> — plain-English guide to the science behind the data.
+              <Link href="/climate-explained" className="text-teal-300 hover:text-teal-200 hover:underline transition-colors">Climate, explained</Link> — plain-English guide to the science behind the data.
             </li>
           </ul>
         </section>

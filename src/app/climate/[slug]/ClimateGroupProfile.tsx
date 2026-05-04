@@ -593,7 +593,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
               {row.sourceUrl ? (
                 <>
                   {' · '}
-                  <a href={row.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[#E8C97A] hover:underline inline-flex items-center gap-1">
+                  <a href={row.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 hover:underline transition-colors inline-flex items-center gap-1">
                     Open at NOAA <ExternalLink className="h-3 w-3" />
                   </a>
                 </>
@@ -605,7 +605,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             <span>
               <strong className="text-white">Two-baseline model</strong> — comparison baseline 1961–1990; native baseline {row.nativeBaseline ?? (isAgg ? 'n/a (aggregate)' : '1901–2000')}.
               {' '}
-              <Link href="/climate/methodology" className="text-[#E8C97A] hover:underline">Methodology →</Link>
+              <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 hover:underline transition-colors">Methodology →</Link>
             </span>
           </li>
         </ul>
@@ -749,7 +749,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
             <span>
               <strong className="text-white">NOAA Climate at a Glance — Regional time series</strong> · NOAA code {data.noaaCode}
               {' · '}
-              <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[#E8C97A] hover:underline inline-flex items-center gap-1">
+              <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:text-teal-200 hover:underline transition-colors inline-flex items-center gap-1">
                 Open at NOAA <ExternalLink className="h-3 w-3" />
               </a>
             </span>
@@ -759,7 +759,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
             <span>
               <strong className="text-white">Two-baseline model</strong> — comparison baseline 1961–1990; native baseline 1901–2000.
               {' '}
-              <Link href="/climate/methodology" className="text-[#E8C97A] hover:underline">Methodology →</Link>
+              <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 hover:underline transition-colors">Methodology →</Link>
             </span>
           </li>
         </ul>

@@ -496,7 +496,7 @@ export default async function RankingsPage() {
               Anomaly = monthly mean temperature − 1961–1990 mean for the same calendar month. The 12-month figure is the trailing 12-month mean minus the 12-month baseline. Country data is from Our World in Data / NOAA; UK regions from the Met Office Regional Series; US states &amp; climate regions from NOAA Climate at a Glance. NOAA values are re-baselined from their native 1901–2000 to 1961–1990 for cross-region comparison; the source-native figure is shown alongside for verification.
             </p>
             <p className="mt-3 text-sm text-gray-300 leading-relaxed">
-              See the <Link href="/climate/methodology" className="text-[#E8C97A] underline hover:text-white">full methodology &amp; data sources</Link> page for the complete two-baseline model, source timeline and known caveats.
+              See the <Link href="/climate/methodology" className="text-teal-300 hover:text-teal-200 underline transition-colors">full methodology &amp; data sources</Link> page for the complete two-baseline model, source timeline and known caveats.
             </p>
           </section>
 
