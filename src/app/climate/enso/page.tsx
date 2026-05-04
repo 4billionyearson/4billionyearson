@@ -234,27 +234,6 @@ function HeroPanel() {
   );
 }
 
-function QuickAnswerPanel() {
-  return (
-    <aside
-      aria-label="Quick answer"
-      className="rounded-2xl border border-[#D0A65E]/40 bg-gray-950/80 backdrop-blur-md p-4 md:p-5 shadow-lg"
-    >
-      <div className="text-[11px] font-mono uppercase tracking-wider text-[#D0A65E] mb-1">Quick Answer</div>
-      <p className="text-sm md:text-base text-gray-200 leading-relaxed">
-        <strong className="text-white">El Niño</strong> is a Pacific climate pattern that
-        typically brings <strong>heavier rain and floods to the western coast of South America</strong>
-        {' '}(Peru, Ecuador), the southern United States and parts of East Africa, while causing
-        <strong> drought across Indonesia, Australia, the Philippines, southern Africa and the Amazon</strong>.
-        <strong className="text-white"> La Niña</strong> flips most of these:
-        wetter conditions in Australia, Indonesia and southern Africa, drier conditions in the
-        southern US and the Horn of Africa. Both phases shift <strong>global average temperatures</strong>
-        {' '}by roughly ±0.1-0.2 °C and now sit on top of the long-term climate-change warming trend.
-      </p>
-    </aside>
-  );
-}
-
 /**
  * Static FAQ panel — visible HTML mirror of the FAQPage JSON-LD in
  * layout.tsx. AI crawlers (Claude, Perplexity, ChatGPT search) typically
@@ -262,6 +241,21 @@ function QuickAnswerPanel() {
  */
 function StaticFAQPanel() {
   const qa: { q: string; a: React.ReactNode }[] = [
+    {
+      q: 'What are El Niño and La Niña, and which countries do they affect?',
+      a: (
+        <>
+          <strong className="text-white">El Niño</strong> is a Pacific climate pattern that
+          typically brings <strong>heavier rain and floods to the western coast of South America</strong>
+          {' '}(Peru, Ecuador), the southern United States and parts of East Africa, while causing
+          <strong> drought across Indonesia, Australia, the Philippines, southern Africa and the Amazon</strong>.
+          <strong className="text-white"> La Niña</strong> flips most of these: wetter conditions
+          in Australia, Indonesia and southern Africa, drier conditions in the southern US and the
+          Horn of Africa. Both phases shift <strong>global average temperatures</strong> by
+          roughly ±0.1–0.2 °C and now sit on top of the long-term climate-change warming trend.
+        </>
+      ),
+    },
     {
       q: 'Which countries are most affected by El Niño?',
       a: (
@@ -354,6 +348,27 @@ function StaticFAQPanel() {
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
+// Dynamic year strings for divider titles so they don't go stale.
+// ENSO "season" is named after the boreal winter it spans (Aug-onwards looks
+// to next year's winter). "Forecast" target window:
+//   - Jan-Jul 2026  -> "2026-27"
+//   - Aug-Dec 2026 -> "2026-27" (still naming the upcoming Dec-Feb winter)
+//   - Jan-Jul 2027 -> "2027-28"
+// Simpler rule that matches NOAA usage: from Jul each year, target window is
+// (currentYear)-(currentYear+1); before Jul, target is current winter
+// (currentYear-1)-(currentYear). For the page divider we always look ahead.
+function ensoForecastYearLabel(now: Date = new Date()): string {
+  const y = now.getFullYear();
+  const m = now.getMonth(); // 0-11
+  // From August onward, look to the next calendar year's season:
+  const startY = m >= 7 ? y : y;          // forecast window starts this year
+  const endY = (startY + 1) % 100;
+  return `${startY}-${endY.toString().padStart(2, '0')}`;
+}
+function pastEventsRangeLabel(now: Date = new Date()): string {
+  return `1982-${now.getFullYear()}`;
+}
+
 const ENSO_COLORS: Record<EnsoState, string> = {
   'El Niño': '#f43f5e',
   'La Niña': '#0ea5e9',
@@ -440,7 +455,6 @@ export default function EnsoPage() {
         <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
           <div className="max-w-7xl mx-auto space-y-6">
             <HeroPanel />
-            <QuickAnswerPanel />
             <div className="flex flex-col items-center gap-3 py-10">
               <Loader2 className="h-8 w-8 animate-spin text-sky-300" />
               <p className="text-gray-400 text-sm">Loading live ENSO indicators…</p>
@@ -492,11 +506,9 @@ export default function EnsoPage() {
           {/* ─── Hero ───────────────────────────────────────────────── */}
           <HeroPanel />
 
-          {/* ─── Quick Answer (TL;DR) ──────────────────────────────── */}
-          <QuickAnswerPanel />
-
-          {/* ─── Static FAQ (mirrors FAQPage JSON-LD; rendered in SSR
-                HTML so AI / non-JS crawlers can extract it) ───────── */}
+          {/* ─── Static FAQ (also serves as the page's TL;DR / Quick
+                Answer; mirrors FAQPage JSON-LD so AI / non-JS
+                crawlers can extract it from raw SSR HTML) ──────────── */}
           <StaticFAQPanel />
 
       {/* ─── Hero state + Niño-region map ──────────────────────── */}
@@ -645,7 +657,7 @@ export default function EnsoPage() {
 
       {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
       <div id="forecast" className="scroll-mt-6">
-      <Divider icon={<TrendingUp className="h-5 w-5" />} title="Will there be an El Niño or La Niña in 2026-27?" />
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title={`Will there be an El Niño or La Niña in ${ensoForecastYearLabel()}?`} />
       <ForecastSection data={data} />
       </div>
 
@@ -1031,7 +1043,7 @@ export default function EnsoPage() {
 
       {/* ═══ PAST EVENTS ═════════════════════════ */}
       <div id="past-events" className="scroll-mt-6">
-        <Divider icon={<History className="h-5 w-5" />} title="Past Major El Niño and La Niña events (1982-2024)" />
+        <Divider icon={<History className="h-5 w-5" />} title={`Past Major El Niño and La Niña events (${pastEventsRangeLabel()})`} />
       </div>
 
       <SectionCard
