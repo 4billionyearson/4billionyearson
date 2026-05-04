@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BookOpen, Database, Calendar, CalendarRange, Trophy, AlertTriangle, Scale } from 'lucide-react';
 import BaselineExplainer from '../_components/BaselineExplainer';
+import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
+import { METHODOLOGY_FAQ } from './methodology-faq';
 import DataSourceTimeline, {
   MonthlyReleaseTimeline,
   AnnualReleaseTimeline,
@@ -417,6 +419,18 @@ export default function MethodologyPage() {
             </li>
           </ul>
         </section>
+
+        {/* Frequently Asked Questions */}
+        <div className="flex items-center gap-4 my-6">
+          <div className="h-px bg-[#D0A65E]/30 flex-1" />
+          <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+            <BookOpen className="h-5 w-5" />
+            <span>Frequently Asked Questions</span>
+          </h2>
+          <div className="h-px bg-[#D0A65E]/30 flex-1" />
+        </div>
+        <StaticFAQPanel headingId="methodology-faq-heading" qa={METHODOLOGY_FAQ} />
+        <FaqJsonLd qa={METHODOLOGY_FAQ} />
       </div>
     </main>
   );

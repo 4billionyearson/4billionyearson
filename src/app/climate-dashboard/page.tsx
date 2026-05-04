@@ -6,10 +6,12 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Brush, Cell,
 } from 'recharts';
-import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe, ExternalLink, Activity } from 'lucide-react';
+import { Search, Loader2, MapPin, TrendingUp, Droplets, Sun, Snowflake, ThermometerSun, Globe, ExternalLink, Activity, BookOpen } from 'lucide-react';
 import { countryFlag } from '@/lib/climate/locations';
 import { getProfileSlugForLocation } from '@/lib/climate/regions';
 import Link from 'next/link';
+import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
+import { CLIMATE_DASHBOARD_FAQ } from './climate-dashboard-faq';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -330,9 +332,47 @@ const CLIMATE_CACHE_KEY = 'climate-dashboard-cache-v3';
 
 export default function ClimateDashboardPage() {
   return (
-    <Suspense>
-      <ClimateDashboard />
-    </Suspense>
+    <main>
+      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
+        <div className="max-w-7xl mx-auto space-y-6">
+
+          {/* SSR Hero — rendered outside Suspense so AI / non-JS crawlers see
+              the H1 and intro copy in raw HTML. The interactive dashboard
+              below is bailed to client rendering via useSearchParams(). */}
+          <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E] overflow-hidden" style={{ background: "linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)" }}>
+            <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
+              <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+                Local &amp; Global Climate Change
+              </h1>
+            </div>
+            <div className="bg-gray-950/90 backdrop-blur-md p-4">
+              <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+                Search for any country, US state or UK region (England, Scotland, Wales, Northern Ireland,
+                South East, Midlands, London and more) to see how its climate has changed since
+                pre-industrial times — with live temperature, rainfall, sea level and ice data.
+              </p>
+            </div>
+          </div>
+
+          <Suspense>
+            <ClimateDashboard />
+          </Suspense>
+
+          {/* Frequently Asked Questions — rendered outside Suspense so the
+              FAQPage JSON-LD and Q&A copy appear in raw SSR HTML. */}
+          <div className="flex items-center gap-4 my-6">
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+            <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+              <BookOpen className="h-5 w-5" />
+              <span>Frequently Asked Questions</span>
+            </h2>
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+          </div>
+          <StaticFAQPanel headingId="climate-dashboard-faq-heading" qa={CLIMATE_DASHBOARD_FAQ} />
+          <FaqJsonLd qa={CLIMATE_DASHBOARD_FAQ} />
+        </div>
+      </div>
+    </main>
   );
 }
 
@@ -733,16 +773,16 @@ function ClimateDashboard() {
   }, [selectedLocation, countryData, usStateData, ukRegionData, ukCountryData, usNationalData, globalData, hasData]);
 
   return (
-    <main>
-      <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
+    <>
+      <div className="font-sans text-gray-200">
       <div className="max-w-7xl mx-auto space-y-6">
 
-        {/* ─── Header & Search ──────────────────────────────────────── */}
+        {/* ─── Search panel ──────────────────────────────────────── */}
         <div className="relative z-10 rounded-2xl shadow-xl border-2 border-[#D0A65E]" style={{ background: "linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)" }}>
           <div className="px-4 py-3 md:px-6 md:py-4 rounded-t-[14px]" style={{ backgroundColor: '#D0A65E' }}>
-            <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
-              Local & Global Climate Change
-            </h1>
+            <h2 className="text-2xl md:text-3xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+              Search by Location
+            </h2>
           </div>
           <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-b-[14px]">
           <p className="text-sm md:text-base mb-4 font-medium" style={{ color: '#D0A65E' }}>
@@ -1418,6 +1458,6 @@ function ClimateDashboard() {
         )}
       </div>
       </div>
-    </main>
+    </>
   );
 }
