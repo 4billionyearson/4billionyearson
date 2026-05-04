@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Extreme Weather live-events map. Wraps WorldMapShell so the aspect ratio,
+ * fractional-zoom strategy, attribution sizing and label conventions match
+ * every other choropleth/marker map on the site.
+ */
+
 import React, { useEffect, useMemo, useState } from "react";
 import { CircleMarker, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
@@ -7,73 +13,48 @@ import type { FeatureCollection } from "geojson";
 import { WorldMapShell } from "./world-map-shell";
 import "leaflet/dist/leaflet.css";
 
-/* ─── Types ──────────────────────────────────────────────────────────────── */
-
-export interface DiseaseOutbreak {
-  disease: string;
+export interface GDACSEvent {
+  type: string;
+  name: string;
+  alertLevel: string;
   country: string;
-  date: string;
-  summary: string;
-  url: string;
+  fromDate: string;
+  toDate: string;
+  severity: string;
+  population: number;
   lat: number;
   lon: number;
+  url: string;
 }
 
-interface Props {
-  outbreaks: DiseaseOutbreak[];
-}
-
-/* ─── Disease → colour lookup ─────────────────────────────────────────────── */
-
-const DISEASE_COLORS: [string, string][] = [
-  ["influenza", "#dc2626"],
-  ["ebola", "#f97316"],
-  ["marburg", "#ea580c"],
-  ["sudan virus", "#f97316"],
-  ["mers", "#ef4444"],
-  ["sars", "#ef4444"],
-  ["covid", "#ef4444"],
-  ["mpox", "#a855f7"],
-  ["monkeypox", "#a855f7"],
-  ["nipah", "#eab308"],
-  ["cholera", "#3b82f6"],
-  ["measles", "#06b6d4"],
-  ["polio", "#14b8a6"],
-  ["zika", "#84cc16"],
-  ["dengue", "#facc15"],
-  ["plague", "#78716c"],
-  ["yellow fever", "#eab308"],
-  ["meningococcal", "#8b5cf6"],
-  ["hiv", "#ec4899"],
-  ["lassa", "#fb923c"],
-  ["rift valley", "#22d3ee"],
-  ["hepatitis", "#f59e0b"],
-  ["typhoid", "#64748b"],
-  ["diphtheria", "#a8a29e"],
-];
-
-function getDiseaseColor(disease: string): string {
-  const lower = disease.toLowerCase();
-  for (const [key, color] of DISEASE_COLORS) {
-    if (lower.includes(key)) return color;
-  }
-  return "#6b7280";
-}
-
-/* ─── Label constants ─────────────────────────────────────────────────────── */
+const ALERT_FILL: Record<string, string> = {
+  Red: "#dc2626",
+  Orange: "#ea580c",
+  Green: "#059669",
+};
+const ALERT_BG: Record<string, string> = {
+  Red: "#1a0505",
+  Orange: "#1a0f05",
+  Green: "#051a0f",
+};
+const ALERT_BORDER: Record<string, string> = {
+  Red: "#ef4444",
+  Orange: "#f97316",
+  Green: "#10b981",
+};
 
 const LABEL_OVERRIDES: Record<string, [number, number]> = {
   "United States of America": [40, -98],
-  "Canada": [56, -96],
-  "Russia": [62, 95],
-  "France": [47, 2.5],
-  "Norway": [65, 13],
-  "Indonesia": [-2, 118],
-  "Malaysia": [4, 109],
-  "Chile": [-35, -71],
+  Canada: [56, -96],
+  Russia: [62, 95],
+  France: [47, 2.5],
+  Norway: [65, 13],
+  Indonesia: [-2, 118],
+  Malaysia: [4, 109],
+  Chile: [-35, -71],
   "New Zealand": [-42, 174],
-  "Japan": [36, 138],
-  "Antarctica": [-82, 0],
+  Japan: [36, 138],
+  Antarctica: [-82, 0],
 };
 
 const CONTINENT_LABELS: { name: string; pos: [number, number] }[] = [
@@ -110,18 +91,7 @@ const MAP_NAME_MAP: Record<string, string> = {
   "Falkland Is.": "Falkland Islands",
   "Fr. S. Antarctic Lands": "French Southern Territories",
   "Eq. Guinea": "Equatorial Guinea",
-  "eSwatini": "Eswatini",
-  "Solomon Is.": "Solomon Islands",
-  "Timor-Leste": "Timor",
-  "N. Cyprus": "North Cyprus",
-  "Somaliland": "Somalia",
-  "Côte d'Ivoire": "Cote d'Ivoire",
-  "Macedonia": "North Macedonia",
-  "Kosovo": "Kosovo",
-  "Taiwan": "Taiwan",
-  "Myanmar": "Myanmar",
   "Lao PDR": "Laos",
-  "Brunei": "Brunei",
 };
 
 function featureCentroid(feature: any): [number, number] | null {
@@ -152,8 +122,6 @@ function featureCentroid(feature: any): [number, number] | null {
   }
   return null;
 }
-
-/* ─── Labels (siblings of WorldMapShell) ──────────────────────────────── */
 
 function MapLabels() {
   const map = useMap();
@@ -225,70 +193,61 @@ function MapLabels() {
   );
 }
 
-/* ─── Public wrapper ──────────────────────────────────────────────────── */
+interface Props {
+  events: GDACSEvent[];
+}
 
-export default function DiseaseOutbreakMap({ outbreaks }: Props) {
+export default function ExtremeWeatherEventsMap({ events }: Props) {
   return (
     <WorldMapShell preset="world" theme="light">
       <MapLabels />
-      {outbreaks.map((o, i) => {
-        const fill = getDiseaseColor(o.disease);
-        return (
-          <CircleMarker
-            key={i}
-            center={[o.lat, o.lon]}
-            radius={11}
-            pathOptions={{
-              color: "#1e293b",
-              fillColor: fill,
-              fillOpacity: 0.75,
-              weight: 2,
-            }}
-          >
-            <Popup>
-              <div
+      {events.map((e, i) => (
+        <CircleMarker
+          key={i}
+          center={[e.lat, e.lon]}
+          radius={e.alertLevel === "Red" ? 14 : e.alertLevel === "Orange" ? 11 : 9}
+          pathOptions={{
+            color: "#1e293b",
+            fillColor: ALERT_FILL[e.alertLevel] || "#6b7280",
+            fillOpacity: 0.75,
+            weight: 2,
+          }}
+        >
+          <Popup>
+            <div
+              style={{
+                background: ALERT_BG[e.alertLevel] || "#111827",
+                border: `1px solid ${ALERT_BORDER[e.alertLevel] || "#374151"}`,
+                borderRadius: "8px",
+                padding: "10px 12px",
+                paddingTop: "18px",
+                paddingRight: "24px",
+                color: ALERT_FILL[e.alertLevel] || "#9ca3af",
+                minWidth: 160,
+                fontSize: 12,
+              }}
+            >
+              <div style={{ fontWeight: 700, marginBottom: 2 }}>{e.name}</div>
+              {e.country && <div style={{ opacity: 0.8 }}>{e.country}</div>}
+              {e.severity && <div style={{ opacity: 0.6, marginTop: 2 }}>{e.severity}</div>}
+              <a
+                href={e.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{
-                  background: "#0c1222",
-                  border: `1px solid ${fill}40`,
-                  borderRadius: 8,
-                  padding: "10px 12px",
-                  paddingRight: 24,
-                  color: "#e5e7eb",
-                  minWidth: 200,
-                  fontSize: 12,
+                  display: "inline-block",
+                  marginTop: 6,
+                  color: ALERT_FILL[e.alertLevel] || "#9ca3af",
+                  textDecoration: "underline",
+                  fontWeight: 600,
                 }}
               >
-                <div style={{ fontWeight: 700, color: fill, marginBottom: 2, fontSize: 13 }}>
-                  {o.disease}
-                </div>
-                <div style={{ opacity: 0.8 }}>{o.country}</div>
-                <div style={{ opacity: 0.5, marginTop: 2, fontSize: 11 }}>
-                  {new Date(o.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                </div>
-                {o.summary && (
-                  <div style={{ opacity: 0.6, marginTop: 6, fontSize: 11, lineHeight: 1.4, maxHeight: 60, overflow: "hidden" }}>
-                    {o.summary.slice(0, 150)}{o.summary.length > 150 ? "…" : ""}
-                  </div>
-                )}
-                <a
-                  href={o.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-block",
-                    marginTop: 6,
-                    color: fill,
-                    textDecoration: "underline",
-                    fontWeight: 600,
-                  }}
-                >
-                  WHO report →
-                </a>
-              </div>
-            </Popup>
-          </CircleMarker>
-        );
-      })}
+                View GDACS report →
+              </a>
+            </div>
+          </Popup>
+        </CircleMarker>
+      ))}
     </WorldMapShell>
   );
 }

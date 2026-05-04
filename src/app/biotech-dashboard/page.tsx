@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, Brush, Cell,
@@ -9,7 +10,14 @@ import {
   Loader2, Dna, Activity, FlaskConical,
   FileText, MapPin, Syringe,
 } from "lucide-react";
-import DiseaseOutbreakMap, { type DiseaseOutbreak } from "../_components/disease-outbreak-map";
+import { type DiseaseOutbreak } from "../_components/disease-outbreak-map";
+
+// Disease outbreak map uses react-leaflet which references `window` at import,
+// so it must be loaded client-side only.
+const DiseaseOutbreakMap = dynamic(() => import("../_components/disease-outbreak-map"), {
+  ssr: false,
+  loading: () => <div className="aspect-[4/3] w-full rounded-xl bg-gray-900 animate-pulse" />,
+});
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 

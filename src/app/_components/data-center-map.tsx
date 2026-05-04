@@ -1,7 +1,10 @@
 "use client";
 
-import React from "react";
-import dynamic from "next/dynamic";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { CircleMarker, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+import type { FeatureCollection } from "geojson";
+import { WorldMapShell } from "./world-map-shell";
 import "leaflet/dist/leaflet.css";
 
 interface SiteData {
@@ -128,238 +131,200 @@ function featureCentroid(feature: any): [number, number] | null {
   return null;
 }
 
-/* ─── Dynamic map (needs leaflet + geoData for labels) ─────────────────── */
+/* ─── Labels (siblings of WorldMapShell) ───────────────────────────────── */
 
-const InnerMap = dynamic(
-  () =>
-    Promise.all([
-      import("react-leaflet"),
-      import("leaflet"),
-      fetch("/data/world-countries.json").then(r => r.json()).catch(() => null),
-    ]).then(([mod, L, geoData]) => {
-      const { MapContainer, TileLayer, CircleMarker, Popup, Marker, useMap, useMapEvents } = mod;
+function MapLabels() {
+  const map = useMap();
+  const [ready, setReady] = useState(false);
+  const [zoom, setZoom] = useState(map.getZoom());
+  const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
 
-      function MapLabels() {
-        const map = useMap();
-        const [ready, setReady] = React.useState(false);
-        const [zoom, setZoom] = React.useState(map.getZoom());
+  useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
 
-        useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+  useEffect(() => {
+    if (!map.getPane("labels")) {
+      const pane = map.createPane("labels");
+      pane.style.zIndex = "450";
+      pane.style.pointerEvents = "none";
+    }
+    const tooltipPane = map.getPane("tooltipPane");
+    if (tooltipPane) tooltipPane.style.zIndex = "700";
+    setReady(true);
+  }, [map]);
 
-        React.useEffect(() => {
-          if (!map.getPane("labels")) {
-            const pane = map.createPane("labels");
-            pane.style.zIndex = "450";
-            pane.style.pointerEvents = "none";
-          }
-          const tooltipPane = map.getPane("tooltipPane");
-          if (tooltipPane) tooltipPane.style.zIndex = "700";
-          setReady(true);
-        }, [map]);
+  useEffect(() => {
+    fetch("/data/world-countries.json")
+      .then((r) => r.json())
+      .then((g) => setGeoData(g))
+      .catch(() => {});
+  }, []);
 
-        const countryLabels = React.useMemo(() => {
-          if (!geoData) return [];
-          const result: { name: string; pos: [number, number] }[] = [];
-          for (const f of geoData.features) {
-            const name = f.properties?.name;
-            if (!name) continue;
-            const pos = LABEL_OVERRIDES[name] ?? featureCentroid(f);
-            if (pos) result.push({ name, pos });
-          }
-          return result;
-        }, []);
+  const countryLabels = useMemo(() => {
+    if (!geoData) return [];
+    const result: { name: string; pos: [number, number] }[] = [];
+    for (const f of geoData.features) {
+      const name = (f.properties as any)?.name;
+      if (!name) continue;
+      const pos = LABEL_OVERRIDES[name] ?? featureCentroid(f);
+      if (pos) result.push({ name, pos });
+    }
+    return result;
+  }, [geoData]);
 
-        if (!ready || !geoData) return null;
+  if (!ready || !geoData) return null;
 
-        const visibleLabels =
-          zoom <= 2
-            ? CONTINENT_LABELS
-            : zoom <= 3
-              ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
-              : countryLabels;
+  const visibleLabels =
+    zoom <= 2
+      ? CONTINENT_LABELS
+      : zoom <= 3
+        ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
+        : countryLabels;
 
-        const fontSize = zoom <= 2 ? 13 : 10;
-        const cls = zoom <= 2 ? "continent-label-dark" : "country-label-dark";
+  const fontSize = zoom <= 2 ? 13 : 10;
+  const cls = zoom <= 2 ? "continent-label-dark" : "country-label-dark";
 
-        return (
-          <>
-            {visibleLabels.map(({ name, pos }) => (
-              <Marker
-                key={name}
-                position={pos}
-                pane="labels"
-                interactive={false}
-                icon={L.default.divIcon({
-                  className: cls,
-                  html: `<span style="font-size:${fontSize}px">${MAP_NAME_MAP[name] || name}</span>`,
-                  iconSize: [0, 0],
-                  iconAnchor: [0, 0],
-                })}
-              />
-            ))}
-          </>
-        );
-      }
+  return (
+    <>
+      {visibleLabels.map(({ name, pos }) => (
+        <Marker
+          key={name}
+          position={pos}
+          pane="labels"
+          interactive={false}
+          icon={L.divIcon({
+            className: cls,
+            html: `<span style="font-size:${fontSize}px">${MAP_NAME_MAP[name] || name}</span>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0],
+          })}
+        />
+      ))}
+    </>
+  );
+}
 
-      const US_STATES_ZOOM = 4;
+const US_STATES_ZOOM = 4;
 
-      function USStateLabels() {
-        const map = useMap();
-        const [visible, setVisible] = React.useState(map.getZoom() >= US_STATES_ZOOM);
-        const [statesGeo, setStatesGeo] = React.useState<any>(null);
-        const fetched = React.useRef(false);
+function USStateLabels() {
+  const map = useMap();
+  const [visible, setVisible] = useState(map.getZoom() >= US_STATES_ZOOM);
+  const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
+  const fetched = useRef(false);
 
-        useMapEvents({ zoomend: () => setVisible(map.getZoom() >= US_STATES_ZOOM) });
+  useMapEvents({ zoomend: () => setVisible(map.getZoom() >= US_STATES_ZOOM) });
 
-        React.useEffect(() => {
-          if (visible && !fetched.current) {
-            fetched.current = true;
-            fetch("/data/us-states.json")
-              .then(r => r.json())
-              .then(geo => setStatesGeo(geo))
-              .catch(() => {});
-          }
-        }, [visible]);
+  useEffect(() => {
+    if (visible && !fetched.current) {
+      fetched.current = true;
+      fetch("/data/us-states.json")
+        .then((r) => r.json())
+        .then((g) => setStatesGeo(g))
+        .catch(() => {});
+    }
+  }, [visible]);
 
-        if (!visible || !statesGeo) return null;
+  if (!visible || !statesGeo) return null;
 
-        const stateLabels: { name: string; pos: [number, number] }[] = [];
-        for (const f of statesGeo.features) {
-          const name = f.properties?.name;
-          if (!name) continue;
-          const pos = featureCentroid(f);
-          if (pos) stateLabels.push({ name, pos });
-        }
+  const stateLabels: { name: string; pos: [number, number] }[] = [];
+  for (const f of statesGeo.features) {
+    const name = (f.properties as any)?.name;
+    if (!name) continue;
+    const pos = featureCentroid(f);
+    if (pos) stateLabels.push({ name, pos });
+  }
 
-        return (
-          <>
-            {stateLabels.map(({ name, pos }) => (
-              <Marker
-                key={`state-${name}`}
-                position={pos}
-                pane="labels"
-                interactive={false}
-                icon={L.default.divIcon({
-                  className: "country-label-dark",
-                  html: `<span style="font-size:9px">${name}</span>`,
-                  iconSize: [0, 0],
-                  iconAnchor: [0, 0],
-                })}
-              />
-            ))}
-          </>
-        );
-      }
+  return (
+    <>
+      {stateLabels.map(({ name, pos }) => (
+        <Marker
+          key={`state-${name}`}
+          position={pos}
+          pane="labels"
+          interactive={false}
+          icon={L.divIcon({
+            className: "country-label-dark",
+            html: `<span style="font-size:9px">${name}</span>`,
+            iconSize: [0, 0],
+            iconAnchor: [0, 0],
+          })}
+        />
+      ))}
+    </>
+  );
+}
 
-      function FitSites({ sites }: { sites: SiteData[] }) {
-        const map = useMap();
-        React.useEffect(() => {
-          if (!sites.length) return;
-          const validSites = sites.filter(s => s.lat && s.lon);
-          if (!validSites.length) return;
-          const width = map.getContainer().clientWidth;
-          if (width < 500) {
-            map.setView([20, 30], 1);
-          } else {
-            const bounds = L.default.latLngBounds(validSites.map((s: SiteData) => [s.lat, s.lon]));
-            map.fitBounds(bounds, {
-              padding: [40, 40],
-              maxZoom: width < 768 ? 3 : 5,
-            });
-          }
-        }, [sites, map]);
-        return null;
-      }
+/* ─── Pin offsetting ───────────────────────────────────────────────────── */
 
-      return function DCMap({ sites }: Props) {
-        return (
-          <MapContainer
-            center={[20, 0]}
-            zoom={2}
-            minZoom={1}
-            maxZoom={8}
-            scrollWheelZoom={true}
-          className="aspect-[4/3] w-full rounded-xl z-0"
-            style={{ background: "#BEEEF9" }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
-            />
-            <MapLabels />
-            <USStateLabels />
-            <FitSites sites={sites} />
-            {(() => {
-              // Offset overlapping pins using a spiral pattern
-              const posMap = new Map<string, number>();
-              const OFFSET = 1.0; // degrees offset per ring
-              const offsetSites = sites.map(site => {
-                if (!site.lat || !site.lon) return site;
-                // Round to 1 decimal (~11km grid) to catch nearby pins
-                const key = `${site.lat.toFixed(1)},${site.lon.toFixed(1)}`;
-                const count = posMap.get(key) || 0;
-                posMap.set(key, count + 1);
-                if (count === 0) return site;
-                const angle = (count * 2 * Math.PI) / 6;
-                const r = OFFSET * Math.ceil(count / 6);
-                return { ...site, lat: site.lat + r * Math.sin(angle), lon: site.lon + r * Math.cos(angle) };
-              });
-              return offsetSites.map((site, i) => {
-              if (!site.lat || !site.lon) return null;
-              return (
-                <CircleMarker
-                  key={i}
-                  center={[site.lat, site.lon]}
-                  radius={getPinRadius(site.powerMW)}
-                  pathOptions={{
-                    color: "#1e293b",
-                    fillColor: getPinColor(site.powerMW),
-                    fillOpacity: 0.8,
-                    weight: 2,
-                  }}
-                >
-                  <Popup>
-                    <div
-                      style={{
-                        background: "#0c1222",
-                        border: "1px solid #334155",
-                        borderRadius: "8px",
-                        padding: "10px 12px",
-                        paddingRight: "24px",
-                        color: "#e5e7eb",
-                        minWidth: 200,
-                        fontSize: 12,
-                      }}
-                    >
-                      <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13, borderBottom: "1px solid #334155", paddingBottom: 4 }}>{site.name}</div>
-                      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "2px 8px", opacity: 0.8, marginTop: 4 }}>
-                        <span style={{ color: "#94a3b8" }}>Owner:</span><span>{site.owner || "—"}</span>
-                        {site.users && <><span style={{ color: "#94a3b8" }}>Users:</span><span>{site.users}</span></>}
-                        <span style={{ color: "#94a3b8" }}>Status:</span>
-                        <span style={{ color: site.powerMW > 0 ? "#10b981" : "#f59e0b" }}>
-                          {site.powerMW > 0 ? "Operational" : "Planned"}
-                        </span>
-                        {site.powerMW > 0 && <><span style={{ color: "#94a3b8" }}>Power:</span><span style={{ color: "#06b6d4", fontFamily: "monospace", fontSize: 11 }}>{site.powerMW.toLocaleString()} MW</span></>}
-                        {site.h100Equiv && site.h100Equiv > 0 ? <><span style={{ color: "#94a3b8" }}>H100 Eq:</span><span style={{ fontFamily: "monospace", fontSize: 11 }}>{(site.h100Equiv / 1000).toFixed(0)}K</span></> : null}
-                        {site.costBillions && site.costBillions > 0 ? <><span style={{ color: "#94a3b8" }}>Cost:</span><span style={{ fontFamily: "monospace", fontSize: 11 }}>${site.costBillions}B</span></> : null}
-                      </div>
-                    </div>
-                  </Popup>
-                </CircleMarker>
-              );
-            });
-            })()}
-          </MapContainer>
-        );
-      };
-    }),
-  { ssr: false, loading: () => <div className="aspect-[4/3] w-full rounded-xl bg-gray-900 animate-pulse" /> },
-);
+function offsetOverlapping(sites: SiteData[]): SiteData[] {
+  const posMap = new Map<string, number>();
+  const OFFSET = 1.0; // degrees per ring
+  return sites.map((site) => {
+    if (!site.lat || !site.lon) return site;
+    const key = `${site.lat.toFixed(1)},${site.lon.toFixed(1)}`;
+    const count = posMap.get(key) || 0;
+    posMap.set(key, count + 1);
+    if (count === 0) return site;
+    const angle = (count * 2 * Math.PI) / 6;
+    const r = OFFSET * Math.ceil(count / 6);
+    return { ...site, lat: site.lat + r * Math.sin(angle), lon: site.lon + r * Math.cos(angle) };
+  });
+}
+
+/* ─── Public wrapper ───────────────────────────────────────────────────── */
 
 export default function DataCenterMap({ sites }: Props) {
+  const offsetSites = useMemo(() => offsetOverlapping(sites), [sites]);
+
   return (
     <div className="relative w-full">
-      <InnerMap sites={sites} />
+      <WorldMapShell preset="world" theme="light">
+        <MapLabels />
+        <USStateLabels />
+        {offsetSites.map((site, i) => {
+          if (!site.lat || !site.lon) return null;
+          return (
+            <CircleMarker
+              key={i}
+              center={[site.lat, site.lon]}
+              radius={getPinRadius(site.powerMW)}
+              pathOptions={{
+                color: "#1e293b",
+                fillColor: getPinColor(site.powerMW),
+                fillOpacity: 0.8,
+                weight: 2,
+              }}
+            >
+              <Popup>
+                <div
+                  style={{
+                    background: "#0c1222",
+                    border: "1px solid #334155",
+                    borderRadius: "8px",
+                    padding: "10px 12px",
+                    paddingRight: "24px",
+                    color: "#e5e7eb",
+                    minWidth: 200,
+                    fontSize: 12,
+                  }}
+                >
+                  <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13, borderBottom: "1px solid #334155", paddingBottom: 4 }}>{site.name}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "2px 8px", opacity: 0.8, marginTop: 4 }}>
+                    <span style={{ color: "#94a3b8" }}>Owner:</span><span>{site.owner || "—"}</span>
+                    {site.users && <><span style={{ color: "#94a3b8" }}>Users:</span><span>{site.users}</span></>}
+                    <span style={{ color: "#94a3b8" }}>Status:</span>
+                    <span style={{ color: site.powerMW > 0 ? "#10b981" : "#f59e0b" }}>
+                      {site.powerMW > 0 ? "Operational" : "Planned"}
+                    </span>
+                    {site.powerMW > 0 && <><span style={{ color: "#94a3b8" }}>Power:</span><span style={{ color: "#06b6d4", fontFamily: "monospace", fontSize: 11 }}>{site.powerMW.toLocaleString()} MW</span></>}
+                    {site.h100Equiv && site.h100Equiv > 0 ? <><span style={{ color: "#94a3b8" }}>H100 Eq:</span><span style={{ fontFamily: "monospace", fontSize: 11 }}>{(site.h100Equiv / 1000).toFixed(0)}K</span></> : null}
+                    {site.costBillions && site.costBillions > 0 ? <><span style={{ color: "#94a3b8" }}>Cost:</span><span style={{ fontFamily: "monospace", fontSize: 11 }}>${site.costBillions}B</span></> : null}
+                  </div>
+                </div>
+              </Popup>
+            </CircleMarker>
+          );
+        })}
+      </WorldMapShell>
 
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-2 text-xs text-gray-400">
