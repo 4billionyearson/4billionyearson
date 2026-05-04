@@ -520,7 +520,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
   if (loading) {
     return (
-      <div className="aspect-square md:aspect-[4/3] w-full rounded-xl bg-gray-900/50 flex items-center justify-center">
+      <div className="aspect-[4/3] w-full rounded-xl bg-gray-900/50 flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-red-400 border-t-transparent rounded-full" />
       </div>
     );
@@ -528,7 +528,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
 
   if (!geoData) {
     return (
-      <div className="aspect-square md:aspect-[4/3] w-full rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-500">
+      <div className="aspect-[4/3] w-full rounded-xl bg-gray-900/50 flex items-center justify-center text-gray-500">
         Failed to load map data
       </div>
     );

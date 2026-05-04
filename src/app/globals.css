@@ -185,6 +185,21 @@ html[data-embed] .relative.z-10 {
   filter: saturate(3);
 }
 
+/* Smooth recolour when the user changes Level / Metric / Stretch on a
+   choropleth map. The fill, stroke and opacity changes happen on every
+   GeoJSON path, so a short ease covers the visual jump nicely. */
+.leaflet-overlay-pane svg path {
+  transition:
+    fill 280ms ease,
+    fill-opacity 280ms ease,
+    stroke 280ms ease,
+    stroke-opacity 280ms ease;
+}
+/* Legend swatches recolour in lockstep with the map. */
+.map-legend-swatch {
+  transition: background-color 280ms ease;
+}
+
 /* Mobile: shrink the Leaflet/CARTO attribution so it doesn't eat the corner
    of the map, and shrink in-map country/continent labels so they remain
    legible without crowding the now-square mobile map.

@@ -28,7 +28,7 @@
  *   </WorldMapShell>
  */
 
-import { useEffect, type ReactNode } from 'react';
+import React, { useEffect, type ReactNode } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import type { LatLngBoundsExpression } from 'leaflet';
 
@@ -78,16 +78,14 @@ const BG_DARK = '#0b1220';
  * Aspect-ratio strategy: at width-fit zoom (z = log2(w/256)) the world is
  * exactly the container width. Container HEIGHT therefore controls how
  * much of the Mercator north/south is visible. A square container shows
- * the entire ±85° Mercator map; a 2:1 wide-short container shows only
- * the central band, hiding Greenland and Antarctica.
- *
- * So we use:
- *  - mobile: aspect-square — full Mercator visible (Greenland to Antarctic).
- *  - desktop: aspect-[4/3] — 75% of Mercator height visible (~±67° lat),
- *    a balanced trade-off between showing top/bottom and not making the
- *    map dominate the page on big screens.
+ * the entire ±85° Mercator, which exposes the polar regions where
+ * CARTO tiles run out and the GeoJSON continues — you get a cyan ocean
+ * band at the top and a green Antarctica blob at the bottom. A 4:3
+ * container shows ~75% of Mercator height (~±67° lat), which trims those
+ * bands while still keeping Greenland, Iceland and the southern tip of
+ * South America visible.
  */
-const SHELL_HEIGHT_CLASS = 'aspect-square md:aspect-[4/3]';
+const SHELL_HEIGHT_CLASS = 'aspect-[4/3]';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -137,8 +135,12 @@ const PRESET_BOUNDS: Record<WorldMapPreset, LatLngBoundsExpression> = {
  */
 function WorldFitter({ preset }: { preset: WorldMapPreset }) {
   const map = useMap();
+  // First fit on mount is instant; subsequent fits (preset changes) animate.
+  const firstFitRef = React.useRef(true);
   useEffect(() => {
     const fit = () => {
+      const animate = !firstFitRef.current;
+      firstFitRef.current = false;
       map.invalidateSize();
       if (preset === 'world') {
         const w = map.getContainer().clientWidth;
@@ -146,13 +148,17 @@ function WorldFitter({ preset }: { preset: WorldMapPreset }) {
         // where 256 × 2^z = container width → z = log2(w / 256).
         const z = Math.max(0, Math.log2(Math.max(64, w) / 256));
         map.setMinZoom(z);
-        map.setView([20, 0], z, { animate: false });
+        map.setView([20, 0], z, { animate, duration: 0.5 });
       } else {
         const bounds = PRESET_BOUNDS[preset];
         // Reset min zoom for regional presets — the user may legitimately
         // want to zoom out from a regional fit to see context.
         map.setMinZoom(0);
-        map.fitBounds(bounds, { animate: false, padding: [10, 10] });
+        if (animate) {
+          map.flyToBounds(bounds, { duration: 0.6, padding: [10, 10] });
+        } else {
+          map.fitBounds(bounds, { animate: false, padding: [10, 10] });
+        }
       }
     };
 
