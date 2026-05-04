@@ -354,6 +354,27 @@ export default function EnsoPage() {
         </div>
       </div>
 
+      {/* ─── Quick Answer (TL;DR) ──────────────────────────────── */}
+      <aside
+        aria-label="Quick answer"
+        className="rounded-2xl border border-[#D0A65E]/40 bg-gray-950/80 backdrop-blur-md p-4 md:p-5 shadow-lg"
+      >
+        <div className="text-[11px] font-mono uppercase tracking-wider text-[#D0A65E] mb-1">
+          Quick Answer
+        </div>
+        <p className="text-sm md:text-base text-gray-200 leading-relaxed">
+          <strong className="text-white">El Niño</strong> is a Pacific climate pattern that
+          typically brings <strong>heavier rain and floods to the western coast of South America</strong>
+          {' '}(Peru, Ecuador), the southern United States and parts of East Africa, while causing
+          <strong> drought across Indonesia, Australia, the Philippines, southern Africa and the Amazon</strong>.
+          <strong className="text-white"> La Niña</strong> flips most of these:
+          wetter conditions in Australia, Indonesia and southern Africa, drier conditions in
+          the southern US and the Horn of Africa. Both phases shift <strong>global average
+          temperatures</strong> by roughly ±0.1-0.2 °C and now sit on top of the long-term
+          climate-change warming trend.
+        </p>
+      </aside>
+
       {/* ─── Hero state + Niño-region map ──────────────────────── */}
       <div id="current-state" className="scroll-mt-6">
       {oni && (() => {
@@ -500,7 +521,7 @@ export default function EnsoPage() {
 
       {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
       <div id="forecast" className="scroll-mt-6">
-      <Divider icon={<TrendingUp className="h-5 w-5" />} title="Prediction" />
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title="Will there be an El Niño or La Niña in 2026-27?" />
       <ForecastSection data={data} />
       </div>
 
@@ -731,7 +752,7 @@ export default function EnsoPage() {
 
       {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
       <div id="impacts" className="scroll-mt-6">
-        <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impacts" />
+        <Divider icon={<Globe2 className="h-5 w-5" />} title="Which countries are affected by El Niño and La Niña?" />
       </div>
 
       <SectionCard
@@ -886,7 +907,7 @@ export default function EnsoPage() {
 
       {/* ═══ PAST EVENTS ═════════════════════════ */}
       <div id="past-events" className="scroll-mt-6">
-        <Divider icon={<History className="h-5 w-5" />} title="Past Major Events" />
+        <Divider icon={<History className="h-5 w-5" />} title="Past Major El Niño and La Niña events (1982-2024)" />
       </div>
 
       <SectionCard
@@ -952,7 +973,7 @@ export default function EnsoPage() {
       </SectionCard>
 
       {/* ═══ CLIMATE CHANGE ══════════════════════ */}
-      <Divider icon={<Wind className="h-5 w-5" />} title="ENSO and Climate Change" />
+      <Divider icon={<Wind className="h-5 w-5" />} title="How does climate change affect El Niño and La Niña?" />
 
       <SectionCard
         icon={<Wind className="text-[#D0A65E]" />}

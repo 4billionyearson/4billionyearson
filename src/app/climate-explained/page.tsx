@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import {
   Thermometer, Wind, Droplets, Mountain, Snowflake, Flame,
   ArrowUpRight, Globe, TreePine, AlertTriangle, BookOpen, ExternalLink, Waves, Compass,
@@ -137,7 +138,7 @@ export default function ClimateExplainedPage() {
               <div>
                 <h3 className="text-base font-bold text-white mb-1">ENSO – El Ni&ntilde;o / La Ni&ntilde;a</h3>
                 <p className="text-sm text-gray-300 leading-relaxed mb-2">
-                  The <strong className="text-white">El Ni&ntilde;o–Southern Oscillation (ENSO)</strong> is the most influential natural climate pattern on Earth. It describes a recurring shift in sea-surface temperatures across the tropical Pacific Ocean, typically cycling every 2–7 years.
+                  The <strong className="text-white">El Ni&ntilde;o–Southern Oscillation (ENSO)</strong> is the most influential natural climate pattern on Earth. It describes a recurring shift in sea-surface temperatures across the tropical Pacific Ocean, typically cycling every 2–7 years. See our <Link href="/climate/enso" className="text-sky-300 underline decoration-sky-400/40 underline-offset-2 hover:decoration-sky-300">live ENSO tracker</Link> for the current state, regional impacts and NOAA forecast.
                 </p>
                 <div className="grid sm:grid-cols-2 gap-3 mb-2">
                   <div className="bg-red-950/30 rounded-xl p-3.5 border border-red-900/40">

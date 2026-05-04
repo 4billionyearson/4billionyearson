@@ -98,8 +98,14 @@ export default function PastEventsSection() {
         {PAST_EVENTS.slice().reverse().map((e) => {
           const phaseAccent = e.phase === 'el-nino' ? 'border-l-rose-500/70' : 'border-l-sky-400/70';
           const phaseText = e.phase === 'el-nino' ? 'text-rose-300' : 'text-sky-300';
+          const phaseSlug = e.phase === 'el-nino' ? 'el-nino' : 'la-nina';
+          const anchorId = `${phaseSlug}-${e.start.slice(0, 4)}-${e.end.slice(2, 4)}`;
           return (
-            <div key={`${e.start}-${e.end}`} className={`rounded-xl border border-gray-700/50 bg-gray-800/60 border-l-4 ${phaseAccent} p-4`}>
+            <div
+              key={`${e.start}-${e.end}`}
+              id={anchorId}
+              className={`scroll-mt-24 rounded-xl border border-gray-700/50 bg-gray-800/60 border-l-4 ${phaseAccent} p-4`}
+            >
               <div className="flex items-baseline justify-between gap-2 flex-wrap">
                 <p className={`text-base font-bold font-mono ${phaseText}`}>
                   {e.start.slice(0, 4)}-{e.end.slice(0, 4)} {e.phase === 'el-nino' ? 'El Niño' : 'La Niña'}
