@@ -13,6 +13,9 @@ import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard
 import type { ClimateMapPreset } from '../global/ClimateMapCard';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
+import { QuickTLDR } from '@/app/_components/seo/QuickTLDR';
+import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
+import { buildRegionFAQ } from '@/lib/climate/region-faq';
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
 
@@ -818,6 +821,17 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
             </div>
           </div>
 
+          {/* ─── Quick TL;DR + static FAQ ─ rendered unconditionally so AI
+              crawlers and Google's first crawl see region-named
+              content in raw SSR HTML even before the live data loads. ── */}
+          <QuickTLDR>
+            {region.tagline}{region.tagline.endsWith('.') ? ' ' : '. '}
+            Anomalies are calculated against the 1961–1990 climatological
+            baseline used by the Met Office, NOAA and the IPCC. Refreshed
+            monthly from {region.dataSources.includes('met-office') ? 'Met Office HadUK-Grid' : region.dataSources.includes('noaa-state') || region.dataSources.includes('noaa-national') ? 'NOAA Climate at a Glance' : 'authoritative national climate datasets'}.{' '}
+            <a href="#climate-faq-heading" className="text-[#D0A65E] hover:underline">Full Q&amp;A below ↓</a>
+          </QuickTLDR>
+
           {/* Loading / Error */}
           {loading && (
             <div className="bg-gray-950/90 backdrop-blur-md p-12 rounded-2xl shadow-xl border-2 border-[#D0A65E] flex flex-col items-center gap-4">
@@ -1007,6 +1021,16 @@ export default function ClimateProfile({ slug, region }: { slug: string; region:
               </section>
             </>
           )}
+
+          {/* ─── Frequently Asked Questions ─ always rendered so AI search
+              engines and non-JS crawlers can extract region-tailored
+              Q&A from raw SSR HTML. Mirrors FAQPage JSON-LD below. ────── */}
+          <Divider icon={<BookOpen className="h-5 w-5" />} title="Frequently Asked Questions" />
+          <StaticFAQPanel
+            headingId="climate-faq-heading"
+            qa={buildRegionFAQ(region)}
+          />
+          <FaqJsonLd qa={buildRegionFAQ(region)} />
         </div>
       </div>
     </main>
