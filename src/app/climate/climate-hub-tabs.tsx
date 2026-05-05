@@ -8,6 +8,7 @@ import { ChevronRight, Search, Sparkles, X, List, Map as MapIcon, Globe, Bookmar
 import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import type { CountryAnomalyRow, ClimateMapPreset } from './global/ClimateMapCard';
+import type { MetricKey } from './global/climate-map-metrics';
 
 const ClimateMapCard = dynamic(() => import('./global/ClimateMapCard'), { ssr: false });
 
@@ -145,7 +146,7 @@ export function ClimateTabsProvider({
 export function ClimateHubControls() {
   const { active, setActive, counts, query, setQuery, view, setView } = useClimateTabs();
 
-  const sectionOptions = useMemo(
+  const allOptions = useMemo(
     () =>
       TABS.map((tab) => {
         const count = tab.countKey ? counts[tab.countKey] : null;
@@ -157,9 +158,14 @@ export function ClimateHubControls() {
     [counts],
   );
 
+  // In map mode, hide list-only sections (Editor's Picks, Rankings).
+  const dropdownOptions = view === 'map'
+    ? allOptions.filter((o) => !MAP_INCOMPATIBLE.has(o.key as ClimateTabId))
+    : allOptions;
+
   return (
     <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5">
-      {/* View toggle (List/Map) — first, then Section, then Search. All h-9. */}
+      {/* View toggle (List/Map) — first, then Section/Level, then Search. All h-9. */}
       <div
         role="tablist"
         aria-label="View"
@@ -178,7 +184,11 @@ export function ClimateHubControls() {
           type="button"
           role="tab"
           aria-selected={view === 'map'}
-          onClick={() => setView('map')}
+          onClick={() => {
+            // If the active section has no map equivalent, switch to Continents.
+            if (MAP_INCOMPATIBLE.has(active)) setActive('continents');
+            setView('map');
+          }}
           className={`inline-flex items-center gap-1.5 rounded-full px-3 font-medium transition-colors ${view === 'map' ? 'bg-[#D0A65E] text-gray-950' : 'text-[#FFF5E7]/75 hover:text-white'}`}
         >
           <MapIcon className="h-3.5 w-3.5" /> Map
@@ -187,11 +197,11 @@ export function ClimateHubControls() {
 
       <div className="shrink-0">
         <ChipDropdown
-          label="Section"
+          label={view === 'map' ? 'Level' : 'Section'}
           ariaLabel="Climate hub section"
           value={active}
           onChange={(k) => setActive(k as ClimateTabId)}
-          options={sectionOptions}
+          options={dropdownOptions}
           triggerClassName="h-9 px-3 text-[13px]"
         />
       </div>
@@ -304,7 +314,7 @@ export function ClimateTabsPanels() {
           countryAnomalies={countryAnomalies}
           preset={cfg.preset}
           initialLevel={cfg.level}
-          initialMetric="temp-actual"
+          initialMetric={cfg.metric ?? 'temp-actual'}
           hideShare
           embedded
           onSelect={handleMapSelect}
@@ -335,14 +345,18 @@ export function ClimateTabsPanels() {
 
 type MapLevel = 'continents' | 'countries' | 'uk-countries' | 'uk-regions' | 'us-states' | 'us-regions';
 
-const SECTION_MAP_CONFIG: Partial<Record<ClimateTabId, { preset: ClimateMapPreset; level: MapLevel }>> = {
-  continents: { preset: 'global', level: 'continents' },
+const SECTION_MAP_CONFIG: Partial<Record<ClimateTabId, { preset: ClimateMapPreset; level: MapLevel; metric?: MetricKey }>> = {
+  // temp-anomaly is the only metric with data for continents and us-regions.
+  continents: { preset: 'global', level: 'continents', metric: 'temp-anomaly' },
   countries: { preset: 'global', level: 'countries' },
   'uk-countries': { preset: 'uk', level: 'uk-countries' },
   'uk-regions': { preset: 'uk', level: 'uk-regions' },
   'us-states': { preset: 'usa', level: 'us-states' },
-  'us-climate-regions': { preset: 'usa', level: 'us-regions' },
+  'us-climate-regions': { preset: 'usa', level: 'us-regions', metric: 'temp-anomaly' },
 };
+
+// Tab IDs that have no map equivalent (list-only).
+const MAP_INCOMPATIBLE: Set<ClimateTabId> = new Set(['editors-picks', 'rankings']);
 
 // Quick-pick pills shown above the map for sections that aren't pickable
 // from a polygon: the worldwide ("Global") update, Editor's Picks and the
