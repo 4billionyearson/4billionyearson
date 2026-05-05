@@ -180,7 +180,7 @@ export default function ClimateMapCard({
         </h3>
       )}
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        {visibleLevels.length > 1 && (
+        {visibleLevels.length > 1 && !embedded && (
           <ChipDropdown
             label="Level"
             ariaLabel="Map level"

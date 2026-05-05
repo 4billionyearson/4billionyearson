@@ -1112,7 +1112,15 @@ export default function ClimateMap({
     layer.on('click', () => {
       show();
       if (onSelect) {
-        onSelect({ level, name, iso3: rec?.iso3 });
+        const slug =
+          level === 'continents'
+            ? (() => {
+                const groupKey = NAME_TO_CONTINENT[name.toLowerCase()] ?? (rec ? CONTINENT_GROUP_KEY[rec.iso3] : undefined);
+                const group = groupKey ? continentByKey.get(groupKey) : undefined;
+                return group?.slug;
+              })()
+            : undefined;
+        onSelect({ level, name, iso3: rec?.iso3, slug });
       }
     });
     layer.on('mouseout', () => setSelected(null));

@@ -813,6 +813,17 @@ export default async function ClimateGroupProfile({
             </h1>
           </div>
           <div className="bg-gray-950/90 backdrop-blur-md px-4 pt-0 pb-3 md:px-6 md:pb-4">
+            {region.coveragePlaces && region.coveragePlaces.length > 0 && (
+              <div className="inline-flex items-start gap-2 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
+                <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />
+                <p className="text-xs md:text-sm font-medium text-[#D0A65E]">
+                  <span className="font-semibold">
+                    {region.groupKind === 'continent' ? 'Top 5 Countries:' : 'Top States:'}
+                  </span>{' '}
+                  {region.coveragePlaces.slice(0, -1).join(', ')}{region.coveragePlaces.length > 1 ? `${region.coveragePlaces.length > 2 ? ',' : ''} and ${region.coveragePlaces[region.coveragePlaces.length - 1]}` : ''}
+                </p>
+              </div>
+            )}
             {region.isAggregate ? (
               <p className="mb-3 text-xs text-amber-200/80 flex items-start gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />

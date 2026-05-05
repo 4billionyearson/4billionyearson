@@ -130,6 +130,7 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     emoji: '🌍',
     dataSources: ['noaa-continent'],
     keywords: ['Africa climate data', 'Africa temperature anomaly', 'NOAA continental data', 'African heatwave', 'African drought'],
+    coveragePlaces: ['Nigeria', 'Ethiopia', 'Egypt', 'South Africa', 'Kenya'],
   },
   {
     slug: 'asia',
@@ -143,6 +144,7 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     emoji: '🌏',
     dataSources: ['noaa-continent'],
     keywords: ['Asia climate data', 'Asia temperature anomaly', 'Asian heatwave', 'Asian monsoon', 'NOAA continental data'],
+    coveragePlaces: ['China', 'India', 'Indonesia', 'Japan', 'Pakistan'],
   },
   {
     slug: 'europe',
@@ -156,6 +158,7 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     emoji: '🇪🇺',
     dataSources: ['noaa-continent'],
     keywords: ['Europe climate data', 'European temperature', 'Europe heatwave', 'European warming', 'NOAA continental data'],
+    coveragePlaces: ['Russia', 'Germany', 'France', 'United Kingdom', 'Italy'],
   },
   {
     slug: 'oceania',
@@ -169,6 +172,7 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     emoji: '🌏',
     dataSources: ['noaa-continent'],
     keywords: ['Oceania climate data', 'Australia New Zealand temperature', 'Pacific climate', 'NOAA continental data'],
+    coveragePlaces: ['Australia', 'New Zealand', 'Papua New Guinea', 'Fiji', 'Solomon Islands'],
   },
   {
     slug: 'north-america',
@@ -183,6 +187,7 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     emoji: '🌎',
     dataSources: ['owid-temp'],
     keywords: ['North America climate data', 'North American temperature', 'continental climate', 'aggregate temperature anomaly'],
+    coveragePlaces: ['United States', 'Canada', 'Mexico', 'Cuba', 'Guatemala'],
   },
   {
     slug: 'south-america',
@@ -197,6 +202,7 @@ const CONTINENT_GROUPS: ClimateRegion[] = [
     emoji: '🌎',
     dataSources: ['owid-temp'],
     keywords: ['South America climate data', 'South American temperature', 'continental climate', 'Amazon temperature trends'],
+    coveragePlaces: ['Brazil', 'Argentina', 'Colombia', 'Peru', 'Chile'],
   },
 ];
 
@@ -214,6 +220,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['Northeast US climate', 'NOAA climate region', 'Northeast temperature', 'Northeast precipitation'],
     memberSlugs: ['us-connecticut', 'us-delaware', 'us-maine', 'us-massachusetts', 'us-maryland', 'us-new-hampshire', 'us-new-jersey', 'us-new-york', 'us-pennsylvania', 'us-rhode-island', 'us-vermont'],
+    coveragePlaces: ['New York', 'Pennsylvania', 'Massachusetts', 'New Jersey', 'Maryland'],
   },
   {
     slug: 'us-upper-midwest',
@@ -228,6 +235,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['Upper Midwest US climate', 'NOAA climate region', 'Upper Midwest temperature', 'Great Lakes climate'],
     memberSlugs: ['us-iowa', 'us-michigan', 'us-minnesota', 'us-wisconsin'],
+    coveragePlaces: ['Michigan', 'Minnesota', 'Wisconsin', 'Iowa'],
   },
   {
     slug: 'us-ohio-valley',
@@ -242,6 +250,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['Ohio Valley climate', 'NOAA climate region', 'Ohio Valley temperature', 'Midwest climate'],
     memberSlugs: ['us-illinois', 'us-indiana', 'us-kentucky', 'us-missouri', 'us-ohio', 'us-tennessee', 'us-west-virginia'],
+    coveragePlaces: ['Ohio', 'Illinois', 'Missouri', 'Indiana', 'Tennessee'],
   },
   {
     slug: 'us-southeast',
@@ -256,6 +265,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['Southeast US climate', 'NOAA climate region', 'Southeast temperature', 'Atlantic hurricane region'],
     memberSlugs: ['us-alabama', 'florida', 'us-georgia', 'us-north-carolina', 'us-south-carolina', 'us-virginia'],
+    coveragePlaces: ['Florida', 'Georgia', 'Virginia', 'North Carolina', 'South Carolina'],
   },
   {
     slug: 'us-northern-rockies-plains',
@@ -270,6 +280,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['Northern Rockies Plains climate', 'NOAA climate region', 'Northern Plains temperature'],
     memberSlugs: ['us-montana', 'us-nebraska', 'us-north-dakota', 'us-south-dakota', 'us-wyoming'],
+    coveragePlaces: ['Montana', 'Nebraska', 'North Dakota', 'South Dakota', 'Wyoming'],
   },
   {
     slug: 'us-south',
@@ -284,6 +295,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['South US climate', 'NOAA climate region', 'Southern Plains temperature', 'Texas climate'],
     memberSlugs: ['us-arkansas', 'us-kansas', 'us-louisiana', 'us-mississippi', 'us-oklahoma', 'texas'],
+    coveragePlaces: ['Texas', 'Oklahoma', 'Louisiana', 'Kansas', 'Arkansas'],
   },
   {
     slug: 'us-southwest',
@@ -298,6 +310,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['Southwest US climate', 'NOAA climate region', 'Southwest temperature', 'desert climate'],
     memberSlugs: ['us-arizona', 'us-colorado', 'us-new-mexico', 'us-utah'],
+    coveragePlaces: ['Arizona', 'Colorado', 'New Mexico', 'Utah'],
   },
   {
     slug: 'us-northwest',
@@ -312,6 +325,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['Northwest US climate', 'NOAA climate region', 'Pacific Northwest temperature'],
     memberSlugs: ['us-idaho', 'us-oregon', 'us-washington'],
+    coveragePlaces: ['Washington', 'Oregon', 'Idaho'],
   },
   {
     slug: 'us-west',
@@ -326,6 +340,7 @@ const US_CLIMATE_REGION_GROUPS: ClimateRegion[] = [
     dataSources: ['noaa-region'],
     keywords: ['West US climate', 'NOAA climate region', 'California climate', 'Nevada climate'],
     memberSlugs: ['california', 'us-nevada'],
+    coveragePlaces: ['California', 'Nevada'],
   },
 ];
 
