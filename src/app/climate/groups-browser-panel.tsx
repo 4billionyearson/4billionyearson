@@ -45,13 +45,6 @@ export default function GroupsBrowserPanel({ groups, kind }: Props) {
 
   return (
     <section className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6 space-y-6">
-      <p className="text-sm text-gray-400 max-w-3xl">
-        {kind === 'continent'
-          ? 'NOAA continents rebuilt with a two-baseline anomaly view (1961–1990 comparison plus the source-native 1901–2000 anomaly). North and South America are 4BYO aggregates because NOAA does not publish a standalone continental land series for either.'
-          : kind === 'us-climate-region'
-            ? 'The 9 NOAA US climate regions, each with monthly tavg and precipitation rebased to 1961–1990 alongside the source-native 1901–2000 figures.'
-            : 'NOAA continents and the 9 US climate regions, each rebuilt with a two-baseline anomaly view (1961–1990 comparison baseline plus the source-native 1901–2000 anomaly). North and South America are 4BYO aggregates because NOAA does not publish a standalone continental land series for either.'}
-      </p>
 
       {showContinents && (
         <div className="space-y-3">
@@ -73,13 +66,19 @@ export default function GroupsBrowserPanel({ groups, kind }: Props) {
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <Flag className="h-4 w-4 text-[#D0A65E]" />
-            <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">US climate regions</h3>
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">US Climate Regions</h3>
             <span className="flex-1 h-px bg-[#D0A65E]/15" />
             <span className="text-[11px] text-gray-500">{usRegions.length}</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="flex flex-wrap gap-2">
             {usRegions.map((g) => (
-              <GroupCard key={g.slug} region={g} />
+              <Link
+                key={g.slug}
+                href={`/climate/${g.slug}`}
+                className="inline-flex h-8 items-center rounded-full border px-3 text-[13px] font-medium transition-colors border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/40 hover:bg-[#D0A65E]/10 hover:text-[#FFF5E7] whitespace-nowrap"
+              >
+                {g.name}
+              </Link>
             ))}
           </div>
         </div>

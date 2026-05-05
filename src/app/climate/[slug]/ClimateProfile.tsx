@@ -802,7 +802,7 @@ export default function ClimateProfile({
                     />
                     <Link
                       href={`/climate-dashboard?q=${encodeURIComponent(dashboardSearchTerm)}`}
-                      className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors"
+                      className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors ml-auto"
                     >
                       Full Climate Data for {pageTitle} →
                     </Link>

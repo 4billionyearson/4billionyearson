@@ -162,9 +162,9 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-4 my-6">
       <div className="h-px bg-[#D0A65E]/30 flex-1" />
-      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+      <h2 className="text-sm md:text-base font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
         {icon}
-        <span>{title}</span>
+        <span className="whitespace-nowrap">{title}</span>
       </h2>
       <div className="h-px bg-[#D0A65E]/30 flex-1" />
     </div>
@@ -218,7 +218,7 @@ function HeroPanel() {
   return (
     <div className="rounded-2xl border-2 border-[#D0A65E] shadow-xl overflow-hidden" style={{ background: 'linear-gradient(to bottom, #D0A65E 0%, #D0A65E 20px, transparent 20px)' }}>
       <div className="px-4 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D0A65E' }}>
-        <h1 className="text-3xl md:text-5xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
+        <h1 className="text-2xl md:text-4xl font-bold font-mono tracking-wide leading-tight" style={{ color: '#FFF5E7' }}>
           El Niño / La Niña - ENSO Tracker
         </h1>
       </div>

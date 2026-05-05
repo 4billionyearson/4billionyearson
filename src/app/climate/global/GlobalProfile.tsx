@@ -459,7 +459,7 @@ export default function GlobalProfile({
                     />
                     <Link
                       href="/climate-dashboard"
-                      className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors"
+                      className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors ml-auto"
                     >
                       Full Climate Data →
                     </Link>

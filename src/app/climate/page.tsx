@@ -77,7 +77,13 @@ function HubSchema() {
 export default function ClimateProfilesIndex() {
   const countries = CLIMATE_REGIONS.filter(r => r.type === 'country' && r.slug !== 'ireland');
   const usStates = CLIMATE_REGIONS.filter(r => r.type === 'us-state');
-  const ukAndIrelandRegions = CLIMATE_REGIONS.filter(r => r.type === 'uk-region' || r.slug === 'ireland');
+  const UK_NATION_API_CODES = new Set(['uk-eng', 'uk-wal', 'uk-sco', 'uk-ni']);
+  const ukCountriesNations = CLIMATE_REGIONS.filter(r =>
+    (r.type === 'uk-region' && UK_NATION_API_CODES.has(r.apiCode)) || r.slug === 'ireland'
+  );
+  const ukSubRegions = CLIMATE_REGIONS.filter(r =>
+    r.type === 'uk-region' && !UK_NATION_API_CODES.has(r.apiCode)
+  );
   const groups = CLIMATE_REGIONS.filter(r => r.type === 'group');
   const continentsGroup = groups.filter(g => g.groupKind === 'continent');
   const usClimateRegions = groups.filter(g => g.groupKind === 'us-climate-region');
@@ -92,7 +98,8 @@ export default function ClimateProfilesIndex() {
             counts={{
               countries: countries.length,
               usStates: usStates.length,
-              ukRegions: ukAndIrelandRegions.length,
+              ukCountries: ukCountriesNations.length,
+              ukRegions: ukSubRegions.length,
               continents: continentsGroup.length,
               usClimateRegions: usClimateRegions.length,
             }}
@@ -108,9 +115,14 @@ export default function ClimateProfilesIndex() {
                   headless
                 />
               ),
+              'uk-countries': (
+                <Suspense fallback={<UKRegionsFallback />}>
+                  <UKRegionsBrowser regions={ukCountriesNations} headless />
+                </Suspense>
+              ),
               'uk-regions': (
                 <Suspense fallback={<UKRegionsFallback />}>
-                  <UKRegionsBrowser regions={ukAndIrelandRegions} headless />
+                  <UKRegionsBrowser regions={ukSubRegions} headless />
                 </Suspense>
               ),
               'us-states': (

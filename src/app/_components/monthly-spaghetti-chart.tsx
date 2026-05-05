@@ -289,8 +289,8 @@ export default function MonthlySpaghettiChart({
               tick={{ fill: '#9CA3AF', fontSize: 11 }}
               axisLine={{ stroke: '#555' }}
               tickLine={false}
-              tickFormatter={(v: number) => formatValue(cfg, v)}
-              width={cfg.unitTight ? 52 : 60}
+              tickFormatter={(v: number) => cfg.unitTight ? `${Math.round(v)}${cfg.unit}` : `${Math.round(v)} ${cfg.unit}`}
+              width={cfg.unitTight ? 60 : 65}
             />
 
             {backgroundYears.map((yr) => (

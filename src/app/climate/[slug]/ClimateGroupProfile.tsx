@@ -845,7 +845,7 @@ export default async function ClimateGroupProfile({
               />
               <Link
                 href={`/climate-dashboard?q=${encodeURIComponent(region.name)}`}
-                className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors"
+                className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors ml-auto"
               >
                 Full Climate Data for {region.name} →
               </Link>

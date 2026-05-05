@@ -217,13 +217,15 @@ export default function ClimateRegionsBrowser({
                 if (!items.length) return null;
                 return (
                   <div key={group} className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">
-                        {group}
-                      </h3>
-                      <span className="flex-1 h-px bg-[#D0A65E]/15" />
-                      <span className="text-[11px] text-gray-500">{items.length}</span>
-                    </div>
+                    {filter !== 'all' && (
+                      <div className="flex items-center gap-3">
+                        <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">
+                          {group}
+                        </h3>
+                        <span className="flex-1 h-px bg-[#D0A65E]/15" />
+                        <span className="text-[11px] text-gray-500">{items.length}</span>
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {items.map((region) => (
                         <RegionCard key={region.slug} region={region} />
