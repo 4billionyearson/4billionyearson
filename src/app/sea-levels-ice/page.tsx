@@ -177,6 +177,39 @@ interface HemisphereSeaIce {
   monthly: { year: number; month: number; extent: number }[];
 }
 
+function SeaIceCallout({ cx, cy, color, text, monthIdx }: { cx: number; cy: number; color: string; text: string; monthIdx: number }) {
+  const charW = 6.2;
+  const padX = 6;
+  const textW = text.length * charW;
+  const rectW = textW + padX * 2;
+  const rectH = 16;
+  const above = cy > 28;
+  const rectY = above ? cy - 14 - rectH : cy + 12;
+  const textY = above ? cy - 14 - rectH / 2 + 4 : cy + 12 + rectH / 2 + 4;
+  let rectX: number;
+  let textX: number;
+  let textAnchor: 'start' | 'middle' | 'end' = 'middle';
+  if (monthIdx <= 1) {
+    rectX = cx + 8;
+    textX = cx + 8 + padX;
+    textAnchor = 'start';
+  } else if (monthIdx >= 10) {
+    rectX = cx - 8 - rectW;
+    textX = cx - 8 - padX;
+    textAnchor = 'end';
+  } else {
+    rectX = cx - rectW / 2;
+    textX = cx;
+  }
+  return (
+    <g pointerEvents="none">
+      <circle cx={cx} cy={cy} r={3.5} fill={color} />
+      <rect x={rectX} y={rectY} width={rectW} height={rectH} rx={4} ry={4} fill="rgba(3, 7, 18, 0.88)" stroke={color} strokeWidth={1} />
+      <text x={textX} y={textY} textAnchor={textAnchor} fill={color} fontSize={11} fontWeight="bold">{text}</text>
+    </g>
+  );
+}
+
 function HemisphereSeaIceCard({ data, accent }: { data: HemisphereSeaIce; accent: 'cyan' | 'sky' }) {
   const years = useMemo(() => Array.from(new Set(data.monthly.map(p => p.year))).sort((a, b) => a - b), [data]);
   const latestYear = data.latest.year;
@@ -245,6 +278,16 @@ function HemisphereSeaIceCard({ data, accent }: { data: HemisphereSeaIce; accent
               const stroke = isCurrent ? currentColor : isRecord ? recordColor : '#6b7280';
               const width = isCurrent ? 3 : isRecord ? 2 : 1;
               const opacity = isCurrent ? 1 : isRecord ? 0.95 : 0.35;
+              const calloutText = `${MONTH_LABELS[data.latest.month - 1]} ${latestYear}: ${data.latest.extent.toFixed(2)} Mkm²`;
+              const renderCurrentDot = (props: any) => {
+                const { cx, cy, payload, index } = props ?? {};
+                if (cx == null || cy == null) return null as any;
+                const month = payload?.month ?? (typeof index === 'number' ? index + 1 : null);
+                if (month === data.latest.month) {
+                  return <SeaIceCallout cx={cx} cy={cy} color={stroke} text={calloutText} monthIdx={data.latest.month - 1} />;
+                }
+                return <circle cx={cx} cy={cy} r={2.5} fill={stroke} />;
+              };
               return (
                 <Line
                   key={y}
@@ -254,7 +297,7 @@ function HemisphereSeaIceCard({ data, accent }: { data: HemisphereSeaIce; accent
                   stroke={stroke}
                   strokeWidth={width}
                   strokeOpacity={opacity}
-                  dot={isCurrent ? { r: 3, fill: stroke } : false}
+                  dot={isCurrent ? renderCurrentDot : false}
                   connectNulls={false}
                   isAnimationActive={false}
                 />

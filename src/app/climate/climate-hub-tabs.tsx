@@ -1,10 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { ChevronRight, Search, Sparkles, X } from 'lucide-react';
+import { ChevronRight, Search, Sparkles, X, List, Map as MapIcon } from 'lucide-react';
 import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 import type { ClimateRegion } from '@/lib/climate/regions';
+import type { CountryAnomalyRow, ClimateMapPreset } from './global/ClimateMapCard';
+
+const ClimateMapCard = dynamic(() => import('./global/ClimateMapCard'), { ssr: false });
 
 export type ClimateTabId =
   | 'editors-picks'
@@ -58,6 +62,9 @@ type Ctx = {
   query: string;
   setQuery: (q: string) => void;
   regions: ClimateRegion[];
+  countryAnomalies: CountryAnomalyRow[];
+  view: 'list' | 'map';
+  setView: (v: 'list' | 'map') => void;
 };
 
 const ClimateTabsCtx = createContext<Ctx | null>(null);
@@ -72,15 +79,18 @@ export function ClimateTabsProvider({
   counts,
   panels,
   regions,
+  countryAnomalies,
   children,
 }: {
   counts: Counts;
   panels: Panels;
   regions: ClimateRegion[];
+  countryAnomalies: CountryAnomalyRow[];
   children: ReactNode;
 }) {
   const [active, setActive] = useState<ClimateTabId>('editors-picks');
   const [query, setQuery] = useState('');
+  const [view, setView] = useState<'list' | 'map'>('list');
 
   useEffect(() => {
     const sync = () => {
@@ -101,7 +111,7 @@ export function ClimateTabsProvider({
 
   return (
     <ClimateTabsCtx.Provider
-      value={{ active, setActive: handleSetActive, counts, panels, query, setQuery, regions }}
+      value={{ active, setActive: handleSetActive, counts, panels, query, setQuery, regions, countryAnomalies, view, setView }}
     >
       {children}
     </ClimateTabsCtx.Provider>
@@ -117,7 +127,7 @@ export function ClimateTabsProvider({
  * results across all systems instead of the active section's panel.
  */
 export function ClimateHubControls() {
-  const { active, setActive, counts, query, setQuery } = useClimateTabs();
+  const { active, setActive, counts, query, setQuery, view, setView } = useClimateTabs();
 
   const sectionOptions = useMemo(
     () =>
@@ -131,6 +141,8 @@ export function ClimateHubControls() {
     [counts],
   );
 
+  const sectionHasMap = SECTION_MAP_CONFIG[active] != null;
+
   return (
     <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
       <ChipDropdown
@@ -140,6 +152,32 @@ export function ClimateHubControls() {
         onChange={(k) => setActive(k as ClimateTabId)}
         options={sectionOptions}
       />
+      {sectionHasMap && (
+        <div
+          role="tablist"
+          aria-label="View"
+          className="inline-flex rounded-full border border-[#D0A65E]/35 bg-gray-900/40 p-0.5 text-xs"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === 'list'}
+            onClick={() => setView('list')}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium transition-colors ${view === 'list' ? 'bg-[#D0A65E] text-gray-950' : 'text-[#FFF5E7]/75 hover:text-white'}`}
+          >
+            <List className="h-3.5 w-3.5" /> List
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === 'map'}
+            onClick={() => setView('map')}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium transition-colors ${view === 'map' ? 'bg-[#D0A65E] text-gray-950' : 'text-[#FFF5E7]/75 hover:text-white'}`}
+          >
+            <MapIcon className="h-3.5 w-3.5" /> Map
+          </button>
+        </div>
+      )}
       <div className="relative flex-1 min-w-0">
         <Search
           className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
@@ -170,11 +208,28 @@ export function ClimateHubControls() {
 }
 
 export function ClimateTabsPanels() {
-  const { active, panels, query, regions } = useClimateTabs();
+  const { active, panels, query, regions, view, countryAnomalies } = useClimateTabs();
   const trimmed = query.trim();
 
   if (trimmed.length >= 1) {
     return <UnifiedSearchResults query={trimmed} regions={regions} />;
+  }
+
+  const mapConfig = SECTION_MAP_CONFIG[active];
+  if (view === 'map' && mapConfig) {
+    return (
+      <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6">
+        <ClimateMapCard
+          countryAnomalies={countryAnomalies}
+          preset={mapConfig.preset}
+          initialLevel={mapConfig.level}
+          hideShare
+        />
+        <p className="mt-3 text-xs text-gray-500">
+          Tip: hover or tap a region to see its latest anomaly. Use the map&rsquo;s Level toggle to drill down to states or sub-regions.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -193,6 +248,19 @@ export function ClimateTabsPanels() {
     </>
   );
 }
+
+// ─── Section → map config ────────────────────────────────────────────────────
+
+type MapLevel = 'continents' | 'countries' | 'uk-countries' | 'uk-regions' | 'us-states' | 'us-regions';
+
+const SECTION_MAP_CONFIG: Partial<Record<ClimateTabId, { preset: ClimateMapPreset; level: MapLevel }>> = {
+  continents: { preset: 'global', level: 'continents' },
+  countries: { preset: 'global', level: 'countries' },
+  'uk-countries': { preset: 'uk', level: 'uk-countries' },
+  'uk-regions': { preset: 'uk', level: 'uk-regions' },
+  'us-states': { preset: 'usa', level: 'us-states' },
+  'us-climate-regions': { preset: 'usa', level: 'us-regions' },
+};
 
 // ─── Unified search ──────────────────────────────────────────────────────────
 

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { Suspense } from 'react';
 import { Globe2, Flag, BookOpen } from 'lucide-react';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
@@ -6,6 +8,7 @@ import UKRegionsBrowser from './uk-regions-browser';
 import ClimateRegionsBrowser from './climate-regions-browser';
 import GroupsBrowserPanel from './groups-browser-panel';
 import { ClimateTabsProvider, ClimateHubControls, ClimateTabsPanels } from './climate-hub-tabs';
+import type { CountryAnomalyRow } from './global/ClimateMapCard';
 import EditorsPicksPanel from './editors-picks-panel';
 import ClimateRankingsPanel from './climate-rankings-panel';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
@@ -74,7 +77,7 @@ function HubSchema() {
   );
 }
 
-export default function ClimateProfilesIndex() {
+export default async function ClimateProfilesIndex() {
   const countries = CLIMATE_REGIONS.filter(r => r.type === 'country' && r.slug !== 'ireland');
   const usStates = CLIMATE_REGIONS.filter(r => r.type === 'us-state');
   const UK_NATION_API_CODES = new Set(['uk-eng', 'uk-wal', 'uk-sco', 'uk-ni']);
@@ -88,6 +91,16 @@ export default function ClimateProfilesIndex() {
   const continentsGroup = groups.filter(g => g.groupKind === 'continent');
   const usClimateRegions = groups.filter(g => g.groupKind === 'us-climate-region');
 
+  let countryAnomalies: CountryAnomalyRow[] = [];
+  try {
+    const p = resolve(process.cwd(), 'public', 'data', 'climate', 'global-history.json');
+    const raw = await readFile(p, 'utf8');
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed?.countryAnomalies)) countryAnomalies = parsed.countryAnomalies;
+  } catch {
+    /* map view will simply not render until data is available */
+  }
+
   return (
     <main>
       <HubSchema />
@@ -96,6 +109,7 @@ export default function ClimateProfilesIndex() {
 
           <ClimateTabsProvider
             regions={CLIMATE_REGIONS}
+            countryAnomalies={countryAnomalies}
             counts={{
               countries: countries.length,
               usStates: usStates.length,

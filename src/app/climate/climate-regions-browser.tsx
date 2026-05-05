@@ -52,6 +52,50 @@ const US_REGION_ORDER: USRegion[] = [
   'West',
 ];
 
+const CONTINENT_DESCRIPTIONS: Record<string, string> = {
+  'North America': 'United States, Canada, Mexico and Central America / Caribbean nations.',
+  'South America': 'Andean and Atlantic-coast South American nations.',
+  'Europe': 'European nations including the UK, Ireland and the Nordics.',
+  'Asia': 'East, South, South-East, Central and Western Asia (incl. the Middle East).',
+  'Africa': 'African nations from the Sahara south to the Cape.',
+  'Oceania': 'Australia, New Zealand and the Pacific island states.',
+  'Antarctica': 'The frozen continent – limited monthly station data.',
+};
+
+const US_REGION_DESCRIPTIONS: Record<string, string> = {
+  'Northeast': 'New England, Mid-Atlantic and Maryland.',
+  'Upper Midwest': 'Iowa, Michigan, Minnesota and Wisconsin.',
+  'Ohio Valley': 'Illinois, Indiana, Kentucky, Missouri, Ohio, Tennessee and West Virginia.',
+  'Southeast': 'Alabama, Florida, Georgia, North Carolina, South Carolina and Virginia.',
+  'South': 'Arkansas, Kansas, Louisiana, Mississippi, Oklahoma and Texas.',
+  'Northern Rockies and Plains': 'Montana, Nebraska, the Dakotas and Wyoming.',
+  'Southwest': 'Arizona, Colorado, New Mexico and Utah.',
+  'Northwest': 'Idaho, Oregon and Washington.',
+  'West': 'California and Nevada.',
+};
+
+function DESCRIPTION_FOR(mode: 'country' | 'us-state', group: string): string | undefined {
+  return mode === 'country' ? CONTINENT_DESCRIPTIONS[group] : US_REGION_DESCRIPTIONS[group];
+}
+
+function GroupDivider({ title, description, count }: { title: string; description?: string; count: number }) {
+  return (
+    <div className="border-t border-[#D0A65E]/30 pt-3">
+      <div className="flex items-baseline gap-3 flex-wrap">
+        <h3 className="text-sm md:text-base font-bold font-mono text-[#FFF5E7] tracking-wide">
+          {title}
+        </h3>
+        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#D0A65E]/80">
+          {count} region{count === 1 ? '' : 's'}
+        </span>
+      </div>
+      {description && (
+        <p className="mt-1 text-xs text-gray-400 max-w-3xl">{description}</p>
+      )}
+    </div>
+  );
+}
+
 // ─── Region card ─────────────────────────────────────────────────────────────
 
 function typeAccent(type: ClimateRegion['type']): { card: string; hover: string } {
@@ -182,15 +226,7 @@ export default function ClimateRegionsBrowser({
                 if (!items.length) return null;
                 return (
                   <div key={group} className="space-y-3">
-                    {filter !== 'all' && (
-                      <div className="flex items-center gap-3">
-                        <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">
-                          {group}
-                        </h3>
-                        <span className="flex-1 h-px bg-[#D0A65E]/15" />
-                        <span className="text-[11px] text-gray-500">{items.length}</span>
-                      </div>
-                    )}
+                    <GroupDivider title={String(group)} description={DESCRIPTION_FOR(mode, String(group))} count={items.length} />
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {items.map((region) => (
                         <RegionCard key={region.slug} region={region} />
@@ -296,13 +332,7 @@ export default function ClimateRegionsBrowser({
                   if (!items.length) return null;
                   return (
                     <div key={group} className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">
-                          {group}
-                        </h3>
-                        <span className="flex-1 h-px bg-[#D0A65E]/15" />
-                        <span className="text-[11px] text-gray-500">{items.length}</span>
-                      </div>
+                      <GroupDivider title={String(group)} description={DESCRIPTION_FOR(mode, String(group))} count={items.length} />
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {items.map((region) => (
                           <RegionCard key={region.slug} region={region} />

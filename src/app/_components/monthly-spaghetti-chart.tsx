@@ -324,7 +324,7 @@ export default function MonthlySpaghettiChart({
                 return (
                   <g key={index}>
                     <circle cx={cx} cy={cy} r={5} fill={cfg.currentColor} stroke="#fff" strokeWidth={1.5} />
-                    <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} ${currentYear}: ${formatValue(cfg, raw)}`} />
+                    <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} ${currentYear}: ${formatValue(cfg, raw)}`} monthIdx={latestMonthIdx} />
                   </g>
                 );
               }}
@@ -350,7 +350,7 @@ export default function MonthlySpaghettiChart({
                   return (
                     <g key={index}>
                       <circle cx={cx} cy={cy} r={5} fill={cfg.currentColor} stroke="#fff" strokeWidth={1.5} />
-                      <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} ${currentYear}: ${formatValue(cfg, raw)} (provisional)`} />
+                      <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} ${currentYear}: ${formatValue(cfg, raw)} (provisional)`} monthIdx={latestMonthIdx} />
                     </g>
                   );
                 }}
@@ -437,7 +437,7 @@ interface TooltipPayloadEntry {
  * so it stays readable against any underlying spaghetti line. Position flips
  * below the dot when the dot is near the top of the plot area.
  */
-function CalloutLabel({ cx, cy, color, text }: { cx: number; cy: number; color: string; text: string }) {
+function CalloutLabel({ cx, cy, color, text, monthIdx }: { cx: number; cy: number; color: string; text: string; monthIdx?: number }) {
   // Approximate text width (monospace-ish at 11px)
   const charW = 6.2;
   const padX = 6;
@@ -451,10 +451,29 @@ function CalloutLabel({ cx, cy, color, text }: { cx: number; cy: number; color: 
   const rectY = above ? cy - 14 - rectH : cy + 12;
   const textY = above ? cy - 14 - rectH / 2 + 4 : cy + 12 + rectH / 2 + 4;
 
+  // Edge-aware horizontal anchor: when latest data point is in Jan/Feb (left
+  // edge) shift the pill to the right of the dot; when Nov/Dec (right edge)
+  // shift it to the left so it doesn't overflow the plot area.
+  let rectX: number;
+  let textX: number;
+  let textAnchor: 'start' | 'middle' | 'end' = 'middle';
+  if (monthIdx != null && monthIdx <= 1) {
+    rectX = cx + 8;
+    textX = cx + 8 + padX;
+    textAnchor = 'start';
+  } else if (monthIdx != null && monthIdx >= 10) {
+    rectX = cx - 8 - rectW;
+    textX = cx - 8 - padX;
+    textAnchor = 'end';
+  } else {
+    rectX = cx - rectW / 2;
+    textX = cx;
+  }
+
   return (
     <g pointerEvents="none">
       <rect
-        x={cx - rectW / 2}
+        x={rectX}
         y={rectY}
         width={rectW}
         height={rectH}
@@ -464,7 +483,7 @@ function CalloutLabel({ cx, cy, color, text }: { cx: number; cy: number; color: 
         stroke={color}
         strokeWidth={1}
       />
-      <text x={cx} y={textY} textAnchor="middle" fill={color} fontSize={11} fontWeight="bold">
+      <text x={textX} y={textY} textAnchor={textAnchor} fill={color} fontSize={11} fontWeight="bold">
         {text}
       </text>
     </g>

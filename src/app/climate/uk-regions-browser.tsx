@@ -44,6 +44,33 @@ const GROUP_TITLES: Record<Exclude<RegionGroupFilter, 'all'>, string> = {
   'cross-border': 'Cross-border Regions',
 };
 
+const GROUP_DESCRIPTIONS: Record<Exclude<RegionGroupFilter, 'all'>, string> = {
+  england: 'Met Office sub-regions covering England, from the North East to the South West.',
+  wales: 'Welsh climate data covering the south coast, valleys and west coast.',
+  scotland: 'Met Office Scottish sub-regions: East, West and the Northern Highlands.',
+  'northern-ireland': 'Northern Ireland regional climate data.',
+  ireland: 'Republic of Ireland — included alongside the UK home nations for context.',
+  'cross-border': 'Combined Met Office series that span more than one nation (e.g. England & Wales).',
+};
+
+function GroupDivider({ title, description, count }: { title: string; description?: string; count: number }) {
+  return (
+    <div className="border-t border-[#D0A65E]/30 pt-3">
+      <div className="flex items-baseline gap-3 flex-wrap">
+        <h3 className="text-sm md:text-base font-bold font-mono text-[#FFF5E7] tracking-wide">
+          {title}
+        </h3>
+        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#D0A65E]/80">
+          {count} region{count === 1 ? '' : 's'}
+        </span>
+      </div>
+      {description && (
+        <p className="mt-1 text-xs text-gray-400 max-w-3xl">{description}</p>
+      )}
+    </div>
+  );
+}
+
 const URL_PARAM_KEYS = {
   query: 'ukq',
   filter: 'ukfilter',
@@ -159,6 +186,7 @@ export default function UKRegionsBrowser({ regions, headless = false, hideFilter
   }, [browserRegions]);
 
   useEffect(() => {
+    if (headless) return; // URL sync is for the standalone /climate (legacy) view, not the hub-embedded panel
     const nextQuery = searchParams.get(URL_PARAM_KEYS.query) ?? '';
     const nextFilterParam = searchParams.get(URL_PARAM_KEYS.filter);
     const nextFilter = (nextFilterParam && nextFilterParam in FILTER_LABELS)
@@ -167,9 +195,10 @@ export default function UKRegionsBrowser({ regions, headless = false, hideFilter
     setQuery((current) => current === nextQuery ? current : nextQuery);
     setFilter((current) => current === nextFilter ? current : nextFilter);
     if (nextQuery || nextFilter !== 'all') setIsExpanded(true);
-  }, [searchParams]);
+  }, [searchParams, headless]);
 
   useEffect(() => {
+    if (headless) return;
     const params = new URLSearchParams(searchParams.toString());
     if (query.trim()) params.set(URL_PARAM_KEYS.query, query);
     else params.delete(URL_PARAM_KEYS.query);
@@ -180,7 +209,7 @@ export default function UKRegionsBrowser({ regions, headless = false, hideFilter
     if (next !== current) {
       router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
     }
-  }, [query, filter, pathname, router, searchParams]);
+  }, [query, filter, pathname, router, searchParams, headless]);
 
   if (headless) {
     return (
@@ -201,32 +230,39 @@ export default function UKRegionsBrowser({ regions, headless = false, hideFilter
             </div>
           )}
 
-          <div className="space-y-6">
-            {GROUP_ORDER.map((group) => {
-              const items = groupedRegions.get(group) ?? [];
-              if (!items.length) return null;
-              return (
-                <div key={group} className="space-y-3">
-                  {filter !== 'all' && (
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">{GROUP_TITLES[group]}</h3>
-                      <span className="flex-1 h-px bg-[#D0A65E]/15" />
-                      <span className="text-[11px] text-gray-500">{items.length}</span>
+          <div className="space-y-8">
+            {hideFilter ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {filteredRegions.map((item) => (
+                  <UKRegionCard
+                    key={item.region.slug}
+                    region={item.region}
+                    representativeCities={item.representativeCities}
+                    matchedCities={getMatchedCities(item, normalizedQuery)}
+                  />
+                ))}
+              </div>
+            ) : (
+              GROUP_ORDER.map((group) => {
+                const items = groupedRegions.get(group) ?? [];
+                if (!items.length) return null;
+                return (
+                  <div key={group} className="space-y-3">
+                    <GroupDivider title={GROUP_TITLES[group]} description={GROUP_DESCRIPTIONS[group]} count={items.length} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {items.map((item) => (
+                        <UKRegionCard
+                          key={item.region.slug}
+                          region={item.region}
+                          representativeCities={item.representativeCities}
+                          matchedCities={getMatchedCities(item, normalizedQuery)}
+                        />
+                      ))}
                     </div>
-                  )}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {items.map((item) => (
-                      <UKRegionCard
-                        key={item.region.slug}
-                        region={item.region}
-                        representativeCities={item.representativeCities}
-                        matchedCities={getMatchedCities(item, normalizedQuery)}
-                      />
-                    ))}
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
             {!filteredRegions.length && <EmptyState />}
           </div>
         </div>
