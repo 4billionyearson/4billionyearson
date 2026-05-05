@@ -97,6 +97,8 @@ export default function ClimateMapCard({
   share,
   hideShare = false,
   embedded = false,
+  extraControls,
+  onSelect,
 }: {
   countryAnomalies: CountryAnomalyRow[];
   initialWindow?: AnomalyWindow;
@@ -113,6 +115,11 @@ export default function ClimateMapCard({
    *  title / metric / window / share / footer). Used inside the Climate Hub
    *  where the map is just one of two views of the same section. */
   embedded?: boolean;
+  /** Extra controls (e.g. quick-pick pills) rendered inline with the Level
+   *  dropdown to save vertical space when the card is embedded. */
+  extraControls?: React.ReactNode;
+  /** Forwarded to ClimateMap. When provided, polygon clicks fire this. */
+  onSelect?: (info: { level: MapLevel; name: string; slug?: string; iso3?: string }) => void;
 }) {
   const cardTitle = title ?? PRESET_TITLE[preset];
   const availableLevels = PRESET_LEVELS[preset];
@@ -211,6 +218,7 @@ export default function ClimateMapCard({
             />
           </>
         )}
+        {extraControls}
       </div>
       <ClimateMap
         countryAnomalies={countryAnomalies}
@@ -218,7 +226,9 @@ export default function ClimateMapCard({
         level={level}
         metric={metric}
         autoStretch={autoStretch}
-        onToggleAutoStretch={() => setAutoStretch((v) => !v)}
+        onToggleAutoStretch={embedded ? undefined : () => setAutoStretch((v) => !v)}
+        compact={embedded}
+        onSelect={onSelect}
       />
       {!embedded && (
         <p className="text-xs text-gray-500 mt-3">

@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ChevronRight, Search, Sparkles, X, List, Map as MapIcon, Globe, BookmarkCheck, Trophy } from 'lucide-react';
 import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 import type { ClimateRegion } from '@/lib/climate/regions';
@@ -211,7 +212,66 @@ export function ClimateHubControls() {
 
 export function ClimateTabsPanels() {
   const { active, setActive, panels, query, regions, view, setView, countryAnomalies } = useClimateTabs();
+  const router = useRouter();
   const trimmed = query.trim();
+
+  // Build slug-resolution maps from CLIMATE_REGIONS so a click on a polygon
+  // can navigate to the right /climate/{slug} page. Names are normalised to
+  // lowercase; iso3 codes (apiCode for countries) are used as-is.
+  const slugMaps = useMemo(() => {
+    const continentBySlug = new Map<string, string>();
+    const countryByIso3 = new Map<string, string>();
+    const countryByName = new Map<string, string>();
+    const usStateByName = new Map<string, string>();
+    const ukRegionBySlug = new Map<string, string>();
+    for (const r of regions) {
+      if (r.type === 'group' && r.groupKind === 'continent') continentBySlug.set(r.slug, r.slug);
+      else if (r.type === 'country') {
+        if (r.apiCode) countryByIso3.set(r.apiCode.toUpperCase(), r.slug);
+        countryByName.set(r.name.toLowerCase(), r.slug);
+      } else if (r.type === 'us-state') usStateByName.set(r.name.toLowerCase(), r.slug);
+      else if (r.type === 'uk-region') ukRegionBySlug.set(r.slug, r.slug);
+    }
+    return { continentBySlug, countryByIso3, countryByName, usStateByName, ukRegionBySlug };
+  }, [regions]);
+
+  const handleMapSelect = useCallback(
+    (info: { level: MapLevel; name: string; slug?: string; iso3?: string }) => {
+      const lower = info.name.toLowerCase();
+      let slug: string | undefined;
+      switch (info.level) {
+        case 'continents': {
+          // Feature names are 'North America', 'Europe', etc. — kebab-case
+          // and confirm the slug exists in CLIMATE_REGIONS.
+          const candidate = lower.replace(/\s+/g, '-');
+          slug = slugMaps.continentBySlug.get(candidate);
+          break;
+        }
+        case 'countries': {
+          if (info.iso3) slug = slugMaps.countryByIso3.get(info.iso3.toUpperCase());
+          if (!slug) slug = slugMaps.countryByName.get(lower);
+          break;
+        }
+        case 'us-states': {
+          slug = slugMaps.usStateByName.get(lower);
+          break;
+        }
+        case 'us-regions': {
+          // Feature carries the climate-region slug directly.
+          slug = info.slug;
+          break;
+        }
+        case 'uk-countries':
+        case 'uk-regions': {
+          // Feature carries the slug directly (e.g. 'england', 'midlands').
+          slug = info.slug && slugMaps.ukRegionBySlug.get(info.slug);
+          break;
+        }
+      }
+      if (slug) router.push(`/climate/${slug}`);
+    },
+    [router, slugMaps],
+  );
 
   if (trimmed.length >= 1) {
     return <UnifiedSearchResults query={trimmed} regions={regions} />;
@@ -223,19 +283,18 @@ export function ClimateTabsPanels() {
     // global continents view so the map still renders.
     const cfg = SECTION_MAP_CONFIG[active] ?? { preset: 'global' as ClimateMapPreset, level: 'continents' as MapLevel };
     return (
-      <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6 space-y-3">
-        <MapQuickPicks setActive={setActive} setView={setView} />
+      <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6">
         <ClimateMapCard
           key={`${cfg.preset}-${cfg.level}`}
           countryAnomalies={countryAnomalies}
           preset={cfg.preset}
           initialLevel={cfg.level}
+          initialMetric="temp-actual"
           hideShare
           embedded
+          onSelect={handleMapSelect}
+          extraControls={<MapQuickPicks setActive={setActive} setView={setView} />}
         />
-        <p className="text-xs text-gray-500">
-          Tip: hover or tap a region on the map to see its latest anomaly, then click through to the full climate update.
-        </p>
       </div>
     );
   }
@@ -282,14 +341,14 @@ function MapQuickPicks({
   setView: (v: 'list' | 'map') => void;
 }) {
   const pillCls =
-    'inline-flex h-8 items-center gap-1.5 rounded-full border border-[#D0A65E]/35 bg-gray-900/40 px-3 text-[12px] font-medium text-[#FFF5E7] hover:border-[#D0A65E]/60 hover:bg-white/[0.04] transition-colors';
+    'inline-flex h-8 items-center gap-1.5 rounded-full border border-[#D0A65E]/35 bg-gray-900/40 px-2.5 text-[12px] font-medium text-[#FFF5E7] hover:border-[#D0A65E]/60 hover:bg-white/[0.04] transition-colors';
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">
+    <>
+      <span className="hidden sm:inline text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 ml-1">
         Or jump to
       </span>
       <Link href="/climate/global" className={pillCls}>
-        <Globe className="h-3.5 w-3.5 text-[#D0A65E]" /> Global Update
+        <Globe className="h-3.5 w-3.5 text-[#D0A65E]" /> Global
       </Link>
       <button
         type="button"
@@ -303,9 +362,9 @@ function MapQuickPicks({
         onClick={() => { setActive('rankings'); setView('list'); }}
         className={pillCls}
       >
-        <Trophy className="h-3.5 w-3.5 text-[#D0A65E]" /> Climate Ranking
+        <Trophy className="h-3.5 w-3.5 text-[#D0A65E]" /> Ranking
       </button>
-    </div>
+    </>
   );
 }
 

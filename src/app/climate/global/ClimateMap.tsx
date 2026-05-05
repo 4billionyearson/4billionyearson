@@ -655,6 +655,7 @@ function UKNationsOverlay({
   ukGeo,
   level,
   customScale,
+  onSelect,
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
@@ -663,6 +664,7 @@ function UKNationsOverlay({
   ukGeo: FeatureCollection | null;
   level: MapLevel;
   customScale?: { min: number; max: number };
+  onSelect?: (info: { level: MapLevel; name: string; slug?: string }) => void;
 }) {
   const map = useMap();
   const forced = level === 'uk-regions' || level === 'uk-countries';
@@ -710,10 +712,13 @@ function UKNationsOverlay({
       const color = value != null ? colorForMetric(metric, value, windowSel, customScale) : '#1f2937';
       const show = () => onInfo({ name, value, label, color });
       layer.on('mouseover', show);
-      layer.on('click', show);
+      layer.on('click', () => {
+        show();
+        if (onSelect) onSelect({ level, name, slug });
+      });
       layer.on('mouseout', () => onInfo(null));
     },
-    [bySlug, windowSel, metric, onInfo, customScale],
+    [bySlug, windowSel, metric, onInfo, customScale, onSelect, level],
   );
 
   if (!visible || !ukGeo) return null;
@@ -736,6 +741,7 @@ function USStatesOverlay({
   level,
   usRegionGroups,
   customScale,
+  onSelect,
 }: {
   rankings: RankingRow[] | null;
   windowSel: AnomalyWindow;
@@ -745,6 +751,7 @@ function USStatesOverlay({
   level: MapLevel;
   usRegionGroups: GroupRow[] | null;
   customScale?: { min: number; max: number };
+  onSelect?: (info: { level: MapLevel; name: string; slug?: string }) => void;
 }) {
   const map = useMap();
   // In us-states / us-regions mode the overlay is forced visible at any zoom
@@ -815,10 +822,20 @@ function USStatesOverlay({
       const color = value != null ? colorForMetric(metric, value, windowSel, customScale) : '#1f2937';
       const show = () => onInfo({ name: displayName, value, label, color });
       layer.on('mouseover', show);
-      layer.on('click', show);
+      layer.on('click', () => {
+        show();
+        if (onSelect) {
+          // For us-regions the click should go to the climate region
+          // (us-northeast, etc.), not the state polygon underneath.
+          const slug = level === 'us-regions'
+            ? US_STATE_NAME_TO_REGION_SLUG[name.toLowerCase()]
+            : undefined;
+          onSelect({ level, name, slug });
+        }
+      });
       layer.on('mouseout', () => onInfo(null));
     },
-    [resolve, metric, windowSel, onInfo, customScale],
+    [resolve, metric, windowSel, onInfo, customScale, onSelect, level],
   );
 
   if (!visible || !statesGeo) return null;
@@ -842,6 +859,8 @@ export default function ClimateMap({
   metric = 'temp-anomaly',
   autoStretch = false,
   onToggleAutoStretch,
+  compact = false,
+  onSelect,
 }: {
   countryAnomalies: CountryAnomaly[];
   window?: AnomalyWindow;
@@ -852,6 +871,15 @@ export default function ClimateMap({
    *  Card hosts pass this so the toggle lives next to the gradient it
    *  controls instead of in the controls row at the top. */
   onToggleAutoStretch?: () => void;
+  /** When true, hide the legend row, the auto-stretch toggle, and the value
+   *  in the bottom info panel — just show the region name. Used by the hub
+   *  when the map is a navigation surface, not a data-explorer. */
+  compact?: boolean;
+  /** Called when the user clicks a region polygon. Slug is provided when
+   *  the feature’s geojson carries one (UK, US climate regions); otherwise
+   *  the parent must resolve it from `name + level`. iso3 is provided at
+   *  country level so parents can look up by ISO code rather than name. */
+  onSelect?: (info: { level: MapLevel; name: string; slug?: string; iso3?: string }) => void;
 }) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
   const [statesGeo, setStatesGeo] = useState<FeatureCollection | null>(null);
@@ -1081,9 +1109,14 @@ export default function ClimateMap({
       color,
     });
     layer.on('mouseover', show);
-    layer.on('click', show);
+    layer.on('click', () => {
+      show();
+      if (onSelect) {
+        onSelect({ level, name, iso3: rec?.iso3 });
+      }
+    });
     layer.on('mouseout', () => setSelected(null));
-  }, [lookup, pick, level, metric, continentByKey]);
+  }, [lookup, pick, level, metric, continentByKey, onSelect]);
 
   const cfg = METRICS[metric];
   const legend = legendForWindow(metric, windowSel, customScale ?? undefined);
@@ -1126,6 +1159,7 @@ export default function ClimateMap({
             level={level}
             usRegionGroups={usRegionGroups}
             customScale={customScale ?? undefined}
+            onSelect={onSelect}
             onInfo={(info) =>
               setSelected(
                 info
@@ -1141,6 +1175,7 @@ export default function ClimateMap({
             ukGeo={ukGeo}
             level={level}
             customScale={customScale ?? undefined}
+            onSelect={onSelect}
             onInfo={(info) =>
               setSelected(
                 info
@@ -1155,18 +1190,23 @@ export default function ClimateMap({
         {selected && (
           <div className="absolute bottom-0 left-0 right-0 z-[1001] bg-gray-950/95 backdrop-blur-sm border-t border-gray-700/60 px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm pointer-events-none">
             <span className="font-bold text-gray-100">{selected.name}</span>
-            {selected.value != null ? (
-              <>
-                <span className="font-mono font-semibold" style={{ color: selected.color }}>
-                  {formatMetricValue(metric, selected.value)}{baselineCopy ? ` ${baselineCopy}` : ''}
-                </span>
-                <span className="text-gray-300">
-                  {selected.extra ? `${selected.extra}` : ''}
-                  {selected.label ? `${selected.extra ? ' · ' : ''}${selected.label}` : ''}
-                </span>
-              </>
-            ) : (
-              <span className="text-gray-300">No data on this site</span>
+            {!compact && (
+              selected.value != null ? (
+                <>
+                  <span className="font-mono font-semibold" style={{ color: selected.color }}>
+                    {formatMetricValue(metric, selected.value)}{baselineCopy ? ` ${baselineCopy}` : ''}
+                  </span>
+                  <span className="text-gray-300">
+                    {selected.extra ? `${selected.extra}` : ''}
+                    {selected.label ? `${selected.extra ? ' · ' : ''}${selected.label}` : ''}
+                  </span>
+                </>
+              ) : (
+                <span className="text-gray-300">No data on this site</span>
+              )
+            )}
+            {compact && onSelect && (
+              <span className="text-[#D0A65E]">Click to open climate update →</span>
             )}
           </div>
         )}
@@ -1178,7 +1218,8 @@ export default function ClimateMap({
           removed: the controls above already say which metric/window is
           active, the source line below names the baseline, and grey/zoom
           behaviour is self-evident on the map itself. */}
-      <div className="mt-3 flex items-center gap-3 text-xs text-gray-300">
+      {!compact && (
+        <div className="mt-3 flex items-center gap-3 text-xs text-gray-300">
         <div className="flex items-center gap-2 min-w-0">
           <span className="shrink-0 tabular-nums text-gray-400">{legend.legendMin}</span>
           <div
@@ -1209,7 +1250,8 @@ export default function ClimateMap({
             {autoStretch ? 'Auto-Stretch: On' : 'Auto-Stretch: Off'}
           </button>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
