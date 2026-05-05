@@ -70,15 +70,9 @@ export default function GroupsBrowserPanel({ groups, kind }: Props) {
             <span className="flex-1 h-px bg-[#D0A65E]/15" />
             <span className="text-[11px] text-gray-500">{usRegions.length}</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {usRegions.map((g) => (
-              <Link
-                key={g.slug}
-                href={`/climate/${g.slug}`}
-                className="inline-flex h-8 items-center rounded-full border px-3 text-[13px] font-medium transition-colors border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/40 hover:bg-[#D0A65E]/10 hover:text-[#FFF5E7] whitespace-nowrap"
-              >
-                {g.name}
-              </Link>
+              <GroupCard key={g.slug} region={g} />
             ))}
           </div>
         </div>

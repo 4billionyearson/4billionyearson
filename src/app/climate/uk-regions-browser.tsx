@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ChevronRight, Map as MapIcon, MapPin, X } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { UK_CITY_REGION_MAP } from '@/lib/climate/locations';
+import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 
 type RegionGroupFilter = 'all' | 'england' | 'wales' | 'scotland' | 'northern-ireland' | 'ireland' | 'cross-border';
 
@@ -43,10 +44,6 @@ const GROUP_TITLES: Record<Exclude<RegionGroupFilter, 'all'>, string> = {
   ireland: 'Ireland',
   'cross-border': 'Cross-border Regions',
 };
-
-const FILTER_BUTTON_BASE = 'inline-flex h-8 items-center rounded-full border px-3 text-[13px] font-medium transition-colors';
-const FILTER_BUTTON_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
-const FILTER_BUTTON_INACTIVE = 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 
 const URL_PARAM_KEYS = {
   query: 'ukq',
@@ -151,6 +148,17 @@ export default function UKRegionsBrowser({ regions, headless = false }: { region
     return grouped;
   }, [filteredRegions]);
 
+  // Only offer filter options for groups actually present in the supplied
+  // regions array (UK Countries vs UK Regions panels share this component).
+  const availableFilterOptions = useMemo(() => {
+    const present = new Set(browserRegions.map((r) => r.group));
+    const opts: { key: RegionGroupFilter; label: string }[] = [{ key: 'all', label: FILTER_LABELS.all }];
+    for (const g of GROUP_ORDER) {
+      if (present.has(g)) opts.push({ key: g, label: FILTER_LABELS[g] });
+    }
+    return opts;
+  }, [browserRegions]);
+
   useEffect(() => {
     const nextQuery = searchParams.get(URL_PARAM_KEYS.query) ?? '';
     const nextFilterParam = searchParams.get(URL_PARAM_KEYS.filter);
@@ -204,19 +212,13 @@ export default function UKRegionsBrowser({ regions, headless = false }: { region
 
             <div className="border-t border-gray-800/80 pt-4">
               <div className="flex flex-wrap items-center gap-2">
-                {(Object.keys(FILTER_LABELS) as RegionGroupFilter[]).map((option) => {
-                  const active = filter === option;
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setFilter(option)}
-                      className={`${FILTER_BUTTON_BASE} ${active ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE}`}
-                    >
-                      {FILTER_LABELS[option]}
-                    </button>
-                  );
-                })}
+                <ChipDropdown
+                  label="Nation"
+                  ariaLabel="Filter by UK nation"
+                  value={filter}
+                  onChange={(k) => setFilter(k as RegionGroupFilter)}
+                  options={availableFilterOptions}
+                />
                 <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
                   {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
                   {normalizedQuery ? ` matching "${query.trim()}"` : ''}
@@ -313,19 +315,13 @@ export default function UKRegionsBrowser({ regions, headless = false }: { region
 
               <div className="border-t border-gray-800/80 pt-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  {(Object.keys(FILTER_LABELS) as RegionGroupFilter[]).map((option) => {
-                    const active = filter === option;
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => setFilter(option)}
-                        className={`${FILTER_BUTTON_BASE} ${active ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE}`}
-                      >
-                        {FILTER_LABELS[option]}
-                      </button>
-                    );
-                  })}
+                  <ChipDropdown
+                    label="Nation"
+                    ariaLabel="Filter by UK nation"
+                    value={filter}
+                    onChange={(k) => setFilter(k as RegionGroupFilter)}
+                    options={availableFilterOptions}
+                  />
                   <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
                     {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
                     {normalizedQuery ? ` matching "${query.trim()}"` : ''}

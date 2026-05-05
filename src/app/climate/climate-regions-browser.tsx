@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, MapPin, X } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
+import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 import {
   continentForCountryApiCode,
   usRegionForStateApiCode,
@@ -29,10 +30,6 @@ interface ClimateRegionsBrowserProps {
 }
 
 // ─── Styling ─────────────────────────────────────────────────────────────────
-
-const FILTER_BUTTON_BASE = 'inline-flex h-8 items-center rounded-full border px-3 text-[13px] font-medium transition-colors';
-const FILTER_BUTTON_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
-const FILTER_BUTTON_INACTIVE = 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -186,23 +183,16 @@ export default function ClimateRegionsBrowser({
 
           <div className="border-t border-gray-800/80 pt-4">
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setFilter('all')}
-                className={`${FILTER_BUTTON_BASE} ${filter === 'all' ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE}`}
-              >
-                All
-              </button>
-              {availableGroups.map((group) => (
-                <button
-                  key={group}
-                  type="button"
-                  onClick={() => setFilter(group)}
-                  className={`${FILTER_BUTTON_BASE} ${filter === group ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE}`}
-                >
-                  {group}
-                </button>
-              ))}
+              <ChipDropdown
+                label={mode === 'country' ? 'Continent' : 'Region'}
+                ariaLabel={mode === 'country' ? 'Filter by continent' : 'Filter by US climate region'}
+                value={filter}
+                onChange={(k) => setFilter(k)}
+                options={[
+                  { key: 'all', label: 'All' },
+                  ...availableGroups.map((g) => ({ key: g as string, label: g as string })),
+                ]}
+              />
               <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
                 {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
                 {normalizedQuery ? ` matching "${query.trim()}"` : ''}
@@ -306,23 +296,16 @@ export default function ClimateRegionsBrowser({
             {/* Group filter pills */}
             <div className="border-t border-gray-800/80 pt-4">
               <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setFilter('all')}
-                  className={`${FILTER_BUTTON_BASE} ${filter === 'all' ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE}`}
-                >
-                  All
-                </button>
-                {availableGroups.map((group) => (
-                  <button
-                    key={group}
-                    type="button"
-                    onClick={() => setFilter(group)}
-                    className={`${FILTER_BUTTON_BASE} ${filter === group ? FILTER_BUTTON_ACTIVE : FILTER_BUTTON_INACTIVE}`}
-                  >
-                    {group}
-                  </button>
-                ))}
+                <ChipDropdown
+                  label={mode === 'country' ? 'Continent' : 'Region'}
+                  ariaLabel={mode === 'country' ? 'Filter by continent' : 'Filter by US climate region'}
+                  value={filter}
+                  onChange={(k) => setFilter(k)}
+                  options={[
+                    { key: 'all', label: 'All' },
+                    ...availableGroups.map((g) => ({ key: g as string, label: g as string })),
+                  ]}
+                />
                 <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
                   {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
                   {normalizedQuery ? ` matching "${query.trim()}"` : ''}
