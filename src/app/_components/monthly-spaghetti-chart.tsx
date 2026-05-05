@@ -80,8 +80,8 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
   },
   sunshine: {
     longLabel: 'Monthly Sunshine',
-    unit: 'h',
-    unitTight: true,
+    unit: 'hours',
+    unitTight: false,
     decimals: 0,
     aggregate: 'sum',
     recordBy: 'max',
@@ -95,8 +95,8 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
   },
   frost: {
     longLabel: 'Monthly Frost Days',
-    unit: 'd',
-    unitTight: true,
+    unit: 'days',
+    unitTight: false,
     decimals: 0,
     aggregate: 'sum',
     recordBy: 'max',
@@ -290,7 +290,7 @@ export default function MonthlySpaghettiChart({
               axisLine={{ stroke: '#555' }}
               tickLine={false}
               tickFormatter={(v: number) => `${Math.round(v)}`}
-              width={36}
+              width={44}
             />
 
             {backgroundYears.map((yr) => (
