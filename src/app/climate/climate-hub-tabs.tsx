@@ -93,7 +93,16 @@ export function ClimateTabsProvider({
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'list' | 'map'>('list');
 
+  // On mount: restore view + active from sessionStorage (so the back button
+  // returns the user to the same state they left).
   useEffect(() => {
+    try {
+      const savedView = sessionStorage.getItem('climate-hub-view');
+      if (savedView === 'map' || savedView === 'list') setView(savedView);
+      const savedActive = sessionStorage.getItem('climate-hub-active');
+      if (savedActive && isTabId(savedActive)) setActive(savedActive);
+    } catch { /* sessionStorage unavailable (private browsing etc.) */ }
+
     const sync = () => {
       const hash = window.location.hash.replace('#', '');
       if (hash && isTabId(hash)) setActive(hash);
@@ -105,14 +114,20 @@ export function ClimateTabsProvider({
 
   const handleSetActive = (id: ClimateTabId) => {
     setActive(id);
+    try { sessionStorage.setItem('climate-hub-active', id); } catch { /* ignore */ }
     if (typeof history !== 'undefined' && history.replaceState) {
       history.replaceState(null, '', `#${id}`);
     }
   };
 
+  const handleSetView = (v: 'list' | 'map') => {
+    setView(v);
+    try { sessionStorage.setItem('climate-hub-view', v); } catch { /* ignore */ }
+  };
+
   return (
     <ClimateTabsCtx.Provider
-      value={{ active, setActive: handleSetActive, counts, panels, query, setQuery, regions, countryAnomalies, view, setView }}
+      value={{ active, setActive: handleSetActive, counts, panels, query, setQuery, regions, countryAnomalies, view, setView: handleSetView }}
     >
       {children}
     </ClimateTabsCtx.Provider>
