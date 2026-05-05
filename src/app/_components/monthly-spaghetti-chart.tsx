@@ -66,7 +66,7 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
   precip: {
     longLabel: 'Monthly Rainfall',
     unit: 'mm',
-    unitTight: false,
+    unitTight: true,
     decimals: 0,
     aggregate: 'sum',
     recordBy: 'max',
@@ -80,8 +80,8 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
   },
   sunshine: {
     longLabel: 'Monthly Sunshine',
-    unit: 'hrs',
-    unitTight: false,
+    unit: 'h',
+    unitTight: true,
     decimals: 0,
     aggregate: 'sum',
     recordBy: 'max',
@@ -95,8 +95,8 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
   },
   frost: {
     longLabel: 'Monthly Frost Days',
-    unit: 'days',
-    unitTight: false,
+    unit: 'd',
+    unitTight: true,
     decimals: 0,
     aggregate: 'sum',
     recordBy: 'max',
