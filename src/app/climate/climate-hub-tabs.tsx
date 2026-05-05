@@ -9,7 +9,7 @@ type TabDef = {
   id: ClimateTabId;
   label: string;
   icon: LucideIcon;
-  countKey?: 'countries' | 'usStates' | 'ukRegions' | 'continents' | 'usClimateRegions';
+  countKey?: 'countries' | 'usStates' | 'ukCountries' | 'ukRegions' | 'continents' | 'usClimateRegions';
 };
 
 const TABS: TabDef[] = [
