@@ -120,6 +120,7 @@ export function ChipDropdown({
   onChange,
   ariaLabel,
   className = '',
+  triggerClassName,
 }: {
   label?: string;
   options: SegmentedOption[];
@@ -127,6 +128,7 @@ export function ChipDropdown({
   onChange: (key: string) => void;
   ariaLabel?: string;
   className?: string;
+  triggerClassName?: string;
 }) {
   return (
     <div className={className}>
@@ -137,6 +139,7 @@ export function ChipDropdown({
         value={value}
         onChange={onChange}
         ariaLabel={ariaLabel ?? label}
+        triggerClassName={triggerClassName}
       />
     </div>
   );
@@ -157,6 +160,7 @@ function ListboxTrigger({
   value,
   onChange,
   ariaLabel,
+  triggerClassName,
 }: {
   variant: 'select' | 'chip';
   label?: string;
@@ -164,6 +168,7 @@ function ListboxTrigger({
   value: string;
   onChange: (key: string) => void;
   ariaLabel?: string;
+  triggerClassName?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState<number>(() => {
@@ -231,9 +236,10 @@ function ListboxTrigger({
   }
 
   // Two visual styles share the same popover and key handling.
-  const triggerClass = variant === 'select'
+  const baseTriggerClass = variant === 'select'
     ? 'w-full h-10 inline-flex items-center justify-between rounded-lg border border-[#D0A65E]/30 bg-gray-900/60 text-sm text-[#FFF5E7] pl-3 pr-2.5 font-medium hover:border-[#D0A65E]/55 focus:outline-none focus:ring-2 focus:ring-[#D0A65E] focus:border-[#D0A65E] transition-colors'
     : 'inline-flex items-center gap-2 h-7 rounded-full border border-gray-700 bg-gray-900/45 pl-2.5 pr-1.5 text-[12px] text-[#FFF5E7] hover:border-[#D0A65E]/45 hover:bg-white/[0.03] focus:outline-none focus:ring-2 focus:ring-[#D0A65E] transition-colors';
+  const triggerClass = triggerClassName ? `${baseTriggerClass} ${triggerClassName}` : baseTriggerClass;
 
   return (
     <div ref={rootRef} className={variant === 'chip' ? 'relative inline-block' : 'relative'}>

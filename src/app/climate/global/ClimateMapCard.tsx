@@ -96,6 +96,7 @@ export default function ClimateMapCard({
   title,
   share,
   hideShare = false,
+  embedded = false,
 }: {
   countryAnomalies: CountryAnomalyRow[];
   initialWindow?: AnomalyWindow;
@@ -108,6 +109,10 @@ export default function ClimateMapCard({
   share?: { pageUrl: string; sectionId: string };
   /** Used by the embed route to suppress the ShareBar. */
   hideShare?: boolean;
+  /** When true, render the map as a transparent inline block (no card border /
+   *  title / metric / window / share / footer). Used inside the Climate Hub
+   *  where the map is just one of two views of the same section. */
+  embedded?: boolean;
 }) {
   const cardTitle = title ?? PRESET_TITLE[preset];
   const availableLevels = PRESET_LEVELS[preset];
@@ -153,11 +158,20 @@ export default function ClimateMapCard({
   const embedCode = `<iframe\n  src="${embedUrl}"\n  width="100%" height="640"\n  style="border:none;"\n  title="${cardTitle} - 4 Billion Years On"\n></iframe>`;
 
   return (
-    <div id={share?.sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
-      <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
-        <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
-        <span className="min-w-0 flex-1">{cardTitle}</span>
-      </h3>
+    <div
+      id={share?.sectionId}
+      className={
+        embedded
+          ? 'scroll-mt-24'
+          : 'bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24'
+      }
+    >
+      {!embedded && (
+        <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+          <Globe2 className="h-5 w-5 shrink-0 text-[#D0A65E] mt-1" />
+          <span className="min-w-0 flex-1">{cardTitle}</span>
+        </h3>
+      )}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {visibleLevels.length > 1 && (
           <ChipDropdown
@@ -173,26 +187,30 @@ export default function ClimateMapCard({
             }))}
           />
         )}
-        <ChipDropdown
-          label="Metric"
-          ariaLabel="Map metric"
-          value={metric}
-          onChange={(k) => setMetric(k as MetricKey)}
-          options={availableMetrics.map((key) => ({
-            key,
-            label: METRICS[key].shortLabel,
-            disabled: !METRIC_LEVELS[key].includes(level),
-            title: METRIC_LEVELS[key].includes(level) ? undefined : `No ${METRICS[key].shortLabel.toLowerCase()} data at the current level`,
-          }))}
-        />
-        <ResponsiveSegmentedControl
-          forcePills
-          label="Window"
-          ariaLabel="Anomaly window"
-          value={anomalyWindow}
-          onChange={(k) => setAnomalyWindow(k as AnomalyWindow)}
-          options={WINDOW_OPTS.map((o) => ({ key: o.key, label: o.label }))}
-        />
+        {!embedded && (
+          <>
+            <ChipDropdown
+              label="Metric"
+              ariaLabel="Map metric"
+              value={metric}
+              onChange={(k) => setMetric(k as MetricKey)}
+              options={availableMetrics.map((key) => ({
+                key,
+                label: METRICS[key].shortLabel,
+                disabled: !METRIC_LEVELS[key].includes(level),
+                title: METRIC_LEVELS[key].includes(level) ? undefined : `No ${METRICS[key].shortLabel.toLowerCase()} data at the current level`,
+              }))}
+            />
+            <ResponsiveSegmentedControl
+              forcePills
+              label="Window"
+              ariaLabel="Anomaly window"
+              value={anomalyWindow}
+              onChange={(k) => setAnomalyWindow(k as AnomalyWindow)}
+              options={WINDOW_OPTS.map((o) => ({ key: o.key, label: o.label }))}
+            />
+          </>
+        )}
       </div>
       <ClimateMap
         countryAnomalies={countryAnomalies}
@@ -202,16 +220,18 @@ export default function ClimateMapCard({
         autoStretch={autoStretch}
         onToggleAutoStretch={() => setAutoStretch((v) => !v)}
       />
-      <p className="text-xs text-gray-500 mt-3">
-        {preset === 'uk' ? (
-          <>Source: Met Office UK Regional &amp; National series (Tmean, Rainfall, Sunshine, Air Frost) &copy; Crown copyright. Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall, sunshine, frost). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
-        ) : preset === 'usa' ? (
-          <>Source: NOAA Climate at a Glance &mdash; US states &amp; climate regions (tavg, pcp). Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
-        ) : (
-          <>Source: NOAA Climate at a Glance (countries &amp; continents) &middot; Met Office (UK) &middot; US states &amp; climate regions. Temperature anomalies are vs the 1961&ndash;1990 baseline. See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
-        )}
-      </p>
-      {share && !hideShare && (
+      {!embedded && (
+        <p className="text-xs text-gray-500 mt-3">
+          {preset === 'uk' ? (
+            <>Source: Met Office UK Regional &amp; National series (Tmean, Rainfall, Sunshine, Air Frost) &copy; Crown copyright. Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall, sunshine, frost). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
+          ) : preset === 'usa' ? (
+            <>Source: NOAA Climate at a Glance &mdash; US states &amp; climate regions (tavg, pcp). Anomalies are vs the 1961&ndash;1990 baseline (temperature) or 1991&ndash;2020 (rainfall). See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
+          ) : (
+            <>Source: NOAA Climate at a Glance (countries &amp; continents) &middot; Met Office (UK) &middot; US states &amp; climate regions. Temperature anomalies are vs the 1961&ndash;1990 baseline. See <a className="underline hover:text-[#D0A65E]" href="/climate/methodology">methodology</a>.</>
+          )}
+        </p>
+      )}
+      {share && !hideShare && !embedded && (
         <ShareBar
           pageUrl={`${share.pageUrl}#${share.sectionId}`}
           shareText={encodeURIComponent(`${cardTitle} - live temperature, rainfall and more on 4 Billion Years On`)}

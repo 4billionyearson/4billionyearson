@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { ChevronRight, Search, Sparkles, X, List, Map as MapIcon } from 'lucide-react';
+import { ChevronRight, Search, Sparkles, X, List, Map as MapIcon, Globe, BookmarkCheck, Trophy } from 'lucide-react';
 import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import type { CountryAnomalyRow, ClimateMapPreset } from './global/ClimateMapCard';
@@ -141,43 +141,45 @@ export function ClimateHubControls() {
     [counts],
   );
 
-  const sectionHasMap = SECTION_MAP_CONFIG[active] != null;
-
   return (
-    <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
-      <ChipDropdown
-        label="Section"
-        ariaLabel="Climate hub section"
-        value={active}
-        onChange={(k) => setActive(k as ClimateTabId)}
-        options={sectionOptions}
-      />
-      {sectionHasMap && (
-        <div
-          role="tablist"
-          aria-label="View"
-          className="inline-flex rounded-full border border-[#D0A65E]/35 bg-gray-900/40 p-0.5 text-xs"
+    <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-2.5">
+      {/* View toggle (List/Map) — first, then Section, then Search. All h-9. */}
+      <div
+        role="tablist"
+        aria-label="View"
+        className="inline-flex h-9 shrink-0 rounded-full border border-[#D0A65E]/35 bg-gray-900/40 p-0.5 text-xs"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === 'list'}
+          onClick={() => setView('list')}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 font-medium transition-colors ${view === 'list' ? 'bg-[#D0A65E] text-gray-950' : 'text-[#FFF5E7]/75 hover:text-white'}`}
         >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={view === 'list'}
-            onClick={() => setView('list')}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium transition-colors ${view === 'list' ? 'bg-[#D0A65E] text-gray-950' : 'text-[#FFF5E7]/75 hover:text-white'}`}
-          >
-            <List className="h-3.5 w-3.5" /> List
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={view === 'map'}
-            onClick={() => setView('map')}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium transition-colors ${view === 'map' ? 'bg-[#D0A65E] text-gray-950' : 'text-[#FFF5E7]/75 hover:text-white'}`}
-          >
-            <MapIcon className="h-3.5 w-3.5" /> Map
-          </button>
-        </div>
-      )}
+          <List className="h-3.5 w-3.5" /> List
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === 'map'}
+          onClick={() => setView('map')}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 font-medium transition-colors ${view === 'map' ? 'bg-[#D0A65E] text-gray-950' : 'text-[#FFF5E7]/75 hover:text-white'}`}
+        >
+          <MapIcon className="h-3.5 w-3.5" /> Map
+        </button>
+      </div>
+
+      <div className="shrink-0">
+        <ChipDropdown
+          label="Section"
+          ariaLabel="Climate hub section"
+          value={active}
+          onChange={(k) => setActive(k as ClimateTabId)}
+          options={sectionOptions}
+          triggerClassName="h-9 px-3 text-[13px]"
+        />
+      </div>
+
       <div className="relative flex-1 min-w-0">
         <Search
           className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
@@ -188,7 +190,7 @@ export function ClimateHubControls() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search any country, US state, UK region or city…"
-          className="w-full rounded-xl border border-[#D0A65E]/35 bg-gray-900/50 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#FFF5E7]/35 outline-none transition-all focus:border-[#D0A65E]/55 focus:ring-2 focus:ring-[#D0A65E]/20"
+          className="h-9 w-full rounded-full border border-[#D0A65E]/35 bg-gray-900/50 pl-9 pr-10 text-[13px] text-white placeholder:text-[#FFF5E7]/35 outline-none transition-all focus:border-[#D0A65E]/55 focus:ring-2 focus:ring-[#D0A65E]/20"
           autoComplete="off"
           aria-label="Search any region across all systems"
         />
@@ -208,25 +210,31 @@ export function ClimateHubControls() {
 }
 
 export function ClimateTabsPanels() {
-  const { active, panels, query, regions, view, countryAnomalies } = useClimateTabs();
+  const { active, setActive, panels, query, regions, view, setView, countryAnomalies } = useClimateTabs();
   const trimmed = query.trim();
 
   if (trimmed.length >= 1) {
     return <UnifiedSearchResults query={trimmed} regions={regions} />;
   }
 
-  const mapConfig = SECTION_MAP_CONFIG[active];
-  if (view === 'map' && mapConfig) {
+  if (view === 'map') {
+    // Choose a sensible map config for the active section. For sections
+    // without an obvious map (Editor's Picks, Rankings) fall back to the
+    // global continents view so the map still renders.
+    const cfg = SECTION_MAP_CONFIG[active] ?? { preset: 'global' as ClimateMapPreset, level: 'continents' as MapLevel };
     return (
-      <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6">
+      <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6 space-y-3">
+        <MapQuickPicks setActive={setActive} setView={setView} />
         <ClimateMapCard
+          key={`${cfg.preset}-${cfg.level}`}
           countryAnomalies={countryAnomalies}
-          preset={mapConfig.preset}
-          initialLevel={mapConfig.level}
+          preset={cfg.preset}
+          initialLevel={cfg.level}
           hideShare
+          embedded
         />
-        <p className="mt-3 text-xs text-gray-500">
-          Tip: hover or tap a region to see its latest anomaly. Use the map&rsquo;s Level toggle to drill down to states or sub-regions.
+        <p className="text-xs text-gray-500">
+          Tip: hover or tap a region on the map to see its latest anomaly, then click through to the full climate update.
         </p>
       </div>
     );
@@ -261,6 +269,45 @@ const SECTION_MAP_CONFIG: Partial<Record<ClimateTabId, { preset: ClimateMapPrese
   'us-states': { preset: 'usa', level: 'us-states' },
   'us-climate-regions': { preset: 'usa', level: 'us-regions' },
 };
+
+// Quick-pick pills shown above the map for sections that aren't pickable
+// from a polygon: the worldwide ("Global") update, Editor's Picks and the
+// Climate Ranking. The map view is great for choosing a continent / country /
+// state, but you still need a path to these three.
+function MapQuickPicks({
+  setActive,
+  setView,
+}: {
+  setActive: (id: ClimateTabId) => void;
+  setView: (v: 'list' | 'map') => void;
+}) {
+  const pillCls =
+    'inline-flex h-8 items-center gap-1.5 rounded-full border border-[#D0A65E]/35 bg-gray-900/40 px-3 text-[12px] font-medium text-[#FFF5E7] hover:border-[#D0A65E]/60 hover:bg-white/[0.04] transition-colors';
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 mr-1">
+        Or jump to
+      </span>
+      <Link href="/climate/global" className={pillCls}>
+        <Globe className="h-3.5 w-3.5 text-[#D0A65E]" /> Global Update
+      </Link>
+      <button
+        type="button"
+        onClick={() => { setActive('editors-picks'); setView('list'); }}
+        className={pillCls}
+      >
+        <BookmarkCheck className="h-3.5 w-3.5 text-[#D0A65E]" /> Editor&rsquo;s Picks
+      </button>
+      <button
+        type="button"
+        onClick={() => { setActive('rankings'); setView('list'); }}
+        className={pillCls}
+      >
+        <Trophy className="h-3.5 w-3.5 text-[#D0A65E]" /> Climate Ranking
+      </button>
+    </div>
+  );
+}
 
 // ─── Unified search ──────────────────────────────────────────────────────────
 
