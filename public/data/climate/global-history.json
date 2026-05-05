@@ -12054,15 +12054,10 @@
   "enso": {
     "state": "Neutral",
     "strength": "",
-    "anomaly": -0.16,
-    "season": "JFM",
+    "anomaly": 0.11,
+    "season": "FMA",
     "seasonYear": 2026,
     "history": [
-      {
-        "season": "FMA",
-        "year": 2023,
-        "anom": -0.02
-      },
       {
         "season": "MAM",
         "year": 2023,
@@ -12236,7 +12231,12 @@
       {
         "season": "JFM",
         "year": 2026,
-        "anom": -0.16
+        "anom": -0.15
+      },
+      {
+        "season": "FMA",
+        "year": 2026,
+        "anom": 0.11
       }
     ]
   },
@@ -13510,35 +13510,20 @@
     "baseline": "1991–2020",
     "latest": {
       "year": 2026,
-      "month": 3,
-      "extent": 14.13
+      "month": 4,
+      "extent": 13.57
     },
-    "climatology": 15.03,
-    "anomaly": -0.9,
+    "climatology": 14.32,
+    "anomaly": -0.75,
     "rankLowestOfSameMonth": 2,
     "totalYearsInMonth": 48,
     "recordLow": {
-      "year": 2025,
-      "month": 3,
-      "extent": 14.12
+      "year": 2019,
+      "month": 4,
+      "extent": 13.43
     },
     "previousLowest": null,
     "monthly": [
-      {
-        "year": 1978,
-        "month": 11,
-        "extent": 11.65
-      },
-      {
-        "year": 1978,
-        "month": 12,
-        "extent": 13.67
-      },
-      {
-        "year": 1979,
-        "month": 1,
-        "extent": 15.41
-      },
       {
         "year": 1979,
         "month": 2,
@@ -13568,36 +13553,6 @@
         "year": 1979,
         "month": 7,
         "extent": 10.31
-      },
-      {
-        "year": 1979,
-        "month": 8,
-        "extent": 8.04
-      },
-      {
-        "year": 1979,
-        "month": 9,
-        "extent": 7.05
-      },
-      {
-        "year": 1979,
-        "month": 10,
-        "extent": 8.75
-      },
-      {
-        "year": 1979,
-        "month": 11,
-        "extent": 10.94
-      },
-      {
-        "year": 1979,
-        "month": 12,
-        "extent": 13.34
-      },
-      {
-        "year": 1980,
-        "month": 1,
-        "extent": 14.86
       },
       {
         "year": 1980,
@@ -13630,36 +13585,6 @@
         "extent": 10.1
       },
       {
-        "year": 1980,
-        "month": 8,
-        "extent": 7.98
-      },
-      {
-        "year": 1980,
-        "month": 9,
-        "extent": 7.67
-      },
-      {
-        "year": 1980,
-        "month": 10,
-        "extent": 9.18
-      },
-      {
-        "year": 1980,
-        "month": 11,
-        "extent": 11.38
-      },
-      {
-        "year": 1980,
-        "month": 12,
-        "extent": 13.59
-      },
-      {
-        "year": 1981,
-        "month": 1,
-        "extent": 14.91
-      },
-      {
         "year": 1981,
         "month": 2,
         "extent": 15.6
@@ -13688,36 +13613,6 @@
         "year": 1981,
         "month": 7,
         "extent": 10.27
-      },
-      {
-        "year": 1981,
-        "month": 8,
-        "extent": 7.84
-      },
-      {
-        "year": 1981,
-        "month": 9,
-        "extent": 7.14
-      },
-      {
-        "year": 1981,
-        "month": 10,
-        "extent": 8.86
-      },
-      {
-        "year": 1981,
-        "month": 11,
-        "extent": 10.93
-      },
-      {
-        "year": 1981,
-        "month": 12,
-        "extent": 13.34
-      },
-      {
-        "year": 1982,
-        "month": 1,
-        "extent": 15.18
       },
       {
         "year": 1982,
@@ -13750,36 +13645,6 @@
         "extent": 10.37
       },
       {
-        "year": 1982,
-        "month": 8,
-        "extent": 8.14
-      },
-      {
-        "year": 1982,
-        "month": 9,
-        "extent": 7.3
-      },
-      {
-        "year": 1982,
-        "month": 10,
-        "extent": 9.42
-      },
-      {
-        "year": 1982,
-        "month": 11,
-        "extent": 11.63
-      },
-      {
-        "year": 1982,
-        "month": 12,
-        "extent": 13.64
-      },
-      {
-        "year": 1983,
-        "month": 1,
-        "extent": 14.94
-      },
-      {
         "year": 1983,
         "month": 2,
         "extent": 16.01
@@ -13808,36 +13673,6 @@
         "year": 1983,
         "month": 7,
         "extent": 10.57
-      },
-      {
-        "year": 1983,
-        "month": 8,
-        "extent": 8.19
-      },
-      {
-        "year": 1983,
-        "month": 9,
-        "extent": 7.39
-      },
-      {
-        "year": 1983,
-        "month": 10,
-        "extent": 9.33
-      },
-      {
-        "year": 1983,
-        "month": 11,
-        "extent": 11.46
-      },
-      {
-        "year": 1983,
-        "month": 12,
-        "extent": 13.3
-      },
-      {
-        "year": 1984,
-        "month": 1,
-        "extent": 14.47
       },
       {
         "year": 1984,
@@ -13870,36 +13705,6 @@
         "extent": 9.98
       },
       {
-        "year": 1984,
-        "month": 8,
-        "extent": 7.77
-      },
-      {
-        "year": 1984,
-        "month": 9,
-        "extent": 6.81
-      },
-      {
-        "year": 1984,
-        "month": 10,
-        "extent": 8.56
-      },
-      {
-        "year": 1984,
-        "month": 11,
-        "extent": 10.84
-      },
-      {
-        "year": 1984,
-        "month": 12,
-        "extent": 12.99
-      },
-      {
-        "year": 1985,
-        "month": 1,
-        "extent": 14.72
-      },
-      {
         "year": 1985,
         "month": 2,
         "extent": 15.47
@@ -13928,36 +13733,6 @@
         "year": 1985,
         "month": 7,
         "extent": 9.74
-      },
-      {
-        "year": 1985,
-        "month": 8,
-        "extent": 7.4
-      },
-      {
-        "year": 1985,
-        "month": 9,
-        "extent": 6.7
-      },
-      {
-        "year": 1985,
-        "month": 10,
-        "extent": 8.55
-      },
-      {
-        "year": 1985,
-        "month": 11,
-        "extent": 11.02
-      },
-      {
-        "year": 1985,
-        "month": 12,
-        "extent": 13.05
-      },
-      {
-        "year": 1986,
-        "month": 1,
-        "extent": 14.89
       },
       {
         "year": 1986,
@@ -13990,36 +13765,6 @@
         "extent": 10.15
       },
       {
-        "year": 1986,
-        "month": 8,
-        "extent": 7.98
-      },
-      {
-        "year": 1986,
-        "month": 9,
-        "extent": 7.41
-      },
-      {
-        "year": 1986,
-        "month": 10,
-        "extent": 9.48
-      },
-      {
-        "year": 1986,
-        "month": 11,
-        "extent": 11.45
-      },
-      {
-        "year": 1986,
-        "month": 12,
-        "extent": 13.22
-      },
-      {
-        "year": 1987,
-        "month": 1,
-        "extent": 14.97
-      },
-      {
         "year": 1987,
         "month": 2,
         "extent": 16.05
@@ -14048,26 +13793,6 @@
         "year": 1987,
         "month": 7,
         "extent": 10.33
-      },
-      {
-        "year": 1987,
-        "month": 8,
-        "extent": 7.63
-      },
-      {
-        "year": 1987,
-        "month": 9,
-        "extent": 7.28
-      },
-      {
-        "year": 1987,
-        "month": 10,
-        "extent": 9.05
-      },
-      {
-        "year": 1987,
-        "month": 11,
-        "extent": 11.22
       },
       {
         "year": 1988,
@@ -14100,36 +13825,6 @@
         "extent": 9.81
       },
       {
-        "year": 1988,
-        "month": 8,
-        "extent": 7.89
-      },
-      {
-        "year": 1988,
-        "month": 9,
-        "extent": 7.37
-      },
-      {
-        "year": 1988,
-        "month": 10,
-        "extent": 9.13
-      },
-      {
-        "year": 1988,
-        "month": 11,
-        "extent": 11.33
-      },
-      {
-        "year": 1988,
-        "month": 12,
-        "extent": 13.63
-      },
-      {
-        "year": 1989,
-        "month": 1,
-        "extent": 14.95
-      },
-      {
         "year": 1989,
         "month": 2,
         "extent": 15.5
@@ -14158,36 +13853,6 @@
         "year": 1989,
         "month": 7,
         "extent": 10.13
-      },
-      {
-        "year": 1989,
-        "month": 8,
-        "extent": 7.88
-      },
-      {
-        "year": 1989,
-        "month": 9,
-        "extent": 7.01
-      },
-      {
-        "year": 1989,
-        "month": 10,
-        "extent": 8.83
-      },
-      {
-        "year": 1989,
-        "month": 11,
-        "extent": 11.12
-      },
-      {
-        "year": 1989,
-        "month": 12,
-        "extent": 13.39
-      },
-      {
-        "year": 1990,
-        "month": 1,
-        "extent": 14.78
       },
       {
         "year": 1990,
@@ -14220,36 +13885,6 @@
         "extent": 9.25
       },
       {
-        "year": 1990,
-        "month": 8,
-        "extent": 6.8
-      },
-      {
-        "year": 1990,
-        "month": 9,
-        "extent": 6.14
-      },
-      {
-        "year": 1990,
-        "month": 10,
-        "extent": 8.48
-      },
-      {
-        "year": 1990,
-        "month": 11,
-        "extent": 11.08
-      },
-      {
-        "year": 1990,
-        "month": 12,
-        "extent": 13.11
-      },
-      {
-        "year": 1991,
-        "month": 1,
-        "extent": 14.36
-      },
-      {
         "year": 1991,
         "month": 2,
         "extent": 15.25
@@ -14278,36 +13913,6 @@
         "year": 1991,
         "month": 7,
         "extent": 9.51
-      },
-      {
-        "year": 1991,
-        "month": 8,
-        "extent": 7.42
-      },
-      {
-        "year": 1991,
-        "month": 9,
-        "extent": 6.47
-      },
-      {
-        "year": 1991,
-        "month": 10,
-        "extent": 8.54
-      },
-      {
-        "year": 1991,
-        "month": 11,
-        "extent": 10.88
-      },
-      {
-        "year": 1991,
-        "month": 12,
-        "extent": 12.95
-      },
-      {
-        "year": 1992,
-        "month": 1,
-        "extent": 14.64
       },
       {
         "year": 1992,
@@ -14340,36 +13945,6 @@
         "extent": 10.32
       },
       {
-        "year": 1992,
-        "month": 8,
-        "extent": 7.93
-      },
-      {
-        "year": 1992,
-        "month": 9,
-        "extent": 7.47
-      },
-      {
-        "year": 1992,
-        "month": 10,
-        "extent": 9.32
-      },
-      {
-        "year": 1992,
-        "month": 11,
-        "extent": 11.38
-      },
-      {
-        "year": 1992,
-        "month": 12,
-        "extent": 13.41
-      },
-      {
-        "year": 1993,
-        "month": 1,
-        "extent": 14.9
-      },
-      {
         "year": 1993,
         "month": 2,
         "extent": 15.69
@@ -14398,36 +13973,6 @@
         "year": 1993,
         "month": 7,
         "extent": 9.48
-      },
-      {
-        "year": 1993,
-        "month": 8,
-        "extent": 7.33
-      },
-      {
-        "year": 1993,
-        "month": 9,
-        "extent": 6.4
-      },
-      {
-        "year": 1993,
-        "month": 10,
-        "extent": 8.79
-      },
-      {
-        "year": 1993,
-        "month": 11,
-        "extent": 11.32
-      },
-      {
-        "year": 1993,
-        "month": 12,
-        "extent": 13.32
-      },
-      {
-        "year": 1994,
-        "month": 1,
-        "extent": 14.73
       },
       {
         "year": 1994,
@@ -14460,36 +14005,6 @@
         "extent": 9.93
       },
       {
-        "year": 1994,
-        "month": 8,
-        "extent": 7.64
-      },
-      {
-        "year": 1994,
-        "month": 9,
-        "extent": 7.14
-      },
-      {
-        "year": 1994,
-        "month": 10,
-        "extent": 8.92
-      },
-      {
-        "year": 1994,
-        "month": 11,
-        "extent": 11.12
-      },
-      {
-        "year": 1994,
-        "month": 12,
-        "extent": 13.27
-      },
-      {
-        "year": 1995,
-        "month": 1,
-        "extent": 14.59
-      },
-      {
         "year": 1995,
         "month": 2,
         "extent": 15.23
@@ -14518,36 +14033,6 @@
         "year": 1995,
         "month": 7,
         "extent": 8.99
-      },
-      {
-        "year": 1995,
-        "month": 8,
-        "extent": 6.74
-      },
-      {
-        "year": 1995,
-        "month": 9,
-        "extent": 6.08
-      },
-      {
-        "year": 1995,
-        "month": 10,
-        "extent": 7.83
-      },
-      {
-        "year": 1995,
-        "month": 11,
-        "extent": 10.76
-      },
-      {
-        "year": 1995,
-        "month": 12,
-        "extent": 12.92
-      },
-      {
-        "year": 1996,
-        "month": 1,
-        "extent": 14.18
       },
       {
         "year": 1996,
@@ -14580,36 +14065,6 @@
         "extent": 10.16
       },
       {
-        "year": 1996,
-        "month": 8,
-        "extent": 8.18
-      },
-      {
-        "year": 1996,
-        "month": 9,
-        "extent": 7.58
-      },
-      {
-        "year": 1996,
-        "month": 10,
-        "extent": 9.16
-      },
-      {
-        "year": 1996,
-        "month": 11,
-        "extent": 10.4
-      },
-      {
-        "year": 1996,
-        "month": 12,
-        "extent": 12.86
-      },
-      {
-        "year": 1997,
-        "month": 1,
-        "extent": 14.42
-      },
-      {
         "year": 1997,
         "month": 2,
         "extent": 15.44
@@ -14638,36 +14093,6 @@
         "year": 1997,
         "month": 7,
         "extent": 9.41
-      },
-      {
-        "year": 1997,
-        "month": 8,
-        "extent": 7.29
-      },
-      {
-        "year": 1997,
-        "month": 9,
-        "extent": 6.69
-      },
-      {
-        "year": 1997,
-        "month": 10,
-        "extent": 8.34
-      },
-      {
-        "year": 1997,
-        "month": 11,
-        "extent": 10.68
-      },
-      {
-        "year": 1997,
-        "month": 12,
-        "extent": 13.08
-      },
-      {
-        "year": 1998,
-        "month": 1,
-        "extent": 14.72
       },
       {
         "year": 1998,
@@ -14700,36 +14125,6 @@
         "extent": 9.42
       },
       {
-        "year": 1998,
-        "month": 8,
-        "extent": 7.51
-      },
-      {
-        "year": 1998,
-        "month": 9,
-        "extent": 6.54
-      },
-      {
-        "year": 1998,
-        "month": 10,
-        "extent": 8.45
-      },
-      {
-        "year": 1998,
-        "month": 11,
-        "extent": 10.44
-      },
-      {
-        "year": 1998,
-        "month": 12,
-        "extent": 12.76
-      },
-      {
-        "year": 1999,
-        "month": 1,
-        "extent": 14.36
-      },
-      {
         "year": 1999,
         "month": 2,
         "extent": 15.31
@@ -14758,36 +14153,6 @@
         "year": 1999,
         "month": 7,
         "extent": 9.49
-      },
-      {
-        "year": 1999,
-        "month": 8,
-        "extent": 7.23
-      },
-      {
-        "year": 1999,
-        "month": 9,
-        "extent": 6.12
-      },
-      {
-        "year": 1999,
-        "month": 10,
-        "extent": 8.6
-      },
-      {
-        "year": 1999,
-        "month": 11,
-        "extent": 10.8
-      },
-      {
-        "year": 1999,
-        "month": 12,
-        "extent": 12.64
-      },
-      {
-        "year": 2000,
-        "month": 1,
-        "extent": 14.22
       },
       {
         "year": 2000,
@@ -14820,36 +14185,6 @@
         "extent": 9.51
       },
       {
-        "year": 2000,
-        "month": 8,
-        "extent": 7.17
-      },
-      {
-        "year": 2000,
-        "month": 9,
-        "extent": 6.25
-      },
-      {
-        "year": 2000,
-        "month": 10,
-        "extent": 8.38
-      },
-      {
-        "year": 2000,
-        "month": 11,
-        "extent": 10.32
-      },
-      {
-        "year": 2000,
-        "month": 12,
-        "extent": 12.64
-      },
-      {
-        "year": 2001,
-        "month": 1,
-        "extent": 14.2
-      },
-      {
         "year": 2001,
         "month": 2,
         "extent": 15.21
@@ -14878,36 +14213,6 @@
         "year": 2001,
         "month": 7,
         "extent": 9.07
-      },
-      {
-        "year": 2001,
-        "month": 8,
-        "extent": 7.46
-      },
-      {
-        "year": 2001,
-        "month": 9,
-        "extent": 6.73
-      },
-      {
-        "year": 2001,
-        "month": 10,
-        "extent": 8.3
-      },
-      {
-        "year": 2001,
-        "month": 11,
-        "extent": 10.66
-      },
-      {
-        "year": 2001,
-        "month": 12,
-        "extent": 12.49
-      },
-      {
-        "year": 2002,
-        "month": 1,
-        "extent": 14.27
       },
       {
         "year": 2002,
@@ -14940,36 +14245,6 @@
         "extent": 9.27
       },
       {
-        "year": 2002,
-        "month": 8,
-        "extent": 6.6
-      },
-      {
-        "year": 2002,
-        "month": 9,
-        "extent": 5.83
-      },
-      {
-        "year": 2002,
-        "month": 10,
-        "extent": 8.16
-      },
-      {
-        "year": 2002,
-        "month": 11,
-        "extent": 10.34
-      },
-      {
-        "year": 2002,
-        "month": 12,
-        "extent": 12.61
-      },
-      {
-        "year": 2003,
-        "month": 1,
-        "extent": 14.39
-      },
-      {
         "year": 2003,
         "month": 2,
         "extent": 15.19
@@ -14998,36 +14273,6 @@
         "year": 2003,
         "month": 7,
         "extent": 9.21
-      },
-      {
-        "year": 2003,
-        "month": 8,
-        "extent": 6.94
-      },
-      {
-        "year": 2003,
-        "month": 9,
-        "extent": 6.12
-      },
-      {
-        "year": 2003,
-        "month": 10,
-        "extent": 7.85
-      },
-      {
-        "year": 2003,
-        "month": 11,
-        "extent": 10.13
-      },
-      {
-        "year": 2003,
-        "month": 12,
-        "extent": 12.59
-      },
-      {
-        "year": 2004,
-        "month": 1,
-        "extent": 14.03
       },
       {
         "year": 2004,
@@ -15060,36 +14305,6 @@
         "extent": 9.43
       },
       {
-        "year": 2004,
-        "month": 8,
-        "extent": 6.85
-      },
-      {
-        "year": 2004,
-        "month": 9,
-        "extent": 5.98
-      },
-      {
-        "year": 2004,
-        "month": 10,
-        "extent": 7.93
-      },
-      {
-        "year": 2004,
-        "month": 11,
-        "extent": 10.34
-      },
-      {
-        "year": 2004,
-        "month": 12,
-        "extent": 12.55
-      },
-      {
-        "year": 2005,
-        "month": 1,
-        "extent": 13.66
-      },
-      {
         "year": 2005,
         "month": 2,
         "extent": 14.37
@@ -15118,36 +14333,6 @@
         "year": 2005,
         "month": 7,
         "extent": 8.65
-      },
-      {
-        "year": 2005,
-        "month": 8,
-        "extent": 6.3
-      },
-      {
-        "year": 2005,
-        "month": 9,
-        "extent": 5.5
-      },
-      {
-        "year": 2005,
-        "month": 10,
-        "extent": 7.35
-      },
-      {
-        "year": 2005,
-        "month": 11,
-        "extent": 10.22
-      },
-      {
-        "year": 2005,
-        "month": 12,
-        "extent": 12.23
-      },
-      {
-        "year": 2006,
-        "month": 1,
-        "extent": 13.47
       },
       {
         "year": 2006,
@@ -15180,36 +14365,6 @@
         "extent": 8.46
       },
       {
-        "year": 2006,
-        "month": 8,
-        "extent": 6.5
-      },
-      {
-        "year": 2006,
-        "month": 9,
-        "extent": 5.86
-      },
-      {
-        "year": 2006,
-        "month": 10,
-        "extent": 7.54
-      },
-      {
-        "year": 2006,
-        "month": 11,
-        "extent": 9.66
-      },
-      {
-        "year": 2006,
-        "month": 12,
-        "extent": 11.95
-      },
-      {
-        "year": 2007,
-        "month": 1,
-        "extent": 13.7
-      },
-      {
         "year": 2007,
         "month": 2,
         "extent": 14.51
@@ -15238,36 +14393,6 @@
         "year": 2007,
         "month": 7,
         "extent": 7.94
-      },
-      {
-        "year": 2007,
-        "month": 8,
-        "extent": 5.34
-      },
-      {
-        "year": 2007,
-        "month": 9,
-        "extent": 4.27
-      },
-      {
-        "year": 2007,
-        "month": 10,
-        "extent": 6.04
-      },
-      {
-        "year": 2007,
-        "month": 11,
-        "extent": 9.76
-      },
-      {
-        "year": 2007,
-        "month": 12,
-        "extent": 12.03
-      },
-      {
-        "year": 2008,
-        "month": 1,
-        "extent": 13.89
       },
       {
         "year": 2008,
@@ -15300,36 +14425,6 @@
         "extent": 8.68
       },
       {
-        "year": 2008,
-        "month": 8,
-        "extent": 5.91
-      },
-      {
-        "year": 2008,
-        "month": 9,
-        "extent": 4.69
-      },
-      {
-        "year": 2008,
-        "month": 10,
-        "extent": 7.35
-      },
-      {
-        "year": 2008,
-        "month": 11,
-        "extent": 10.34
-      },
-      {
-        "year": 2008,
-        "month": 12,
-        "extent": 12.36
-      },
-      {
-        "year": 2009,
-        "month": 1,
-        "extent": 13.91
-      },
-      {
         "year": 2009,
         "month": 2,
         "extent": 14.81
@@ -15358,36 +14453,6 @@
         "year": 2009,
         "month": 7,
         "extent": 8.47
-      },
-      {
-        "year": 2009,
-        "month": 8,
-        "extent": 6.14
-      },
-      {
-        "year": 2009,
-        "month": 9,
-        "extent": 5.26
-      },
-      {
-        "year": 2009,
-        "month": 10,
-        "extent": 6.92
-      },
-      {
-        "year": 2009,
-        "month": 11,
-        "extent": 9.77
-      },
-      {
-        "year": 2009,
-        "month": 12,
-        "extent": 12.2
-      },
-      {
-        "year": 2010,
-        "month": 1,
-        "extent": 13.74
       },
       {
         "year": 2010,
@@ -15420,36 +14485,6 @@
         "extent": 8.07
       },
       {
-        "year": 2010,
-        "month": 8,
-        "extent": 5.87
-      },
-      {
-        "year": 2010,
-        "month": 9,
-        "extent": 4.87
-      },
-      {
-        "year": 2010,
-        "month": 10,
-        "extent": 6.98
-      },
-      {
-        "year": 2010,
-        "month": 11,
-        "extent": 9.61
-      },
-      {
-        "year": 2010,
-        "month": 12,
-        "extent": 11.83
-      },
-      {
-        "year": 2011,
-        "month": 1,
-        "extent": 13.46
-      },
-      {
         "year": 2011,
         "month": 2,
         "extent": 14.36
@@ -15478,36 +14513,6 @@
         "year": 2011,
         "month": 7,
         "extent": 7.72
-      },
-      {
-        "year": 2011,
-        "month": 8,
-        "extent": 5.5
-      },
-      {
-        "year": 2011,
-        "month": 9,
-        "extent": 4.56
-      },
-      {
-        "year": 2011,
-        "month": 10,
-        "extent": 6.46
-      },
-      {
-        "year": 2011,
-        "month": 11,
-        "extent": 9.77
-      },
-      {
-        "year": 2011,
-        "month": 12,
-        "extent": 12.15
-      },
-      {
-        "year": 2012,
-        "month": 1,
-        "extent": 13.73
       },
       {
         "year": 2012,
@@ -15540,36 +14545,6 @@
         "extent": 7.67
       },
       {
-        "year": 2012,
-        "month": 8,
-        "extent": 4.72
-      },
-      {
-        "year": 2012,
-        "month": 9,
-        "extent": 3.57
-      },
-      {
-        "year": 2012,
-        "month": 10,
-        "extent": 5.89
-      },
-      {
-        "year": 2012,
-        "month": 11,
-        "extent": 9.39
-      },
-      {
-        "year": 2012,
-        "month": 12,
-        "extent": 12.01
-      },
-      {
-        "year": 2013,
-        "month": 1,
-        "extent": 13.7
-      },
-      {
         "year": 2013,
         "month": 2,
         "extent": 14.72
@@ -15598,36 +14573,6 @@
         "year": 2013,
         "month": 7,
         "extent": 8.13
-      },
-      {
-        "year": 2013,
-        "month": 8,
-        "extent": 6.01
-      },
-      {
-        "year": 2013,
-        "month": 9,
-        "extent": 5.21
-      },
-      {
-        "year": 2013,
-        "month": 10,
-        "extent": 7.45
-      },
-      {
-        "year": 2013,
-        "month": 11,
-        "extent": 9.94
-      },
-      {
-        "year": 2013,
-        "month": 12,
-        "extent": 12.18
-      },
-      {
-        "year": 2014,
-        "month": 1,
-        "extent": 13.65
       },
       {
         "year": 2014,
@@ -15660,36 +14605,6 @@
         "extent": 8.11
       },
       {
-        "year": 2014,
-        "month": 8,
-        "extent": 6.08
-      },
-      {
-        "year": 2014,
-        "month": 9,
-        "extent": 5.22
-      },
-      {
-        "year": 2014,
-        "month": 10,
-        "extent": 7.23
-      },
-      {
-        "year": 2014,
-        "month": 11,
-        "extent": 10.11
-      },
-      {
-        "year": 2014,
-        "month": 12,
-        "extent": 12.35
-      },
-      {
-        "year": 2015,
-        "month": 1,
-        "extent": 13.6
-      },
-      {
         "year": 2015,
         "month": 2,
         "extent": 14.4
@@ -15718,36 +14633,6 @@
         "year": 2015,
         "month": 7,
         "extent": 8.38
-      },
-      {
-        "year": 2015,
-        "month": 8,
-        "extent": 5.6
-      },
-      {
-        "year": 2015,
-        "month": 9,
-        "extent": 4.62
-      },
-      {
-        "year": 2015,
-        "month": 10,
-        "extent": 6.97
-      },
-      {
-        "year": 2015,
-        "month": 11,
-        "extent": 9.85
-      },
-      {
-        "year": 2015,
-        "month": 12,
-        "extent": 12.04
-      },
-      {
-        "year": 2016,
-        "month": 1,
-        "extent": 13.46
       },
       {
         "year": 2016,
@@ -15780,36 +14665,6 @@
         "extent": 7.94
       },
       {
-        "year": 2016,
-        "month": 8,
-        "extent": 5.37
-      },
-      {
-        "year": 2016,
-        "month": 9,
-        "extent": 4.53
-      },
-      {
-        "year": 2016,
-        "month": 10,
-        "extent": 6.08
-      },
-      {
-        "year": 2016,
-        "month": 11,
-        "extent": 8.66
-      },
-      {
-        "year": 2016,
-        "month": 12,
-        "extent": 11.46
-      },
-      {
-        "year": 2017,
-        "month": 1,
-        "extent": 13.19
-      },
-      {
         "year": 2017,
         "month": 2,
         "extent": 14.12
@@ -15838,36 +14693,6 @@
         "year": 2017,
         "month": 7,
         "extent": 7.94
-      },
-      {
-        "year": 2017,
-        "month": 8,
-        "extent": 5.48
-      },
-      {
-        "year": 2017,
-        "month": 9,
-        "extent": 4.82
-      },
-      {
-        "year": 2017,
-        "month": 10,
-        "extent": 6.77
-      },
-      {
-        "year": 2017,
-        "month": 11,
-        "extent": 9.49
-      },
-      {
-        "year": 2017,
-        "month": 12,
-        "extent": 11.74
-      },
-      {
-        "year": 2018,
-        "month": 1,
-        "extent": 13.08
       },
       {
         "year": 2018,
@@ -15900,36 +14725,6 @@
         "extent": 8.27
       },
       {
-        "year": 2018,
-        "month": 8,
-        "extent": 5.61
-      },
-      {
-        "year": 2018,
-        "month": 9,
-        "extent": 4.79
-      },
-      {
-        "year": 2018,
-        "month": 10,
-        "extent": 6.13
-      },
-      {
-        "year": 2018,
-        "month": 11,
-        "extent": 9.82
-      },
-      {
-        "year": 2018,
-        "month": 12,
-        "extent": 11.86
-      },
-      {
-        "year": 2019,
-        "month": 1,
-        "extent": 13.57
-      },
-      {
         "year": 2019,
         "month": 2,
         "extent": 14.39
@@ -15958,36 +14753,6 @@
         "year": 2019,
         "month": 7,
         "extent": 7.59
-      },
-      {
-        "year": 2019,
-        "month": 8,
-        "extent": 5.03
-      },
-      {
-        "year": 2019,
-        "month": 9,
-        "extent": 4.36
-      },
-      {
-        "year": 2019,
-        "month": 10,
-        "extent": 5.73
-      },
-      {
-        "year": 2019,
-        "month": 11,
-        "extent": 9.35
-      },
-      {
-        "year": 2019,
-        "month": 12,
-        "extent": 11.9
-      },
-      {
-        "year": 2020,
-        "month": 1,
-        "extent": 13.64
       },
       {
         "year": 2020,
@@ -16020,36 +14785,6 @@
         "extent": 7.29
       },
       {
-        "year": 2020,
-        "month": 8,
-        "extent": 5.07
-      },
-      {
-        "year": 2020,
-        "month": 9,
-        "extent": 4
-      },
-      {
-        "year": 2020,
-        "month": 10,
-        "extent": 5.33
-      },
-      {
-        "year": 2020,
-        "month": 11,
-        "extent": 8.99
-      },
-      {
-        "year": 2020,
-        "month": 12,
-        "extent": 11.73
-      },
-      {
-        "year": 2021,
-        "month": 1,
-        "extent": 13.5
-      },
-      {
         "year": 2021,
         "month": 2,
         "extent": 14.39
@@ -16078,36 +14813,6 @@
         "year": 2021,
         "month": 7,
         "extent": 7.65
-      },
-      {
-        "year": 2021,
-        "month": 8,
-        "extent": 5.71
-      },
-      {
-        "year": 2021,
-        "month": 9,
-        "extent": 4.95
-      },
-      {
-        "year": 2021,
-        "month": 10,
-        "extent": 6.82
-      },
-      {
-        "year": 2021,
-        "month": 11,
-        "extent": 9.83
-      },
-      {
-        "year": 2021,
-        "month": 12,
-        "extent": 12.15
-      },
-      {
-        "year": 2022,
-        "month": 1,
-        "extent": 13.87
       },
       {
         "year": 2022,
@@ -16140,36 +14845,6 @@
         "extent": 8.29
       },
       {
-        "year": 2022,
-        "month": 8,
-        "extent": 5.95
-      },
-      {
-        "year": 2022,
-        "month": 9,
-        "extent": 4.9
-      },
-      {
-        "year": 2022,
-        "month": 10,
-        "extent": 6.66
-      },
-      {
-        "year": 2022,
-        "month": 11,
-        "extent": 9.73
-      },
-      {
-        "year": 2022,
-        "month": 12,
-        "extent": 11.89
-      },
-      {
-        "year": 2023,
-        "month": 1,
-        "extent": 13.36
-      },
-      {
         "year": 2023,
         "month": 2,
         "extent": 14.19
@@ -16198,36 +14873,6 @@
         "year": 2023,
         "month": 7,
         "extent": 8.21
-      },
-      {
-        "year": 2023,
-        "month": 8,
-        "extent": 5.51
-      },
-      {
-        "year": 2023,
-        "month": 9,
-        "extent": 4.38
-      },
-      {
-        "year": 2023,
-        "month": 10,
-        "extent": 6.41
-      },
-      {
-        "year": 2023,
-        "month": 11,
-        "extent": 9.68
-      },
-      {
-        "year": 2023,
-        "month": 12,
-        "extent": 11.98
-      },
-      {
-        "year": 2024,
-        "month": 1,
-        "extent": 13.92
       },
       {
         "year": 2024,
@@ -16260,36 +14905,6 @@
         "extent": 7.87
       },
       {
-        "year": 2024,
-        "month": 8,
-        "extent": 5.13
-      },
-      {
-        "year": 2024,
-        "month": 9,
-        "extent": 4.35
-      },
-      {
-        "year": 2024,
-        "month": 10,
-        "extent": 5.93
-      },
-      {
-        "year": 2024,
-        "month": 11,
-        "extent": 9.15
-      },
-      {
-        "year": 2024,
-        "month": 12,
-        "extent": 11.41
-      },
-      {
-        "year": 2025,
-        "month": 1,
-        "extent": 13.11
-      },
-      {
         "year": 2025,
         "month": 2,
         "extent": 13.75
@@ -16320,36 +14935,6 @@
         "extent": 7.66
       },
       {
-        "year": 2025,
-        "month": 8,
-        "extent": 5.39
-      },
-      {
-        "year": 2025,
-        "month": 9,
-        "extent": 4.75
-      },
-      {
-        "year": 2025,
-        "month": 10,
-        "extent": 6.32
-      },
-      {
-        "year": 2025,
-        "month": 11,
-        "extent": 8.77
-      },
-      {
-        "year": 2025,
-        "month": 12,
-        "extent": 11.22
-      },
-      {
-        "year": 2026,
-        "month": 1,
-        "extent": 13.11
-      },
-      {
         "year": 2026,
         "month": 2,
         "extent": 14.1
@@ -16358,2861 +14943,15 @@
         "year": 2026,
         "month": 3,
         "extent": 14.13
-      }
-    ]
-  },
-  "antarcticSeaIce": {
-    "label": "Antarctic sea ice",
-    "unit": "million km²",
-    "baseline": "1991–2020",
-    "latest": {
-      "year": 2026,
-      "month": 3,
-      "extent": 3.57
-    },
-    "climatology": 4.08,
-    "anomaly": -0.51,
-    "rankLowestOfSameMonth": 14,
-    "totalYearsInMonth": 48,
-    "recordLow": {
-      "year": 2017,
-      "month": 3,
-      "extent": 2.7
-    },
-    "previousLowest": null,
-    "monthly": [
-      {
-        "year": 1978,
-        "month": 11,
-        "extent": 15.9
       },
       {
-        "year": 1978,
-        "month": 12,
-        "extent": 10.4
-      },
-      {
-        "year": 1979,
-        "month": 1,
-        "extent": 5.4
-      },
-      {
-        "year": 1979,
-        "month": 2,
-        "extent": 3.14
-      },
-      {
-        "year": 1979,
-        "month": 3,
-        "extent": 4
-      },
-      {
-        "year": 1979,
+        "year": 2026,
         "month": 4,
-        "extent": 7.49
-      },
-      {
-        "year": 1979,
-        "month": 5,
-        "extent": 10.83
-      },
-      {
-        "year": 1979,
-        "month": 6,
-        "extent": 14.19
-      },
-      {
-        "year": 1979,
-        "month": 7,
-        "extent": 16.52
-      },
-      {
-        "year": 1979,
-        "month": 8,
-        "extent": 17.7
-      },
-      {
-        "year": 1979,
-        "month": 9,
-        "extent": 18.2
-      },
-      {
-        "year": 1979,
-        "month": 10,
-        "extent": 17.82
-      },
-      {
-        "year": 1979,
-        "month": 11,
-        "extent": 15.34
-      },
-      {
-        "year": 1979,
-        "month": 12,
-        "extent": 9.24
-      },
-      {
-        "year": 1980,
-        "month": 1,
-        "extent": 4.56
-      },
-      {
-        "year": 1980,
-        "month": 2,
-        "extent": 2.82
-      },
-      {
-        "year": 1980,
-        "month": 3,
-        "extent": 3.29
-      },
-      {
-        "year": 1980,
-        "month": 4,
-        "extent": 5.4
-      },
-      {
-        "year": 1980,
-        "month": 5,
-        "extent": 8.86
-      },
-      {
-        "year": 1980,
-        "month": 6,
-        "extent": 12.49
-      },
-      {
-        "year": 1980,
-        "month": 7,
-        "extent": 15.56
-      },
-      {
-        "year": 1980,
-        "month": 8,
-        "extent": 17.81
-      },
-      {
-        "year": 1980,
-        "month": 9,
-        "extent": 18.82
-      },
-      {
-        "year": 1980,
-        "month": 10,
-        "extent": 18.57
-      },
-      {
-        "year": 1980,
-        "month": 11,
-        "extent": 16.13
-      },
-      {
-        "year": 1980,
-        "month": 12,
-        "extent": 10.16
-      },
-      {
-        "year": 1981,
-        "month": 1,
-        "extent": 4.41
-      },
-      {
-        "year": 1981,
-        "month": 2,
-        "extent": 2.87
-      },
-      {
-        "year": 1981,
-        "month": 3,
-        "extent": 3.39
-      },
-      {
-        "year": 1981,
-        "month": 4,
-        "extent": 5.84
-      },
-      {
-        "year": 1981,
-        "month": 5,
-        "extent": 9.35
-      },
-      {
-        "year": 1981,
-        "month": 6,
-        "extent": 13.11
-      },
-      {
-        "year": 1981,
-        "month": 7,
-        "extent": 16.04
-      },
-      {
-        "year": 1981,
-        "month": 8,
-        "extent": 17.74
-      },
-      {
-        "year": 1981,
-        "month": 9,
-        "extent": 18.6
-      },
-      {
-        "year": 1981,
-        "month": 10,
-        "extent": 18.29
-      },
-      {
-        "year": 1981,
-        "month": 11,
-        "extent": 16.11
-      },
-      {
-        "year": 1981,
-        "month": 12,
-        "extent": 10.89
-      },
-      {
-        "year": 1982,
-        "month": 1,
-        "extent": 5.26
-      },
-      {
-        "year": 1982,
-        "month": 2,
-        "extent": 3.13
-      },
-      {
-        "year": 1982,
-        "month": 3,
-        "extent": 4.29
-      },
-      {
-        "year": 1982,
-        "month": 4,
-        "extent": 7.72
-      },
-      {
-        "year": 1982,
-        "month": 5,
-        "extent": 10.76
-      },
-      {
-        "year": 1982,
-        "month": 6,
-        "extent": 13.42
-      },
-      {
-        "year": 1982,
-        "month": 7,
-        "extent": 15.87
-      },
-      {
-        "year": 1982,
-        "month": 8,
-        "extent": 17.79
-      },
-      {
-        "year": 1982,
-        "month": 9,
-        "extent": 18.35
-      },
-      {
-        "year": 1982,
-        "month": 10,
-        "extent": 17.79
-      },
-      {
-        "year": 1982,
-        "month": 11,
-        "extent": 15.54
-      },
-      {
-        "year": 1982,
-        "month": 12,
-        "extent": 9.22
-      },
-      {
-        "year": 1983,
-        "month": 1,
-        "extent": 4.77
-      },
-      {
-        "year": 1983,
-        "month": 2,
-        "extent": 3.07
-      },
-      {
-        "year": 1983,
-        "month": 3,
-        "extent": 4.02
-      },
-      {
-        "year": 1983,
-        "month": 4,
-        "extent": 6.47
-      },
-      {
-        "year": 1983,
-        "month": 5,
-        "extent": 9.53
-      },
-      {
-        "year": 1983,
-        "month": 6,
-        "extent": 12.64
-      },
-      {
-        "year": 1983,
-        "month": 7,
-        "extent": 15.47
-      },
-      {
-        "year": 1983,
-        "month": 8,
-        "extent": 17.25
-      },
-      {
-        "year": 1983,
-        "month": 9,
-        "extent": 18.59
-      },
-      {
-        "year": 1983,
-        "month": 10,
-        "extent": 17.92
-      },
-      {
-        "year": 1983,
-        "month": 11,
-        "extent": 16.01
-      },
-      {
-        "year": 1983,
-        "month": 12,
-        "extent": 10.39
-      },
-      {
-        "year": 1984,
-        "month": 1,
-        "extent": 4.78
-      },
-      {
-        "year": 1984,
-        "month": 2,
-        "extent": 2.68
-      },
-      {
-        "year": 1984,
-        "month": 3,
-        "extent": 3.61
-      },
-      {
-        "year": 1984,
-        "month": 4,
-        "extent": 6.42
-      },
-      {
-        "year": 1984,
-        "month": 5,
-        "extent": 9.75
-      },
-      {
-        "year": 1984,
-        "month": 6,
-        "extent": 13.23
-      },
-      {
-        "year": 1984,
-        "month": 7,
-        "extent": 16.4
-      },
-      {
-        "year": 1984,
-        "month": 8,
-        "extent": 17.93
-      },
-      {
-        "year": 1984,
-        "month": 9,
-        "extent": 18.17
-      },
-      {
-        "year": 1984,
-        "month": 10,
-        "extent": 17.57
-      },
-      {
-        "year": 1984,
-        "month": 11,
-        "extent": 16.13
-      },
-      {
-        "year": 1984,
-        "month": 12,
-        "extent": 10.47
-      },
-      {
-        "year": 1985,
-        "month": 1,
-        "extent": 4.46
-      },
-      {
-        "year": 1985,
-        "month": 2,
-        "extent": 2.84
-      },
-      {
-        "year": 1985,
-        "month": 3,
-        "extent": 3.72
-      },
-      {
-        "year": 1985,
-        "month": 4,
-        "extent": 6.49
-      },
-      {
-        "year": 1985,
-        "month": 5,
-        "extent": 10.15
-      },
-      {
-        "year": 1985,
-        "month": 6,
-        "extent": 13.43
-      },
-      {
-        "year": 1985,
-        "month": 7,
-        "extent": 15.72
-      },
-      {
-        "year": 1985,
-        "month": 8,
-        "extent": 17.63
-      },
-      {
-        "year": 1985,
-        "month": 9,
-        "extent": 18.7
-      },
-      {
-        "year": 1985,
-        "month": 10,
-        "extent": 18.2
-      },
-      {
-        "year": 1985,
-        "month": 11,
-        "extent": 16.14
-      },
-      {
-        "year": 1985,
-        "month": 12,
-        "extent": 11.35
-      },
-      {
-        "year": 1986,
-        "month": 1,
-        "extent": 5.42
-      },
-      {
-        "year": 1986,
-        "month": 2,
-        "extent": 3.19
-      },
-      {
-        "year": 1986,
-        "month": 3,
-        "extent": 3.7
-      },
-      {
-        "year": 1986,
-        "month": 4,
-        "extent": 6.39
-      },
-      {
-        "year": 1986,
-        "month": 5,
-        "extent": 9.3
-      },
-      {
-        "year": 1986,
-        "month": 6,
-        "extent": 12.69
-      },
-      {
-        "year": 1986,
-        "month": 7,
-        "extent": 15.32
-      },
-      {
-        "year": 1986,
-        "month": 8,
-        "extent": 17
-      },
-      {
-        "year": 1986,
-        "month": 9,
-        "extent": 17.68
-      },
-      {
-        "year": 1986,
-        "month": 10,
-        "extent": 17.18
-      },
-      {
-        "year": 1986,
-        "month": 11,
-        "extent": 15.01
-      },
-      {
-        "year": 1986,
-        "month": 12,
-        "extent": 9.65
-      },
-      {
-        "year": 1987,
-        "month": 1,
-        "extent": 5.13
-      },
-      {
-        "year": 1987,
-        "month": 2,
-        "extent": 3.25
-      },
-      {
-        "year": 1987,
-        "month": 3,
-        "extent": 4.11
-      },
-      {
-        "year": 1987,
-        "month": 4,
-        "extent": 6.8
-      },
-      {
-        "year": 1987,
-        "month": 5,
-        "extent": 9.69
-      },
-      {
-        "year": 1987,
-        "month": 6,
-        "extent": 12.68
-      },
-      {
-        "year": 1987,
-        "month": 7,
-        "extent": 15.75
-      },
-      {
-        "year": 1987,
-        "month": 8,
-        "extent": 17.6
-      },
-      {
-        "year": 1987,
-        "month": 9,
-        "extent": 18.25
-      },
-      {
-        "year": 1987,
-        "month": 10,
-        "extent": 17.67
-      },
-      {
-        "year": 1987,
-        "month": 11,
-        "extent": 15.58
-      },
-      {
-        "year": 1988,
-        "month": 2,
-        "extent": 2.89
-      },
-      {
-        "year": 1988,
-        "month": 3,
-        "extent": 3.97
-      },
-      {
-        "year": 1988,
-        "month": 4,
-        "extent": 6.29
-      },
-      {
-        "year": 1988,
-        "month": 5,
-        "extent": 9.6
-      },
-      {
-        "year": 1988,
-        "month": 6,
-        "extent": 13.09
-      },
-      {
-        "year": 1988,
-        "month": 7,
-        "extent": 15.75
-      },
-      {
-        "year": 1988,
-        "month": 8,
-        "extent": 17.56
-      },
-      {
-        "year": 1988,
-        "month": 9,
-        "extent": 18.31
-      },
-      {
-        "year": 1988,
-        "month": 10,
-        "extent": 18.36
-      },
-      {
-        "year": 1988,
-        "month": 11,
-        "extent": 16.15
-      },
-      {
-        "year": 1988,
-        "month": 12,
-        "extent": 11.06
-      },
-      {
-        "year": 1989,
-        "month": 1,
-        "extent": 4.74
-      },
-      {
-        "year": 1989,
-        "month": 2,
-        "extent": 2.98
-      },
-      {
-        "year": 1989,
-        "month": 3,
-        "extent": 3.93
-      },
-      {
-        "year": 1989,
-        "month": 4,
-        "extent": 6.31
-      },
-      {
-        "year": 1989,
-        "month": 5,
-        "extent": 10.3
-      },
-      {
-        "year": 1989,
-        "month": 6,
-        "extent": 13.58
-      },
-      {
-        "year": 1989,
-        "month": 7,
-        "extent": 15.71
-      },
-      {
-        "year": 1989,
-        "month": 8,
-        "extent": 17.47
-      },
-      {
-        "year": 1989,
-        "month": 9,
-        "extent": 18.12
-      },
-      {
-        "year": 1989,
-        "month": 10,
-        "extent": 17.86
-      },
-      {
-        "year": 1989,
-        "month": 11,
-        "extent": 15.73
-      },
-      {
-        "year": 1989,
-        "month": 12,
-        "extent": 9.84
-      },
-      {
-        "year": 1990,
-        "month": 1,
-        "extent": 4.87
-      },
-      {
-        "year": 1990,
-        "month": 2,
-        "extent": 3.04
-      },
-      {
-        "year": 1990,
-        "month": 3,
-        "extent": 3.97
-      },
-      {
-        "year": 1990,
-        "month": 4,
-        "extent": 7
-      },
-      {
-        "year": 1990,
-        "month": 5,
-        "extent": 9.72
-      },
-      {
-        "year": 1990,
-        "month": 6,
-        "extent": 13.08
-      },
-      {
-        "year": 1990,
-        "month": 7,
-        "extent": 15.57
-      },
-      {
-        "year": 1990,
-        "month": 8,
-        "extent": 17.57
-      },
-      {
-        "year": 1990,
-        "month": 9,
-        "extent": 18.19
-      },
-      {
-        "year": 1990,
-        "month": 10,
-        "extent": 17.95
-      },
-      {
-        "year": 1990,
-        "month": 11,
-        "extent": 15.47
-      },
-      {
-        "year": 1990,
-        "month": 12,
-        "extent": 9.95
-      },
-      {
-        "year": 1991,
-        "month": 1,
-        "extent": 5.34
-      },
-      {
-        "year": 1991,
-        "month": 2,
-        "extent": 3.16
-      },
-      {
-        "year": 1991,
-        "month": 3,
-        "extent": 3.81
-      },
-      {
-        "year": 1991,
-        "month": 4,
-        "extent": 7.05
-      },
-      {
-        "year": 1991,
-        "month": 5,
-        "extent": 10.28
-      },
-      {
-        "year": 1991,
-        "month": 6,
-        "extent": 13.07
-      },
-      {
-        "year": 1991,
-        "month": 7,
-        "extent": 15.55
-      },
-      {
-        "year": 1991,
-        "month": 8,
-        "extent": 17.72
-      },
-      {
-        "year": 1991,
-        "month": 9,
-        "extent": 18.31
-      },
-      {
-        "year": 1991,
-        "month": 10,
-        "extent": 17.92
-      },
-      {
-        "year": 1991,
-        "month": 11,
-        "extent": 15.58
-      },
-      {
-        "year": 1991,
-        "month": 12,
-        "extent": 10.19
-      },
-      {
-        "year": 1992,
-        "month": 1,
-        "extent": 4.75
-      },
-      {
-        "year": 1992,
-        "month": 2,
-        "extent": 2.84
-      },
-      {
-        "year": 1992,
-        "month": 3,
-        "extent": 3.57
-      },
-      {
-        "year": 1992,
-        "month": 4,
-        "extent": 6.79
-      },
-      {
-        "year": 1992,
-        "month": 5,
-        "extent": 9.92
-      },
-      {
-        "year": 1992,
-        "month": 6,
-        "extent": 12.81
-      },
-      {
-        "year": 1992,
-        "month": 7,
-        "extent": 15.89
-      },
-      {
-        "year": 1992,
-        "month": 8,
-        "extent": 17.73
-      },
-      {
-        "year": 1992,
-        "month": 9,
-        "extent": 18.15
-      },
-      {
-        "year": 1992,
-        "month": 10,
-        "extent": 17.93
-      },
-      {
-        "year": 1992,
-        "month": 11,
-        "extent": 15.9
-      },
-      {
-        "year": 1992,
-        "month": 12,
-        "extent": 10.21
-      },
-      {
-        "year": 1993,
-        "month": 1,
-        "extent": 4.41
-      },
-      {
-        "year": 1993,
-        "month": 2,
-        "extent": 2.48
-      },
-      {
-        "year": 1993,
-        "month": 3,
-        "extent": 3.67
-      },
-      {
-        "year": 1993,
-        "month": 4,
-        "extent": 6.65
-      },
-      {
-        "year": 1993,
-        "month": 5,
-        "extent": 10.1
-      },
-      {
-        "year": 1993,
-        "month": 6,
-        "extent": 13.15
-      },
-      {
-        "year": 1993,
-        "month": 7,
-        "extent": 15.85
-      },
-      {
-        "year": 1993,
-        "month": 8,
-        "extent": 17.49
-      },
-      {
-        "year": 1993,
-        "month": 9,
-        "extent": 18.54
-      },
-      {
-        "year": 1993,
-        "month": 10,
-        "extent": 18.13
-      },
-      {
-        "year": 1993,
-        "month": 11,
-        "extent": 16.04
-      },
-      {
-        "year": 1993,
-        "month": 12,
-        "extent": 9.93
-      },
-      {
-        "year": 1994,
-        "month": 1,
-        "extent": 4.97
-      },
-      {
-        "year": 1994,
-        "month": 2,
-        "extent": 3.2
-      },
-      {
-        "year": 1994,
-        "month": 3,
-        "extent": 4.55
-      },
-      {
-        "year": 1994,
-        "month": 4,
-        "extent": 7.22
-      },
-      {
-        "year": 1994,
-        "month": 5,
-        "extent": 10.41
-      },
-      {
-        "year": 1994,
-        "month": 6,
-        "extent": 13.56
-      },
-      {
-        "year": 1994,
-        "month": 7,
-        "extent": 16.3
-      },
-      {
-        "year": 1994,
-        "month": 8,
-        "extent": 17.84
-      },
-      {
-        "year": 1994,
-        "month": 9,
-        "extent": 18.61
-      },
-      {
-        "year": 1994,
-        "month": 10,
-        "extent": 18.09
-      },
-      {
-        "year": 1994,
-        "month": 11,
-        "extent": 15.88
-      },
-      {
-        "year": 1994,
-        "month": 12,
-        "extent": 10.1
-      },
-      {
-        "year": 1995,
-        "month": 1,
-        "extent": 5.64
-      },
-      {
-        "year": 1995,
-        "month": 2,
-        "extent": 3.56
-      },
-      {
-        "year": 1995,
-        "month": 3,
-        "extent": 4.63
-      },
-      {
-        "year": 1995,
-        "month": 4,
-        "extent": 7.27
-      },
-      {
-        "year": 1995,
-        "month": 5,
-        "extent": 10.42
-      },
-      {
-        "year": 1995,
-        "month": 6,
-        "extent": 13.29
-      },
-      {
-        "year": 1995,
-        "month": 7,
-        "extent": 15.74
-      },
-      {
-        "year": 1995,
-        "month": 8,
-        "extent": 17.78
-      },
-      {
-        "year": 1995,
-        "month": 9,
-        "extent": 18.37
-      },
-      {
-        "year": 1995,
-        "month": 10,
-        "extent": 18.03
-      },
-      {
-        "year": 1995,
-        "month": 11,
-        "extent": 15.63
-      },
-      {
-        "year": 1995,
-        "month": 12,
-        "extent": 10.62
-      },
-      {
-        "year": 1996,
-        "month": 1,
-        "extent": 5.87
-      },
-      {
-        "year": 1996,
-        "month": 2,
-        "extent": 2.98
-      },
-      {
-        "year": 1996,
-        "month": 3,
-        "extent": 4.18
-      },
-      {
-        "year": 1996,
-        "month": 4,
-        "extent": 7.28
-      },
-      {
-        "year": 1996,
-        "month": 5,
-        "extent": 10.92
-      },
-      {
-        "year": 1996,
-        "month": 6,
-        "extent": 13.87
-      },
-      {
-        "year": 1996,
-        "month": 7,
-        "extent": 16.12
-      },
-      {
-        "year": 1996,
-        "month": 8,
-        "extent": 17.74
-      },
-      {
-        "year": 1996,
-        "month": 9,
-        "extent": 18.63
-      },
-      {
-        "year": 1996,
-        "month": 10,
-        "extent": 17.96
-      },
-      {
-        "year": 1996,
-        "month": 11,
-        "extent": 15.72
-      },
-      {
-        "year": 1996,
-        "month": 12,
-        "extent": 9.65
-      },
-      {
-        "year": 1997,
-        "month": 1,
-        "extent": 4.2
-      },
-      {
-        "year": 1997,
-        "month": 2,
-        "extent": 2.49
-      },
-      {
-        "year": 1997,
-        "month": 3,
-        "extent": 3.46
-      },
-      {
-        "year": 1997,
-        "month": 4,
-        "extent": 6.49
-      },
-      {
-        "year": 1997,
-        "month": 5,
-        "extent": 10.12
-      },
-      {
-        "year": 1997,
-        "month": 6,
-        "extent": 13.12
-      },
-      {
-        "year": 1997,
-        "month": 7,
-        "extent": 15.92
-      },
-      {
-        "year": 1997,
-        "month": 8,
-        "extent": 17.68
-      },
-      {
-        "year": 1997,
-        "month": 9,
-        "extent": 18.6
-      },
-      {
-        "year": 1997,
-        "month": 10,
-        "extent": 17.99
-      },
-      {
-        "year": 1997,
-        "month": 11,
-        "extent": 15.73
-      },
-      {
-        "year": 1997,
-        "month": 12,
-        "extent": 10.29
-      },
-      {
-        "year": 1998,
-        "month": 1,
-        "extent": 4.46
-      },
-      {
-        "year": 1998,
-        "month": 2,
-        "extent": 2.99
-      },
-      {
-        "year": 1998,
-        "month": 3,
-        "extent": 4.11
-      },
-      {
-        "year": 1998,
-        "month": 4,
-        "extent": 6.85
-      },
-      {
-        "year": 1998,
-        "month": 5,
-        "extent": 10.33
-      },
-      {
-        "year": 1998,
-        "month": 6,
-        "extent": 13.31
-      },
-      {
-        "year": 1998,
-        "month": 7,
-        "extent": 15.96
-      },
-      {
-        "year": 1998,
-        "month": 8,
-        "extent": 17.88
-      },
-      {
-        "year": 1998,
-        "month": 9,
-        "extent": 18.9
-      },
-      {
-        "year": 1998,
-        "month": 10,
-        "extent": 18.66
-      },
-      {
-        "year": 1998,
-        "month": 11,
-        "extent": 16.3
-      },
-      {
-        "year": 1998,
-        "month": 12,
-        "extent": 10.52
-      },
-      {
-        "year": 1999,
-        "month": 1,
-        "extent": 4.82
-      },
-      {
-        "year": 1999,
-        "month": 2,
-        "extent": 2.97
-      },
-      {
-        "year": 1999,
-        "month": 3,
-        "extent": 3.98
-      },
-      {
-        "year": 1999,
-        "month": 4,
-        "extent": 6.89
-      },
-      {
-        "year": 1999,
-        "month": 5,
-        "extent": 10.27
-      },
-      {
-        "year": 1999,
-        "month": 6,
-        "extent": 13.65
-      },
-      {
-        "year": 1999,
-        "month": 7,
-        "extent": 16.28
-      },
-      {
-        "year": 1999,
-        "month": 8,
-        "extent": 17.96
-      },
-      {
-        "year": 1999,
-        "month": 9,
-        "extent": 18.7
-      },
-      {
-        "year": 1999,
-        "month": 10,
-        "extent": 18.35
-      },
-      {
-        "year": 1999,
-        "month": 11,
-        "extent": 15.96
-      },
-      {
-        "year": 1999,
-        "month": 12,
-        "extent": 10.72
-      },
-      {
-        "year": 2000,
-        "month": 1,
-        "extent": 4.75
-      },
-      {
-        "year": 2000,
-        "month": 2,
-        "extent": 2.91
-      },
-      {
-        "year": 2000,
-        "month": 3,
-        "extent": 4.09
-      },
-      {
-        "year": 2000,
-        "month": 4,
-        "extent": 7.13
-      },
-      {
-        "year": 2000,
-        "month": 5,
-        "extent": 10.92
-      },
-      {
-        "year": 2000,
-        "month": 6,
-        "extent": 13.89
-      },
-      {
-        "year": 2000,
-        "month": 7,
-        "extent": 16.1
-      },
-      {
-        "year": 2000,
-        "month": 8,
-        "extent": 18.21
-      },
-      {
-        "year": 2000,
-        "month": 9,
-        "extent": 18.89
-      },
-      {
-        "year": 2000,
-        "month": 10,
-        "extent": 18.13
-      },
-      {
-        "year": 2000,
-        "month": 11,
-        "extent": 15.76
-      },
-      {
-        "year": 2000,
-        "month": 12,
-        "extent": 9.91
-      },
-      {
-        "year": 2001,
-        "month": 1,
-        "extent": 5.23
-      },
-      {
-        "year": 2001,
-        "month": 2,
-        "extent": 3.65
-      },
-      {
-        "year": 2001,
-        "month": 3,
-        "extent": 4.73
-      },
-      {
-        "year": 2001,
-        "month": 4,
-        "extent": 7.04
-      },
-      {
-        "year": 2001,
-        "month": 5,
-        "extent": 10.33
-      },
-      {
-        "year": 2001,
-        "month": 6,
-        "extent": 13.42
-      },
-      {
-        "year": 2001,
-        "month": 7,
-        "extent": 15.85
-      },
-      {
-        "year": 2001,
-        "month": 8,
-        "extent": 17.42
-      },
-      {
-        "year": 2001,
-        "month": 9,
-        "extent": 18.17
-      },
-      {
-        "year": 2001,
-        "month": 10,
-        "extent": 17.73
-      },
-      {
-        "year": 2001,
-        "month": 11,
-        "extent": 15.61
-      },
-      {
-        "year": 2001,
-        "month": 12,
-        "extent": 10.35
-      },
-      {
-        "year": 2002,
-        "month": 1,
-        "extent": 4.74
-      },
-      {
-        "year": 2002,
-        "month": 2,
-        "extent": 2.96
-      },
-      {
-        "year": 2002,
-        "month": 3,
-        "extent": 3.75
-      },
-      {
-        "year": 2002,
-        "month": 4,
-        "extent": 6.33
-      },
-      {
-        "year": 2002,
-        "month": 5,
-        "extent": 9.51
-      },
-      {
-        "year": 2002,
-        "month": 6,
-        "extent": 12.38
-      },
-      {
-        "year": 2002,
-        "month": 7,
-        "extent": 15.41
-      },
-      {
-        "year": 2002,
-        "month": 8,
-        "extent": 17.07
-      },
-      {
-        "year": 2002,
-        "month": 9,
-        "extent": 17.89
-      },
-      {
-        "year": 2002,
-        "month": 10,
-        "extent": 17.87
-      },
-      {
-        "year": 2002,
-        "month": 11,
-        "extent": 15.41
-      },
-      {
-        "year": 2002,
-        "month": 12,
-        "extent": 10.79
-      },
-      {
-        "year": 2003,
-        "month": 1,
-        "extent": 5.77
-      },
-      {
-        "year": 2003,
-        "month": 2,
-        "extent": 3.79
-      },
-      {
-        "year": 2003,
-        "month": 3,
-        "extent": 4.44
-      },
-      {
-        "year": 2003,
-        "month": 4,
-        "extent": 7.21
-      },
-      {
-        "year": 2003,
-        "month": 5,
-        "extent": 10.74
-      },
-      {
-        "year": 2003,
-        "month": 6,
-        "extent": 13.99
-      },
-      {
-        "year": 2003,
-        "month": 7,
-        "extent": 16.4
-      },
-      {
-        "year": 2003,
-        "month": 8,
-        "extent": 17.58
-      },
-      {
-        "year": 2003,
-        "month": 9,
-        "extent": 18.3
-      },
-      {
-        "year": 2003,
-        "month": 10,
-        "extent": 18.2
-      },
-      {
-        "year": 2003,
-        "month": 11,
-        "extent": 16.11
-      },
-      {
-        "year": 2003,
-        "month": 12,
-        "extent": 10.56
-      },
-      {
-        "year": 2004,
-        "month": 1,
-        "extent": 5.59
-      },
-      {
-        "year": 2004,
-        "month": 2,
-        "extent": 3.58
-      },
-      {
-        "year": 2004,
-        "month": 3,
-        "extent": 4.53
-      },
-      {
-        "year": 2004,
-        "month": 4,
-        "extent": 7.28
-      },
-      {
-        "year": 2004,
-        "month": 5,
-        "extent": 10.47
-      },
-      {
-        "year": 2004,
-        "month": 6,
-        "extent": 13.78
-      },
-      {
-        "year": 2004,
-        "month": 7,
-        "extent": 16.33
-      },
-      {
-        "year": 2004,
-        "month": 8,
-        "extent": 18.01
-      },
-      {
-        "year": 2004,
-        "month": 9,
-        "extent": 18.92
-      },
-      {
-        "year": 2004,
-        "month": 10,
-        "extent": 18.46
-      },
-      {
-        "year": 2004,
-        "month": 11,
-        "extent": 16.08
-      },
-      {
-        "year": 2004,
-        "month": 12,
-        "extent": 10.23
-      },
-      {
-        "year": 2005,
-        "month": 1,
-        "extent": 4.75
-      },
-      {
-        "year": 2005,
-        "month": 2,
-        "extent": 2.97
-      },
-      {
-        "year": 2005,
-        "month": 3,
-        "extent": 4.08
-      },
-      {
-        "year": 2005,
-        "month": 4,
-        "extent": 7.03
-      },
-      {
-        "year": 2005,
-        "month": 5,
-        "extent": 10.29
-      },
-      {
-        "year": 2005,
-        "month": 6,
-        "extent": 13.29
-      },
-      {
-        "year": 2005,
-        "month": 7,
-        "extent": 16.16
-      },
-      {
-        "year": 2005,
-        "month": 8,
-        "extent": 17.92
-      },
-      {
-        "year": 2005,
-        "month": 9,
-        "extent": 18.8
-      },
-      {
-        "year": 2005,
-        "month": 10,
-        "extent": 18.48
-      },
-      {
-        "year": 2005,
-        "month": 11,
-        "extent": 16.32
-      },
-      {
-        "year": 2005,
-        "month": 12,
-        "extent": 9.68
-      },
-      {
-        "year": 2006,
-        "month": 1,
-        "extent": 4.16
-      },
-      {
-        "year": 2006,
-        "month": 2,
-        "extent": 2.65
-      },
-      {
-        "year": 2006,
-        "month": 3,
-        "extent": 3.21
-      },
-      {
-        "year": 2006,
-        "month": 4,
-        "extent": 6.01
-      },
-      {
-        "year": 2006,
-        "month": 5,
-        "extent": 9.46
-      },
-      {
-        "year": 2006,
-        "month": 6,
-        "extent": 13.34
-      },
-      {
-        "year": 2006,
-        "month": 7,
-        "extent": 16.11
-      },
-      {
-        "year": 2006,
-        "month": 8,
-        "extent": 18.1
-      },
-      {
-        "year": 2006,
-        "month": 9,
-        "extent": 19.09
-      },
-      {
-        "year": 2006,
-        "month": 10,
-        "extent": 18.73
-      },
-      {
-        "year": 2006,
-        "month": 11,
-        "extent": 16.23
-      },
-      {
-        "year": 2006,
-        "month": 12,
-        "extent": 9.85
-      },
-      {
-        "year": 2007,
-        "month": 1,
-        "extent": 4.67
-      },
-      {
-        "year": 2007,
-        "month": 2,
-        "extent": 2.9
-      },
-      {
-        "year": 2007,
-        "month": 3,
-        "extent": 3.83
-      },
-      {
-        "year": 2007,
-        "month": 4,
-        "extent": 6.42
-      },
-      {
-        "year": 2007,
-        "month": 5,
-        "extent": 9.65
-      },
-      {
-        "year": 2007,
-        "month": 6,
-        "extent": 13.29
-      },
-      {
-        "year": 2007,
-        "month": 7,
-        "extent": 15.96
-      },
-      {
-        "year": 2007,
-        "month": 8,
-        "extent": 17.68
-      },
-      {
-        "year": 2007,
-        "month": 9,
-        "extent": 18.86
-      },
-      {
-        "year": 2007,
-        "month": 10,
-        "extent": 18.51
-      },
-      {
-        "year": 2007,
-        "month": 11,
-        "extent": 15.89
-      },
-      {
-        "year": 2007,
-        "month": 12,
-        "extent": 11.98
-      },
-      {
-        "year": 2008,
-        "month": 1,
-        "extent": 6.41
-      },
-      {
-        "year": 2008,
-        "month": 2,
-        "extent": 3.89
-      },
-      {
-        "year": 2008,
-        "month": 3,
-        "extent": 5.28
-      },
-      {
-        "year": 2008,
-        "month": 4,
-        "extent": 8.24
-      },
-      {
-        "year": 2008,
-        "month": 5,
-        "extent": 11.05
-      },
-      {
-        "year": 2008,
-        "month": 6,
-        "extent": 14.06
-      },
-      {
-        "year": 2008,
-        "month": 7,
-        "extent": 16.09
-      },
-      {
-        "year": 2008,
-        "month": 8,
-        "extent": 17.64
-      },
-      {
-        "year": 2008,
-        "month": 9,
-        "extent": 18.15
-      },
-      {
-        "year": 2008,
-        "month": 10,
-        "extent": 17.99
-      },
-      {
-        "year": 2008,
-        "month": 11,
-        "extent": 16.25
-      },
-      {
-        "year": 2008,
-        "month": 12,
-        "extent": 11.51
-      },
-      {
-        "year": 2009,
-        "month": 1,
-        "extent": 5.71
-      },
-      {
-        "year": 2009,
-        "month": 2,
-        "extent": 2.99
-      },
-      {
-        "year": 2009,
-        "month": 3,
-        "extent": 4.44
-      },
-      {
-        "year": 2009,
-        "month": 4,
-        "extent": 7.8
-      },
-      {
-        "year": 2009,
-        "month": 5,
-        "extent": 10.93
-      },
-      {
-        "year": 2009,
-        "month": 6,
-        "extent": 13.91
-      },
-      {
-        "year": 2009,
-        "month": 7,
-        "extent": 16.26
-      },
-      {
-        "year": 2009,
-        "month": 8,
-        "extent": 18.1
-      },
-      {
-        "year": 2009,
-        "month": 9,
-        "extent": 18.96
-      },
-      {
-        "year": 2009,
-        "month": 10,
-        "extent": 18.3
-      },
-      {
-        "year": 2009,
-        "month": 11,
-        "extent": 15.85
-      },
-      {
-        "year": 2009,
-        "month": 12,
-        "extent": 10.74
-      },
-      {
-        "year": 2010,
-        "month": 1,
-        "extent": 4.96
-      },
-      {
-        "year": 2010,
-        "month": 2,
-        "extent": 3.11
-      },
-      {
-        "year": 2010,
-        "month": 3,
-        "extent": 3.85
-      },
-      {
-        "year": 2010,
-        "month": 4,
-        "extent": 6.72
-      },
-      {
-        "year": 2010,
-        "month": 5,
-        "extent": 10.64
-      },
-      {
-        "year": 2010,
-        "month": 6,
-        "extent": 14.41
-      },
-      {
-        "year": 2010,
-        "month": 7,
-        "extent": 16.92
-      },
-      {
-        "year": 2010,
-        "month": 8,
-        "extent": 18.61
-      },
-      {
-        "year": 2010,
-        "month": 9,
-        "extent": 18.8
-      },
-      {
-        "year": 2010,
-        "month": 10,
-        "extent": 18.65
-      },
-      {
-        "year": 2010,
-        "month": 11,
-        "extent": 16.75
-      },
-      {
-        "year": 2010,
-        "month": 12,
-        "extent": 11.27
-      },
-      {
-        "year": 2011,
-        "month": 1,
-        "extent": 4.51
-      },
-      {
-        "year": 2011,
-        "month": 2,
-        "extent": 2.52
-      },
-      {
-        "year": 2011,
-        "month": 3,
-        "extent": 3.37
-      },
-      {
-        "year": 2011,
-        "month": 4,
-        "extent": 6.1
-      },
-      {
-        "year": 2011,
-        "month": 5,
-        "extent": 10.09
-      },
-      {
-        "year": 2011,
-        "month": 6,
-        "extent": 13.33
-      },
-      {
-        "year": 2011,
-        "month": 7,
-        "extent": 15.75
-      },
-      {
-        "year": 2011,
-        "month": 8,
-        "extent": 17.81
-      },
-      {
-        "year": 2011,
-        "month": 9,
-        "extent": 18.74
-      },
-      {
-        "year": 2011,
-        "month": 10,
-        "extent": 18.22
-      },
-      {
-        "year": 2011,
-        "month": 11,
-        "extent": 15.76
-      },
-      {
-        "year": 2011,
-        "month": 12,
-        "extent": 11.2
-      },
-      {
-        "year": 2012,
-        "month": 1,
-        "extent": 5.65
-      },
-      {
-        "year": 2012,
-        "month": 2,
-        "extent": 3.55
-      },
-      {
-        "year": 2012,
-        "month": 3,
-        "extent": 4.55
-      },
-      {
-        "year": 2012,
-        "month": 4,
-        "extent": 7.31
-      },
-      {
-        "year": 2012,
-        "month": 5,
-        "extent": 10.46
-      },
-      {
-        "year": 2012,
-        "month": 6,
-        "extent": 13.55
-      },
-      {
-        "year": 2012,
-        "month": 7,
-        "extent": 16.3
-      },
-      {
-        "year": 2012,
-        "month": 8,
-        "extent": 18.1
-      },
-      {
-        "year": 2012,
-        "month": 9,
-        "extent": 19.21
-      },
-      {
-        "year": 2012,
-        "month": 10,
-        "extent": 18.59
-      },
-      {
-        "year": 2012,
-        "month": 11,
-        "extent": 16.11
-      },
-      {
-        "year": 2012,
-        "month": 12,
-        "extent": 10.39
-      },
-      {
-        "year": 2013,
-        "month": 1,
-        "extent": 5.54
-      },
-      {
-        "year": 2013,
-        "month": 2,
-        "extent": 3.84
-      },
-      {
-        "year": 2013,
-        "month": 3,
-        "extent": 5.02
-      },
-      {
-        "year": 2013,
-        "month": 4,
-        "extent": 7.62
-      },
-      {
-        "year": 2013,
-        "month": 5,
-        "extent": 10.92
-      },
-      {
-        "year": 2013,
-        "month": 6,
-        "extent": 14.15
-      },
-      {
-        "year": 2013,
-        "month": 7,
-        "extent": 16.81
-      },
-      {
-        "year": 2013,
-        "month": 8,
-        "extent": 18.66
-      },
-      {
-        "year": 2013,
-        "month": 9,
-        "extent": 19.39
-      },
-      {
-        "year": 2013,
-        "month": 10,
-        "extent": 19.02
-      },
-      {
-        "year": 2013,
-        "month": 11,
-        "extent": 16.87
-      },
-      {
-        "year": 2013,
-        "month": 12,
-        "extent": 11.85
-      },
-      {
-        "year": 2014,
-        "month": 1,
-        "extent": 6.33
-      },
-      {
-        "year": 2014,
-        "month": 2,
-        "extent": 3.84
-      },
-      {
-        "year": 2014,
-        "month": 3,
-        "extent": 4.9
-      },
-      {
-        "year": 2014,
-        "month": 4,
-        "extent": 8.34
-      },
-      {
-        "year": 2014,
-        "month": 5,
-        "extent": 11.52
-      },
-      {
-        "year": 2014,
-        "month": 6,
-        "extent": 14.69
-      },
-      {
-        "year": 2014,
-        "month": 7,
-        "extent": 17.11
-      },
-      {
-        "year": 2014,
-        "month": 8,
-        "extent": 18.91
-      },
-      {
-        "year": 2014,
-        "month": 9,
-        "extent": 19.76
-      },
-      {
-        "year": 2014,
-        "month": 10,
-        "extent": 19
-      },
-      {
-        "year": 2014,
-        "month": 11,
-        "extent": 16.39
-      },
-      {
-        "year": 2014,
-        "month": 12,
-        "extent": 11.93
-      },
-      {
-        "year": 2015,
-        "month": 1,
-        "extent": 6.85
-      },
-      {
-        "year": 2015,
-        "month": 2,
-        "extent": 3.8
-      },
-      {
-        "year": 2015,
-        "month": 3,
-        "extent": 4.96
-      },
-      {
-        "year": 2015,
-        "month": 4,
-        "extent": 8.37
-      },
-      {
-        "year": 2015,
-        "month": 5,
-        "extent": 11.72
-      },
-      {
-        "year": 2015,
-        "month": 6,
-        "extent": 14.47
-      },
-      {
-        "year": 2015,
-        "month": 7,
-        "extent": 16.78
-      },
-      {
-        "year": 2015,
-        "month": 8,
-        "extent": 17.75
-      },
-      {
-        "year": 2015,
-        "month": 9,
-        "extent": 18.44
-      },
-      {
-        "year": 2015,
-        "month": 10,
-        "extent": 18.41
-      },
-      {
-        "year": 2015,
-        "month": 11,
-        "extent": 16.18
-      },
-      {
-        "year": 2015,
-        "month": 12,
-        "extent": 10.66
-      },
-      {
-        "year": 2016,
-        "month": 1,
-        "extent": 4.69
-      },
-      {
-        "year": 2016,
-        "month": 2,
-        "extent": 2.79
-      },
-      {
-        "year": 2016,
-        "month": 3,
-        "extent": 4.07
-      },
-      {
-        "year": 2016,
-        "month": 4,
-        "extent": 7.22
-      },
-      {
-        "year": 2016,
-        "month": 5,
-        "extent": 10.1
-      },
-      {
-        "year": 2016,
-        "month": 6,
-        "extent": 13.24
-      },
-      {
-        "year": 2016,
-        "month": 7,
-        "extent": 16.02
-      },
-      {
-        "year": 2016,
-        "month": 8,
-        "extent": 17.89
-      },
-      {
-        "year": 2016,
-        "month": 9,
-        "extent": 18.15
-      },
-      {
-        "year": 2016,
-        "month": 10,
-        "extent": 17.46
-      },
-      {
-        "year": 2016,
-        "month": 11,
-        "extent": 14.22
-      },
-      {
-        "year": 2016,
-        "month": 12,
-        "extent": 8.28
-      },
-      {
-        "year": 2017,
-        "month": 1,
-        "extent": 3.78
-      },
-      {
-        "year": 2017,
-        "month": 2,
-        "extent": 2.29
-      },
-      {
-        "year": 2017,
-        "month": 3,
-        "extent": 2.7
-      },
-      {
-        "year": 2017,
-        "month": 4,
-        "extent": 5.44
-      },
-      {
-        "year": 2017,
-        "month": 5,
-        "extent": 9.01
-      },
-      {
-        "year": 2017,
-        "month": 6,
-        "extent": 12.41
-      },
-      {
-        "year": 2017,
-        "month": 7,
-        "extent": 15.3
-      },
-      {
-        "year": 2017,
-        "month": 8,
-        "extent": 17.22
-      },
-      {
-        "year": 2017,
-        "month": 9,
-        "extent": 17.91
-      },
-      {
-        "year": 2017,
-        "month": 10,
-        "extent": 17.78
-      },
-      {
-        "year": 2017,
-        "month": 11,
-        "extent": 15.11
-      },
-      {
-        "year": 2017,
-        "month": 12,
-        "extent": 9.48
-      },
-      {
-        "year": 2018,
-        "month": 1,
-        "extent": 4.21
-      },
-      {
-        "year": 2018,
-        "month": 2,
-        "extent": 2.33
-      },
-      {
-        "year": 2018,
-        "month": 3,
-        "extent": 3.54
-      },
-      {
-        "year": 2018,
-        "month": 4,
-        "extent": 6.03
-      },
-      {
-        "year": 2018,
-        "month": 5,
-        "extent": 9.32
-      },
-      {
-        "year": 2018,
-        "month": 6,
-        "extent": 12.89
-      },
-      {
-        "year": 2018,
-        "month": 7,
-        "extent": 15.7
-      },
-      {
-        "year": 2018,
-        "month": 8,
-        "extent": 17.42
-      },
-      {
-        "year": 2018,
-        "month": 9,
-        "extent": 17.96
-      },
-      {
-        "year": 2018,
-        "month": 10,
-        "extent": 17.73
-      },
-      {
-        "year": 2018,
-        "month": 11,
-        "extent": 15.1
-      },
-      {
-        "year": 2018,
-        "month": 12,
-        "extent": 9.19
-      },
-      {
-        "year": 2019,
-        "month": 1,
-        "extent": 3.87
-      },
-      {
-        "year": 2019,
-        "month": 2,
-        "extent": 2.65
-      },
-      {
-        "year": 2019,
-        "month": 3,
-        "extent": 3.17
-      },
-      {
-        "year": 2019,
-        "month": 4,
-        "extent": 5.72
-      },
-      {
-        "year": 2019,
-        "month": 5,
-        "extent": 8.85
-      },
-      {
-        "year": 2019,
-        "month": 6,
-        "extent": 12.25
-      },
-      {
-        "year": 2019,
-        "month": 7,
-        "extent": 15.3
-      },
-      {
-        "year": 2019,
-        "month": 8,
-        "extent": 17.48
-      },
-      {
-        "year": 2019,
-        "month": 9,
-        "extent": 18.33
-      },
-      {
-        "year": 2019,
-        "month": 10,
-        "extent": 17.94
-      },
-      {
-        "year": 2019,
-        "month": 11,
-        "extent": 14.99
-      },
-      {
-        "year": 2019,
-        "month": 12,
-        "extent": 9.41
-      },
-      {
-        "year": 2020,
-        "month": 1,
-        "extent": 4.6
-      },
-      {
-        "year": 2020,
-        "month": 2,
-        "extent": 2.92
-      },
-      {
-        "year": 2020,
-        "month": 3,
-        "extent": 4
-      },
-      {
-        "year": 2020,
-        "month": 4,
-        "extent": 6.66
-      },
-      {
-        "year": 2020,
-        "month": 5,
-        "extent": 9.87
-      },
-      {
-        "year": 2020,
-        "month": 6,
-        "extent": 13.27
-      },
-      {
-        "year": 2020,
-        "month": 7,
-        "extent": 15.72
-      },
-      {
-        "year": 2020,
-        "month": 8,
-        "extent": 17.76
-      },
-      {
-        "year": 2020,
-        "month": 9,
-        "extent": 18.84
-      },
-      {
-        "year": 2020,
-        "month": 10,
-        "extent": 18.49
-      },
-      {
-        "year": 2020,
-        "month": 11,
-        "extent": 16.23
-      },
-      {
-        "year": 2020,
-        "month": 12,
-        "extent": 10.57
-      },
-      {
-        "year": 2021,
-        "month": 1,
-        "extent": 4.78
-      },
-      {
-        "year": 2021,
-        "month": 2,
-        "extent": 2.89
-      },
-      {
-        "year": 2021,
-        "month": 3,
-        "extent": 4.48
-      },
-      {
-        "year": 2021,
-        "month": 4,
-        "extent": 7.13
-      },
-      {
-        "year": 2021,
-        "month": 5,
-        "extent": 10.4
-      },
-      {
-        "year": 2021,
-        "month": 6,
-        "extent": 13.54
-      },
-      {
-        "year": 2021,
-        "month": 7,
-        "extent": 16.45
-      },
-      {
-        "year": 2021,
-        "month": 8,
-        "extent": 18.19
-      },
-      {
-        "year": 2021,
-        "month": 9,
-        "extent": 18.51
-      },
-      {
-        "year": 2021,
-        "month": 10,
-        "extent": 17.69
-      },
-      {
-        "year": 2021,
-        "month": 11,
-        "extent": 15.04
-      },
-      {
-        "year": 2021,
-        "month": 12,
-        "extent": 9.24
-      },
-      {
-        "year": 2022,
-        "month": 1,
-        "extent": 3.94
-      },
-      {
-        "year": 2022,
-        "month": 2,
-        "extent": 2.21
-      },
-      {
-        "year": 2022,
-        "month": 3,
-        "extent": 2.86
-      },
-      {
-        "year": 2022,
-        "month": 4,
-        "extent": 5.95
-      },
-      {
-        "year": 2022,
-        "month": 5,
-        "extent": 9.42
-      },
-      {
-        "year": 2022,
-        "month": 6,
-        "extent": 12.22
-      },
-      {
-        "year": 2022,
-        "month": 7,
-        "extent": 14.99
-      },
-      {
-        "year": 2022,
-        "month": 8,
-        "extent": 17.05
-      },
-      {
-        "year": 2022,
-        "month": 9,
-        "extent": 18.06
-      },
-      {
-        "year": 2022,
-        "month": 10,
-        "extent": 17.47
-      },
-      {
-        "year": 2022,
-        "month": 11,
-        "extent": 15.16
-      },
-      {
-        "year": 2022,
-        "month": 12,
-        "extent": 8.84
-      },
-      {
-        "year": 2023,
-        "month": 1,
-        "extent": 3.3
-      },
-      {
-        "year": 2023,
-        "month": 2,
-        "extent": 1.98
-      },
-      {
-        "year": 2023,
-        "month": 3,
-        "extent": 2.84
-      },
-      {
-        "year": 2023,
-        "month": 4,
-        "extent": 5.54
-      },
-      {
-        "year": 2023,
-        "month": 5,
-        "extent": 8.45
-      },
-      {
-        "year": 2023,
-        "month": 6,
-        "extent": 11.11
-      },
-      {
-        "year": 2023,
-        "month": 7,
         "extent": 13.57
-      },
-      {
-        "year": 2023,
-        "month": 8,
-        "extent": 15.57
-      },
-      {
-        "year": 2023,
-        "month": 9,
-        "extent": 16.89
-      },
-      {
-        "year": 2023,
-        "month": 10,
-        "extent": 16.28
-      },
-      {
-        "year": 2023,
-        "month": 11,
-        "extent": 14.38
-      },
-      {
-        "year": 2023,
-        "month": 12,
-        "extent": 8.76
-      },
-      {
-        "year": 2024,
-        "month": 1,
-        "extent": 4.05
-      },
-      {
-        "year": 2024,
-        "month": 2,
-        "extent": 2.19
-      },
-      {
-        "year": 2024,
-        "month": 3,
-        "extent": 3.22
-      },
-      {
-        "year": 2024,
-        "month": 4,
-        "extent": 6.25
-      },
-      {
-        "year": 2024,
-        "month": 6,
-        "extent": 11.85
-      },
-      {
-        "year": 2024,
-        "month": 7,
-        "extent": 14.2
-      },
-      {
-        "year": 2024,
-        "month": 8,
-        "extent": 16.41
-      },
-      {
-        "year": 2024,
-        "month": 9,
-        "extent": 17.15
-      },
-      {
-        "year": 2024,
-        "month": 10,
-        "extent": 16.65
-      },
-      {
-        "year": 2024,
-        "month": 11,
-        "extent": 14.31
-      },
-      {
-        "year": 2024,
-        "month": 12,
-        "extent": 9.59
-      },
-      {
-        "year": 2025,
-        "month": 1,
-        "extent": 4.69
-      },
-      {
-        "year": 2025,
-        "month": 2,
-        "extent": 2.22
-      },
-      {
-        "year": 2025,
-        "month": 3,
-        "extent": 3
-      },
-      {
-        "year": 2025,
-        "month": 4,
-        "extent": 6.17
-      },
-      {
-        "year": 2025,
-        "month": 5,
-        "extent": 9.27
-      },
-      {
-        "year": 2025,
-        "month": 6,
-        "extent": 12.11
-      },
-      {
-        "year": 2025,
-        "month": 7,
-        "extent": 14.66
-      },
-      {
-        "year": 2025,
-        "month": 8,
-        "extent": 16.5
-      },
-      {
-        "year": 2025,
-        "month": 9,
-        "extent": 17.64
-      },
-      {
-        "year": 2025,
-        "month": 10,
-        "extent": 16.96
-      },
-      {
-        "year": 2025,
-        "month": 11,
-        "extent": 14.58
-      },
-      {
-        "year": 2025,
-        "month": 12,
-        "extent": 9.22
-      },
-      {
-        "year": 2026,
-        "month": 1,
-        "extent": 4.49
-      },
-      {
-        "year": 2026,
-        "month": 2,
-        "extent": 2.91
-      },
-      {
-        "year": 2026,
-        "month": 3,
-        "extent": 3.57
       }
     ]
   },
+  "antarcticSeaIce": null,
   "continentStats": [
     {
       "key": "northernHemisphere",
@@ -33823,2537 +29562,2537 @@
     {
       "iso3": "AFG",
       "name": "Afghanistan",
-      "anomaly": 1.39,
-      "value": 6.92,
-      "monthLabel": "Mar 2026",
-      "rank": 28,
+      "anomaly": 4.47,
+      "value": 16.71,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 1.39,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.22,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.56,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 4.47,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.54,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.98,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "AGO",
       "name": "Angola",
-      "anomaly": 1.28,
-      "value": 23.07,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 0.68,
+      "value": 22.48,
+      "monthLabel": "Apr 2026",
+      "rank": 20,
       "total": 86,
-      "anomaly1m": 1.28,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.15,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.34,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.68,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.99,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.27,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ALB",
       "name": "Albania",
-      "anomaly": 3.08,
-      "value": 9.89,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.16,
+      "value": 11.82,
+      "monthLabel": "Apr 2026",
+      "rank": 18,
       "total": 86,
-      "anomaly1m": 3.08,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.7,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.3,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.16,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.84,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.15,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ARE",
       "name": "United Arab Emirates",
-      "anomaly": 1.77,
-      "value": 24.23,
-      "monthLabel": "Mar 2026",
-      "rank": 13,
+      "anomaly": 3.84,
+      "value": 30.62,
+      "monthLabel": "Apr 2026",
+      "rank": 1,
       "total": 86,
-      "anomaly1m": 1.77,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.67,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.04,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.84,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.62,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.28,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ARG",
       "name": "Argentina",
-      "anomaly": 0.82,
-      "value": 18.69,
-      "monthLabel": "Mar 2026",
-      "rank": 21,
+      "anomaly": -0.44,
+      "value": 13.9,
+      "monthLabel": "Apr 2026",
+      "rank": 64,
       "total": 86,
-      "anomaly1m": 0.82,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.79,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.87,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": -0.44,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.03,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.81,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ARM",
       "name": "Armenia",
-      "anomaly": 4.71,
-      "value": 3.88,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 1.8,
+      "value": 6.99,
+      "monthLabel": "Apr 2026",
+      "rank": 20,
       "total": 86,
-      "anomaly1m": 4.71,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.62,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.84,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.8,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.12,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.58,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "AUS",
       "name": "Australia",
-      "anomaly": 2.02,
-      "value": 27.49,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 0.32,
+      "value": 22.61,
+      "monthLabel": "Apr 2026",
+      "rank": 32,
       "total": 86,
-      "anomaly1m": 2.02,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.94,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.22,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.32,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.34,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.33,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "AUT",
       "name": "Austria",
-      "anomaly": 3.34,
-      "value": 4.18,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 3.51,
+      "value": 8.67,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 3.34,
-      "label1m": "Mar 2026",
-      "anomaly3m": 3.02,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.75,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.51,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.03,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.8,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "AZE",
       "name": "Azerbaijan",
-      "anomaly": 3.91,
-      "value": 8.27,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.71,
+      "value": 12.19,
+      "monthLabel": "Apr 2026",
+      "rank": 16,
       "total": 86,
-      "anomaly1m": 3.91,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.16,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.63,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.71,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.66,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.44,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BDI",
       "name": "Burundi",
-      "anomaly": 1.73,
-      "value": 21.45,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.5,
+      "value": 20.88,
+      "monthLabel": "Apr 2026",
+      "rank": 4,
       "total": 86,
-      "anomaly1m": 1.73,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.83,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.94,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.5,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.8,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.92,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BEL",
       "name": "Belgium",
-      "anomaly": 2.43,
-      "value": 7.47,
-      "monthLabel": "Mar 2026",
-      "rank": 17,
+      "anomaly": 3.41,
+      "value": 11.48,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 2.43,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.54,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.67,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.41,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.39,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.77,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BEN",
       "name": "Benin",
-      "anomaly": 2.13,
-      "value": 31.86,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 1.73,
+      "value": 31.42,
+      "monthLabel": "Apr 2026",
+      "rank": 4,
       "total": 86,
-      "anomaly1m": 2.13,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.8,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.42,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.73,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.86,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.4,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BFA",
       "name": "Burkina Faso",
-      "anomaly": 2.97,
-      "value": 33.41,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 1.79,
+      "value": 33.73,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 2.97,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.08,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.32,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.79,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.1,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.26,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BGD",
       "name": "Bangladesh",
-      "anomaly": 0.73,
-      "value": 26.22,
-      "monthLabel": "Mar 2026",
-      "rank": 22,
+      "anomaly": 0.41,
+      "value": 28.18,
+      "monthLabel": "Apr 2026",
+      "rank": 34,
       "total": 86,
-      "anomaly1m": 0.73,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.7,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.34,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.41,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.68,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.16,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BGR",
       "name": "Bulgaria",
-      "anomaly": 4.47,
-      "value": 9.3,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": -0.1,
+      "value": 10.3,
+      "monthLabel": "Apr 2026",
+      "rank": 45,
       "total": 86,
-      "anomaly1m": 4.47,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.39,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.25,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": -0.1,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.04,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.94,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BHS",
       "name": "Bahamas",
-      "anomaly": 0.71,
-      "value": 23.74,
-      "monthLabel": "Mar 2026",
-      "rank": 26,
+      "anomaly": 0.72,
+      "value": 24.69,
+      "monthLabel": "Apr 2026",
+      "rank": 20,
       "total": 86,
-      "anomaly1m": 0.71,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.96,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.09,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.72,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.09,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.1,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BIH",
       "name": "Bosnia and Herzegovina",
-      "anomaly": 4.13,
-      "value": 8.33,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 2.74,
+      "value": 11.53,
+      "monthLabel": "Apr 2026",
+      "rank": 10,
       "total": 86,
-      "anomaly1m": 4.13,
-      "label1m": "Mar 2026",
-      "anomaly3m": 3.6,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 3.13,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.74,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.94,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 3.06,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BLR",
       "name": "Belarus",
-      "anomaly": 6.52,
-      "value": 5.26,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 2.95,
+      "value": 9.35,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 6.52,
-      "label1m": "Mar 2026",
-      "anomaly3m": 5.41,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 3.63,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.95,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.62,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 3.56,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BLZ",
       "name": "Belize",
-      "anomaly": 1.45,
-      "value": 25.9,
-      "monthLabel": "Mar 2026",
-      "rank": 9,
+      "anomaly": 0.47,
+      "value": 26.16,
+      "monthLabel": "Apr 2026",
+      "rank": 38,
       "total": 86,
-      "anomaly1m": 1.45,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.59,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.78,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.47,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.25,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.63,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BOL",
       "name": "Bolivia",
-      "anomaly": 0.81,
-      "value": 21.25,
-      "monthLabel": "Mar 2026",
-      "rank": 20,
+      "anomaly": 0.6,
+      "value": 20.11,
+      "monthLabel": "Apr 2026",
+      "rank": 34,
       "total": 86,
-      "anomaly1m": 0.81,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.13,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.71,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.6,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.02,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.51,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BRA",
       "name": "Brazil",
-      "anomaly": 1.07,
-      "value": 25.66,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 1.08,
+      "value": 25.19,
+      "monthLabel": "Apr 2026",
+      "rank": 9,
       "total": 86,
-      "anomaly1m": 1.07,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.9,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.29,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.08,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.24,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BRN",
       "name": "Brunei",
-      "anomaly": 1.29,
-      "value": 26.84,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 0.97,
+      "value": 26.96,
+      "monthLabel": "Apr 2026",
+      "rank": 12,
       "total": 86,
-      "anomaly1m": 1.29,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.3,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.56,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.97,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.16,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.47,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BTN",
       "name": "Bhutan",
-      "anomaly": 2.17,
-      "value": 6.29,
-      "monthLabel": "Mar 2026",
-      "rank": 5,
+      "anomaly": 1.44,
+      "value": 9.01,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 2.17,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.69,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.08,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.44,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.89,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.06,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "BWA",
       "name": "Botswana",
-      "anomaly": 0.27,
-      "value": 24.26,
-      "monthLabel": "Mar 2026",
-      "rank": 38,
+      "anomaly": 0.03,
+      "value": 21.41,
+      "monthLabel": "Apr 2026",
+      "rank": 50,
       "total": 86,
-      "anomaly1m": 0.27,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.01,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.27,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.03,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.23,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.17,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CAF",
       "name": "Central African Republic",
-      "anomaly": 2.42,
-      "value": 29.92,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.42,
+      "value": 28.51,
+      "monthLabel": "Apr 2026",
+      "rank": 10,
       "total": 86,
-      "anomaly1m": 2.42,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.01,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.81,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.42,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.98,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.71,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CAN",
       "name": "Canada",
-      "anomaly": 1.4,
-      "value": -13.89,
-      "monthLabel": "Mar 2026",
-      "rank": 34,
+      "anomaly": 1.51,
+      "value": -4.83,
+      "monthLabel": "Apr 2026",
+      "rank": 16,
       "total": 86,
-      "anomaly1m": 1.4,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.47,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.83,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.51,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.23,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.71,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CHE",
       "name": "Switzerland",
-      "anomaly": 2.94,
-      "value": 2.66,
-      "monthLabel": "Mar 2026",
-      "rank": 9,
+      "anomaly": 3.55,
+      "value": 6.79,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 2.94,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.83,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.34,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.55,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.06,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.47,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CHL",
       "name": "Chile",
-      "anomaly": 0.63,
-      "value": 12.14,
-      "monthLabel": "Mar 2026",
-      "rank": 25,
+      "anomaly": 0.39,
+      "value": 9.71,
+      "monthLabel": "Apr 2026",
+      "rank": 23,
       "total": 86,
-      "anomaly1m": 0.63,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.98,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.58,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.39,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.69,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.61,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CHN",
       "name": "China",
-      "anomaly": 1.42,
-      "value": 2.09,
-      "monthLabel": "Mar 2026",
-      "rank": 20,
+      "anomaly": 2.59,
+      "value": 10.1,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 1.42,
-      "label1m": "Mar 2026",
+      "anomaly1m": 2.59,
+      "label1m": "Apr 2026",
       "anomaly3m": 1.78,
-      "label3m": "Jan–Mar 2026",
+      "label3m": "Feb–Apr 2026",
       "anomaly12m": 2.05,
-      "label12m": "Apr 2025 – Mar 2026"
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CIV",
       "name": "Cote d'Ivoire",
-      "anomaly": 1.23,
-      "value": 28.83,
-      "monthLabel": "Mar 2026",
-      "rank": 9,
+      "anomaly": 1.09,
+      "value": 28.3,
+      "monthLabel": "Apr 2026",
+      "rank": 12,
       "total": 86,
-      "anomaly1m": 1.23,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.43,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.36,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.09,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.23,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.28,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CMR",
       "name": "Cameroon",
-      "anomaly": 2.07,
-      "value": 27.82,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 1.18,
+      "value": 26.77,
+      "monthLabel": "Apr 2026",
+      "rank": 8,
       "total": 86,
-      "anomaly1m": 2.07,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.81,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.64,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.18,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.69,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.56,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "COD",
       "name": "DR Congo",
-      "anomaly": 1.98,
-      "value": 25.63,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.28,
+      "value": 24.91,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 1.98,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.08,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.12,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.28,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.85,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.04,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "COG",
       "name": "Congo",
-      "anomaly": 1.47,
-      "value": 26.34,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 1.1,
+      "value": 26,
+      "monthLabel": "Apr 2026",
+      "rank": 9,
       "total": 86,
-      "anomaly1m": 1.47,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.51,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.67,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.1,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.36,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.59,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "COL",
       "name": "Colombia",
-      "anomaly": 0.71,
-      "value": 24.77,
-      "monthLabel": "Mar 2026",
-      "rank": 13,
+      "anomaly": 1.03,
+      "value": 24.63,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 0.71,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.68,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.34,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.03,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.77,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.27,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CRI",
       "name": "Costa Rica",
-      "anomaly": 0.74,
-      "value": 23.73,
-      "monthLabel": "Mar 2026",
-      "rank": 11,
+      "anomaly": 0.4,
+      "value": 23.83,
+      "monthLabel": "Apr 2026",
+      "rank": 31,
       "total": 86,
-      "anomaly1m": 0.74,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.72,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.4,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.6,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.92,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CUB",
       "name": "Cuba",
-      "anomaly": 0.7,
-      "value": 24.49,
-      "monthLabel": "Mar 2026",
-      "rank": 26,
+      "anomaly": 0.55,
+      "value": 25.39,
+      "monthLabel": "Apr 2026",
+      "rank": 33,
       "total": 86,
-      "anomaly1m": 0.7,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.03,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.19,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.55,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.02,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.17,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CYP",
       "name": "Cyprus",
-      "anomaly": 2.62,
-      "value": 15.7,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 0.38,
+      "value": 16.74,
+      "monthLabel": "Apr 2026",
+      "rank": 39,
       "total": 86,
-      "anomaly1m": 2.62,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.12,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.64,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.38,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.55,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.38,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "CZE",
       "name": "Czechia",
-      "anomaly": 3.02,
-      "value": 5.62,
-      "monthLabel": "Mar 2026",
-      "rank": 11,
+      "anomaly": 3.11,
+      "value": 10.54,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 3.02,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.33,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.36,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.11,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.26,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.38,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "DEU",
       "name": "Germany",
-      "anomaly": 2.46,
-      "value": 6.08,
-      "monthLabel": "Mar 2026",
-      "rank": 16,
+      "anomaly": 3.02,
+      "value": 10.58,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 2.46,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.07,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.07,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.02,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.23,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.11,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "DJI",
       "name": "Djibouti",
-      "anomaly": 1.31,
-      "value": 27.05,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 1.57,
+      "value": 29.3,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 1.31,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.2,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.7,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.57,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.38,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.69,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "DNK",
       "name": "Denmark",
-      "anomaly": 3.23,
-      "value": 5.44,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 3.49,
+      "value": 9.03,
+      "monthLabel": "Apr 2026",
+      "rank": 4,
       "total": 86,
-      "anomaly1m": 3.23,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.58,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.99,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.49,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.84,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.11,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "DOM",
       "name": "Dominican Republic",
-      "anomaly": 1.47,
-      "value": 24.24,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 0.82,
+      "value": 24.18,
+      "monthLabel": "Apr 2026",
+      "rank": 14,
       "total": 86,
-      "anomaly1m": 1.47,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.43,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.54,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.82,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.22,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.49,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "DZA",
       "name": "Algeria",
-      "anomaly": 3.52,
-      "value": 21.43,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 2.7,
+      "value": 24.92,
+      "monthLabel": "Apr 2026",
+      "rank": 8,
       "total": 86,
-      "anomaly1m": 3.52,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.03,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.6,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.7,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.33,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.61,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ECU",
       "name": "Ecuador",
-      "anomaly": 1,
-      "value": 21.77,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 1.16,
+      "value": 21.92,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 1,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.98,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.43,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.16,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.02,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.37,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "EGY",
       "name": "Egypt",
-      "anomaly": 1.97,
-      "value": 20.07,
-      "monthLabel": "Mar 2026",
-      "rank": 10,
+      "anomaly": 1.04,
+      "value": 23.89,
+      "monthLabel": "Apr 2026",
+      "rank": 20,
       "total": 86,
-      "anomaly1m": 1.97,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.73,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.08,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.04,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.96,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.02,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ERI",
       "name": "Eritrea",
-      "anomaly": 1.13,
-      "value": 26.57,
-      "monthLabel": "Mar 2026",
-      "rank": 14,
+      "anomaly": 2.07,
+      "value": 29.53,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 1.13,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.05,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.36,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.07,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.45,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.39,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ESP",
       "name": "Spain",
-      "anomaly": 0.5,
-      "value": 9.21,
-      "monthLabel": "Mar 2026",
-      "rank": 51,
+      "anomaly": 2.32,
+      "value": 13.17,
+      "monthLabel": "Apr 2026",
+      "rank": 10,
       "total": 86,
-      "anomaly1m": 0.5,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.42,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.76,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.32,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.57,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.74,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "EST",
       "name": "Estonia",
-      "anomaly": 5.51,
-      "value": 3,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 2.66,
+      "value": 6.29,
+      "monthLabel": "Apr 2026",
+      "rank": 10,
       "total": 86,
-      "anomaly1m": 5.51,
-      "label1m": "Mar 2026",
-      "anomaly3m": 5.23,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 3.48,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.66,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.79,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 3.54,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ETH",
       "name": "Ethiopia",
-      "anomaly": 1.55,
-      "value": 25.56,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 1.74,
+      "value": 25.38,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 1.55,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.56,
-      "label3m": "Jan–Mar 2026",
+      "anomaly1m": 1.74,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.73,
+      "label3m": "Feb–Apr 2026",
       "anomaly12m": 1.64,
-      "label12m": "Apr 2025 – Mar 2026"
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "FIN",
       "name": "Finland",
-      "anomaly": 4.02,
-      "value": -1.57,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 1.84,
+      "value": 2.11,
+      "monthLabel": "Apr 2026",
+      "rank": 23,
       "total": 86,
-      "anomaly1m": 4.02,
-      "label1m": "Mar 2026",
-      "anomaly3m": 4.75,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 3.07,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.84,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.91,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 3.25,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "FJI",
       "name": "Fiji",
-      "anomaly": 0.71,
-      "value": 25.96,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 1.29,
+      "value": 26,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 0.71,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.73,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.03,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.29,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.97,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "FRA",
       "name": "France",
-      "anomaly": 1.57,
-      "value": 10.41,
-      "monthLabel": "Mar 2026",
-      "rank": 24,
+      "anomaly": 2.65,
+      "value": 13.94,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 1.57,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.46,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.43,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.65,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.88,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.51,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GAB",
       "name": "Gabon",
-      "anomaly": 1.27,
-      "value": 25.88,
-      "monthLabel": "Mar 2026",
-      "rank": 10,
+      "anomaly": 0.96,
+      "value": 25.72,
+      "monthLabel": "Apr 2026",
+      "rank": 11,
       "total": 86,
-      "anomaly1m": 1.27,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.42,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.54,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.96,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.25,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.47,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GBR",
       "name": "United Kingdom",
-      "anomaly": 2.37,
-      "value": 7.17,
-      "monthLabel": "Mar 2026",
-      "rank": 9,
+      "anomaly": 2.84,
+      "value": 9.72,
+      "monthLabel": "Apr 2026",
+      "rank": 3,
       "total": 86,
-      "anomaly1m": 2.37,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.48,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.34,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.84,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.34,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.44,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GEO",
       "name": "Georgia",
-      "anomaly": 3.61,
-      "value": 4.78,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 0.75,
+      "value": 7.57,
+      "monthLabel": "Apr 2026",
+      "rank": 30,
       "total": 86,
-      "anomaly1m": 3.61,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.66,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.54,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.75,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.02,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.2,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GHA",
       "name": "Ghana",
-      "anomaly": 1.56,
-      "value": 30.52,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 1.55,
+      "value": 30.05,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 1.56,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.56,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.53,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.55,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.52,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.49,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GIN",
       "name": "Guinea",
-      "anomaly": 1.71,
-      "value": 29.76,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 0.9,
+      "value": 29.24,
+      "monthLabel": "Apr 2026",
+      "rank": 11,
       "total": 86,
-      "anomaly1m": 1.71,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.35,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.37,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.9,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.23,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.29,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GMB",
       "name": "Gambia",
-      "anomaly": 0.65,
-      "value": 28.44,
-      "monthLabel": "Mar 2026",
-      "rank": 23,
+      "anomaly": 1.41,
+      "value": 30.16,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 0.65,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.73,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.01,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.41,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.84,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.99,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GNB",
       "name": "Guinea-Bissau",
-      "anomaly": 0.69,
-      "value": 28.84,
-      "monthLabel": "Mar 2026",
-      "rank": 21,
+      "anomaly": 0.79,
+      "value": 29.82,
+      "monthLabel": "Apr 2026",
+      "rank": 10,
       "total": 86,
-      "anomaly1m": 0.69,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.65,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.99,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.79,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.72,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.97,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GNQ",
       "name": "Equatorial Guinea",
-      "anomaly": 1.51,
-      "value": 25.33,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 1.16,
+      "value": 25.1,
+      "monthLabel": "Apr 2026",
+      "rank": 8,
       "total": 86,
-      "anomaly1m": 1.51,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.67,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.72,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.16,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.47,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.66,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GRC",
       "name": "Greece",
-      "anomaly": 2.93,
-      "value": 11.58,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 0.53,
+      "value": 13.01,
+      "monthLabel": "Apr 2026",
+      "rank": 32,
       "total": 86,
-      "anomaly1m": 2.93,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.99,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.12,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.53,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.17,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.88,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GRL",
       "name": "Greenland",
-      "anomaly": 3.13,
-      "value": -24.85,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 2.48,
+      "value": -20.12,
+      "monthLabel": "Apr 2026",
+      "rank": 16,
       "total": 86,
-      "anomaly1m": 3.13,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.1,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.52,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.48,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.83,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.42,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GTM",
       "name": "Guatemala",
-      "anomaly": 1.84,
-      "value": 24.08,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 0.86,
+      "value": 24.34,
+      "monthLabel": "Apr 2026",
+      "rank": 30,
       "total": 86,
-      "anomaly1m": 1.84,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.93,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.09,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.86,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.63,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.95,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "GUY",
       "name": "Guyana",
-      "anomaly": 0.46,
-      "value": 25.35,
-      "monthLabel": "Mar 2026",
-      "rank": 23,
+      "anomaly": 0.34,
+      "value": 25.42,
+      "monthLabel": "Apr 2026",
+      "rank": 26,
       "total": 86,
-      "anomaly1m": 0.46,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.62,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.4,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.34,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.41,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.27,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "HND",
       "name": "Honduras",
-      "anomaly": 1.66,
-      "value": 24.8,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 0.46,
+      "value": 24.76,
+      "monthLabel": "Apr 2026",
+      "rank": 33,
       "total": 86,
-      "anomaly1m": 1.66,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.63,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.76,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.46,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.28,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.61,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "HRV",
       "name": "Croatia",
-      "anomaly": 3.24,
-      "value": 9.48,
-      "monthLabel": "Mar 2026",
+      "anomaly": 2.47,
+      "value": 13.31,
+      "monthLabel": "Apr 2026",
       "rank": 9,
       "total": 86,
-      "anomaly1m": 3.24,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.94,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.64,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.47,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.29,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.61,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "HTI",
       "name": "Haiti",
-      "anomaly": 1.3,
-      "value": 24.73,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 0.85,
+      "value": 24.79,
+      "monthLabel": "Apr 2026",
+      "rank": 16,
       "total": 86,
-      "anomaly1m": 1.3,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.53,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.57,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.85,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.31,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.52,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "HUN",
       "name": "Hungary",
-      "anomaly": 2.58,
-      "value": 8.19,
-      "monthLabel": "Mar 2026",
-      "rank": 13,
+      "anomaly": 1.83,
+      "value": 12.89,
+      "monthLabel": "Apr 2026",
+      "rank": 14,
       "total": 86,
-      "anomaly1m": 2.58,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.14,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.98,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.83,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.35,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.93,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "IDN",
       "name": "Indonesia",
-      "anomaly": 1.24,
-      "value": 25.65,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 0.92,
+      "value": 25.51,
+      "monthLabel": "Apr 2026",
+      "rank": 16,
       "total": 86,
-      "anomaly1m": 1.24,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.29,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.51,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.92,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.19,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.43,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "IND",
       "name": "India",
-      "anomaly": 1.04,
-      "value": 24.82,
-      "monthLabel": "Mar 2026",
-      "rank": 14,
+      "anomaly": 0.83,
+      "value": 28.51,
+      "monthLabel": "Apr 2026",
+      "rank": 15,
       "total": 86,
-      "anomaly1m": 1.04,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.11,
-      "label3m": "Jan–Mar 2026",
+      "anomaly1m": 0.83,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.17,
+      "label3m": "Feb–Apr 2026",
       "anomaly12m": 1.1,
-      "label12m": "Apr 2025 – Mar 2026"
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "IRL",
       "name": "Ireland",
-      "anomaly": 1.9,
-      "value": 8.1,
-      "monthLabel": "Mar 2026",
-      "rank": 9,
+      "anomaly": 2.44,
+      "value": 10.4,
+      "monthLabel": "Apr 2026",
+      "rank": 3,
       "total": 86,
-      "anomaly1m": 1.9,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.24,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.88,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.44,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.03,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.99,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "IRN",
       "name": "Iran",
-      "anomaly": 3.09,
-      "value": 13.9,
-      "monthLabel": "Mar 2026",
-      "rank": 15,
+      "anomaly": 5.23,
+      "value": 21.99,
+      "monthLabel": "Apr 2026",
+      "rank": 1,
       "total": 86,
-      "anomaly1m": 3.09,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.24,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.13,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 5.23,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.21,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.43,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "IRQ",
       "name": "Iraq",
-      "anomaly": 2.64,
-      "value": 17.62,
-      "monthLabel": "Mar 2026",
-      "rank": 14,
+      "anomaly": 3.34,
+      "value": 24.18,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 2.64,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.31,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.96,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.34,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.7,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.9,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ISL",
       "name": "Iceland",
-      "anomaly": 3.51,
-      "value": -0.57,
-      "monthLabel": "Mar 2026",
-      "rank": 9,
+      "anomaly": 3.24,
+      "value": 1.61,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 3.51,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.95,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.37,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.24,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.69,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.65,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ISR",
       "name": "Israel",
-      "anomaly": 2.72,
-      "value": 17.54,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 1.7,
+      "value": 20.32,
+      "monthLabel": "Apr 2026",
+      "rank": 9,
       "total": 86,
-      "anomaly1m": 2.72,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.52,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.05,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.7,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.23,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.94,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ITA",
       "name": "Italy",
-      "anomaly": 2.31,
-      "value": 9.39,
-      "monthLabel": "Mar 2026",
-      "rank": 10,
+      "anomaly": 2.11,
+      "value": 12.4,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 2.31,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.42,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.2,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.11,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.15,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.19,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "JAM",
       "name": "Jamaica",
-      "anomaly": 1.58,
-      "value": 25.66,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 1.11,
+      "value": 25.82,
+      "monthLabel": "Apr 2026",
+      "rank": 8,
       "total": 86,
-      "anomaly1m": 1.58,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.72,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.73,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.11,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.5,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.67,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "JOR",
       "name": "Jordan",
-      "anomaly": 2.45,
-      "value": 15.72,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 2.25,
+      "value": 20.23,
+      "monthLabel": "Apr 2026",
+      "rank": 10,
       "total": 86,
-      "anomaly1m": 2.45,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.18,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.95,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.25,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.19,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.83,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "JPN",
       "name": "Japan",
-      "anomaly": 1.93,
-      "value": 5.32,
-      "monthLabel": "Mar 2026",
-      "rank": 13,
+      "anomaly": 1.21,
+      "value": 10.62,
+      "monthLabel": "Apr 2026",
+      "rank": 17,
       "total": 86,
-      "anomaly1m": 1.93,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.37,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.06,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.21,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.25,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.85,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "KAZ",
       "name": "Kazakhstan",
-      "anomaly": 4.78,
-      "value": 0.75,
-      "monthLabel": "Mar 2026",
-      "rank": 13,
+      "anomaly": 5.08,
+      "value": 13.05,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 4.78,
-      "label1m": "Mar 2026",
-      "anomaly3m": 4.7,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.3,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 5.08,
+      "label1m": "Apr 2026",
+      "anomaly3m": 4.65,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.36,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "KEN",
       "name": "Kenya",
-      "anomaly": 1.05,
-      "value": 27.02,
-      "monthLabel": "Mar 2026",
-      "rank": 23,
+      "anomaly": 1.02,
+      "value": 25.86,
+      "monthLabel": "Apr 2026",
+      "rank": 24,
       "total": 86,
-      "anomaly1m": 1.05,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.17,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.45,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.02,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.14,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.43,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "KGZ",
       "name": "Kyrgyzstan",
-      "anomaly": 1.44,
-      "value": -3.96,
-      "monthLabel": "Mar 2026",
-      "rank": 24,
+      "anomaly": 2.84,
+      "value": 3.84,
+      "monthLabel": "Apr 2026",
+      "rank": 4,
       "total": 86,
-      "anomaly1m": 1.44,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.21,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.59,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.84,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.39,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.7,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "KHM",
       "name": "Cambodia",
-      "anomaly": 0.56,
-      "value": 28.79,
-      "monthLabel": "Mar 2026",
-      "rank": 31,
+      "anomaly": 0.72,
+      "value": 29.38,
+      "monthLabel": "Apr 2026",
+      "rank": 24,
       "total": 86,
-      "anomaly1m": 0.56,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.4,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.37,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.72,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.72,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.13,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "KOR",
       "name": "South Korea",
-      "anomaly": 2.57,
-      "value": 7.15,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 1.53,
+      "value": 12.82,
+      "monthLabel": "Apr 2026",
+      "rank": 17,
       "total": 86,
-      "anomaly1m": 2.57,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.45,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.19,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.53,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.26,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.03,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "KWT",
       "name": "Kuwait",
-      "anomaly": 0.77,
-      "value": 19.49,
-      "monthLabel": "Mar 2026",
-      "rank": 33,
+      "anomaly": 3.32,
+      "value": 27.9,
+      "monthLabel": "Apr 2026",
+      "rank": 3,
       "total": 86,
-      "anomaly1m": 0.77,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.49,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.54,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.32,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.06,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.61,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LAO",
       "name": "Laos",
-      "anomaly": 0.5,
-      "value": 23.43,
-      "monthLabel": "Mar 2026",
-      "rank": 36,
+      "anomaly": 0.9,
+      "value": 25.43,
+      "monthLabel": "Apr 2026",
+      "rank": 16,
       "total": 86,
-      "anomaly1m": 0.5,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.27,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.34,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.9,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.75,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.08,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LBN",
       "name": "Lebanon",
-      "anomaly": 3.48,
-      "value": 12.49,
-      "monthLabel": "Mar 2026",
-      "rank": 5,
+      "anomaly": 1.93,
+      "value": 14.77,
+      "monthLabel": "Apr 2026",
+      "rank": 13,
       "total": 86,
-      "anomaly1m": 3.48,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.74,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.25,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.93,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.35,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.09,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LBR",
       "name": "Liberia",
-      "anomaly": 1.18,
-      "value": 27.06,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 0.91,
+      "value": 26.62,
+      "monthLabel": "Apr 2026",
+      "rank": 8,
       "total": 86,
-      "anomaly1m": 1.18,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.51,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.39,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.91,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.19,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.31,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LBY",
       "name": "Libya",
-      "anomaly": 3.63,
-      "value": 21.11,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 0.9,
+      "value": 23.43,
+      "monthLabel": "Apr 2026",
+      "rank": 22,
       "total": 86,
-      "anomaly1m": 3.63,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.57,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.64,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.9,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.78,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.5,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LKA",
       "name": "Sri Lanka",
-      "anomaly": 0.48,
-      "value": 26.78,
-      "monthLabel": "Mar 2026",
+      "anomaly": 0.27,
+      "value": 27.45,
+      "monthLabel": "Apr 2026",
       "rank": 30,
       "total": 86,
-      "anomaly1m": 0.48,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.82,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.97,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.27,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.62,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.88,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LSO",
       "name": "Lesotho",
-      "anomaly": 1.4,
-      "value": 15.4,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 0.84,
+      "value": 11.27,
+      "monthLabel": "Apr 2026",
+      "rank": 27,
       "total": 86,
-      "anomaly1m": 1.4,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.51,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.78,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.84,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.27,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.7,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LTU",
       "name": "Lithuania",
-      "anomaly": 5.4,
-      "value": 4.63,
-      "monthLabel": "Mar 2026",
+      "anomaly": 3.29,
+      "value": 8.84,
+      "monthLabel": "Apr 2026",
       "rank": 4,
       "total": 86,
-      "anomaly1m": 5.4,
-      "label1m": "Mar 2026",
-      "anomaly3m": 4.98,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 3.41,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.29,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.64,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 3.44,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LUX",
       "name": "Luxembourg",
-      "anomaly": 2.5,
-      "value": 6.84,
-      "monthLabel": "Mar 2026",
-      "rank": 16,
+      "anomaly": 2.96,
+      "value": 10.68,
+      "monthLabel": "Apr 2026",
+      "rank": 9,
       "total": 86,
-      "anomaly1m": 2.5,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.73,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.67,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.96,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.17,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.77,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "LVA",
       "name": "Latvia",
-      "anomaly": 5.5,
-      "value": 3.92,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 2.95,
+      "value": 7.64,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 5.5,
-      "label1m": "Mar 2026",
-      "anomaly3m": 5.2,
-      "label3m": "Jan–Mar 2026",
+      "anomaly1m": 2.95,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.64,
+      "label3m": "Feb–Apr 2026",
       "anomaly12m": 3.48,
-      "label12m": "Apr 2025 – Mar 2026"
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MAR",
       "name": "Morocco",
-      "anomaly": 0.59,
-      "value": 14.12,
-      "monthLabel": "Mar 2026",
-      "rank": 39,
+      "anomaly": 2.45,
+      "value": 17.87,
+      "monthLabel": "Apr 2026",
+      "rank": 17,
       "total": 86,
-      "anomaly1m": 0.59,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.92,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.97,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.45,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.28,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.87,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MDA",
       "name": "Moldova",
-      "anomaly": 6.08,
-      "value": 8.47,
-      "monthLabel": "Mar 2026",
-      "rank": 1,
+      "anomaly": 1.12,
+      "value": 10.94,
+      "monthLabel": "Apr 2026",
+      "rank": 28,
       "total": 86,
-      "anomaly1m": 6.08,
-      "label1m": "Mar 2026",
-      "anomaly3m": 4.13,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 3.15,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.12,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.28,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.88,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MDG",
       "name": "Madagascar",
-      "anomaly": 1.06,
-      "value": 24.64,
-      "monthLabel": "Mar 2026",
-      "rank": 11,
+      "anomaly": 2.03,
+      "value": 24.8,
+      "monthLabel": "Apr 2026",
+      "rank": 1,
       "total": 86,
-      "anomaly1m": 1.06,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.29,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.51,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.03,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.37,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.54,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MEX",
       "name": "Mexico",
-      "anomaly": 2.04,
-      "value": 20.29,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 1.29,
+      "value": 22.33,
+      "monthLabel": "Apr 2026",
+      "rank": 11,
       "total": 86,
-      "anomaly1m": 2.04,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.87,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.04,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.29,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.09,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.01,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MLI",
       "name": "Mali",
-      "anomaly": 4.08,
-      "value": 30.81,
-      "monthLabel": "Mar 2026",
-      "rank": 1,
+      "anomaly": 3.08,
+      "value": 33.15,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 4.08,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.14,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.8,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.08,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.73,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.83,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MMR",
       "name": "Myanmar",
-      "anomaly": 1.51,
-      "value": 25.09,
-      "monthLabel": "Mar 2026",
-      "rank": 5,
+      "anomaly": 0.57,
+      "value": 26.69,
+      "monthLabel": "Apr 2026",
+      "rank": 24,
       "total": 86,
-      "anomaly1m": 1.51,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.55,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.57,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.57,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.21,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.43,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MNE",
       "name": "Montenegro",
-      "anomaly": 3.51,
-      "value": 7.01,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 1.99,
+      "value": 9.49,
+      "monthLabel": "Apr 2026",
+      "rank": 12,
       "total": 86,
-      "anomaly1m": 3.51,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.71,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.58,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.99,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.19,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.45,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MNG",
       "name": "Mongolia",
-      "anomaly": 2.75,
-      "value": -4.43,
-      "monthLabel": "Mar 2026",
-      "rank": 20,
+      "anomaly": 3.75,
+      "value": 6.26,
+      "monthLabel": "Apr 2026",
+      "rank": 4,
       "total": 86,
-      "anomaly1m": 2.75,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.35,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.57,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.75,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.6,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.62,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MOZ",
       "name": "Mozambique",
-      "anomaly": 0.86,
-      "value": 25.48,
-      "monthLabel": "Mar 2026",
-      "rank": 17,
+      "anomaly": 1.31,
+      "value": 24.84,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 0.86,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.22,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.52,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.31,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.17,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.53,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MRT",
       "name": "Mauritania",
-      "anomaly": 1.61,
-      "value": 25.55,
-      "monthLabel": "Mar 2026",
-      "rank": 15,
+      "anomaly": 3.04,
+      "value": 29.9,
+      "monthLabel": "Apr 2026",
+      "rank": 4,
       "total": 86,
-      "anomaly1m": 1.61,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.77,
-      "label3m": "Jan–Mar 2026",
+      "anomaly1m": 3.04,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.58,
+      "label3m": "Feb–Apr 2026",
       "anomaly12m": 1.47,
-      "label12m": "Apr 2025 – Mar 2026"
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MWI",
       "name": "Malawi",
-      "anomaly": 0.75,
-      "value": 23.16,
-      "monthLabel": "Mar 2026",
-      "rank": 18,
+      "anomaly": 1.07,
+      "value": 22.79,
+      "monthLabel": "Apr 2026",
+      "rank": 11,
       "total": 86,
-      "anomaly1m": 0.75,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.94,
-      "label3m": "Jan–Mar 2026",
+      "anomaly1m": 1.07,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.01,
+      "label3m": "Feb–Apr 2026",
       "anomaly12m": 1.13,
-      "label12m": "Apr 2025 – Mar 2026"
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "MYS",
       "name": "Malaysia",
-      "anomaly": 1,
-      "value": 25.88,
-      "monthLabel": "Mar 2026",
-      "rank": 10,
+      "anomaly": 0.73,
+      "value": 26.02,
+      "monthLabel": "Apr 2026",
+      "rank": 19,
       "total": 86,
-      "anomaly1m": 1,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.07,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.45,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.73,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.93,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.34,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NAM",
       "name": "Namibia",
-      "anomaly": 0.73,
-      "value": 23.78,
-      "monthLabel": "Mar 2026",
-      "rank": 27,
+      "anomaly": 0.42,
+      "value": 21.54,
+      "monthLabel": "Apr 2026",
+      "rank": 43,
       "total": 86,
-      "anomaly1m": 0.73,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.02,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.65,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.42,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.84,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.5,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NCL",
       "name": "New Caledonia",
-      "anomaly": 0.87,
-      "value": 25.11,
-      "monthLabel": "Mar 2026",
-      "rank": 17,
+      "anomaly": 1.58,
+      "value": 24.49,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 0.87,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.67,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.99,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.58,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.02,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NER",
       "name": "Niger",
-      "anomaly": 3.89,
-      "value": 29.07,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 0.89,
+      "value": 30.61,
+      "monthLabel": "Apr 2026",
+      "rank": 31,
       "total": 86,
-      "anomaly1m": 3.89,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.99,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.8,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.89,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.32,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.61,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NGA",
       "name": "Nigeria",
-      "anomaly": 1.97,
-      "value": 30.92,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 1.29,
+      "value": 31,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 1.97,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.5,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.23,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.29,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.53,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.14,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NIC",
       "name": "Nicaragua",
-      "anomaly": 1.12,
-      "value": 26.35,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 0.52,
+      "value": 26.7,
+      "monthLabel": "Apr 2026",
+      "rank": 25,
       "total": 86,
-      "anomaly1m": 1.12,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.2,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.36,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.52,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.93,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.26,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NLD",
       "name": "Netherlands",
-      "anomaly": 2.09,
-      "value": 7.02,
-      "monthLabel": "Mar 2026",
-      "rank": 20,
+      "anomaly": 3.1,
+      "value": 11.04,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 2.09,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.48,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.74,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.1,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.11,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.78,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NOR",
       "name": "Norway",
-      "anomaly": 4.34,
-      "value": -2.81,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 2.53,
+      "value": -0.52,
+      "monthLabel": "Apr 2026",
+      "rank": 9,
       "total": 86,
-      "anomaly1m": 4.34,
-      "label1m": "Mar 2026",
-      "anomaly3m": 4.94,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 3.49,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.53,
+      "label1m": "Apr 2026",
+      "anomaly3m": 4.33,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 3.6,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NPL",
       "name": "Nepal",
-      "anomaly": 1.67,
-      "value": 11.3,
-      "monthLabel": "Mar 2026",
-      "rank": 10,
+      "anomaly": 1.2,
+      "value": 15.23,
+      "monthLabel": "Apr 2026",
+      "rank": 13,
       "total": 86,
-      "anomaly1m": 1.67,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.97,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.86,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.2,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.66,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.8,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "NZL",
       "name": "New Zealand",
-      "anomaly": 0.63,
-      "value": 14.13,
-      "monthLabel": "Mar 2026",
-      "rank": 21,
+      "anomaly": 1.9,
+      "value": 12.76,
+      "monthLabel": "Apr 2026",
+      "rank": 3,
       "total": 86,
-      "anomaly1m": 0.63,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.65,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.9,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.9,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.33,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "OMN",
       "name": "Oman",
-      "anomaly": 1.25,
-      "value": 25.69,
-      "monthLabel": "Mar 2026",
-      "rank": 18,
+      "anomaly": 2.52,
+      "value": 30.9,
+      "monthLabel": "Apr 2026",
+      "rank": 3,
       "total": 86,
-      "anomaly1m": 1.25,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.25,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.38,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.52,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.95,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.52,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PAK",
       "name": "Pakistan",
-      "anomaly": 1.85,
-      "value": 18.01,
-      "monthLabel": "Mar 2026",
-      "rank": 14,
+      "anomaly": 3.77,
+      "value": 25.6,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 1.85,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.76,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.51,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.77,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.64,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.87,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PAN",
       "name": "Panama",
       "anomaly": 0.61,
-      "value": 25.44,
-      "monthLabel": "Mar 2026",
-      "rank": 18,
+      "value": 25.58,
+      "monthLabel": "Apr 2026",
+      "rank": 19,
       "total": 86,
       "anomaly1m": 0.61,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.68,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.06,
-      "label12m": "Apr 2025 – Mar 2026"
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.59,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PER",
       "name": "Peru",
-      "anomaly": 0.82,
-      "value": 19.54,
-      "monthLabel": "Mar 2026",
-      "rank": 10,
+      "anomaly": 1,
+      "value": 19.47,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 0.82,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.87,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.53,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.9,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.43,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PHL",
       "name": "Philippines",
-      "anomaly": 1.11,
-      "value": 26.14,
-      "monthLabel": "Mar 2026",
+      "anomaly": 1.03,
+      "value": 27.17,
+      "monthLabel": "Apr 2026",
       "rank": 8,
       "total": 86,
-      "anomaly1m": 1.11,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.29,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.4,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.03,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.14,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.34,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PNG",
       "name": "Papua New Guinea",
-      "anomaly": 1.52,
-      "value": 24.55,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.04,
+      "value": 24.04,
+      "monthLabel": "Apr 2026",
+      "rank": 8,
       "total": 86,
-      "anomaly1m": 1.52,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.53,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.47,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.04,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.32,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.4,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "POL",
       "name": "Poland",
-      "anomaly": 4.07,
-      "value": 6.01,
-      "monthLabel": "Mar 2026",
-      "rank": 5,
+      "anomaly": 3.28,
+      "value": 10.63,
+      "monthLabel": "Apr 2026",
+      "rank": 4,
       "total": 86,
-      "anomaly1m": 4.07,
-      "label1m": "Mar 2026",
-      "anomaly3m": 3.49,
-      "label3m": "Jan–Mar 2026",
+      "anomaly1m": 3.28,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.87,
+      "label3m": "Feb–Apr 2026",
       "anomaly12m": 2.88,
-      "label12m": "Apr 2025 – Mar 2026"
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PRI",
       "name": "Puerto Rico",
-      "anomaly": 0.94,
-      "value": 24.7,
-      "monthLabel": "Mar 2026",
-      "rank": 5,
+      "anomaly": 0.61,
+      "value": 24.92,
+      "monthLabel": "Apr 2026",
+      "rank": 10,
       "total": 86,
-      "anomaly1m": 0.94,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.2,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.49,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.61,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.95,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.44,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PRK",
       "name": "North Korea",
-      "anomaly": 3.07,
-      "value": 1.73,
-      "monthLabel": "Mar 2026",
-      "rank": 10,
+      "anomaly": 1.6,
+      "value": 8.34,
+      "monthLabel": "Apr 2026",
+      "rank": 20,
       "total": 86,
-      "anomaly1m": 3.07,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.25,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.55,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.6,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.64,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.32,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PRT",
       "name": "Portugal",
-      "anomaly": 0.43,
-      "value": 11.38,
-      "monthLabel": "Mar 2026",
-      "rank": 49,
+      "anomaly": 1.86,
+      "value": 14.48,
+      "monthLabel": "Apr 2026",
+      "rank": 19,
       "total": 86,
-      "anomaly1m": 0.43,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.26,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.35,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.86,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.25,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.28,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PRY",
       "name": "Paraguay",
-      "anomaly": 1.04,
-      "value": 26.76,
-      "monthLabel": "Mar 2026",
-      "rank": 21,
+      "anomaly": -0.76,
+      "value": 22.31,
+      "monthLabel": "Apr 2026",
+      "rank": 70,
       "total": 86,
-      "anomaly1m": 1.04,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.03,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.78,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": -0.76,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.07,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.44,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "PSE",
       "name": "Palestine",
-      "anomaly": 2.75,
-      "value": 17.21,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 1.75,
+      "value": 19.91,
+      "monthLabel": "Apr 2026",
+      "rank": 14,
       "total": 86,
-      "anomaly1m": 2.75,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.42,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.89,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.75,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.2,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.78,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "QAT",
       "name": "Qatar",
-      "anomaly": 0.84,
-      "value": 22.06,
-      "monthLabel": "Mar 2026",
-      "rank": 34,
+      "anomaly": 3.17,
+      "value": 29.08,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 0.84,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.83,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.55,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.17,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.6,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.73,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ROU",
       "name": "Romania",
-      "anomaly": 4.53,
-      "value": 7.94,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 1.03,
+      "value": 10.59,
+      "monthLabel": "Apr 2026",
+      "rank": 24,
       "total": 86,
-      "anomaly1m": 4.53,
-      "label1m": "Mar 2026",
-      "anomaly3m": 3.1,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.6,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.03,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.68,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.41,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "RUS",
       "name": "Russia",
-      "anomaly": 3.25,
-      "value": -11.05,
-      "monthLabel": "Mar 2026",
-      "rank": 14,
+      "anomaly": 3.62,
+      "value": -1.33,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 3.25,
-      "label1m": "Mar 2026",
-      "anomaly3m": 3.93,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.97,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.62,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.55,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 3.04,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "RWA",
       "name": "Rwanda",
-      "anomaly": 1.94,
-      "value": 20.62,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.47,
+      "value": 19.93,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 1.94,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.13,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.22,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.47,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.01,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.19,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SAU",
       "name": "Saudi Arabia",
-      "anomaly": 1.4,
-      "value": 21.94,
-      "monthLabel": "Mar 2026",
-      "rank": 21,
+      "anomaly": 3.56,
+      "value": 28.52,
+      "monthLabel": "Apr 2026",
+      "rank": 1,
       "total": 86,
-      "anomaly1m": 1.4,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.13,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.22,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.56,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.94,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.37,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SDN",
       "name": "Sudan",
-      "anomaly": 0.77,
-      "value": 26.09,
-      "monthLabel": "Mar 2026",
-      "rank": 29,
+      "anomaly": 1.38,
+      "value": 29.92,
+      "monthLabel": "Apr 2026",
+      "rank": 15,
       "total": 86,
-      "anomaly1m": 0.77,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.36,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.56,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.38,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.17,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.53,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SEN",
       "name": "Senegal",
-      "anomaly": 0.78,
-      "value": 29.53,
-      "monthLabel": "Mar 2026",
-      "rank": 27,
+      "anomaly": 1.61,
+      "value": 31.97,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 0.78,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.28,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.87,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.61,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.68,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.82,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SLB",
       "name": "Solomon Islands",
-      "anomaly": 0.92,
-      "value": 26.84,
-      "monthLabel": "Mar 2026",
-      "rank": 5,
+      "anomaly": 0.83,
+      "value": 26.74,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 0.92,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.08,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.2,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.83,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.99,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.14,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SLE",
       "name": "Sierra Leone",
-      "anomaly": 1.28,
-      "value": 28.91,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 1,
+      "value": 28.22,
+      "monthLabel": "Apr 2026",
+      "rank": 7,
       "total": 86,
-      "anomaly1m": 1.28,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.5,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.37,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.28,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.27,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SLV",
       "name": "El Salvador",
-      "anomaly": 1.63,
-      "value": 27.93,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.19,
+      "value": 28.11,
+      "monthLabel": "Apr 2026",
+      "rank": 8,
       "total": 86,
-      "anomaly1m": 1.63,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.87,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.45,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.19,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.72,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.39,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SOM",
       "name": "Somalia",
-      "anomaly": 0.98,
-      "value": 27.64,
-      "monthLabel": "Mar 2026",
-      "rank": 6,
+      "anomaly": 0.72,
+      "value": 27.81,
+      "monthLabel": "Apr 2026",
+      "rank": 17,
       "total": 86,
-      "anomaly1m": 0.98,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.54,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.25,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.72,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.77,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.2,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SRB",
       "name": "Serbia",
-      "anomaly": 3.99,
-      "value": 9.27,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.42,
+      "value": 12.08,
+      "monthLabel": "Apr 2026",
+      "rank": 16,
       "total": 86,
-      "anomaly1m": 3.99,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.76,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.43,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.42,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.87,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.3,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SSD",
       "name": "South Sudan",
-      "anomaly": 1.85,
-      "value": 31.05,
-      "monthLabel": "Mar 2026",
-      "rank": 17,
+      "anomaly": 1.71,
+      "value": 30.46,
+      "monthLabel": "Apr 2026",
+      "rank": 20,
       "total": 86,
-      "anomaly1m": 1.85,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.42,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.43,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.71,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.25,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.29,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SUR",
       "name": "Suriname",
-      "anomaly": 0.42,
-      "value": 25.61,
-      "monthLabel": "Mar 2026",
+      "anomaly": 0.33,
+      "value": 25.74,
+      "monthLabel": "Apr 2026",
       "rank": 27,
       "total": 86,
-      "anomaly1m": 0.42,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.51,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.34,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.33,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.34,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.24,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SVK",
       "name": "Slovakia",
-      "anomaly": 3.64,
-      "value": 6.16,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 2.63,
+      "value": 10.59,
+      "monthLabel": "Apr 2026",
+      "rank": 6,
       "total": 86,
-      "anomaly1m": 3.64,
-      "label1m": "Mar 2026",
-      "anomaly3m": 3.06,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.66,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.63,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.4,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.63,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SVN",
       "name": "Slovenia",
-      "anomaly": 3.01,
-      "value": 7.1,
-      "monthLabel": "Mar 2026",
-      "rank": 12,
+      "anomaly": 2.58,
+      "value": 11.34,
+      "monthLabel": "Apr 2026",
+      "rank": 8,
       "total": 86,
-      "anomaly1m": 3.01,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.96,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.33,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.58,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.31,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.35,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SWE",
       "name": "Sweden",
-      "anomaly": 4.33,
-      "value": 0.5,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 3.24,
+      "value": 4.37,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 4.33,
-      "label1m": "Mar 2026",
-      "anomaly3m": 4.18,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.61,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 3.24,
+      "label1m": "Apr 2026",
+      "anomaly3m": 4.03,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.88,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SWZ",
       "name": "Eswatini",
-      "anomaly": 0.99,
-      "value": 23.04,
-      "monthLabel": "Mar 2026",
-      "rank": 11,
+      "anomaly": 0.64,
+      "value": 20.33,
+      "monthLabel": "Apr 2026",
+      "rank": 25,
       "total": 86,
-      "anomaly1m": 0.99,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.89,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.2,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.64,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.8,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.21,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "SYR",
       "name": "Syria",
-      "anomaly": 4.05,
-      "value": 15.81,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 2.43,
+      "value": 19.17,
+      "monthLabel": "Apr 2026",
+      "rank": 12,
       "total": 86,
-      "anomaly1m": 4.05,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.01,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.38,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.43,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.86,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.17,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TCD",
       "name": "Chad",
-      "anomaly": 1.88,
-      "value": 28.3,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 1.06,
+      "value": 30.83,
+      "monthLabel": "Apr 2026",
+      "rank": 21,
       "total": 86,
-      "anomaly1m": 1.88,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.03,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.67,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.06,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.63,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.52,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TGO",
       "name": "Togo",
-      "anomaly": 1.62,
-      "value": 30.31,
-      "monthLabel": "Mar 2026",
-      "rank": 5,
+      "anomaly": 1.29,
+      "value": 29.42,
+      "monthLabel": "Apr 2026",
+      "rank": 11,
       "total": 86,
-      "anomaly1m": 1.62,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.7,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.51,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.29,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.55,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.46,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "THA",
       "name": "Thailand",
-      "anomaly": 0.61,
-      "value": 27.59,
-      "monthLabel": "Mar 2026",
+      "anomaly": 0.38,
+      "value": 28.68,
+      "monthLabel": "Apr 2026",
       "rank": 29,
       "total": 86,
-      "anomaly1m": 0.61,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.37,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.3,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.38,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.6,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.06,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TJK",
       "name": "Tajikistan",
-      "anomaly": 1.52,
-      "value": -4.82,
-      "monthLabel": "Mar 2026",
-      "rank": 22,
+      "anomaly": 2.88,
+      "value": 2.32,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 1.52,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.59,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.7,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.88,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.15,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.85,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TKM",
       "name": "Turkmenistan",
-      "anomaly": 3.89,
-      "value": 12.43,
-      "monthLabel": "Mar 2026",
-      "rank": 10,
+      "anomaly": 5.21,
+      "value": 21.72,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 3.89,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.49,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.55,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 5.21,
+      "label1m": "Apr 2026",
+      "anomaly3m": 3.31,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.74,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TLS",
       "name": "East Timor",
-      "anomaly": 1.13,
-      "value": 25.4,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 0.53,
+      "value": 24.8,
+      "monthLabel": "Apr 2026",
+      "rank": 17,
       "total": 86,
-      "anomaly1m": 1.13,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.07,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.84,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.53,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.93,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.79,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TTO",
       "name": "Trinidad and Tobago",
-      "anomaly": 0.95,
-      "value": 26.25,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 0.8,
+      "value": 26.62,
+      "monthLabel": "Apr 2026",
+      "rank": 13,
       "total": 86,
-      "anomaly1m": 0.95,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.41,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.8,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.91,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.35,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TUN",
       "name": "Tunisia",
-      "anomaly": 4.06,
-      "value": 17.96,
-      "monthLabel": "Mar 2026",
-      "rank": 2,
+      "anomaly": 2.03,
+      "value": 19.2,
+      "monthLabel": "Apr 2026",
+      "rank": 17,
       "total": 86,
-      "anomaly1m": 4.06,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.38,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.57,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.03,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.4,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.61,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TUR",
       "name": "Turkey",
-      "anomaly": 4.09,
-      "value": 8.48,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 0.48,
+      "value": 10.04,
+      "monthLabel": "Apr 2026",
+      "rank": 34,
       "total": 86,
-      "anomaly1m": 4.09,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.09,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.18,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.48,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.12,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.79,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "TZA",
       "name": "Tanzania",
-      "anomaly": 1.41,
-      "value": 23.78,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 1.15,
+      "value": 22.99,
+      "monthLabel": "Apr 2026",
+      "rank": 9,
       "total": 86,
-      "anomaly1m": 1.41,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.58,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.27,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.15,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.5,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.28,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "UGA",
       "name": "Uganda",
-      "anomaly": 2.16,
-      "value": 25.34,
-      "monthLabel": "Mar 2026",
-      "rank": 8,
+      "anomaly": 1.32,
+      "value": 23.71,
+      "monthLabel": "Apr 2026",
+      "rank": 9,
       "total": 86,
-      "anomaly1m": 2.16,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.4,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.06,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.32,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.21,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.04,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "UKR",
       "name": "Ukraine",
-      "anomaly": 6.26,
-      "value": 6.94,
-      "monthLabel": "Mar 2026",
-      "rank": 1,
+      "anomaly": 1.79,
+      "value": 10.45,
+      "monthLabel": "Apr 2026",
+      "rank": 20,
       "total": 86,
-      "anomaly1m": 6.26,
-      "label1m": "Mar 2026",
-      "anomaly3m": 4.57,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 3.46,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.79,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.65,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 3.21,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "URY",
       "name": "Uruguay",
-      "anomaly": 1.01,
-      "value": 22.03,
-      "monthLabel": "Mar 2026",
-      "rank": 18,
+      "anomaly": -0.71,
+      "value": 16.68,
+      "monthLabel": "Apr 2026",
+      "rank": 74,
       "total": 86,
-      "anomaly1m": 1.01,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.49,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": -0.71,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.7,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.36,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "USA",
       "name": "United States",
-      "anomaly": 3.29,
-      "value": 5.52,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.9,
+      "value": 9.87,
+      "monthLabel": "Apr 2026",
+      "rank": 5,
       "total": 86,
-      "anomaly1m": 3.29,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.93,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.87,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.9,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2.19,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.88,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "UZB",
       "name": "Uzbekistan",
-      "anomaly": 4.03,
-      "value": 8.95,
-      "monthLabel": "Mar 2026",
-      "rank": 13,
+      "anomaly": 5.56,
+      "value": 19.36,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 4.03,
-      "label1m": "Mar 2026",
-      "anomaly3m": 3.23,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.82,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 5.56,
+      "label1m": "Apr 2026",
+      "anomaly3m": 4,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.97,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "VEN",
       "name": "Venezuela",
-      "anomaly": 1.53,
-      "value": 27.36,
-      "monthLabel": "Mar 2026",
-      "rank": 4,
+      "anomaly": 0.78,
+      "value": 26.46,
+      "monthLabel": "Apr 2026",
+      "rank": 17,
       "total": 86,
-      "anomaly1m": 1.53,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.45,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.58,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.78,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.22,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.48,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "VNM",
       "name": "Vietnam",
-      "anomaly": 0.29,
-      "value": 22.71,
-      "monthLabel": "Mar 2026",
-      "rank": 47,
+      "anomaly": 0.7,
+      "value": 25.32,
+      "monthLabel": "Apr 2026",
+      "rank": 23,
       "total": 86,
-      "anomaly1m": 0.29,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.28,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.19,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.7,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.42,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.97,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "VUT",
       "name": "Vanuatu",
-      "anomaly": 0.52,
-      "value": 26.3,
-      "monthLabel": "Mar 2026",
-      "rank": 19,
+      "anomaly": 1.19,
+      "value": 26.51,
+      "monthLabel": "Apr 2026",
+      "rank": 2,
       "total": 86,
-      "anomaly1m": 0.52,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.69,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 0.84,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.19,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.85,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 0.83,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "XKX",
       "name": "Kosovo",
-      "anomaly": 3.84,
-      "value": 8.45,
-      "monthLabel": "Mar 2026",
-      "rank": 3,
+      "anomaly": 1.23,
+      "value": 10.6,
+      "monthLabel": "Apr 2026",
+      "rank": 21,
       "total": 86,
-      "anomaly1m": 3.84,
-      "label1m": "Mar 2026",
-      "anomaly3m": 2.45,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.32,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.23,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.77,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.17,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "YEM",
       "name": "Yemen",
-      "anomaly": 1.67,
-      "value": 24.76,
-      "monthLabel": "Mar 2026",
-      "rank": 7,
+      "anomaly": 2.28,
+      "value": 27.78,
+      "monthLabel": "Apr 2026",
+      "rank": 3,
       "total": 86,
-      "anomaly1m": 1.67,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.52,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 2.31,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 2.28,
+      "label1m": "Apr 2026",
+      "anomaly3m": 2,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 2.29,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ZAF",
       "name": "South Africa",
-      "anomaly": 1.15,
-      "value": 21.84,
-      "monthLabel": "Mar 2026",
-      "rank": 9,
+      "anomaly": 0.53,
+      "value": 17.79,
+      "monthLabel": "Apr 2026",
+      "rank": 35,
       "total": 86,
-      "anomaly1m": 1.15,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.2,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.48,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 0.53,
+      "label1m": "Apr 2026",
+      "anomaly3m": 0.97,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.42,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ZMB",
       "name": "Zambia",
-      "anomaly": 1.43,
-      "value": 23.05,
-      "monthLabel": "Mar 2026",
-      "rank": 9,
+      "anomaly": 1.17,
+      "value": 22.5,
+      "monthLabel": "Apr 2026",
+      "rank": 11,
       "total": 86,
-      "anomaly1m": 1.43,
-      "label1m": "Mar 2026",
-      "anomaly3m": 1.18,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.18,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.17,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.31,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.17,
+      "label12m": "May 2025 – Apr 2026"
     },
     {
       "iso3": "ZWE",
       "name": "Zimbabwe",
-      "anomaly": 0.72,
-      "value": 23.18,
-      "monthLabel": "Mar 2026",
-      "rank": 25,
+      "anomaly": 1.34,
+      "value": 22.29,
+      "monthLabel": "Apr 2026",
+      "rank": 12,
       "total": 86,
-      "anomaly1m": 0.72,
-      "label1m": "Mar 2026",
-      "anomaly3m": 0.83,
-      "label3m": "Jan–Mar 2026",
-      "anomaly12m": 1.76,
-      "label12m": "Apr 2025 – Mar 2026"
+      "anomaly1m": 1.34,
+      "label1m": "Apr 2026",
+      "anomaly3m": 1.15,
+      "label3m": "Feb–Apr 2026",
+      "anomaly12m": 1.74,
+      "label12m": "May 2025 – Apr 2026"
     }
   ],
   "globalBaseline": 13.9,
@@ -36365,7 +32104,7 @@
     "plus2_0": 15.5
   },
   "lastUpdated": "2026-05-v9",
-  "generatedAt": "2026-05-01T08:46:32.213Z",
+  "generatedAt": "2026-05-05T05:09:49.220Z",
   "sources": [
     {
       "label": "NOAA Climate at a Glance — Global Land+Ocean",
