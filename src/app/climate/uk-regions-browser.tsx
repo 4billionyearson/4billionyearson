@@ -7,7 +7,6 @@ import { ChevronRight, Map as MapIcon, MapPin, X } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { UK_CITY_REGION_MAP } from '@/lib/climate/locations';
 import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
-
 type RegionGroupFilter = 'all' | 'england' | 'wales' | 'scotland' | 'northern-ireland' | 'ireland' | 'cross-border';
 
 type UKRegionCardData = {
@@ -111,7 +110,7 @@ function getMatchedCities(region: UKRegionCardData, query: string): string[] {
   return region.searchableCities.filter((city) => city.toLowerCase().includes(query)).slice(0, 3);
 }
 
-export default function UKRegionsBrowser({ regions, headless = false }: { regions: ClimateRegion[]; headless?: boolean }) {
+export default function UKRegionsBrowser({ regions, headless = false, hideFilter = false }: { regions: ClimateRegion[]; headless?: boolean; hideFilter?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -187,45 +186,20 @@ export default function UKRegionsBrowser({ regions, headless = false }: { region
     return (
       <section className="relative">
         <div className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6 space-y-5">
-          <div className="space-y-4">
-            <div className="relative max-w-2xl">
-              <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'rgba(208, 166, 94, 0.8)' }} />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by city, region or nation"
-                className="w-full rounded-xl border border-[#D0A65E]/35 bg-gray-900/50 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#FFF5E7]/35 outline-none transition-all focus:border-[#D0A65E]/55 focus:ring-2 focus:ring-[#D0A65E]/20"
-                autoComplete="off"
+          {!hideFilter && (
+            <div className="flex flex-wrap items-center gap-2">
+              <ChipDropdown
+                label="Nation"
+                ariaLabel="Filter by UK nation"
+                value={filter}
+                onChange={(k) => setFilter(k as RegionGroupFilter)}
+                options={availableFilterOptions}
               />
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => setQuery('')}
-                  className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-700 hover:text-white"
-                  aria-label="Clear search"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
+                {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
+              </span>
             </div>
-
-            <div className="border-t border-gray-800/80 pt-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <ChipDropdown
-                  label="Nation"
-                  ariaLabel="Filter by UK nation"
-                  value={filter}
-                  onChange={(k) => setFilter(k as RegionGroupFilter)}
-                  options={availableFilterOptions}
-                />
-                <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
-                  {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
-                  {normalizedQuery ? ` matching "${query.trim()}"` : ''}
-                </span>
-              </div>
-            </div>
-          </div>
+          )}
 
           <div className="space-y-6">
             {GROUP_ORDER.map((group) => {

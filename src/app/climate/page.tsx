@@ -5,7 +5,7 @@ import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import UKRegionsBrowser from './uk-regions-browser';
 import ClimateRegionsBrowser from './climate-regions-browser';
 import GroupsBrowserPanel from './groups-browser-panel';
-import { ClimateTabsProvider, ClimateTabsBar, ClimateTabsPanels } from './climate-hub-tabs';
+import { ClimateTabsProvider, ClimateHubControls, ClimateTabsPanels } from './climate-hub-tabs';
 import EditorsPicksPanel from './editors-picks-panel';
 import ClimateRankingsPanel from './climate-rankings-panel';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
@@ -95,6 +95,7 @@ export default function ClimateProfilesIndex() {
         <div className="max-w-7xl mx-auto space-y-6">
 
           <ClimateTabsProvider
+            regions={CLIMATE_REGIONS}
             counts={{
               countries: countries.length,
               usStates: usStates.length,
@@ -117,7 +118,7 @@ export default function ClimateProfilesIndex() {
               ),
               'uk-countries': (
                 <Suspense fallback={<UKRegionsFallback />}>
-                  <UKRegionsBrowser regions={ukCountriesNations} headless />
+                  <UKRegionsBrowser regions={ukCountriesNations} headless hideFilter />
                 </Suspense>
               ),
               'uk-regions': (
@@ -158,8 +159,8 @@ export default function ClimateProfilesIndex() {
                   temperature, rainfall and emissions trends from NOAA, OWID, the Met Office and CRU TS.
                 </p>
               </div>
-              <div className="sticky top-0 z-30 bg-gray-950 px-4 pt-2 pb-1 md:px-6">
-                <ClimateTabsBar />
+              <div className="sticky top-0 z-30 bg-gray-950 px-4 pt-3 pb-3 md:px-6 md:pt-4 md:pb-3 border-b border-gray-800/60">
+                <ClimateHubControls />
               </div>
               <div className="bg-gray-950">
                 <ClimateTabsPanels />

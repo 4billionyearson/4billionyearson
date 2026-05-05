@@ -159,45 +159,20 @@ export default function ClimateRegionsBrowser({
             <p className="text-sm text-gray-400 max-w-3xl">{intro}</p>
           ) : null}
 
-          <div className="relative max-w-2xl">
-            <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'rgba(208, 166, 94, 0.8)' }} />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={mode === 'country' ? 'Search by country or major city' : 'Search by state or city'}
-              className="w-full rounded-xl border border-[#D0A65E]/35 bg-gray-900/50 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#FFF5E7]/35 outline-none transition-all focus:border-[#D0A65E]/55 focus:ring-2 focus:ring-[#D0A65E]/20"
-              autoComplete="off"
+          <div className="flex flex-wrap items-center gap-2">
+            <ChipDropdown
+              label={mode === 'country' ? 'Continent' : 'Region'}
+              ariaLabel={mode === 'country' ? 'Filter by continent' : 'Filter by US climate region'}
+              value={filter}
+              onChange={(k) => setFilter(k)}
+              options={[
+                { key: 'all', label: 'All' },
+                ...availableGroups.map((g) => ({ key: g as string, label: g as string })),
+              ]}
             />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery('')}
-                className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-700 hover:text-white"
-                aria-label="Clear search"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-
-          <div className="border-t border-gray-800/80 pt-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <ChipDropdown
-                label={mode === 'country' ? 'Continent' : 'Region'}
-                ariaLabel={mode === 'country' ? 'Filter by continent' : 'Filter by US climate region'}
-                value={filter}
-                onChange={(k) => setFilter(k)}
-                options={[
-                  { key: 'all', label: 'All' },
-                  ...availableGroups.map((g) => ({ key: g as string, label: g as string })),
-                ]}
-              />
-              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
-                {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
-                {normalizedQuery ? ` matching "${query.trim()}"` : ''}
-              </span>
-            </div>
+            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gray-500 sm:ml-auto">
+              {filteredRegions.length} region{filteredRegions.length === 1 ? '' : 's'}
+            </span>
           </div>
 
           {filteredRegions.length ? (

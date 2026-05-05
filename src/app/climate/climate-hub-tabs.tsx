@@ -1,29 +1,49 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { Sparkles, Globe2, Flag, MapPin, Trophy, Layers, type LucideIcon } from 'lucide-react';
+import Link from 'next/link';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { ChevronRight, Search, Sparkles, X } from 'lucide-react';
+import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
+import type { ClimateRegion } from '@/lib/climate/regions';
 
-export type ClimateTabId = 'editors-picks' | 'continents' | 'countries' | 'uk-countries' | 'uk-regions' | 'us-states' | 'us-climate-regions' | 'rankings';
+export type ClimateTabId =
+  | 'editors-picks'
+  | 'continents'
+  | 'countries'
+  | 'uk-countries'
+  | 'uk-regions'
+  | 'us-states'
+  | 'us-climate-regions'
+  | 'rankings';
+
+type CountKey = 'countries' | 'usStates' | 'ukCountries' | 'ukRegions' | 'continents' | 'usClimateRegions';
 
 type TabDef = {
   id: ClimateTabId;
   label: string;
-  icon: LucideIcon;
-  countKey?: 'countries' | 'usStates' | 'ukCountries' | 'ukRegions' | 'continents' | 'usClimateRegions';
+  countKey?: CountKey;
 };
 
 const TABS: TabDef[] = [
-  { id: 'editors-picks', label: "Editor's Picks", icon: Sparkles },
-  { id: 'continents', label: 'Continents', icon: Layers, countKey: 'continents' },
-  { id: 'countries', label: 'Countries', icon: Globe2, countKey: 'countries' },
-  { id: 'uk-countries', label: 'UK Countries', icon: MapPin, countKey: 'ukCountries' },
-  { id: 'uk-regions', label: 'UK Regions', icon: MapPin, countKey: 'ukRegions' },
-  { id: 'us-states', label: 'US States', icon: Flag, countKey: 'usStates' },
-  { id: 'us-climate-regions', label: 'US Climate Regions', icon: Flag, countKey: 'usClimateRegions' },
-  { id: 'rankings', label: 'Climate Ranking', icon: Trophy },
+  { id: 'editors-picks', label: "Editor's Picks" },
+  { id: 'continents', label: 'Continents', countKey: 'continents' },
+  { id: 'countries', label: 'Countries', countKey: 'countries' },
+  { id: 'uk-countries', label: 'UK Countries', countKey: 'ukCountries' },
+  { id: 'uk-regions', label: 'UK Regions', countKey: 'ukRegions' },
+  { id: 'us-states', label: 'US States', countKey: 'usStates' },
+  { id: 'us-climate-regions', label: 'US Climate Regions', countKey: 'usClimateRegions' },
+  { id: 'rankings', label: 'Climate Ranking' },
 ];
 
-type Counts = { countries: number; usStates: number; ukRegions: number; ukCountries: number; continents: number; usClimateRegions: number };
+type Counts = {
+  countries: number;
+  usStates: number;
+  ukRegions: number;
+  ukCountries: number;
+  continents: number;
+  usClimateRegions: number;
+};
+
 type Panels = Record<ClimateTabId, ReactNode>;
 
 function isTabId(value: string): value is ClimateTabId {
@@ -35,6 +55,9 @@ type Ctx = {
   setActive: (id: ClimateTabId) => void;
   counts: Counts;
   panels: Panels;
+  query: string;
+  setQuery: (q: string) => void;
+  regions: ClimateRegion[];
 };
 
 const ClimateTabsCtx = createContext<Ctx | null>(null);
@@ -48,13 +71,16 @@ function useClimateTabs(): Ctx {
 export function ClimateTabsProvider({
   counts,
   panels,
+  regions,
   children,
 }: {
   counts: Counts;
   panels: Panels;
+  regions: ClimateRegion[];
   children: ReactNode;
 }) {
   const [active, setActive] = useState<ClimateTabId>('editors-picks');
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     const sync = () => {
@@ -74,59 +100,83 @@ export function ClimateTabsProvider({
   };
 
   return (
-    <ClimateTabsCtx.Provider value={{ active, setActive: handleSetActive, counts, panels }}>
+    <ClimateTabsCtx.Provider
+      value={{ active, setActive: handleSetActive, counts, panels, query, setQuery, regions }}
+    >
       {children}
     </ClimateTabsCtx.Provider>
   );
 }
 
-export function ClimateTabsBar() {
-  const { active, setActive, counts } = useClimateTabs();
-  return (
-    <div
-      role="tablist"
-      aria-label="Climate hub sections"
-      className="flex flex-wrap gap-1.5"
-    >
-      {TABS.map((tab) => {
-        const Icon = tab.icon;
+/**
+ * Top-level controls for the Climate Updates hub:
+ *   • Section ChipDropdown (replaces the wrapping 8-chip tab row).
+ *   • Global search input that searches across every system at once.
+ *
+ * When the search input has text, ClimateTabsPanels renders unified
+ * results across all systems instead of the active section's panel.
+ */
+export function ClimateHubControls() {
+  const { active, setActive, counts, query, setQuery } = useClimateTabs();
+
+  const sectionOptions = useMemo(
+    () =>
+      TABS.map((tab) => {
         const count = tab.countKey ? counts[tab.countKey] : null;
-        const isActive = active === tab.id;
-        return (
+        return {
+          key: tab.id,
+          label: count != null ? `${tab.label} (${count})` : tab.label,
+        };
+      }),
+    [counts],
+  );
+
+  return (
+    <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+      <ChipDropdown
+        label="Section"
+        ariaLabel="Climate hub section"
+        value={active}
+        onChange={(k) => setActive(k as ClimateTabId)}
+        options={sectionOptions}
+      />
+      <div className="relative flex-1 min-w-0">
+        <Search
+          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+          style={{ color: 'rgba(208, 166, 94, 0.8)' }}
+        />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search any country, US state, UK region or city…"
+          className="w-full rounded-xl border border-[#D0A65E]/35 bg-gray-900/50 py-2.5 pl-9 pr-10 text-sm text-white placeholder:text-[#FFF5E7]/35 outline-none transition-all focus:border-[#D0A65E]/55 focus:ring-2 focus:ring-[#D0A65E]/20"
+          autoComplete="off"
+          aria-label="Search any region across all systems"
+        />
+        {query && (
           <button
-            key={tab.id}
             type="button"
-            role="tab"
-            aria-selected={isActive}
-            aria-controls={`panel-${tab.id}`}
-            id={`tab-${tab.id}`}
-            onClick={() => setActive(tab.id)}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 h-8 text-[12px] sm:text-[13px] font-medium transition-colors ${
-              isActive
-                ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
-                : 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
-            }`}
+            onClick={() => setQuery('')}
+            className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-700 hover:text-white"
+            aria-label="Clear search"
           >
-            <Icon className="h-3.5 w-3.5" />
-            <span>{tab.label}</span>
-            {count != null && (
-              <span
-                className={`hidden sm:inline rounded-full px-1.5 text-[10px] font-semibold ${
-                  isActive ? 'bg-[#D0A65E]/20 text-[#FFF5E7]' : 'bg-gray-800 text-gray-400'
-                }`}
-              >
-                {count}
-              </span>
-            )}
+            <X className="h-4 w-4" />
           </button>
-        );
-      })}
+        )}
+      </div>
     </div>
   );
 }
 
 export function ClimateTabsPanels() {
-  const { active, panels } = useClimateTabs();
+  const { active, panels, query, regions } = useClimateTabs();
+  const trimmed = query.trim();
+
+  if (trimmed.length >= 1) {
+    return <UnifiedSearchResults query={trimmed} regions={regions} />;
+  }
+
   return (
     <>
       {TABS.map((tab) => (
@@ -142,4 +192,169 @@ export function ClimateTabsPanels() {
       ))}
     </>
   );
+}
+
+// ─── Unified search ──────────────────────────────────────────────────────────
+
+type ResultGroupKey =
+  | 'continents'
+  | 'countries'
+  | 'us-states'
+  | 'uk-regions'
+  | 'us-climate-regions'
+  | 'special';
+
+const RESULT_GROUP_ORDER: ResultGroupKey[] = [
+  'countries',
+  'us-states',
+  'uk-regions',
+  'continents',
+  'us-climate-regions',
+  'special',
+];
+
+const RESULT_GROUP_LABELS: Record<ResultGroupKey, string> = {
+  continents: 'Continents',
+  countries: 'Countries',
+  'us-states': 'US States',
+  'uk-regions': 'UK Regions',
+  'us-climate-regions': 'US Climate Regions',
+  special: 'Other',
+};
+
+function resultGroupFor(region: ClimateRegion): ResultGroupKey {
+  if (region.type === 'country') return 'countries';
+  if (region.type === 'us-state') return 'us-states';
+  if (region.type === 'uk-region') return 'uk-regions';
+  if (region.type === 'group' && region.groupKind === 'continent') return 'continents';
+  if (region.type === 'group' && region.groupKind === 'us-climate-region') return 'us-climate-regions';
+  return 'special';
+}
+
+function regionMatches(region: ClimateRegion, q: string): boolean {
+  const haystack = [region.name, region.tagline, ...(region.coveragePlaces ?? [])]
+    .join(' ')
+    .toLowerCase();
+  return haystack.includes(q);
+}
+
+function UnifiedSearchResults({ query, regions }: { query: string; regions: ClimateRegion[] }) {
+  const q = query.toLowerCase();
+
+  const grouped = useMemo(() => {
+    const map = new Map<ResultGroupKey, ClimateRegion[]>();
+    for (const r of regions) {
+      if (!regionMatches(r, q)) continue;
+      const key = resultGroupFor(r);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return map;
+  }, [regions, q]);
+
+  const total = useMemo(() => {
+    let n = 0;
+    for (const list of grouped.values()) n += list.length;
+    return n;
+  }, [grouped]);
+
+  return (
+    <section className="px-4 pt-3 pb-5 md:px-6 md:pt-4 md:pb-6 space-y-5">
+      <div className="flex items-center gap-3">
+        <Sparkles className="h-4 w-4 text-[#D0A65E]" />
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">
+          Search results
+        </h3>
+        <span className="flex-1 h-px bg-[#D0A65E]/15" />
+        <span className="text-[11px] text-gray-500">
+          {total} match{total === 1 ? '' : 'es'} for &ldquo;{query}&rdquo;
+        </span>
+      </div>
+
+      {total === 0 ? (
+        <div className="rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-8 text-center">
+          <p className="text-sm font-medium text-gray-200">No regions match &ldquo;{query}&rdquo;.</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Try a country, city, US state or UK region name.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {RESULT_GROUP_ORDER.map((groupKey) => {
+            const items = grouped.get(groupKey);
+            if (!items || !items.length) return null;
+            return (
+              <div key={groupKey} className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <h4 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFF5E7]/65">
+                    {RESULT_GROUP_LABELS[groupKey]}
+                  </h4>
+                  <span className="flex-1 h-px bg-[#D0A65E]/15" />
+                  <span className="text-[11px] text-gray-500">{items.length}</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {items.map((r) => (
+                    <ResultCard key={r.slug} region={r} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function typeAccent(region: ClimateRegion): { card: string; hover: string } {
+  if (region.type === 'country') {
+    return {
+      card: 'border-sky-500/40 bg-sky-950/20',
+      hover: 'hover:border-sky-400/70 hover:bg-sky-950/35',
+    };
+  }
+  if (region.type === 'us-state') {
+    return {
+      card: 'border-orange-500/40 bg-orange-950/15',
+      hover: 'hover:border-orange-400/70 hover:bg-orange-950/30',
+    };
+  }
+  if (region.type === 'uk-region') {
+    return {
+      card: 'border-[#D0A65E]/45 bg-[#3a2a12]/30',
+      hover: 'hover:border-[#D0A65E]/75 hover:bg-[#3a2a12]/45',
+    };
+  }
+  return {
+    card: 'border-emerald-500/40 bg-emerald-950/20',
+    hover: 'hover:border-emerald-400/70 hover:bg-emerald-950/35',
+  };
+}
+
+function ResultCard({ region }: { region: ClimateRegion }) {
+  const accent = typeAccent(region);
+  return (
+    <Link
+      href={`/climate/${region.slug}`}
+      className={`group flex flex-col rounded-xl border p-3.5 transition-all duration-200 ${accent.card} ${accent.hover}`}
+    >
+      <div className="flex items-center gap-2 mb-1.5">
+        <span className="text-xl leading-none shrink-0" aria-hidden>
+          {region.emoji}
+        </span>
+        <h4 className="flex-1 min-w-0 text-sm font-semibold text-[#FFF5E7] group-hover:text-white leading-tight truncate">
+          {region.name}
+        </h4>
+      </div>
+      <p className="text-[12px] text-gray-400 line-clamp-2 flex-1">{region.tagline}</p>
+      <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[#D0A65E]/80 group-hover:text-[#D0A65E]">
+        Open climate update <ChevronRight className="h-3 w-3" />
+      </span>
+    </Link>
+  );
+}
+
+/** @deprecated Replaced by ClimateHubControls. Kept as no-op for any stragglers. */
+export function ClimateTabsBar() {
+  return null;
 }
