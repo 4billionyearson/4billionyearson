@@ -290,7 +290,7 @@ export default function MonthlySpaghettiChart({
               axisLine={{ stroke: '#555' }}
               tickLine={false}
               tickFormatter={(v: number) => `${Math.round(v)}`}
-              width={44}
+              width={52}
             />
 
             {backgroundYears.map((yr) => (
