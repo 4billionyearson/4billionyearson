@@ -314,7 +314,7 @@ export function ClimateTabsPanels() {
           countryAnomalies={countryAnomalies}
           preset={cfg.preset}
           initialLevel={cfg.level}
-          initialMetric={cfg.metric ?? 'temp-actual'}
+          initialMetric="temp-anomaly"
           hideShare
           embedded
           onSelect={handleMapSelect}
