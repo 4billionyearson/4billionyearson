@@ -271,7 +271,7 @@ export default function MonthlySpaghettiChart({
         </h2>
       )}
       <p className="text-xs text-gray-400 mb-3">
-        Each line represents one year of monthly {cfg.longLabel.replace('Monthly ', '').toLowerCase()}.
+        Each line represents one year of monthly {cfg.longLabel.replace('Monthly ', '').toLowerCase()} in {cfg.unit}.
       </p>
 
       <div className="w-full h-[360px] md:h-[480px]">
@@ -289,8 +289,8 @@ export default function MonthlySpaghettiChart({
               tick={{ fill: '#9CA3AF', fontSize: 11 }}
               axisLine={{ stroke: '#555' }}
               tickLine={false}
-              tickFormatter={(v: number) => cfg.unitTight ? `${Math.round(v)}${cfg.unit}` : `${Math.round(v)} ${cfg.unit}`}
-              width={cfg.unitTight ? 60 : 65}
+              tickFormatter={(v: number) => `${Math.round(v)}`}
+              width={36}
             />
 
             {backgroundYears.map((yr) => (
@@ -324,9 +324,7 @@ export default function MonthlySpaghettiChart({
                 return (
                   <g key={index}>
                     <circle cx={cx} cy={cy} r={5} fill={cfg.currentColor} stroke="#fff" strokeWidth={1.5} />
-                    <text x={cx} y={cy - 12} textAnchor="middle" fill={cfg.currentColor} fontSize={11} fontWeight="bold">
-                      {MONTH_LABELS[latestMonthIdx]} {currentYear}: {formatValue(cfg, raw)}
-                    </text>
+                    <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} ${currentYear}: ${formatValue(cfg, raw)}`} />
                   </g>
                 );
               }}
@@ -352,9 +350,7 @@ export default function MonthlySpaghettiChart({
                   return (
                     <g key={index}>
                       <circle cx={cx} cy={cy} r={5} fill={cfg.currentColor} stroke="#fff" strokeWidth={1.5} />
-                      <text x={cx} y={cy - 12} textAnchor="middle" fill={cfg.currentColor} fontSize={11} fontWeight="bold">
-                        {MONTH_LABELS[latestMonthIdx]} {currentYear}: {formatValue(cfg, raw)} (provisional)
-                      </text>
+                      <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} ${currentYear}: ${formatValue(cfg, raw)} (provisional)`} />
                     </g>
                   );
                 }}
@@ -433,6 +429,46 @@ export default function MonthlySpaghettiChart({
 interface TooltipPayloadEntry {
   dataKey?: string;
   value?: number | null;
+}
+
+/**
+ * High-contrast callout for the latest-month data point.
+ * Renders the text on a translucent dark pill outlined in the series colour
+ * so it stays readable against any underlying spaghetti line. Position flips
+ * below the dot when the dot is near the top of the plot area.
+ */
+function CalloutLabel({ cx, cy, color, text }: { cx: number; cy: number; color: string; text: string }) {
+  // Approximate text width (monospace-ish at 11px)
+  const charW = 6.2;
+  const padX = 6;
+  const padY = 3;
+  const textW = text.length * charW;
+  const rectW = textW + padX * 2;
+  const rectH = 16;
+
+  // Default: above dot. Flip below when dot is near the top edge.
+  const above = cy > 28;
+  const rectY = above ? cy - 14 - rectH : cy + 12;
+  const textY = above ? cy - 14 - rectH / 2 + 4 : cy + 12 + rectH / 2 + 4;
+
+  return (
+    <g pointerEvents="none">
+      <rect
+        x={cx - rectW / 2}
+        y={rectY}
+        width={rectW}
+        height={rectH}
+        rx={4}
+        ry={4}
+        fill="rgba(3, 7, 18, 0.88)"
+        stroke={color}
+        strokeWidth={1}
+      />
+      <text x={cx} y={textY} textAnchor="middle" fill={color} fontSize={11} fontWeight="bold">
+        {text}
+      </text>
+    </g>
+  );
 }
 
 function SpaghettiTooltip({
