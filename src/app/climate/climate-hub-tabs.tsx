@@ -266,10 +266,10 @@ export function ClimateTabsPanels() {
       let slug: string | undefined;
       switch (info.level) {
         case 'continents': {
-          // Feature names are 'North America', 'Europe', etc. — kebab-case
-          // and confirm the slug exists in CLIMATE_REGIONS.
-          const candidate = lower.replace(/\s+/g, '-');
-          slug = slugMaps.continentBySlug.get(candidate);
+          // The continent slug is resolved in ClimateMap.tsx and passed
+          // directly as info.slug (e.g. 'europe'). Use it directly rather
+          // than trying to derive it from the raw country-polygon name.
+          slug = info.slug && slugMaps.continentBySlug.get(info.slug);
           break;
         }
         case 'countries': {

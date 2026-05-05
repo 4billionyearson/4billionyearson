@@ -442,6 +442,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
       <ClimateMapCard
         countryAnomalies={[] as CountryAnomalyRow[]}
         preset="global"
+        initialLevel="continents"
         share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-map' }}
       />
 
@@ -672,6 +673,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
       <ClimateMapCard
         countryAnomalies={[] as CountryAnomalyRow[]}
         preset="usa"
+        initialLevel="us-regions"
         share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-map' }}
       />
 
@@ -812,7 +814,7 @@ export default async function ClimateGroupProfile({
               {combinedTitle}
             </h1>
           </div>
-          <div className="bg-gray-950/90 backdrop-blur-md px-4 pt-0 pb-3 md:px-6 md:pb-4">
+          <div className="bg-gray-950/90 backdrop-blur-md px-4 pt-3 pb-3 md:px-6 md:pb-4">
             {region.coveragePlaces && region.coveragePlaces.length > 0 && (
               <div className="inline-flex items-start gap-2 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
                 <MapPin className="h-4 w-4 text-[#D0A65E] mt-0.5 shrink-0" />

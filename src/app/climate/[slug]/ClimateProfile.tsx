@@ -906,6 +906,14 @@ export default function ClimateProfile({
                   region.slug === 'usa' || region.type === 'us-state' ? 'usa' :
                   region.slug === 'uk' || region.type === 'uk-region' ? 'uk' :
                   null;
+                // For UK sub-regions (Met Office areas) the default level is
+                // 'uk-countries' but we want to show 'uk-regions'. UK nations
+                // (england/wales/scotland/northern-ireland) are fine at the default.
+                const UK_NATIONS = new Set(['england', 'scotland', 'wales', 'northern-ireland']);
+                const mapInitialLevel =
+                  region.type === 'uk-region' && !UK_NATIONS.has(region.slug)
+                    ? 'uk-regions' as const
+                    : undefined;
                 if (tempPanels.length === 0 && !mapPreset) return null;
                 return (
                   <>
@@ -915,6 +923,7 @@ export default function ClimateProfile({
                       <ClimateMapCard
                         countryAnomalies={[] as CountryAnomalyRow[]}
                         preset={mapPreset}
+                        initialLevel={mapInitialLevel}
                         share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-map' }}
                       />
                     )}
