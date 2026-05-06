@@ -184,22 +184,22 @@ export default function CurrentStateSection({ data }: { data: EnsoSnapshot }) {
         <span className="text-sky-400 font-mono">≤ −0.5°C</span> La Niña · otherwise Neutral.
       </p>
 
-      <p className="text-[11px] text-gray-500 mt-3 leading-relaxed">
-        Data: NOAA CPC —{' '}
+      <p className="text-[11px] text-gray-400 mt-3 leading-relaxed">
+        Data: NOAA CPC -{' '}
         <a
           href="https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:text-gray-300 transition-colors"
+          className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
         >
           ONI (3-month mean)
         </a>
-        {' '}·{' '}
+        {' '}-{' '}
         <a
           href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:text-gray-300 transition-colors"
+          className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
         >
           weekly Niño-region SSTs
         </a>
