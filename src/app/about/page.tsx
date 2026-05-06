@@ -1,6 +1,7 @@
 import Container from "@/app/_components/container";
 
 export const metadata = {
+  alternates: { canonical: 'https://4billionyearson.org/about' },
   title: "About | 4 Billion Years On",
   description: "4 Billion Years On is a data journalism platform tracking four civilisation-scale shifts - AI, climate change, renewable energy, and biotechnology - in one place. Real-time dashboards, plain-English explainers, curated books, and sourced articles for curious non-experts.",
   openGraph: {

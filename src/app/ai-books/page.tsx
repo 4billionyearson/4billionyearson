@@ -5,6 +5,7 @@ import { getCountryCode, amazonUrl } from "@/lib/amazon";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  alternates: { canonical: 'https://4billionyearson.org/ai-books' },
   title: "Best Artificial Intelligence Books | 4 Billion Years On",
   description:
     "Recommended books on artificial intelligence, machine learning, and the future of AI – from leading researchers and bestselling authors.",

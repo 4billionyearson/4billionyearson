@@ -5,6 +5,7 @@ import { getCountryCode, amazonUrl } from "@/lib/amazon";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  alternates: { canonical: 'https://4billionyearson.org/energy-books' },
   title: "Best Renewable Energy Books | 4 Billion Years On",
   description:
     "Recommended books on renewable energy, the clean energy transition, and sustainable power – from expert authors and bestselling titles.",

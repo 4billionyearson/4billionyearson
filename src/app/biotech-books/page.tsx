@@ -5,6 +5,7 @@ import { getCountryCode, amazonUrl } from "@/lib/amazon";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  alternates: { canonical: 'https://4billionyearson.org/biotech-books' },
   title: "Best Biotechnology Books | 4 Billion Years On",
   description:
     "Recommended books on biotechnology, gene editing, CRISPR, and the future of medicine – from pioneering scientists and bestselling authors.",

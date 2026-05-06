@@ -1,6 +1,7 @@
 import Container from "@/app/_components/container";
 
 export const metadata = {
+  alternates: { canonical: 'https://4billionyearson.org/privacy' },
   title: "Privacy Policy | 4 Billion Years On",
   description: "Privacy Policy for 4 Billion Years On.",
 };

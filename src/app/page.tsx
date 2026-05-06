@@ -5,6 +5,11 @@ import HeroBanner from "@/app/_components/hero-banner";
 import NavigationHub from "@/app/_components/navigation-hub";
 import { getAllPosts, getAllCategories } from "@/lib/api";
 import { Newspaper } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "https://4billionyearson.org" },
+};
 
 export const revalidate = 60;
 
