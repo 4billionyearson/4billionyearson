@@ -181,36 +181,32 @@ export default function CurrentStateSection({ data }: { data: EnsoSnapshot }) {
       <p className="text-xs text-gray-400 mt-4 leading-relaxed">
         El Niño years push global temperatures higher; La Niña years temporarily damp them - though the underlying greenhouse-gas trend continues either way.
         Thresholds: <span className="text-rose-400 font-mono">≥ +0.5°C</span> El Niño ·{' '}
-        <span className="text-sky-400 font-mono">≤ −0.5°C</span> La Niña · otherwise Neutral.
-      </p>
-
-      <div className="mt-3">
-        <p className="text-[11px] text-gray-400 leading-relaxed">
-          Data: NOAA CPC -{' '}
-          <a
-            href="https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
-          >
-            ONI (3-month mean)
-          </a>
-          {' '}-{' '}
-          <a
-            href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
-          >
-            weekly Niño-region SSTs
-          </a>
-        </p>
-        <details className="mt-1 group">
-          <summary className="text-[11px] text-gray-500 cursor-pointer select-none list-none flex items-center gap-1 hover:text-gray-300 transition-colors w-fit">
-            <span className="group-open:rotate-90 inline-block transition-transform text-[10px]">▶</span>
+        <span className="text-sky-400 font-mono">≤ −0.5°C</span> La Niña · otherwise Neutral.{' '}
+        Data: NOAA CPC -{' '}
+        <a
+          href="https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
+        >
+          ONI (3-month mean)
+        </a>
+        {' '}-{' '}
+        <a
+          href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
+        >
+          weekly Niño-region SSTs
+        </a>
+        .{' '}
+        <details className="inline group">
+          <summary className="inline cursor-pointer select-none list-none text-gray-500 hover:text-gray-300 transition-colors">
+            <span className="group-open:rotate-90 inline-block transition-transform text-[10px] mr-0.5">▶</span>
             Why do these figures differ from NOAA&rsquo;s weekly report?
           </summary>
-          <p className="text-[11px] text-gray-500 mt-1.5 leading-relaxed pl-3 border-l border-gray-700">
+          <span className="block mt-1.5 pl-3 border-l border-gray-700 text-gray-500">
             As of February 2026, NOAA&rsquo;s official reports switched to <em>relative</em> anomalies,
             which subtract out the background global warming signal (~+0.5°C) across the tropical Pacific.
             The figures here use <em>traditional</em> anomalies from the source files above - the same
@@ -225,9 +221,9 @@ export default function CurrentStateSection({ data }: { data: EnsoSnapshot }) {
             >
               NOAA PNS26-05
             </a>
-          </p>
+          </span>
         </details>
-      </div>
+      </p>
 
       <ShareBar
         pageUrl="https://4billionyearson.org/climate/enso#current-state"
