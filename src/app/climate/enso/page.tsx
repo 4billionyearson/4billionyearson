@@ -529,10 +529,32 @@ export default function EnsoPage() {
             )}
 
             <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-              El Niño years push global temperatures higher; La Niña years temporarily damp them — though the underlying greenhouse-gas trend continues either way.
+              El Niño years push global temperatures higher; La Niña years temporarily damp them - though the underlying greenhouse-gas trend continues either way.
               Thresholds: <span className="text-rose-400 font-mono">≥ +0.5°C</span> El Niño ·{' '}
               <span className="text-sky-400 font-mono">≤ −0.5°C</span> La Niña · otherwise Neutral.
             </p>
+
+            <p className="text-[11px] text-gray-400 mt-3 leading-relaxed">
+              Data: NOAA CPC -{' '}
+              <a
+                href="https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
+              >
+                ONI (3-month mean)
+              </a>
+              {' '}-{' '}
+              <a
+                href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
+              >
+                weekly Niño-region SSTs
+              </a>
+            </p>
+
             <ShareBar
               pageUrl="https://4billionyearson.org/climate/enso#current-state"
               shareText={encodeURIComponent('Current ENSO state - El Nino / La Nina tracker with live NOAA data')}
