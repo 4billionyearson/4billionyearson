@@ -31,6 +31,13 @@ export default async function Index() {
         <NavigationHub />
       </section>
 
+      {/* SEO intro paragraph for homepage */}
+      <div className="container mx-auto px-3 md:px-4 pb-2 md:pb-4">
+        <p className="text-lg text-gray-200 max-w-2xl mx-auto text-center">
+          4 Billion Years On is a living dashboard for the forces reshaping the world. Dive into our latest articles for insights on artificial intelligence, climate change, renewable energy, and biotechnology.
+        </p>
+      </div>
+
       {/* Posts */}
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8">
         {heroPost && (
