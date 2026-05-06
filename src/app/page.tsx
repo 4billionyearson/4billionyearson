@@ -31,10 +31,10 @@ export default async function Index() {
         <NavigationHub />
       </section>
 
-      {/* SEO intro paragraph for homepage - styled like hero */}
+      {/* SEO intro paragraph for homepage - styled to match hero */}
       <div className="container mx-auto px-3 md:px-4 pb-2 md:pb-4">
-        <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-800 px-4 md:px-8 py-4 md:py-6 max-w-2xl mx-auto">
-          <p className="text-lg text-gray-100 text-center">
+        <div className="bg-black/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/80 px-4 md:px-8 py-4 md:py-6 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl font-bold font-mono text-[#FFF5E7] text-center tracking-tight">
             4 Billion Years On is a living dashboard for the forces reshaping the world. Dive into our latest articles for insights on artificial intelligence, climate change, renewable energy, and biotechnology…
           </p>
         </div>
