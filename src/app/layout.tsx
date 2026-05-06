@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | 4 Billion Years On",
   },
   description:
-    "Track climate change, energy, AI, and biotech with interactive data, clear explainers, and sourced articles—updated monthly.",
+    "Track climate change, energy, AI, and biotech with interactive data, clear explainers, and sourced articles - updated monthly.",
   keywords: [
     "climate change data",
     "renewable energy dashboard",
