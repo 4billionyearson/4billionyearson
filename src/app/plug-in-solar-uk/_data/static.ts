@@ -1,5 +1,5 @@
 import type { FAQItem } from '@/app/_components/seo/StaticFAQPanel';
-import type { TimelineEntry } from '@/lib/plug-in-solar/types';
+import type { FullyAvailableEstimate, TimelineEntry } from '@/lib/plug-in-solar/types';
 
 /**
  * Evergreen content for the UK Plug-in Solar guide. Anything that changes
@@ -56,6 +56,22 @@ export const PLUG_IN_VS_ROOFTOP: { question: string; plugIn: string; rooftop: st
     rooftop: 'No',
   },
 ];
+
+/* ─── Fully-available milestone fallback ───────────────────────────────────── */
+
+/**
+ * Fallback used when Gemini hasn't yet filled in `fullyAvailableDate`. The
+ * date is anchored to the BSI product-standard publication (which is the
+ * current bottleneck for "fully legal, no caveats, in every high-street
+ * shop"). Gemini overrides this daily.
+ */
+export const FULLY_AVAILABLE_FALLBACK: FullyAvailableEstimate = {
+  date: '2026-07-15',
+  label: 'Fully legal & widely in shops',
+  rationale:
+    "Gated by BSI publication of the new plug-in solar product standard, expected mid-2026. Once that lands, mainstream UK retailers can stock kits without 'pending' compliance disclaimers.",
+  confidence: 'medium',
+};
 
 /* ─── Base timeline ────────────────────────────────────────────────────────── */
 

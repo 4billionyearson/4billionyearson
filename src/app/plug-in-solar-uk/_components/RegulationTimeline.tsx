@@ -1,50 +1,101 @@
-import { CheckCircle2, Circle, FileText, Package, Scale, Sparkles } from 'lucide-react';
-import type { TimelineEntry } from '@/lib/plug-in-solar/types';
-import { BASE_TIMELINE } from '../_data/static';
+import { CheckCircle2, Circle, FileText, Package, Scale, Sparkles, Star, CalendarCheck } from 'lucide-react';
+import type { FullyAvailableEstimate, TimelineEntry } from '@/lib/plug-in-solar/types';
+import { BASE_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
 
 /**
  * Hybrid timeline: static base milestones merged with any new entries
- * Gemini supplied today. Today's "you are here" marker is computed at
- * render time. Server-rendered.
+ * Gemini supplied today, plus the prominent "fully legal & widely
+ * available" callout at the top. Today's "you are here" marker is
+ * computed at render time. Server-rendered.
  */
-export function RegulationTimeline({ updates }: { updates: TimelineEntry[] | undefined }) {
+export function RegulationTimeline({
+  updates,
+  fullyAvailable,
+}: {
+  updates: TimelineEntry[] | undefined;
+  fullyAvailable?: FullyAvailableEstimate;
+}) {
   const merged = mergeAndSort([...BASE_TIMELINE, ...(updates ?? [])]);
   const todayISO = new Date().toISOString().slice(0, 10);
   // Insert a synthetic "today" marker so users can see where they are.
   const withToday = injectToday(merged, todayISO);
+  const fa = fullyAvailable ?? FULLY_AVAILABLE_FALLBACK;
 
   return (
-    <ol aria-label="UK plug-in solar regulation timeline" className="relative space-y-4 pl-6 border-l border-[#D2E369]/30">
-      {withToday.map((entry, i) => (
-        <li key={`${entry.date}-${entry.title}-${i}`} className="relative">
-          <span
-            className={
-              'absolute -left-[33px] top-0.5 grid h-6 w-6 place-items-center rounded-full border ' +
-              statusRing(entry, todayISO)
-            }
-            aria-hidden
-          >
-            {iconFor(entry, todayISO)}
-          </span>
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <span
-              className={
-                'font-mono text-[11px] uppercase tracking-wider ' +
-                (entry.date === '__today__'
-                  ? 'text-[#D2E369]'
-                  : entry.date <= todayISO
-                  ? 'text-emerald-300'
-                  : 'text-sky-300')
-              }
-            >
-              {entry.date === '__today__' ? 'Today' : formatDate(entry.date)}
-            </span>
-            <h4 className="text-sm font-semibold text-[#FFF5E7]">{entry.title}</h4>
+    <div className="space-y-4">
+      <FullyAvailableHeadline fa={fa} todayISO={todayISO} />
+
+      <ol
+        aria-label="UK plug-in solar regulation timeline"
+        className="relative space-y-4 pl-6 border-l border-[#D2E369]/30"
+      >
+        {withToday.map((entry, i) => {
+          const matchesFA = entry.date === fa.date;
+          return (
+            <li key={`${entry.date}-${entry.title}-${i}`} className="relative">
+              <span
+                className={
+                  'absolute -left-[33px] top-0.5 grid h-6 w-6 place-items-center rounded-full border ' +
+                  statusRing(entry, todayISO, matchesFA)
+                }
+                aria-hidden
+              >
+                {iconFor(entry, todayISO, matchesFA)}
+              </span>
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <span
+                  className={
+                    'font-mono text-[11px] uppercase tracking-wider ' +
+                    (entry.date === '__today__'
+                      ? 'text-[#D2E369]'
+                      : entry.date <= todayISO
+                      ? 'text-emerald-300'
+                      : 'text-sky-300')
+                  }
+                >
+                  {entry.date === '__today__' ? 'Today' : formatDate(entry.date)}
+                </span>
+                <h4 className="text-sm font-semibold text-[#FFF5E7]">{entry.title}</h4>
+                {matchesFA && (
+                  <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-[#D2E369] bg-[#D2E369]/15 px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
+                    <Star className="h-2.5 w-2.5 fill-[#D2E369]" /> Available milestone
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-sm text-gray-300 leading-relaxed">{entry.description}</p>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+function FullyAvailableHeadline({
+  fa,
+  todayISO,
+}: {
+  fa: FullyAvailableEstimate;
+  todayISO: string;
+}) {
+  const passed = fa.date <= todayISO;
+  return (
+    <div className="rounded-xl border-2 border-[#D2E369] bg-gradient-to-r from-[#D2E369]/20 via-[#D2E369]/10 to-transparent p-3">
+      <div className="flex items-start gap-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#D2E369] text-[#2C5263] shadow-[0_0_10px_rgba(210,227,105,0.6)]">
+          <CalendarCheck className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-[#D2E369]">
+            {fa.label}
           </div>
-          <p className="mt-1 text-sm text-gray-300 leading-relaxed">{entry.description}</p>
-        </li>
-      ))}
-    </ol>
+          <div className="text-base font-extrabold text-[#FFF5E7] leading-tight">
+            {passed ? `Reached on ${formatDate(fa.date)}` : formatDate(fa.date)}
+          </div>
+          <p className="mt-0.5 text-xs text-gray-400 leading-snug">{fa.rationale}</p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -95,8 +146,9 @@ function formatDate(iso: string): string {
   }
 }
 
-function iconFor(entry: TimelineEntry, todayISO: string) {
+function iconFor(entry: TimelineEntry, todayISO: string, matchesFA: boolean) {
   if (entry.date === '__today__') return <Sparkles className="h-3.5 w-3.5 text-[#D2E369]" />;
+  if (matchesFA) return <Star className="h-3.5 w-3.5 text-[#2C5263] fill-[#2C5263]" />;
   if (entry.date <= todayISO) return <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />;
   switch (entry.category) {
     case 'standard':
@@ -110,8 +162,9 @@ function iconFor(entry: TimelineEntry, todayISO: string) {
   }
 }
 
-function statusRing(entry: TimelineEntry, todayISO: string): string {
+function statusRing(entry: TimelineEntry, todayISO: string, matchesFA: boolean): string {
   if (entry.date === '__today__') return 'bg-[#D2E369]/10 border-[#D2E369]';
+  if (matchesFA) return 'bg-[#D2E369] border-[#D2E369]';
   if (entry.date <= todayISO) return 'bg-emerald-500/10 border-emerald-500/60';
   return 'bg-sky-500/10 border-sky-500/40';
 }

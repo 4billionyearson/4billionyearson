@@ -8,9 +8,9 @@ import {
   ArrowRight,
   Sun,
   Battery,
+  RefreshCw,
 } from 'lucide-react';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
-import { MiniTimeline } from './MiniTimeline';
 
 /**
  * Top-of-page "answer the four big questions in 5 seconds" panel.
@@ -49,8 +49,9 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           <Zap className="h-5 w-5" />
           The 5-second verdict
         </h2>
-        <span className="hidden sm:inline text-[11px] font-mono uppercase tracking-wider text-[#2C5263]/80">
-          Daily-refreshed
+        <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#2C5263] px-3 py-1 text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
+          <RefreshCw className="h-3 w-3" />
+          Refreshed {formatToday(data?.generatedAt)}
         </span>
       </div>
 
@@ -119,10 +120,6 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           <ul className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
             <UseCaseTick icons={[<Sun key="s" className="h-4 w-4 text-[#FFE066]" />]} label="Solar only" />
             <UseCaseTick
-              icons={[<Battery key="b" className="h-4 w-4 text-[#D2E369]" />]}
-              label="Battery only"
-            />
-            <UseCaseTick
               icons={[
                 <Sun key="s" className="h-4 w-4 text-[#FFE066]" />,
                 <span key="plus" className="text-gray-400 text-xs font-mono">+</span>,
@@ -130,11 +127,12 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
               ]}
               label="Solar + battery"
             />
+            <UseCaseTick
+              icons={[<Battery key="b" className="h-4 w-4 text-[#D2E369]" />]}
+              label="Battery only"
+            />
           </ul>
         </div>
-
-        {/* Mini regulation timeline */}
-        <MiniTimeline />
 
         {/* Inline legend / jump links */}
         <div className="flex flex-wrap gap-2 text-xs">
@@ -146,6 +144,12 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
       </div>
     </section>
   );
+}
+
+function formatToday(generatedAt: string | undefined): string {
+  const d = generatedAt ? new Date(generatedAt) : new Date();
+  if (Number.isNaN(d.getTime())) return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 type Tone = 'green' | 'orange' | 'rose' | 'lime' | 'sky';
@@ -173,13 +177,14 @@ function VerdictCard({
       labelText: 'text-emerald-300',
     },
     orange: {
-      // Vivid orange (was muted amber that read as brown)
-      bg: 'bg-orange-500/25',
-      border: 'border-orange-400/70',
-      iconBg: 'bg-orange-400 text-orange-950',
-      bigText: 'text-orange-200',
-      subText: 'text-orange-100/85',
-      labelText: 'text-orange-300',
+      // Vivid orange. Lower opacities (/25) muddied to brown over the dark
+      // gray-950 backdrop; /60 gives a clearly orange surface.
+      bg: 'bg-orange-500/60',
+      border: 'border-orange-400',
+      iconBg: 'bg-orange-300 text-orange-950',
+      bigText: 'text-white',
+      subText: 'text-orange-50',
+      labelText: 'text-orange-100',
     },
     rose: {
       bg: 'bg-rose-500/15',

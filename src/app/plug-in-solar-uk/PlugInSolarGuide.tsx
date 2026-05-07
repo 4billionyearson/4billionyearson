@@ -29,6 +29,7 @@ import { AffiliateDisclosure } from './_components/AffiliateDisclosure';
 import { HeroVerdict } from './_components/HeroVerdict';
 import { HowItWorksDiagram } from './_components/HowItWorksDiagram';
 import { LegalChecklist } from './_components/LegalChecklist';
+import { MiniTimeline } from './_components/MiniTimeline';
 import {
   HOW_IT_WORKS_PARAGRAPHS,
   PLUG_IN_VS_ROOFTOP,
@@ -89,18 +90,41 @@ export default function PlugInSolarGuide({
           {/* ─── 5-second visual verdict — leads the page ─── */}
           <HeroVerdict data={data} />
 
-          {/* ─── Intro paragraph + Today's verdict TL;DR (sits below the visual verdict) ─── */}
-          <section className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl px-5 py-4 md:px-6 md:py-5 space-y-4">
-            <p className="text-sm md:text-base text-gray-300 max-w-4xl">
-              An impartial, daily-refreshed guide to plug-in solar in the UK: is it legal, what
-              can you actually buy today, what will it cost, and can you pair (or replace) it with
-              a battery on a smart tariff. Generated each day by AI from primary sources.
-            </p>
-            {data?.tldr ? (
-              <QuickTLDR label="Today's verdict">{data.tldr}</QuickTLDR>
-            ) : cacheMiss ? (
-              <CacheMissPanel />
-            ) : null}
+          {/* ─── 10-second update: simplified timeline, today's verdict text, page intro ─── */}
+          <section className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden">
+            <div
+              className="px-5 py-3 md:px-6 md:py-4 flex items-center justify-between gap-3"
+              style={{ backgroundColor: '#D2E369' }}
+            >
+              <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">
+                <CalendarClock className="h-5 w-5" />
+                The 10-second update
+              </h2>
+              <span className="hidden sm:inline text-[11px] font-mono uppercase tracking-wider text-[#2C5263]/80">
+                Where we are · what we wrote today
+              </span>
+            </div>
+            <div className="p-4 md:p-6 space-y-4">
+              <MiniTimeline fullyAvailable={data?.fullyAvailableDate} />
+
+              {data?.tldr ? (
+                <QuickTLDR label="Today's verdict">{data.tldr}</QuickTLDR>
+              ) : cacheMiss ? (
+                <CacheMissPanel />
+              ) : null}
+
+              <p className="text-sm text-gray-400 leading-relaxed border-t border-gray-800 pt-3">
+                <span className="text-gray-300 font-semibold">About this page.</span> A daily-
+                refreshed, impartial UK guide to plug-in solar (also called balcony solar or
+                Balkonkraftwerk) covering the legal status, the kits you can actually buy today,
+                prices and payback, and how to pair – or replace – panels with a battery on a
+                smart tariff. We re-research the regulations, products and prices every morning
+                using Gemini against primary UK sources (gov.uk, BSI, Ofgem, mainstream UK
+                press) so the figures you see below are never more than 24 hours old. We are
+                editorially independent: any retailer link is disclosed and never affects what
+                we list or rank.
+              </p>
+            </div>
           </section>
 
           {/* ─── 2-column section: Timeline (sticky) | Status + What is + Legal + Regs ─── */}
@@ -109,7 +133,10 @@ export default function PlugInSolarGuide({
             <aside className="lg:col-span-1">
               <div className="lg:sticky lg:top-4 space-y-6">
                 <Section icon={<CalendarClock className="h-5 w-5" />} title="Regulation timeline">
-                  <RegulationTimeline updates={data?.timelineUpdates} />
+                  <RegulationTimeline
+                    updates={data?.timelineUpdates}
+                    fullyAvailable={data?.fullyAvailableDate}
+                  />
                 </Section>
               </div>
             </aside>

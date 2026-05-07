@@ -88,6 +88,23 @@ export interface PriceSnapshot {
   asOf: string;
 }
 
+/**
+ * The single most-asked question from non-experts: "when can I just walk
+ * into a shop, buy a plug-in solar kit and know it's fully legal without
+ * caveats?" This object lets Gemini return its current best estimate of
+ * that date so the page can show it prominently. Updated daily.
+ */
+export interface FullyAvailableEstimate {
+  /** ISO date string (YYYY-MM-DD). The expected milestone date. */
+  date: string;
+  /** Short label, e.g. "Fully legal & widely in shops". */
+  label: string;
+  /** 1-2 sentence rationale. */
+  rationale: string;
+  /** How confident Gemini is in this estimate. */
+  confidence: 'high' | 'medium' | 'low';
+}
+
 export interface PlugInSolarLiveData {
   /** ISO timestamp this payload was generated. */
   generatedAt: string;
@@ -97,6 +114,8 @@ export interface PlugInSolarLiveData {
   tldr: string;
   /** Long-form daily-updated paragraph on legal status (120-180 words). */
   legalStatus: string;
+  /** Best-estimate date for the "fully legal & widely available" milestone. */
+  fullyAvailableDate?: FullyAvailableEstimate;
   /** Section keyed paragraphs on individual regulatory threads. */
   regulations: {
     bs7671: string;
