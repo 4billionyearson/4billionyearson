@@ -29,7 +29,7 @@ import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
  */
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const PREVIOUS_LOOKBACK_DAYS = 7;
 
 /**
@@ -455,6 +455,12 @@ async function filterProductBrokenLinks(
       product.url = sanitiseRetailerProductUrl(String(primary.url ?? '').trim());
       if (typeof primary.priceGBP === 'number' && Number.isFinite(primary.priceGBP)) {
         product.priceGBP = primary.priceGBP;
+      }
+      // Mirror primary retailer's stock onto the row when the model
+      // didn't set a top-level value, so the headline row pill agrees
+      // with the cheapest retailer link.
+      if (!product.stock && typeof primary.stock === 'string') {
+        product.stock = primary.stock;
       }
       return product;
     }),

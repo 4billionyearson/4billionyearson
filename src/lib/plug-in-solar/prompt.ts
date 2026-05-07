@@ -121,9 +121,11 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('      ukCompliant ("yes"|"pending"|"no"|"unknown"),');
   lines.push('      retailer (display name of the cheapest retailer, mirrors retailers[0].retailer),');
   lines.push('      url (absolute https URL of the cheapest retailer, mirrors retailers[0].url),');
+  lines.push('      stock ("in-stock"|"out-of-stock"|"pre-order"|"unknown") - headline stock status (mirrors retailers[0].stock),');
   lines.push('      retailers: [');
   lines.push('        { retailer (display name), url (absolute https - VERIFIED working URL),');
-  lines.push('          priceGBP (number, may differ per retailer), affiliate (boolean) }');
+  lines.push('          priceGBP (number, may differ per retailer), affiliate (boolean),');
+  lines.push('          stock ("in-stock"|"out-of-stock"|"pre-order"|"unknown") - per-retailer availability today }');
   lines.push('        ... 1-4 entries, primary/cheapest first.');
   lines.push('      ],');
   lines.push('      notes (optional <=80 char), hasBattery (boolean), batteryKWh (number, may be null)');
@@ -138,6 +140,7 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('  - If you can only verify ONE working URL total, return a single retailers[] entry. One verified link beats several guessed ones.');
   lines.push('  - Mirror top-level `retailer` and `url` from the first (cheapest) retailers[] entry.');
   lines.push('  - Set `affiliate: true` only if the URL already contains an Amazon Associates tag; otherwise omit or false (the site adds its own tag on amazon.co.uk).');
+  lines.push('  - STOCK STATUS: For every retailer entry set `stock` to one of "in-stock", "out-of-stock", "pre-order" or "unknown" based on what the live retailer page actually says today. Use "unknown" if you can\'t see a clear add-to-basket button or status. Mirror the cheapest retailer\'s status to the top-level `stock` field. The site renders an explicit "Out of stock" pill so be honest — visitors will trust the page more for it.');
   lines.push('');
   lines.push('  STRICT INCLUSION CRITERIA (apply BEFORE listing a product):');
   lines.push('  - Must be a "plug-in solar" or "plug-in battery" product: micro-inverter clipped to <=800 W AC, fed via a single domestic 13 A socket (BS 1363 plug), self-installable without an electrician.');
@@ -277,11 +280,13 @@ export const PLUG_IN_SOLAR_RESPONSE_SCHEMA = {
                 url: { type: 'STRING' },
                 priceGBP: { type: 'NUMBER', nullable: true },
                 affiliate: { type: 'BOOLEAN' },
+                stock: { type: 'STRING' },
               },
               required: ['retailer', 'url'],
             },
           },
           notes: { type: 'STRING' },
+          stock: { type: 'STRING' },
           hasBattery: { type: 'BOOLEAN' },
           batteryKWh: { type: 'NUMBER', nullable: true },
         },

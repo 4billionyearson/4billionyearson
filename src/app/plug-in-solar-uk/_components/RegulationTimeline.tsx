@@ -1,7 +1,12 @@
 import { CheckCircle2, Circle, FileText, Package, Scale, Sparkles, Star, CalendarCheck } from 'lucide-react';
 import type { FullyAvailableEstimate, TimelineEntry } from '@/lib/plug-in-solar/types';
-import { milestoneForUi, normaliseMilestoneLabel } from '@/lib/plug-in-solar/milestoneDisplay';
-import { BASE_TIMELINE, FULLY_AVAILABLE_FALLBACK, LEGAL_IN_SHOPS_TIMELINE_TITLE } from '../_data/static';
+import {
+  milestoneForUi,
+  normaliseMilestoneLabel,
+  collapseBsiAndShopsIfSameMonth,
+  isLegalInShopsEntry,
+} from '@/lib/plug-in-solar/milestoneDisplay';
+import { BASE_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
 
 /**
  * Hybrid timeline: static base milestones merged with any new entries
@@ -30,7 +35,12 @@ export function RegulationTimeline({
   // end of July vs mid-July). Without this, no timeline row matches `fa.date`
   // and the in-list star + pill disappear even though the headline shows the date.
   const withFullyAvailable = ensureFullyAvailableMilestone(merged, faRaw, todayISO);
-  const withToday = injectToday(withFullyAvailable, todayISO);
+  // When BSI publication and "Legal & in the shops" fall in the same calendar
+  // month we collapse them into one combined row dated to the AI estimate
+  // (matches the MiniTimeline above, avoids two near-duplicate rows on the
+  // page when the technical + retail beats genuinely line up).
+  const collapsed = collapseBsiAndShopsIfSameMonth(withFullyAvailable, faRaw);
+  const withToday = injectToday(collapsed, todayISO);
 
   return (
     <div className="space-y-4">
@@ -85,10 +95,11 @@ export function RegulationTimeline({
   );
 }
 
-/** Lime star + pill only on the retail / “in the shops” row, not the BSI technical row on the same date. */
+/** Lime star + pill on the retail / “in the shops” row, including the merged BSI+shops row. */
 function isRetailMilestoneAccent(entry: TimelineEntry, fa: { date: string; label: string }): boolean {
   if (entry.date === '__today__' || entry.date !== fa.date) return false;
-  if (entry.title === LEGAL_IN_SHOPS_TIMELINE_TITLE) return true;
+  if (isLegalInShopsEntry(entry)) return true;
+  if (/legal\s*&\s*in the shops/i.test(entry.title)) return true;
   return entry.title === normaliseMilestoneLabel(fa.label);
 }
 function ensureFullyAvailableMilestone(

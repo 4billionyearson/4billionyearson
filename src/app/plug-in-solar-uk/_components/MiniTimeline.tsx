@@ -1,6 +1,6 @@
 import { CheckCircle2, Clock, Star, CalendarCheck } from 'lucide-react';
 import type { FullyAvailableEstimate } from '@/lib/plug-in-solar/types';
-import { milestoneForUi } from '@/lib/plug-in-solar/milestoneDisplay';
+import { milestoneForUi, sameCalendarMonth } from '@/lib/plug-in-solar/milestoneDisplay';
 import { HERO_TIMELINE, FULLY_AVAILABLE_FALLBACK, LEGAL_IN_SHOPS_TIMELINE_TITLE } from '../_data/static';
 
 /**
@@ -27,8 +27,22 @@ function mergeHeroTimelineWithFa(
   hero: typeof HERO_TIMELINE,
   fa: FullyAvailableEstimate,
 ): MiniEntry[] {
+  // The hero strip is just a small subset of milestones — there is no
+  // separate BSI dot today, only the consumer "Legal & in the shops"
+  // dot at the static fallback date. If the AI estimate falls in the
+  // SAME calendar month, anchor the hero "Legal & in the shops" dot
+  // to the AI date so the strip and the headline pill agree.
+  const heroEntries = hero.map((e) => {
+    if (
+      e.label === LEGAL_IN_SHOPS_TIMELINE_TITLE &&
+      sameCalendarMonth(e.date, fa.date)
+    ) {
+      return { ...e, date: fa.date };
+    }
+    return e;
+  });
   const raw: MiniEntry[] = [
-    ...hero.map((e) => ({ date: e.date, label: e.label, kind: e.kind })),
+    ...heroEntries.map((e) => ({ date: e.date, label: e.label, kind: e.kind })),
     { date: fa.date, label: fa.label, kind: 'available' },
   ];
   const byDate = new Map<string, MiniEntry>();

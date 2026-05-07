@@ -47,6 +47,17 @@ export interface RetailerLink {
   priceGBP?: number | null;
   /** Whether this is a paid / affiliate link (drives rel attribute). */
   affiliate?: boolean;
+  /**
+   * Stock status of this listing. `unknown` (the default) renders no
+   * pill in the UI; the other values render a coloured pill.
+   */
+  stock?: 'in-stock' | 'out-of-stock' | 'pre-order' | 'unknown';
+  /**
+   * Marks a synthetic fallback link (e.g. a generic Amazon UK search URL
+   * we add when no real product page is verified). The UI styles these
+   * differently so visitors know it's not a confirmed product page.
+   */
+  isFallback?: boolean;
 }
 
 export interface ProductRow {
@@ -74,6 +85,12 @@ export interface ProductRow {
   retailers?: RetailerLink[];
   /** Optional 1-line note (e.g. "Government's named partner"). */
   notes?: string;
+  /**
+   * Headline stock status (mirrors retailers[0].stock). Drives a pill
+   * in the products table — "out of stock" lets us be honest about the
+   * EcoFlow STREAM Balcony Kit and similar.
+   */
+  stock?: 'in-stock' | 'out-of-stock' | 'pre-order' | 'unknown';
   /** Whether a battery is included or available as an add-on. */
   hasBattery?: boolean;
   /** Battery capacity in kWh if included. */

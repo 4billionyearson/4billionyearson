@@ -1,11 +1,15 @@
-import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle, RefreshCw, ShoppingBag } from 'lucide-react';
+import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle, RefreshCw, ShoppingBag, Search, PackageX, PackageCheck, Hourglass } from 'lucide-react';
 import type { ProductRow, RetailerLink } from '@/lib/plug-in-solar/types';
 import {
   applyAmazonAffiliateTag,
   amazonAssociateTagForCountry,
   isAmazonAssociatesEligibleUrl,
 } from '@/lib/amazon';
-import { sanitiseRetailerProductUrl } from '@/lib/plug-in-solar/retailerUrls';
+import {
+  sanitiseRetailerProductUrl,
+  buildAmazonUkSearchFallback,
+  isAmazonProductPageUrl,
+} from '@/lib/plug-in-solar/retailerUrls';
 import { AffiliateDisclosure } from './AffiliateDisclosure';
 
 function dedupeRetailersByUrl(entries: RetailerLink[]): RetailerLink[] {
@@ -36,10 +40,6 @@ function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
         ? [{ retailer: p.retailer, url: p.url, priceGBP: p.priceGBP }]
         : [];
 
-  if (raw.length === 0) {
-    return [];
-  }
-
   const cleaned = raw.map((r) => ({
     ...r,
     url: sanitiseRetailerProductUrl(r.url.trim()),
@@ -47,14 +47,25 @@ function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
 
   const unique = dedupeRetailersByUrl(cleaned.filter((r) => r.url.length > 0));
   const hasProgram = amazonAssociateTagForCountry(countryCode) !== null;
-  return unique.map((r) => {
+  const tagged = unique.map((r) => {
     const isAmz = isAmazonAssociatesEligibleUrl(r.url);
     return {
       ...r,
       url: applyAmazonAffiliateTag(r.url, countryCode),
-      affiliate: hasProgram && isAmz,
+      affiliate: hasProgram && isAmz ? true : r.affiliate,
     };
   });
+
+  // Always make sure each row has at least one Amazon UK shoppable
+  // link. If Gemini hasn't verified a real `/dp/...` product page we
+  // append a tagged search-URL fallback so the row stays clickable and
+  // the click still earns the UK Associates fee.
+  const hasAmazonProductPage = tagged.some((r) => isAmazonProductPageUrl(r.url));
+  if (!hasAmazonProductPage) {
+    tagged.push(buildAmazonUkSearchFallback(p.brand, p.model));
+  }
+
+  return tagged;
 }
 
 /**
@@ -108,6 +119,7 @@ export function ProductsTable({
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-300">
                 <ComplianceBadge status={p.ukCompliant} />
+                <StockBadge status={p.stock} />
                 {p.hasBattery && (
                   <>
                     <span className="text-gray-500">·</span>
@@ -159,6 +171,11 @@ export function ProductsTable({
                   </td>
                   <td className="px-4 py-3 align-top">
                     <ComplianceBadge status={p.ukCompliant} />
+                    {p.stock && p.stock !== 'unknown' ? (
+                      <div className="mt-1">
+                        <StockBadge status={p.stock} />
+                      </div>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3 align-top whitespace-nowrap text-gray-300">
                     {p.hasBattery ? (
@@ -209,21 +226,30 @@ function RetailerLinks({
         const rel = r.affiliate
           ? 'sponsored noopener noreferrer'
           : 'noopener noreferrer';
+        const Icon = r.isFallback ? Search : ShoppingBag;
+        const linkClass = r.isFallback
+          ? 'inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#D2E369] transition-colors whitespace-nowrap italic'
+          : 'inline-flex items-center gap-1.5 text-sm font-semibold text-[#D2E369] hover:text-[#E5F08A] transition-colors whitespace-nowrap';
         return (
           <a
             key={r.url}
             href={r.url}
             target="_blank"
             rel={rel}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#D2E369] hover:text-[#E5F08A] transition-colors whitespace-nowrap"
-            title={r.url}
+            className={linkClass}
+            title={r.isFallback ? `Search Amazon UK for ${r.retailer} listings` : r.url}
           >
-            <ShoppingBag className="h-3.5 w-3.5 shrink-0" />
+            <Icon className="h-3.5 w-3.5 shrink-0" />
             <span>
               {r.retailer}
-              {typeof r.priceGBP === 'number' && r.priceGBP > 0 && (
+              {!r.isFallback && typeof r.priceGBP === 'number' && r.priceGBP > 0 && (
                 <span className="ml-1 text-xs font-normal text-gray-400">
                   £{Math.round(r.priceGBP)}
+                </span>
+              )}
+              {r.stock === 'out-of-stock' && !r.isFallback && (
+                <span className="ml-1 text-[10px] font-normal text-rose-300">
+                  · out of stock
                 </span>
               )}
             </span>
@@ -265,6 +291,34 @@ function ComplianceBadge({ status }: { status: ProductRow['ukCompliant'] }) {
           Unknown
         </span>
       );
+  }
+}
+
+function StockBadge({ status }: { status: ProductRow['stock'] }) {
+  switch (status) {
+    case 'in-stock':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300 border border-emerald-500/30">
+          <PackageCheck className="h-3 w-3" />
+          In stock
+        </span>
+      );
+    case 'out-of-stock':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-300 border border-rose-500/30">
+          <PackageX className="h-3 w-3" />
+          Out of stock
+        </span>
+      );
+    case 'pre-order':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-300 border border-amber-500/30">
+          <Hourglass className="h-3 w-3" />
+          Pre-order
+        </span>
+      );
+    default:
+      return null;
   }
 }
 
