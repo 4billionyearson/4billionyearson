@@ -50,12 +50,22 @@ export interface SeedProduct {
   /** AC output cap (always 800 W for UK plug-in solar). */
   wattsAC: number;
   /**
-   * Pick which variants to surface. EcoFlow's STREAM page has 17
-   * SKUs (cheap "no-bracket" through to "pitched-roof + 4 panels");
-   * we only want the headline 3-4 for the table. Default behaviour
-   * if not provided: keep all variants.
+   * Pick which variants to surface. We normally want just the cheapest
+   * offer per product family (1 row), not one row per SKU.
+   * Default behaviour if not provided: keep all variants.
    */
   selectVariants?: (offers: JsonLdOffer[]) => JsonLdOffer[];
+  /**
+   * If set, this URL is used as the ProductRow.url instead of the
+   * variant-specific offer URL. Use the generic product page so links
+   * stay valid regardless of which variant is currently in stock.
+   */
+  canonicalUrl?: string;
+  /**
+   * When true, no Amazon fallback link is added. Use for brands that
+   * sell direct from their own site and aren't on Amazon UK officially.
+   */
+  suppressAmazonFallback?: boolean;
   /**
    * Optional: turn a JsonLdOffer into the human-friendly
    * `{model, wattsDC, notes}` triple for the ProductRow.
@@ -110,127 +120,60 @@ export const SEED_PRODUCTS: SeedProduct[] = [
     ],
   },
 
-  // EcoFlow STREAM Plug & Play Solar System (UK government delivery
-  // partner). The page exposes a ProductGroup with 17 variants — we
-  // pick the cheapest "no-bracket" SKU per panel-wattage tier so the
-  // table shows one headline row per panel option.
+  // EcoFlow STREAM Plug & Play Solar System — panels + microinverter only.
+  // EcoFlow sell direct; Amazon doesn't officially stock these. One headline
+  // row with the entry price; visitors choose their panel size and bracket
+  // on EcoFlow's own configurator.
   {
     id: 'ecoflow-stream-balcony',
     brand: 'EcoFlow',
     sourceUrl: 'https://uk.ecoflow.com/products/stream-balcony-solar-system',
+    canonicalUrl: 'https://uk.ecoflow.com/products/stream-balcony-solar-system',
     retailerLabel: 'EcoFlow UK',
     ukCompliant: 'pending',
     hasBattery: false,
     wattsAC: 800,
+    suppressAmazonFallback: true,
+    // Return only the cheapest offer to get the headline "from £X" price.
     selectVariants: (offers) => {
-      // SKU naming convention seen on EcoFlow UK:
-      //   MI800WII-{PANELW}W{-MOUNT}{xN}
-      // e.g. MI800WII-400W (no bracket, 2x400W),
-      //      MI800WII-400W-BRACKETADJx2 (with adjustable bracket).
-      // For the headline list we want the cheapest variant per
-      // panel-watt tier (no mount = lowest sticker price).
-      const cheapestPerTier = new Map<string, JsonLdOffer>();
-      for (const o of offers) {
-        const m = o.sku.match(/MI800WII-(\d+)W(?:-LIGHTWEIGHTx(\d+))?/i);
-        if (!m) continue;
-        const panelW = parseInt(m[1], 10);
-        const mountSuffix = o.sku.replace(/^MI800WII-\d+W/i, '');
-        // Group by panel wattage AND by "lightweight x4" because
-        // 4×250W and 2×500W are very different setups.
-        const tier = mountSuffix.includes('LIGHTWEIGHT')
-          ? `${panelW}W-x4`
-          : `${panelW}W`;
-        const isPlain = mountSuffix === '' || mountSuffix.startsWith('-LIGHTWEIGHT');
-        const existing = cheapestPerTier.get(tier);
-        // Prefer the "plain" (no bracket) SKU as the headline; if no
-        // plain SKU is present in this tier, fall back to the cheapest.
-        if (!existing) {
-          cheapestPerTier.set(tier, o);
-        } else if (isPlain && !cheapestPerTier.get(tier + '-locked')) {
-          cheapestPerTier.set(tier, o);
-          cheapestPerTier.set(tier + '-locked', o);
-        } else if (!cheapestPerTier.get(tier + '-locked') && o.priceGBP < existing.priceGBP) {
-          cheapestPerTier.set(tier, o);
-        }
-      }
-      // Strip the helper "-locked" markers and sort cheapest first.
-      return Array.from(cheapestPerTier.entries())
-        .filter(([k]) => !k.endsWith('-locked'))
-        .map(([, v]) => v)
-        .sort((a, b) => a.priceGBP - b.priceGBP);
+      const valid = offers.filter((o) => /^MI800WII-/i.test(o.sku));
+      if (valid.length === 0) return offers.slice(0, 1);
+      return [valid.sort((a, b) => a.priceGBP - b.priceGBP)[0]];
     },
     describeVariant: (offer) => {
-      // SKU shape: MI800WII-400W, MI800WII-450W, MI800WII-520W,
-      //            MI800WII-250W (which is 4×250W = 1000W DC).
-      const m = offer.sku.match(/MI800WII-(\d+)W(?:-LIGHTWEIGHTx(\d+))?/i);
-      if (!m) return { model: 'STREAM Plug & Play Solar System' };
-      const panelW = parseInt(m[1], 10);
-      const isLightweight = /LIGHTWEIGHT/i.test(offer.sku);
-      const panelCount = isLightweight ? 4 : 2;
-      const wattsDC = panelW * panelCount;
+      const cheapestPrice = offer.priceGBP;
       return {
-        model: `STREAM Plug & Play (${panelCount} × ${panelW} W panels)`,
-        wattsDC,
-        notes: `${panelCount} × ${panelW} W rigid panels + STREAM 800 W microinverter`,
+        model: 'STREAM Plug & Play Solar System',
+        wattsDC: 800,
+        notes: `From £${cheapestPrice} — choose panel size (2×400 W to 4×250 W) and bracket on EcoFlow's site`,
       };
     },
   },
 
   // EcoFlow STREAM Series Solar Plant — battery-included system.
-  // The page exposes a single Product with offers[] (one entry per
-  // SKU). We pick the cheapest in-stock entry (or cheapest overall
-  // if all are out of stock) plus the "Ultra + AC Pro + 4 panels"
-  // top-of-range bundle.
+  // Entry product is the STREAM Ultra battery at £1,199 (in stock);
+  // visitors can configure panels and extra batteries on EcoFlow's site.
   {
     id: 'ecoflow-stream-solar-plant',
     brand: 'EcoFlow',
     sourceUrl: 'https://uk.ecoflow.com/pages/stream-series-plug-in-solar-battery',
+    canonicalUrl: 'https://uk.ecoflow.com/pages/stream-series-plug-in-solar-battery',
     retailerLabel: 'EcoFlow UK',
     ukCompliant: 'pending',
     hasBattery: true,
     batteryKWh: 1.92,
     wattsAC: 800,
+    suppressAmazonFallback: true,
+    // Return only the cheapest in-stock offer (battery only) as the headline.
     selectVariants: (offers) => {
-      if (offers.length === 0) return [];
-      const sorted = [...offers].sort((a, b) => a.priceGBP - b.priceGBP);
-      // Headline rows: cheapest entry-level (battery-only or battery
-      // + cheapest panel) and the top-of-range full system, no more.
-      const headline: JsonLdOffer[] = [sorted[0]];
-      if (sorted.length >= 3) {
-        const topEnd = sorted[sorted.length - 1];
-        if (topEnd.sku !== headline[0].sku) headline.push(topEnd);
-      }
-      return headline;
+      const inStock = offers.filter((o) => o.availability === 'in-stock');
+      const pool = inStock.length > 0 ? inStock : offers;
+      return [pool.sort((a, b) => a.priceGBP - b.priceGBP)[0]];
     },
-    describeVariant: (offer) => {
-      // SKU shapes:
-      //   EFSTREAMULTRA800W-UK            → battery only
-      //   ULTRA800W+520x2                 → battery + 2x520W panels
-      //   ULTRA800W+ACProx2+450x4         → battery + 2x AC Pro + 4x450W
-      const sku = offer.sku;
-      const acProMatch = sku.match(/ACPro(?:x(\d+))?/i);
-      const panelsMatch = sku.match(/(\d{3,4})x(\d+)/);
-      const acProCount = acProMatch ? parseInt(acProMatch[1] || '1', 10) : 0;
-      const acProBatteryKWh = acProCount * 1.92;
-
-      const parts: string[] = ['STREAM Ultra battery'];
-      if (acProCount > 0) parts.push(`+ ${acProCount} × AC Pro battery`);
-      let wattsDC: number | undefined;
-      if (panelsMatch) {
-        const panelW = parseInt(panelsMatch[1], 10);
-        const panelN = parseInt(panelsMatch[2], 10);
-        parts.push(`+ ${panelN} × ${panelW} W panels`);
-        wattsDC = panelW * panelN;
-      }
-
-      return {
-        model: parts.join(' '),
-        wattsDC,
-        notes: panelsMatch
-          ? `Plug-in battery system with included panels (~${(1.92 + acProBatteryKWh).toFixed(2)} kWh storage)`
-          : `Plug-in battery only (~${(1.92 + acProBatteryKWh).toFixed(2)} kWh) — pair with any panels or charge from grid`,
-      };
-    },
+    describeVariant: (offer) => ({
+      model: 'STREAM Series Solar Plant',
+      notes: `From £${offer.priceGBP} for battery only (1.92 kWh) — add panels and extra batteries on EcoFlow's site`,
+    }),
   },
 ];
 
@@ -268,6 +211,22 @@ export async function buildSeedProductRows(): Promise<ProductRow[]> {
 
 function seedToRow(seed: SeedProduct, offer: JsonLdOffer): ProductRow {
   const desc = (seed.describeVariant ?? defaultDescribe)(offer);
+  // Use the canonical product-page URL (no variant params) when provided,
+  // so links stay valid regardless of which variant is in or out of stock.
+  const url = seed.canonicalUrl ?? offer.url;
+  const retailers: import('./types').RetailerLink[] = [
+    {
+      retailer: seed.retailerLabel,
+      url,
+      priceGBP: Math.round(offer.priceGBP),
+      stock: offer.availability,
+    },
+  ];
+  // Only add an Amazon fallback if the seed explicitly opts in.
+  // EcoFlow sell direct; Amazon UK doesn't officially stock these.
+  if (!seed.suppressAmazonFallback) {
+    retailers.push(buildAmazonUkSearchFallback(seed.brand, desc.model));
+  }
   return {
     brand: seed.brand,
     model: desc.model,
@@ -276,22 +235,13 @@ function seedToRow(seed: SeedProduct, offer: JsonLdOffer): ProductRow {
     priceGBP: Math.round(offer.priceGBP),
     ukCompliant: seed.ukCompliant,
     retailer: seed.retailerLabel,
-    url: offer.url,
-    retailers: [
-      {
-        retailer: seed.retailerLabel,
-        url: offer.url,
-        priceGBP: Math.round(offer.priceGBP),
-        stock: offer.availability,
-      },
-      // Always include an Amazon UK search fallback so the row stays
-      // useful when EcoFlow are out of stock.
-      buildAmazonUkSearchFallback(seed.brand, desc.model),
-    ],
+    url,
+    retailers,
     notes: desc.notes,
     hasBattery: seed.hasBattery,
     batteryKWh: seed.batteryKWh,
     stock: offer.availability,
+    suppressAmazonFallback: seed.suppressAmazonFallback ?? false,
   };
 }
 

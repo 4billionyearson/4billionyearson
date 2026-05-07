@@ -57,11 +57,10 @@ function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
   });
 
   // Always make sure each row has at least one Amazon UK shoppable
-  // link. If Gemini hasn't verified a real `/dp/...` product page we
-  // append a tagged search-URL fallback so the row stays clickable and
-  // the click still earns the UK Associates fee.
-  const hasAmazonProductPage = tagged.some((r) => isAmazonProductPageUrl(r.url));
-  if (!hasAmazonProductPage) {
+  // link — unless the product has opted out (e.g. manufacturer-direct
+  // products where Amazon doesn't officially stock the kit).
+  const hasAmazonLink = tagged.some((r) => /amazon\.co\.uk|amazon\.com/i.test(r.url));
+  if (!hasAmazonLink && !p.suppressAmazonFallback) {
     tagged.push(buildAmazonUkSearchFallback(p.brand, p.model));
   }
 

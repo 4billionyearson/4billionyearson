@@ -96,6 +96,12 @@ export interface ProductRow {
   hasBattery?: boolean;
   /** Battery capacity in kWh if included. */
   batteryKWh?: number | null;
+  /**
+   * When true, ProductsTable will not append an automatic Amazon search
+   * fallback link. Set for manufacturer-direct products (e.g. EcoFlow UK)
+   * where Amazon doesn't officially stock the kit.
+   */
+  suppressAmazonFallback?: boolean;
 }
 
 export interface NewsItem {
