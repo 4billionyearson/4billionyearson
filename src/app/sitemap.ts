@@ -82,6 +82,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/plug-in-solar-uk`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/extreme-weather`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,

@@ -58,6 +58,15 @@ Core value proposition: Real-time and regularly updated data dashboards, plain-E
 - Emissions: ${baseUrl}/emissions
 - Energy: ${baseUrl}/energy-dashboard
 - Energy Rankings: ${baseUrl}/energy-rankings
+- UK Plug-in Solar Guide: ${baseUrl}/plug-in-solar-uk
+  - Daily-updated, impartial UK guide to plug-in / balcony solar
+  - Live legal-status dashboard (BS 7671 Amendment 4, G98, BSI product standard)
+  - Currently-available UK kits (EcoFlow, Lidl, Anker, Growatt, Jackery, BougeRV) with prices and compliance status
+  - Postcode-driven payback calculator powered by EU PVGIS solar yield data
+  - Three-track battery economics calculator (solar+battery, Octopus Flux arbitrage, off-peak charging)
+  - Postcode → DNO finder linking to G98 notification forms
+  - Downloadable landlord letter template referencing the Renters' Rights Act 2025
+  - Daily AI-curated UK plug-in solar news feed
 - Greenhouse Gases: ${baseUrl}/greenhouse-gases
 - Sea Levels & Ice: ${baseUrl}/sea-levels-ice
 - Extreme Weather: ${baseUrl}/extreme-weather

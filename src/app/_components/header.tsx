@@ -30,6 +30,12 @@ const Header = () => {
       Updated Annually
     </span>
   );
+  const DailyBadge = () => (
+    <span className="flex items-center gap-1 mt-0.5 text-[10px] font-bold tracking-wide uppercase text-[#D2E369]">
+      <span className="w-1.5 h-1.5 rounded-full bg-[#D2E369] inline-block" />
+      Updated Daily
+    </span>
+  );
   const NewArticleBadge = () => (
     <span className="inline-flex items-center gap-1 ml-2 text-[10px] font-bold tracking-wide uppercase text-amber-300">
       <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
@@ -139,7 +145,7 @@ const Header = () => {
           {/* Renewables Dropdown */}
           <div className="relative" onMouseEnter={() => setIsRenewablesOpen(true)} onMouseLeave={() => setIsRenewablesOpen(false)}>
             <button className={`uppercase whitespace-nowrap [text-shadow:0_1px_4px_black] transition-colors ${
-              pathname === '/energy' || pathname === '/energy-rankings' || pathname === '/energy-explained' || pathname === '/energy-books' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
+              pathname === '/energy' || pathname === '/energy-rankings' || pathname === '/energy-explained' || pathname === '/energy-books' || pathname === '/plug-in-solar-uk' || pathname === '/category/renewable-energy' ? 'text-white' : 'text-[#FFF5E7] hover:text-white'
             }`}>
               Renewable Energy ▾
             </button>
@@ -151,6 +157,9 @@ const Header = () => {
                 </Link>
                 <Link href="/energy-rankings" className={desktopDropdownItemClass(pathname === '/energy-rankings', 'text-emerald-400', 'hover:text-emerald-400')} onClick={closeMenu}>
                   Global Energy Rankings<AnnualBadge />
+                </Link>
+                <Link href="/plug-in-solar-uk" className={desktopDropdownItemClass(pathname === '/plug-in-solar-uk', 'text-[#D2E369]', 'hover:text-[#D2E369]')} onClick={closeMenu}>
+                  UK Plug-in Solar Guide<DailyBadge />
                 </Link>
                 <div className="border-t border-gray-700/50">
                 <Link href="/energy-explained" className={desktopDropdownItemClass(pathname === '/energy-explained', 'text-emerald-300', 'hover:text-emerald-300')} onClick={closeMenu}>
@@ -381,6 +390,9 @@ const Header = () => {
                 </Link>
                 <Link href="/energy-rankings" className={mobileDropdownItemClass(pathname === '/energy-rankings', 'text-emerald-400', 'hover:text-emerald-400')} onClick={closeMenu}>
                   Global Energy Rankings<AnnualBadge />
+                </Link>
+                <Link href="/plug-in-solar-uk" className={mobileDropdownItemClass(pathname === '/plug-in-solar-uk', 'text-[#D2E369]', 'hover:text-[#D2E369]')} onClick={closeMenu}>
+                  UK Plug-in Solar Guide<DailyBadge />
                 </Link>
                 <Link href="/energy-explained" className={mobileDropdownItemClass(pathname === '/energy-explained', 'text-emerald-300', 'hover:text-emerald-300')} onClick={closeMenu}>
                   Energy Explained
