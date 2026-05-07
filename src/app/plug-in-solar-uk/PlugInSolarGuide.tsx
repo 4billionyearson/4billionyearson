@@ -56,10 +56,13 @@ export default function PlugInSolarGuide({
   data,
   source,
   cacheMiss,
+  countryCode,
 }: {
   data: PlugInSolarLiveData | null;
   source: string;
   cacheMiss: boolean;
+  /** From Vercel geo — same as book pages for Amazon Associates. */
+  countryCode: string;
 }) {
   return (
     <main>
@@ -137,10 +140,10 @@ export default function PlugInSolarGuide({
 
           {/* ─── 2-column section: Timeline (sticky) | Status + What is + Legal + Regs ─── */}
           <div className="grid gap-6 lg:grid-cols-3">
-            {/* Left column: lg:self-start so this column does not stretch to match the tall right
-                stack. Grid stretch + Section h-full was forcing the first right-hand card to fill
-                the full row height with empty space below the status pills. */}
-            <aside className="lg:col-span-1 lg:self-start">
+            {/* Left column must stretch to the full row height so `sticky` has room to ride
+                alongside the tall right-hand stack. Do not use lg:self-start here — it shrinks the
+                track and the timeline scrolls away immediately. */}
+            <aside className="lg:col-span-1">
               <div className="lg:sticky lg:top-4 space-y-6">
                 <Section icon={<CalendarClock className="h-5 w-5" />} title="Regulation timeline">
                   <RegulationTimeline
@@ -216,7 +219,7 @@ export default function PlugInSolarGuide({
             title="What can you buy in the UK today?"
             id="products"
           >
-            <ProductsTable products={data?.products} />
+            <ProductsTable products={data?.products} countryCode={countryCode} />
           </Section>
 
           {/* ─── Plug-in vs rooftop decision panel ─── */}

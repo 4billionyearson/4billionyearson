@@ -15,16 +15,20 @@ export function RegulationTimeline({
   updates: TimelineEntry[] | undefined;
   fullyAvailable?: FullyAvailableEstimate;
 }) {
-  const merged = mergeAndSort([...BASE_TIMELINE, ...(updates ?? [])]);
   const todayISO = new Date().toISOString().slice(0, 10);
-  // Insert a synthetic "today" marker so users can see where they are.
-  const withToday = injectToday(merged, todayISO);
   // Guard against Gemini handing us a non-ISO date (the downstream date
   // formatter would render "Invalid Date" / "NaN months").
   const fa =
     fullyAvailable && /^\d{4}-\d{2}-\d{2}$/.test(fullyAvailable.date)
       ? fullyAvailable
       : FULLY_AVAILABLE_FALLBACK;
+
+  const merged = mergeAndSort([...BASE_TIMELINE, ...(updates ?? [])]);
+  // The AI "fully available" date often differs from the static BSI row (e.g.
+  // end of July vs mid-July). Without this, no timeline row matches `fa.date`
+  // and the in-list star + pill disappear even though the headline shows the date.
+  const withFullyAvailable = ensureFullyAvailableMilestone(merged, fa, todayISO);
+  const withToday = injectToday(withFullyAvailable, todayISO);
 
   return (
     <div className="space-y-4">
@@ -63,9 +67,10 @@ export function RegulationTimeline({
                 <h4 className="text-sm font-semibold text-[#FFF5E7]">{entry.title}</h4>
               </div>
               {matchesFA && (
-                <div className="mt-1.5 mb-0.5">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#D2E369] bg-[#D2E369]/15 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
-                    <Star className="h-3 w-3 fill-[#D2E369]" /> Available milestone
+                <div className="mt-2 mb-1 rounded-xl border-2 border-[#D2E369] bg-gradient-to-r from-[#D2E369]/20 via-[#D2E369]/10 to-transparent px-3 py-2 shadow-[0_0_12px_rgba(210,227,105,0.12)]">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
+                    <Star className="h-3.5 w-3.5 fill-[#D2E369] text-[#D2E369]" />
+                    {fa.label}
                   </span>
                 </div>
               )}
@@ -76,6 +81,26 @@ export function RegulationTimeline({
       </ol>
     </div>
   );
+}
+
+/** Adds a dated row for the consumer “fully available” milestone when it is not already in the list. */
+function ensureFullyAvailableMilestone(
+  entries: TimelineEntry[],
+  fa: FullyAvailableEstimate,
+  todayISO: string,
+): TimelineEntry[] {
+  if (entries.some((e) => e.date === fa.date)) {
+    return [...entries].sort((a, b) => a.date.localeCompare(b.date));
+  }
+  const kind: 'past' | 'future' = fa.date <= todayISO ? 'past' : 'future';
+  const extra: TimelineEntry = {
+    date: fa.date,
+    title: fa.label,
+    description: fa.rationale,
+    kind,
+    category: 'product',
+  };
+  return mergeAndSort([...entries, extra]);
 }
 
 function FullyAvailableHeadline({

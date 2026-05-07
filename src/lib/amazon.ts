@@ -60,3 +60,44 @@ export function amazonUrl(
   const tag = program ? `&tag=${AFFILIATE_TAGS[program]}` : "";
   return `https://${domain}/s?k=${q}&i=stripbooks${tag}`;
 }
+
+/**
+ * Product / shop URLs on amazon.* domains — eligible for the same Associates
+ * tags as our book pages (UK + US programs only).
+ */
+export function isAmazonAssociatesEligibleUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    const h = u.hostname.toLowerCase();
+    if (!h.includes("amazon.")) return false;
+    if (h.includes("amazon-adsystem") || h.includes("amazonpay") || h.includes("advertising")) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Associates tag for this visitor country, or null if we do not run a program there. */
+export function amazonAssociateTagForCountry(countryCode: string): string | null {
+  const program = COUNTRY_AFFILIATE[countryCode];
+  return program ? AFFILIATE_TAGS[program] : null;
+}
+
+/**
+ * Set the Amazon `tag` query parameter to our Associates ID (same IDs as the
+ * book pages). Non-Amazon URLs and countries without a configured program
+ * are returned unchanged.
+ */
+export function applyAmazonAffiliateTag(url: string, countryCode: string): string {
+  const tag = amazonAssociateTagForCountry(countryCode);
+  if (!tag || !isAmazonAssociatesEligibleUrl(url)) return url;
+  try {
+    const u = new URL(url);
+    u.searchParams.set("tag", tag);
+    return u.toString();
+  } catch {
+    return url;
+  }
+}

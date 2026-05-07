@@ -15,7 +15,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const LOOKBACK_DAYS = 7;
 
 function dateOffsetKey(daysAgo: number): string {

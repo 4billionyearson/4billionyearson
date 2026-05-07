@@ -132,6 +132,8 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('  RETAILERS RULE - CRITICAL:');
   lines.push('  - List EVERY UK retailer carrying the kit (manufacturer direct + Amazon UK + B&Q + Currys + Argos + Lidl + IKEA + etc) where you can verify the listing exists.');
   lines.push('  - Each retailers[].url MUST be a deep link to the actual product page on that retailer, copied verbatim from a Google Search result. Do NOT guess slugs (e.g. "/products/ecoflow-balcony-solar-system" is the kind of slug that often turns out to be wrong - we have already seen 404s on this page from invented uk.ecoflow.com URLs).');
+  lines.push('  - The API route HEAD-checks third-party URLs before caching. Amazon UK / Amazon.com and major manufacturer domains (e.g. uk.ecoflow.com, anker.com, zendure.com) are trusted without a fetch because bots often get false 403s — you must still only use URLs you verified in search.');
+  lines.push('  - If you cannot verify a working URL for a particular retailer, OMIT that retailer entry rather than guess.');
   lines.push('  - The API route HEAD-checks every retailers[].url before caching and silently drops broken ones. If you cannot verify a working URL for a particular retailer, OMIT that retailer entry rather than guess.');
   lines.push('  - If you can only verify ONE working URL for a product, return retailers with a single entry. One verified link is much better than three guessed ones.');
   lines.push('  - The top-level `retailer` and `url` fields are kept for backwards compatibility - mirror them from the first (cheapest) entry of retailers[].');

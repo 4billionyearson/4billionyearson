@@ -1,25 +1,49 @@
 import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle, RefreshCw, ShoppingBag } from 'lucide-react';
 import type { ProductRow, RetailerLink } from '@/lib/plug-in-solar/types';
+import {
+  applyAmazonAffiliateTag,
+  amazonAssociateTagForCountry,
+  isAmazonAssociatesEligibleUrl,
+} from '@/lib/amazon';
 import { AffiliateDisclosure } from './AffiliateDisclosure';
 
 /**
  * Build a normalised list of retailer links for a product. Falls back
  * to a single-entry list built from the legacy { retailer, url } pair
  * when Gemini hasn't populated the new retailers[] array yet.
+ * Amazon `amazon.*` links get the same Associates tag as our book pages.
  */
-function getRetailers(p: ProductRow): RetailerLink[] {
-  if (Array.isArray(p.retailers) && p.retailers.length > 0) return p.retailers;
-  if (p.url && p.retailer) {
-    return [{ retailer: p.retailer, url: p.url, priceGBP: p.priceGBP }];
-  }
-  return [];
+function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
+  const raw: RetailerLink[] =
+    Array.isArray(p.retailers) && p.retailers.length > 0
+      ? p.retailers
+      : p.url && p.retailer
+        ? [{ retailer: p.retailer, url: p.url, priceGBP: p.priceGBP }]
+        : [];
+  const hasProgram = amazonAssociateTagForCountry(countryCode) !== null;
+  return raw.map((r) => {
+    const isAmz = isAmazonAssociatesEligibleUrl(r.url);
+    return {
+      ...r,
+      url: applyAmazonAffiliateTag(r.url, countryCode),
+      // Only Amazon links use our Associates account (same as Energy Books / etc.).
+      affiliate: hasProgram && isAmz,
+    };
+  });
 }
 
 /**
  * Products table. Server-rendered so the kit list is in raw SSR HTML
  * (good for AI crawlers and Google product-results).
  */
-export function ProductsTable({ products }: { products: ProductRow[] | undefined }) {
+export function ProductsTable({
+  products,
+  countryCode = 'GB',
+}: {
+  products: ProductRow[] | undefined;
+  /** Vercel geo (or GB fallback) — drives Amazon Associates tag. */
+  countryCode?: string;
+}) {
   if (!products || products.length === 0) {
     return (
       <p className="text-sm text-gray-400">
@@ -39,7 +63,7 @@ export function ProductsTable({ products }: { products: ProductRow[] | undefined
       {/* Card layout on mobile */}
       <div className="grid grid-cols-1 gap-3 sm:hidden">
         {products.map((p) => {
-          const retailers = getRetailers(p);
+          const retailers = getRetailers(p, countryCode);
           return (
             <article
               key={`${p.brand}-${p.model}`}
@@ -91,7 +115,7 @@ export function ProductsTable({ products }: { products: ProductRow[] | undefined
           </thead>
           <tbody className="divide-y divide-gray-800">
             {products.map((p) => {
-              const retailers = getRetailers(p);
+              const retailers = getRetailers(p, countryCode);
               return (
                 <tr key={`${p.brand}-${p.model}`} className="hover:bg-gray-900/40 transition-colors">
                   <td className="px-4 py-3 align-top">

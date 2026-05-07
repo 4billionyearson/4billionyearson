@@ -24,7 +24,7 @@ import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
  */
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const PREVIOUS_LOOKBACK_DAYS = 7;
 
 /**
@@ -228,6 +228,51 @@ function coerceIsoDate(input: unknown): string | null {
 
 /* ─── URL validation ─────────────────────────────────────────────────────── */
 
+/**
+ * Retailer hosts we trust without a live HEAD check. Amazon and several
+ * manufacturer sites often return 403/bot challenges to server-side
+ * fetches even when the product page is valid, which was stripping most
+ * `retailers[]` entries and collapsing the whole product table.
+ */
+function retailerUrlTrustedWithoutFetch(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    if (host.includes('amazon-adsystem') || host.includes('amazonpay') || host.includes('advertising.amazon')) {
+      return false;
+    }
+    const suffixes = [
+      'amazon.co.uk',
+      'amazon.com',
+      'ecoflow.com',
+      'anker.com',
+      'zendure.com',
+      'growatt.com',
+      'jackery.com',
+      'bougerv.co.uk',
+      'marstekenergy.com',
+      'currys.co.uk',
+      'argos.co.uk',
+      'johnlewis.com',
+      'diy.com',
+      'screwfix.com',
+      'wickes.co.uk',
+      'toolstation.com',
+      'ikea.com',
+      'lidl.co.uk',
+      'halfords.com',
+      'smythstoys.com',
+      'eurocell.co.uk',
+      'homebase.co.uk',
+    ];
+    for (const s of suffixes) {
+      if (host === s || host.endsWith(`.${s}`)) return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 const URL_VALIDATION_TIMEOUT_MS = 5000;
 const URL_VALIDATION_USER_AGENT =
   'Mozilla/5.0 (compatible; 4billionyearson-bot/1.0; +https://4billionyearson.org/about)';
@@ -347,6 +392,9 @@ async function filterProductBrokenLinks(
           const u = (r?.url ?? '').trim();
           if (!u) return { entry: r, valid: false };
           if (groundingUris.has(u.toLowerCase())) {
+            return { entry: r, valid: true };
+          }
+          if (retailerUrlTrustedWithoutFetch(u)) {
             return { entry: r, valid: true };
           }
           const valid = await validateUrl(u);

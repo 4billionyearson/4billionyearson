@@ -1,5 +1,6 @@
 import { headers } from 'next/headers';
 import { getCached } from '@/lib/climate/redis';
+import { getCountryCode } from '@/lib/amazon';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 import PlugInSolarGuide from './PlugInSolarGuide';
 
@@ -19,7 +20,7 @@ export const dynamicParams = true;
 export const revalidate = 86400;
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const LOOKBACK_DAYS = 7;
 
 function dateOffsetKey(daysAgo: number): string {
@@ -69,8 +70,16 @@ async function warmUp(): Promise<void> {
 
 export default async function PlugInSolarUKPage() {
   const { data, cacheMiss, source } = await readCachedPayload();
+  const countryCode = await getCountryCode();
   if (cacheMiss) {
     await warmUp();
   }
-  return <PlugInSolarGuide data={data} source={source} cacheMiss={cacheMiss} />;
+  return (
+    <PlugInSolarGuide
+      data={data}
+      source={source}
+      cacheMiss={cacheMiss}
+      countryCode={countryCode}
+    />
+  );
 }

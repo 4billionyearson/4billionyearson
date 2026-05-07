@@ -22,11 +22,15 @@ export function AffiliateDisclosure({ variant = 'inline' }: { variant?: 'inline'
               relevant to the UK market right now - not because anyone has paid us to feature them.
             </p>
             <p>
-              Some of the outbound links in our products table are affiliate links. If you click
-              one and buy a product we may earn a small commission at no extra cost to you. The
-              choice of which products appear, and what we say about them, is never influenced by
-              whether or not an affiliate program is available. Pages, paragraphs and rankings
-              are not for sale.
+              Only links to the <strong className="font-semibold text-[#FFF5E7]">Amazon</strong>{' '}
+              store in the products table use our Amazon Associates account — the same programme
+              as our energy, climate and AI book pages. For UK, Ireland and US visitors those Amazon
+              URLs include our affiliate tag; if you buy after clicking, we may earn a small
+              commission at no extra cost to you. Links to manufacturer sites (for example EcoFlow),
+              other retailers or anywhere that is not Amazon are ordinary outbound links — we do not
+              earn commission from them here. The choice of which products appear, and what we say
+              about them, is never influenced by affiliate availability. Pages, paragraphs and
+              rankings are not for sale.
             </p>
             <p className="text-xs text-gray-500">
               Have a correction or want to suggest a kit we have missed? Email us at
@@ -42,8 +46,9 @@ export function AffiliateDisclosure({ variant = 'inline' }: { variant?: 'inline'
     <div className="flex items-start gap-2 rounded-lg border border-[#D2E369]/40 bg-[#D2E369]/5 px-3 py-2 text-xs text-gray-300">
       <Info className="h-4 w-4 text-[#D2E369] shrink-0 mt-0.5" />
       <p>
-        Some links below are affiliate links. We may earn a small commission - editorial choices
-        are not influenced by it. See the disclosure at the foot of this page.
+        <strong className="font-semibold text-[#FFF5E7]">Amazon</strong> shop links below use our
+        Associates tag (UK/US/IE only, same as our book pages); other retailer links do not. Editorial
+        choices are not influenced by it. See the full note at the foot of this page.
       </p>
     </div>
   );
