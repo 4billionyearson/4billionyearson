@@ -16,7 +16,7 @@ export function DnoFinder() {
   return (
     <section
       aria-labelledby="dno-finder-heading"
-      className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
+      className="rounded-2xl border-2 border-[#D2E369] shadow-xl flex flex-col h-full"
       style={{
         background:
           'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
@@ -31,7 +31,7 @@ export function DnoFinder() {
           Find your DNO
         </h2>
       </div>
-      <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-b-[14px] space-y-3">
+      <div className="flex-1 bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-b-[14px] space-y-3">
         <p className="text-sm text-gray-300 leading-relaxed">
           Within 28 days of installing your kit you must notify your Distribution Network Operator
           (DNO). The form is free, online, and takes a few minutes - no approval is required for

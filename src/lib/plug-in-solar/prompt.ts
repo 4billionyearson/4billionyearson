@@ -88,9 +88,15 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('');
   lines.push('  statusDashboard: array of exactly 4 pills, in this order:');
   lines.push('    1. label "Legal in the UK?"            - status legal | partial | not-legal');
+  lines.push('       Today this should be "partial" - BS 7671 Amendment 4 has been published (legalised) but the BSI product standard is still pending and the wiring-regs transition runs until 2 October 2026.');
   lines.push('    2. label "Products on shelves?"        - status yes | soon | no');
+  lines.push('       Use "yes" if at least ONE plug-in / sub-800 W kit is currently on sale to UK consumers (direct from manufacturer counts - e.g. EcoFlow STREAM Balcony Solar System on uk.ecoflow.com from ~£449, Lidl announced ~£500 kit). Today the answer is "yes". Do not downgrade to "soon" because the BSI standard is still pending - several kits already meet BS 7671 / EN 50549 today.');
+  lines.push('       Use "soon" only if NO product is currently on sale anywhere in the UK.');
+  lines.push('       Use "no" only if products have been actively withdrawn / banned.');
   lines.push('    3. label "SEG export payments?"        - status yes | partial | no');
+  lines.push('       Today the answer is "no" / "partial" - SEG requires MCS, which DIY plug-in installs cannot get; a simplified Ofgem pathway is expected ~2027.');
   lines.push('    4. label "DNO notification needed?"    - status yes | no');
+  lines.push('       Today the answer is "yes" - G98 notification within 28 days is mandatory.');
   lines.push('  Each pill: { label, status, reason (max 80 chars), asOf (YYYY-MM-DD) }.');
   lines.push('');
   lines.push('  tldr: 50-80 word plain-text paragraph for AI search snippet bait. Lead with current status (yes / partial / no), one cost figure, one product example, and the next big date to watch.');
@@ -107,7 +113,30 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('');
   lines.push('  timelineUpdates: array of 0-5 NEW or REVISED milestone entries to merge with the static base timeline. Use this only for entries the static list does not already contain (e.g. an Ofgem announcement landing today). Entry shape: { date (YYYY-MM-DD), title (max 70 chars), description (1 sentence), kind ("past" | "future"), category ("regulation" | "product" | "policy" | "standard") }.');
   lines.push('');
-  lines.push('  products: array of 4-12 currently-available UK PLUG-IN solar kits. Each: { brand, model, wattsAC (number), wattsDC (number, may be null), priceGBP (number), ukCompliant ("yes"|"pending"|"no"|"unknown"), retailer, url (absolute https), notes (optional <=80 char), hasBattery (boolean), batteryKWh (number, may be null) }.');
+  lines.push('  products: array of 4-12 currently-available UK PLUG-IN solar kits. Each entry shape:');
+  lines.push('    {');
+  lines.push('      brand, model,');
+  lines.push('      wattsAC (number), wattsDC (number, may be null),');
+  lines.push('      priceGBP (number, headline / cheapest current price),');
+  lines.push('      ukCompliant ("yes"|"pending"|"no"|"unknown"),');
+  lines.push('      retailer (display name of the cheapest retailer, mirrors retailers[0].retailer),');
+  lines.push('      url (absolute https URL of the cheapest retailer, mirrors retailers[0].url),');
+  lines.push('      retailers: [');
+  lines.push('        { retailer (display name), url (absolute https - VERIFIED working URL),');
+  lines.push('          priceGBP (number, may differ per retailer), affiliate (boolean) }');
+  lines.push('        ... 1-4 entries, primary/cheapest first.');
+  lines.push('      ],');
+  lines.push('      notes (optional <=80 char), hasBattery (boolean), batteryKWh (number, may be null)');
+  lines.push('    }');
+  lines.push('');
+  lines.push('  RETAILERS RULE - CRITICAL:');
+  lines.push('  - List EVERY UK retailer carrying the kit (manufacturer direct + Amazon UK + B&Q + Currys + Argos + Lidl + IKEA + etc) where you can verify the listing exists.');
+  lines.push('  - Each retailers[].url MUST be a deep link to the actual product page on that retailer, copied verbatim from a Google Search result. Do NOT guess slugs (e.g. "/products/ecoflow-balcony-solar-system" is the kind of slug that often turns out to be wrong - we have already seen 404s on this page from invented uk.ecoflow.com URLs).');
+  lines.push('  - The API route HEAD-checks every retailers[].url before caching and silently drops broken ones. If you cannot verify a working URL for a particular retailer, OMIT that retailer entry rather than guess.');
+  lines.push('  - If you can only verify ONE working URL for a product, return retailers with a single entry. One verified link is much better than three guessed ones.');
+  lines.push('  - The top-level `retailer` and `url` fields are kept for backwards compatibility - mirror them from the first (cheapest) entry of retailers[].');
+  lines.push('  - Mark `affiliate: true` for any link that is clearly an affiliate URL (Amazon "tag=" parameter, etc). Otherwise leave it false / omit.');
+  lines.push('');
   lines.push('  STRICT INCLUSION CRITERIA (apply BEFORE listing a product):');
   lines.push('  - Must be a "plug-in solar" or "plug-in battery" product: micro-inverter clipped to <=800 W AC, fed via a single domestic 13 A socket (BS 1363 plug), self-installable without an electrician.');
   lines.push('  - DO NOT include portable power stations, camping power banks, or roof-mounted MCS-installed solar systems.');
@@ -118,8 +147,7 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('  - EcoFlow STREAM AC Pro (battery-only AC home battery) and the EcoFlow STREAM Ultra X (3.84 kWh) where applicable - flag both with `notes` explaining whether they are sold as plug-in (sub-800 W AC into a wall socket) or as a hard-wired home battery. Mark ukCompliant: "pending" until BSI product standard publishes; mark ukCompliant: "no" if the unit exceeds 800 W AC and cannot be socket-installed in the UK.');
   lines.push('  - Lidl in-store kit (~£500) and any Iceland or B&Q listing once available.');
   lines.push('  - Anker SOLIX Solarbank, Growatt NOAH, Zendure SolarFlow, BougeRV, Marstek if/once on UK sale - mark `ukCompliant: pending` while the BSI product standard remains in draft.');
-  lines.push('  - Verify prices and stock status via Google Search against the manufacturer\'s UK domain. If a product is announced but not yet on sale, set retailer to "Coming soon" and price to your best estimate.');
-  lines.push('  - For every EcoFlow STREAM listing, the URL should be the relevant uk.ecoflow.com product page.');
+  lines.push('  - Verify prices and stock status via Google Search against the manufacturer\'s UK domain. If a product is announced but not yet on sale, set retailer to "Coming soon" and omit it from retailers[] until you can verify a real listing.');
   lines.push('');
   lines.push('  prices: latest UK electricity tariff rates in p/kWh as numbers:');
   lines.push('    unitRate_pPerKWh: typical Ofgem-cap unit rate.');
@@ -238,6 +266,19 @@ export const PLUG_IN_SOLAR_RESPONSE_SCHEMA = {
           ukCompliant: { type: 'STRING' },
           retailer: { type: 'STRING' },
           url: { type: 'STRING' },
+          retailers: {
+            type: 'ARRAY',
+            items: {
+              type: 'OBJECT',
+              properties: {
+                retailer: { type: 'STRING' },
+                url: { type: 'STRING' },
+                priceGBP: { type: 'NUMBER', nullable: true },
+                affiliate: { type: 'BOOLEAN' },
+              },
+              required: ['retailer', 'url'],
+            },
+          },
           notes: { type: 'STRING' },
           hasBattery: { type: 'BOOLEAN' },
           batteryKWh: { type: 'NUMBER', nullable: true },

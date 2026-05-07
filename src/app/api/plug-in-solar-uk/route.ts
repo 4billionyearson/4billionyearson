@@ -24,7 +24,7 @@ import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
  */
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const PREVIOUS_LOOKBACK_DAYS = 7;
 
 /**
@@ -164,10 +164,66 @@ function tryParse(text: string | null): PlugInSolarLiveData | null {
     if (!Array.isArray(parsed.statusDashboard) || !parsed.legalStatus || !parsed.regulations) {
       return null;
     }
+    sanitisePayload(parsed);
     return parsed as PlugInSolarLiveData;
   } catch {
     return null;
   }
+}
+
+/**
+ * Coerce date-shaped fields that Gemini sometimes returns as free text
+ * ("around July 2026", "Q3 2026", "mid-2026") into proper YYYY-MM-DD
+ * strings. The downstream components rely on Date.parse() succeeding;
+ * if it doesn't, the timeline renders "Invalid Date / NaN mo away".
+ */
+function sanitisePayload(payload: any): void {
+  if (payload?.fullyAvailableDate) {
+    const cleaned = coerceIsoDate(payload.fullyAvailableDate.date);
+    if (cleaned) {
+      payload.fullyAvailableDate.date = cleaned;
+    } else {
+      // Strip the field entirely so the static fallback kicks in.
+      delete payload.fullyAvailableDate;
+    }
+  }
+  if (Array.isArray(payload?.timelineUpdates)) {
+    payload.timelineUpdates = payload.timelineUpdates.filter((t: any) => {
+      const cleaned = coerceIsoDate(t?.date);
+      if (!cleaned) return false;
+      t.date = cleaned;
+      return true;
+    });
+  }
+  if (Array.isArray(payload?.news)) {
+    payload.news = payload.news.filter((n: any) => {
+      const cleaned = coerceIsoDate(n?.date);
+      if (!cleaned) return false;
+      n.date = cleaned;
+      return true;
+    });
+  }
+}
+
+/** Parse a wide range of date strings into YYYY-MM-DD, or null if hopeless. */
+function coerceIsoDate(input: unknown): string | null {
+  if (typeof input !== 'string') return null;
+  const trimmed = input.trim();
+  // Strict YYYY-MM-DD (the schema asks for this).
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const t = Date.parse(trimmed + 'T00:00:00Z');
+    return Number.isFinite(t) ? trimmed : null;
+  }
+  // Try free-form parsing as a last resort (e.g. "July 2026", "2026-07").
+  const fuzz = trimmed
+    .replace(/^(?:around|approx(?:imately)?|mid-?|early-?|late-?)\s+/i, '')
+    .replace(/^Q[1-4]\s+/i, '')
+    .replace(/^([0-9]{4})$/, '$1-12-31')
+    .replace(/^([0-9]{4})-([0-9]{1,2})$/, (_, y, m) => `${y}-${m.padStart(2, '0')}-15`);
+  const t2 = Date.parse(fuzz);
+  if (!Number.isFinite(t2)) return null;
+  const d = new Date(t2);
+  return d.toISOString().slice(0, 10);
 }
 
 /* ─── URL validation ─────────────────────────────────────────────────────── */
@@ -252,6 +308,84 @@ async function filterNewsBrokenLinks(
   return { kept: parsed.news.length, dropped: droppedItems.length };
 }
 
+/**
+ * Validate every retailer URL on every product. Drops broken retailer
+ * entries; if a product is left with zero working retailers, drop the
+ * product entirely. Mirrors the news validator.
+ */
+async function filterProductBrokenLinks(
+  parsed: PlugInSolarLiveData,
+  groundingUris: Set<string>,
+): Promise<{ keptProducts: number; droppedProducts: number; droppedRetailers: number }> {
+  if (!Array.isArray(parsed.products) || parsed.products.length === 0) {
+    return { keptProducts: 0, droppedProducts: 0, droppedRetailers: 0 };
+  }
+
+  let droppedRetailers = 0;
+  const productResults = await Promise.all(
+    parsed.products.map(async (product: any) => {
+      // Build a normalised retailers[] array, falling back to the
+      // top-level url/retailer if Gemini didn't populate retailers[].
+      const rawRetailers: any[] = Array.isArray(product?.retailers) && product.retailers.length
+        ? product.retailers
+        : product?.url && product?.retailer
+        ? [{ retailer: product.retailer, url: product.url, priceGBP: product.priceGBP }]
+        : [];
+
+      // De-duplicate by URL.
+      const seen = new Set<string>();
+      const unique = rawRetailers.filter((r) => {
+        const u = (r?.url ?? '').toLowerCase().trim();
+        if (!u || seen.has(u)) return false;
+        seen.add(u);
+        return true;
+      });
+
+      // Validate concurrently.
+      const validated = await Promise.all(
+        unique.map(async (r) => {
+          const u = (r?.url ?? '').trim();
+          if (!u) return { entry: r, valid: false };
+          if (groundingUris.has(u.toLowerCase())) {
+            return { entry: r, valid: true };
+          }
+          const valid = await validateUrl(u);
+          return { entry: r, valid };
+        }),
+      );
+
+      const goodRetailers = validated.filter((v) => v.valid).map((v) => v.entry);
+      droppedRetailers += validated.length - goodRetailers.length;
+
+      if (goodRetailers.length === 0) {
+        console.warn(
+          `[plug-in-solar-uk] dropping product with no working retailer URL: ${product?.brand} ${product?.model}`,
+        );
+        return null;
+      }
+
+      // Refresh top-level url / retailer / priceGBP from the first
+      // working retailer, so SSR fallbacks always show a real link.
+      const primary = goodRetailers[0];
+      product.retailers = goodRetailers;
+      product.retailer = primary.retailer;
+      product.url = primary.url;
+      if (typeof primary.priceGBP === 'number' && Number.isFinite(primary.priceGBP)) {
+        product.priceGBP = primary.priceGBP;
+      }
+      return product;
+    }),
+  );
+
+  const before = parsed.products.length;
+  parsed.products = productResults.filter((p): p is NonNullable<typeof p> => p !== null);
+  return {
+    keptProducts: parsed.products.length,
+    droppedProducts: before - parsed.products.length,
+    droppedRetailers,
+  };
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const skipCache = url.searchParams.get('nocache') === '1';
@@ -325,21 +459,31 @@ export async function GET(request: Request) {
   parsed.groundingSources = sources;
   parsed.generatedAt = new Date().toISOString();
 
-  // Validate every news[].sourceUrl. Even with grounding, Gemini will
-  // occasionally invent plausible-looking URLs (wrong path / merged
-  // hostname / dead article), so we sanity-check each link via HEAD
-  // and drop any that don't resolve. Grounding-metadata URLs are
-  // trusted without a fetch.
+  // Validate every news[].sourceUrl + every product retailers[].url.
+  // Even with grounding, Gemini will occasionally invent plausible-
+  // looking URLs (wrong path / merged hostname / dead article), so we
+  // sanity-check each link via HEAD and drop any that don't resolve.
+  // Grounding-metadata URLs are trusted without a fetch.
   const groundingUriSet = new Set(sources.map((s) => s.uri.toLowerCase()));
   try {
-    const result = await filterNewsBrokenLinks(parsed, groundingUriSet);
-    if (result.dropped > 0) {
+    const newsResult = await filterNewsBrokenLinks(parsed, groundingUriSet);
+    if (newsResult.dropped > 0) {
       console.warn(
-        `[plug-in-solar-uk] news url validation: kept ${result.kept}, dropped ${result.dropped}`,
+        `[plug-in-solar-uk] news url validation: kept ${newsResult.kept}, dropped ${newsResult.dropped}`,
       );
     }
   } catch (err) {
     console.warn('[plug-in-solar-uk] news url validation threw - keeping news as-is:', err);
+  }
+  try {
+    const productResult = await filterProductBrokenLinks(parsed, groundingUriSet);
+    if (productResult.droppedProducts > 0 || productResult.droppedRetailers > 0) {
+      console.warn(
+        `[plug-in-solar-uk] product url validation: kept ${productResult.keptProducts} products, dropped ${productResult.droppedProducts} products and ${productResult.droppedRetailers} retailer entries`,
+      );
+    }
+  } catch (err) {
+    console.warn('[plug-in-solar-uk] product url validation threw - keeping products as-is:', err);
   }
 
   // Cache for 24 hours and tell Next.js to invalidate the SSR HTML +

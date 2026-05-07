@@ -33,6 +33,22 @@ export interface TimelineEntry {
   category?: 'regulation' | 'product' | 'policy' | 'standard';
 }
 
+/**
+ * One outbound link for a product. The same kit may be sold at several
+ * retailers (e.g. EcoFlow direct + Amazon UK + B&Q). Each retailer
+ * needs its own validated URL and an optional independent price.
+ */
+export interface RetailerLink {
+  /** Retailer / vendor display name (e.g. "EcoFlow UK", "Amazon UK", "Lidl in-store"). */
+  retailer: string;
+  /** Absolute https URL to the product listing on that retailer. */
+  url: string;
+  /** Optional retailer-specific price in GBP (overrides the row-level price). */
+  priceGBP?: number | null;
+  /** Whether this is a paid / affiliate link (drives rel attribute). */
+  affiliate?: boolean;
+}
+
 export interface ProductRow {
   brand: string;
   model: string;
@@ -40,14 +56,22 @@ export interface ProductRow {
   wattsAC: number;
   /** Total panel input in watts (often higher than AC output). */
   wattsDC?: number | null;
-  /** Retail price in GBP. */
+  /** Headline retail price in GBP (cheapest currently-listed retailer). */
   priceGBP: number;
   /** Whether the kit, as sold, currently meets the upcoming UK product standard. */
   ukCompliant: 'yes' | 'pending' | 'no' | 'unknown';
-  /** Where it's sold - retailer name (e.g. "EcoFlow UK", "Lidl in-store", "Amazon"). */
+  /**
+   * Retailer of the headline price (kept for backward compat / SSR
+   * fallbacks). New payloads should populate `retailers[]` instead.
+   */
   retailer: string;
-  /** Outbound URL for the buy-link (manufacturer or retailer). May include affiliate codes. */
+  /** Headline buy link (mirrors retailers[0].url for backward compat). */
   url: string;
+  /**
+   * All retailers carrying this product. The first entry is the
+   * primary / cheapest one. Each entry must have its own working URL.
+   */
+  retailers?: RetailerLink[];
   /** Optional 1-line note (e.g. "Government's named partner"). */
   notes?: string;
   /** Whether a battery is included or available as an add-on. */

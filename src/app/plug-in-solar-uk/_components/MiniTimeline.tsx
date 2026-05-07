@@ -25,7 +25,12 @@ export function MiniTimeline({
 }: {
   fullyAvailable?: FullyAvailableEstimate;
 }) {
-  const fa = fullyAvailable ?? FULLY_AVAILABLE_FALLBACK;
+  // Defensive: if Gemini handed us a non-ISO date (e.g. "around July 2026")
+  // the math below collapses to NaN and the layout breaks. Fall back to
+  // the static estimate in that case.
+  const fa = isValidIso(fullyAvailable?.date)
+    ? (fullyAvailable as FullyAvailableEstimate)
+    : FULLY_AVAILABLE_FALLBACK;
   const todayISO = new Date().toISOString().slice(0, 10);
   const today = new Date(todayISO).getTime();
 
@@ -291,10 +296,18 @@ function confidenceTone(c: 'high' | 'medium' | 'low'): string {
   }
 }
 
+function isValidIso(s: unknown): s is string {
+  if (typeof s !== 'string') return false;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const t = Date.parse(s + 'T00:00:00Z');
+  return Number.isFinite(t);
+}
+
 function monthsBetween(fromISO: string, toISO: string): number {
   const a = new Date(fromISO);
   const b = new Date(toISO);
   const diffMs = b.getTime() - a.getTime();
+  if (!Number.isFinite(diffMs)) return 0;
   return Math.max(0, Math.round(diffMs / (1000 * 60 * 60 * 24 * 30.44)));
 }
 

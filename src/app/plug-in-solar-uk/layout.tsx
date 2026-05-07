@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 };
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const LOOKBACK_DAYS = 7;
 
 function dateOffsetKey(daysAgo: number): string {

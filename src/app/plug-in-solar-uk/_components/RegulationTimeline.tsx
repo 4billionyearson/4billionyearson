@@ -19,7 +19,12 @@ export function RegulationTimeline({
   const todayISO = new Date().toISOString().slice(0, 10);
   // Insert a synthetic "today" marker so users can see where they are.
   const withToday = injectToday(merged, todayISO);
-  const fa = fullyAvailable ?? FULLY_AVAILABLE_FALLBACK;
+  // Guard against Gemini handing us a non-ISO date (the downstream date
+  // formatter would render "Invalid Date" / "NaN months").
+  const fa =
+    fullyAvailable && /^\d{4}-\d{2}-\d{2}$/.test(fullyAvailable.date)
+      ? fullyAvailable
+      : FULLY_AVAILABLE_FALLBACK;
 
   return (
     <div className="space-y-4">
