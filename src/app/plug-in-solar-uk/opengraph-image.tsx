@@ -296,8 +296,6 @@ export default async function OgImage() {
   );
 }
 
-
-function dateOffsetKey(daysAgo: number): string {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() - daysAgo);
   return `${CACHE_KEY_PREFIX}:${d.toISOString().slice(0, 10)}-${CACHE_VERSION}`;
