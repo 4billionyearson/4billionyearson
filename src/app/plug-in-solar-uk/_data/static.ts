@@ -57,19 +57,24 @@ export const PLUG_IN_VS_ROOFTOP: { question: string; plugIn: string; rooftop: st
   },
 ];
 
+/**
+ * Consumer milestone on the vertical timeline (retail / certified kits on shelves).
+ * Kept in sync with `FULLY_AVAILABLE_FALLBACK.label` and Gemini `fullyAvailableDate.label`.
+ */
+export const LEGAL_IN_SHOPS_TIMELINE_TITLE = 'Legal & in the shops';
+
 /* ─── Fully-available milestone fallback ───────────────────────────────────── */
 
 /**
- * Fallback when Gemini hasn't yet filled in `fullyAvailableDate`. This is the
- * **retail / BSI product-standard** milestone (~mid-July 2026): certified kits
- * in widespread sale. It is not the same as the BS 7671 Amendment 4 transition
- * end (2 October 2026), which already appears on the static timeline.
+ * Fallback when Gemini hasn't yet filled in `fullyAvailableDate`. Mid-July aligns with
+ * the BSI product-standard publication; we show a separate timeline row for technical
+ * vs retail wording even when the date is the same.
  */
 export const FULLY_AVAILABLE_FALLBACK: FullyAvailableEstimate = {
   date: '2026-07-15',
-  label: 'Legal',
+  label: LEGAL_IN_SHOPS_TIMELINE_TITLE,
   rationale:
-    'Roughly when the BSI plug-in solar product standard is expected to publish and mainstream UK retailers can stock certified kits—mid‑July 2026 is the usual shorthand. Tighter legal uniformity for all new installation work continues until the BS 7671 Amendment 4 transition ends on 2 October 2026 (see timeline).',
+    'Expected when the BSI plug-in solar product standard publishes: mainstream UK retailers can stock certified kits on the shelf in the usual sense — the same mid-July window as the “BSI standard expected” milestone above (one moment, two aspects: technical standard + shop-ready products). Full regulatory alignment for all new install work continues until the BS 7671 Amendment 4 transition ends on 2 October 2026.',
   confidence: 'medium',
 };
 
@@ -93,7 +98,7 @@ export const BASE_TIMELINE: TimelineEntry[] = [
     date: '2026-03-16',
     title: 'Government confirmed legalisation',
     description:
-      'DESNZ announced it would amend BS 7671 and the G98 distribution code to permit sub-800 W plug-in solar via a domestic socket. EcoFlow was named as a delivery partner.',
+      'DESNZ announced it would amend BS 7671 and the G98 distribution code to permit sub-800W plug-in solar via a domestic socket. EcoFlow was named as a delivery partner.',
     kind: 'past',
     category: 'policy',
   },
@@ -109,9 +114,17 @@ export const BASE_TIMELINE: TimelineEntry[] = [
     date: '2026-07-15',
     title: 'BSI plug-in solar product standard expected',
     description:
-      'A new BSI product standard is expected mid-2026 covering anti-islanding, max 800W AC output, micro-inverter certification (EN 50549), and BS 1363 plug compliance.',
+      'Technical publication: a new BSI product standard is expected mid-2026 covering anti-islanding, max 800W AC output, micro-inverter certification (EN 50549), and BS 1363 plug compliance. Same calendar milestone as “Legal & in the shops” below when timing aligns.',
     kind: 'future',
     category: 'standard',
+  },
+  {
+    date: '2026-07-15',
+    title: LEGAL_IN_SHOPS_TIMELINE_TITLE,
+    description:
+      'Retail expectation: certified kits widely available from mainstream UK sellers once the BSI standard exists — same mid-July date as the row above when both land together; we list both so technical vs shop-floor timing is obvious.',
+    kind: 'future',
+    category: 'product',
   },
   {
     date: '2026-10-02',
@@ -143,7 +156,7 @@ export const BASE_TIMELINE: TimelineEntry[] = [
 export const HERO_TIMELINE: { date: string; label: string; kind: 'past' | 'future' }[] = [
   { date: '2026-03-16', label: 'Legalisation announced', kind: 'past' },
   { date: '2026-04-15', label: 'BS 7671 Amend. 4 live', kind: 'past' },
-  { date: '2026-07-15', label: 'BSI standard due', kind: 'future' },
+  { date: '2026-07-15', label: 'BSI · shops', kind: 'future' },
   { date: '2026-10-02', label: 'Amend. 4 transition ends', kind: 'future' },
   { date: '2027-04-01', label: 'Simplified SEG', kind: 'future' },
 ];

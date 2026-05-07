@@ -7,9 +7,8 @@ import { HERO_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
  * panel. Server-rendered: today's marker is computed at request time.
  *
  * Implementation notes:
- *  - A prominent "Legal" (retail / BSI) callout pill is rendered above
- *    the track with the AI-derived date. Its dot on the timeline is
- *    star-styled and lime so it stands out from the regular milestones.
+ *  - Callout + track use the AI-derived "Legal & in the shops" milestone;
+ *    merged track has one dot per calendar date (mid-July combines BSI + shops).
  *  - Track is positioned within an inner padded zone (PAD px on each
  *    side) so the leftmost / rightmost label can't escape the rounded
  *    box.
@@ -19,6 +18,33 @@ import { HERO_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
  *    of pill cards.
  */
 const PAD_PX = 70; // horizontal inset for the leftmost / rightmost dot
+
+type MiniEntry = { date: string; label: string; kind: 'past' | 'future' | 'available' };
+
+/** Collapse HERO + FA onto one dot per date so July does not stack two markers. */
+function mergeHeroTimelineWithFa(
+  hero: typeof HERO_TIMELINE,
+  fa: FullyAvailableEstimate,
+): MiniEntry[] {
+  const raw: MiniEntry[] = [
+    ...hero.map((e) => ({ date: e.date, label: e.label, kind: e.kind })),
+    { date: fa.date, label: fa.label, kind: 'available' },
+  ];
+  const byDate = new Map<string, MiniEntry>();
+  for (const e of raw) {
+    const cur = byDate.get(e.date);
+    if (!cur) {
+      byDate.set(e.date, { ...e });
+      continue;
+    }
+    const labels = [cur.label, e.label].filter(Boolean);
+    const uniq = [...new Set(labels)];
+    const kind: MiniEntry['kind'] =
+      cur.kind === 'available' || e.kind === 'available' ? 'available' : cur.kind;
+    byDate.set(e.date, { date: e.date, label: uniq.join(' · '), kind });
+  }
+  return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
 
 export function MiniTimeline({
   fullyAvailable,
@@ -34,13 +60,7 @@ export function MiniTimeline({
   const todayISO = new Date().toISOString().slice(0, 10);
   const today = new Date(todayISO).getTime();
 
-  // Merge the static milestones with the AI-supplied "fully available" entry.
-  // We mark it with __available__ so the renderer can style it specially.
-  type Entry = { date: string; label: string; kind: 'past' | 'future' | 'available' };
-  const merged: Entry[] = [
-    ...HERO_TIMELINE,
-    { date: fa.date, label: fa.label, kind: 'available' as const },
-  ].sort((a, b) => a.date.localeCompare(b.date));
+  const merged = mergeHeroTimelineWithFa(HERO_TIMELINE, fa);
 
   const dates = merged.map((t) => new Date(t.date).getTime());
   const min = Math.min(...dates, today);

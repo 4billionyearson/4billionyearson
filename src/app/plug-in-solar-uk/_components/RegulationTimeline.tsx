@@ -1,10 +1,10 @@
 import { CheckCircle2, Circle, FileText, Package, Scale, Sparkles, Star, CalendarCheck } from 'lucide-react';
 import type { FullyAvailableEstimate, TimelineEntry } from '@/lib/plug-in-solar/types';
-import { BASE_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
+import { BASE_TIMELINE, FULLY_AVAILABLE_FALLBACK, LEGAL_IN_SHOPS_TIMELINE_TITLE } from '../_data/static';
 
 /**
  * Hybrid timeline: static base milestones merged with any new entries
- * Gemini supplied today, plus the prominent "Legal" retail milestone callout
+ * Gemini supplied today, plus the prominent "Legal & in the shops" callout
  * at the top. Today's "you are here" marker is
  * computed at render time. Server-rendered.
  */
@@ -39,17 +39,17 @@ export function RegulationTimeline({
         className="relative space-y-4 pl-6 border-l border-[#D2E369]/30"
       >
         {withToday.map((entry, i) => {
-          const matchesFA = entry.date === fa.date;
+          const retailMilestoneAccent = isRetailMilestoneAccent(entry, fa);
           return (
             <li key={`${entry.date}-${entry.title}-${i}`} className="relative">
               <span
                 className={
                   'absolute -left-[33px] top-0.5 grid h-6 w-6 place-items-center rounded-full border ' +
-                  statusRing(entry, todayISO, matchesFA)
+                  statusRing(entry, todayISO, retailMilestoneAccent)
                 }
                 aria-hidden
               >
-                {iconFor(entry, todayISO, matchesFA)}
+                {iconFor(entry, todayISO, retailMilestoneAccent)}
               </span>
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 <span
@@ -66,7 +66,7 @@ export function RegulationTimeline({
                 </span>
                 <h4 className="text-sm font-semibold text-[#FFF5E7]">{entry.title}</h4>
               </div>
-              {matchesFA && (
+              {retailMilestoneAccent && (
                 <div className="mt-2 mb-1 rounded-xl border-2 border-[#D2E369] bg-gradient-to-r from-[#D2E369]/20 via-[#D2E369]/10 to-transparent px-3 py-2 shadow-[0_0_12px_rgba(210,227,105,0.12)]">
                   <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
                     <Star className="h-3.5 w-3.5 fill-[#D2E369] text-[#D2E369]" />
@@ -83,14 +83,20 @@ export function RegulationTimeline({
   );
 }
 
-/** Adds a dated row for the consumer “fully available” milestone when it is not already in the list. */
+/** Lime star + pill only on the retail / “in the shops” row, not the BSI technical row on the same date. */
+function isRetailMilestoneAccent(entry: TimelineEntry, fa: { date: string; label: string }): boolean {
+  if (entry.date === '__today__' || entry.date !== fa.date) return false;
+  if (entry.title === LEGAL_IN_SHOPS_TIMELINE_TITLE) return true;
+  if (entry.title === fa.label) return true;
+  return false;
+}
 function ensureFullyAvailableMilestone(
   entries: TimelineEntry[],
   fa: FullyAvailableEstimate,
   todayISO: string,
 ): TimelineEntry[] {
   if (entries.some((e) => e.date === fa.date)) {
-    return [...entries].sort((a, b) => a.date.localeCompare(b.date));
+    return mergeAndSort(entries);
   }
   const kind: 'past' | 'future' = fa.date <= todayISO ? 'past' : 'future';
   const extra: TimelineEntry = {
@@ -137,7 +143,11 @@ function mergeAndSort(entries: TimelineEntry[]): TimelineEntry[] {
     const key = `${e.date}|${e.title.toLowerCase()}`;
     if (!seen.has(key)) seen.set(key, e);
   }
-  return [...seen.values()].sort((a, b) => a.date.localeCompare(b.date));
+  return [...seen.values()].sort((a, b) => {
+    const byDate = a.date.localeCompare(b.date);
+    if (byDate !== 0) return byDate;
+    return a.title.localeCompare(b.title);
+  });
 }
 
 function injectToday(entries: TimelineEntry[], todayISO: string): TimelineEntry[] {

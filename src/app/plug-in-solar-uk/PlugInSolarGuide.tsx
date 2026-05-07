@@ -68,6 +68,23 @@ export default function PlugInSolarGuide({
   /** From Vercel geo — same as book pages for Amazon Associates. */
   countryCode: string;
 }) {
+  if (cacheMiss) {
+    return (
+      <main className="min-h-[65vh] flex flex-col justify-center font-sans text-gray-200">
+        <div className="container mx-auto px-4 max-w-lg w-full py-12">
+          <h1 className="text-center text-2xl md:text-3xl font-extrabold font-mono text-[#D2E369] mb-10">
+            UK Plug-in Solar Guide
+          </h1>
+          <DailyRefreshNotice
+            cacheMiss={cacheMiss}
+            hasPayload={data != null}
+            source={payloadSource}
+          />
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -101,12 +118,6 @@ export default function PlugInSolarGuide({
               <HeroVerdict data={data} />
             </div>
           </header>
-
-          <DailyRefreshNotice
-            cacheMiss={cacheMiss}
-            hasPayload={data != null}
-            source={payloadSource}
-          />
 
           {/* ─── 10-second update: simplified timeline, today's verdict text, page intro ─── */}
           <section

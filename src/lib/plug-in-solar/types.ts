@@ -119,7 +119,7 @@ export interface PriceSnapshot {
 export interface FullyAvailableEstimate {
   /** ISO date string (YYYY-MM-DD). The expected milestone date. */
   date: string;
-  /** Short label — keep to "Legal" for UI consistency. */
+  /** Short label — use exact string "Legal & in the shops" for UI consistency. */
   label: string;
   /** 1-2 sentence rationale. */
   rationale: string;
@@ -136,7 +136,7 @@ export interface PlugInSolarLiveData {
   tldr: string;
   /** Long-form daily-updated paragraph on legal status (120-180 words). */
   legalStatus: string;
-  /** Best-estimate date for BSI-driven retail / "Legal" milestone (~mid-July 2026). */
+  /** Best-estimate date for kits on mainstream shelves ("Legal & in the shops", ~mid-July 2026). */
   fullyAvailableDate?: FullyAvailableEstimate;
   /** Section keyed paragraphs on individual regulatory threads. */
   regulations: {

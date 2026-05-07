@@ -4,7 +4,10 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { getCached, setDailyTerm } from '@/lib/climate/redis';
-import { FULLY_AVAILABLE_FALLBACK } from '@/app/plug-in-solar-uk/_data/static';
+import {
+  FULLY_AVAILABLE_FALLBACK,
+  LEGAL_IN_SHOPS_TIMELINE_TITLE,
+} from '@/app/plug-in-solar-uk/_data/static';
 import { buildPlugInSolarPrompt, PLUG_IN_SOLAR_RESPONSE_SCHEMA } from '@/lib/plug-in-solar/prompt';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 
@@ -217,11 +220,14 @@ function normaliseFullyAvailableMilestone(payload: any): void {
   if (!fa || typeof fa.date !== 'string') return;
   if (fa.date === '2026-10-02') {
     fa.date = FULLY_AVAILABLE_FALLBACK.date;
-    fa.label = 'Legal';
+    fa.label = LEGAL_IN_SHOPS_TIMELINE_TITLE;
     fa.rationale = FULLY_AVAILABLE_FALLBACK.rationale;
   }
-  if (typeof fa.label === 'string' && /\bfully\s+legal\b/i.test(fa.label)) {
-    fa.label = 'Legal';
+  if (typeof fa.label === 'string') {
+    const t = fa.label.trim();
+    if (/\bfully\s+legal\b/i.test(fa.label) || /^legal$/i.test(t)) {
+      fa.label = LEGAL_IN_SHOPS_TIMELINE_TITLE;
+    }
   }
 }
 
