@@ -6,6 +6,8 @@ import {
   TrendingDown,
   Zap,
   ArrowRight,
+  Sun,
+  Battery,
 } from 'lucide-react';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 import { MiniTimeline } from './MiniTimeline';
@@ -58,7 +60,7 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           {/* 1 - Legal? */}
           <VerdictCard
             label="Legal in the UK?"
-            tone={isLegal ? 'green' : isPartial ? 'amber' : 'rose'}
+            tone={isLegal ? 'green' : isPartial ? 'orange' : 'rose'}
             icon={isLegal ? <CheckCircle2 className="h-7 w-7" /> : <AlertTriangle className="h-7 w-7" />}
             big={isLegal ? 'Yes' : isPartial ? 'Partial' : 'No'}
             sub={isLegal ? 'Sub-800 W kits, since Apr 2026' : 'See timeline below'}
@@ -76,7 +78,7 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           {/* 3 - Can I install today? */}
           <VerdictCard
             label="Can I install today?"
-            tone={isLegal ? 'green' : 'amber'}
+            tone={isLegal ? 'green' : 'orange'}
             icon={<Plug className="h-7 w-7" />}
             big={isLegal ? 'Yes' : 'Soon'}
             sub="Buy → plug in → notify your DNO (G98)"
@@ -92,23 +94,43 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           />
         </div>
 
-        {/* The 800W limit hero strip */}
-        <div className="rounded-xl border-2 border-[#D2E369]/50 bg-gradient-to-r from-[#D2E369]/15 via-[#D2E369]/5 to-transparent p-4 flex items-center gap-4">
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#D2E369] text-[#2C5263]">
-            <span className="font-mono font-extrabold text-lg leading-none">800</span>
+        {/* The 800W limit hero strip - applies across all three configurations */}
+        <div className="rounded-xl border-2 border-[#D2E369]/50 bg-gradient-to-r from-[#D2E369]/15 via-[#D2E369]/5 to-transparent p-4">
+          <div className="flex items-start gap-4">
+            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#D2E369] text-[#2C5263]">
+              <span className="font-mono font-extrabold text-lg leading-none">800</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
+                The legal limit
+              </div>
+              <div className="text-sm md:text-base text-[#FFF5E7] font-semibold leading-tight">
+                <span className="text-[#D2E369]">800 W AC</span> max output per home, via a
+                standard 13&nbsp;A socket
+              </div>
+              <div className="mt-0.5 text-xs text-gray-400 leading-snug">
+                Panels can total more on the DC side – the micro-inverter clips output to 800 W
+                AC. The same limit applies whether you have solar, a battery, or both.
+              </div>
+            </div>
           </div>
-          <div className="min-w-0">
-            <div className="text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
-              The legal limit
-            </div>
-            <div className="text-sm md:text-base text-[#FFF5E7] font-semibold leading-tight">
-              <span className="text-[#D2E369]">800 W AC</span> max output per home, via a standard
-              13&nbsp;A socket
-            </div>
-            <div className="mt-0.5 text-xs text-gray-400 leading-snug">
-              Panels can total more on the DC side – the micro-inverter clips output to 800 W AC.
-            </div>
-          </div>
+
+          {/* Three use-case ticks showing the 800 W limit covers all setups */}
+          <ul className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <UseCaseTick icons={[<Sun key="s" className="h-4 w-4 text-[#FFE066]" />]} label="Solar only" />
+            <UseCaseTick
+              icons={[<Battery key="b" className="h-4 w-4 text-[#D2E369]" />]}
+              label="Battery only"
+            />
+            <UseCaseTick
+              icons={[
+                <Sun key="s" className="h-4 w-4 text-[#FFE066]" />,
+                <span key="plus" className="text-gray-400 text-xs font-mono">+</span>,
+                <Battery key="b" className="h-4 w-4 text-[#D2E369]" />,
+              ]}
+              label="Solar + battery"
+            />
+          </ul>
         </div>
 
         {/* Mini regulation timeline */}
@@ -126,6 +148,8 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
   );
 }
 
+type Tone = 'green' | 'orange' | 'rose' | 'lime' | 'sky';
+
 function VerdictCard({
   label,
   tone,
@@ -134,12 +158,12 @@ function VerdictCard({
   sub,
 }: {
   label: string;
-  tone: 'green' | 'amber' | 'rose' | 'lime' | 'sky';
+  tone: Tone;
   icon: React.ReactNode;
   big: string;
   sub: string;
 }) {
-  const toneStyles: Record<typeof tone, { bg: string; border: string; iconBg: string; bigText: string; subText: string; labelText: string }> = {
+  const toneStyles: Record<Tone, { bg: string; border: string; iconBg: string; bigText: string; subText: string; labelText: string }> = {
     green: {
       bg: 'bg-emerald-500/15',
       border: 'border-emerald-400/60',
@@ -148,13 +172,14 @@ function VerdictCard({
       subText: 'text-emerald-100/80',
       labelText: 'text-emerald-300',
     },
-    amber: {
-      bg: 'bg-amber-500/15',
-      border: 'border-amber-400/60',
-      iconBg: 'bg-amber-400 text-amber-950',
-      bigText: 'text-amber-200',
-      subText: 'text-amber-100/80',
-      labelText: 'text-amber-300',
+    orange: {
+      // Vivid orange (was muted amber that read as brown)
+      bg: 'bg-orange-500/25',
+      border: 'border-orange-400/70',
+      iconBg: 'bg-orange-400 text-orange-950',
+      bigText: 'text-orange-200',
+      subText: 'text-orange-100/85',
+      labelText: 'text-orange-300',
     },
     rose: {
       bg: 'bg-rose-500/15',
@@ -195,6 +220,18 @@ function VerdictCard({
       <div className={`text-2xl md:text-3xl font-extrabold leading-none ${s.bigText}`}>{big}</div>
       <div className={`text-xs leading-snug ${s.subText}`}>{sub}</div>
     </div>
+  );
+}
+
+function UseCaseTick({ icons, label }: { icons: React.ReactNode[]; label: string }) {
+  return (
+    <li className="flex items-center gap-2 rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2">
+      <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-400 text-emerald-950 shrink-0">
+        <CheckCircle2 className="h-4 w-4" />
+      </span>
+      <span className="flex items-center gap-1 shrink-0">{icons}</span>
+      <span className="text-xs font-semibold text-[#FFF5E7] truncate">{label}</span>
+    </li>
   );
 }
 

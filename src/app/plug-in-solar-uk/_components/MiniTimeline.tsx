@@ -4,8 +4,17 @@ import { HERO_TIMELINE } from '../_data/static';
 /**
  * Compact horizontal timeline used in the top hero verdict block.
  * Server-rendered: today's marker is computed at request time.
- * Renders as a horizontal strip on desktop, scroll-snap on small screens.
+ *
+ * Implementation notes:
+ *  - Track is positioned within an inner padded zone (PAD px on each side)
+ *    so the leftmost / rightmost label can't escape the rounded box.
+ *  - Adjacent labels alternate above and below the line so even closely-
+ *    spaced milestones don't overlap each other.
+ *  - On small screens the track collapses to a horizontal scroll strip
+ *    of pill cards.
  */
+const PAD_PX = 70; // horizontal inset for the leftmost / rightmost dot
+
 export function MiniTimeline() {
   const todayISO = new Date().toISOString().slice(0, 10);
   const today = new Date(todayISO).getTime();
@@ -14,6 +23,11 @@ export function MiniTimeline() {
   const max = Math.max(...dates, today);
   const span = Math.max(max - min, 1);
   const todayPct = ((today - min) / span) * 100;
+
+  /** Map a 0-100 % position to an absolute-left CSS calc that keeps the
+   *  point inside the padded inner zone. */
+  const insetLeft = (pct: number) =>
+    `calc(${PAD_PX}px + (${pct} / 100) * (100% - ${2 * PAD_PX}px))`;
 
   return (
     <div className="rounded-xl border border-[#D2E369]/30 bg-gray-950/80 p-3 md:p-4">
@@ -26,34 +40,45 @@ export function MiniTimeline() {
         </span>
       </div>
 
-      {/* Desktop: horizontal track with proportional positioning */}
-      <div className="relative hidden md:block h-24">
-        <div className="absolute left-0 right-0 top-9 h-[2px] bg-gradient-to-r from-emerald-500/60 via-[#D2E369] to-sky-500/60 rounded-full" />
+      {/* Desktop: horizontal track with proportional positioning + alternating labels */}
+      <div className="relative hidden md:block" style={{ height: 140 }}>
+        {/* The line */}
         <div
-          className="absolute top-7 h-6 w-[3px] bg-[#D2E369] rounded-full shadow-[0_0_12px_rgba(210,227,105,0.8)]"
-          style={{ left: `calc(${todayPct}% - 1.5px)` }}
+          className="absolute h-[2px] bg-gradient-to-r from-emerald-500/60 via-[#D2E369] to-sky-500/60 rounded-full"
+          style={{ left: PAD_PX, right: PAD_PX, top: 70 }}
+        />
+
+        {/* Today marker */}
+        <div
+          className="absolute h-7 w-[3px] bg-[#D2E369] rounded-full shadow-[0_0_12px_rgba(210,227,105,0.8)]"
+          style={{ top: 57, left: insetLeft(todayPct), transform: 'translateX(-50%)' }}
           aria-label="Today"
         >
           <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] font-mono font-bold uppercase tracking-wider text-[#D2E369] whitespace-nowrap">
             Today
           </div>
         </div>
-        {HERO_TIMELINE.map((t) => {
+
+        {HERO_TIMELINE.map((t, i) => {
           const pct = ((new Date(t.date).getTime() - min) / span) * 100;
           const isPast = t.date <= todayISO;
+          // alternate labels above the line (even index) / below (odd index)
+          const above = i % 2 === 0;
           return (
             <div
               key={t.date + t.label}
-              className="absolute flex flex-col items-center"
-              style={{ left: `calc(${pct}% - 60px)`, width: 120, top: 0 }}
+              className="absolute"
+              style={{ left: insetLeft(pct), top: 0, width: 0 }}
             >
+              {/* Dot */}
               <div
                 className={
-                  'mt-7 h-4 w-4 rounded-full border-2 grid place-items-center ' +
+                  'absolute h-4 w-4 rounded-full border-2 grid place-items-center ' +
                   (isPast
                     ? 'bg-emerald-500 border-emerald-300'
                     : 'bg-gray-900 border-sky-400')
                 }
+                style={{ top: 62, left: 0, transform: 'translateX(-50%)' }}
               >
                 {isPast ? (
                   <CheckCircle2 className="h-3 w-3 text-white" />
@@ -61,16 +86,40 @@ export function MiniTimeline() {
                   <Clock className="h-2.5 w-2.5 text-sky-300" />
                 )}
               </div>
+
+              {/* Tiny tick joining label block to the line */}
               <div
                 className={
-                  'mt-1 text-[10px] font-mono uppercase tracking-wider text-center ' +
-                  (isPast ? 'text-emerald-300' : 'text-sky-300')
+                  'absolute w-px ' + (isPast ? 'bg-emerald-500/50' : 'bg-sky-500/50')
                 }
+                style={
+                  above
+                    ? { top: 48, left: 0, transform: 'translateX(-50%)', height: 14 }
+                    : { top: 78, left: 0, transform: 'translateX(-50%)', height: 14 }
+                }
+              />
+
+              {/* Alternating label */}
+              <div
+                className={`absolute text-center ${above ? '' : ''}`}
+                style={{
+                  width: 130,
+                  left: 0,
+                  transform: 'translateX(-50%)',
+                  top: above ? 4 : 92,
+                }}
               >
-                {formatShort(t.date)}
-              </div>
-              <div className="mt-0.5 text-[11px] font-medium text-center text-[#FFF5E7] leading-tight">
-                {t.label}
+                <div
+                  className={
+                    'text-[10px] font-mono uppercase tracking-wider ' +
+                    (isPast ? 'text-emerald-300' : 'text-sky-300')
+                  }
+                >
+                  {formatShort(t.date)}
+                </div>
+                <div className="mt-0.5 text-[11px] font-medium text-[#FFF5E7] leading-tight">
+                  {t.label}
+                </div>
               </div>
             </div>
           );

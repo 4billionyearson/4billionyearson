@@ -92,12 +92,13 @@ function toneFor(status: string): ToneSpec {
       return {
         Icon: AlertTriangle,
         verdictText: 'Partial',
-        bg: 'bg-amber-500/15',
-        border: 'border-amber-400/60',
-        iconBg: 'bg-amber-400 text-amber-950',
-        label: 'text-amber-300',
-        verdict: 'text-amber-200',
-        asOf: 'text-amber-300/80',
+        // Vivid orange (the previous amber read as brown on dark backgrounds)
+        bg: 'bg-orange-500/25',
+        border: 'border-orange-400/70',
+        iconBg: 'bg-orange-400 text-orange-950',
+        label: 'text-orange-300',
+        verdict: 'text-orange-200',
+        asOf: 'text-orange-300/80',
       };
     case 'soon':
       return {

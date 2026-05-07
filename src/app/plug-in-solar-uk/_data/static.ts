@@ -119,9 +119,12 @@ export const BASE_TIMELINE: TimelineEntry[] = [
  * Compact, single-line strings used in the top-of-page hero mini timeline.
  * Past entries should use past tense; future entries use "expected" / future
  * tense. We keep these short so they fit a horizontal strip on mobile.
+ *
+ * The Feb-2025 consultation milestone is intentionally excluded here: it
+ * compresses the rest of the timeline visually. The full timeline below
+ * still shows it.
  */
 export const HERO_TIMELINE: { date: string; label: string; kind: 'past' | 'future' }[] = [
-  { date: '2025-02-26', label: 'Consultation opened', kind: 'past' },
   { date: '2026-03-16', label: 'Legalisation announced', kind: 'past' },
   { date: '2026-04-15', label: 'BS 7671 Amend. 4 live', kind: 'past' },
   { date: '2026-07-15', label: 'BSI standard due', kind: 'future' },

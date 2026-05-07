@@ -65,45 +65,43 @@ export default function PlugInSolarGuide({
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
 
-          {/* ─── Hero ─── */}
+          {/* ─── Title bar (H1 only) ─── */}
           <header
             className="rounded-2xl border-2 border-[#D2E369] shadow-xl overflow-hidden"
-            style={{
-              background: 'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
-            }}
+            style={{ backgroundColor: '#D2E369' }}
           >
-            <div className="px-5 py-4 md:px-6 md:py-5" style={{ backgroundColor: '#D2E369' }}>
-              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">
-                UK Plug-in Solar Guide
-              </h1>
-              <div className="flex items-center gap-2 mt-3">
-                <Sun className="h-5 w-5 text-[#2C5263]/80" />
-                <p className="text-sm uppercase tracking-[0.3em] text-[#2C5263]/80 font-mono">
-                  Daily-updated UK Status, Products &amp; Costs
-                </p>
+            <div className="px-5 py-4 md:px-6 md:py-5 flex flex-wrap items-start gap-3 justify-between">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">
+                  UK Plug-in Solar Guide
+                </h1>
+                <div className="flex items-center gap-2 mt-2">
+                  <Sun className="h-5 w-5 text-[#2C5263]/80" />
+                  <p className="text-xs md:text-sm uppercase tracking-[0.25em] md:tracking-[0.3em] text-[#2C5263]/80 font-mono">
+                    Daily-updated UK Status, Products &amp; Costs
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="bg-gray-950/90 backdrop-blur-md px-5 py-4 md:px-6 md:py-5 space-y-4">
-              <div className="flex flex-wrap items-center gap-3 justify-between">
-                <p className="text-sm md:text-base text-gray-300 max-w-3xl">
-                  An impartial, daily-refreshed guide to plug-in solar in the UK: is it legal, what
-                  can you actually buy today, what will it cost, and can you pair (or replace) it
-                  with a battery on a smart tariff. Generated each day by AI from primary sources.
-                </p>
-                <LastUpdatedBadge generatedAt={data?.generatedAt} source={source} />
-              </div>
-
-              {/* Quick TL;DR - snippet bait */}
-              {data?.tldr ? (
-                <QuickTLDR label="Today's verdict">{data.tldr}</QuickTLDR>
-              ) : cacheMiss ? (
-                <CacheMissPanel />
-              ) : null}
+              <LastUpdatedBadge generatedAt={data?.generatedAt} source={source} />
             </div>
           </header>
 
-          {/* ─── 5-second visual verdict (cards + 800W + mini timeline) ─── */}
+          {/* ─── 5-second visual verdict — leads the page ─── */}
           <HeroVerdict data={data} />
+
+          {/* ─── Intro paragraph + Today's verdict TL;DR (sits below the visual verdict) ─── */}
+          <section className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl px-5 py-4 md:px-6 md:py-5 space-y-4">
+            <p className="text-sm md:text-base text-gray-300 max-w-4xl">
+              An impartial, daily-refreshed guide to plug-in solar in the UK: is it legal, what
+              can you actually buy today, what will it cost, and can you pair (or replace) it with
+              a battery on a smart tariff. Generated each day by AI from primary sources.
+            </p>
+            {data?.tldr ? (
+              <QuickTLDR label="Today's verdict">{data.tldr}</QuickTLDR>
+            ) : cacheMiss ? (
+              <CacheMissPanel />
+            ) : null}
+          </section>
 
           {/* ─── 2-column section: Timeline (sticky) | Status + What is + Legal + Regs ─── */}
           <div className="grid gap-6 lg:grid-cols-3">
@@ -175,6 +173,15 @@ export default function PlugInSolarGuide({
             </div>
           </div>
 
+          {/* ─── Products (moved up — buyers' guide first) ─── */}
+          <Section
+            icon={<ShoppingCart className="h-5 w-5" />}
+            title="What can you buy in the UK today?"
+            id="products"
+          >
+            <ProductsTable products={data?.products} />
+          </Section>
+
           {/* ─── Plug-in vs rooftop decision panel ─── */}
           <Section icon={<TrendingUp className="h-5 w-5" />} title="Plug-in solar vs rooftop solar">
             <p className="text-sm text-gray-300 leading-relaxed mb-3">
@@ -216,7 +223,7 @@ export default function PlugInSolarGuide({
             </p>
           </Section>
 
-          {/* ─── Installation guide ─── */}
+          {/* ─── Installation guide (now after the buyers' guide) ─── */}
           <Section icon={<Wrench className="h-5 w-5" />} title="Installation guide" id="install">
             <ol className="grid gap-3 md:grid-cols-2">
               {INSTALL_STEPS.map((step, i) => (
@@ -233,20 +240,11 @@ export default function PlugInSolarGuide({
             </ol>
           </Section>
 
-          {/* ─── Calculators side-by-side on desktop ─── */}
-          <div className="grid gap-6 lg:grid-cols-2" id="payback">
+          {/* ─── Calculators stacked full-width (Payback was wasting space when paired) ─── */}
+          <div id="payback" className="space-y-6">
             <PaybackCalculator prices={data?.prices} />
             <BatteryCalculator prices={data?.prices} />
           </div>
-
-          {/* ─── Products ─── */}
-          <Section
-            icon={<ShoppingCart className="h-5 w-5" />}
-            title="What can you buy in the UK today?"
-            id="products"
-          >
-            <ProductsTable products={data?.products} />
-          </Section>
 
           {/* ─── SEG status + DNO finder side-by-side on desktop ─── */}
           <div className="grid gap-6 lg:grid-cols-2">
