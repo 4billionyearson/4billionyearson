@@ -90,7 +90,7 @@ export default function PlugInSolarGuide({
               </div>
             </div>
             {/* Dark body — 5-second verdict block */}
-            <div className="bg-gray-950/95 backdrop-blur-md p-4 md:p-6 rounded-b-[14px]">
+            <div className="bg-gray-950 p-4 md:p-6 rounded-b-[14px]">
               <HeroVerdict data={data} />
             </div>
           </header>
@@ -112,7 +112,7 @@ export default function PlugInSolarGuide({
                 The 10-second update
               </h2>
             </div>
-            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-b-[14px] space-y-4">
+            <div className="bg-gray-950 p-4 md:p-6 rounded-b-[14px] space-y-4">
               <MiniTimeline fullyAvailable={data?.fullyAvailableDate} />
 
               {data?.tldr ? (
@@ -137,8 +137,10 @@ export default function PlugInSolarGuide({
 
           {/* ─── 2-column section: Timeline (sticky) | Status + What is + Legal + Regs ─── */}
           <div className="grid gap-6 lg:grid-cols-3">
-            {/* Left column - sticky regulation timeline (the user said this should be a key part of the page, higher up) */}
-            <aside className="lg:col-span-1">
+            {/* Left column: lg:self-start so this column does not stretch to match the tall right
+                stack. Grid stretch + Section h-full was forcing the first right-hand card to fill
+                the full row height with empty space below the status pills. */}
+            <aside className="lg:col-span-1 lg:self-start">
               <div className="lg:sticky lg:top-4 space-y-6">
                 <Section icon={<CalendarClock className="h-5 w-5" />} title="Regulation timeline">
                   <RegulationTimeline
@@ -282,15 +284,19 @@ export default function PlugInSolarGuide({
           </div>
 
           {/* ─── SEG status + DNO finder side-by-side on desktop ─── */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Section icon={<Info className="h-5 w-5" />} title="Smart Export Guarantee: will you get paid?">
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+            <Section
+              icon={<Info className="h-5 w-5" />}
+              title="Smart Export Guarantee: will you get paid?"
+              fillGridHeight
+            >
               {data?.segStatus ? (
                 <p className="text-sm text-gray-300 leading-relaxed">{data.segStatus}</p>
               ) : (
                 <RegeneratingNote />
               )}
             </Section>
-            <DnoFinder />
+            <DnoFinder fillGridHeight />
           </div>
 
           {/* ─── Landlord letter ─── */}
@@ -306,7 +312,7 @@ export default function PlugInSolarGuide({
             headingId="plug-in-solar-faq"
             title="Frequently asked questions"
             qa={PLUG_IN_SOLAR_FAQ}
-            className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D2E369]"
+            className="bg-gray-950 backdrop-blur-md p-5 md:p-6 rounded-2xl shadow-xl border-2 border-[#D2E369]"
           />
 
           {/* ─── Glossary ─── */}
@@ -370,16 +376,22 @@ function Section({
   title,
   children,
   id,
+  /** Only for cards in a 2-col row (SEG + DNO) — stretches body to match sibling height. */
+  fillGridHeight,
 }: {
   icon?: React.ReactNode;
   title: string;
   children: React.ReactNode;
   id?: string;
+  fillGridHeight?: boolean;
 }) {
   return (
     <section
       id={id}
-      className="scroll-mt-6 md:scroll-mt-8 rounded-2xl border-2 border-[#D2E369] shadow-xl flex flex-col h-full"
+      className={
+        'scroll-mt-6 md:scroll-mt-8 rounded-2xl border-2 border-[#D2E369] shadow-xl ' +
+        (fillGridHeight ? 'flex min-h-0 flex-col lg:h-full' : '')
+      }
       style={{
         background:
           'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
@@ -394,7 +406,12 @@ function Section({
           {title}
         </h2>
       </div>
-      <div className="flex-1 bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-b-[14px]">
+      <div
+        className={
+          'bg-gray-950 backdrop-blur-md p-5 md:p-6 rounded-b-[14px]' +
+          (fillGridHeight ? ' flex-1 min-h-0' : '')
+        }
+      >
         {children}
       </div>
     </section>

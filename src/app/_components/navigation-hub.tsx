@@ -50,10 +50,10 @@ const SECTIONS: Section[] = [
     color: "#D2E369",
     icon: <Zap className="h-6 w-6" />,
     links: [
+      { href: "/energy-dashboard", label: "Local & Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
+      { href: "/energy-rankings", label: "Global Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
       { href: "/plug-in-solar-uk", label: "UK Plug-in Solar Guide", icon: <PlugZap className="h-4 w-4" />, badge: "daily", desc: "Legality, products, payback & news" },
-      { href: "/energy-dashboard", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
-      { href: "/energy-rankings", label: "Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
-      { href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
+      { group: "Guides & library", href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
       { href: "/energy-books", label: "Books on Energy", icon: <BookOpen className="h-4 w-4" />, desc: "Recommended reading on energy" },
       { href: "/category/renewable-energy", label: "Blog", icon: <Newspaper className="h-4 w-4" />, blogCategory: "renewable-energy", desc: "Latest articles" },
     ],

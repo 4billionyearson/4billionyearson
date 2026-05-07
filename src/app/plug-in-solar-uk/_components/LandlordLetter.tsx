@@ -38,7 +38,7 @@ export function LandlordLetter() {
   return (
     <section
       aria-labelledby="landlord-heading"
-      className="rounded-2xl border-2 border-[#D2E369] shadow-xl flex flex-col h-full"
+      className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
       style={{
         background:
           'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
@@ -53,7 +53,7 @@ export function LandlordLetter() {
           Landlord letter template
         </h2>
       </div>
-      <div className="flex-1 bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-b-[14px] space-y-3">
+      <div className="bg-gray-950 backdrop-blur-md p-5 md:p-6 rounded-b-[14px] space-y-3">
         <p className="text-sm text-gray-300 leading-relaxed">
           If you rent, the simplest path is to write to your landlord before installing. The
           template below references BS 7671 Amendment 4 (2026), explains that the kit is portable
