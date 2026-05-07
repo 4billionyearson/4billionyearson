@@ -119,7 +119,7 @@ export default function PlugInSolarGuide({
             </div>
           </header>
 
-          {/* ─── 10-second update: simplified timeline, today's verdict text, page intro ─── */}
+          {/* ─── 1-minute update: simplified timeline, today's verdict text, page intro ─── */}
           <section
             className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
             style={{
@@ -133,7 +133,7 @@ export default function PlugInSolarGuide({
             >
               <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">
                 <CalendarClock className="h-5 w-5" />
-                The 10-second update
+                The 1-minute update
               </h2>
             </div>
             <div className="bg-gray-950 p-4 md:p-6 rounded-b-[14px] space-y-4">

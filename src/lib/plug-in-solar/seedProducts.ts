@@ -15,10 +15,12 @@
  *     the AI flow as before. The merge step in route.ts gives
  *     seed entries priority over Gemini's guess for the same brand.
  *
- * To add a new brand: append a new SeedProduct here with a
- * `selectVariants()` that picks the small "headline" set the page
- * should show (the EcoFlow URL exposes 17 variants — we only want
- * the four sensible "one row per panel-watt config" picks).
+ * To add a new brand: append a new SeedProduct here. For brands with
+ * a live product page: supply `sourceUrl` + optional `selectVariants`.
+ * For brands where the product hasn't launched in the UK yet: omit
+ * `sourceUrl` and supply `staticRows` instead — those rows appear in
+ * the table with price shown as "—" so visitors know it's coming but
+ * we're not inventing a number.
  */
 
 import type { ProductRow } from './types';
@@ -29,8 +31,12 @@ export interface SeedProduct {
   /** Stable identifier (also used as React key prefix). */
   id: string;
   brand: string;
-  /** Manufacturer page that emits the JSON-LD Product / ProductGroup. */
-  sourceUrl: string;
+  /**
+   * Manufacturer page that emits the JSON-LD Product / ProductGroup.
+   * Omit (or set undefined) for brands where no live UK product page
+   * exists yet — use `staticRows` instead.
+   */
+  sourceUrl?: string;
   /** Display name of the retailer (e.g. "EcoFlow UK"). */
   retailerLabel: string;
   /** UK compliance status — we set this manually because Gemini's
@@ -61,6 +67,19 @@ export interface SeedProduct {
     wattsDC?: number;
     notes?: string;
   };
+  /**
+   * Static rows to generate without scraping. Used when the product
+   * has been announced but isn't yet live on any UK retailer page.
+   * Each entry produces a ProductRow with `priceGBP: null` so the
+   * table shows "—" rather than an AI-guessed figure.
+   */
+  staticRows?: Array<{
+    model: string;
+    wattsDC?: number;
+    notes?: string;
+    /** Direct product page if one exists (optional). */
+    url?: string;
+  }>;
 }
 
 /**
@@ -69,6 +88,28 @@ export interface SeedProduct {
  * with real prices and stock.
  */
 export const SEED_PRODUCTS: SeedProduct[] = [
+  // Lidl UK — Parkside plug-in solar kit.
+  // Sold in Germany & EU (Parkside branding); a UK version has been
+  // announced but is not yet available with a confirmed price or
+  // product page. We show it as a stub so the table is honest:
+  // price = "—", compliance = unknown, no buy link yet.
+  {
+    id: 'lidl-parkside',
+    brand: 'Lidl',
+    // No sourceUrl: no live UK product page to scrape.
+    retailerLabel: 'Lidl UK',
+    ukCompliant: 'unknown',
+    hasBattery: false,
+    wattsAC: 800,
+    staticRows: [
+      {
+        model: 'Parkside Plug-in Solar Kit',
+        notes: 'Sold in Germany & EU; UK launch not yet confirmed — check lidl.co.uk',
+        url: 'https://www.lidl.co.uk',
+      },
+    ],
+  },
+
   // EcoFlow STREAM Plug & Play Solar System (UK government delivery
   // partner). The page exposes a ProductGroup with 17 variants — we
   // pick the cheapest "no-bracket" SKU per panel-wattage tier so the
@@ -203,6 +244,11 @@ export const SEED_PRODUCTS: SeedProduct[] = [
 export async function buildSeedProductRows(): Promise<ProductRow[]> {
   const settled = await Promise.all(
     SEED_PRODUCTS.map(async (seed) => {
+      // Static stub: no live URL to scrape.
+      if (!seed.sourceUrl) {
+        if (!seed.staticRows?.length) return [];
+        return seed.staticRows.map((r) => staticToRow(seed, r));
+      }
       try {
         const offers = await fetchJsonLdOffers(seed.sourceUrl);
         if (offers.length === 0) {
@@ -246,6 +292,36 @@ function seedToRow(seed: SeedProduct, offer: JsonLdOffer): ProductRow {
     hasBattery: seed.hasBattery,
     batteryKWh: seed.batteryKWh,
     stock: offer.availability,
+  };
+}
+
+/** Build a ProductRow from a static stub (no live scraped price). */
+function staticToRow(
+  seed: SeedProduct,
+  row: NonNullable<SeedProduct['staticRows']>[number],
+): ProductRow {
+  const fallbackUrl = row.url ?? `https://www.${seed.brand.toLowerCase()}.co.uk`;
+  return {
+    brand: seed.brand,
+    model: row.model,
+    wattsAC: seed.wattsAC,
+    wattsDC: row.wattsDC,
+    priceGBP: null, // not yet confirmed — UI shows "—"
+    ukCompliant: seed.ukCompliant,
+    retailer: seed.retailerLabel,
+    url: fallbackUrl,
+    retailers: [
+      {
+        retailer: seed.retailerLabel,
+        url: fallbackUrl,
+        priceGBP: undefined,
+        isFallback: true,
+      },
+    ],
+    notes: row.notes,
+    hasBattery: seed.hasBattery,
+    batteryKWh: seed.batteryKWh,
+    stock: 'unknown',
   };
 }
 

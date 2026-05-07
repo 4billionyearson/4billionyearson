@@ -67,8 +67,9 @@ export interface ProductRow {
   wattsAC: number;
   /** Total panel input in watts (often higher than AC output). */
   wattsDC?: number | null;
-  /** Headline retail price in GBP (cheapest currently-listed retailer). */
-  priceGBP: number;
+  /** Headline retail price in GBP (cheapest currently-listed retailer).
+   *  Null for brands where the product hasn't launched in the UK yet. */
+  priceGBP: number | null;
   /** Whether the kit, as sold, currently meets the upcoming UK product standard. */
   ukCompliant: 'yes' | 'pending' | 'no' | 'unknown';
   /**

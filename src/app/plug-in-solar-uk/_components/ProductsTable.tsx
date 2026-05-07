@@ -112,7 +112,9 @@ export function ProductsTable({
                   <div className="text-base font-semibold text-[#FFF5E7]">{p.model}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-[#FFF5E7]">£{Math.round(p.priceGBP)}</div>
+                  <div className="text-lg font-bold text-[#FFF5E7]">
+                    {p.priceGBP != null ? `£${Math.round(p.priceGBP)}` : <span className="text-gray-500">—</span>}
+                  </div>
                   <div className="text-[11px] text-gray-400">{p.wattsAC} W AC</div>
                 </div>
               </div>
@@ -143,7 +145,7 @@ export function ProductsTable({
             <tr className="text-left text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
               <th className="px-4 py-3">Brand &amp; model</th>
               <th className="px-4 py-3">Output</th>
-              <th className="px-4 py-3">Price (est.)</th>
+              <th className="px-4 py-3">Price</th>
               <th className="px-4 py-3">UK compliant</th>
               <th className="px-4 py-3">Battery</th>
               <th className="px-4 py-3">Where to buy</th>
@@ -166,7 +168,7 @@ export function ProductsTable({
                     ) : null}
                   </td>
                   <td className="px-4 py-3 align-top whitespace-nowrap font-semibold text-[#FFF5E7]">
-                    £{Math.round(p.priceGBP)}
+                    {p.priceGBP != null ? `£${Math.round(p.priceGBP)}` : <span className="text-gray-500">—</span>}
                   </td>
                   <td className="px-4 py-3 align-top">
                     <ComplianceBadge status={p.ukCompliant} />

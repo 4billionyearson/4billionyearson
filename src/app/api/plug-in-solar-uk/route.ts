@@ -593,11 +593,22 @@ export async function GET(request: Request) {
   try {
     const seedRows = await buildSeedProductRows();
     if (seedRows.length > 0) {
+      // Suppress Gemini rows for any brand that the seed list covers.
+      // Also handle common brand aliases (e.g. Gemini may call Lidl's
+      // product "Parkside" since that's the actual product brand).
+      const BRAND_ALIASES: Record<string, string> = {
+        parkside: 'lidl',
+        'lidl parkside': 'lidl',
+      };
       const seededBrands = new Set(
         SEED_PRODUCTS.map((s) => s.brand.toLowerCase()),
       );
+      const normaliseBrand = (b: string) => {
+        const lc = b.toLowerCase();
+        return BRAND_ALIASES[lc] ?? lc;
+      };
       const geminiKept = (parsed.products || []).filter(
-        (p: { brand?: string }) => !seededBrands.has((p.brand || '').toLowerCase()),
+        (p: { brand?: string }) => !seededBrands.has(normaliseBrand(p.brand || '')),
       );
       parsed.products = [...seedRows, ...geminiKept];
       console.warn(

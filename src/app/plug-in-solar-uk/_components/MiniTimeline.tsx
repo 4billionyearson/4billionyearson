@@ -4,7 +4,7 @@ import { milestoneForUi, sameCalendarMonth } from '@/lib/plug-in-solar/milestone
 import { HERO_TIMELINE, FULLY_AVAILABLE_FALLBACK, LEGAL_IN_SHOPS_TIMELINE_TITLE } from '../_data/static';
 
 /**
- * Compact horizontal timeline used in the "Today's 10-second update"
+ * Compact horizontal timeline used in the "The 1-minute update"
  * panel. Server-rendered: today's marker is computed at request time.
  *
  * Implementation notes:
