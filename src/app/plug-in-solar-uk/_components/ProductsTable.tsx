@@ -47,7 +47,7 @@ function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
 
   const unique = dedupeRetailersByUrl(cleaned.filter((r) => r.url.length > 0));
   const hasProgram = amazonAssociateTagForCountry(countryCode) !== null;
-  const tagged = unique.map((r) => {
+  const tagged: RetailerLink[] = unique.map((r) => {
     const isAmz = isAmazonAssociatesEligibleUrl(r.url);
     return {
       ...r,
