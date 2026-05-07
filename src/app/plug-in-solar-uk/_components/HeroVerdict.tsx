@@ -32,12 +32,11 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
     ? Math.round(Math.min(...data.products.map((p) => p.priceGBP)))
     : 400;
 
-  // Annual saving estimate using live unit rate when available.
+  // Payback estimate uses live unit rate at ~65 % self-consumption.
   const unitRate = data?.prices?.unitRate_pPerKWh ?? 25.5;
   const annualKWh = 600;
-  const annualSavingLow = Math.round(((unitRate - 4) * annualKWh) / 100);
-  const annualSavingHigh = Math.round(((unitRate + 1.5) * annualKWh) / 100);
-  const paybackYears = Math.round((cheapestKitGBP / annualSavingHigh) * 10) / 10;
+  const annualSavingMid = Math.round((unitRate * 0.65 * annualKWh) / 100);
+  const paybackYears = Math.round((cheapestKitGBP / Math.max(annualSavingMid, 1)) * 10) / 10;
 
   return (
     <div aria-label="UK plug-in solar at a glance" className="space-y-4">
@@ -67,7 +66,7 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           tone="lime"
           icon={<PoundSterling className="h-7 w-7" />}
           big={`From £${cheapestKitGBP}`}
-          sub={`Typical 800W kit · approx. £${annualSavingLow}-${annualSavingHigh}/yr saving`}
+          sub={`Typical 800W kit · £70-£175/yr saving`}
         />
         <VerdictCard
           label="Can I install today?"

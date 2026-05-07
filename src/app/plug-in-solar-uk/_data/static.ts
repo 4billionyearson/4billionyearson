@@ -252,7 +252,7 @@ export const PLUG_IN_SOLAR_FAQ: FAQItem[] = [
   {
     q: 'How much money will I save?',
     aText:
-      "A typical 800 W kit in southern England generates roughly 500-700 kWh a year. At a unit rate around 24-27 p/kWh that's £130-£190 of self-consumed electricity. Real-world savings depend on how much you use during the day - households where someone is home, or where always-on appliances run continuously, see the highest payback. Government modelling suggested £70-£110 a year for an average household with a 4-year payback.",
+      "A typical 800 W kit in southern England generates roughly 500-700 kWh a year. At current unit rates (24-27 p/kWh), savings range from around £70 a year for an average household to up to £175 a year if you use most of the power during the day - giving a headline range of £70-£175/yr. Government modelling put the typical figure at £70-£110 a year with a roughly 4-year payback; households where someone is home during the day, or with always-on loads, often do better.",
   },
   {
     q: 'Can I get paid for excess solar I send to the grid?',

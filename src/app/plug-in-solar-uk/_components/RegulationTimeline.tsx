@@ -80,7 +80,7 @@ export function RegulationTimeline({
                 <h4 className="text-sm font-semibold text-[#FFF5E7]">{entry.title}</h4>
               </div>
               {retailMilestoneAccent && (
-                <div className="mt-2 mb-1 rounded-xl border-2 border-[#D2E369] bg-gradient-to-r from-[#D2E369]/20 via-[#D2E369]/10 to-transparent px-3 py-2 shadow-[0_0_12px_rgba(210,227,105,0.12)]">
+                <div className="mt-2 mb-1 w-fit rounded-xl border-2 border-[#D2E369] bg-[#D2E369]/15 px-3 py-2 shadow-[0_0_12px_rgba(210,227,105,0.12)]">
                   <span className="flex items-center gap-1.5 text-xs sm:text-[13px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
                     <Star className="h-3.5 w-3.5 shrink-0 fill-[#D2E369] text-[#D2E369]" />
                     {faUi.label}

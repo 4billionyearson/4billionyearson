@@ -42,7 +42,7 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('- 15 April 2026: BS 7671 Amendment 4 published by IET/BSI. Transition period ends 2 October 2026.');
   lines.push('- A separate BSI product standard for plug-in solar systems is expected mid-2026 (around July 2026).');
   lines.push('- Sub-800 W AC output limit per circuit. G98 notification still required within 28 days. SEG not yet available for DIY plug-in installs (MCS gap); simplified pathway expected ~2027.');
-  lines.push('- Government modelling: £70-£110/yr saving, ~4-year payback for an 800 W kit at typical electricity prices.');
+  lines.push('- Typical saving range: £70-£175/yr for an 800 W kit (government modelling floor: ~£70-£110/yr for average households; full self-consumption at current unit rates reaches ~£150-£175/yr). Use £70-£175/yr as the headline figure in your summary.');
   lines.push('- EcoFlow STREAM Balcony Kit was already on sale in the UK at ~£449-£499 in late April 2026. Lidl announced a ~£500 kit for in-store sale "within months" of April 2026.');
   lines.push('');
   lines.push('SOURCE PREFERENCE - HARD RULE: PRIMARY UK SOURCES FIRST.');

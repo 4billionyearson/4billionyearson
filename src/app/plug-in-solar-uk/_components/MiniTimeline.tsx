@@ -288,37 +288,42 @@ function FullyAvailableCallout({
   const monthsAway = monthsBetween(todayISO, fa.date);
   const passed = fa.date <= todayISO;
   return (
-    <div className="mb-3 rounded-xl border-2 border-[#D2E369] bg-gradient-to-r from-[#D2E369]/20 via-[#D2E369]/10 to-transparent p-3 md:p-4 flex items-center gap-3">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#D2E369] text-[#2C5263] shadow-[0_0_12px_rgba(210,227,105,0.6)]">
-        <CalendarCheck className="h-5 w-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="text-[10px] font-mono uppercase tracking-wider text-[#D2E369]">
-            {fa.label}
-          </span>
-          <span
-            className={
-              'text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded-full border ' +
-              confidenceTone(fa.confidence)
-            }
-          >
-            {fa.confidence} confidence
-          </span>
-        </div>
-        <div className="text-base md:text-lg font-extrabold text-[#FFF5E7] leading-tight">
-          {passed ? (
-            <>Reached on {formatLong(fa.date)}</>
-          ) : (
-            <>
-              {formatLong(fa.date)}
-              <span className="ml-2 text-sm font-semibold text-[#D2E369]">
-                ({monthsAway === 0 ? 'within weeks' : `~${monthsAway} mo away`})
+    <div className="mb-3 rounded-xl border-2 border-[#D2E369] bg-gradient-to-r from-[#D2E369]/20 via-[#D2E369]/10 to-transparent p-3 md:p-4">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#D2E369] text-[#2C5263] shadow-[0_0_12px_rgba(210,227,105,0.6)]">
+          <CalendarCheck className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1 md:flex md:items-center md:gap-5">
+          <div className="md:shrink-0">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#D2E369]">
+                {fa.label}
               </span>
-            </>
-          )}
+              <span
+                className={
+                  'text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded-full border ' +
+                  confidenceTone(fa.confidence)
+                }
+              >
+                {fa.confidence} confidence
+              </span>
+            </div>
+            <div className="text-base md:text-lg font-extrabold text-[#FFF5E7] leading-tight">
+              {passed ? (
+                <>Reached on {formatLong(fa.date)}</>
+              ) : (
+                <>
+                  {formatLong(fa.date)}
+                  <span className="ml-2 text-sm font-semibold text-[#D2E369]">
+                    ({monthsAway === 0 ? 'within weeks' : `~${monthsAway} mo away`})
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="hidden md:block w-px self-stretch bg-[#D2E369]/25" />
+          <p className="mt-1.5 md:mt-0 text-xs text-gray-400 leading-snug">{fa.rationale}</p>
         </div>
-        <p className="mt-0.5 text-xs text-gray-400 leading-snug line-clamp-2">{fa.rationale}</p>
       </div>
     </div>
   );
