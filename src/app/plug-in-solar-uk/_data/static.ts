@@ -342,20 +342,20 @@ export const DNO_LOOKUP: Record<string, DNOEntry> = (() => {
   const ukpn: DNOEntry = {
     name: 'UK Power Networks',
     region: 'London, South East and East England',
-    url: 'https://www.ukpowernetworks.co.uk/generation',
+    url: 'https://www.ukpowernetworks.co.uk/smart-connect',
     phone: '0800 029 4285',
   };
   const ssen: DNOEntry = {
-    name: 'SSEN',
-    region: 'Southern England and Northern Scotland',
-    url: 'https://www.ssen.co.uk/our-services/connections/connecting-generation/connecting-small-generation/',
+    name: 'SSEN (Scottish & Southern Electricity Networks)',
+    region: 'Central Southern England and Northern Scotland',
+    url: 'https://www.ssen.co.uk/our-services/new-supplies/generation-connections/micro-generation-connections/',
     phone: '0800 048 3516',
   };
   const ngedSW: DNOEntry = {
     name: 'National Grid Electricity Distribution',
     region: 'South West, South Wales, Midlands',
-    url: 'https://www.nationalgrid.co.uk/our-services/applying-for-a-new-connection/connecting-distributed-generation',
-    phone: '0800 6783 105',
+    url: 'https://connections.nationalgrid.co.uk/get-connected/solar-and-wind/micro-generation-single-g98',
+    phone: '0800 096 3080',
   };
   const enwl: DNOEntry = {
     name: 'Electricity North West',
@@ -383,43 +383,58 @@ export const DNO_LOOKUP: Record<string, DNOEntry> = (() => {
   };
 
   const map: Record<string, DNOEntry> = {};
-  // London (UKPN)
+  // UKPN — London
   ['E', 'EC', 'N', 'NW', 'SE', 'SW', 'W', 'WC'].forEach((p) => (map[p] = ukpn));
-  // South East / East (UKPN)
-  ['BR', 'CM', 'CO', 'CR', 'CT', 'DA', 'EN', 'HA', 'IG', 'IP', 'KT', 'ME', 'RH', 'RM', 'SG', 'SS', 'TN', 'TW', 'UB', 'WD', 'AL', 'CB', 'PE', 'NR'].forEach((p) => (map[p] = ukpn));
-  // SSEN South (Southern)
-  ['BH', 'GU', 'OX', 'PO', 'RG', 'SL', 'SN', 'SO', 'SP'].forEach((p) => (map[p] = ssen));
-  // SSEN North (Scotland)
-  ['AB', 'IV', 'PA', 'PH', 'KW', 'HS', 'ZE', 'DD', 'KY', 'FK'].forEach((p) => (map[p] = ssen));
-  // SP Energy Networks Scotland (central/southern)
-  ['EH', 'G', 'KA', 'ML', 'TD', 'DG'].forEach((p) => (map[p] = sp));
-  // SP Manweb (Cheshire / North Wales / Merseyside)
+  // UKPN — South East and East England (Brighton, Kent, Surrey, Sussex, Beds, Bucks, Essex, Herts, Cambs, Norfolk, Suffolk, Peterborough)
+  [
+    'AL', 'BN', 'BR', 'CB', 'CM', 'CO', 'CR', 'CT', 'DA', 'EN', 'HA', 'HP', 'IG',
+    'IP', 'KT', 'LU', 'ME', 'NR', 'PE', 'RH', 'RM', 'SG', 'SS', 'TN', 'TW', 'UB',
+    'WD',
+  ].forEach((p) => (map[p] = ukpn));
+  // SSEN — Southern (central south coast, Berks, Hants, Dorset, Wilts, Oxon)
+  ['BH', 'DT', 'GU', 'OX', 'PO', 'RG', 'SL', 'SN', 'SO', 'SP'].forEach((p) => (map[p] = ssen));
+  // SSEN — North Scotland (Highlands, Aberdeen, Inverness, Western Isles, Shetland, Orkney, Tayside, Fife, Stirling, Falkirk)
+  ['AB', 'DD', 'FK', 'HS', 'IV', 'KW', 'KY', 'PA', 'PH', 'ZE'].forEach((p) => (map[p] = ssen));
+  // SP Energy Networks — Central/Southern Scotland (Edinburgh, Glasgow, Ayrshire, Lanarkshire, Borders, Dumfries)
+  ['DG', 'EH', 'G', 'KA', 'ML', 'TD'].forEach((p) => (map[p] = sp));
+  // SP Manweb — Cheshire, North Wales, Merseyside, Mid-Wales borders
   ['CH', 'CW', 'L', 'LL', 'SY'].forEach((p) => (map[p] = sp));
-  // ENWL (North West England)
+  // ENWL — North West England (Cumbria, Lancs, Greater Manchester)
   ['BB', 'BL', 'CA', 'FY', 'LA', 'M', 'OL', 'PR', 'SK', 'WA', 'WN'].forEach((p) => (map[p] = enwl));
-  // Northern Powergrid (Yorkshire + North East)
-  ['BD', 'DH', 'DL', 'DN', 'HD', 'HG', 'HU', 'HX', 'LS', 'NE', 'SR', 'TS', 'WF', 'YO', 'S'].forEach((p) => (map[p] = npg));
-  // National Grid Electricity Distribution (West Midlands, East Midlands, South West, South Wales)
-  ['B', 'BS', 'CV', 'DE', 'DY', 'GL', 'HR', 'LE', 'NG', 'NN', 'ST', 'TF', 'WR', 'WS', 'WV', 'CF', 'SA', 'NP', 'EX', 'LD', 'LN', 'PL', 'TA', 'TQ', 'TR'].forEach((p) => (map[p] = ngedSW));
-  // NI
+  // Northern Powergrid — Yorkshire and North East
+  ['BD', 'DH', 'DL', 'DN', 'HD', 'HG', 'HU', 'HX', 'LS', 'NE', 'S', 'SR', 'TS', 'WF', 'YO'].forEach(
+    (p) => (map[p] = npg),
+  );
+  // NGED — West Mids, East Mids, South West, South Wales (Birmingham, Nottingham, Bristol, Bath, Cardiff, Swansea, Cornwall, Devon, Milton Keynes, Northants)
+  [
+    'B', 'BA', 'BS', 'CF', 'CV', 'DE', 'DY', 'EX', 'GL', 'HR', 'LD', 'LE', 'LN',
+    'MK', 'NG', 'NN', 'NP', 'PL', 'SA', 'ST', 'TA', 'TF', 'TQ', 'TR', 'WR',
+    'WS', 'WV',
+  ].forEach((p) => (map[p] = ngedSW));
+  // NIE — Northern Ireland
   ['BT'].forEach((p) => (map[p] = niee));
   return map;
 })();
 
 /**
- * Given a free-text postcode, return the postcode-area letters (e.g. "SW1A 2AA" -> "SW").
+ * Given a free-text postcode, return the postcode-area letters
+ * (e.g. "SW1A 2AA" -> "SW", "bn1 1aa" -> "BN", "BN" -> "BN").
  */
 export function getPostcodeArea(input: string): string | null {
   const cleaned = input.trim().toUpperCase().replace(/\s+/g, ' ');
-  const m = cleaned.match(/^([A-Z]{1,2})\d/);
+  const m = cleaned.match(/^([A-Z]{1,2})(?:\d|$)/);
   return m ? m[1] : null;
 }
 
 export function lookupDNO(postcode: string): { area: string; dno: DNOEntry } | null {
   const area = getPostcodeArea(postcode);
   if (!area) return null;
-  // Try the 2-letter area first, then fall back to the 1-letter prefix.
-  const dno = DNO_LOOKUP[area] || DNO_LOOKUP[area.charAt(0)];
+  // Strict 2-letter lookup. We deliberately do NOT fall back to the
+  // 1-letter prefix because 2-letter areas often map to a different
+  // operator than a 1-letter one would suggest (e.g. "BN" -> UKPN,
+  // "B" -> NGED). For 1-letter UK postcode areas (B, E, G, L, M, N,
+  // S, W) the lookup returns the correct DNO directly.
+  const dno = DNO_LOOKUP[area];
   if (!dno) return null;
   return { area, dno };
 }

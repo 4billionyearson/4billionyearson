@@ -29,6 +29,7 @@ import { HeroVerdict } from './_components/HeroVerdict';
 import { HowItWorksDiagram } from './_components/HowItWorksDiagram';
 import { LegalChecklist } from './_components/LegalChecklist';
 import { MiniTimeline } from './_components/MiniTimeline';
+import { PrimarySources } from './_components/PrimarySources';
 import {
   HOW_IT_WORKS_PARAGRAPHS,
   PLUG_IN_VS_ROOFTOP,
@@ -260,7 +261,7 @@ export default function PlugInSolarGuide({
           </Section>
 
           {/* ─── Calculators stacked full-width (Payback was wasting space when paired) ─── */}
-          <div id="payback" className="space-y-6">
+          <div id="payback" className="scroll-mt-6 md:scroll-mt-8 space-y-6">
             <PaybackCalculator prices={data?.prices} />
             <BatteryCalculator prices={data?.prices} />
           </div>
@@ -305,9 +306,22 @@ export default function PlugInSolarGuide({
             </dl>
           </Section>
 
-          {/* ─── Sources ─── */}
+          {/* ─── Primary UK sources (always visible) ─── */}
+          <Section icon={<BookOpen className="h-5 w-5" />} title="Primary UK sources">
+            <PrimarySources />
+          </Section>
+
+          {/* ─── Today's grounding citations (Gemini's Google Search) ─── */}
           {data?.groundingSources && data.groundingSources.length > 0 && (
-            <Section icon={<BookOpen className="h-5 w-5" />} title="Sources for today's update">
+            <Section
+              icon={<BookOpen className="h-5 w-5" />}
+              title="Today's grounding citations"
+            >
+              <p className="text-sm text-gray-400 mb-3">
+                The additional pages Gemini's Google Search grounding consulted for today's
+                refresh. Official UK sources are listed first; trade press and other secondary
+                sources follow.
+              </p>
               <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {data.groundingSources.map((s, i) => (
                   <li key={i}>
@@ -350,7 +364,7 @@ function Section({
   return (
     <section
       id={id}
-      className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden"
+      className="scroll-mt-6 md:scroll-mt-8 rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden"
     >
       <div className="px-5 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
         <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">

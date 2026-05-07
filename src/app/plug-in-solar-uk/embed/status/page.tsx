@@ -13,7 +13,7 @@ export const runtime = 'nodejs';
 export const revalidate = 3600;
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const LOOKBACK_DAYS = 7;
 
 function dateOffsetKey(daysAgo: number): string {

@@ -19,7 +19,7 @@ export const dynamicParams = true;
 export const revalidate = 86400;
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const LOOKBACK_DAYS = 7;
 
 function dateOffsetKey(daysAgo: number): string {

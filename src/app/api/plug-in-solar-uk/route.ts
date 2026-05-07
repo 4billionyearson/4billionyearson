@@ -24,8 +24,34 @@ import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
  */
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const PREVIOUS_LOOKBACK_DAYS = 7;
+
+/**
+ * Primary-source domains (UK government, regulators, standards bodies).
+ * Listed roughly highest-priority first so we can sort grounding citations
+ * to surface official sources at the top of the "Sources" rail.
+ */
+const PRIMARY_SOURCE_DOMAINS = [
+  'gov.uk',
+  'desnz.gov.uk',
+  'ofgem.gov.uk',
+  'theiet.org',
+  'electrical.theiet.org',
+  'bsigroup.com',
+  'energynetworks.org',
+  'electricalsafetyfirst.org.uk',
+  'hse.gov.uk',
+  'parliament.uk',
+];
+
+function sourcePriority(uri: string): number {
+  const lower = uri.toLowerCase();
+  for (let i = 0; i < PRIMARY_SOURCE_DOMAINS.length; i++) {
+    if (lower.includes(PRIMARY_SOURCE_DOMAINS[i])) return i;
+  }
+  return 100;
+}
 
 function todayKey(): string {
   const d = new Date();
@@ -65,7 +91,10 @@ function extractGroundingSources(geminiData: any): GroundingSource[] {
       out.push({ title, uri });
     }
   }
-  return out.slice(0, 8);
+  // Stable sort: official sources first, third-party press second, original
+  // order preserved within each tier.
+  out.sort((a, b) => sourcePriority(a.uri) - sourcePriority(b.uri));
+  return out.slice(0, 12);
 }
 
 function extractTextFromParts(geminiData: any): string | null {
