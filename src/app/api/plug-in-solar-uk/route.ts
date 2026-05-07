@@ -10,6 +10,7 @@ import {
 } from '@/app/plug-in-solar-uk/_data/static';
 import { sanitiseRetailerProductUrl } from '@/lib/plug-in-solar/retailerUrls';
 import { buildPlugInSolarPrompt, PLUG_IN_SOLAR_RESPONSE_SCHEMA } from '@/lib/plug-in-solar/prompt';
+import { buildSeedProductRows, SEED_PRODUCTS } from '@/lib/plug-in-solar/seedProducts';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 
 /**
@@ -583,6 +584,30 @@ export async function GET(request: Request) {
     }
   } catch (err) {
     console.warn('[plug-in-solar-uk] product url validation threw - keeping products as-is:', err);
+  }
+
+  // Merge in seed-product rows scraped from manufacturer JSON-LD.
+  // Seed entries always win over Gemini guesses for the same brand —
+  // their prices and stock state come from the live retailer page
+  // rather than Gemini's grounding-metadata snapshot.
+  try {
+    const seedRows = await buildSeedProductRows();
+    if (seedRows.length > 0) {
+      const seededBrands = new Set(
+        SEED_PRODUCTS.map((s) => s.brand.toLowerCase()),
+      );
+      const geminiKept = (parsed.products || []).filter(
+        (p: { brand?: string }) => !seededBrands.has((p.brand || '').toLowerCase()),
+      );
+      parsed.products = [...seedRows, ...geminiKept];
+      console.warn(
+        `[plug-in-solar-uk] seed scrape: added ${seedRows.length} seed-derived rows, kept ${geminiKept.length} Gemini-discovered rows`,
+      );
+    } else {
+      console.warn('[plug-in-solar-uk] seed scrape returned no rows; keeping Gemini products only');
+    }
+  } catch (err) {
+    console.warn('[plug-in-solar-uk] seed scrape threw - keeping Gemini products only:', err);
   }
 
   // Cache for 24 hours and tell Next.js to invalidate the SSR HTML +

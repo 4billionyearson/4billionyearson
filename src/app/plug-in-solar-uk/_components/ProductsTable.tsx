@@ -1,4 +1,4 @@
-import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle, ShoppingBag, Search } from 'lucide-react';
+import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle, ShoppingBag, Search, PackageX, Hourglass } from 'lucide-react';
 import type { ProductRow, RetailerLink } from '@/lib/plug-in-solar/types';
 import {
   applyAmazonAffiliateTag,
@@ -118,6 +118,7 @@ export function ProductsTable({
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-300">
                 <ComplianceBadge status={p.ukCompliant} />
+                <StockBadge status={p.stock} />
                 {p.hasBattery && (
                   <>
                     <span className="text-gray-500">·</span>
@@ -169,6 +170,11 @@ export function ProductsTable({
                   </td>
                   <td className="px-4 py-3 align-top">
                     <ComplianceBadge status={p.ukCompliant} />
+                    {p.stock === 'out-of-stock' || p.stock === 'pre-order' ? (
+                      <div className="mt-1">
+                        <StockBadge status={p.stock} />
+                      </div>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3 align-top whitespace-nowrap text-gray-300">
                     {p.hasBattery ? (
@@ -284,13 +290,30 @@ function ComplianceBadge({ status }: { status: ProductRow['ukCompliant'] }) {
   }
 }
 
-function StockBadge(_props: { status: ProductRow['stock'] }) {
-  // Stock pill removed entirely: Gemini cannot reliably see live
-  // retailer stock state, so any pill (positive OR negative) was
-  // more often wrong than right. Users default-assume things are
-  // buyable; we surface availability through the AI-disclaimer banner
-  // and ask people to verify on the retailer's own page.
-  return null;
+function StockBadge({ status }: { status: ProductRow['stock'] }) {
+  // We deliberately never render a green 'In stock' pill: even with
+  // ground-truth JSON-LD scraping (where we could) it adds visual
+  // clutter and users default-assume things are buyable. We only
+  // surface the negative cases that the visitor actively needs to
+  // know about (sold out, pre-order).
+  switch (status) {
+    case 'out-of-stock':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-300 border border-rose-500/30">
+          <PackageX className="h-3 w-3" />
+          Out of stock
+        </span>
+      );
+    case 'pre-order':
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-300 border border-amber-500/30">
+          <Hourglass className="h-3 w-3" />
+          Pre-order
+        </span>
+      );
+    default:
+      return null;
+  }
 }
 
 function NonCompliantWarning() {
