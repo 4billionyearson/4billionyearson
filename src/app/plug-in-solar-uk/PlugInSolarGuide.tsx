@@ -26,6 +26,9 @@ import { NewsFeed } from './_components/NewsFeed';
 import { LandlordLetter } from './_components/LandlordLetter';
 import { LastUpdatedBadge } from './_components/LastUpdatedBadge';
 import { AffiliateDisclosure } from './_components/AffiliateDisclosure';
+import { HeroVerdict } from './_components/HeroVerdict';
+import { HowItWorksDiagram } from './_components/HowItWorksDiagram';
+import { LegalChecklist } from './_components/LegalChecklist';
 import {
   HOW_IT_WORKS_PARAGRAPHS,
   PLUG_IN_VS_ROOFTOP,
@@ -36,9 +39,17 @@ import {
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 
 /**
- * Server component (no 'use client') that renders the entire page from
- * the daily cached payload. The data flows in from page.tsx so the page
- * can SSR with everything baked into HTML for AI / search crawlers.
+ * Server component that renders the entire page from the daily cached
+ * payload. The data flows in from page.tsx so the page can SSR with
+ * everything baked into HTML for AI / search crawlers.
+ *
+ * Layout:
+ *  - Full-width hero (title + Today's TL;DR)
+ *  - Full-width HeroVerdict ("5-second answer" cards + 800 W limit + mini timeline)
+ *  - 2-column on lg+: left sticky Regulation timeline, right Status + What is +
+ *    Is it legal + Regulations deep dive
+ *  - Full-width: Products, Plug-in vs rooftop, Install, Calculators, SEG, DNO,
+ *    Landlord, News, FAQ, Glossary, Sources
  */
 export default function PlugInSolarGuide({
   data,
@@ -52,7 +63,7 @@ export default function PlugInSolarGuide({
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
-        <div className="max-w-5xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Hero ─── */}
           <header
@@ -74,7 +85,7 @@ export default function PlugInSolarGuide({
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-5 py-4 md:px-6 md:py-5 space-y-4">
               <div className="flex flex-wrap items-center gap-3 justify-between">
-                <p className="text-sm md:text-base text-gray-300 max-w-2xl">
+                <p className="text-sm md:text-base text-gray-300 max-w-3xl">
                   An impartial, daily-refreshed guide to plug-in solar in the UK: is it legal, what
                   can you actually buy today, what will it cost, and can you pair (or replace) it
                   with a battery on a smart tariff. Generated each day by AI from primary sources.
@@ -91,65 +102,78 @@ export default function PlugInSolarGuide({
             </div>
           </header>
 
-          {/* ─── Status dashboard ─── */}
-          <Section icon={<ListChecks className="h-5 w-5" />} title="Where things stand today">
-            <StatusDashboard pills={data?.statusDashboard} />
-            {data?.changeLog && data.changeLog.length > 0 && (
-              <div className="mt-4 rounded-xl border border-[#D2E369]/30 bg-[#D2E369]/5 p-4">
-                <h3 className="text-xs font-mono uppercase tracking-wider text-[#D2E369] mb-2">What changed since yesterday</h3>
-                <ul className="space-y-1.5 text-sm text-gray-300">
-                  {data.changeLog.map((c, i) => (
-                    <li key={i} className="flex gap-2">
-                      <span className="text-[#D2E369] font-mono text-xs whitespace-nowrap mt-0.5">{c.date}</span>
-                      <span>{c.summary}</span>
-                    </li>
+          {/* ─── 5-second visual verdict (cards + 800W + mini timeline) ─── */}
+          <HeroVerdict data={data} />
+
+          {/* ─── 2-column section: Timeline (sticky) | Status + What is + Legal + Regs ─── */}
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Left column - sticky regulation timeline (the user said this should be a key part of the page, higher up) */}
+            <aside className="lg:col-span-1">
+              <div className="lg:sticky lg:top-4 space-y-6">
+                <Section icon={<CalendarClock className="h-5 w-5" />} title="Regulation timeline">
+                  <RegulationTimeline updates={data?.timelineUpdates} />
+                </Section>
+              </div>
+            </aside>
+
+            {/* Right column - main editorial flow */}
+            <div className="lg:col-span-2 space-y-6">
+
+              {/* Status dashboard */}
+              <Section icon={<ListChecks className="h-5 w-5" />} title="Where things stand today">
+                <StatusDashboard pills={data?.statusDashboard} />
+                {data?.changeLog && data.changeLog.length > 0 && (
+                  <div className="mt-4 rounded-xl border border-[#D2E369]/30 bg-[#D2E369]/5 p-4">
+                    <h3 className="text-xs font-mono uppercase tracking-wider text-[#D2E369] mb-2">What changed since yesterday</h3>
+                    <ul className="space-y-1.5 text-sm text-gray-300">
+                      {data.changeLog.map((c, i) => (
+                        <li key={i} className="flex gap-2">
+                          <span className="text-[#D2E369] font-mono text-xs whitespace-nowrap mt-0.5">{c.date}</span>
+                          <span>{c.summary}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </Section>
+
+              {/* What is plug-in solar? (with diagram) */}
+              <Section icon={<Sparkles className="h-5 w-5" />} title="What is plug-in solar?">
+                <HowItWorksDiagram />
+                <div className="mt-3 space-y-3 text-sm text-gray-300 leading-relaxed">
+                  {HOW_IT_WORKS_PARAGRAPHS.map((p, i) => (
+                    <p key={i}>{p}</p>
                   ))}
-                </ul>
-              </div>
-            )}
-          </Section>
+                </div>
+              </Section>
 
-          {/* ─── What is plug-in solar? ─── */}
-          <Section icon={<Sparkles className="h-5 w-5" />} title="What is plug-in solar?">
-            <div className="space-y-3 text-sm text-gray-300 leading-relaxed">
-              {HOW_IT_WORKS_PARAGRAPHS.map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
+              {/* Is it legal yet? - now with visual checklist + paragraph */}
+              <Section icon={<Scale className="h-5 w-5" />} title="Is it legal in the UK yet?">
+                <div className="space-y-4">
+                  <LegalChecklist />
+                  {data?.legalStatus ? (
+                    <p className="text-sm text-gray-300 leading-relaxed">{data.legalStatus}</p>
+                  ) : (
+                    <RegeneratingNote />
+                  )}
+                </div>
+              </Section>
+
+              {/* Regulations deep dive */}
+              <Section icon={<BookOpen className="h-5 w-5" />} title="Regulations deep dive">
+                {data?.regulations ? (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <RegBlock title="BS 7671 Amendment 4" body={data.regulations.bs7671} />
+                    <RegBlock title="G98 connect-and-notify" body={data.regulations.g98} />
+                    <RegBlock title="BSI product standard" body={data.regulations.bsi} />
+                    <RegBlock title="How the UK compares to Europe" body={data.regulations.eu} />
+                  </div>
+                ) : (
+                  <RegeneratingNote />
+                )}
+              </Section>
             </div>
-          </Section>
-
-          {/* ─── Is it legal yet? ─── */}
-          <Section icon={<Scale className="h-5 w-5" />} title="Is it legal in the UK yet?">
-            {data?.legalStatus ? (
-              <p className="text-sm text-gray-300 leading-relaxed">{data.legalStatus}</p>
-            ) : (
-              <RegeneratingNote />
-            )}
-          </Section>
-
-          {/* ─── Regulations deep dive ─── */}
-          <Section icon={<BookOpen className="h-5 w-5" />} title="Regulations deep dive">
-            {data?.regulations ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                <RegBlock title="BS 7671 Amendment 4" body={data.regulations.bs7671} />
-                <RegBlock title="G98 connect-and-notify" body={data.regulations.g98} />
-                <RegBlock title="BSI product standard" body={data.regulations.bsi} />
-                <RegBlock title="How the UK compares to Europe" body={data.regulations.eu} />
-              </div>
-            ) : (
-              <RegeneratingNote />
-            )}
-          </Section>
-
-          {/* ─── Regulation timeline ─── */}
-          <Section icon={<CalendarClock className="h-5 w-5" />} title="Regulation timeline">
-            <RegulationTimeline updates={data?.timelineUpdates} />
-          </Section>
-
-          {/* ─── Products ─── */}
-          <Section icon={<ShoppingCart className="h-5 w-5" />} title="What can you buy in the UK today?">
-            <ProductsTable products={data?.products} />
-          </Section>
+          </div>
 
           {/* ─── Plug-in vs rooftop decision panel ─── */}
           <Section icon={<TrendingUp className="h-5 w-5" />} title="Plug-in solar vs rooftop solar">
@@ -194,9 +218,9 @@ export default function PlugInSolarGuide({
 
           {/* ─── Installation guide ─── */}
           <Section icon={<Wrench className="h-5 w-5" />} title="Installation guide" id="install">
-            <ol className="space-y-3">
+            <ol className="grid gap-3 md:grid-cols-2">
               {INSTALL_STEPS.map((step, i) => (
-                <li key={i} className="flex gap-3">
+                <li key={i} className="flex gap-3 rounded-xl border border-[#D2E369]/20 bg-gray-900/40 p-3">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#D2E369] bg-[#D2E369]/10 text-[#D2E369] font-mono text-sm">
                     {i + 1}
                   </span>
@@ -209,23 +233,32 @@ export default function PlugInSolarGuide({
             </ol>
           </Section>
 
-          {/* ─── Payback calculator ─── */}
-          <PaybackCalculator prices={data?.prices} />
+          {/* ─── Calculators side-by-side on desktop ─── */}
+          <div className="grid gap-6 lg:grid-cols-2" id="payback">
+            <PaybackCalculator prices={data?.prices} />
+            <BatteryCalculator prices={data?.prices} />
+          </div>
 
-          {/* ─── Battery calculator ─── */}
-          <BatteryCalculator prices={data?.prices} />
-
-          {/* ─── SEG status ─── */}
-          <Section icon={<Info className="h-5 w-5" />} title="The Smart Export Guarantee (SEG): will you get paid?">
-            {data?.segStatus ? (
-              <p className="text-sm text-gray-300 leading-relaxed">{data.segStatus}</p>
-            ) : (
-              <RegeneratingNote />
-            )}
+          {/* ─── Products ─── */}
+          <Section
+            icon={<ShoppingCart className="h-5 w-5" />}
+            title="What can you buy in the UK today?"
+            id="products"
+          >
+            <ProductsTable products={data?.products} />
           </Section>
 
-          {/* ─── DNO finder ─── */}
-          <DnoFinder />
+          {/* ─── SEG status + DNO finder side-by-side on desktop ─── */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Section icon={<Info className="h-5 w-5" />} title="Smart Export Guarantee: will you get paid?">
+              {data?.segStatus ? (
+                <p className="text-sm text-gray-300 leading-relaxed">{data.segStatus}</p>
+              ) : (
+                <RegeneratingNote />
+              )}
+            </Section>
+            <DnoFinder />
+          </div>
 
           {/* ─── Landlord letter ─── */}
           <LandlordLetter />
@@ -245,7 +278,7 @@ export default function PlugInSolarGuide({
 
           {/* ─── Glossary ─── */}
           <Section icon={<HelpCircle className="h-5 w-5" />} title="Glossary">
-            <dl className="grid gap-3 sm:grid-cols-2">
+            <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {GLOSSARY.map((g) => (
                 <div key={g.term} className="rounded-xl border border-gray-800 bg-gray-900/40 p-3">
                   <dt className="text-sm font-semibold text-[#FFF5E7]">{g.term}</dt>
@@ -258,7 +291,7 @@ export default function PlugInSolarGuide({
           {/* ─── Sources ─── */}
           {data?.groundingSources && data.groundingSources.length > 0 && (
             <Section icon={<BookOpen className="h-5 w-5" />} title="Sources for today's update">
-              <ul className="grid gap-2 sm:grid-cols-2">
+              <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {data.groundingSources.map((s, i) => (
                   <li key={i}>
                     <a

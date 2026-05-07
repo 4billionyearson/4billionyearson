@@ -4,7 +4,8 @@ import type { StatusPill } from '@/lib/plug-in-solar/types';
 /**
  * Headline 4-pill status dashboard, fully server-rendered so AI / search
  * crawlers see the current "Legal? / Products? / SEG? / DNO?" verdicts on
- * first byte.
+ * first byte. Uses translucent status-coloured backgrounds so the verdict
+ * is visible at a glance without reading the words.
  */
 export function StatusDashboard({ pills }: { pills: StatusPill[] | undefined }) {
   if (!pills || pills.length === 0) {
@@ -27,30 +28,27 @@ export function StatusDashboard({ pills }: { pills: StatusPill[] | undefined }) 
 }
 
 function Pill({ pill }: { pill: StatusPill }) {
-  const { tone, Icon, verdict } = toneFor(pill.status);
+  const t = toneFor(pill.status);
+  const Icon = t.Icon;
   return (
     <div
-      className={
-        'rounded-2xl border px-4 py-3 backdrop-blur-md shadow-lg ' +
-        'bg-gray-950/80 ' +
-        tone.border
-      }
+      className={`rounded-2xl border-2 ${t.border} ${t.bg} backdrop-blur-md shadow-lg px-4 py-3 flex flex-col gap-2`}
     >
-      <div className="flex items-start gap-2">
-        <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${tone.icon}`} />
-        <div className="min-w-0 flex-1">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-gray-400">
-            {pill.label}
-          </div>
-          <div className={`text-base font-bold ${tone.verdict}`}>{verdict}</div>
-          <p className="mt-1 text-xs text-gray-300 leading-snug">{pill.reason}</p>
-          {pill.asOf && (
-            <p className="mt-1 text-[10px] uppercase tracking-wider text-gray-500">
-              As of {formatAsOf(pill.asOf)}
-            </p>
-          )}
+      <div className="flex items-center justify-between gap-2">
+        <div className={`text-[11px] font-mono uppercase tracking-wider font-semibold ${t.label}`}>
+          {pill.label}
         </div>
+        <span className={`grid h-8 w-8 place-items-center rounded-full ${t.iconBg}`}>
+          <Icon className="h-4.5 w-4.5" style={{ width: '1.1rem', height: '1.1rem' }} />
+        </span>
       </div>
+      <div className={`text-xl font-extrabold leading-none ${t.verdict}`}>{t.verdictText}</div>
+      <p className="text-xs text-[#FFF5E7] leading-snug">{pill.reason}</p>
+      {pill.asOf && (
+        <p className={`text-[10px] uppercase tracking-wider font-mono ${t.asOf}`}>
+          Verified {formatAsOf(pill.asOf)}
+        </p>
+      )}
     </div>
   );
 }
@@ -65,59 +63,75 @@ function formatAsOf(asOf: string): string {
   }
 }
 
-function toneFor(status: string) {
+interface ToneSpec {
+  Icon: typeof CheckCircle2;
+  verdictText: string;
+  bg: string;
+  border: string;
+  iconBg: string;
+  label: string;
+  verdict: string;
+  asOf: string;
+}
+
+function toneFor(status: string): ToneSpec {
   switch (status) {
     case 'legal':
     case 'yes':
       return {
         Icon: CheckCircle2,
-        verdict: status === 'legal' ? 'Legal' : 'Yes',
-        tone: {
-          border: 'border-emerald-500/40',
-          icon: 'text-emerald-400',
-          verdict: 'text-emerald-300',
-        },
+        verdictText: status === 'legal' ? 'Legal' : 'Yes',
+        bg: 'bg-emerald-500/15',
+        border: 'border-emerald-400/60',
+        iconBg: 'bg-emerald-400 text-emerald-950',
+        label: 'text-emerald-300',
+        verdict: 'text-emerald-200',
+        asOf: 'text-emerald-300/80',
       };
     case 'partial':
       return {
         Icon: AlertTriangle,
-        verdict: 'Partial',
-        tone: {
-          border: 'border-amber-500/40',
-          icon: 'text-amber-400',
-          verdict: 'text-amber-300',
-        },
+        verdictText: 'Partial',
+        bg: 'bg-amber-500/15',
+        border: 'border-amber-400/60',
+        iconBg: 'bg-amber-400 text-amber-950',
+        label: 'text-amber-300',
+        verdict: 'text-amber-200',
+        asOf: 'text-amber-300/80',
       };
     case 'soon':
       return {
         Icon: Clock,
-        verdict: 'Soon',
-        tone: {
-          border: 'border-sky-500/40',
-          icon: 'text-sky-400',
-          verdict: 'text-sky-300',
-        },
+        verdictText: 'Soon',
+        bg: 'bg-sky-500/15',
+        border: 'border-sky-400/60',
+        iconBg: 'bg-sky-400 text-sky-950',
+        label: 'text-sky-300',
+        verdict: 'text-sky-200',
+        asOf: 'text-sky-300/80',
       };
     case 'not-legal':
     case 'no':
       return {
         Icon: XCircle,
-        verdict: status === 'not-legal' ? 'Not legal' : 'No',
-        tone: {
-          border: 'border-rose-500/40',
-          icon: 'text-rose-400',
-          verdict: 'text-rose-300',
-        },
+        verdictText: status === 'not-legal' ? 'Not legal' : 'No',
+        bg: 'bg-rose-500/15',
+        border: 'border-rose-400/60',
+        iconBg: 'bg-rose-400 text-rose-950',
+        label: 'text-rose-300',
+        verdict: 'text-rose-200',
+        asOf: 'text-rose-300/80',
       };
     default:
       return {
         Icon: AlertTriangle,
-        verdict: status,
-        tone: {
-          border: 'border-gray-500/40',
-          icon: 'text-gray-400',
-          verdict: 'text-gray-300',
-        },
+        verdictText: status,
+        bg: 'bg-gray-500/15',
+        border: 'border-gray-400/40',
+        iconBg: 'bg-gray-400 text-gray-950',
+        label: 'text-gray-300',
+        verdict: 'text-gray-200',
+        asOf: 'text-gray-400',
       };
   }
 }

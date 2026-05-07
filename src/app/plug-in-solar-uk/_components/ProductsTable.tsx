@@ -1,4 +1,4 @@
-import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle } from 'lucide-react';
+import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle, RefreshCw } from 'lucide-react';
 import type { ProductRow } from '@/lib/plug-in-solar/types';
 import { AffiliateDisclosure } from './AffiliateDisclosure';
 
@@ -17,6 +17,8 @@ export function ProductsTable({ products }: { products: ProductRow[] | undefined
 
   return (
     <div className="space-y-3">
+      <AutoUpdateNote count={products.length} />
+
       <AffiliateDisclosure variant="inline" />
 
       <NonCompliantWarning />
@@ -162,6 +164,27 @@ function ComplianceBadge({ status }: { status: ProductRow['ukCompliant'] }) {
         </span>
       );
   }
+}
+
+function AutoUpdateNote({ count }: { count: number }) {
+  return (
+    <div className="flex items-start gap-2 rounded-lg border border-[#D2E369]/30 bg-[#D2E369]/5 px-3 py-2 text-xs text-gray-300">
+      <RefreshCw className="h-4 w-4 text-[#D2E369] shrink-0 mt-0.5" />
+      <p>
+        <span className="font-semibold text-[#D2E369]">List auto-expands.</span> Showing
+        the {count} UK plug-in solar kits we know are on sale today. Each daily refresh asks Gemini
+        (with Google Search grounding) to add new launches and drop discontinued models, so the
+        table grows as the UK market does. Spotted a missing kit?{' '}
+        <a
+          href="mailto:hello@4billionyearson.org?subject=UK%20plug-in%20solar%20kit%20suggestion"
+          className="text-[#D2E369] hover:text-[#E5F08A] underline"
+        >
+          let us know
+        </a>
+        .
+      </p>
+    </div>
+  );
 }
 
 function NonCompliantWarning() {

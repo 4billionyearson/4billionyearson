@@ -67,17 +67,17 @@ export const PLUG_IN_VS_ROOFTOP: { question: string; plugIn: string; rooftop: st
 export const BASE_TIMELINE: TimelineEntry[] = [
   {
     date: '2025-02-26',
-    title: 'Government consultation opens',
+    title: 'Government consultation opened',
     description:
-      'DESNZ launches public consultation on plug-in solar legalisation, citing 1.5 million installations across Germany.',
+      'DESNZ launched a public consultation on plug-in solar legalisation, citing 1.5 million installations across Germany.',
     kind: 'past',
     category: 'policy',
   },
   {
     date: '2026-03-16',
-    title: 'Government confirms legalisation',
+    title: 'Government confirmed legalisation',
     description:
-      'DESNZ announces it will amend BS 7671 and the G98 distribution code to permit sub-800 W plug-in solar via a domestic socket. EcoFlow named as a delivery partner.',
+      'DESNZ announced it would amend BS 7671 and the G98 distribution code to permit sub-800 W plug-in solar via a domestic socket. EcoFlow was named as a delivery partner.',
     kind: 'past',
     category: 'policy',
   },
@@ -85,7 +85,7 @@ export const BASE_TIMELINE: TimelineEntry[] = [
     date: '2026-04-15',
     title: 'BS 7671 Amendment 4 published',
     description:
-      'IET and BSI publish Amendment 4 to the IET Wiring Regulations. Chapter 712 updated to recognise small plug-connected PV sources.',
+      'The IET and BSI published Amendment 4 to the IET Wiring Regulations. Chapter 712 was updated to recognise small plug-connected PV sources.',
     kind: 'past',
     category: 'regulation',
   },
@@ -113,6 +113,20 @@ export const BASE_TIMELINE: TimelineEntry[] = [
     kind: 'future',
     category: 'policy',
   },
+];
+
+/**
+ * Compact, single-line strings used in the top-of-page hero mini timeline.
+ * Past entries should use past tense; future entries use "expected" / future
+ * tense. We keep these short so they fit a horizontal strip on mobile.
+ */
+export const HERO_TIMELINE: { date: string; label: string; kind: 'past' | 'future' }[] = [
+  { date: '2025-02-26', label: 'Consultation opened', kind: 'past' },
+  { date: '2026-03-16', label: 'Legalisation announced', kind: 'past' },
+  { date: '2026-04-15', label: 'BS 7671 Amend. 4 live', kind: 'past' },
+  { date: '2026-07-15', label: 'BSI standard due', kind: 'future' },
+  { date: '2026-10-02', label: 'Amend. 4 transition ends', kind: 'future' },
+  { date: '2027-04-01', label: 'Simplified SEG', kind: 'future' },
 ];
 
 /* ─── Installation steps (HowTo) ───────────────────────────────────────────── */
