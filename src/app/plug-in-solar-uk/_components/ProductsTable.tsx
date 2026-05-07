@@ -137,7 +137,7 @@ export function ProductsTable({
       </div>
 
       {/* Table layout on tablet+ */}
-      <div className="hidden sm:block overflow-hidden rounded-2xl border border-[#D2E369]/30 bg-gray-950/80 shadow-lg">
+      <div className="hidden sm:block overflow-x-auto rounded-2xl border border-[#D2E369]/30 bg-gray-950/80 shadow-lg">
         <table className="w-full text-sm">
           <thead className="border-b border-[#D2E369]/20 bg-[#D2E369]/5">
             <tr className="text-left text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">

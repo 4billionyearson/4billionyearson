@@ -162,7 +162,7 @@ export default function PlugInSolarGuide({
             {/* Left column must stretch to the full row height so `sticky` has room to ride
                 alongside the tall right-hand stack. Do not use lg:self-start here — it shrinks the
                 track and the timeline scrolls away immediately. */}
-            <aside className="lg:col-span-1">
+            <aside className="min-w-0 lg:col-span-1">
               <div className="lg:sticky lg:top-4 space-y-6">
                 <Section icon={<CalendarClock className="h-5 w-5" />} title="Regulation timeline">
                   <RegulationTimeline
@@ -174,7 +174,7 @@ export default function PlugInSolarGuide({
             </aside>
 
             {/* Right column - main editorial flow */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="min-w-0 lg:col-span-2 space-y-6">
 
               {/* Status dashboard */}
               <Section icon={<ListChecks className="h-5 w-5" />} title="Where things stand today">

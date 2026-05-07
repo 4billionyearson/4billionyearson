@@ -263,13 +263,23 @@ function coerceIsoDate(input: unknown): string | null {
  */
 function retailerUrlTrustedWithoutFetch(url: string): boolean {
   try {
-    const host = new URL(url).hostname.toLowerCase();
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
     if (host.includes('amazon-adsystem') || host.includes('amazonpay') || host.includes('advertising.amazon')) {
       return false;
     }
+    // Amazon product-page URLs (/dp/, /gp/product/) get HEAD-validated so bad
+    // ASINs are caught and dropped before caching. Search/browse URLs (/s?k=…)
+    // are always valid — trust those without a fetch.
+    const isAmazonHost =
+      host === 'amazon.co.uk' || host.endsWith('.amazon.co.uk') ||
+      host === 'amazon.com'   || host.endsWith('.amazon.com');
+    if (isAmazonHost) {
+      const path = parsed.pathname.toLowerCase();
+      const isProductPage = path.includes('/dp/') || path.includes('/gp/product/');
+      return !isProductPage;
+    }
     const suffixes = [
-      'amazon.co.uk',
-      'amazon.com',
       'ecoflow.com',
       'anker.com',
       'zendure.com',
