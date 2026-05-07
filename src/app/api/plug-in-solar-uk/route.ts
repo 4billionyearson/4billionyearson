@@ -24,7 +24,7 @@ import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
  */
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const PREVIOUS_LOOKBACK_DAYS = 7;
 
 /**
@@ -170,6 +170,88 @@ function tryParse(text: string | null): PlugInSolarLiveData | null {
   }
 }
 
+/* ─── URL validation ─────────────────────────────────────────────────────── */
+
+const URL_VALIDATION_TIMEOUT_MS = 5000;
+const URL_VALIDATION_USER_AGENT =
+  'Mozilla/5.0 (compatible; 4billionyearson-bot/1.0; +https://4billionyearson.org/about)';
+
+/**
+ * Validate that a URL actually resolves to a working page (not 4xx/5xx
+ * or DNS failure). Tries HEAD first; if the server rejects HEAD with a
+ * 405 we retry with a small ranged GET. Used to filter out URLs that
+ * Gemini occasionally hallucinates - even with grounding the model can
+ * synthesise plausible-looking but non-existent article URLs.
+ */
+async function validateUrl(url: string): Promise<boolean> {
+  if (!url || typeof url !== 'string') return false;
+  if (!/^https?:\/\//i.test(url)) return false;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), URL_VALIDATION_TIMEOUT_MS);
+    const res = await fetch(url, {
+      method: 'HEAD',
+      redirect: 'follow',
+      signal: ctrl.signal,
+      headers: { 'User-Agent': URL_VALIDATION_USER_AGENT },
+    });
+    clearTimeout(timer);
+    if (res.status === 405 || res.status === 501) {
+      // HEAD not supported - retry with a tiny ranged GET.
+      const ctrl2 = new AbortController();
+      const t2 = setTimeout(() => ctrl2.abort(), URL_VALIDATION_TIMEOUT_MS);
+      const res2 = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow',
+        signal: ctrl2.signal,
+        headers: {
+          'User-Agent': URL_VALIDATION_USER_AGENT,
+          Range: 'bytes=0-0',
+        },
+      });
+      clearTimeout(t2);
+      return res2.status >= 200 && res2.status < 400;
+    }
+    return res.status >= 200 && res.status < 400;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Strip out news items whose sourceUrl doesn't resolve. URLs already
+ * present in the grounding-metadata set are trusted without a network
+ * call (they came directly from Google's search index, so they were
+ * live as of seconds ago).
+ */
+async function filterNewsBrokenLinks(
+  parsed: PlugInSolarLiveData,
+  groundingUris: Set<string>,
+): Promise<{ kept: number; dropped: number }> {
+  if (!Array.isArray(parsed.news) || parsed.news.length === 0) {
+    return { kept: 0, dropped: 0 };
+  }
+  const checks = await Promise.all(
+    parsed.news.map(async (item) => {
+      const url = (item?.sourceUrl ?? '').trim();
+      if (!url) return { item, valid: false };
+      if (groundingUris.has(url.toLowerCase())) {
+        return { item, valid: true };
+      }
+      const valid = await validateUrl(url);
+      return { item, valid };
+    }),
+  );
+  const droppedItems = checks.filter((c) => !c.valid);
+  for (const d of droppedItems) {
+    console.warn(
+      `[plug-in-solar-uk] dropping broken news link: ${d.item?.headline?.slice(0, 80)} -> ${d.item?.sourceUrl}`,
+    );
+  }
+  parsed.news = checks.filter((c) => c.valid).map((c) => c.item);
+  return { kept: parsed.news.length, dropped: droppedItems.length };
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const skipCache = url.searchParams.get('nocache') === '1';
@@ -242,6 +324,23 @@ export async function GET(request: Request) {
   // Inject grounding citations
   parsed.groundingSources = sources;
   parsed.generatedAt = new Date().toISOString();
+
+  // Validate every news[].sourceUrl. Even with grounding, Gemini will
+  // occasionally invent plausible-looking URLs (wrong path / merged
+  // hostname / dead article), so we sanity-check each link via HEAD
+  // and drop any that don't resolve. Grounding-metadata URLs are
+  // trusted without a fetch.
+  const groundingUriSet = new Set(sources.map((s) => s.uri.toLowerCase()));
+  try {
+    const result = await filterNewsBrokenLinks(parsed, groundingUriSet);
+    if (result.dropped > 0) {
+      console.warn(
+        `[plug-in-solar-uk] news url validation: kept ${result.kept}, dropped ${result.dropped}`,
+      );
+    }
+  } catch (err) {
+    console.warn('[plug-in-solar-uk] news url validation threw - keeping news as-is:', err);
+  }
 
   // Cache for 24 hours and tell Next.js to invalidate the SSR HTML +
   // the dynamically-generated OG / social-card images.
