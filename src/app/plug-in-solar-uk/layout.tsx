@@ -137,17 +137,19 @@ export default async function PlugInSolarLayout({ children }: { children: React.
     name: `${p.brand} ${p.model}`,
     brand: { '@type': 'Brand', name: p.brand },
     description: `${p.wattsAC} W AC plug-in solar kit. ${p.notes ?? ''}`.trim(),
-    offers: {
-      '@type': 'Offer',
-      url: p.url,
-      priceCurrency: 'GBP',
-      price: Math.round(p.priceGBP),
-      availability:
-        p.retailer.toLowerCase().includes('coming') || p.retailer.toLowerCase().includes('soon')
-          ? 'https://schema.org/PreOrder'
-          : 'https://schema.org/InStock',
-      seller: { '@type': 'Organization', name: p.retailer },
-    },
+    offers: p.priceGBP != null
+      ? {
+          '@type': 'Offer',
+          url: p.url,
+          priceCurrency: 'GBP',
+          price: Math.round(p.priceGBP),
+          availability:
+            p.retailer.toLowerCase().includes('coming') || p.retailer.toLowerCase().includes('soon')
+              ? 'https://schema.org/PreOrder'
+              : 'https://schema.org/InStock',
+          seller: { '@type': 'Organization', name: p.retailer },
+        }
+      : undefined,
   }));
 
   const newsSchemas = (cached?.news ?? []).slice(0, 8).map((n) => ({
