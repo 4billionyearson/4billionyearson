@@ -91,7 +91,7 @@ function toneFor(status: string): ToneSpec {
     case 'partial':
       return {
         Icon: AlertTriangle,
-        verdictText: 'Partial',
+        verdictText: 'Partially',
         // Higher opacity so the orange punches through the gray-950 backdrop.
         bg: 'bg-orange-500/55',
         border: 'border-orange-400',
