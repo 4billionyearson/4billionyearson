@@ -32,11 +32,11 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
     ? Math.round(Math.min(...data.products.map((p) => p.priceGBP)))
     : 400;
 
-  // Payback estimate uses live unit rate at ~65 % self-consumption.
+  // Payback range: optimistic (south UK, 75% self-consumption, ~700 kWh/yr)
+  // vs conservative (north UK, 60% self-consumption, ~550 kWh/yr).
   const unitRate = data?.prices?.unitRate_pPerKWh ?? 25.5;
-  const annualKWh = 600;
-  const annualSavingMid = Math.round((unitRate * 0.65 * annualKWh) / 100);
-  const paybackYears = Math.round((cheapestKitGBP / Math.max(annualSavingMid, 1)) * 10) / 10;
+  const paybackFast = Math.round(cheapestKitGBP / Math.max((unitRate * 0.75 * 700) / 100, 1));
+  const paybackSlow = Math.round(cheapestKitGBP / Math.max((unitRate * 0.60 * 550) / 100, 1));
 
   return (
     <div aria-label="UK plug-in solar at a glance" className="space-y-4">
@@ -58,7 +58,7 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           label="Legal in the UK?"
           tone={isLegal ? 'green' : isPartial ? 'orange' : 'rose'}
           icon={isLegal ? <CheckCircle2 className="h-7 w-7" /> : <AlertTriangle className="h-7 w-7" />}
-          big={isLegal ? 'Yes' : isPartial ? 'Partial' : 'No'}
+          big={isLegal ? 'Yes' : isPartial ? 'Partially' : 'No'}
           sub={isLegal ? 'Sub-800 W kits, since Apr 2026' : 'See timeline below'}
         />
         <VerdictCard
@@ -79,8 +79,8 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           label="Payback period"
           tone="lime"
           icon={<TrendingDown className="h-7 w-7" />}
-          big={`~${paybackYears} yrs`}
-          sub="Self-consumed only (no SEG yet)"
+          big={`${paybackFast}–${paybackSlow} yrs`}
+          sub="Depends on location, usage &amp; tariff"
         />
       </div>
 
