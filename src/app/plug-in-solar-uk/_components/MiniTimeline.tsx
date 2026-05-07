@@ -167,8 +167,19 @@ export function MiniTimeline({
         })}
       </div>
 
-      {/* Mobile: horizontal scroll strip */}
-      <div className="md:hidden -mx-3 px-3 overflow-x-auto scrollbar-thin">
+      {/* Mobile: horizontal scroll strip with dark-theme custom scrollbar */}
+      <div
+        className={
+          'md:hidden -mx-3 px-3 overflow-x-auto pb-2 ' +
+          '[&::-webkit-scrollbar]:h-1.5 ' +
+          '[&::-webkit-scrollbar-track]:bg-[#D2E369]/5 ' +
+          '[&::-webkit-scrollbar-track]:rounded-full ' +
+          '[&::-webkit-scrollbar-thumb]:bg-[#D2E369]/40 ' +
+          '[&::-webkit-scrollbar-thumb]:rounded-full ' +
+          '[scrollbar-color:rgba(210,227,105,0.4)_rgba(210,227,105,0.05)] ' +
+          '[scrollbar-width:thin]'
+        }
+      >
         <ol className="flex gap-2 min-w-max pb-1">
           {merged.map((t, i) => {
             const isPast = t.kind !== 'available' && t.date <= todayISO;

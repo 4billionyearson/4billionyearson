@@ -20,7 +20,7 @@ export function HowItWorksDiagram() {
       className="my-2 rounded-2xl border border-[#D2E369]/30 bg-gradient-to-br from-sky-950/40 via-gray-950/60 to-emerald-950/30 p-4 md:p-6"
     >
       <svg
-        viewBox="0 0 720 240"
+        viewBox="0 0 760 280"
         role="img"
         aria-labelledby="howItWorksTitle howItWorksDesc"
         className="w-full h-auto"
@@ -118,70 +118,69 @@ export function HowItWorksDiagram() {
         {/* Arrow 2: Panel → Combined inverter+battery */}
         <line x1="305" y1="80" x2="365" y2="80" stroke="#D2E369" strokeWidth={3} strokeDasharray="4 4" markerEnd="url(#arrow)" />
 
-        {/* Combined Inverter + (optional) Battery unit */}
-        <g transform="translate(375, 30)">
+        {/* Combined Inverter + (optional) Battery unit (wider so labels breathe) */}
+        <g transform="translate(370, 24)">
           {/* outer housing */}
-          <rect x="0" y="0" width="115" height="115" rx="10" fill="#0f172a" stroke="#D2E369" strokeWidth={2} />
+          <rect x="0" y="0" width="140" height="130" rx="10" fill="#0f172a" stroke="#D2E369" strokeWidth={2} />
 
           {/* top zone: inverter */}
-          <rect x="6" y="6" width="103" height="38" rx="5" fill="#1f2937" stroke="#D2E369" strokeWidth={1} />
-          <text x="57.5" y="22" textAnchor="middle" className="fill-[#D2E369]" style={{ font: '700 11px ui-monospace, Menlo, monospace' }}>
+          <rect x="8" y="8" width="124" height="44" rx="5" fill="#1f2937" stroke="#D2E369" strokeWidth={1} />
+          <text x="70" y="26" textAnchor="middle" className="fill-[#D2E369]" style={{ font: '700 12px ui-monospace, Menlo, monospace' }}>
             DC → AC INVERTER
           </text>
-          <text x="57.5" y="36" textAnchor="middle" className="fill-gray-400" style={{ font: '10px ui-sans-serif, system-ui' }}>
+          <text x="70" y="42" textAnchor="middle" className="fill-gray-400" style={{ font: '10px ui-sans-serif, system-ui' }}>
             800 W max output
           </text>
 
           {/* divider with "+" */}
-          <line x1="6" y1="51" x2="109" y2="51" stroke="#D2E369" strokeOpacity={0.3} strokeWidth={1} strokeDasharray="3 2" />
-          <circle cx="57.5" cy="51" r="6" fill="#0f172a" stroke="#D2E369" strokeWidth={1} />
-          <text x="57.5" y="54" textAnchor="middle" className="fill-[#D2E369]" style={{ font: '700 9px ui-monospace, Menlo, monospace' }}>
+          <line x1="8" y1="60" x2="132" y2="60" stroke="#D2E369" strokeOpacity={0.3} strokeWidth={1} strokeDasharray="3 2" />
+          <circle cx="70" cy="60" r="7" fill="#0f172a" stroke="#D2E369" strokeWidth={1} />
+          <text x="70" y="63.5" textAnchor="middle" className="fill-[#D2E369]" style={{ font: '700 10px ui-monospace, Menlo, monospace' }}>
             +
           </text>
 
           {/* bottom zone: optional battery */}
           <rect
-            x="6"
-            y="58"
-            width="103"
-            height="32"
+            x="8"
+            y="68"
+            width="124"
+            height="42"
             rx="5"
             fill="#0f172a"
             stroke="#34d399"
             strokeWidth={1.5}
             strokeDasharray="4 3"
           />
-          <text x="57.5" y="73" textAnchor="middle" className="fill-emerald-300" style={{ font: '700 11px ui-monospace, Menlo, monospace' }}>
+          {/* battery fill bars - 70% SOC visual hint */}
+          <rect x="14" y="73" width="4" height="32" rx="1" fill="#34d399" opacity={0.85} />
+          <rect x="20" y="73" width="4" height="32" rx="1" fill="#34d399" opacity={0.7} />
+          <rect x="26" y="73" width="4" height="32" rx="1" fill="#34d399" opacity={0.5} />
+          <rect x="32" y="73" width="4" height="32" rx="1" fill="#34d399" opacity={0.2} />
+          <text x="80" y="85" textAnchor="middle" className="fill-emerald-300" style={{ font: '700 11px ui-monospace, Menlo, monospace' }}>
             BATTERY
           </text>
-          <text x="57.5" y="86" textAnchor="middle" className="fill-emerald-300/70" style={{ font: '10px ui-sans-serif, system-ui', fontStyle: 'italic' }}>
+          <text x="80" y="100" textAnchor="middle" className="fill-emerald-300/70" style={{ font: '10px ui-sans-serif, system-ui', fontStyle: 'italic' }}>
             optional · 1-2 kWh
           </text>
 
-          {/* battery fill bars - 70% SOC visual hint */}
-          <rect x="11" y="62" width="4" height="22" rx="1" fill="#34d399" opacity={0.85} />
-          <rect x="17" y="62" width="4" height="22" rx="1" fill="#34d399" opacity={0.7} />
-          <rect x="23" y="62" width="4" height="22" rx="1" fill="#34d399" opacity={0.5} />
-          <rect x="29" y="62" width="4" height="22" rx="1" fill="#34d399" opacity={0.2} />
-
           {/* plug pins underneath the housing */}
-          <rect x="32" y="98" width="6" height="14" rx="1" fill="#9ca3af" />
-          <rect x="55" y="98" width="6" height="14" rx="1" fill="#9ca3af" />
-          <rect x="78" y="98" width="6" height="14" rx="1" fill="#9ca3af" />
+          <rect x="44" y="116" width="6" height="14" rx="1" fill="#9ca3af" />
+          <rect x="67" y="116" width="6" height="14" rx="1" fill="#9ca3af" />
+          <rect x="90" y="116" width="6" height="14" rx="1" fill="#9ca3af" />
 
-          <text x="57.5" y="135" textAnchor="middle" className="fill-[#D2E369]" style={{ font: '600 12px ui-monospace, Menlo, monospace' }}>
+          <text x="70" y="152" textAnchor="middle" className="fill-[#D2E369]" style={{ font: '600 12px ui-monospace, Menlo, monospace' }}>
             INVERTER + BATTERY
           </text>
-          <text x="57.5" y="150" textAnchor="middle" className="fill-gray-400" style={{ font: '10px ui-sans-serif, system-ui' }}>
+          <text x="70" y="167" textAnchor="middle" className="fill-gray-400" style={{ font: '10px ui-sans-serif, system-ui' }}>
             single 13 A plug
           </text>
         </g>
 
         {/* Arrow 3: Unit → Home */}
-        <line x1="495" y1="80" x2="555" y2="80" stroke="#D2E369" strokeWidth={3} strokeDasharray="4 4" markerEnd="url(#arrow)" />
+        <line x1="515" y1="80" x2="575" y2="80" stroke="#D2E369" strokeWidth={3} strokeDasharray="4 4" markerEnd="url(#arrow)" />
 
         {/* Home */}
-        <g transform="translate(560, 28)">
+        <g transform="translate(580, 30)">
           {/* roof */}
           <polygon points="60,0 0,40 120,40" fill="#a8c44a" stroke="#D2E369" strokeWidth={2} />
           {/* body */}
@@ -199,18 +198,27 @@ export function HowItWorksDiagram() {
           </text>
         </g>
 
-        {/* Grid (top-up) - bottom right */}
-        <g transform="translate(610, 188)">
-          <rect x="0" y="0" width="100" height="32" rx="6" fill="#0f172a" stroke="#94a3b8" strokeWidth={1.5} />
-          <text x="50" y="14" textAnchor="middle" className="fill-gray-300" style={{ font: '600 11px ui-monospace, Menlo, monospace' }}>
+        {/* Vertical dotted connector: Home → Grid (Grid sits directly below the house) */}
+        <line
+          x1="640"
+          y1="180"
+          x2="640"
+          y2="222"
+          stroke="#94a3b8"
+          strokeWidth={2}
+          strokeDasharray="3 3"
+        />
+
+        {/* Grid (top-up) - directly below the house */}
+        <g transform="translate(580, 224)">
+          <rect x="10" y="0" width="100" height="32" rx="6" fill="#0f172a" stroke="#94a3b8" strokeWidth={1.5} />
+          <text x="60" y="14" textAnchor="middle" className="fill-gray-300" style={{ font: '600 11px ui-monospace, Menlo, monospace' }}>
             GRID
           </text>
-          <text x="50" y="27" textAnchor="middle" className="fill-gray-500" style={{ font: '10px ui-sans-serif, system-ui' }}>
+          <text x="60" y="27" textAnchor="middle" className="fill-gray-500" style={{ font: '10px ui-sans-serif, system-ui' }}>
             tops up the rest
           </text>
         </g>
-        {/* dashed line from grid up to home */}
-        <line x1="660" y1="188" x2="630" y2="125" stroke="#94a3b8" strokeWidth={2} strokeDasharray="3 3" />
       </svg>
 
       <figcaption className="mt-3 space-y-1.5">
@@ -219,8 +227,8 @@ export function HowItWorksDiagram() {
           single 13 A socket. The grid invisibly tops up whatever isn't being supplied.
         </p>
         <p className="text-center text-[11px] text-emerald-300/80 font-mono leading-snug">
-          ⚡ A battery-only version skips the panel entirely — useful for time-shifting
-          cheap overnight electricity (e.g. on Octopus Flux) into peak hours.
+          ⚡ A battery-only version skips the panel entirely — useful for time-shifting cheap
+          overnight electricity (e.g. on Octopus Flux) into peak hours.
         </p>
       </figcaption>
     </figure>

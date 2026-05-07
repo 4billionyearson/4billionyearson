@@ -42,7 +42,7 @@ export function RegulationTimeline({
               >
                 {iconFor(entry, todayISO, matchesFA)}
               </span>
-              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 <span
                   className={
                     'font-mono text-[11px] uppercase tracking-wider ' +
@@ -56,12 +56,14 @@ export function RegulationTimeline({
                   {entry.date === '__today__' ? 'Today' : formatDate(entry.date)}
                 </span>
                 <h4 className="text-sm font-semibold text-[#FFF5E7]">{entry.title}</h4>
-                {matchesFA && (
-                  <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-[#D2E369] bg-[#D2E369]/15 px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
-                    <Star className="h-2.5 w-2.5 fill-[#D2E369]" /> Available milestone
-                  </span>
-                )}
               </div>
+              {matchesFA && (
+                <div className="mt-1.5 mb-0.5">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#D2E369] bg-[#D2E369]/15 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
+                    <Star className="h-3 w-3 fill-[#D2E369]" /> Available milestone
+                  </span>
+                </div>
+              )}
               <p className="mt-1 text-sm text-gray-300 leading-relaxed">{entry.description}</p>
             </li>
           );

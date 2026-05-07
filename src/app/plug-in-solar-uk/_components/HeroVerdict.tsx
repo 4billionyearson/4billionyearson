@@ -13,9 +13,9 @@ import {
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 
 /**
- * Top-of-page "answer the four big questions in 5 seconds" panel.
- * Mirrors the dashboard pattern used on energy-dashboard: large numbers,
- * status colours, minimal text. Server-rendered for SEO/AI crawlers.
+ * "5-second verdict" content block. Designed to be embedded directly
+ * inside the page header card's dark section (no own wrapper / lime
+ * title); the parent provides the surround.
  *
  * Pulls live values where available (legal status from statusDashboard,
  * cheapest UK kit price from products) and falls back to safe defaults
@@ -40,109 +40,98 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
   const paybackYears = Math.round((cheapestKitGBP / annualSavingHigh) * 10) / 10;
 
   return (
-    <section
-      aria-label="UK plug-in solar at a glance"
-      className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden"
-    >
-      <div className="px-5 py-3 md:px-6 md:py-4 flex items-center justify-between gap-3" style={{ backgroundColor: '#D2E369' }}>
-        <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">
+    <div aria-label="UK plug-in solar at a glance" className="space-y-4">
+      {/* Verdict title row + always-visible refreshed pill */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#D2E369] flex items-center gap-2">
           <Zap className="h-5 w-5" />
           The 5-second verdict
         </h2>
-        <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#2C5263] px-3 py-1 text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#D2E369]/50 bg-[#D2E369]/10 px-2.5 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
           <RefreshCw className="h-3 w-3" />
           Refreshed {formatToday(data?.generatedAt)}
         </span>
       </div>
 
-      <div className="p-4 md:p-6 space-y-4">
-        {/* The four big answer cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* 1 - Legal? */}
-          <VerdictCard
-            label="Legal in the UK?"
-            tone={isLegal ? 'green' : isPartial ? 'orange' : 'rose'}
-            icon={isLegal ? <CheckCircle2 className="h-7 w-7" /> : <AlertTriangle className="h-7 w-7" />}
-            big={isLegal ? 'Yes' : isPartial ? 'Partial' : 'No'}
-            sub={isLegal ? 'Sub-800 W kits, since Apr 2026' : 'See timeline below'}
-          />
+      {/* The four big answer cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <VerdictCard
+          label="Legal in the UK?"
+          tone={isLegal ? 'green' : isPartial ? 'orange' : 'rose'}
+          icon={isLegal ? <CheckCircle2 className="h-7 w-7" /> : <AlertTriangle className="h-7 w-7" />}
+          big={isLegal ? 'Yes' : isPartial ? 'Partial' : 'No'}
+          sub={isLegal ? 'Sub-800 W kits, since Apr 2026' : 'See timeline below'}
+        />
+        <VerdictCard
+          label="How much?"
+          tone="lime"
+          icon={<PoundSterling className="h-7 w-7" />}
+          big={`From £${cheapestKitGBP}`}
+          sub={`Typical 800 W kit · approx. £${annualSavingLow}-${annualSavingHigh}/yr saving`}
+        />
+        <VerdictCard
+          label="Can I install today?"
+          tone={isLegal ? 'green' : 'orange'}
+          icon={<Plug className="h-7 w-7" />}
+          big={isLegal ? 'Yes' : 'Soon'}
+          sub="Buy → plug in → notify your DNO (G98)"
+        />
+        <VerdictCard
+          label="Payback period"
+          tone="lime"
+          icon={<TrendingDown className="h-7 w-7" />}
+          big={`~${paybackYears} yrs`}
+          sub="Self-consumed only (no SEG yet)"
+        />
+      </div>
 
-          {/* 2 - How much? */}
-          <VerdictCard
-            label="How much?"
-            tone="lime"
-            icon={<PoundSterling className="h-7 w-7" />}
-            big={`From £${cheapestKitGBP}`}
-            sub={`Typical 800 W kit · approx. £${annualSavingLow}-${annualSavingHigh}/yr saving`}
-          />
-
-          {/* 3 - Can I install today? */}
-          <VerdictCard
-            label="Can I install today?"
-            tone={isLegal ? 'green' : 'orange'}
-            icon={<Plug className="h-7 w-7" />}
-            big={isLegal ? 'Yes' : 'Soon'}
-            sub="Buy → plug in → notify your DNO (G98)"
-          />
-
-          {/* 4 - Payback */}
-          <VerdictCard
-            label="Payback period"
-            tone="lime"
-            icon={<TrendingDown className="h-7 w-7" />}
-            big={`~${paybackYears} yrs`}
-            sub="Self-consumed only (no SEG yet)"
-          />
-        </div>
-
-        {/* The 800W limit hero strip - applies across all three configurations */}
-        <div className="rounded-xl border-2 border-[#D2E369]/50 bg-gradient-to-r from-[#D2E369]/15 via-[#D2E369]/5 to-transparent p-4">
-          <div className="flex items-start gap-4">
-            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#D2E369] text-[#2C5263]">
-              <span className="font-mono font-extrabold text-lg leading-none">800</span>
+      {/* The 800 W limit hero strip - applies across all three configurations */}
+      <div className="rounded-xl border-2 border-[#D2E369]/50 bg-gradient-to-r from-[#D2E369]/15 via-[#D2E369]/5 to-transparent p-4">
+        <div className="flex items-start gap-4">
+          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#D2E369] text-[#2C5263]">
+            <span className="font-mono font-extrabold text-base leading-none">800 W</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
+              The legal limit
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
-                The legal limit
-              </div>
-              <div className="text-sm md:text-base text-[#FFF5E7] font-semibold leading-tight">
-                <span className="text-[#D2E369]">800 W AC</span> max output per home, via a
-                standard 13&nbsp;A socket
-              </div>
-              <div className="mt-0.5 text-xs text-gray-400 leading-snug">
-                Panels can total more on the DC side – the micro-inverter clips output to 800 W
-                AC. The same limit applies whether you have solar, a battery, or both.
-              </div>
+            <div className="text-sm md:text-base text-[#FFF5E7] font-semibold leading-tight">
+              <span className="text-[#D2E369]">800 W AC</span> max output per home, via a standard
+              13&nbsp;A socket
+            </div>
+            <div className="mt-0.5 text-xs text-gray-400 leading-snug">
+              Panels can total more on the DC side – the micro-inverter clips output to 800 W AC.
+              The same limit applies whether you have solar, a battery, or both.
             </div>
           </div>
-
-          {/* Three use-case ticks showing the 800 W limit covers all setups */}
-          <ul className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <UseCaseTick icons={[<Sun key="s" className="h-4 w-4 text-[#FFE066]" />]} label="Solar only" />
-            <UseCaseTick
-              icons={[
-                <Sun key="s" className="h-4 w-4 text-[#FFE066]" />,
-                <span key="plus" className="text-gray-400 text-xs font-mono">+</span>,
-                <Battery key="b" className="h-4 w-4 text-[#D2E369]" />,
-              ]}
-              label="Solar + battery"
-            />
-            <UseCaseTick
-              icons={[<Battery key="b" className="h-4 w-4 text-[#D2E369]" />]}
-              label="Battery only"
-            />
-          </ul>
         </div>
 
-        {/* Inline legend / jump links */}
-        <div className="flex flex-wrap gap-2 text-xs">
-          <JumpLink href="#install" label="Install steps" />
-          <JumpLink href="#payback" label="Payback calculator" />
-          <JumpLink href="#products" label="UK kits today" />
-          <JumpLink href="#news" label="Latest news" />
-        </div>
+        {/* Three use-case ticks showing the 800 W limit covers all setups */}
+        <ul className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <UseCaseTick icons={[<Sun key="s" className="h-4 w-4 text-[#FFE066]" />]} label="Solar only" />
+          <UseCaseTick
+            icons={[
+              <Sun key="s" className="h-4 w-4 text-[#FFE066]" />,
+              <span key="plus" className="text-gray-400 text-xs font-mono">+</span>,
+              <Battery key="b" className="h-4 w-4 text-[#D2E369]" />,
+            ]}
+            label="Solar + battery"
+          />
+          <UseCaseTick
+            icons={[<Battery key="b" className="h-4 w-4 text-[#D2E369]" />]}
+            label="Battery only"
+          />
+        </ul>
       </div>
-    </section>
+
+      {/* Inline legend / jump links */}
+      <div className="flex flex-wrap gap-2 text-xs">
+        <JumpLink href="#install" label="Install steps" />
+        <JumpLink href="#payback" label="Payback calculator" />
+        <JumpLink href="#products" label="UK kits today" />
+        <JumpLink href="#news" label="Latest news" />
+      </div>
+    </div>
   );
 }
 

@@ -24,7 +24,6 @@ import { BatteryCalculator } from './_components/BatteryCalculator';
 import { DnoFinder } from './_components/DnoFinder';
 import { NewsFeed } from './_components/NewsFeed';
 import { LandlordLetter } from './_components/LandlordLetter';
-import { LastUpdatedBadge } from './_components/LastUpdatedBadge';
 import { AffiliateDisclosure } from './_components/AffiliateDisclosure';
 import { HeroVerdict } from './_components/HeroVerdict';
 import { HowItWorksDiagram } from './_components/HowItWorksDiagram';
@@ -66,43 +65,36 @@ export default function PlugInSolarGuide({
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
         <div className="max-w-7xl mx-auto space-y-6">
 
-          {/* ─── Title bar (H1 only) ─── */}
-          <header
-            className="rounded-2xl border-2 border-[#D2E369] shadow-xl overflow-hidden"
-            style={{ backgroundColor: '#D2E369' }}
-          >
-            <div className="px-5 py-4 md:px-6 md:py-5 flex flex-wrap items-start gap-3 justify-between">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">
-                  UK Plug-in Solar Guide
-                </h1>
-                <div className="flex items-center gap-2 mt-2">
-                  <Sun className="h-5 w-5 text-[#2C5263]/80" />
-                  <p className="text-xs md:text-sm uppercase tracking-[0.25em] md:tracking-[0.3em] text-[#2C5263]/80 font-mono">
-                    Daily-updated UK Status, Products &amp; Costs
-                  </p>
-                </div>
+          {/* ─── Combined title header + 5-second verdict ─── */}
+          <header className="rounded-2xl border-2 border-[#D2E369] shadow-xl overflow-hidden">
+            {/* Lime title band */}
+            <div
+              className="px-5 py-4 md:px-6 md:py-5"
+              style={{ backgroundColor: '#D2E369' }}
+            >
+              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">
+                UK Plug-in Solar Guide
+              </h1>
+              <div className="flex items-center gap-2 mt-2">
+                <Sun className="h-5 w-5 text-[#2C5263]/80" />
+                <p className="text-xs md:text-sm uppercase tracking-[0.25em] md:tracking-[0.3em] text-[#2C5263]/80 font-mono">
+                  Daily-updated UK Status, Products &amp; Costs
+                </p>
               </div>
-              <LastUpdatedBadge generatedAt={data?.generatedAt} source={source} />
+            </div>
+            {/* Dark body — 5-second verdict block */}
+            <div className="bg-gray-950/95 backdrop-blur-md p-4 md:p-6">
+              <HeroVerdict data={data} />
             </div>
           </header>
 
-          {/* ─── 5-second visual verdict — leads the page ─── */}
-          <HeroVerdict data={data} />
-
           {/* ─── 10-second update: simplified timeline, today's verdict text, page intro ─── */}
           <section className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden">
-            <div
-              className="px-5 py-3 md:px-6 md:py-4 flex items-center justify-between gap-3"
-              style={{ backgroundColor: '#D2E369' }}
-            >
+            <div className="px-5 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
               <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">
                 <CalendarClock className="h-5 w-5" />
                 The 10-second update
               </h2>
-              <span className="hidden sm:inline text-[11px] font-mono uppercase tracking-wider text-[#2C5263]/80">
-                Where we are · what we wrote today
-              </span>
             </div>
             <div className="p-4 md:p-6 space-y-4">
               <MiniTimeline fullyAvailable={data?.fullyAvailableDate} />
