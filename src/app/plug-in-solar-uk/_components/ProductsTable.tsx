@@ -93,10 +93,6 @@ export function ProductsTable({
 
   return (
     <div className="space-y-3">
-      <AutoUpdateNote count={products.length} generatedAt={generatedAt} />
-
-      <AffiliateDisclosure variant="inline" />
-
       <NonCompliantWarning />
 
       {/* Card layout on mobile */}
@@ -199,6 +195,8 @@ export function ProductsTable({
           </tbody>
         </table>
       </div>
+
+      <AffiliateDisclosure variant="inline" />
     </div>
   );
 }

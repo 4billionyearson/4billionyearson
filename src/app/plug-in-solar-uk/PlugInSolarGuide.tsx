@@ -103,12 +103,12 @@ export default function PlugInSolarGuide({
               className="px-5 py-4 md:px-6 md:py-5 rounded-t-[14px]"
               style={{ backgroundColor: '#D2E369' }}
             >
-              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">
+              <h1 className="text-2xl md:text-3xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">
                 UK Plug-in Solar Guide
               </h1>
-              <div className="flex items-center gap-2 mt-2">
-                <Sun className="h-5 w-5 text-[#2C5263]/80" />
-                <p className="text-xs md:text-sm uppercase tracking-[0.25em] md:tracking-[0.3em] text-[#2C5263]/80 font-mono">
+              <div className="flex items-center gap-2 mt-1.5">
+                <Sun className="h-4 w-4 text-[#2C5263]/80" />
+                <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-[#2C5263]/80 font-mono">
                   Daily-updated UK Status, Products &amp; Costs
                 </p>
               </div>
@@ -216,6 +216,17 @@ export default function PlugInSolarGuide({
                 </div>
               </Section>
 
+              {/* Mobile-only: Products above Regs deep dive */}
+              <div className="lg:hidden">
+                <Section
+                  icon={<ShoppingCart className="h-5 w-5" />}
+                  title="UK kits on sale today"
+                  id="products"
+                >
+                  <ProductsTable products={data?.products} countryCode={countryCode} generatedAt={data?.generatedAt} />
+                </Section>
+              </div>
+
               {/* Regulations deep dive */}
               <Section icon={<BookOpen className="h-5 w-5" />} title="Regulations deep dive">
                 {data?.regulations ? (
@@ -251,17 +262,19 @@ export default function PlugInSolarGuide({
             </div>
           </div>
 
-          {/* ─── Products (moved up — buyers' guide first) ─── */}
-          <Section
-            icon={<ShoppingCart className="h-5 w-5" />}
-            title="What can you buy in the UK today?"
-            id="products"
-          >
-            <ProductsTable products={data?.products} countryCode={countryCode} generatedAt={data?.generatedAt} />
-          </Section>
+          {/* ─── Products — desktop only; mobile version is inside right column above Regs ─── */}
+          <div className="hidden lg:block">
+            <Section
+              icon={<ShoppingCart className="h-5 w-5" />}
+              title="UK kits on sale today"
+              id="products"
+            >
+              <ProductsTable products={data?.products} countryCode={countryCode} generatedAt={data?.generatedAt} />
+            </Section>
+          </div>
 
           {/* ─── Plug-in vs rooftop decision panel ─── */}
-          <Section icon={<TrendingUp className="h-5 w-5" />} title="Plug-in solar vs rooftop solar">
+          <Section icon={<TrendingUp className="h-5 w-5" />} title="Plug-in vs rooftop">
             <p className="text-sm text-gray-300 leading-relaxed mb-3">
               Plug-in solar is a great fit for some households and the wrong choice for others. If
               you own your roof, have an unshaded south-facing pitch, and use a lot of electricity,

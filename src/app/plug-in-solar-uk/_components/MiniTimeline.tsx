@@ -308,14 +308,14 @@ function FullyAvailableCallout({
                 {fa.confidence} confidence
               </span>
             </div>
-            <div className="text-base md:text-lg font-extrabold text-[#FFF5E7] leading-tight">
+            <div className="mt-1.5 text-base md:text-lg font-extrabold text-[#FFF5E7] leading-tight">
               {passed ? (
                 <>Reached on {formatLong(fa.date)}</>
               ) : (
                 <>
                   {formatLong(fa.date)}
                   <span className="ml-2 text-sm font-semibold text-[#D2E369]">
-                    ({monthsAway === 0 ? 'within weeks' : `~${monthsAway} mo away`})
+                    ({monthsAway === 0 ? 'within weeks' : `~${monthsAway} months away`})
                   </span>
                 </>
               )}

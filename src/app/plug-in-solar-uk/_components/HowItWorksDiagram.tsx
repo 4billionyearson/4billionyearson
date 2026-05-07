@@ -17,7 +17,7 @@ export function HowItWorksDiagram() {
   return (
     <figure
       aria-label="Plug-in solar flow diagram"
-      className="my-2 rounded-2xl border border-[#D2E369]/30 bg-gradient-to-br from-sky-950/40 via-gray-950/60 to-emerald-950/30 p-4 md:p-6"
+      className="my-0 rounded-2xl border border-[#D2E369]/30 bg-gradient-to-br from-sky-950/40 via-gray-950/60 to-emerald-950/30 p-2 md:p-4"
     >
       <svg
         viewBox="0 0 760 280"
