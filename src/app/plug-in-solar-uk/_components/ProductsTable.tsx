@@ -75,10 +75,13 @@ function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
 export function ProductsTable({
   products,
   countryCode = 'GB',
+  generatedAt,
 }: {
   products: ProductRow[] | undefined;
   /** Vercel geo (or GB fallback) — drives Amazon Associates tag. */
   countryCode?: string;
+  /** ISO timestamp of the daily refresh — shown in the price caveat. */
+  generatedAt?: string;
 }) {
   if (!products || products.length === 0) {
     return (
@@ -90,7 +93,7 @@ export function ProductsTable({
 
   return (
     <div className="space-y-3">
-      <AutoUpdateNote count={products.length} />
+      <AutoUpdateNote count={products.length} generatedAt={generatedAt} />
 
       <AffiliateDisclosure variant="inline" />
 
@@ -144,7 +147,7 @@ export function ProductsTable({
             <tr className="text-left text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
               <th className="px-4 py-3">Brand &amp; model</th>
               <th className="px-4 py-3">Output</th>
-              <th className="px-4 py-3">Price</th>
+              <th className="px-4 py-3">Price (est.)</th>
               <th className="px-4 py-3">UK compliant</th>
               <th className="px-4 py-3">Battery</th>
               <th className="px-4 py-3">Where to buy</th>
@@ -322,16 +325,25 @@ function StockBadge({ status }: { status: ProductRow['stock'] }) {
   }
 }
 
-function AutoUpdateNote({ count }: { count: number }) {
+function AutoUpdateNote({ count, generatedAt }: { count: number; generatedAt?: string }) {
+  const dateLabel = generatedAt
+    ? new Date(generatedAt).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })
+    : null;
+
   return (
     <div className="flex items-start gap-2 rounded-lg border border-[#D2E369]/30 bg-[#D2E369]/5 px-3 py-2 text-xs text-gray-300">
       <RefreshCw className="h-4 w-4 text-[#D2E369] shrink-0 mt-0.5" />
       <p>
-        <span className="font-semibold text-[#D2E369]">List auto-expands.</span> Showing
-        the {count} UK plug-in solar kits we know are on sale today. Each daily refresh asks Gemini
-        (with Google Search grounding) to add new launches and drop discontinued models. Known-bad
-        EcoFlow product paths are rewritten to the live UK storefront; Amazon entries should be real
-        product pages (`/dp/…`) when the model finds them.
+        <span className="font-semibold text-[#D2E369]">Daily AI-sourced list.</span>{' '}
+        Showing {count} UK plug-in solar kits verified as on sale today
+        {dateLabel ? <> as of <span className="text-gray-200">{dateLabel}</span></> : null}.
+        {' '}Prices and stock status are checked by Gemini at each daily refresh and{' '}
+        <span className="text-amber-300">may not reflect flash sales or same-day stock changes</span>
+        {' '}— always verify on the retailer’s site before purchasing.
       </p>
     </div>
   );

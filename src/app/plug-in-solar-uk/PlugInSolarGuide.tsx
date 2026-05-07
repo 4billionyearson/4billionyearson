@@ -257,7 +257,7 @@ export default function PlugInSolarGuide({
             title="What can you buy in the UK today?"
             id="products"
           >
-            <ProductsTable products={data?.products} countryCode={countryCode} />
+            <ProductsTable products={data?.products} countryCode={countryCode} generatedAt={data?.generatedAt} />
           </Section>
 
           {/* ─── Plug-in vs rooftop decision panel ─── */}
