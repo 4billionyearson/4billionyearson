@@ -1,4 +1,4 @@
-import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle, RefreshCw, ShoppingBag, Search, PackageX, PackageCheck, Hourglass } from 'lucide-react';
+import { Battery, ExternalLink, ShieldCheck, ShieldQuestion, ShieldX, Clock, AlertTriangle, ShoppingBag, Search, PackageX, Hourglass } from 'lucide-react';
 import type { ProductRow, RetailerLink } from '@/lib/plug-in-solar/types';
 import {
   applyAmazonAffiliateTag,
@@ -296,14 +296,11 @@ function ComplianceBadge({ status }: { status: ProductRow['ukCompliant'] }) {
 }
 
 function StockBadge({ status }: { status: ProductRow['stock'] }) {
+  // Deliberately do NOT render a green "In stock" pill: Gemini cannot
+  // reliably see live retailer stock state, and a wrong "In stock"
+  // is far more misleading than no pill. Users default-assume things
+  // are buyable — we only flag the negative cases.
   switch (status) {
-    case 'in-stock':
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300 border border-emerald-500/30">
-          <PackageCheck className="h-3 w-3" />
-          In stock
-        </span>
-      );
     case 'out-of-stock':
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-300 border border-rose-500/30">
@@ -321,30 +318,6 @@ function StockBadge({ status }: { status: ProductRow['stock'] }) {
     default:
       return null;
   }
-}
-
-function AutoUpdateNote({ count, generatedAt }: { count: number; generatedAt?: string }) {
-  const dateLabel = generatedAt
-    ? new Date(generatedAt).toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      })
-    : null;
-
-  return (
-    <div className="flex items-start gap-2 rounded-lg border border-[#D2E369]/30 bg-[#D2E369]/5 px-3 py-2 text-xs text-gray-300">
-      <RefreshCw className="h-4 w-4 text-[#D2E369] shrink-0 mt-0.5" />
-      <p>
-        <span className="font-semibold text-[#D2E369]">Daily AI-sourced list.</span>{' '}
-        Showing {count} UK plug-in solar kits verified as on sale today
-        {dateLabel ? <> as of <span className="text-gray-200">{dateLabel}</span></> : null}.
-        {' '}Prices and stock status are checked by Gemini at each daily refresh and{' '}
-        <span className="text-amber-300">may not reflect flash sales or same-day stock changes</span>
-        {' '}— always verify on the retailer’s site before purchasing.
-      </p>
-    </div>
-  );
 }
 
 function NonCompliantWarning() {
