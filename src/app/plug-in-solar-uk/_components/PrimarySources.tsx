@@ -39,7 +39,7 @@ const GOV_SOURCES: Source[] = [
     title: 'Ed Miliband MP — Secretary of State for Energy Security and Net Zero',
     description:
       "The Secretary of State's GOV.UK page, where speeches and announcements (including the March 2026 plug-in solar legalisation) are listed.",
-    url: 'https://www.gov.uk/government/people/edward-miliband',
+    url: 'https://www.gov.uk/government/people/ed-miliband',
   },
 ];
 

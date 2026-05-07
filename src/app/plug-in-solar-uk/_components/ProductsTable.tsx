@@ -227,14 +227,7 @@ function AutoUpdateNote({ count }: { count: number }) {
         <span className="font-semibold text-[#D2E369]">List auto-expands.</span> Showing
         the {count} UK plug-in solar kits we know are on sale today. Each daily refresh asks Gemini
         (with Google Search grounding) to add new launches and drop discontinued models, so the
-        table grows as the UK market does. Spotted a missing kit?{' '}
-        <a
-          href="mailto:hello@4billionyearson.org?subject=UK%20plug-in%20solar%20kit%20suggestion"
-          className="text-[#D2E369] hover:text-[#E5F08A] underline"
-        >
-          let us know
-        </a>
-        .
+        table grows as the UK market does.
       </p>
     </div>
   );

@@ -51,7 +51,7 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('TIER 1 - UK government & policy (always check these first):');
   lines.push('- https://www.gov.uk/government/news (filter by Department for Energy Security and Net Zero / DESNZ)');
   lines.push('- https://www.gov.uk/government/organisations/department-for-energy-security-and-net-zero');
-  lines.push('- https://www.gov.uk/government/people/edward-miliband (Secretary of State - look for plug-in / balcony solar speeches and press releases)');
+  lines.push('- https://www.gov.uk/government/people/ed-miliband (Secretary of State - look for plug-in / balcony solar speeches and press releases)');
   lines.push('- https://www.gov.uk/government/consultations - search for "plug-in solar" or "balcony solar" or "domestic micro-generation"');
   lines.push('');
   lines.push('TIER 2 - UK electrical regulators and standards bodies:');
