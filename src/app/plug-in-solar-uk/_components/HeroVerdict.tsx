@@ -28,8 +28,9 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
   const isLegal = legalPill?.status === 'legal' || legalPill?.status === 'yes';
   const isPartial = legalPill?.status === 'partial';
 
-  const cheapestKitGBP = data?.products?.length
-    ? Math.round(Math.min(...data.products.map((p) => p.priceGBP)))
+  const knownPrices = data?.products?.map((p) => p.priceGBP).filter((v): v is number => v != null) ?? [];
+  const cheapestKitGBP = knownPrices.length
+    ? Math.round(Math.min(...knownPrices))
     : 400;
 
   // Payback range: optimistic (south UK, 75% self-consumption, ~700 kWh/yr)
