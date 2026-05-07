@@ -30,6 +30,7 @@ import { HowItWorksDiagram } from './_components/HowItWorksDiagram';
 import { LegalChecklist } from './_components/LegalChecklist';
 import { MiniTimeline } from './_components/MiniTimeline';
 import { PrimarySources } from './_components/PrimarySources';
+import { DailyRefreshNotice } from './_components/DailyRefreshNotice';
 import {
   HOW_IT_WORKS_PARAGRAPHS,
   PLUG_IN_VS_ROOFTOP,
@@ -54,12 +55,13 @@ import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
  */
 export default function PlugInSolarGuide({
   data,
-  source,
+  payloadSource,
   cacheMiss,
   countryCode,
 }: {
   data: PlugInSolarLiveData | null;
-  source: string;
+  /** From page cache read: cache | stale-cache | no-cache */
+  payloadSource: string;
   cacheMiss: boolean;
   /** From Vercel geo — same as book pages for Amazon Associates. */
   countryCode: string;
@@ -98,6 +100,12 @@ export default function PlugInSolarGuide({
             </div>
           </header>
 
+          <DailyRefreshNotice
+            cacheMiss={cacheMiss}
+            hasPayload={data != null}
+            source={payloadSource}
+          />
+
           {/* ─── 10-second update: simplified timeline, today's verdict text, page intro ─── */}
           <section
             className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
@@ -120,8 +128,6 @@ export default function PlugInSolarGuide({
 
               {data?.tldr ? (
                 <QuickTLDR label="Today's verdict">{data.tldr}</QuickTLDR>
-              ) : cacheMiss ? (
-                <CacheMissPanel />
               ) : null}
 
               <p className="text-sm text-gray-400 leading-relaxed border-t border-gray-800 pt-3">
@@ -441,15 +447,3 @@ function RegeneratingNote() {
   );
 }
 
-function CacheMissPanel() {
-  return (
-    <div className="rounded-xl border border-[#D2E369]/40 bg-[#D2E369]/5 px-4 py-3">
-      <p className="text-sm font-medium text-[#FFF5E7]">A fresh daily update is being prepared…</p>
-      <p className="mt-1 text-sm text-gray-300">
-        Today's status, prices and product list are being pulled together by Gemini in the
-        background. The legal framework, install guide, calculators and FAQs below are already up
-        to date. Refresh in 5-10 seconds for the live update.
-      </p>
-    </div>
-  );
-}

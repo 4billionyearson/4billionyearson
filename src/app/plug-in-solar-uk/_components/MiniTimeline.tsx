@@ -7,7 +7,7 @@ import { HERO_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
  * panel. Server-rendered: today's marker is computed at request time.
  *
  * Implementation notes:
- *  - A prominent "fully legal & in shops" callout pill is rendered above
+ *  - A prominent "Legal" (retail / BSI) callout pill is rendered above
  *    the track with the AI-derived date. Its dot on the timeline is
  *    star-styled and lime so it stands out from the regular milestones.
  *  - Track is positioned within an inner padded zone (PAD px on each

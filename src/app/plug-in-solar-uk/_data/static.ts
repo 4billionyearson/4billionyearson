@@ -60,16 +60,16 @@ export const PLUG_IN_VS_ROOFTOP: { question: string; plugIn: string; rooftop: st
 /* ─── Fully-available milestone fallback ───────────────────────────────────── */
 
 /**
- * Fallback used when Gemini hasn't yet filled in `fullyAvailableDate`. The
- * date is anchored to the BSI product-standard publication (which is the
- * current bottleneck for "fully legal, no caveats, in every high-street
- * shop"). Gemini overrides this daily.
+ * Fallback when Gemini hasn't yet filled in `fullyAvailableDate`. This is the
+ * **retail / BSI product-standard** milestone (~mid-July 2026): certified kits
+ * in widespread sale. It is not the same as the BS 7671 Amendment 4 transition
+ * end (2 October 2026), which already appears on the static timeline.
  */
 export const FULLY_AVAILABLE_FALLBACK: FullyAvailableEstimate = {
   date: '2026-07-15',
-  label: 'Fully legal & widely in shops',
+  label: 'Legal',
   rationale:
-    "Gated by BSI publication of the new plug-in solar product standard, expected mid-2026. Once that lands, mainstream UK retailers can stock kits without 'pending' compliance disclaimers.",
+    'Roughly when the BSI plug-in solar product standard is expected to publish and mainstream UK retailers can stock certified kits—mid‑July 2026 is the usual shorthand. Tighter legal uniformity for all new installation work continues until the BS 7671 Amendment 4 transition ends on 2 October 2026 (see timeline).',
   confidence: 'medium',
 };
 
@@ -109,7 +109,7 @@ export const BASE_TIMELINE: TimelineEntry[] = [
     date: '2026-07-15',
     title: 'BSI plug-in solar product standard expected',
     description:
-      'A new BSI product standard is expected mid-2026 covering anti-islanding, max 800 W AC output, micro-inverter certification (EN 50549), and BS 1363 plug compliance.',
+      'A new BSI product standard is expected mid-2026 covering anti-islanding, max 800W AC output, micro-inverter certification (EN 50549), and BS 1363 plug compliance.',
     kind: 'future',
     category: 'standard',
   },

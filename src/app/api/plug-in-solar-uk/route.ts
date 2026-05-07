@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { getCached, setDailyTerm } from '@/lib/climate/redis';
+import { FULLY_AVAILABLE_FALLBACK } from '@/app/plug-in-solar-uk/_data/static';
 import { buildPlugInSolarPrompt, PLUG_IN_SOLAR_RESPONSE_SCHEMA } from '@/lib/plug-in-solar/prompt';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 
@@ -24,7 +25,7 @@ import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
  */
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const PREVIOUS_LOOKBACK_DAYS = 7;
 
 /**
@@ -202,6 +203,25 @@ function sanitisePayload(payload: any): void {
       n.date = cleaned;
       return true;
     });
+  }
+  normaliseFullyAvailableMilestone(payload);
+}
+
+/**
+ * `fullyAvailableDate` is the BSI / mainstream-retail beat (~mid-July 2026).
+ * Gemini often misplaces the BS 7671 Amendment 4 transition end (2 Oct 2026)
+ * here; that date is already a static timeline row.
+ */
+function normaliseFullyAvailableMilestone(payload: any): void {
+  const fa = payload?.fullyAvailableDate;
+  if (!fa || typeof fa.date !== 'string') return;
+  if (fa.date === '2026-10-02') {
+    fa.date = FULLY_AVAILABLE_FALLBACK.date;
+    fa.label = 'Legal';
+    fa.rationale = FULLY_AVAILABLE_FALLBACK.rationale;
+  }
+  if (typeof fa.label === 'string' && /\bfully\s+legal\b/i.test(fa.label)) {
+    fa.label = 'Legal';
   }
 }
 

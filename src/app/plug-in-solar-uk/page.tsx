@@ -20,7 +20,7 @@ export const dynamicParams = true;
 export const revalidate = 86400;
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const LOOKBACK_DAYS = 7;
 
 function dateOffsetKey(daysAgo: number): string {
@@ -77,7 +77,7 @@ export default async function PlugInSolarUKPage() {
   return (
     <PlugInSolarGuide
       data={data}
-      source={source}
+      payloadSource={source}
       cacheMiss={cacheMiss}
       countryCode={countryCode}
     />

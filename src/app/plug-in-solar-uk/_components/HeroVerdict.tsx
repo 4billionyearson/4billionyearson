@@ -67,7 +67,7 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           tone="lime"
           icon={<PoundSterling className="h-7 w-7" />}
           big={`From £${cheapestKitGBP}`}
-          sub={`Typical 800 W kit · approx. £${annualSavingLow}-${annualSavingHigh}/yr saving`}
+          sub={`Typical 800W kit · approx. £${annualSavingLow}-${annualSavingHigh}/yr saving`}
         />
         <VerdictCard
           label="Can I install today?"
@@ -89,18 +89,20 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
       <div className="rounded-xl border-2 border-[#D2E369]/50 bg-gradient-to-r from-[#D2E369]/15 via-[#D2E369]/5 to-transparent p-4">
         <div className="flex items-start gap-4">
           <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#D2E369] text-[#2C5263]">
-            <span className="font-mono font-extrabold text-base leading-none">800 W</span>
+            <span className="font-mono font-extrabold text-base leading-none tracking-tight whitespace-nowrap">
+              800W
+            </span>
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
               The legal limit
             </div>
             <div className="text-sm md:text-base text-[#FFF5E7] font-semibold leading-tight">
-              <span className="text-[#D2E369]">800 W AC</span> max output per home, via a standard
+              <span className="text-[#D2E369]">800W AC</span> max output per home, via a standard
               13&nbsp;A socket
             </div>
             <div className="mt-0.5 text-xs text-gray-400 leading-snug">
-              Panels can total more on the DC side – the micro-inverter clips output to 800 W AC.
+              Panels can total more on the DC side – the micro-inverter clips output to 800W AC.
               The same limit applies whether you have solar, a battery, or both.
             </div>
           </div>

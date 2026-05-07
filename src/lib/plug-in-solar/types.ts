@@ -113,15 +113,13 @@ export interface PriceSnapshot {
 }
 
 /**
- * The single most-asked question from non-experts: "when can I just walk
- * into a shop, buy a plug-in solar kit and know it's fully legal without
- * caveats?" This object lets Gemini return its current best estimate of
- * that date so the page can show it prominently. Updated daily.
+ * Retail / certification milestone (~BSI product standard, widespread kit sales).
+ * Distinct from the BS 7671 Amendment 4 transition deadline (2 Oct 2026).
  */
 export interface FullyAvailableEstimate {
   /** ISO date string (YYYY-MM-DD). The expected milestone date. */
   date: string;
-  /** Short label, e.g. "Fully legal & widely in shops". */
+  /** Short label — keep to "Legal" for UI consistency. */
   label: string;
   /** 1-2 sentence rationale. */
   rationale: string;
@@ -138,7 +136,7 @@ export interface PlugInSolarLiveData {
   tldr: string;
   /** Long-form daily-updated paragraph on legal status (120-180 words). */
   legalStatus: string;
-  /** Best-estimate date for the "fully legal & widely available" milestone. */
+  /** Best-estimate date for BSI-driven retail / "Legal" milestone (~mid-July 2026). */
   fullyAvailableDate?: FullyAvailableEstimate;
   /** Section keyed paragraphs on individual regulatory threads. */
   regulations: {

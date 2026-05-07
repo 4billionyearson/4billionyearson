@@ -4,8 +4,8 @@ import { BASE_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
 
 /**
  * Hybrid timeline: static base milestones merged with any new entries
- * Gemini supplied today, plus the prominent "fully legal & widely
- * available" callout at the top. Today's "you are here" marker is
+ * Gemini supplied today, plus the prominent "Legal" retail milestone callout
+ * at the top. Today's "you are here" marker is
  * computed at render time. Server-rendered.
  */
 export function RegulationTimeline({
