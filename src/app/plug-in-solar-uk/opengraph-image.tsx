@@ -10,13 +10,292 @@ export const runtime = 'nodejs';
 // image immediately so each social-media unfurl after a refresh shows the
 // fresh status pills.
 export const revalidate = 3600;
-export const alt = 'UK Plug-in Solar Guide 2026 — Legal Status, Kits, Payback & Batteries';
+export const alt = 'UK Plug-in Solar Guide 2026 — Legal Status, Verified Prices & Kits';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const LOOKBACK_DAYS = 7;
+
+function dateOffsetKey(daysAgo: number): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - daysAgo);
+  return `${CACHE_KEY_PREFIX}:${d.toISOString().slice(0, 10)}-${CACHE_VERSION}`;
+}
+
+async function readMostRecent(): Promise<PlugInSolarLiveData | null> {
+  for (let i = 0; i <= LOOKBACK_DAYS; i++) {
+    try {
+      const cached = await getCached<PlugInSolarLiveData>(dateOffsetKey(i));
+      if (cached) return cached;
+    } catch {
+      /* keep walking back */
+    }
+  }
+  return null;
+}
+
+async function loadDataUrl(relativePath: string, mime: string): Promise<string | null> {
+  try {
+    const p = resolve(process.cwd(), 'public', relativePath);
+    const buf = await readFile(p);
+    return `data:${mime};base64,${buf.toString('base64')}`;
+  } catch {
+    return null;
+  }
+}
+
+const ACCENT = '#D2E369';
+const ACCENT_DIM = 'rgba(210,227,105,0.65)';
+const BORDER = 'rgba(210,227,105,0.35)';
+
+const TONE = {
+  positive: '#34d399',
+  warning: '#fb923c',
+  amber: '#fbbf24',
+  negative: '#ef4444',
+  info: '#60a5fa',
+} as const;
+
+interface OgPill {
+  label: string;
+  value: string;
+  tone: string;
+}
+
+function pillFor(index: number, status: StatusValue | undefined, fallback: OgPill): OgPill {
+  switch (index) {
+    case 0:
+      if (status === 'legal') return { label: 'Legal in UK', value: 'Yes', tone: TONE.positive };
+      if (status === 'partial') return { label: 'Legal in UK', value: 'Partially', tone: TONE.warning };
+      if (status === 'not-legal') return { label: 'Legal in UK', value: 'No', tone: TONE.negative };
+      return fallback;
+    case 1:
+      if (status === 'yes') return { label: 'Kits on sale', value: 'Yes', tone: TONE.positive };
+      if (status === 'soon') return { label: 'Kits on sale', value: 'Soon', tone: TONE.amber };
+      if (status === 'no') return { label: 'Kits on sale', value: 'No', tone: TONE.negative };
+      return fallback;
+    case 2:
+      if (status === 'yes') return { label: 'SEG payments', value: 'Yes', tone: TONE.positive };
+      if (status === 'partial') return { label: 'SEG payments', value: 'Partial', tone: TONE.warning };
+      if (status === 'no') return { label: 'SEG payments', value: 'Not yet', tone: TONE.amber };
+      return fallback;
+    case 3:
+      if (status === 'yes') return { label: 'DNO notify', value: 'Required', tone: TONE.info };
+      if (status === 'no') return { label: 'DNO notify', value: 'Not needed', tone: TONE.positive };
+      return fallback;
+    default:
+      return fallback;
+  }
+}
+
+const FALLBACK_PILLS: OgPill[] = [
+  { label: 'Legal in UK', value: 'Partially', tone: TONE.warning },
+  { label: 'Kits on sale', value: 'Yes', tone: TONE.positive },
+  { label: 'SEG payments', value: 'Not yet', tone: TONE.amber },
+  { label: 'DNO notify', value: 'Required', tone: TONE.info },
+];
+
+const FALLBACK_TAGLINE =
+  'Plug-in solar is legal under BS 7671 Amendment 4. EcoFlow STREAM kits start at £349. BSI product standard pending.';
+
+function buildPillsFromCache(data: PlugInSolarLiveData | null): OgPill[] {
+  const pills = data?.statusDashboard ?? [];
+  return FALLBACK_PILLS.map((fb, i) => {
+    const live: StatusPill | undefined = pills[i];
+    return pillFor(i, live?.status, fb);
+  });
+}
+
+function buildTaglineFromCache(data: PlugInSolarLiveData | null): string {
+  const tldr = data?.tldr?.trim();
+  if (tldr && tldr.length >= 30) {
+    return tldr.length > 200 ? tldr.slice(0, 197).trimEnd() + '…' : tldr;
+  }
+  return FALLBACK_TAGLINE;
+}
+
+/** Cheapest confirmed (non-null) price across all scraped products. */
+function cheapestKit(data: PlugInSolarLiveData | null): number | null {
+  if (!data?.products?.length) return null;
+  const prices = data.products.map((p) => p.priceGBP).filter((v): v is number => v != null);
+  return prices.length ? Math.min(...prices) : null;
+}
+
+/** Count how many products have a confirmed price (i.e. are actually on sale). */
+function onSaleCount(data: PlugInSolarLiveData | null): number {
+  if (!data?.products?.length) return 0;
+  return data.products.filter((p) => p.priceGBP != null).length;
+}
+
+export default async function OgImage() {
+  const [bgUrl, logoUrl, data] = await Promise.all([
+    loadDataUrl('background.png', 'image/png'),
+    loadDataUrl('header-logo.png', 'image/png'),
+    readMostRecent(),
+  ]);
+
+  const pills = buildPillsFromCache(data);
+  const tagline = buildTaglineFromCache(data);
+  const fromPrice = cheapestKit(data);
+  const kitCount = onSaleCount(data);
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          background: '#030712',
+          fontFamily: 'system-ui, sans-serif',
+        }}
+      >
+        {bgUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={bgUrl}
+            alt=""
+            width={1200}
+            height={630}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.45 }}
+          />
+        ) : null}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            background: 'linear-gradient(135deg, rgba(3,7,18,0.93) 0%, rgba(15,23,42,0.85) 50%, rgba(3,7,18,0.95) 100%)',
+          }}
+        />
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            padding: '44px 60px',
+            position: 'relative',
+            zIndex: 1,
+            gap: 0,
+          }}
+        >
+          {/* ── Header row ── */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+              </svg>
+              <span style={{ fontSize: 46, fontWeight: 800, color: ACCENT, textShadow: '0 2px 10px rgba(0,0,0,0.9)', lineHeight: 1.05 }}>
+                UK Plug-in Solar Guide
+              </span>
+            </div>
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="4 Billion Years On" width={270} height={46} style={{ objectFit: 'contain' }} />
+            ) : null}
+          </div>
+
+          {/* ── Eyebrow ── */}
+          <div style={{ display: 'flex', marginBottom: '12px' }}>
+            <span style={{ fontSize: 18, color: ACCENT_DIM, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 600 }}>
+              Daily-updated · verified prices · legal status · payback calculator
+            </span>
+          </div>
+
+          {/* ── TL;DR tagline ── */}
+          <div style={{ display: 'flex', marginBottom: '18px' }}>
+            <span style={{ fontSize: 22, color: '#e2e8f0', lineHeight: 1.4, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+              {tagline}
+            </span>
+          </div>
+
+          {/* ── Status pills row ── */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '12px',
+              background: 'rgba(3,7,18,0.88)',
+              border: '1px solid ' + BORDER,
+              borderRadius: 14,
+              padding: '16px 22px',
+              marginBottom: '16px',
+            }}
+          >
+            {pills.map((p, i) => (
+              <div
+                key={p.label}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flex: 1,
+                  paddingLeft: i > 0 ? 18 : 0,
+                  borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#94a3b8', marginBottom: 5, letterSpacing: 1, textTransform: 'uppercase' }}>{p.label}</span>
+                <span style={{ fontSize: 24, fontWeight: 800, color: p.tone }}>{p.value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Product highlights strip (dynamic from scraped data) ── */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '32px',
+              background: 'rgba(210,227,105,0.07)',
+              border: '1px solid rgba(210,227,105,0.2)',
+              borderRadius: 12,
+              padding: '13px 22px',
+            }}
+          >
+            {/* Shopping cart icon */}
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontSize: 13, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>UK kits on sale today</span>
+              <span style={{ fontSize: 22, fontWeight: 800, color: '#f1f5f9' }}>
+                {fromPrice != null
+                  ? `From £${fromPrice}${kitCount > 1 ? ` · ${kitCount} kits tracked` : ''}`
+                  : 'Kits tracked — see page for pricing'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flex: 1 }} />
+            {/* Brands */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+              <span style={{ fontSize: 13, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>Brands tracked</span>
+              <span style={{ fontSize: 17, fontWeight: 700, color: ACCENT_DIM }}>EcoFlow · Anker · Lidl</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flex: 1 }} />
+
+          {/* ── Footer ── */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+              <span style={{ fontSize: 17, fontWeight: 700, color: ACCENT }}>
+                Prices verified from manufacturer pages, not AI guesses →
+              </span>
+              <span style={{ fontSize: 13, color: '#6b7280' }}>4billionyearson.org/plug-in-solar-uk</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    { ...size }
+  );
+}
+
 
 function dateOffsetKey(daysAgo: number): string {
   const d = new Date();
