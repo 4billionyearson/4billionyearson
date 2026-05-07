@@ -36,13 +36,22 @@ export default async function PlugInSolarStatusEmbed() {
 
   return (
     <div className="p-3">
-      <div className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden">
-        <div className="px-4 py-3" style={{ backgroundColor: '#D2E369' }}>
+      <div
+        className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
+        style={{
+          background:
+            'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
+        }}
+      >
+        <div
+          className="px-4 py-3 rounded-t-[14px]"
+          style={{ backgroundColor: '#D2E369' }}
+        >
           <h1 className="text-base md:text-lg font-bold font-mono tracking-tight text-[#2C5263]">
             UK Plug-in Solar — Where Things Stand
           </h1>
         </div>
-        <div className="p-4 space-y-3">
+        <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-b-[14px] space-y-3">
           {data ? (
             <>
               <StatusDashboard pills={data.statusDashboard} />

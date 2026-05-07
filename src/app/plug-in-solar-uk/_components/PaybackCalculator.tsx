@@ -65,15 +65,22 @@ export function PaybackCalculator({ prices }: { prices: PriceSnapshot | undefine
   return (
     <section
       aria-labelledby="payback-heading"
-      className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden"
+      className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
+      style={{
+        background:
+          'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
+      }}
     >
-      <div className="px-5 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
+      <div
+        className="px-5 py-3 md:px-6 md:py-4 rounded-t-[14px]"
+        style={{ backgroundColor: '#D2E369' }}
+      >
         <h2 id="payback-heading" className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">
           <Calculator className="h-5 w-5" />
           Payback calculator
         </h2>
       </div>
-      <div className="p-5 md:p-6 space-y-4">
+      <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-b-[14px] space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Postcode" icon={<MapPin className="h-4 w-4 text-[#D2E369]" />}>
             <input

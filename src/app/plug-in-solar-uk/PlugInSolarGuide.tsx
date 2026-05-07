@@ -67,10 +67,16 @@ export default function PlugInSolarGuide({
         <div className="max-w-7xl mx-auto space-y-6">
 
           {/* ─── Combined title header + 5-second verdict ─── */}
-          <header className="rounded-2xl border-2 border-[#D2E369] shadow-xl overflow-hidden">
+          <header
+            className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
+            style={{
+              background:
+                'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
+            }}
+          >
             {/* Lime title band */}
             <div
-              className="px-5 py-4 md:px-6 md:py-5"
+              className="px-5 py-4 md:px-6 md:py-5 rounded-t-[14px]"
               style={{ backgroundColor: '#D2E369' }}
             >
               <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-sm font-mono tracking-tight text-[#2C5263]">
@@ -84,20 +90,29 @@ export default function PlugInSolarGuide({
               </div>
             </div>
             {/* Dark body — 5-second verdict block */}
-            <div className="bg-gray-950/95 backdrop-blur-md p-4 md:p-6">
+            <div className="bg-gray-950/95 backdrop-blur-md p-4 md:p-6 rounded-b-[14px]">
               <HeroVerdict data={data} />
             </div>
           </header>
 
           {/* ─── 10-second update: simplified timeline, today's verdict text, page intro ─── */}
-          <section className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden">
-            <div className="px-5 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
+          <section
+            className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
+            style={{
+              background:
+                'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
+            }}
+          >
+            <div
+              className="px-5 py-3 md:px-6 md:py-4 rounded-t-[14px]"
+              style={{ backgroundColor: '#D2E369' }}
+            >
               <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">
                 <CalendarClock className="h-5 w-5" />
                 The 10-second update
               </h2>
             </div>
-            <div className="p-4 md:p-6 space-y-4">
+            <div className="bg-gray-950/90 backdrop-blur-md p-4 md:p-6 rounded-b-[14px] space-y-4">
               <MiniTimeline fullyAvailable={data?.fullyAvailableDate} />
 
               {data?.tldr ? (
@@ -364,15 +379,24 @@ function Section({
   return (
     <section
       id={id}
-      className="scroll-mt-6 md:scroll-mt-8 rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden"
+      className="scroll-mt-6 md:scroll-mt-8 rounded-2xl border-2 border-[#D2E369] shadow-xl"
+      style={{
+        background:
+          'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
+      }}
     >
-      <div className="px-5 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
+      <div
+        className="px-5 py-3 md:px-6 md:py-4 rounded-t-[14px]"
+        style={{ backgroundColor: '#D2E369' }}
+      >
         <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">
           {icon}
           {title}
         </h2>
       </div>
-      <div className="p-5 md:p-6">{children}</div>
+      <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-b-[14px]">
+        {children}
+      </div>
     </section>
   );
 }

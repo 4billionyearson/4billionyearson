@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Brain, Cpu, Zap, Sun, Wind, Thermometer, Globe, Waves,
   CloudLightning, Factory, Dna, Microscope, BookOpen, Flower2,
-  ChevronRight, Newspaper, BarChart3,
+  ChevronRight, Newspaper, BarChart3, PlugZap,
 } from "lucide-react";
 
 /* ─── Section data ───────────────────────────────────────────────────────── */
@@ -14,7 +14,7 @@ interface SubLink {
   href: string;
   label: string;
   icon: React.ReactNode;
-  badge?: "live" | "weekly" | "monthly" | "annual";
+  badge?: "live" | "daily" | "weekly" | "monthly" | "annual";
   blogCategory?: string;   // slug for article-badge lookup
   desc: string;
   group?: string;          // optional sub-group heading (e.g. "Monitor", "Earth Systems", "Learn")
@@ -50,6 +50,7 @@ const SECTIONS: Section[] = [
     color: "#D2E369",
     icon: <Zap className="h-6 w-6" />,
     links: [
+      { href: "/plug-in-solar-uk", label: "UK Plug-in Solar Guide", icon: <PlugZap className="h-4 w-4" />, badge: "daily", desc: "Legality, products, payback & news" },
       { href: "/energy-dashboard", label: "Global Energy Data", icon: <Sun className="h-4 w-4" />, badge: "annual", desc: "Energy mix by country & source" },
       { href: "/energy-rankings", label: "Energy Rankings", icon: <BarChart3 className="h-4 w-4" />, badge: "annual", desc: "Top producers & consumers" },
       { href: "/energy-explained", label: "Energy Explained", icon: <BookOpen className="h-4 w-4" />, desc: "Plain-English guide" },
@@ -98,12 +99,19 @@ const SECTIONS: Section[] = [
 
 /* ─── Badge components ───────────────────────────────────────────────────── */
 
-function Badge({ type }: { type: "live" | "weekly" | "monthly" | "annual" }) {
+function Badge({ type }: { type: "live" | "daily" | "weekly" | "monthly" | "annual" }) {
   if (type === "live")
     return (
       <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-red-400 flex-shrink-0">
         <span className="live-dot w-1.5 h-1.5 rounded-full bg-red-500" />
         Live
+      </span>
+    );
+  if (type === "daily")
+    return (
+      <span className="inline-flex items-center gap-1 ml-auto text-[10px] font-bold tracking-wide uppercase text-amber-300 flex-shrink-0">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+        Updated Daily
       </span>
     );
   if (type === "weekly")

@@ -26,15 +26,22 @@ export function BatteryCalculator({ prices }: { prices: PriceSnapshot | undefine
   return (
     <section
       aria-labelledby="battery-heading"
-      className="rounded-2xl border-2 border-[#D2E369] bg-gray-950/90 backdrop-blur-md shadow-xl overflow-hidden"
+      className="rounded-2xl border-2 border-[#D2E369] shadow-xl"
+      style={{
+        background:
+          'linear-gradient(to bottom, #D2E369 0%, #D2E369 20px, transparent 20px)',
+      }}
     >
-      <div className="px-5 py-3 md:px-6 md:py-4" style={{ backgroundColor: '#D2E369' }}>
+      <div
+        className="px-5 py-3 md:px-6 md:py-4 rounded-t-[14px]"
+        style={{ backgroundColor: '#D2E369' }}
+      >
         <h2 id="battery-heading" className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#2C5263] flex items-center gap-2">
           <Battery className="h-5 w-5" />
           Batteries: with or without solar
         </h2>
       </div>
-      <div className="p-5 md:p-6 space-y-5">
+      <div className="bg-gray-950/90 backdrop-blur-md p-5 md:p-6 rounded-b-[14px] space-y-5">
         <p className="text-sm text-gray-300 leading-relaxed">
           Batteries are interesting in the UK even <em>without</em> solar. With a time-of-use tariff
           like Octopus Flux you can charge cheaply overnight and either run your home from the
