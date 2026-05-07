@@ -72,7 +72,7 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
           label="Can I install today?"
           tone={isLegal ? 'green' : 'orange'}
           icon={<Plug className="h-7 w-7" />}
-          big={isLegal ? 'Yes' : 'Soon'}
+          big={isLegal ? 'Yes' : formatInstallDate(data?.fullyAvailableDate?.date)}
           sub="Buy → plug in → notify your DNO (G98)"
         />
         <VerdictCard
@@ -134,6 +134,16 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
       </div>
     </div>
   );
+}
+
+function formatInstallDate(dateStr: string | undefined): string {
+  if (!dateStr) return 'Soon';
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return 'Soon';
+  const day = d.getDate();
+  const phase = day <= 10 ? 'Early' : day <= 20 ? 'Mid' : 'Late';
+  const month = d.toLocaleDateString('en-GB', { month: 'long' });
+  return `~${phase} ${month}`;
 }
 
 function formatToday(generatedAt: string | undefined): string {
