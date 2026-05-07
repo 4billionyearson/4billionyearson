@@ -74,7 +74,7 @@ export const FULLY_AVAILABLE_FALLBACK: FullyAvailableEstimate = {
   date: '2026-07-15',
   label: LEGAL_IN_SHOPS_TIMELINE_TITLE,
   rationale:
-    'Expected when the BSI plug-in solar product standard publishes: mainstream UK retailers can stock certified kits on the shelf in the usual sense — the same mid-July window as the “BSI standard expected” milestone above (one moment, two aspects: technical standard + shop-ready products). Full regulatory alignment for all new install work continues until the BS 7671 Amendment 4 transition ends on 2 October 2026.',
+    '“Legal & in the shops” means certified plug-in kits sold through normal UK retail channels (high-street / major retail product listings), not only manufacturer-direct pre-orders. Expected when the BSI plug-in solar product standard publishes — same mid-July window as the “BSI standard expected” row on the full timeline (one moment, two aspects: technical standard + shop-ready stock). Full regulatory alignment for all new install work continues until the BS 7671 Amendment 4 transition ends on 2 October 2026.',
   confidence: 'medium',
 };
 
@@ -156,7 +156,7 @@ export const BASE_TIMELINE: TimelineEntry[] = [
 export const HERO_TIMELINE: { date: string; label: string; kind: 'past' | 'future' }[] = [
   { date: '2026-03-16', label: 'Legalisation announced', kind: 'past' },
   { date: '2026-04-15', label: 'BS 7671 Amend. 4 live', kind: 'past' },
-  { date: '2026-07-15', label: 'BSI · shops', kind: 'future' },
+  { date: '2026-07-15', label: LEGAL_IN_SHOPS_TIMELINE_TITLE, kind: 'future' },
   { date: '2026-10-02', label: 'Amend. 4 transition ends', kind: 'future' },
   { date: '2027-04-01', label: 'Simplified SEG', kind: 'future' },
 ];

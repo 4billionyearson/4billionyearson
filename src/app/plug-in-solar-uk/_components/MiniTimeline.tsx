@@ -1,6 +1,7 @@
 import { CheckCircle2, Clock, Star, CalendarCheck } from 'lucide-react';
 import type { FullyAvailableEstimate } from '@/lib/plug-in-solar/types';
-import { HERO_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
+import { milestoneForUi } from '@/lib/plug-in-solar/milestoneDisplay';
+import { HERO_TIMELINE, FULLY_AVAILABLE_FALLBACK, LEGAL_IN_SHOPS_TIMELINE_TITLE } from '../_data/static';
 
 /**
  * Compact horizontal timeline used in the "Today's 10-second update"
@@ -37,11 +38,14 @@ function mergeHeroTimelineWithFa(
       byDate.set(e.date, { ...e });
       continue;
     }
-    const labels = [cur.label, e.label].filter(Boolean);
-    const uniq = [...new Set(labels)];
     const kind: MiniEntry['kind'] =
       cur.kind === 'available' || e.kind === 'available' ? 'available' : cur.kind;
-    byDate.set(e.date, { date: e.date, label: uniq.join(' · '), kind });
+    // Single mid-July star: same words as the vertical timeline retail row + callout pill — never "BSI · shops · Legal" mashups.
+    const label =
+      kind === 'available'
+        ? LEGAL_IN_SHOPS_TIMELINE_TITLE
+        : [...new Set([cur.label, e.label].filter(Boolean))].join(' · ');
+    byDate.set(e.date, { date: e.date, label, kind });
   }
   return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
@@ -54,13 +58,14 @@ export function MiniTimeline({
   // Defensive: if Gemini handed us a non-ISO date (e.g. "around July 2026")
   // the math below collapses to NaN and the layout breaks. Fall back to
   // the static estimate in that case.
-  const fa = isValidIso(fullyAvailable?.date)
+  const faRaw = isValidIso(fullyAvailable?.date)
     ? (fullyAvailable as FullyAvailableEstimate)
     : FULLY_AVAILABLE_FALLBACK;
+  const faUi = milestoneForUi(faRaw);
   const todayISO = new Date().toISOString().slice(0, 10);
   const today = new Date(todayISO).getTime();
 
-  const merged = mergeHeroTimelineWithFa(HERO_TIMELINE, fa);
+  const merged = mergeHeroTimelineWithFa(HERO_TIMELINE, faUi);
 
   const dates = merged.map((t) => new Date(t.date).getTime());
   const min = Math.min(...dates, today);
@@ -76,7 +81,7 @@ export function MiniTimeline({
   return (
     <div className="rounded-xl border border-[#D2E369]/30 bg-gray-950/80 p-3 md:p-4">
       {/* Headline callout pill - the answer to "when can I just buy one?" */}
-      <FullyAvailableCallout fa={fa} todayISO={todayISO} />
+      <FullyAvailableCallout fa={faUi} todayISO={todayISO} />
 
       <div className="flex items-center justify-between gap-2 mb-2">
         <h3 className="text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">

@@ -8,6 +8,7 @@ import {
   FULLY_AVAILABLE_FALLBACK,
   LEGAL_IN_SHOPS_TIMELINE_TITLE,
 } from '@/app/plug-in-solar-uk/_data/static';
+import { sanitiseRetailerProductUrl } from '@/lib/plug-in-solar/retailerUrls';
 import { buildPlugInSolarPrompt, PLUG_IN_SOLAR_RESPONSE_SCHEMA } from '@/lib/plug-in-solar/prompt';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 
@@ -403,9 +404,14 @@ async function filterProductBrokenLinks(
         ? [{ retailer: product.retailer, url: product.url, priceGBP: product.priceGBP }]
         : [];
 
+      const sanitisedRetailers = rawRetailers.map((r) => ({
+        ...r,
+        url: sanitiseRetailerProductUrl(String(r?.url ?? '').trim()),
+      }));
+
       // De-duplicate by URL.
       const seen = new Set<string>();
-      const unique = rawRetailers.filter((r) => {
+      const unique = sanitisedRetailers.filter((r) => {
         const u = (r?.url ?? '').toLowerCase().trim();
         if (!u || seen.has(u)) return false;
         seen.add(u);
@@ -441,9 +447,12 @@ async function filterProductBrokenLinks(
       // Refresh top-level url / retailer / priceGBP from the first
       // working retailer, so SSR fallbacks always show a real link.
       const primary = goodRetailers[0];
-      product.retailers = goodRetailers;
+      product.retailers = goodRetailers.map((r: any) => ({
+        ...r,
+        url: sanitiseRetailerProductUrl(String(r?.url ?? '').trim()),
+      }));
       product.retailer = primary.retailer;
-      product.url = primary.url;
+      product.url = sanitiseRetailerProductUrl(String(primary.url ?? '').trim());
       if (typeof primary.priceGBP === 'number' && Number.isFinite(primary.priceGBP)) {
         product.priceGBP = primary.priceGBP;
       }

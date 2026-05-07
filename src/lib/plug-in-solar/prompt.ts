@@ -131,8 +131,9 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('');
   lines.push('  RETAILERS RULE - CRITICAL:');
   lines.push('  - List EVERY UK retailer carrying the kit (manufacturer direct + Amazon UK + B&Q + Currys + Argos + Lidl + IKEA + etc) where you can verify the listing exists.');
-  lines.push('  - MANDATORY for Amazon: if a kit or an obviously equivalent SKU is sold on Amazon UK (amazon.co.uk), you MUST include a separate retailers[] entry: prefer the exact product URL from search; if only search results exist, use that Amazon search URL. Do not omit Amazon for EcoFlow, Anker, Zendure and similar brands when a listing exists.');
-  lines.push('  - Each retailers[].url must be copied verbatim from Google Search. For EcoFlow, do NOT invent uk.ecoflow.com paths (404 risk).');
+  lines.push('  - Amazon UK (amazon.co.uk): include a retailers[] entry ONLY with a real product page URL — path must contain /dp/ or /gp/product/ (the page for one ASIN). Do NOT use Amazon search URLs (/s?k=…) or category pages. If you cannot find a product page you opened in this session, omit Amazon for that kit.');
+  lines.push('  - EcoFlow (uk.ecoflow.com): do NOT use https://uk.ecoflow.com/products/ecoflow-balcony-solar-system — that path 404s. Copy the live product URL from search results, or use https://uk.ecoflow.com (store home) if that is the only URL you verified.');
+  lines.push('  - Each retailers[].url must be copied verbatim from a Google Search result you opened. Do not invent manufacturer URL slugs.');
   lines.push('  - The API trusts Amazon UK / Amazon.com and major manufacturer hosts without a live HEAD request (bots get false 403s); all other domains are checked and broken links drop. If you cannot verify a URL for a retailer, omit that retailer.');
   lines.push('  - If you can only verify ONE working URL total, return a single retailers[] entry. One verified link beats several guessed ones.');
   lines.push('  - Mirror top-level `retailer` and `url` from the first (cheapest) retailers[] entry.');

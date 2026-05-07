@@ -3,9 +3,9 @@ import type { ProductRow, RetailerLink } from '@/lib/plug-in-solar/types';
 import {
   applyAmazonAffiliateTag,
   amazonAssociateTagForCountry,
-  amazonProductSearchUrl,
   isAmazonAssociatesEligibleUrl,
 } from '@/lib/amazon';
+import { sanitiseRetailerProductUrl } from '@/lib/plug-in-solar/retailerUrls';
 import { AffiliateDisclosure } from './AffiliateDisclosure';
 
 function dedupeRetailersByUrl(entries: RetailerLink[]): RetailerLink[] {
@@ -25,10 +25,8 @@ function dedupeRetailersByUrl(entries: RetailerLink[]): RetailerLink[] {
  * to a single-entry list built from the legacy { retailer, url } pair
  * when Gemini hasn't populated the new retailers[] array yet.
  * Amazon `amazon.*` links get the same Associates tag as our book pages.
- *
- * If the model omitted Amazon but we have at least one real buy link, we append
- * an Amazon **search** URL (tagged) so readers can find the SKU without us
- * guessing product-detail slugs.
+ * We do not invent Amazon search URLs — the daily refresh must supply
+ * real product pages (`/dp/...` etc.) when listings exist.
  */
 function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
   const raw: RetailerLink[] =
@@ -42,18 +40,12 @@ function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
     return [];
   }
 
-  const hasAmazon = raw.some((r) => isAmazonAssociatesEligibleUrl(r.url));
-  const augmented = hasAmazon
-    ? raw
-    : [
-        ...raw,
-        {
-          retailer: 'Amazon (search)',
-          url: amazonProductSearchUrl(`${p.brand} ${p.model}`, countryCode),
-        },
-      ];
+  const cleaned = raw.map((r) => ({
+    ...r,
+    url: sanitiseRetailerProductUrl(r.url.trim()),
+  }));
 
-  const unique = dedupeRetailersByUrl(augmented);
+  const unique = dedupeRetailersByUrl(cleaned.filter((r) => r.url.length > 0));
   const hasProgram = amazonAssociateTagForCountry(countryCode) !== null;
   return unique.map((r) => {
     const isAmz = isAmazonAssociatesEligibleUrl(r.url);
@@ -283,10 +275,9 @@ function AutoUpdateNote({ count }: { count: number }) {
       <p>
         <span className="font-semibold text-[#D2E369]">List auto-expands.</span> Showing
         the {count} UK plug-in solar kits we know are on sale today. Each daily refresh asks Gemini
-        (with Google Search grounding) to add new launches and drop discontinued models, so the
-        table grows as the UK market does. When Amazon UK is not in the feed for a row, we add an{' '}
-        <span className="text-[#FFF5E7] font-medium">Amazon (search)</span> link (tagged like our
-        book links) so you can find matching listings without us inventing product URLs.
+        (with Google Search grounding) to add new launches and drop discontinued models. Known-bad
+        EcoFlow product paths are rewritten to the live UK storefront; Amazon entries should be real
+        product pages (`/dp/…`) when the model finds them.
       </p>
     </div>
   );

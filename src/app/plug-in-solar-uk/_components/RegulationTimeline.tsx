@@ -1,5 +1,6 @@
 import { CheckCircle2, Circle, FileText, Package, Scale, Sparkles, Star, CalendarCheck } from 'lucide-react';
 import type { FullyAvailableEstimate, TimelineEntry } from '@/lib/plug-in-solar/types';
+import { milestoneForUi, normaliseMilestoneLabel } from '@/lib/plug-in-solar/milestoneDisplay';
 import { BASE_TIMELINE, FULLY_AVAILABLE_FALLBACK, LEGAL_IN_SHOPS_TIMELINE_TITLE } from '../_data/static';
 
 /**
@@ -18,28 +19,29 @@ export function RegulationTimeline({
   const todayISO = new Date().toISOString().slice(0, 10);
   // Guard against Gemini handing us a non-ISO date (the downstream date
   // formatter would render "Invalid Date" / "NaN months").
-  const fa =
+  const faRaw =
     fullyAvailable && /^\d{4}-\d{2}-\d{2}$/.test(fullyAvailable.date)
       ? fullyAvailable
       : FULLY_AVAILABLE_FALLBACK;
+  const faUi = milestoneForUi(faRaw);
 
   const merged = mergeAndSort([...BASE_TIMELINE, ...(updates ?? [])]);
   // The AI "fully available" date often differs from the static BSI row (e.g.
   // end of July vs mid-July). Without this, no timeline row matches `fa.date`
   // and the in-list star + pill disappear even though the headline shows the date.
-  const withFullyAvailable = ensureFullyAvailableMilestone(merged, fa, todayISO);
+  const withFullyAvailable = ensureFullyAvailableMilestone(merged, faRaw, todayISO);
   const withToday = injectToday(withFullyAvailable, todayISO);
 
   return (
     <div className="space-y-4">
-      <FullyAvailableHeadline fa={fa} todayISO={todayISO} />
+      <FullyAvailableHeadline fa={faUi} todayISO={todayISO} />
 
       <ol
         aria-label="UK plug-in solar regulation timeline"
         className="relative space-y-4 pl-6 border-l border-[#D2E369]/30"
       >
         {withToday.map((entry, i) => {
-          const retailMilestoneAccent = isRetailMilestoneAccent(entry, fa);
+          const retailMilestoneAccent = isRetailMilestoneAccent(entry, faRaw);
           return (
             <li key={`${entry.date}-${entry.title}-${i}`} className="relative">
               <span
@@ -70,7 +72,7 @@ export function RegulationTimeline({
                 <div className="mt-2 mb-1 rounded-xl border-2 border-[#D2E369] bg-gradient-to-r from-[#D2E369]/20 via-[#D2E369]/10 to-transparent px-3 py-2 shadow-[0_0_12px_rgba(210,227,105,0.12)]">
                   <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
                     <Star className="h-3.5 w-3.5 fill-[#D2E369] text-[#D2E369]" />
-                    {fa.label}
+                    {faUi.label}
                   </span>
                 </div>
               )}
@@ -87,8 +89,7 @@ export function RegulationTimeline({
 function isRetailMilestoneAccent(entry: TimelineEntry, fa: { date: string; label: string }): boolean {
   if (entry.date === '__today__' || entry.date !== fa.date) return false;
   if (entry.title === LEGAL_IN_SHOPS_TIMELINE_TITLE) return true;
-  if (entry.title === fa.label) return true;
-  return false;
+  return entry.title === normaliseMilestoneLabel(fa.label);
 }
 function ensureFullyAvailableMilestone(
   entries: TimelineEntry[],
