@@ -3,15 +3,32 @@ import type { ProductRow, RetailerLink } from '@/lib/plug-in-solar/types';
 import {
   applyAmazonAffiliateTag,
   amazonAssociateTagForCountry,
+  amazonProductSearchUrl,
   isAmazonAssociatesEligibleUrl,
 } from '@/lib/amazon';
 import { AffiliateDisclosure } from './AffiliateDisclosure';
+
+function dedupeRetailersByUrl(entries: RetailerLink[]): RetailerLink[] {
+  const seen = new Set<string>();
+  const out: RetailerLink[] = [];
+  for (const r of entries) {
+    const key = r.url.trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(r);
+  }
+  return out;
+}
 
 /**
  * Build a normalised list of retailer links for a product. Falls back
  * to a single-entry list built from the legacy { retailer, url } pair
  * when Gemini hasn't populated the new retailers[] array yet.
  * Amazon `amazon.*` links get the same Associates tag as our book pages.
+ *
+ * If the model omitted Amazon but we have at least one real buy link, we append
+ * an Amazon **search** URL (tagged) so readers can find the SKU without us
+ * guessing product-detail slugs.
  */
 function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
   const raw: RetailerLink[] =
@@ -20,13 +37,29 @@ function getRetailers(p: ProductRow, countryCode: string): RetailerLink[] {
       : p.url && p.retailer
         ? [{ retailer: p.retailer, url: p.url, priceGBP: p.priceGBP }]
         : [];
+
+  if (raw.length === 0) {
+    return [];
+  }
+
+  const hasAmazon = raw.some((r) => isAmazonAssociatesEligibleUrl(r.url));
+  const augmented = hasAmazon
+    ? raw
+    : [
+        ...raw,
+        {
+          retailer: 'Amazon (search)',
+          url: amazonProductSearchUrl(`${p.brand} ${p.model}`, countryCode),
+        },
+      ];
+
+  const unique = dedupeRetailersByUrl(augmented);
   const hasProgram = amazonAssociateTagForCountry(countryCode) !== null;
-  return raw.map((r) => {
+  return unique.map((r) => {
     const isAmz = isAmazonAssociatesEligibleUrl(r.url);
     return {
       ...r,
       url: applyAmazonAffiliateTag(r.url, countryCode),
-      // Only Amazon links use our Associates account (same as Energy Books / etc.).
       affiliate: hasProgram && isAmz,
     };
   });
@@ -251,7 +284,9 @@ function AutoUpdateNote({ count }: { count: number }) {
         <span className="font-semibold text-[#D2E369]">List auto-expands.</span> Showing
         the {count} UK plug-in solar kits we know are on sale today. Each daily refresh asks Gemini
         (with Google Search grounding) to add new launches and drop discontinued models, so the
-        table grows as the UK market does.
+        table grows as the UK market does. When Amazon UK is not in the feed for a row, we add an{' '}
+        <span className="text-[#FFF5E7] font-medium">Amazon (search)</span> link (tagged like our
+        book links) so you can find matching listings without us inventing product URLs.
       </p>
     </div>
   );

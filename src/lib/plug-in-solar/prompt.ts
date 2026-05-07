@@ -131,13 +131,12 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('');
   lines.push('  RETAILERS RULE - CRITICAL:');
   lines.push('  - List EVERY UK retailer carrying the kit (manufacturer direct + Amazon UK + B&Q + Currys + Argos + Lidl + IKEA + etc) where you can verify the listing exists.');
-  lines.push('  - Each retailers[].url MUST be a deep link to the actual product page on that retailer, copied verbatim from a Google Search result. Do NOT guess slugs (e.g. "/products/ecoflow-balcony-solar-system" is the kind of slug that often turns out to be wrong - we have already seen 404s on this page from invented uk.ecoflow.com URLs).');
-  lines.push('  - The API route HEAD-checks third-party URLs before caching. Amazon UK / Amazon.com and major manufacturer domains (e.g. uk.ecoflow.com, anker.com, zendure.com) are trusted without a fetch because bots often get false 403s — you must still only use URLs you verified in search.');
-  lines.push('  - If you cannot verify a working URL for a particular retailer, OMIT that retailer entry rather than guess.');
-  lines.push('  - The API route HEAD-checks every retailers[].url before caching and silently drops broken ones. If you cannot verify a working URL for a particular retailer, OMIT that retailer entry rather than guess.');
-  lines.push('  - If you can only verify ONE working URL for a product, return retailers with a single entry. One verified link is much better than three guessed ones.');
-  lines.push('  - The top-level `retailer` and `url` fields are kept for backwards compatibility - mirror them from the first (cheapest) entry of retailers[].');
-  lines.push('  - Mark `affiliate: true` for any link that is clearly an affiliate URL (Amazon "tag=" parameter, etc). Otherwise leave it false / omit.');
+  lines.push('  - MANDATORY for Amazon: if a kit or an obviously equivalent SKU is sold on Amazon UK (amazon.co.uk), you MUST include a separate retailers[] entry: prefer the exact product URL from search; if only search results exist, use that Amazon search URL. Do not omit Amazon for EcoFlow, Anker, Zendure and similar brands when a listing exists.');
+  lines.push('  - Each retailers[].url must be copied verbatim from Google Search. For EcoFlow, do NOT invent uk.ecoflow.com paths (404 risk).');
+  lines.push('  - The API trusts Amazon UK / Amazon.com and major manufacturer hosts without a live HEAD request (bots get false 403s); all other domains are checked and broken links drop. If you cannot verify a URL for a retailer, omit that retailer.');
+  lines.push('  - If you can only verify ONE working URL total, return a single retailers[] entry. One verified link beats several guessed ones.');
+  lines.push('  - Mirror top-level `retailer` and `url` from the first (cheapest) retailers[] entry.');
+  lines.push('  - Set `affiliate: true` only if the URL already contains an Amazon Associates tag; otherwise omit or false (the site adds its own tag on amazon.co.uk).');
   lines.push('');
   lines.push('  STRICT INCLUSION CRITERIA (apply BEFORE listing a product):');
   lines.push('  - Must be a "plug-in solar" or "plug-in battery" product: micro-inverter clipped to <=800 W AC, fed via a single domestic 13 A socket (BS 1363 plug), self-installable without an electrician.');
@@ -145,7 +144,7 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('  - DO NOT include Jackery portable power stations (Explorer / Plus series, etc.) - they are not plug-in solar; they are off-grid portable batteries.');
   lines.push('  - For batteries-only (no panels) products, only include them if the battery itself plugs into a domestic socket and exports up to 800 W AC into the home wiring (e.g. Zendure Hyper, Marstek B-series, EcoFlow STREAM AC Pro). Set hasBattery: true and wattsAC accordingly.');
   lines.push('  REQUIRED INCLUSIONS (always list each of these if a UK SKU exists):');
-  lines.push('  - EcoFlow STREAM Plug & Play Solar System (the "Balcony Solar System") - the UK government delivery partner. Multiple SKUs exist with different DC panel wattages (800 W / 900 W / 1040 W kits) all clipped to 800 W AC. Source from uk.ecoflow.com. List the cheapest current SKU as a baseline plus one expanded panel SKU.');
+  lines.push('  - EcoFlow STREAM Plug & Play Solar System (the "Balcony Solar System") - the UK government delivery partner. Multiple SKUs exist with different DC panel wattages (800 W / 900 W / 1040 W kits) all clipped to 800 W AC. Always include uk.ecoflow.com when verified AND a separate Amazon UK entry when the listing exists on amazon.co.uk.');
   lines.push('  - EcoFlow STREAM AC Pro (battery-only AC home battery) and the EcoFlow STREAM Ultra X (3.84 kWh) where applicable - flag both with `notes` explaining whether they are sold as plug-in (sub-800 W AC into a wall socket) or as a hard-wired home battery. Mark ukCompliant: "pending" until BSI product standard publishes; mark ukCompliant: "no" if the unit exceeds 800 W AC and cannot be socket-installed in the UK.');
   lines.push('  - Lidl in-store kit (~£500) and any Iceland or B&Q listing once available.');
   lines.push('  - Anker SOLIX Solarbank, Growatt NOAH, Zendure SolarFlow, BougeRV, Marstek if/once on UK sale - mark `ukCompliant: pending` while the BSI product standard remains in draft.');

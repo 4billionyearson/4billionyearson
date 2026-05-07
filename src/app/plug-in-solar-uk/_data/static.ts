@@ -148,6 +148,25 @@ export const HERO_TIMELINE: { date: string; label: string; kind: 'past' | 'futur
   { date: '2027-04-01', label: 'Simplified SEG', kind: 'future' },
 ];
 
+/** Short, stable notes where devolved nations differ for plug-in solar. */
+export const UK_DEVOLVED_REGULATORY_NOTES: { title: string; body: string }[] = [
+  {
+    title: 'England & Wales',
+    body:
+      'BS 7671 (IET Wiring Regulations) is the usual technical rulebook for domestic electrical work across England and Wales. Plug-in solar still requires you to notify your distribution network operator under the GB connect-and-notify rules in Energy Networks Association documents (commonly referred to as G98 for sub-16 A single-phase equipment). Wales follows the same product-safety and market framework as England for CE/UKCA equipment of this kind.',
+  },
+  {
+    title: 'Scotland',
+    body:
+      'BS 7671 is widely applied in Scotland for domestic installations. Scottish building standards govern structural or notifiable building work on your home; a freestanding or balcony plug-in frame is not the same as a fixed rooftop array, but you should still complete DNO notification and tell your insurer. Scottish properties use the same GB distribution networks (for example SP Energy Networks in southern Scotland) and the same style of connection forms as in England.',
+  },
+  {
+    title: 'Northern Ireland',
+    body:
+      'Northern Ireland has its own electricity market oversight and NIE Networks as the distribution operator. Notification, export and small-scale connection paperwork can differ in detail from the G98-style process in Great Britain — check NIE Networks and the Utility Regulator for Northern Ireland for the current domestic microgenerator route before you plug in. Product safety (correct plug, inverter limits, instructions) still matters everywhere.',
+  },
+];
+
 /* ─── Installation steps (HowTo) ───────────────────────────────────────────── */
 
 export interface InstallStep {
@@ -235,6 +254,11 @@ export const PLUG_IN_SOLAR_FAQ: FAQItem[] = [
     q: 'Do I need planning permission?',
     aText:
       'For panels mounted on a balcony rail, on a fence, in a garden, or on a wall in a non-conservation area, no - they are treated as portable equipment and fall under permitted development. For listed buildings, conservation areas, or panels mounted on the roof, check with your local authority.',
+  },
+  {
+    q: 'Is plug-in solar different in Scotland, Wales or Northern Ireland?',
+    aText:
+      'Equipment rules and BS 7671 apply much the same across Great Britain, but Northern Ireland uses NIE Networks and has its own regulatory setup — use its published microgenerator / connection guidance instead of assuming a GB G98 form is always correct. Scotland shares GB distribution operators with England (for example SP Energy Networks). See the England, Scotland, Wales & Northern Ireland section on this page.',
   },
   {
     q: 'What is the 800 W limit and why?',

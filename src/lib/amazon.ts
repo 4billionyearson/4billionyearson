@@ -46,6 +46,18 @@ export async function getCountryCode(): Promise<string> {
 }
 
 /**
+ * Amazon **search** URL (not category-restricted) with Associates tag for UK/US/IE.
+ * Used when we want a safe affiliate link without synthesising a product-detail path.
+ */
+export function amazonProductSearchUrl(query: string, countryCode: string): string {
+  const domain = AMAZON_DOMAINS[countryCode] ?? "www.amazon.co.uk";
+  const k = encodeURIComponent(query.trim());
+  const program = COUNTRY_AFFILIATE[countryCode];
+  const tag = program ? `&tag=${encodeURIComponent(AFFILIATE_TAGS[program])}` : "";
+  return `https://${domain}/s?k=${k}${tag}`;
+}
+
+/**
  * Build an Amazon search URL for the visitor's local store.
  * Affiliate tag is appended for UK/IE and US visitors.
  */

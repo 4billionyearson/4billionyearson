@@ -12,6 +12,7 @@ import {
   BookOpen,
   Info,
   ExternalLink,
+  Globe2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { QuickTLDR } from '@/app/_components/seo/QuickTLDR';
@@ -37,6 +38,7 @@ import {
   INSTALL_STEPS,
   PLUG_IN_SOLAR_FAQ,
   GLOSSARY,
+  UK_DEVOLVED_REGULATORY_NOTES,
 } from './_data/static';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 
@@ -215,6 +217,25 @@ export default function PlugInSolarGuide({
                 ) : (
                   <RegeneratingNote />
                 )}
+              </Section>
+
+              <Section icon={<Globe2 className="h-5 w-5" />} title="England, Scotland, Wales & Northern Ireland">
+                <p className="text-sm text-gray-400 mb-3 leading-relaxed">
+                  Most of this guide applies UK-wide for product safety and BS 7671, but who you
+                  notify and the exact paperwork can differ. Use your own country&apos;s network
+                  operator (NIE Networks in Northern Ireland; GB DNOs elsewhere).
+                </p>
+                <ul className="space-y-3">
+                  {UK_DEVOLVED_REGULATORY_NOTES.map((n) => (
+                    <li
+                      key={n.title}
+                      className="rounded-xl border border-[#D2E369]/20 bg-gray-900/40 p-4"
+                    >
+                      <h4 className="text-sm font-semibold text-[#D2E369]">{n.title}</h4>
+                      <p className="mt-1 text-sm text-gray-300 leading-relaxed">{n.body}</p>
+                    </li>
+                  ))}
+                </ul>
               </Section>
             </div>
           </div>
