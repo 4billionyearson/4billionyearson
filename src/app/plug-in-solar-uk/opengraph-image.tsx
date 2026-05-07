@@ -1,11 +1,40 @@
 import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { getCached } from '@/lib/climate/redis';
+import type { PlugInSolarLiveData, StatusPill, StatusValue } from '@/lib/plug-in-solar/types';
 
 export const runtime = 'nodejs';
+// Regenerate the OG image at most once an hour. The daily Gemini refresh
+// also calls revalidatePath('/plug-in-solar-uk'), which invalidates this
+// image immediately so each social-media unfurl after a refresh shows the
+// fresh status pills.
+export const revalidate = 3600;
 export const alt = 'UK Plug-in Solar Guide 2026 — Legal Status, Kits, Payback & Batteries';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
+
+const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
+const CACHE_VERSION = 'v2';
+const LOOKBACK_DAYS = 7;
+
+function dateOffsetKey(daysAgo: number): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - daysAgo);
+  return `${CACHE_KEY_PREFIX}:${d.toISOString().slice(0, 10)}-${CACHE_VERSION}`;
+}
+
+async function readMostRecent(): Promise<PlugInSolarLiveData | null> {
+  for (let i = 0; i <= LOOKBACK_DAYS; i++) {
+    try {
+      const cached = await getCached<PlugInSolarLiveData>(dateOffsetKey(i));
+      if (cached) return cached;
+    } catch {
+      /* keep walking back */
+    }
+  }
+  return null;
+}
 
 async function loadDataUrl(relativePath: string, mime: string): Promise<string | null> {
   try {
@@ -21,18 +50,93 @@ const ACCENT = '#D2E369';
 const ACCENT_DIM = 'rgba(210,227,105,0.65)';
 const BORDER = 'rgba(210,227,105,0.35)';
 
-const PILLS = [
-  { label: 'Legal in UK', value: 'Yes', tone: '#34d399' },
-  { label: 'On UK shelves', value: 'Yes', tone: '#34d399' },
-  { label: 'SEG payments', value: 'Not yet', tone: '#fbbf24' },
-  { label: 'DNO notify', value: 'Required', tone: '#60a5fa' },
+const TONE = {
+  positive: '#34d399',
+  warning: '#fb923c',
+  amber: '#fbbf24',
+  negative: '#ef4444',
+  info: '#60a5fa',
+} as const;
+
+interface OgPill {
+  label: string;
+  value: string;
+  tone: string;
+}
+
+/**
+ * Map the pill at `index` (using the canonical 4-pill order from the
+ * prompt) and its status keyword to a short OG-friendly value + tone.
+ * Falls back to the supplied default if Gemini returned an unexpected
+ * shape.
+ */
+function pillFor(index: number, status: StatusValue | undefined, fallback: OgPill): OgPill {
+  switch (index) {
+    case 0:
+      // "Legal in the UK?" — legal | partial | not-legal
+      if (status === 'legal') return { label: 'Legal in UK', value: 'Yes', tone: TONE.positive };
+      if (status === 'partial') return { label: 'Legal in UK', value: 'Partial', tone: TONE.warning };
+      if (status === 'not-legal') return { label: 'Legal in UK', value: 'No', tone: TONE.negative };
+      return fallback;
+    case 1:
+      // "Products on shelves?" — yes | soon | no
+      if (status === 'yes') return { label: 'On UK shelves', value: 'Yes', tone: TONE.positive };
+      if (status === 'soon') return { label: 'On UK shelves', value: 'Soon', tone: TONE.amber };
+      if (status === 'no') return { label: 'On UK shelves', value: 'No', tone: TONE.negative };
+      return fallback;
+    case 2:
+      // "SEG export payments?" — yes | partial | no
+      if (status === 'yes') return { label: 'SEG payments', value: 'Yes', tone: TONE.positive };
+      if (status === 'partial') return { label: 'SEG payments', value: 'Partial', tone: TONE.warning };
+      if (status === 'no') return { label: 'SEG payments', value: 'Not yet', tone: TONE.amber };
+      return fallback;
+    case 3:
+      // "DNO notification needed?" — yes | no
+      if (status === 'yes') return { label: 'DNO notify', value: 'Required', tone: TONE.info };
+      if (status === 'no') return { label: 'DNO notify', value: 'Not needed', tone: TONE.positive };
+      return fallback;
+    default:
+      return fallback;
+  }
+}
+
+const FALLBACK_PILLS: OgPill[] = [
+  { label: 'Legal in UK', value: 'Partial', tone: TONE.warning },
+  { label: 'On UK shelves', value: 'Yes', tone: TONE.positive },
+  { label: 'SEG payments', value: 'Not yet', tone: TONE.amber },
+  { label: 'DNO notify', value: 'Required', tone: TONE.info },
 ];
 
+const FALLBACK_TAGLINE =
+  'An impartial guide to plug-in solar in the UK in 2026 — legalised under BS 7671 Amendment 4, with kits from £400.';
+
+function buildPillsFromCache(data: PlugInSolarLiveData | null): OgPill[] {
+  const pills = data?.statusDashboard ?? [];
+  return FALLBACK_PILLS.map((fb, i) => {
+    const live: StatusPill | undefined = pills[i];
+    return pillFor(i, live?.status, fb);
+  });
+}
+
+function buildTaglineFromCache(data: PlugInSolarLiveData | null): string {
+  // Prefer the AI's TL;DR as the headline tagline (it's already concise
+  // and current-as-of-today). Trim to a length that won't overflow.
+  const tldr = data?.tldr?.trim();
+  if (tldr && tldr.length >= 30) {
+    return tldr.length > 220 ? tldr.slice(0, 217).trimEnd() + '…' : tldr;
+  }
+  return FALLBACK_TAGLINE;
+}
+
 export default async function OgImage() {
-  const [bgUrl, logoUrl] = await Promise.all([
+  const [bgUrl, logoUrl, data] = await Promise.all([
     loadDataUrl('background.png', 'image/png'),
     loadDataUrl('header-logo.png', 'image/png'),
+    readMostRecent(),
   ]);
+
+  const pills = buildPillsFromCache(data);
+  const tagline = buildTaglineFromCache(data);
 
   return new ImageResponse(
     (
@@ -100,8 +204,8 @@ export default async function OgImage() {
           </div>
 
           <div style={{ display: 'flex', marginBottom: '24px' }}>
-            <span style={{ fontSize: 24, color: '#e2e8f0', lineHeight: 1.35, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
-              An impartial guide to plug-in solar in the UK in 2026 - legalised under BS 7671 Amendment 4, with kits from £400.
+            <span style={{ fontSize: 22, color: '#e2e8f0', lineHeight: 1.35, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+              {tagline}
             </span>
           </div>
 
@@ -115,7 +219,7 @@ export default async function OgImage() {
               padding: '18px 24px',
             }}
           >
-            {PILLS.map((p, i) => (
+            {pills.map((p, i) => (
               <div
                 key={p.label}
                 style={{

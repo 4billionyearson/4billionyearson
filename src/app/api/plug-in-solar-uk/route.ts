@@ -243,10 +243,14 @@ export async function GET(request: Request) {
   parsed.groundingSources = sources;
   parsed.generatedAt = new Date().toISOString();
 
-  // Cache for 24 hours and tell Next.js to invalidate the SSR HTML
+  // Cache for 24 hours and tell Next.js to invalidate the SSR HTML +
+  // the dynamically-generated OG / social-card images.
   await setDailyTerm(cacheKey, parsed);
   try {
     revalidatePath('/plug-in-solar-uk');
+    revalidatePath('/plug-in-solar-uk/opengraph-image');
+    revalidatePath('/plug-in-solar-uk/twitter-image');
+    revalidatePath('/plug-in-solar-uk/embed/status');
   } catch {
     /* best-effort */
   }
