@@ -5,6 +5,7 @@ import {
   normaliseMilestoneLabel,
   collapseBsiAndShopsIfSameMonth,
   isLegalInShopsEntry,
+  formatApproxDate,
 } from '@/lib/plug-in-solar/milestoneDisplay';
 import { BASE_TIMELINE, FULLY_AVAILABLE_FALLBACK } from '../_data/static';
 
@@ -74,14 +75,14 @@ export function RegulationTimeline({
                       : 'text-sky-300')
                   }
                 >
-                  {entry.date === '__today__' ? 'Today' : formatDate(entry.date)}
+                  {entry.date === '__today__' ? 'Today' : retailMilestoneAccent ? formatApproxDate(entry.date) : formatDate(entry.date)}
                 </span>
                 <h4 className="text-sm font-semibold text-[#FFF5E7]">{entry.title}</h4>
               </div>
               {retailMilestoneAccent && (
                 <div className="mt-2 mb-1 rounded-xl border-2 border-[#D2E369] bg-gradient-to-r from-[#D2E369]/20 via-[#D2E369]/10 to-transparent px-3 py-2 shadow-[0_0_12px_rgba(210,227,105,0.12)]">
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
-                    <Star className="h-3.5 w-3.5 fill-[#D2E369] text-[#D2E369]" />
+                  <span className="flex items-center gap-1.5 text-xs sm:text-[13px] font-mono font-bold uppercase tracking-wider text-[#D2E369]">
+                    <Star className="h-3.5 w-3.5 shrink-0 fill-[#D2E369] text-[#D2E369]" />
                     {faUi.label}
                   </span>
                 </div>
@@ -140,7 +141,7 @@ function FullyAvailableHeadline({
             {fa.label}
           </div>
           <div className="text-base font-extrabold text-[#FFF5E7] leading-tight">
-            {passed ? `Reached on ${formatDate(fa.date)}` : formatDate(fa.date)}
+            {passed ? `Reached on ${formatDate(fa.date)}` : formatApproxDate(fa.date)}
           </div>
           <p className="mt-0.5 text-xs text-gray-400 leading-snug">{fa.rationale}</p>
         </div>

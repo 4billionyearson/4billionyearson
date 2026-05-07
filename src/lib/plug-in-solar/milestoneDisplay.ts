@@ -14,7 +14,28 @@ export function normaliseMilestoneLabel(label: string | undefined): string {
 export function milestoneForUi(fa: FullyAvailableEstimate): FullyAvailableEstimate {
   return { ...fa, label: normaliseMilestoneLabel(fa.label) };
 }
-
+/**
+ * Format a future milestone date as an approximate natural-language
+ * description, e.g. "Approx. mid July 2026". Used wherever showing a
+ * specific day (e.g. "31 Jul 2026") would imply false precision for an
+ * AI-estimated date.
+ *
+ *  day  1-10  → "Approx. early [Month] [Year]"
+ *  day 11-20  → "Approx. mid [Month] [Year]"
+ *  day 21+    → "Approx. late [Month] [Year]"
+ */
+export function formatApproxDate(iso: string): string {
+  try {
+    const d = new Date(iso + 'T00:00:00Z');
+    const day = d.getUTCDate();
+    const pos = day <= 10 ? 'early' : day <= 20 ? 'mid' : 'late';
+    const month = d.toLocaleDateString('en-GB', { month: 'long', timeZone: 'UTC' });
+    const year = d.getUTCFullYear();
+    return `Approx. ${pos} ${month} ${year}`;
+  } catch {
+    return iso;
+  }
+}
 /** True if a timeline entry is the BSI plug-in solar product standard row. */
 export function isBsiStandardEntry(e: { title: string; category?: string }): boolean {
   if (e.category === 'standard') return /\bbsi\b/i.test(e.title);
