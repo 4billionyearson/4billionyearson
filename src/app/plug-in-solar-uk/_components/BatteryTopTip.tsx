@@ -48,14 +48,16 @@ export function BatteryTopTip() {
           £100-£200 camping power station can soak up the excess your
           panels generate in the middle of the day (when no-one&apos;s home
           to use it), top up overnight on a cheap-rate tariff if needed,
-          then run your fridge, router and lights during the 5-7pm peak -
-          capturing most of the same saving as a full home battery.
+          then run your TV, computer, games console (e.g. teenager&apos;s
+          bedroom) during the 5-7pm peak - capturing most of the same
+          saving as a full home battery.
         </p>
         <p>
-          With no Smart Export Guarantee on plug-in systems, every kWh you
-          self-consume is worth roughly 4x what you&apos;d get exporting it -
-          so storage that shifts your own usage is the highest-value upgrade
-          you can layer on top.
+          Plug-in solar systems can&apos;t sell power back to the grid, so
+          any midday excess your panels produce while the house is empty is
+          simply wasted. A small battery turns that wasted generation into
+          ~30p-per-kWh of avoided peak-rate import - which is why storage
+          is the single highest-value upgrade you can layer on top.
         </p>
 
         <blockquote className="border-l-2 border-[#D2E369]/60 pl-4 my-4 text-gray-300 italic">
