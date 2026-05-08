@@ -47,8 +47,7 @@ export function BatteryTopTip() {
           on a dedicated home battery to get a good amount of benefit. A
           £100-£200 camping power station can soak up the excess your
           panels generate in the middle of the day (when no-one&apos;s home
-          to use it), top up overnight on a cheap-rate tariff if needed,
-          then run your TV, computer, games console (e.g. teenager&apos;s
+          to use it), then run your TV, computer, games console (e.g. teenager&apos;s
           bedroom) during the 5-7pm peak - capturing some of the saving that a full grid/plug-in battery would.
         </p>
         <p>
