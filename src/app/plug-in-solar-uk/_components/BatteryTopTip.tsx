@@ -49,8 +49,7 @@ export function BatteryTopTip() {
           panels generate in the middle of the day (when no-one&apos;s home
           to use it), top up overnight on a cheap-rate tariff if needed,
           then run your TV, computer, games console (e.g. teenager&apos;s
-          bedroom) during the 5-7pm peak - capturing most of the same
-          saving as a full grid/plug-in battery.
+          bedroom) during the 5-7pm peak - capturing some of the saving that a full grid/plug-in battery would.
         </p>
         <p>
           Plug-in solar systems can&apos;t yet sell power back to the grid, so
