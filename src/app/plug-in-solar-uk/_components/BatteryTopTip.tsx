@@ -50,10 +50,10 @@ export function BatteryTopTip() {
           to use it), top up overnight on a cheap-rate tariff if needed,
           then run your TV, computer, games console (e.g. teenager&apos;s
           bedroom) during the 5-7pm peak - capturing most of the same
-          saving as a full home battery.
+          saving as a full grid/plug-in battery.
         </p>
         <p>
-          Plug-in solar systems can&apos;t sell power back to the grid, so
+          Plug-in solar systems can&apos;t yet sell power back to the grid, so
           any midday excess your panels produce while the house is empty is
           simply wasted. A small battery turns that wasted generation into
           ~30p-per-kWh of avoided peak-rate import - which is why storage
