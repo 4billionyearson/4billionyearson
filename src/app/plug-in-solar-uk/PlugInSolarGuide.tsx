@@ -20,6 +20,7 @@ import { StaticFAQPanel } from '@/app/_components/seo/StaticFAQPanel';
 import { StatusDashboard } from './_components/StatusDashboard';
 import { RegulationTimeline } from './_components/RegulationTimeline';
 import { ProductsTable } from './_components/ProductsTable';
+import { BatteryTopTip } from './_components/BatteryTopTip';
 import { PaybackCalculator } from './_components/PaybackCalculator';
 import { BatteryCalculator } from './_components/BatteryCalculator';
 import { DnoFinder } from './_components/DnoFinder';
@@ -272,6 +273,9 @@ export default function PlugInSolarGuide({
               <ProductsTable products={data?.products} countryCode={countryCode} generatedAt={data?.generatedAt} />
             </Section>
           </div>
+
+          {/* ─── Top tip: cheap battery time-shift (full-width, all viewports) ─── */}
+          <BatteryTopTip />
 
           {/* ─── Plug-in vs rooftop decision panel ─── */}
           <Section icon={<TrendingUp className="h-5 w-5" />} title="Plug-in vs rooftop">
