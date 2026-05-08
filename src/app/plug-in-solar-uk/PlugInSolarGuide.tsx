@@ -228,6 +228,11 @@ export default function PlugInSolarGuide({
                 </Section>
               </div>
 
+              {/* Mobile-only: Top tip directly below the products section */}
+              <div className="lg:hidden">
+                <BatteryTopTip />
+              </div>
+
               {/* Regulations deep dive */}
               <Section icon={<BookOpen className="h-5 w-5" />} title="Regulations deep dive">
                 {data?.regulations ? (
@@ -274,8 +279,10 @@ export default function PlugInSolarGuide({
             </Section>
           </div>
 
-          {/* ─── Top tip: cheap battery time-shift (full-width, all viewports) ─── */}
-          <BatteryTopTip />
+          {/* ─── Top tip: cheap battery time-shift (desktop only; mobile version is inside right column above Regs) ─── */}
+          <div className="hidden lg:block">
+            <BatteryTopTip />
+          </div>
 
           {/* ─── Plug-in vs rooftop decision panel ─── */}
           <Section icon={<TrendingUp className="h-5 w-5" />} title="Plug-in vs rooftop">

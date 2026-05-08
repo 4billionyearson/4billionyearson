@@ -19,7 +19,18 @@ export function HowItWorksDiagram() {
       aria-label="Plug-in solar flow diagram"
       className="my-0 rounded-2xl border border-[#D2E369]/30 bg-gradient-to-br from-sky-950/40 via-gray-950/60 to-emerald-950/30 p-2 md:p-4"
     >
-      <div className="overflow-x-auto -mx-2 px-2 md:mx-0 md:px-0">
+      <div
+        className={
+          'overflow-x-auto -mx-2 px-2 md:mx-0 md:px-0 pb-2 ' +
+          '[&::-webkit-scrollbar]:h-1.5 ' +
+          '[&::-webkit-scrollbar-track]:bg-[#D2E369]/5 ' +
+          '[&::-webkit-scrollbar-track]:rounded-full ' +
+          '[&::-webkit-scrollbar-thumb]:bg-[#D2E369]/40 ' +
+          '[&::-webkit-scrollbar-thumb]:rounded-full ' +
+          '[scrollbar-color:rgba(210,227,105,0.4)_rgba(210,227,105,0.05)] ' +
+          '[scrollbar-width:thin]'
+        }
+      >
         <svg
           viewBox="0 0 760 280"
           role="img"
