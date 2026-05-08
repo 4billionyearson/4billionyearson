@@ -32,10 +32,10 @@ function amazonSearchUrl(q: string): string {
 
 export function BatteryTopTip() {
   return (
-    <section className="rounded-2xl border border-[#D2E369]/30 bg-gradient-to-br from-[#D2E369]/5 to-gray-950 p-5 sm:p-6">
+    <section className="rounded-2xl border-2 border-[#D2E369] bg-gray-950 shadow-xl p-5 md:p-6">
       <div className="flex items-center gap-2 mb-3">
         <Battery className="h-5 w-5 text-[#D2E369]" />
-        <h2 className="text-lg font-semibold text-[#D2E369]">
+        <h2 className="text-lg md:text-xl font-bold font-mono tracking-tight text-[#D2E369]">
           Top tip - a cheaper way to start
         </h2>
       </div>
@@ -45,9 +45,11 @@ export function BatteryTopTip() {
           A plug-in solar kit pays back faster if you also time-shift your
           evening peak - but you don&apos;t necessarily need to spend £1,000+
           on a dedicated home battery to get a good amount of benefit. A
-          £100-£200 camping power station charged overnight on cheap-rate
-          electricity, then run during the 5-7pm peak, captures most of the
-          same saving.
+          £100-£200 camping power station can soak up the excess your
+          panels generate in the middle of the day (when no-one&apos;s home
+          to use it), top up overnight on a cheap-rate tariff if needed,
+          then run your fridge, router and lights during the 5-7pm peak -
+          capturing most of the same saving as a full home battery.
         </p>
         <p>
           With no Smart Export Guarantee on plug-in systems, every kWh you

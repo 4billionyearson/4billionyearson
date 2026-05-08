@@ -19,12 +19,13 @@ export function HowItWorksDiagram() {
       aria-label="Plug-in solar flow diagram"
       className="my-0 rounded-2xl border border-[#D2E369]/30 bg-gradient-to-br from-sky-950/40 via-gray-950/60 to-emerald-950/30 p-2 md:p-4"
     >
-      <svg
-        viewBox="0 0 760 280"
-        role="img"
-        aria-labelledby="howItWorksTitle howItWorksDesc"
-        className="w-full h-auto"
-      >
+      <div className="overflow-x-auto -mx-2 px-2 md:mx-0 md:px-0">
+        <svg
+          viewBox="0 0 760 280"
+          role="img"
+          aria-labelledby="howItWorksTitle howItWorksDesc"
+          className="h-auto w-[760px] md:w-full md:min-w-0"
+        >
         <title id="howItWorksTitle">How plug-in solar works</title>
         <desc id="howItWorksDesc">
           Sunlight hits a solar panel which feeds DC power into a combined micro-inverter and
@@ -220,6 +221,11 @@ export function HowItWorksDiagram() {
           </text>
         </g>
       </svg>
+      </div>
+
+      <p className="mt-2 text-center text-[10px] text-gray-500 font-mono md:hidden">
+        ← swipe to see full diagram →
+      </p>
 
       <figcaption className="mt-3 space-y-1.5">
         <p className="text-center text-[11px] text-gray-400 font-mono leading-snug">
