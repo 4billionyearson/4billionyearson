@@ -41,9 +41,51 @@ const nextConfig: NextConfig = {
         destination: '/energy-dashboard',
         permanent: true,
       },
+      // Old WordPress-style URLs found in Google Search Console
       {
         source: '/renewable-energy',
         destination: '/category/renewable-energy',
+        permanent: true,
+      },
+      {
+        source: '/artificial-intelligence',
+        destination: '/category/artificial-intelligence',
+        permanent: true,
+      },
+      {
+        source: '/artificial-intelligence-2',
+        destination: '/category/artificial-intelligence',
+        permanent: true,
+      },
+      {
+        source: '/climate-change',
+        destination: '/category/climate',
+        permanent: true,
+      },
+      {
+        source: '/biotechnology',
+        destination: '/category/biotechnology',
+        permanent: true,
+      },
+      {
+        source: '/privacy-policy',
+        destination: '/privacy',
+        permanent: true,
+      },
+      {
+        source: '/about-us',
+        destination: '/about',
+        permanent: true,
+      },
+      {
+        source: '/category/uncategorized',
+        destination: '/',
+        permanent: true,
+      },
+      // Old WordPress date-based post URLs e.g. /2025/01/30/renewable-energy/
+      {
+        source: '/:year(\\d{4})/:month(\\d{2})/:day(\\d{2})/:slug*',
+        destination: '/',
         permanent: true,
       },
     ];
