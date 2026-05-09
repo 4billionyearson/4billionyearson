@@ -100,9 +100,9 @@ export interface SeedProduct {
 export const SEED_PRODUCTS: SeedProduct[] = [
   // Anker SOLIX — balcony solar range.
   // Available in Germany, France, and other EU markets but not yet
-  // officially sold in the UK (anker.com/uk product pages 404 as of
-  // May 2026). Suppress Gemini's guessed UK row and replace with an
-  // honest stub pointing to the Anker SOLIX UK landing page.
+  // officially sold in the UK. Anker migrated SOLIX to its own domain
+  // (ankersolix.com/uk) in 2025; the old anker.com/uk/collections/solix-balcony-solar
+  // URL 404s. Link to the SOLIX UK homepage instead.
   {
     id: 'anker-solix',
     brand: 'Anker',
@@ -116,7 +116,7 @@ export const SEED_PRODUCTS: SeedProduct[] = [
         model: 'SOLIX Solarbank 2 E1600 Pro',
         wattsDC: 800,
         notes: 'Available in EU (€989) — not yet officially sold in the UK',
-        url: 'https://www.anker.com/uk/collections/solix-balcony-solar',
+        url: 'https://www.ankersolix.com/uk',
       },
     ],
   },
