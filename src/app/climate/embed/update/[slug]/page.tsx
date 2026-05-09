@@ -4,7 +4,7 @@ import UpdateEmbedClient from './UpdateEmbedClient';
 import { getRegionBySlug } from '@/lib/climate/regions';
 
 export const runtime = 'nodejs';
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 

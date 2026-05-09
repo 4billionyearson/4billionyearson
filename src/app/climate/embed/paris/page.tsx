@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import ParisTrackerCard, { type ParisTrackerData } from '../../global/ParisTrackerCard';
 
 export const runtime = 'nodejs';
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 async function loadParisData(): Promise<ParisTrackerData | null> {
   try {

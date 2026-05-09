@@ -10,7 +10,7 @@ import { LastUpdatedBadge } from '../../_components/LastUpdatedBadge';
  */
 
 export const runtime = 'nodejs';
-export const revalidate = 3600;
+export const revalidate = 86400; // invalidated via revalidatePath after daily Gemini refresh
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
 const CACHE_VERSION = 'v6';

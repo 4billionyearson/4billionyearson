@@ -7,7 +7,7 @@ import { PostHeader } from "@/app/_components/post-header";
 import { PostBody } from "@/app/_components/portable-text-body";
 import { SocialShare } from "@/app/_components/social-share";
 
-export const revalidate = 60;
+export const revalidate = 2592000; // 30 days; primary invalidation via /api/revalidate webhook
 
 export default async function Post(props: Params) {
   const params = await props.params;

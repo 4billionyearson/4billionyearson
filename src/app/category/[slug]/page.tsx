@@ -7,7 +7,7 @@ import { getCategoryBySlug, getPostsByCategory, getAllCategories } from '@/lib/a
 import Container from '@/app/_components/container'
 import DateFormatter from '@/app/_components/date-formatter'
 
-export const revalidate = 60;
+export const revalidate = 604800; // 7 days; primary invalidation via /api/revalidate webhook
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'artificial-intelligence': <Brain className="h-7 w-7 md:h-9 md:w-9" />,

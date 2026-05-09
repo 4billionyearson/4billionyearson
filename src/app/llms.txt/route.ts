@@ -1,7 +1,7 @@
 import { getAllPosts, getAllCategories } from '@/lib/api';
 import { NextResponse } from 'next/server';
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function GET() {
   const [posts, categories] = await Promise.all([getAllPosts(), getAllCategories()]);

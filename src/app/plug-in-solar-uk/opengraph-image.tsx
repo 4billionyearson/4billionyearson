@@ -5,11 +5,11 @@ import { getCached } from '@/lib/climate/redis';
 import type { PlugInSolarLiveData, StatusPill, StatusValue } from '@/lib/plug-in-solar/types';
 
 export const runtime = 'nodejs';
-// Regenerate the OG image at most once an hour. The daily Gemini refresh
-// also calls revalidatePath('/plug-in-solar-uk'), which invalidates this
-// image immediately so each social-media unfurl after a refresh shows the
-// fresh status pills.
-export const revalidate = 3600;
+// Regenerate the OG image at most once a day. The daily Gemini refresh
+// also calls revalidatePath('/plug-in-solar-uk/opengraph-image'), which
+// invalidates this immediately so each social-media unfurl after a refresh
+// shows the fresh status pills.
+export const revalidate = 86400;
 export const alt = 'UK Plug-in Solar Guide 2026 — Legal Status, Verified Prices & Kits';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';

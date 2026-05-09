@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://4billionyearson.org" },
 };
 
-export const revalidate = 60;
+export const revalidate = 86400; // daily fallback; primary invalidation via /api/revalidate webhook
 
 export default async function Index() {
   const [allPosts, categories] = await Promise.all([getAllPosts(), getAllCategories()]);
