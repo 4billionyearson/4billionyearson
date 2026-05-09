@@ -51,14 +51,14 @@ export function DailyRefreshNotice({
         />
         <div className="min-w-0 space-y-1">
           <p className={`text-sm font-semibold ${empty ? 'text-orange-50' : 'text-[#FFF5E7]'}`}>
-            {empty ? "Today's update is still being generated" : "Using the latest saved briefing while today's run finishes"}
+            {empty ? "Today's data is on its way" : 'Showing the most recent saved data'}
           </p>
           <p className={`text-sm leading-relaxed ${empty ? 'text-orange-100/90' : 'text-gray-300'}`}>
             {empty
-              ? 'Live status pills, prices and product links appear after the first successful refresh (often under a minute). You can wait or reload now.'
-              : 'Figures may shift slightly when fresh data lands. If something looks out of date, reload in a few seconds.'}
+              ? 'The page will be ready in under a minute. Reload to see the latest.'
+              : 'A fresh update is running in the background. Reload in a moment if anything looks out of date.'}
           </p>
-          <p className="text-xs font-mono text-gray-500">Tip: try again in {seconds}s or use Refresh</p>
+          <p className="text-xs font-mono text-gray-500">Ready in roughly {seconds}s</p>
         </div>
       </div>
       <button
