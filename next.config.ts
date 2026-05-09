@@ -41,6 +41,11 @@ const nextConfig: NextConfig = {
         destination: '/energy-dashboard',
         permanent: true,
       },
+      {
+        source: '/renewable-energy',
+        destination: '/category/renewable-energy',
+        permanent: true,
+      },
     ];
   },
 }
