@@ -19,6 +19,7 @@
  */
 
 import React from 'react';
+import { Flower2, Leaf, Droplet } from 'lucide-react';
 
 const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -64,6 +65,9 @@ export type TimelineRow =
       baselineAutumnDoy: number;
       recentSpringDoy: number;
       recentAutumnDoy: number;
+      /** When true, render the recent bar with a spring-green → summer-yellow
+       *  → autumn-russet gradient and add flower / leaf icons at its ends. */
+      seasonalPalette?: boolean;
     }
   | {
       kind: 'fixed-bar';
@@ -75,6 +79,7 @@ export type TimelineRow =
       recentColor: string;
       baselineFrac: { start: number; end: number };
       recentFrac: { start: number; end: number };
+      seasonalPalette?: boolean;
     }
   | {
       kind: 'point';
@@ -86,6 +91,9 @@ export type TimelineRow =
       color: string;
       baselineDoy: number;
       recentDoy: number;
+      /** Visual variant for the recent marker. 'wet' = droplet icon on top
+       *  of the dot, used for wet-season-onset rows. */
+      pointStyle?: 'wet' | 'bloom';
     };
 
 export default function CalendarTimeline({
@@ -127,6 +135,7 @@ export default function CalendarTimeline({
                 recentFracStart={doyToFrac(row.recentSpringDoy)}
                 recentFracEnd={doyToFrac(row.recentAutumnDoy)}
                 recentWraps={row.recentSpringDoy > row.recentAutumnDoy}
+                seasonalPalette={row.seasonalPalette}
               />
             );
           case 'fixed-bar':
@@ -144,6 +153,7 @@ export default function CalendarTimeline({
                 recentFracStart={row.recentFrac.start}
                 recentFracEnd={row.recentFrac.end}
                 recentWraps={row.recentFrac.start > row.recentFrac.end}
+                seasonalPalette={row.seasonalPalette}
               />
             );
           case 'point':
@@ -157,6 +167,7 @@ export default function CalendarTimeline({
                 color={row.color}
                 baselineFrac={doyToFrac(row.baselineDoy)}
                 recentFrac={doyToFrac(row.recentDoy)}
+                pointStyle={row.pointStyle}
               />
             );
         }
@@ -228,6 +239,7 @@ function BarRow({
   title, sub, delta, deltaColor, recentColor,
   baselineFracStart, baselineFracEnd, baselineWraps,
   recentFracStart, recentFracEnd, recentWraps,
+  seasonalPalette,
 }: {
   title: string;
   sub?: string;
@@ -240,6 +252,7 @@ function BarRow({
   recentFracStart: number;
   recentFracEnd: number;
   recentWraps: boolean;
+  seasonalPalette?: boolean;
 }) {
   return (
     <div className="cal-row">
@@ -261,14 +274,54 @@ function BarRow({
           variant: 'recent',
           color: recentColor,
           top: RECENT_TOP,
+          seasonalPalette,
         })}
       </div>
     </div>
   );
 }
 
+/* ── Seasonal palette helpers ─────────────────────────────────
+ * The recent bar can opt into a horizontal gradient that maps the bar's
+ * own length onto a spring-green → summer-yellow → autumn-russet ramp.
+ * For wrapping bars (e.g. SH summer Sep→Apr) we render two segments and
+ * give each its own slice of the gradient so the colour ramp continues
+ * across the year boundary. */
+const SEASON_STOPS: Array<[number, [number, number, number]]> = [
+  [0.00, [101, 163, 13]],   // #65A30D spring green
+  [0.50, [234, 179, 8]],    // #EAB308 summer yellow
+  [1.00, [180, 83, 9]],     // #B45309 autumn russet
+];
+function seasonColorAt(t: number): string {
+  const x = Math.max(0, Math.min(1, t));
+  for (let i = 1; i < SEASON_STOPS.length; i++) {
+    const [t0, c0] = SEASON_STOPS[i - 1];
+    const [t1, c1] = SEASON_STOPS[i];
+    if (x <= t1) {
+      const u = (x - t0) / (t1 - t0);
+      const r = Math.round(c0[0] + (c1[0] - c0[0]) * u);
+      const g = Math.round(c0[1] + (c1[1] - c0[1]) * u);
+      const b = Math.round(c0[2] + (c1[2] - c0[2]) * u);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+  }
+  const [, last] = SEASON_STOPS[SEASON_STOPS.length - 1];
+  return `rgb(${last[0]}, ${last[1]}, ${last[2]})`;
+}
+function seasonalGradient(t0: number, t1: number): string {
+  // produce a linear-gradient with stops sampled across [t0, t1]
+  const stops: string[] = [];
+  const n = 5;
+  for (let i = 0; i <= n; i++) {
+    const u = i / n;
+    const t = t0 + (t1 - t0) * u;
+    stops.push(`${seasonColorAt(t)} ${Math.round(u * 100)}%`);
+  }
+  return `linear-gradient(90deg, ${stops.join(', ')})`;
+}
+
 function renderBarSegments({
-  start, end, wraps, variant, color, top,
+  start, end, wraps, variant, color, top, seasonalPalette,
 }: {
   start: number;
   end: number;
@@ -276,6 +329,7 @@ function renderBarSegments({
   variant: 'baseline' | 'recent';
   color: string;
   top: number;
+  seasonalPalette?: boolean;
 }) {
   const baseStyle: React.CSSProperties = {
     position: 'absolute',
@@ -283,34 +337,137 @@ function renderBarSegments({
     height: BAR_H,
     borderRadius: 9999,
   };
-  const segStyle: React.CSSProperties =
-    variant === 'baseline'
-      ? {
-          ...baseStyle,
-          border: '1.5px dashed #94A3B8',
-          background: 'rgba(148,163,184,0.08)',
-        }
-      : {
-          ...baseStyle,
-          background: `linear-gradient(180deg, ${hexToRgba(color, 1)}, ${hexToRgba(color, 0.85)})`,
-          boxShadow: `inset 0 0 0 1px ${hexToRgba(color, 0.35)}, 0 0 14px ${hexToRgba(color, 0.35)}`,
-        };
 
-  if (!wraps) {
-    const left = `${Math.min(start, end) * 100}%`;
-    const width = `${Math.max(0.01, Math.abs(end - start)) * 100}%`;
-    return <div style={{ ...segStyle, left, width }} />;
+  // Total bar length as a fraction of the year (handles wrapping).
+  const totalLen = wraps ? (1 - start) + end : Math.max(1e-6, end - start);
+
+  function recentSegStyle(progressFrom: number, progressTo: number): React.CSSProperties {
+    if (seasonalPalette) {
+      return {
+        ...baseStyle,
+        backgroundImage: seasonalGradient(progressFrom, progressTo),
+        boxShadow: `inset 0 0 0 1px ${hexToRgba(color, 0.45)}, 0 0 14px ${hexToRgba(color, 0.30)}`,
+      };
+    }
+    return {
+      ...baseStyle,
+      background: `linear-gradient(180deg, ${hexToRgba(color, 1)}, ${hexToRgba(color, 0.85)})`,
+      boxShadow: `inset 0 0 0 1px ${hexToRgba(color, 0.35)}, 0 0 14px ${hexToRgba(color, 0.35)}`,
+    };
   }
+
+  if (variant === 'baseline') {
+    const segStyle: React.CSSProperties = {
+      ...baseStyle,
+      border: '1.5px dashed #94A3B8',
+      background: 'rgba(148,163,184,0.08)',
+    };
+    if (!wraps) {
+      const left = `${Math.min(start, end) * 100}%`;
+      const width = `${Math.max(0.01, Math.abs(end - start)) * 100}%`;
+      return <div style={{ ...segStyle, left, width }} />;
+    }
+    return (
+      <>
+        <div style={{ ...segStyle, left: 0, width: `${end * 100}%` }} />
+        <div style={{ ...segStyle, left: `${start * 100}%`, width: `${(1 - start) * 100}%` }} />
+      </>
+    );
+  }
+
+  // recent variant
+  if (!wraps) {
+    const segStart = Math.min(start, end);
+    const segEnd = Math.max(start, end);
+    const width = Math.max(0.01, segEnd - segStart);
+    return (
+      <>
+        <div style={{ ...recentSegStyle(0, 1), left: `${segStart * 100}%`, width: `${width * 100}%` }} />
+        {seasonalPalette && (
+          <SeasonalEndcaps
+            startPct={segStart * 100}
+            endPct={segEnd * 100}
+            top={top}
+          />
+        )}
+      </>
+    );
+  }
+  // wraps: two segments
+  const seg1Len = end;                 // 0 .. end
+  const seg2Len = 1 - start;           // start .. 1
+  // Segment 2 (start..1) holds the FIRST part of the season (spring side).
+  // Segment 1 (0..end)   holds the LAST part (autumn side).
+  const split = seg2Len / totalLen;    // where the year boundary falls in [0,1] season-progress
   return (
     <>
-      <div style={{ ...segStyle, left: 0, width: `${end * 100}%` }} />
-      <div style={{ ...segStyle, left: `${start * 100}%`, width: `${(1 - start) * 100}%` }} />
+      <div
+        style={{
+          ...recentSegStyle(split, 1),
+          left: 0,
+          width: `${seg1Len * 100}%`,
+        }}
+      />
+      <div
+        style={{
+          ...recentSegStyle(0, split),
+          left: `${start * 100}%`,
+          width: `${seg2Len * 100}%`,
+        }}
+      />
+      {seasonalPalette && (
+        <SeasonalEndcaps
+          startPct={start * 100}
+          endPct={end * 100}
+          top={top}
+        />
+      )}
+    </>
+  );
+}
+
+/** Tiny flower / leaf icons sat at the start and end of the recent warm bar. */
+function SeasonalEndcaps({
+  startPct, endPct, top,
+}: { startPct: number; endPct: number; top: number }) {
+  const iconSize = 12;
+  const cy = top + BAR_H / 2;
+  return (
+    <>
+      <span
+        className="absolute pointer-events-none"
+        style={{
+          left: `${startPct}%`,
+          top: cy,
+          transform: 'translate(-50%, -50%)',
+          color: '#F0FDF4',
+          filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.55))',
+          lineHeight: 0,
+        }}
+        aria-hidden
+      >
+        <Flower2 width={iconSize} height={iconSize} />
+      </span>
+      <span
+        className="absolute pointer-events-none"
+        style={{
+          left: `${endPct}%`,
+          top: cy,
+          transform: 'translate(-50%, -50%)',
+          color: '#FFF7ED',
+          filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.55))',
+          lineHeight: 0,
+        }}
+        aria-hidden
+      >
+        <Leaf width={iconSize} height={iconSize} />
+      </span>
     </>
   );
 }
 
 function PointRow({
-  title, sub, delta, deltaColor, color, baselineFrac, recentFrac,
+  title, sub, delta, deltaColor, color, baselineFrac, recentFrac, pointStyle,
 }: {
   title: string;
   sub?: string;
@@ -319,6 +476,7 @@ function PointRow({
   color: string;
   baselineFrac: number;
   recentFrac: number;
+  pointStyle?: 'wet' | 'bloom';
 }) {
   const reversed = recentFrac < baselineFrac;
   const baselineCenter = BAR_TOP + BAR_H / 2;
@@ -373,6 +531,38 @@ function PointRow({
             boxShadow: `inset 0 0 0 1px ${hexToRgba(color, 0.35)}, 0 0 12px ${hexToRgba(color, 0.45)}`,
           }}
         />
+        {pointStyle === 'wet' && (
+          <span
+            className="absolute pointer-events-none"
+            style={{
+              left: `${recentFrac * 100}%`,
+              top: RECENT_TOP + POINT_SIZE / 2,
+              transform: 'translate(-50%, -50%)',
+              color: '#F0F9FF',
+              filter: 'drop-shadow(0 0 1.5px rgba(0,0,0,0.6))',
+              lineHeight: 0,
+            }}
+            aria-hidden
+          >
+            <Droplet width={9} height={9} fill="currentColor" />
+          </span>
+        )}
+        {pointStyle === 'bloom' && (
+          <span
+            className="absolute pointer-events-none"
+            style={{
+              left: `${recentFrac * 100}%`,
+              top: RECENT_TOP + POINT_SIZE / 2,
+              transform: 'translate(-50%, -50%)',
+              color: '#FDF2F8',
+              filter: 'drop-shadow(0 0 1.5px rgba(0,0,0,0.6))',
+              lineHeight: 0,
+            }}
+            aria-hidden
+          >
+            <Flower2 width={9} height={9} />
+          </span>
+        )}
         {/* tiny direction chevron next to recent marker */}
         <div
           className="absolute font-mono"

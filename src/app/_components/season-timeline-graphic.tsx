@@ -29,6 +29,7 @@ export default function SeasonTimelineGraphic() {
       recentColor: '#10B981',
       baselineFrac: { start: toFrac(5, 4), end: toFrac(10, 7) },
       recentFrac: { start: toFrac(4, 26), end: toFrac(10, 15) },
+      seasonalPalette: true,
     },
     {
       kind: 'point',
@@ -40,6 +41,7 @@ export default function SeasonTimelineGraphic() {
       color: '#F472B6',
       baselineDoy: dayOfYear(4, 17),
       recentDoy: dayOfYear(4, 6),
+      pointStyle: 'bloom',
     },
     {
       kind: 'fixed-bar',
@@ -51,6 +53,7 @@ export default function SeasonTimelineGraphic() {
       recentColor: '#22D3EE',
       baselineFrac: { start: toFrac(4, 24), end: toFrac(10, 28) },
       recentFrac: { start: toFrac(4, 14), end: toFrac(11, 4) },
+      seasonalPalette: true,
     },
   ];
 

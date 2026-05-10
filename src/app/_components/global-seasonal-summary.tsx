@@ -242,6 +242,7 @@ export default function GlobalSeasonalSummary({
       baselineAutumnDoy: c.baselineAutumnDoy,
       recentSpringDoy: c.recentSpringDoy,
       recentAutumnDoy: c.recentAutumnDoy,
+      seasonalPalette: true,
     };
   }
 
@@ -256,6 +257,7 @@ export default function GlobalSeasonalSummary({
       color: w.color,
       baselineDoy: w.baselineDoy,
       recentDoy: w.recentDoy,
+      pointStyle: 'wet',
     };
   }
 
@@ -279,6 +281,7 @@ export default function GlobalSeasonalSummary({
       recentColor: '#10B981',
       baselineFrac: { start: dayOfYear(5, 4) / 365, end: dayOfYear(10, 7) / 365 },
       recentFrac: { start: dayOfYear(4, 26) / 365, end: dayOfYear(10, 15) / 365 },
+      seasonalPalette: true,
     },
     {
       kind: 'fixed-bar',
@@ -290,6 +293,7 @@ export default function GlobalSeasonalSummary({
       recentColor: '#22D3EE',
       baselineFrac: { start: dayOfYear(4, 24) / 365, end: dayOfYear(10, 28) / 365 },
       recentFrac: { start: dayOfYear(4, 14) / 365, end: dayOfYear(11, 4) / 365 },
+      seasonalPalette: true,
     },
     {
       kind: 'point',
@@ -301,6 +305,7 @@ export default function GlobalSeasonalSummary({
       color: '#F472B6',
       baselineDoy: dayOfYear(4, 17),
       recentDoy: dayOfYear(4, 6),
+      pointStyle: 'bloom',
     },
   ];
 

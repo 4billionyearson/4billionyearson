@@ -434,7 +434,7 @@ export default function GlobalProfile({
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               <GlobalRankingsTeaser />
-              <div className="mt-3 mb-3 flex flex-wrap items-center gap-x-2 gap-y-2">
+              <div className="mt-1 mb-3 flex">
                 <NextSnapshotBadge latestDataLabel={latestDataLabel} />
               </div>
 

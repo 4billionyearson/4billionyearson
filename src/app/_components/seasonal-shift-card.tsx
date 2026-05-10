@@ -639,6 +639,7 @@ function WarmSeasonShiftBar({
       baselineAutumnDoy,
       recentSpringDoy,
       recentAutumnDoy,
+      seasonalPalette: true,
     },
   ];
 

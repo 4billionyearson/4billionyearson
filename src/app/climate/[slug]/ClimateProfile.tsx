@@ -820,7 +820,7 @@ export default function ClimateProfile({
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <div className="mt-3 mb-3 flex flex-wrap items-center gap-x-2 gap-y-2">
+                  <div className="mt-3 mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                     <ClimateRankPill slug={slug} pageSnapshotMonth={pageSnapshotMonth} />
                     <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
@@ -880,7 +880,7 @@ export default function ClimateProfile({
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <div className="mt-3 mb-3 flex flex-wrap items-center gap-x-2 gap-y-2">
+                  <div className="mt-3 mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                     <ClimateRankPill slug={slug} pageSnapshotMonth={pageSnapshotMonth} />
                     <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
@@ -915,7 +915,7 @@ export default function ClimateProfile({
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <div className="mt-3 mb-3 flex flex-wrap items-center gap-x-2 gap-y-2">
+                  <div className="mt-3 mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                     <ClimateRankPill slug={slug} pageSnapshotMonth={pageSnapshotMonth} />
                     <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
