@@ -778,17 +778,40 @@ export default async function ClimateGroupProfile({
   initialSummary = null,
   initialSources = [],
   summaryCacheMiss = false,
+  latestDataLabel: latestDataLabelProp,
 }: {
   region: ClimateRegion;
   initialSummary?: string | null;
   initialSources?: { title: string; uri: string }[];
   summaryCacheMiss?: boolean;
+  /** Raw snapshot month label threaded from page.tsx (may be null for group pages
+   *  that have no single snapshot file). The component also derives a label from
+   *  member rankings data as a fallback. */
+  latestDataLabel?: string;
 }) {
   const isContinent = region.groupKind === 'continent';
 
-  // Title parity with country / global pages: "<Region> Climate – <Month Year> Update"
-  // with dynamic font sizing so longer names (e.g. "US Northeast Climate – April 2026 Update") still fit.
-  const updateLabel = getClimateUpdateDateLabel();
+  // Load member rankings to determine actual data month (used by badge + title).
+  const members = await loadMembersForRegion(region);
+  const membersWithLabel = members.filter((r) => r.latestLabel);
+  // Use the most common latestLabel among members (mode) as the data month reference.
+  const labelCounts = new Map<string, number>();
+  for (const m of membersWithLabel) labelCounts.set(m.latestLabel!, (labelCounts.get(m.latestLabel!) ?? 0) + 1);
+  const memberDataLabel = labelCounts.size
+    ? [...labelCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]  // most common label
+    : null;
+  // Prefer prop (from page.tsx) over derived member label; both may be null.
+  const rawDataLabel = latestDataLabelProp ?? memberDataLabel ?? null;
+
+  // Title uses actual data month when available, else falls back to calendar arithmetic.
+  const LONG: Record<string, string> = {
+    Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',
+    Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December',
+  };
+  const expandedDataLabel = rawDataLabel
+    ? rawDataLabel.replace(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/, (m) => LONG[m] ?? m)
+    : null;
+  const updateLabel = expandedDataLabel ?? getClimateUpdateDateLabel();
   const combinedTitle = `${region.name} Climate – ${updateLabel} Update`;
   const h1SizeClass =
     combinedTitle.length > 38 ? 'text-xl md:text-2xl' :
@@ -837,9 +860,9 @@ export default async function ClimateGroupProfile({
                 </span>
               </p>
             ) : null}
-            <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="mb-3 space-y-2">
               <ClimateRankPill slug={region.slug} />
-              <NextSnapshotBadge />
+              <NextSnapshotBadge latestDataLabel={rawDataLabel ?? undefined} />
             </div>
             <GroupSummaryPanel
               slug={region.slug}

@@ -247,12 +247,16 @@ interface GlobalProfileProps {
    *  "summary is being generated, refresh in a moment" panel instead of
    *  duplicating the fetch. */
   summaryCacheMiss?: boolean;
+  /** Raw snapshot month label, e.g. "Mar 2026". Passed from the server page
+   *  so NextSnapshotBadge can hide itself once the snapshot has advanced. */
+  latestDataLabel?: string;
 }
 
 export default function GlobalProfile({
   initialSummary = null,
   initialSources = [],
   summaryCacheMiss = false,
+  latestDataLabel,
 }: GlobalProfileProps = {}) {
   const region = getRegionBySlug('global')!;
   const [data, setData] = useState<GlobalData | null>(null);
@@ -416,7 +420,7 @@ export default function GlobalProfile({
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               <GlobalRankingsTeaser />
               <div className="mb-3">
-                <NextSnapshotBadge />
+                <NextSnapshotBadge latestDataLabel={latestDataLabel} />
               </div>
 
               {summary ? (

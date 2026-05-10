@@ -2,21 +2,59 @@
 
 import { CalendarDays } from 'lucide-react';
 
+const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const LONG_MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
 /**
- * Shows a "Next update: ~12–14 [month]" pill during the first half of each
- * month, when the latest snapshot data is still from two months ago (the
- * 4BYO snapshot rebuild runs on the 12th–14th of each month).
- * Renders nothing on the 15th or later (snapshot has already run).
+ * Parse a short snapshot label like "Mar 2026" into { monthIdx, year }.
+ * monthIdx is 0-based (Jan=0, Dec=11).
  */
-export default function NextSnapshotBadge() {
+function parseShortLabel(label: string): { monthIdx: number; year: number } | null {
+  const m = label.match(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})$/);
+  if (!m) return null;
+  const monthIdx = SHORT_MONTHS.indexOf(m[1]);
+  if (monthIdx === -1) return null;
+  return { monthIdx, year: parseInt(m[2], 10) };
+}
+
+/**
+ * Shows an "[Month] update · ~12–14 [CurrentMonth]" pill only when the
+ * page's data has not yet been advanced to last month's snapshot.
+ *
+ * Pass `latestDataLabel` (the raw short label from the snapshot JSON, e.g.
+ * "Mar 2026") so the badge can hide itself once the snapshot has been
+ * updated (data label ≥ last month). Without a label, it falls back to a
+ * day-of-month heuristic (shows on days 1–14).
+ */
+export default function NextSnapshotBadge({ latestDataLabel }: { latestDataLabel?: string }) {
   const now = new Date();
-  const day = now.getDate();
-  if (day > 14) return null;
-  const monthName = now.toLocaleDateString('en-GB', { month: 'long' });
+  const currentMonthIdx = now.getMonth(); // 0-based
+  const currentYear     = now.getFullYear();
+  const lastMonthIdx    = currentMonthIdx === 0 ? 11 : currentMonthIdx - 1;
+  const lastMonthYear   = currentMonthIdx === 0 ? currentYear - 1 : currentYear;
+
+  if (latestDataLabel) {
+    const parsed = parseShortLabel(latestDataLabel);
+    if (parsed) {
+      // Data is already at or beyond last month → snapshot has run → hide.
+      const dataIsCurrent =
+        parsed.year > lastMonthYear ||
+        (parsed.year === lastMonthYear && parsed.monthIdx >= lastMonthIdx);
+      if (dataIsCurrent) return null;
+    }
+  } else {
+    // No label supplied: fall back to day heuristic — hide after the 14th.
+    if (now.getDate() > 14) return null;
+  }
+
+  // "April update · ~12–14 May"
+  const comingMonth = LONG_MONTHS[lastMonthIdx];   // data month expected
+  const updateMonth = LONG_MONTHS[currentMonthIdx]; // month the CI window runs in
+
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/40 bg-sky-400/10 px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider text-sky-300">
       <CalendarDays className="h-3 w-3 shrink-0" />
-      Next update: ~12–14 {monthName}
+      {comingMonth} update · ~12–14 {updateMonth}
     </span>
   );
 }

@@ -13,6 +13,7 @@ import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { RANKINGS_FAQ } from './rankings-faq';
 import { getCached } from '@/lib/climate/redis';
+import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
 
 // 24-hour ISR safety net; cache invalidation is event-driven via
 // revalidatePath() inside /api/climate/rankings-analysis.
@@ -349,9 +350,16 @@ export default async function RankingsPage() {
               </h1>
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-4 md:px-6 md:py-5 space-y-4">
-              <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                <strong className="text-white">144 regions</strong> ranked by this month’s temperature anomaly vs their 1961–1990 baseline - every country, US state and UK region we track.
-              </p>
+              <div>
+                <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+                  <strong className="text-white">144 regions</strong> ranked by this month's temperature anomaly vs their 1961–1990 baseline - every country, US state and UK region we track.
+                </p>
+                {latestLabel && (
+                  <div className="mt-2">
+                    <NextSnapshotBadge latestDataLabel={latestLabel} />
+                  </div>
+                )}
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Top 5 warmest */}

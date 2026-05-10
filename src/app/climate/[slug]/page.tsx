@@ -81,23 +81,25 @@ export async function generateStaticParams() {
   return CURATED_CLIMATE_REGIONS.map(region => ({ slug: region.slug }));
 }
 
-async function getRegionDataMonthLabel(region: ReturnType<typeof getRegionBySlug>): Promise<string> {
-  if (!region) return getClimateUpdateDateLabel();
+async function getRegionDataLabels(
+  region: ReturnType<typeof getRegionBySlug>,
+): Promise<{ raw: string | null; expanded: string }> {
+  if (!region) return { raw: null, expanded: getClimateUpdateDateLabel() };
   try {
     const base = resolve(process.cwd(), 'public', 'data', 'climate');
     let filePath: string | null = null;
     if (region.type === 'country') filePath = resolve(base, 'country', `${region.apiCode}.json`);
     else if (region.type === 'us-state') filePath = resolve(base, 'us-state', `${region.apiCode}.json`);
     else if (region.type === 'uk-region') filePath = resolve(base, 'uk-region', `${region.apiCode}.json`);
-    if (!filePath) return getClimateUpdateDateLabel();
+    if (!filePath) return { raw: null, expanded: getClimateUpdateDateLabel() };
     const d = JSON.parse(await readFile(filePath, 'utf8'));
     let label: string | undefined;
     if (region.type === 'country') label = d?.latestMonthStats?.label;
     else if (region.type === 'us-state') label = d?.paramData?.tavg?.latestMonthStats?.label;
     else if (region.type === 'uk-region') label = d?.varData?.Tmean?.latestMonthStats?.label;
-    if (label) return expandMonthLabel(label);
+    if (label) return { raw: label, expanded: expandMonthLabel(label) };
   } catch { /* fall through */ }
-  return getClimateUpdateDateLabel();
+  return { raw: null, expanded: getClimateUpdateDateLabel() };
 }
 
 export async function generateMetadata(
@@ -107,7 +109,7 @@ export async function generateMetadata(
   const region = getRegionBySlug(slug);
   if (!region) return {};
 
-  const updateLabel = await getRegionDataMonthLabel(region);
+  const updateLabel = await getRegionDataLabels(region).then((l) => l.expanded);
   const title = getClimateMetadataTitle(region, updateLabel);
   const description = getClimateMetadataDescription(region, updateLabel);
   const canonicalUrl = getClimatePageUrl(region);
@@ -196,6 +198,7 @@ export default async function ClimateProfilePage(
   // Group/aggregate slugs (continents, US climate regions) get their own
   // server-rendered template that reads continent / region snapshots directly.
   if (region.type === 'group') {
+    const { raw: rawLabel } = await getRegionDataLabels(region);
     return (
       <>
         <DatasetSchema region={region} />
@@ -204,11 +207,13 @@ export default async function ClimateProfilePage(
           initialSummary={cached?.summary ?? null}
           initialSources={cached?.sources ?? []}
           summaryCacheMiss={cacheMiss}
+          latestDataLabel={rawLabel ?? undefined}
         />
       </>
     );
   }
 
+  const { raw: rawLabel } = await getRegionDataLabels(region);
   return (
     <>
       <DatasetSchema region={region} />
@@ -218,6 +223,7 @@ export default async function ClimateProfilePage(
         initialSummary={cached?.summary ?? null}
         initialSources={cached?.sources ?? []}
         summaryCacheMiss={cacheMiss}
+        latestDataLabel={rawLabel ?? undefined}
       />
     </>
   );

@@ -70,21 +70,21 @@ async function warmGlobalSummary(): Promise<void> {
   }
 }
 
-async function getGlobalDataMonthLabel(): Promise<string> {
+async function getGlobalDataLabels(): Promise<{ raw: string | null; expanded: string }> {
   try {
     const p = resolve(process.cwd(), 'public', 'data', 'climate', 'global-history.json');
     const d = JSON.parse(await readFile(p, 'utf8'));
     const label: string | undefined = d?.noaaStats?.landOcean?.latestMonthStats?.label;
-    if (label) return expandMonthLabel(label);
+    if (label) return { raw: label, expanded: expandMonthLabel(label) };
   } catch { /* fall through */ }
-  return getClimateUpdateDateLabel();
+  return { raw: null, expanded: getClimateUpdateDateLabel() };
 }
 
 export async function generateMetadata(): Promise<Metadata> {
   const region = getRegionBySlug('global');
   if (!region) return {};
 
-  const updateLabel = await getGlobalDataMonthLabel();
+  const updateLabel = await getGlobalDataLabels().then((l) => l.expanded);
   const title = getClimateMetadataTitle(region, updateLabel);
   const description = getClimateMetadataDescription(region, updateLabel);
   const canonicalUrl = getClimatePageUrl(region);
@@ -178,6 +178,7 @@ export default async function ClimateGlobalPage() {
     await warmGlobalSummary();
   }
 
+  const { raw: rawLabel } = await getGlobalDataLabels();
   return (
     <>
       <DatasetSchema />
@@ -185,6 +186,7 @@ export default async function ClimateGlobalPage() {
         initialSummary={cached?.summary ?? null}
         initialSources={cached?.sources ?? []}
         summaryCacheMiss={cacheMiss}
+        latestDataLabel={rawLabel ?? undefined}
       />
     </>
   );
