@@ -12,17 +12,39 @@ import {
   type OverviewMetricBlock,
   type RankedPeriodStat,
   type YearlyLike,
+  type MonthlyPoint,
   formatSignedValue,
   formatValue,
   ordinal,
   getYearlyPointValue,
   buildOverviewRow,
   pruneStaleComparisonRows,
+  parseMonthLabel,
+  formatMonthLabel,
+  compareMonthLabels,
+  pickPageSnapshotMonth,
+  computeMonthStats,
+  computeThreeMonthStats,
+  pickStatsForMonth,
 } from './overview-grid-types';
 
 // Re-export so existing imports keep working.
-export type { OverviewPanel, OverviewRow, OverviewSection, OverviewMetricBlock, RankedPeriodStat, YearlyLike };
-export { formatSignedValue, formatValue, ordinal, getYearlyPointValue, buildOverviewRow, pruneStaleComparisonRows };
+export type { OverviewPanel, OverviewRow, OverviewSection, OverviewMetricBlock, RankedPeriodStat, YearlyLike, MonthlyPoint };
+export {
+  formatSignedValue,
+  formatValue,
+  ordinal,
+  getYearlyPointValue,
+  buildOverviewRow,
+  pruneStaleComparisonRows,
+  parseMonthLabel,
+  formatMonthLabel,
+  compareMonthLabels,
+  pickPageSnapshotMonth,
+  computeMonthStats,
+  computeThreeMonthStats,
+  pickStatsForMonth,
+};
 
 // ─── Render ─────────────────────────────────────────────────────────────────
 

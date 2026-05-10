@@ -129,6 +129,10 @@ interface SpaghettiChartProps {
   dataSource?: string;
   /** Hide the title (when the wrapping card already shows a title). */
   hideTitle?: boolean;
+  /** Months strictly later than this are treated as provisional (dashed) even
+   *  if the source didn't flag them. Used by climate profile pages so charts
+   *  align with the page-wide snapshot month. */
+  provisionalAfterMonth?: { year: number; month: number } | null;
 }
 
 export default function MonthlySpaghettiChart({
@@ -138,6 +142,7 @@ export default function MonthlySpaghettiChart({
   title,
   dataSource,
   hideTitle = false,
+  provisionalAfterMonth = null,
 }: SpaghettiChartProps) {
   const cfg = METRIC_CONFIG[metric];
   const { chartData, backgroundYears, recordYear, currentYear, currentIsLatestFallback, yMin, yMax, startYear, latestMonthIdx, provisionalFromMonthIdx } = useMemo(() => {
@@ -151,11 +156,18 @@ export default function MonthlySpaghettiChart({
     // Group by year, excluding the current calendar year's incomplete months.
     const byYear = new Map<number, Map<number, number>>();
     const provByYear = new Map<number, Set<number>>();
+    // Helper: is this point past the page's snapshot month? If so, treat it
+    // as provisional even when the source itself didn't flag it.
+    const isPastSnapshot = (year: number, month: number): boolean => {
+      if (!provisionalAfterMonth) return false;
+      if (year !== provisionalAfterMonth.year) return year > provisionalAfterMonth.year;
+      return month > provisionalAfterMonth.month;
+    };
     for (const p of monthlyAll) {
       if (p.year === calendarYear && p.month >= currentMonth) continue;
       if (!byYear.has(p.year)) byYear.set(p.year, new Map());
       byYear.get(p.year)!.set(p.month, p.value);
-      if (p.provisional) {
+      if (p.provisional || isPastSnapshot(p.year, p.month)) {
         if (!provByYear.has(p.year)) provByYear.set(p.year, new Set());
         provByYear.get(p.year)!.add(p.month);
       }
@@ -256,7 +268,7 @@ export default function MonthlySpaghettiChart({
       })(),
       provisionalFromMonthIdx: firstProvMonth > 0 ? firstProvMonth - 1 : -1,
     };
-  }, [monthlyAll, cfg]);
+  }, [monthlyAll, cfg, provisionalAfterMonth]);
 
   if (chartData.length === 0) return null;
 

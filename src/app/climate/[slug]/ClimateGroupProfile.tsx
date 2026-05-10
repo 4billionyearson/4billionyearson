@@ -15,7 +15,7 @@ import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
 import { OverviewGrid } from '@/app/climate/_shared/overview-grid';
-import { buildOverviewRow, pruneStaleComparisonRows, type OverviewPanel, type OverviewRow, type RankedPeriodStat } from '@/app/climate/_shared/overview-grid-types';
+import { buildOverviewRow, pruneStaleComparisonRows, pickPageSnapshotMonth, pickStatsForMonth, type OverviewPanel, type OverviewRow, type RankedPeriodStat } from '@/app/climate/_shared/overview-grid-types';
 import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { RegionDataSourcesCard } from './RegionDataSourcesCard';
@@ -454,12 +454,25 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
       {(() => {
         const continentStats = absolutes?.monthlyAll?.length ? buildClimatologyStats(absolutes.monthlyAll) : null;
         const globalLandOcean = history.noaaStats?.landOcean;
+        // Pin to the page-wide snapshot month: the slowest of (continent CRU,
+        // NOAA global). The page only advances to a new month once both have
+        // caught up; tables show that month for every row.
+        const pageSnapshotMonth = pickPageSnapshotMonth([
+          continentStats?.latestMonthStats?.label,
+          globalLandOcean?.latestMonthStats?.label,
+        ]);
+        const continentPinned = continentStats
+          ? pickStatsForMonth(absolutes?.monthlyAll, continentStats.latestMonthStats, continentStats.latestThreeMonthStats ?? undefined, pageSnapshotMonth)
+          : { m: undefined, q: undefined };
         const continentOverviewRow = continentStats
-          ? buildOverviewRow(region.name, continentStats.yearly, continentStats.latestMonthStats, continentStats.latestThreeMonthStats ?? undefined, '°C', 1, false, true)
+          ? buildOverviewRow(region.name, continentStats.yearly, continentPinned.m, continentPinned.q, '°C', 1, false, true)
           : null;
+        const globalPinned = globalLandOcean
+          ? pickStatsForMonth(undefined, globalLandOcean.latestMonthStats, globalLandOcean.latestThreeMonthStats, pageSnapshotMonth)
+          : { m: undefined, q: undefined };
         const globalOverviewRow = globalLandOcean
           ? (() => {
-              const r = buildOverviewRow('Global', globalLandOcean.yearly, globalLandOcean.latestMonthStats, globalLandOcean.latestThreeMonthStats, '°C', 1);
+              const r = buildOverviewRow('Global', globalLandOcean.yearly, globalPinned.m, globalPinned.q, '°C', 1);
               return r ? { ...r, sublabel: 'Land + Ocean' } : null;
             })()
           : null;
@@ -639,12 +652,27 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
   const usPcp = usNational?.paramData.pcp;
   const globalLandOcean = history?.noaaStats?.landOcean;
 
+  // Pin every row to the slowest source on this page (region / US national /
+  // NOAA global). The page only flips to a new month once every source has
+  // caught up; tables show that month for every row.
+  const pageSnapshotMonth = pickPageSnapshotMonth([
+    tavg?.latestMonthStats?.label,
+    usTavg?.latestMonthStats?.label,
+    globalLandOcean?.latestMonthStats?.label,
+  ]);
+  const pin = (
+    monthlyAll: any[] | undefined,
+    latest: RankedPeriodStat | undefined,
+    three: RankedPeriodStat | undefined,
+  ) => pickStatsForMonth(monthlyAll, latest, three, pageSnapshotMonth);
+
   // ── Build OverviewGrid panels (same shape as country / global pages) ──
   const tempRows = pruneStaleComparisonRows([
-    buildOverviewRow(region.name, tavg.yearly, tavg.latestMonthStats, tavg.latestThreeMonthStats, '°C', 1, false, true),
-    usTavg ? buildOverviewRow('United States', usTavg.yearly, usTavg.latestMonthStats, usTavg.latestThreeMonthStats, '°C', 1) : null,
+    (() => { const s = pin(tavg?.monthlyAll, tavg?.latestMonthStats, tavg?.latestThreeMonthStats); return buildOverviewRow(region.name, tavg.yearly, s.m, s.q, '°C', 1, false, true); })(),
+    usTavg ? (() => { const s = pin(usTavg.monthlyAll, usTavg.latestMonthStats, usTavg.latestThreeMonthStats); return buildOverviewRow('United States', usTavg.yearly, s.m, s.q, '°C', 1); })() : null,
     globalLandOcean ? (() => {
-      const r = buildOverviewRow('Global', globalLandOcean.yearly, globalLandOcean.latestMonthStats, globalLandOcean.latestThreeMonthStats, '°C', 1);
+      const s = pin(undefined, globalLandOcean.latestMonthStats, globalLandOcean.latestThreeMonthStats);
+      const r = buildOverviewRow('Global', globalLandOcean.yearly, s.m, s.q, '°C', 1);
       return r ? { ...r, sublabel: 'Land + Ocean' } : null;
     })() : null,
   ].filter((r): r is OverviewRow => Boolean(r)));
@@ -658,8 +686,8 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
   } : null;
 
   const rainRows = pruneStaleComparisonRows([
-    pcp ? buildOverviewRow(region.name, pcp.yearly, pcp.latestMonthStats, pcp.latestThreeMonthStats, ' mm', 0, false, true) : null,
-    usPcp ? buildOverviewRow('United States', usPcp.yearly, usPcp.latestMonthStats, usPcp.latestThreeMonthStats, ' mm', 0) : null,
+    pcp ? (() => { const s = pin(pcp.monthlyAll, pcp.latestMonthStats, pcp.latestThreeMonthStats); return buildOverviewRow(region.name, pcp.yearly, s.m, s.q, ' mm', 0, false, true); })() : null,
+    usPcp ? (() => { const s = pin(usPcp.monthlyAll, usPcp.latestMonthStats, usPcp.latestThreeMonthStats); return buildOverviewRow('United States', usPcp.yearly, s.m, s.q, ' mm', 0); })() : null,
   ].filter((r): r is OverviewRow => Boolean(r)));
   const rainPanel: OverviewPanel | null = rainRows.length ? {
     title: 'Rainfall & Rain Days – Totals',
@@ -802,8 +830,16 @@ export default async function ClimateGroupProfile({
   const memberDataLabel = labelCounts.size
     ? [...labelCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]  // most common label
     : null;
+
+  // Read NOAA global label so the page snapshot month is gated by the
+  // slowest source (member CRU/NOAA local + global). The page only flips
+  // to a new month once both have caught up.
+  const globalHistory = await readJson<GlobalHistory>('global-history.json');
+  const globalLabel = globalHistory?.noaaStats?.landOcean?.latestMonthStats?.label ?? null;
+
   // Prefer prop (from page.tsx) over derived member label; both may be null.
-  const rawDataLabel = latestDataLabelProp ?? memberDataLabel ?? null;
+  const localLabel = latestDataLabelProp ?? memberDataLabel ?? null;
+  const rawDataLabel = pickPageSnapshotMonth([localLabel, globalLabel]) ?? localLabel;
 
   // Title uses actual data month when available, else falls back to calendar arithmetic.
   const LONG: Record<string, string> = {

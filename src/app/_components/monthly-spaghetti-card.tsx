@@ -50,6 +50,13 @@ interface MonthlySpaghettiCardProps {
   hideShare?: boolean;
   /** When true, the card chrome (border, background) is suppressed - useful inside an existing card. */
   inline?: boolean;
+  /** When set, any month strictly later than this is treated as provisional
+   *  (rendered with the dashed-line + endpoint-label treatment) regardless
+   *  of whether the source itself flagged it. Used by climate profile pages
+   *  to keep charts aligned with the page's snapshot month — a country
+   *  whose source has already advanced to April will still render April as
+   *  provisional dashes while the page is still a "March update". */
+  provisionalAfterMonth?: { year: number; month: number } | null;
 }
 
 export default function MonthlySpaghettiCard({
@@ -62,6 +69,7 @@ export default function MonthlySpaghettiCard({
   share,
   hideShare = false,
   inline = false,
+  provisionalAfterMonth = null,
 }: MonthlySpaghettiCardProps) {
   const available = TAB_ORDER.filter((m) => (series[m]?.length ?? 0) > 0);
   const fallback: SpaghettiMetric = available[0] ?? 'temp';
@@ -135,6 +143,7 @@ export default function MonthlySpaghettiCard({
           regionName={regionName}
           metric={metric}
           dataSource={dataSource}
+          provisionalAfterMonth={provisionalAfterMonth}
           hideTitle
         />
       </div>

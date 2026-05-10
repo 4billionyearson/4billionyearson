@@ -16,6 +16,7 @@ import {
 import { getCached } from '@/lib/climate/redis';
 import ClimateProfile from './ClimateProfile';
 import ClimateGroupProfile from './ClimateGroupProfile';
+import { pickPageSnapshotMonth } from '@/app/climate/_shared/overview-grid-types';
 
 // Build curated pages eagerly; stub (auto-generated) pages render
 // on-demand and are then cached, so builds stay fast.
@@ -81,6 +82,16 @@ export async function generateStaticParams() {
   return CURATED_CLIMATE_REGIONS.map(region => ({ slug: region.slug }));
 }
 
+async function getGlobalSnapshotLabel(): Promise<string | null> {
+  try {
+    const base = resolve(process.cwd(), 'public', 'data', 'climate');
+    const d = JSON.parse(await readFile(resolve(base, 'global-history.json'), 'utf8'));
+    return d?.noaaStats?.landOcean?.latestMonthStats?.label ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function getRegionDataLabels(
   region: ReturnType<typeof getRegionBySlug>,
 ): Promise<{ raw: string | null; expanded: string }> {
@@ -97,7 +108,14 @@ async function getRegionDataLabels(
     if (region.type === 'country') label = d?.latestMonthStats?.label;
     else if (region.type === 'us-state') label = d?.paramData?.tavg?.latestMonthStats?.label;
     else if (region.type === 'uk-region') label = d?.varData?.Tmean?.latestMonthStats?.label;
-    if (label) return { raw: label, expanded: expandMonthLabel(label) };
+    if (label) {
+      // Gate against NOAA global so metadata title matches the on-page title:
+      // the page only flips to "April Update" once every cross-source row
+      // (including Global) has caught up to that month.
+      const globalLabel = await getGlobalSnapshotLabel();
+      const pinned = pickPageSnapshotMonth([label, globalLabel]) ?? label;
+      return { raw: pinned, expanded: expandMonthLabel(pinned) };
+    }
   } catch { /* fall through */ }
   return { raw: null, expanded: getClimateUpdateDateLabel() };
 }

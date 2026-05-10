@@ -38,7 +38,8 @@ export async function GET(
   // We peek at a tiny header in the primary snapshot file to get the month
   // label (e.g. "Apr 2026"). Falling back to the calendar-based key is safe
   // if the file is missing or malformed.
-  async function getPrimaryDataMonth(): Promise<string> {
+  async function getPrimaryDataMonth(): Promise<string | null> {
+    if (!region) return null;
     try {
       if (region.type === 'country') {
         const snap = await loadSnapshot(`country/${region.apiCode}.json`);

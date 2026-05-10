@@ -17,6 +17,7 @@ import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/d
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { RegionDataSourcesCard } from './RegionDataSourcesCard';
 import { buildRegionFAQ } from '@/lib/climate/region-faq';
+import { pickPageSnapshotMonth, pickStatsForMonth, parseMonthLabel } from '@/app/climate/_shared/overview-grid-types';
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
 
@@ -464,7 +465,12 @@ function OverviewGrid({ panels }: { panels: OverviewPanel[] }) {
   );
 }
 
-function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLabel: string): OverviewPanel[] {
+function buildOverviewPanels(
+  data: ProfileData,
+  regionLabel: string,
+  nationalLabel: string,
+  pageSnapshotMonth: string | null,
+): OverviewPanel[] {
   const panels: OverviewPanel[] = [];
 
   // For country pages with dedicated national data (UK Met Office / US NOAA), use it as primary
@@ -472,49 +478,55 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
   const useNationalAsPrimary = data.type === 'country' && !!(data.nationalData?.varData || data.nationalData?.paramData);
   const nd = data.nationalData;
 
+  // Pin every row to the page-wide snapshot month so columns can never mix
+  // months. When a source's own latestMonthStats matches pageSnapshotMonth
+  // we use it directly; otherwise stats are re-derived from monthlyAll so
+  // the table shows the agreed-upon month even if the source has run ahead.
+  type SourceShape = {
+    yearly?: any[];
+    yearlyData?: any[];
+    precipYearly?: any[];
+    monthlyAll?: any[];
+    latestMonthStats?: any;
+    latestThreeMonthStats?: any;
+  };
+  const buildPinnedRow = (
+    label: string,
+    src: SourceShape | undefined | null,
+    units: string,
+    digits: number,
+    lowerIsBetter = false,
+    isPrimary = false,
+  ): OverviewRow | null => {
+    if (!src) return null;
+    const yearly = src.yearly ?? src.yearlyData ?? src.precipYearly;
+    if (!yearly?.length) return null;
+    const { m, q } = pickStatsForMonth(src.monthlyAll, src.latestMonthStats, src.latestThreeMonthStats, pageSnapshotMonth);
+    return buildOverviewRow(label, yearly, m, q, units, digits, lowerIsBetter, isPrimary);
+  };
+
+  // ── Temperature ───────────────────────────────────────────────────────
+  const primaryTempSrc: SourceShape | undefined = useNationalAsPrimary
+    ? (nd!.varData?.Tmean ?? nd!.paramData?.tavg)
+    : (data.ukRegionData?.varData?.Tmean
+       ?? data.usStateData?.paramData?.tavg
+       ?? data.countryData);
+  const nationalTempSrc: SourceShape | undefined = useNationalAsPrimary
+    ? undefined
+    : (data.nationalData?.varData?.Tmean ?? data.nationalData?.paramData?.tavg);
+  const globalTempSrc: SourceShape | undefined = data.globalData
+    ? {
+        yearly: data.globalData?.noaaStats?.landOcean?.yearly ?? data.globalData?.landYearlyData,
+        latestMonthStats: data.globalData?.noaaStats?.landOcean?.latestMonthStats ?? data.globalData?.landLatestMonthStats,
+        latestThreeMonthStats: data.globalData?.noaaStats?.landOcean?.latestThreeMonthStats ?? data.globalData?.landLatestThreeMonthStats,
+      }
+    : undefined;
+
   const temperatureRows = [
-    buildOverviewRow(
-      regionLabel,
-      useNationalAsPrimary
-        ? (nd!.varData?.Tmean?.yearly || nd!.paramData?.tavg?.yearly)
-        : (data.ukRegionData?.varData?.Tmean?.yearly || data.usStateData?.paramData?.tavg?.yearly || data.countryData?.yearlyData),
-      useNationalAsPrimary
-        ? (nd!.varData?.Tmean?.latestMonthStats || nd!.paramData?.tavg?.latestMonthStats)
-        : (data.ukRegionData?.varData?.Tmean?.latestMonthStats || data.usStateData?.paramData?.tavg?.latestMonthStats || data.countryData?.latestMonthStats),
-      useNationalAsPrimary
-        ? (nd!.varData?.Tmean?.latestThreeMonthStats || nd!.paramData?.tavg?.latestThreeMonthStats)
-        : (data.ukRegionData?.varData?.Tmean?.latestThreeMonthStats || data.usStateData?.paramData?.tavg?.latestThreeMonthStats || data.countryData?.latestThreeMonthStats),
-      '°C',
-      1,
-      false,
-      true,
-    ),
-    ...(useNationalAsPrimary ? [] : [
-      buildOverviewRow(
-        nationalLabel || 'National',
-        data.nationalData?.varData?.Tmean?.yearly || data.nationalData?.paramData?.tavg?.yearly,
-        data.nationalData?.varData?.Tmean?.latestMonthStats || data.nationalData?.paramData?.tavg?.latestMonthStats,
-        data.nationalData?.varData?.Tmean?.latestThreeMonthStats || data.nationalData?.paramData?.tavg?.latestThreeMonthStats,
-        '°C',
-        1,
-      ),
-    ]),
-    // Only include the Global comparison row when global NOAA data is from the
-    // same month as the primary local series. Different months would appear
-    // side-by-side under a shared period header (e.g. "APR 2026"), falsely
-    // implying both values are for the same month. Charts can show all
-    // available data using the dotted-line provisional system instead.
+    buildPinnedRow(regionLabel, primaryTempSrc, '°C', 1, false, true),
+    nationalTempSrc ? buildPinnedRow(nationalLabel || 'National', nationalTempSrc, '°C', 1) : null,
     (() => {
-      const primaryLabel: string | undefined = useNationalAsPrimary
-        ? (nd!.varData?.Tmean?.latestMonthStats?.label ?? nd!.paramData?.tavg?.latestMonthStats?.label)
-        : (data.ukRegionData?.varData?.Tmean?.latestMonthStats?.label
-          ?? data.usStateData?.paramData?.tavg?.latestMonthStats?.label
-          ?? data.countryData?.latestMonthStats?.label);
-      const globalLabel: string | undefined =
-        data.globalData?.noaaStats?.landOcean?.latestMonthStats?.label
-        ?? data.globalData?.landLatestMonthStats?.label;
-      if (!primaryLabel || !globalLabel || primaryLabel !== globalLabel) return null;
-      const row = buildOverviewRow('Global', data.globalData?.noaaStats?.landOcean?.yearly ?? data.globalData?.landYearlyData, data.globalData?.noaaStats?.landOcean?.latestMonthStats ?? data.globalData?.landLatestMonthStats, data.globalData?.noaaStats?.landOcean?.latestThreeMonthStats ?? data.globalData?.landLatestThreeMonthStats, '°C', 1);
+      const row = buildPinnedRow('Global', globalTempSrc, '°C', 1);
       return row ? { ...row, sublabel: 'Land + Ocean' } : null;
     })(),
   ].filter((row): row is OverviewRow => Boolean(row));
@@ -531,17 +543,18 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     });
   }
 
+  // ── Sunshine (UK only — Met Office variables) ─────────────────────────
   const sunshineRows = [
-    buildOverviewRow(
+    buildPinnedRow(
       regionLabel,
-      useNationalAsPrimary ? nd!.varData?.Sunshine?.yearly : data.ukRegionData?.varData?.Sunshine?.yearly,
-      useNationalAsPrimary ? nd!.varData?.Sunshine?.latestMonthStats : data.ukRegionData?.varData?.Sunshine?.latestMonthStats,
-      useNationalAsPrimary ? nd!.varData?.Sunshine?.latestThreeMonthStats : data.ukRegionData?.varData?.Sunshine?.latestThreeMonthStats,
+      useNationalAsPrimary ? nd!.varData?.Sunshine : data.ukRegionData?.varData?.Sunshine,
       ' hrs', 0, false, true,
     ),
-    ...(useNationalAsPrimary ? [] : [
-      buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, data.nationalData?.varData?.Sunshine?.latestMonthStats, data.nationalData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0),
-    ]),
+    useNationalAsPrimary ? null : buildPinnedRow(
+      nationalLabel || 'United Kingdom',
+      data.nationalData?.varData?.Sunshine,
+      ' hrs', 0,
+    ),
   ].filter((row): row is OverviewRow => Boolean(row));
   const sunshineRowsPruned = pruneStaleComparisonRows(sunshineRows);
 
@@ -556,47 +569,33 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     });
   }
 
+  // ── Rainfall + Rain Days ─────────────────────────────────────────────
+  const primaryRainSrc: SourceShape | undefined = useNationalAsPrimary
+    ? (nd!.varData?.Rainfall ?? nd!.paramData?.pcp)
+    : (data.ukRegionData?.varData?.Rainfall
+       ?? data.usStateData?.paramData?.pcp
+       ?? (data.countryData ? { precipYearly: data.countryData.precipYearly } : undefined));
+  const nationalRainSrc: SourceShape | undefined = useNationalAsPrimary
+    ? undefined
+    : (data.nationalData?.varData?.Rainfall ?? data.nationalData?.paramData?.pcp);
+
   const rainfallRows = [
-    buildOverviewRow(
-      regionLabel,
-      useNationalAsPrimary
-        ? (nd!.varData?.Rainfall?.yearly || nd!.paramData?.pcp?.yearly)
-        : (data.ukRegionData?.varData?.Rainfall?.yearly || data.usStateData?.paramData?.pcp?.yearly || data.countryData?.precipYearly),
-      useNationalAsPrimary
-        ? (nd!.varData?.Rainfall?.latestMonthStats || nd!.paramData?.pcp?.latestMonthStats)
-        : (data.ukRegionData?.varData?.Rainfall?.latestMonthStats || data.usStateData?.paramData?.pcp?.latestMonthStats),
-      useNationalAsPrimary
-        ? (nd!.varData?.Rainfall?.latestThreeMonthStats || nd!.paramData?.pcp?.latestThreeMonthStats)
-        : (data.ukRegionData?.varData?.Rainfall?.latestThreeMonthStats || data.usStateData?.paramData?.pcp?.latestThreeMonthStats),
-      ' mm',
-      0,
-      false,
-      true,
-    ),
-    ...(useNationalAsPrimary ? [] : [
-      buildOverviewRow(
-        nationalLabel || 'National',
-        data.nationalData?.varData?.Rainfall?.yearly || data.nationalData?.paramData?.pcp?.yearly,
-        data.nationalData?.varData?.Rainfall?.latestMonthStats || data.nationalData?.paramData?.pcp?.latestMonthStats,
-        data.nationalData?.varData?.Rainfall?.latestThreeMonthStats || data.nationalData?.paramData?.pcp?.latestThreeMonthStats,
-        ' mm',
-        0,
-      ),
-    ]),
+    buildPinnedRow(regionLabel, primaryRainSrc, ' mm', 0, false, true),
+    nationalRainSrc ? buildPinnedRow(nationalLabel || 'National', nationalRainSrc, ' mm', 0) : null,
   ].filter((row): row is OverviewRow => Boolean(row));
   const rainfallRowsPruned = pruneStaleComparisonRows(rainfallRows);
 
   const rainDaysRows = [
-    buildOverviewRow(
+    buildPinnedRow(
       regionLabel,
-      useNationalAsPrimary ? nd!.varData?.Raindays1mm?.yearly : data.ukRegionData?.varData?.Raindays1mm?.yearly,
-      useNationalAsPrimary ? nd!.varData?.Raindays1mm?.latestMonthStats : data.ukRegionData?.varData?.Raindays1mm?.latestMonthStats,
-      useNationalAsPrimary ? nd!.varData?.Raindays1mm?.latestThreeMonthStats : data.ukRegionData?.varData?.Raindays1mm?.latestThreeMonthStats,
+      useNationalAsPrimary ? nd!.varData?.Raindays1mm : data.ukRegionData?.varData?.Raindays1mm,
       ' days', 0, false, true,
     ),
-    ...(useNationalAsPrimary ? [] : [
-      buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, data.nationalData?.varData?.Raindays1mm?.latestMonthStats, data.nationalData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0),
-    ]),
+    useNationalAsPrimary ? null : buildPinnedRow(
+      nationalLabel || 'United Kingdom',
+      data.nationalData?.varData?.Raindays1mm,
+      ' days', 0,
+    ),
   ].filter((row): row is OverviewRow => Boolean(row));
   const rainDaysRowsPruned = pruneStaleComparisonRows(rainDaysRows);
 
@@ -614,17 +613,18 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
     });
   }
 
+  // ── Frost (UK only) ──────────────────────────────────────────────────
   const frostRows = [
-    buildOverviewRow(
+    buildPinnedRow(
       regionLabel,
-      useNationalAsPrimary ? nd!.varData?.AirFrost?.yearly : data.ukRegionData?.varData?.AirFrost?.yearly,
-      useNationalAsPrimary ? nd!.varData?.AirFrost?.latestMonthStats : data.ukRegionData?.varData?.AirFrost?.latestMonthStats,
-      useNationalAsPrimary ? nd!.varData?.AirFrost?.latestThreeMonthStats : data.ukRegionData?.varData?.AirFrost?.latestThreeMonthStats,
+      useNationalAsPrimary ? nd!.varData?.AirFrost : data.ukRegionData?.varData?.AirFrost,
       ' days', 0, true, true,
     ),
-    ...(useNationalAsPrimary ? [] : [
-      buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.latestMonthStats, data.nationalData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true),
-    ]),
+    useNationalAsPrimary ? null : buildPinnedRow(
+      nationalLabel || 'United Kingdom',
+      data.nationalData?.varData?.AirFrost,
+      ' days', 0, true,
+    ),
   ].filter((row): row is OverviewRow => Boolean(row));
   const frostRowsPruned = pruneStaleComparisonRows(frostRows);
 
@@ -635,7 +635,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       accentClass: 'bg-[#E6F8F6]/20',
       accentBg: 'bg-[#E6F8F6]/10',
       accentBorder: 'border-[#E6F8F6]/60',
-      sections: [{ rows: frostRows }],
+      sections: [{ rows: frostRowsPruned }],
     });
   }
 
@@ -733,20 +733,40 @@ export default function ClimateProfile({
   const regionLabel = data?.ukRegionData?.region || data?.usStateData?.state || data?.name || region.name;
   const nationalLabel = data?.nationalData?.region || (region.type === 'us-state' ? 'United States' : region.type === 'uk-region' ? 'United Kingdom' : '');
   const isSubNational = region.type === 'uk-region' || region.type === 'us-state';
-  const overviewPanels = data ? buildOverviewPanels(data, regionLabel, nationalLabel) : [];
 
   // Use the API-returned region name for UK regions (correct Met Office name)
   const pageTitle = data?.ukRegionData?.region || region.name;
   const dashboardSearchTerm = data?.ukRegionData?.region || data?.usStateData?.state || data?.name || region.name;
 
-  // Derive the latest data month for the page title
-  const latestMonthLabel = (() => {
-    const stats = data?.ukRegionData?.varData?.Tmean?.latestMonthStats
-      || data?.usStateData?.paramData?.tavg?.latestMonthStats
-      || data?.countryData?.latestMonthStats
-      || data?.globalData?.landLatestMonthStats;
-    return stats?.label || null; // e.g. "Mar 2026"
+  // ── Page snapshot month ──────────────────────────────────────────────
+  // The page is a "March 2026 update" or an "April 2026 update", never a
+  // mix. We pick the chronological MIN of every source's latest-month
+  // label, so the page only advances to a new month once *every* source
+  // (local, national, global NOAA) has caught up. Charts may overrun this
+  // month with dashed/provisional points; tables and headings never do.
+  const pageSnapshotMonth = (() => {
+    if (!data) return null;
+    const localLabel =
+      data.ukRegionData?.varData?.Tmean?.latestMonthStats?.label
+      ?? data.usStateData?.paramData?.tavg?.latestMonthStats?.label
+      ?? data.countryData?.latestMonthStats?.label;
+    const nationalLbl =
+      data.nationalData?.varData?.Tmean?.latestMonthStats?.label
+      ?? data.nationalData?.paramData?.tavg?.latestMonthStats?.label;
+    const globalLabel =
+      data.globalData?.noaaStats?.landOcean?.latestMonthStats?.label
+      ?? data.globalData?.landLatestMonthStats?.label;
+    return pickPageSnapshotMonth([localLabel, nationalLbl, globalLabel]);
   })();
+  // Parsed form for chart "dash everything after this month" cutoff.
+  const pageSnapshotCut = pageSnapshotMonth ? parseMonthLabel(pageSnapshotMonth) : null;
+
+  const overviewPanels = data ? buildOverviewPanels(data, regionLabel, nationalLabel, pageSnapshotMonth) : [];
+
+  // The page heading reflects pageSnapshotMonth (the slowest source), not the
+  // fastest-advancing source — so the page stays a "March update" until every
+  // source has April data, even if the local snapshot already has April.
+  const latestMonthLabel = pageSnapshotMonth;
 
   // Full month name for the subtitle (e.g. "March" from "Mar 2026")
   const FULL_MONTHS: Record<string, string> = {
@@ -802,7 +822,7 @@ export default function ClimateProfile({
                   )}
                   <div className="mb-3 space-y-2">
                     <ClimateRankPill slug={slug} />
-                    <NextSnapshotBadge latestDataLabel={latestDataLabel} />
+                    <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
                   <div className="mt-3 text-gray-300 text-sm leading-relaxed space-y-3">
                     {summary.split('\n\n').map((para, i) => {
@@ -862,7 +882,7 @@ export default function ClimateProfile({
                   )}
                   <div className="mb-3 space-y-2">
                     <ClimateRankPill slug={slug} />
-                    <NextSnapshotBadge latestDataLabel={latestDataLabel} />
+                    <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
                   <div className="rounded-xl border border-[#D0A65E]/40 bg-[#D0A65E]/5 px-4 py-3">
                     <p className="text-sm font-medium text-[#FFF5E7]">A fresh climate update for {region.name} is being generated…</p>
@@ -897,7 +917,7 @@ export default function ClimateProfile({
                   )}
                   <div className="mb-3 space-y-2">
                     <ClimateRankPill slug={slug} />
-                    <NextSnapshotBadge latestDataLabel={latestDataLabel} />
+                    <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
                   <div className="mt-3 rounded-xl border border-amber-700/40 bg-amber-950/20 px-4 py-3">
                     <p className="text-sm font-medium text-amber-200">Climate update temporarily unavailable</p>
@@ -1019,6 +1039,7 @@ export default function ClimateProfile({
                           regionName={pageTitle}
                           dataSource={chartSource}
                           embedSlug={slug}
+                          provisionalAfterMonth={pageSnapshotCut}
                           share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'monthly-history' }}
                         />
                       </>
