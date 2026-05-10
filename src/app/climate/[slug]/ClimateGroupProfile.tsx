@@ -7,6 +7,7 @@ import { CLIMATE_REGIONS, getProfileSlugForLocation, getClimateUpdateDateLabel }
 import { ALL_LOCATIONS } from '@/lib/climate/locations';
 import { CONTINENT_BY_ISO } from '@/lib/climate/editorial';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
+import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
 import GroupSummaryPanel from './GroupSummaryPanel';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import MonthlySpaghettiCard from '@/app/_components/monthly-spaghetti-card';
@@ -836,8 +837,9 @@ export default async function ClimateGroupProfile({
                 </span>
               </p>
             ) : null}
-            <div className="mb-3">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
               <ClimateRankPill slug={region.slug} />
+              <NextSnapshotBadge />
             </div>
             <GroupSummaryPanel
               slug={region.slug}

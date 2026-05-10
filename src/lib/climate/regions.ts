@@ -57,6 +57,19 @@ export function getClimateUpdateDateLabel(date = new Date()): string {
   });
 }
 
+/**
+ * Expand a short snapshot month label ("Mar 2026") into the long form
+ * ("March 2026") expected by getClimateMetadataTitle/Description.
+ */
+export function expandMonthLabel(short: string): string {
+  const MAP: Record<string, string> = {
+    Jan: 'January', Feb: 'February', Mar: 'March', Apr: 'April',
+    May: 'May', Jun: 'June', Jul: 'July', Aug: 'August',
+    Sep: 'September', Oct: 'October', Nov: 'November', Dec: 'December',
+  };
+  return short.replace(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/, (m) => MAP[m] ?? m);
+}
+
 export function getClimatePageUrl(region: ClimateRegion): string {
   return `${SITE_URL}/climate/${region.slug}`;
 }

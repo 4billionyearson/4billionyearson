@@ -7,6 +7,7 @@ import type { ClimateRegion } from '@/lib/climate/regions';
 import MonthlySpaghettiCard, { type SeriesMap } from '@/app/_components/monthly-spaghetti-card';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
+import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
 import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard';
@@ -757,8 +758,9 @@ export default function ClimateProfile({
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <div className="mb-3">
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
                     <ClimateRankPill slug={slug} />
+                    <NextSnapshotBadge />
                   </div>
                   <div className="mt-3 text-gray-300 text-sm leading-relaxed space-y-3">
                     {summary.split('\n\n').map((para, i) => {
@@ -816,8 +818,9 @@ export default function ClimateProfile({
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <div className="mb-3">
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
                     <ClimateRankPill slug={slug} />
+                    <NextSnapshotBadge />
                   </div>
                   <div className="rounded-xl border border-[#D0A65E]/40 bg-[#D0A65E]/5 px-4 py-3">
                     <p className="text-sm font-medium text-[#FFF5E7]">A fresh climate update for {region.name} is being generated…</p>
@@ -850,8 +853,9 @@ export default function ClimateProfile({
                       <p className="text-xs md:text-sm font-medium text-[#D0A65E]"><span className="font-semibold">{coverageLabel}</span> {coverageLine}</p>
                     </div>
                   )}
-                  <div className="mb-3">
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
                     <ClimateRankPill slug={slug} />
+                    <NextSnapshotBadge />
                   </div>
                   <div className="mt-3 rounded-xl border border-amber-700/40 bg-amber-950/20 px-4 py-3">
                     <p className="text-sm font-medium text-amber-200">Climate update temporarily unavailable</p>

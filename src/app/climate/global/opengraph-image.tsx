@@ -52,10 +52,7 @@ export default async function OgImage() {
   const co2 = data?.ghgStats?.co2?.latest?.value ?? null;
   const seaIce = data?.seaIceStats ?? null;
   const enso = data?.enso ?? null;
-  const genDate = data?.generatedAt ? new Date(data.generatedAt) : null;
-  const lastUpdated = genDate && !isNaN(genDate.getTime())
-    ? genDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-    : '';
+  // Use the actual NOAA data month label, not the build/generation timestamp.
 
   return new ImageResponse(
     (
@@ -114,7 +111,7 @@ export default async function OgImage() {
           </div>
           <div style={{ display: 'flex', marginBottom: '22px' }}>
             <span style={{ fontSize: 22, color: '#cbd5e1', textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}>
-              {lastUpdated ? `${lastUpdated} · ` : ''}Land + ocean temperature · GHGs · sea ice · ENSO
+              {latestMonthLabel !== '—' ? `${latestMonthLabel} · ` : ''}Land + ocean temperature · GHGs · sea ice · ENSO
             </span>
           </div>
 

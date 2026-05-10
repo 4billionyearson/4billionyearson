@@ -152,8 +152,7 @@ export default function SeasonalShiftCard({
 
   return (
     <section id={share?.sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
-      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
           <Leaf className="h-5 w-5 text-emerald-400 shrink-0" />
           <h3 className="text-lg sm:text-xl font-bold font-mono text-[#FFF5E7]">Shifting Seasons</h3>
           <InfoTooltip
@@ -186,32 +185,6 @@ export default function SeasonalShiftCard({
               </span>
             </InfoTooltip>
           )}
-        </div>
-        <div className="flex gap-2 text-xs flex-wrap">
-          <TabButton active={effectiveView === 'monthly'} onClick={() => setView('monthly')}>
-            Month-by-month
-          </TabButton>
-          {hasTempSeasons && (
-            <TabButton active={effectiveView === 'length'} onClick={() => setView('length')}>
-              Spring &amp; Autumn
-            </TabButton>
-          )}
-          {hasWetDry && (
-            <TabButton active={effectiveView === 'wet-season'} onClick={() => setView('wet-season')}>
-              Wet / dry season
-            </TabButton>
-          )}
-          {rain && !hasWetDry && (
-            <TabButton active={effectiveView === 'rainfall'} onClick={() => setView('rainfall')}>
-              Rainfall
-            </TabButton>
-          )}
-          {sunshine && (
-            <TabButton active={effectiveView === 'sunshine'} onClick={() => setView('sunshine')}>
-              Sunshine
-            </TabButton>
-          )}
-        </div>
       </div>
 
       <ShiftExplanation
@@ -277,6 +250,32 @@ export default function SeasonalShiftCard({
             autumnShiftDays={temp.autumnShiftDays ?? 0}
           />
         )}
+
+      <div className="flex gap-2 text-xs flex-wrap mt-4 mb-2">
+        <TabButton active={effectiveView === 'monthly'} onClick={() => setView('monthly')}>
+          Month-by-month
+        </TabButton>
+        {hasTempSeasons && (
+          <TabButton active={effectiveView === 'length'} onClick={() => setView('length')}>
+            Spring &amp; Autumn
+          </TabButton>
+        )}
+        {hasWetDry && (
+          <TabButton active={effectiveView === 'wet-season'} onClick={() => setView('wet-season')}>
+            Wet / dry season
+          </TabButton>
+        )}
+        {rain && !hasWetDry && (
+          <TabButton active={effectiveView === 'rainfall'} onClick={() => setView('rainfall')}>
+            Rainfall
+          </TabButton>
+        )}
+        {sunshine && (
+          <TabButton active={effectiveView === 'sunshine'} onClick={() => setView('sunshine')}>
+            Sunshine
+          </TabButton>
+        )}
+      </div>
 
       {hasWetDry && rain && effectiveView === 'wet-season' && (
         <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
@@ -415,7 +414,7 @@ export default function SeasonalShiftCard({
                     y={temp.baselineAnnualMean}
                     stroke="#D0A65E"
                     strokeDasharray="4 4"
-                    label={{ value: `Annual mean ${temp.baselineAnnualMean.toFixed(1)}°C`, fill: '#D0A65E', fontSize: 10, position: 'right', offset: 6 }}
+                    label={{ value: 'Annual mean', fill: '#D0A65E', fontSize: 10, position: 'right', offset: 6 }}
                   />
                 )}
                 <Bar dataKey="baseline" name={`${baselineStart}–${baselineEnd}`} fill="#64748b" radius={[2, 2, 0, 0]} />

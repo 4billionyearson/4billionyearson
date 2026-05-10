@@ -19,6 +19,7 @@ import {
 } from '../_shared/overview-grid';
 import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar } from './ClimateSystemsPanel';
 import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
+import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
 import ClimateMapCard from './ClimateMapCard';
 import ParisTrackerCard from './ParisTrackerCard';
 import EmissionsCard from '@/app/_components/emissions-card';
@@ -414,6 +415,9 @@ export default function GlobalProfile({
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               <GlobalRankingsTeaser />
+              <div className="mb-3">
+                <NextSnapshotBadge />
+              </div>
 
               {summary ? (
                 <div>

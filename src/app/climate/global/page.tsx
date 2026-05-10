@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import {
   getRegionBySlug,
   getClimateMetadataTitle,
   getClimateMetadataDescription,
   getClimatePageUrl,
+  getClimateUpdateDateLabel,
+  expandMonthLabel,
 } from '@/lib/climate/regions';
 import { getCached } from '@/lib/climate/redis';
 import GlobalProfile from './GlobalProfile';
@@ -66,12 +70,23 @@ async function warmGlobalSummary(): Promise<void> {
   }
 }
 
+async function getGlobalDataMonthLabel(): Promise<string> {
+  try {
+    const p = resolve(process.cwd(), 'public', 'data', 'climate', 'global-history.json');
+    const d = JSON.parse(await readFile(p, 'utf8'));
+    const label: string | undefined = d?.noaaStats?.landOcean?.latestMonthStats?.label;
+    if (label) return expandMonthLabel(label);
+  } catch { /* fall through */ }
+  return getClimateUpdateDateLabel();
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const region = getRegionBySlug('global');
   if (!region) return {};
 
-  const title = getClimateMetadataTitle(region);
-  const description = getClimateMetadataDescription(region);
+  const updateLabel = await getGlobalDataMonthLabel();
+  const title = getClimateMetadataTitle(region, updateLabel);
+  const description = getClimateMetadataDescription(region, updateLabel);
   const canonicalUrl = getClimatePageUrl(region);
 
   return {

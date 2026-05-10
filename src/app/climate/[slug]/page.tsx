@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import {
   getRegionBySlug,
   CURATED_CLIMATE_REGIONS,
@@ -8,6 +10,8 @@ import {
   getClimateMetadataTitle,
   getClimateMetadataDescription,
   getClimatePageUrl,
+  getClimateUpdateDateLabel,
+  expandMonthLabel,
 } from '@/lib/climate/regions';
 import { getCached } from '@/lib/climate/redis';
 import ClimateProfile from './ClimateProfile';
@@ -77,6 +81,25 @@ export async function generateStaticParams() {
   return CURATED_CLIMATE_REGIONS.map(region => ({ slug: region.slug }));
 }
 
+async function getRegionDataMonthLabel(region: ReturnType<typeof getRegionBySlug>): Promise<string> {
+  if (!region) return getClimateUpdateDateLabel();
+  try {
+    const base = resolve(process.cwd(), 'public', 'data', 'climate');
+    let filePath: string | null = null;
+    if (region.type === 'country') filePath = resolve(base, 'country', `${region.apiCode}.json`);
+    else if (region.type === 'us-state') filePath = resolve(base, 'us-state', `${region.apiCode}.json`);
+    else if (region.type === 'uk-region') filePath = resolve(base, 'uk-region', `${region.apiCode}.json`);
+    if (!filePath) return getClimateUpdateDateLabel();
+    const d = JSON.parse(await readFile(filePath, 'utf8'));
+    let label: string | undefined;
+    if (region.type === 'country') label = d?.latestMonthStats?.label;
+    else if (region.type === 'us-state') label = d?.paramData?.tavg?.latestMonthStats?.label;
+    else if (region.type === 'uk-region') label = d?.varData?.Tmean?.latestMonthStats?.label;
+    if (label) return expandMonthLabel(label);
+  } catch { /* fall through */ }
+  return getClimateUpdateDateLabel();
+}
+
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
@@ -84,8 +107,9 @@ export async function generateMetadata(
   const region = getRegionBySlug(slug);
   if (!region) return {};
 
-  const title = getClimateMetadataTitle(region);
-  const description = getClimateMetadataDescription(region);
+  const updateLabel = await getRegionDataMonthLabel(region);
+  const title = getClimateMetadataTitle(region, updateLabel);
+  const description = getClimateMetadataDescription(region, updateLabel);
   const canonicalUrl = getClimatePageUrl(region);
 
   return {
