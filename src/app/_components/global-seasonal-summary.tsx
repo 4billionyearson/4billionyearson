@@ -236,7 +236,11 @@ export default function GlobalSeasonalSummary({
       title: c.label,
       sub: `${c.count} regions · ${doyToLabel(c.recentSpringDoy)} → ${doyToLabel(c.recentAutumnDoy)}`,
       delta: `Spring ${fmtShift(c.meanSpringShift)} · Autumn ${fmtShift(c.meanAutumnShift)}${c.meanNetMonths !== null ? ` · ${fmtMonths(c.meanNetMonths)}` : ''}`,
-      deltaColor: c.color,
+      // Warm cohorts all share the spring→summer→autumn gradient + flower/sun/leaf
+      // icons. Tinting each badge a different blue/cyan/lime fragmented the design;
+      // a single warm-cream tint (matching the sun in the bar) ties every warm row
+      // together and lets the row label do the cohort identification.
+      deltaColor: '#FDE68A',
       recentColor: c.color,
       baselineSpringDoy: c.baselineSpringDoy,
       baselineAutumnDoy: c.baselineAutumnDoy,
@@ -277,7 +281,7 @@ export default function GlobalSeasonalSummary({
       title: 'US growing season',
       sub: '1895 → present · EPA frost-free season',
       delta: '156 days → 172 days (+15 days)',
-      deltaColor: '#10B981',
+      deltaColor: '#FDE68A',
       recentColor: '#10B981',
       baselineFrac: { start: dayOfYear(5, 4) / 365, end: dayOfYear(10, 7) / 365 },
       recentFrac: { start: dayOfYear(4, 26) / 365, end: dayOfYear(10, 15) / 365 },
@@ -289,7 +293,7 @@ export default function GlobalSeasonalSummary({
       title: 'NH snow-free season',
       sub: '1971–2000 → present · NOAA Rutgers GSL',
       delta: '187 days → 204 days (+17 days)',
-      deltaColor: '#22D3EE',
+      deltaColor: '#FDE68A',
       recentColor: '#22D3EE',
       baselineFrac: { start: dayOfYear(4, 24) / 365, end: dayOfYear(10, 28) / 365 },
       recentFrac: { start: dayOfYear(4, 14) / 365, end: dayOfYear(11, 4) / 365 },
