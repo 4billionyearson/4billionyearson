@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { getRegionBySlug, type ClimateRegion, CLIMATE_REGIONS } from '@/lib/climate/regions';
+import { getSummaryCacheKey } from '@/lib/climate/summary-cache-key';
 import { buildDriverVocabularySection } from '@/lib/climate/warming-drivers';
 import { getEnsoImpactsForSlug, type RegionImpact, type ImpactPhase } from '@/lib/climate/enso-impacts';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID, US_CLIMATE_REGION_SLUG } from '@/lib/climate/editorial';
@@ -1169,17 +1170,12 @@ export async function GET(
   const url = new URL(request.url);
   const skipCache = url.searchParams.get('nocache') === '1';
 
-  // Date-aware cache key
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  const cacheMonth = dayOfMonth >= 21
-    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    : (() => {
-        const prev = new Date(now);
-        prev.setMonth(prev.getMonth() - 1);
-        return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
-      })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v27`;
+  // Cache key is pinned to the page-wide snapshot month so the cached
+  // summary text always matches the on-page Update header. While sources
+  // are out of sync, this key stays on the prior month and Gemini does
+  // NOT regenerate; once every source has caught up the key advances
+  // and a fresh summary is written.
+  const cacheKey = await getSummaryCacheKey(slug, region);
 
   // Check cache (skip if ?nocache=1)
   if (!skipCache) {

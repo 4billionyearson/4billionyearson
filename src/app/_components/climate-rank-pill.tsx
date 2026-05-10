@@ -48,7 +48,18 @@ const TYPE_LABEL: Record<RankingRow['type'], string> = {
   'uk-region': 'UK regions',
 };
 
-export default function ClimateRankPill({ slug }: { slug: string }) {
+export default function ClimateRankPill({
+  slug,
+  pageSnapshotMonth,
+}: {
+  slug: string;
+  /** When provided, the pill is hidden if the rankings row's latestLabel
+   *  doesn't match the page-wide snapshot month. This prevents the pill
+   *  from showing (e.g.) "3rd-warmest April" while the rest of the page
+   *  is still pinned to the prior March update because Global hasn't
+   *  caught up yet. */
+  pageSnapshotMonth?: string | null;
+}) {
   const [rankings, setRankings] = useState<RankingsResponse | null>(null);
 
   useEffect(() => {
@@ -67,6 +78,15 @@ export default function ClimateRankPill({ slug }: { slug: string }) {
   if (!rankings?.rows?.length) return null;
   const rows = rankings.rows;
 
+  // Hide the pill when its underlying rankings month doesn't match the
+  // page snapshot month — the rank/anomaly figures would otherwise refer
+  // to a different month than the rest of the page is showing.
+  const matchesPageMonth = (rowLabel: string | null): boolean => {
+    if (!pageSnapshotMonth) return true;
+    if (!rowLabel) return false;
+    return rowLabel === pageSnapshotMonth;
+  };
+
   // ─── Group (continent / US climate region) branch ────────────────────────
   const continents = rankings.groups?.continents ?? [];
   const usClimateRegions = rankings.groups?.usClimateRegions ?? [];
@@ -77,6 +97,7 @@ export default function ClimateRankPill({ slug }: { slug: string }) {
       : null;
   if (groupArr) {
     const group = groupArr.find((g) => g.slug === slug)!;
+    if (!matchesPageMonth(group.latestLabel)) return null;
     const winKey: 'anomaly1m' | 'anomaly3m' | 'anomaly12m' | null =
       group.anomaly1m != null ? 'anomaly1m' : group.anomaly3m != null ? 'anomaly3m' : group.anomaly12m != null ? 'anomaly12m' : null;
     if (!winKey) return null;
@@ -120,6 +141,7 @@ export default function ClimateRankPill({ slug }: { slug: string }) {
   // ─── Country / US state / UK region branch ───────────────────────────────
   const me = rows.find((r) => r.slug === slug);
   if (!me) return null;
+  if (!matchesPageMonth(me.latestLabel)) return null;
 
   // Use the best available window: 1m → 3m → 12m
   const windowKey: 'anomaly1m' | 'anomaly3m' | 'anomaly12m' | null =

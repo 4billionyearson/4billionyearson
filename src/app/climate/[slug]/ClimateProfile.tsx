@@ -821,7 +821,7 @@ export default function ClimateProfile({
                     </div>
                   )}
                   <div className="mb-3 space-y-2">
-                    <ClimateRankPill slug={slug} />
+                    <ClimateRankPill slug={slug} pageSnapshotMonth={pageSnapshotMonth} />
                     <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
                   <div className="mt-3 text-gray-300 text-sm leading-relaxed space-y-3">
@@ -881,7 +881,7 @@ export default function ClimateProfile({
                     </div>
                   )}
                   <div className="mb-3 space-y-2">
-                    <ClimateRankPill slug={slug} />
+                    <ClimateRankPill slug={slug} pageSnapshotMonth={pageSnapshotMonth} />
                     <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
                   <div className="rounded-xl border border-[#D0A65E]/40 bg-[#D0A65E]/5 px-4 py-3">
@@ -916,7 +916,7 @@ export default function ClimateProfile({
                     </div>
                   )}
                   <div className="mb-3 space-y-2">
-                    <ClimateRankPill slug={slug} />
+                    <ClimateRankPill slug={slug} pageSnapshotMonth={pageSnapshotMonth} />
                     <NextSnapshotBadge latestDataLabel={pageSnapshotMonth ?? latestDataLabel} />
                   </div>
                   <div className="mt-3 rounded-xl border border-amber-700/40 bg-amber-950/20 px-4 py-3">

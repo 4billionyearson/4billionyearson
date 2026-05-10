@@ -11,6 +11,7 @@ import {
   expandMonthLabel,
 } from '@/lib/climate/regions';
 import { getCached } from '@/lib/climate/redis';
+import { getSummaryCacheKey } from '@/lib/climate/summary-cache-key';
 import GlobalProfile from './GlobalProfile';
 
 // ISR: 24-hour safety net. Cache invalidation is event-driven via
@@ -24,16 +25,7 @@ interface CachedSummary {
 }
 
 async function readCachedGlobalSummary(): Promise<CachedSummary | null> {
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  const cacheMonth = dayOfMonth >= 21
-    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    : (() => {
-        const prev = new Date(now);
-        prev.setMonth(prev.getMonth() - 1);
-        return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
-      })();
-  const cacheKey = `climate:summary:global:${cacheMonth}-v27`;
+  const cacheKey = await getSummaryCacheKey('global', null);
   try {
     return await getCached<CachedSummary>(cacheKey);
   } catch {

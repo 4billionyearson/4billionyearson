@@ -14,6 +14,7 @@ import {
   expandMonthLabel,
 } from '@/lib/climate/regions';
 import { getCached } from '@/lib/climate/redis';
+import { getSummaryCacheKey } from '@/lib/climate/summary-cache-key';
 import ClimateProfile from './ClimateProfile';
 import ClimateGroupProfile from './ClimateGroupProfile';
 import { pickPageSnapshotMonth } from '@/app/climate/_shared/overview-grid-types';
@@ -33,16 +34,8 @@ interface CachedSummary {
 }
 
 async function readCachedSummary(slug: string): Promise<CachedSummary | null> {
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  const cacheMonth = dayOfMonth >= 21
-    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    : (() => {
-        const prev = new Date(now);
-        prev.setMonth(prev.getMonth() - 1);
-        return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
-      })();
-  const cacheKey = `climate:summary:${slug}:${cacheMonth}-v27`;
+  const region = getRegionBySlug(slug);
+  const cacheKey = await getSummaryCacheKey(slug, region);
   try {
     return await getCached<CachedSummary>(cacheKey);
   } catch {

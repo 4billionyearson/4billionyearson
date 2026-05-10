@@ -899,7 +899,7 @@ export default async function ClimateGroupProfile({
               </p>
             ) : null}
             <div className="mb-3 space-y-2">
-              <ClimateRankPill slug={region.slug} />
+              <ClimateRankPill slug={region.slug} pageSnapshotMonth={rawDataLabel} />
               <NextSnapshotBadge latestDataLabel={rawDataLabel ?? undefined} />
             </div>
             <GroupSummaryPanel
