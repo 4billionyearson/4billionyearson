@@ -338,7 +338,10 @@ export default function GlobalSeasonalSummary({
             </span>
             <span className="text-gray-600">→</span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-4 h-2 rounded-full bg-gradient-to-b from-cyan-400 to-cyan-500" />
+              <span
+                className="inline-block w-5 h-2 rounded-full"
+                style={{ background: 'linear-gradient(90deg, #65A30D 0%, #A3CB38 18%, #EAB308 35%, #EAB308 65%, #D97706 82%, #B45309 100%)' }}
+              />
               now
             </span>
           </div>
