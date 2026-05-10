@@ -460,7 +460,7 @@ function SeasonalEndcaps({
     <>
       <span
         className="pointer-events-none"
-        style={iconStyle(startPct, '#86EFAC', 'rgba(74,222,128,0.55)')}
+        style={iconStyle(startPct, '#A3E635', 'rgba(132,204,22,0.60)')}
         aria-hidden
       >
         <Flower2 width={iconSize} height={iconSize} strokeWidth={2.25} />
