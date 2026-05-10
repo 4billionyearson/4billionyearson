@@ -624,7 +624,15 @@ function WarmSeasonShiftBar({
   const baselineLen = lenOf(baselineSpringDoy, baselineAutumnDoy);
   const recentLen = lenOf(recentSpringDoy, recentAutumnDoy);
   const deltaDays = Math.round(recentLen - baselineLen);
-  const shiftColor = deltaDays > 0 ? '#fb923c' : deltaDays < 0 ? '#38bdf8' : '#9CA3AF';
+  // Tie the "longer summer" badge to the yellow midpoint of the bar gradient
+  // (#EAB308) so all summer-stretching cues are visually keyed to the same hue.
+  // "Shorter summer" stays a cool sky tone — it carries the opposite, cooling
+  // semantic and reads correctly against the warm gradient.
+  const shiftColor = deltaDays > 0 ? '#EAB308' : deltaDays < 0 ? '#38BDF8' : '#9CA3AF';
+  // Per-edge colours that match the bar endcap icons: spring = lime flower,
+  // autumn = russet leaf. Used to colour the per-edge shift text.
+  const SPRING_HUE = '#A3E635';
+  const AUTUMN_HUE = '#FB923C';
 
   const springText = springShiftDays === 0
     ? null
@@ -666,8 +674,16 @@ function WarmSeasonShiftBar({
       </div>
       <CalendarTimeline rows={rows} labelColPx={150} />
       {(springText || autumnText) && (
-        <div className="mt-2 text-xs font-mono text-center" style={{ color: shiftColor }}>
-          {[springText, autumnText].filter(Boolean).join(' · ')}
+        <div className="mt-2 text-xs font-mono text-center">
+          {springText && (
+            <span style={{ color: SPRING_HUE }}>{springText}</span>
+          )}
+          {springText && autumnText && (
+            <span className="text-gray-500"> · </span>
+          )}
+          {autumnText && (
+            <span style={{ color: AUTUMN_HUE }}>{autumnText}</span>
+          )}
         </div>
       )}
     </div>

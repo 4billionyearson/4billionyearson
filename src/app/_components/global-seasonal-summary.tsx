@@ -229,17 +229,36 @@ export default function GlobalSeasonalSummary({
   const fmtShift = (d: number) => `${d > 0 ? '+' : ''}${d.toFixed(1)} days`;
   const fmtMonths = (m: number | null) => (m === null ? '—' : `${m > 0 ? '+' : ''}${m.toFixed(2)} months`);
 
+  // Per-edge hues that match the bar endcap icons.
+  const SPRING_HUE = '#A3E635';
+  const AUTUMN_HUE = '#FB923C';
+
+  function warmDelta(c: WarmCohort): React.ReactNode {
+    return (
+      <>
+        <span style={{ color: SPRING_HUE }}>Spring {fmtShift(c.meanSpringShift)}</span>
+        <span className="text-gray-500"> · </span>
+        <span style={{ color: AUTUMN_HUE }}>Autumn {fmtShift(c.meanAutumnShift)}</span>
+        {c.meanNetMonths !== null && (
+          <>
+            <span className="text-gray-500"> · </span>
+            <span>{fmtMonths(c.meanNetMonths)}</span>
+          </>
+        )}
+      </>
+    );
+  }
+
   function warmToRow(c: WarmCohort): TimelineRow {
     return {
       kind: 'bar',
       key: c.key,
       title: c.label,
       sub: `${c.count} regions · ${doyToLabel(c.recentSpringDoy)} → ${doyToLabel(c.recentAutumnDoy)}`,
-      delta: `Spring ${fmtShift(c.meanSpringShift)} · Autumn ${fmtShift(c.meanAutumnShift)}${c.meanNetMonths !== null ? ` · ${fmtMonths(c.meanNetMonths)}` : ''}`,
+      delta: warmDelta(c),
       // Warm cohorts all share the spring→summer→autumn gradient + flower/sun/leaf
-      // icons. Tinting each badge a different blue/cyan/lime fragmented the design;
-      // a single warm-cream tint (matching the sun in the bar) ties every warm row
-      // together and lets the row label do the cohort identification.
+      // icons. Tint badge text & border with the warm-cream "sun" hue; per-edge
+      // Spring/Autumn portions inside are recoloured to match their endcap icons.
       deltaColor: '#FDE68A',
       recentColor: c.color,
       baselineSpringDoy: c.baselineSpringDoy,

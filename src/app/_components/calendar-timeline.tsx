@@ -58,7 +58,7 @@ export type TimelineRow =
       key: string;
       title: string;
       sub?: string;
-      delta?: string;
+      delta?: React.ReactNode;
       deltaColor?: string;
       recentColor: string;
       baselineSpringDoy: number;
@@ -74,7 +74,7 @@ export type TimelineRow =
       key: string;
       title: string;
       sub?: string;
-      delta?: string;
+      delta?: React.ReactNode;
       deltaColor?: string;
       recentColor: string;
       baselineFrac: { start: number; end: number };
@@ -86,7 +86,7 @@ export type TimelineRow =
       key: string;
       title: string;
       sub?: string;
-      delta?: string;
+      delta?: React.ReactNode;
       deltaColor?: string;
       color: string;
       baselineDoy: number;
@@ -192,7 +192,7 @@ function RowLabel({
 }: {
   title: string;
   sub?: string;
-  delta?: string;
+  delta?: React.ReactNode;
   deltaColor?: string;
 }) {
   return (
@@ -243,7 +243,7 @@ function BarRow({
 }: {
   title: string;
   sub?: string;
-  delta?: string;
+  delta?: React.ReactNode;
   deltaColor?: string;
   recentColor: string;
   baselineFracStart: number;
@@ -488,7 +488,7 @@ function PointRow({
 }: {
   title: string;
   sub?: string;
-  delta?: string;
+  delta?: React.ReactNode;
   deltaColor?: string;
   color: string;
   baselineFrac: number;
