@@ -14,6 +14,7 @@ import { getRegionBySlug } from '@/lib/climate/regions';
 import {
   OverviewGrid,
   buildOverviewRow,
+  pruneStaleComparisonRows,
   type OverviewPanel,
   type OverviewRow,
 } from '../_shared/overview-grid';
@@ -387,13 +388,17 @@ export default function GlobalProfile({
   const overviewPanels = useMemo<OverviewPanel[]>(() => {
     if (!data?.noaaStats) return [];
     const { landOcean, land, ocean } = data.noaaStats;
-    const rows: OverviewRow[] = [];
+    const rawRows: OverviewRow[] = [];
     const landRow = buildOverviewRow('Land', land.yearly, land.latestMonthStats ?? undefined, land.latestThreeMonthStats ?? undefined, '°C', 1, false, false);
     const oceanRow = buildOverviewRow('Ocean', ocean.yearly, ocean.latestMonthStats ?? undefined, ocean.latestThreeMonthStats ?? undefined, '°C', 1, false, false);
     const landOceanRow = buildOverviewRow('Land + Ocean', landOcean.yearly, landOcean.latestMonthStats ?? undefined, landOcean.latestThreeMonthStats ?? undefined, '°C', 1, false, true);
-    if (landRow) rows.push(landRow);
-    if (oceanRow) rows.push(oceanRow);
-    if (landOceanRow) rows.push(landOceanRow);
+    if (landRow) rawRows.push(landRow);
+    if (oceanRow) rawRows.push(oceanRow);
+    if (landOceanRow) rawRows.push(landOceanRow);
+    // Drop comparison rows whose latest month doesn't match the primary
+    // (Land + Ocean) row — prevents mixed-month rows under one column header
+    // if NOAA ever publishes Land/Ocean asynchronously.
+    const rows = pruneStaleComparisonRows(rawRows);
     if (!rows.length) return [];
     return [{
       title: 'Temperature - Average',

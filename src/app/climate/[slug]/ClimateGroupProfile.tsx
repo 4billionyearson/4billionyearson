@@ -15,7 +15,7 @@ import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
 import { OverviewGrid } from '@/app/climate/_shared/overview-grid';
-import { buildOverviewRow, type OverviewPanel, type OverviewRow, type RankedPeriodStat } from '@/app/climate/_shared/overview-grid-types';
+import { buildOverviewRow, pruneStaleComparisonRows, type OverviewPanel, type OverviewRow, type RankedPeriodStat } from '@/app/climate/_shared/overview-grid-types';
 import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { RegionDataSourcesCard } from './RegionDataSourcesCard';
@@ -463,7 +463,9 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
               return r ? { ...r, sublabel: 'Land + Ocean' } : null;
             })()
           : null;
-        const tempRows: OverviewRow[] = [continentOverviewRow, globalOverviewRow].filter((r): r is OverviewRow => Boolean(r));
+        const tempRows: OverviewRow[] = pruneStaleComparisonRows(
+          [continentOverviewRow, globalOverviewRow].filter((r): r is OverviewRow => Boolean(r)),
+        );
 
         if (tempRows.length >= 1 && continentOverviewRow) {
           const tempPanel: OverviewPanel = {
@@ -638,14 +640,14 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
   const globalLandOcean = history?.noaaStats?.landOcean;
 
   // ── Build OverviewGrid panels (same shape as country / global pages) ──
-  const tempRows = [
+  const tempRows = pruneStaleComparisonRows([
     buildOverviewRow(region.name, tavg.yearly, tavg.latestMonthStats, tavg.latestThreeMonthStats, '°C', 1, false, true),
     usTavg ? buildOverviewRow('United States', usTavg.yearly, usTavg.latestMonthStats, usTavg.latestThreeMonthStats, '°C', 1) : null,
     globalLandOcean ? (() => {
       const r = buildOverviewRow('Global', globalLandOcean.yearly, globalLandOcean.latestMonthStats, globalLandOcean.latestThreeMonthStats, '°C', 1);
       return r ? { ...r, sublabel: 'Land + Ocean' } : null;
     })() : null,
-  ].filter((r): r is OverviewRow => Boolean(r));
+  ].filter((r): r is OverviewRow => Boolean(r)));
   const tempPanel: OverviewPanel | null = tempRows.length ? {
     title: 'Temperature – Average',
     icon: <Thermometer className="text-orange-400" />,
@@ -655,10 +657,10 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
     sections: [{ rows: tempRows }],
   } : null;
 
-  const rainRows = [
+  const rainRows = pruneStaleComparisonRows([
     pcp ? buildOverviewRow(region.name, pcp.yearly, pcp.latestMonthStats, pcp.latestThreeMonthStats, ' mm', 0, false, true) : null,
     usPcp ? buildOverviewRow('United States', usPcp.yearly, usPcp.latestMonthStats, usPcp.latestThreeMonthStats, ' mm', 0) : null,
-  ].filter((r): r is OverviewRow => Boolean(r));
+  ].filter((r): r is OverviewRow => Boolean(r)));
   const rainPanel: OverviewPanel | null = rainRows.length ? {
     title: 'Rainfall & Rain Days – Totals',
     icon: <CloudRain className="text-blue-400" />,

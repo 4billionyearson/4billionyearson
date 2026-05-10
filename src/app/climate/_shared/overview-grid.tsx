@@ -17,11 +17,12 @@ import {
   ordinal,
   getYearlyPointValue,
   buildOverviewRow,
+  pruneStaleComparisonRows,
 } from './overview-grid-types';
 
 // Re-export so existing imports keep working.
 export type { OverviewPanel, OverviewRow, OverviewSection, OverviewMetricBlock, RankedPeriodStat, YearlyLike };
-export { formatSignedValue, formatValue, ordinal, getYearlyPointValue, buildOverviewRow };
+export { formatSignedValue, formatValue, ordinal, getYearlyPointValue, buildOverviewRow, pruneStaleComparisonRows };
 
 // ─── Render ─────────────────────────────────────────────────────────────────
 

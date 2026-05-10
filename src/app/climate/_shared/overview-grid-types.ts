@@ -137,3 +137,28 @@ export function buildOverviewRow(
     },
   };
 }
+
+/**
+ * Drop comparison rows whose latest-month period does not match the primary
+ * row's latest-month period. This prevents the At-a-Glance grid from
+ * displaying e.g. "APR 2026" for a country alongside a stale "MAR 2026"
+ * global value under a shared "APR 2026" column header. Charts may still
+ * show partial data via the dotted-line provisional system; only summary
+ * comparison tables are affected.
+ *
+ * The first row (or one with isPrimary=true) is always kept. Comparison
+ * rows are kept only if their latestMonth.title matches the primary's.
+ * Rows with title 'n/a' are kept (no data is unambiguous, not stale).
+ */
+export function pruneStaleComparisonRows(rows: OverviewRow[]): OverviewRow[] {
+  if (rows.length < 2) return rows;
+  const primary = rows.find((r) => r.isPrimary) ?? rows[0];
+  const primaryMonth = primary.latestMonth.title;
+  if (!primaryMonth || primaryMonth === 'n/a') return rows;
+  return rows.filter((row) => {
+    if (row === primary) return true;
+    const t = row.latestMonth.title;
+    if (!t || t === 'n/a') return true;
+    return t === primaryMonth;
+  });
+}

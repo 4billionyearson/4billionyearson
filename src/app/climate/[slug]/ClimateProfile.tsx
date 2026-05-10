@@ -233,6 +233,24 @@ type OverviewSection = {
   rows: OverviewRow[];
 };
 
+// Drop comparison rows whose latest-month period doesn't match the primary
+// row's latest-month period, so the At-a-Glance grid never shows e.g. a
+// "Mar 2026" Global value next to an "Apr 2026" country value under a shared
+// "APR 2026" column header. The first row (or one with isPrimary=true) is
+// always kept; rows with no data ('n/a') are kept (no data is unambiguous).
+function pruneStaleComparisonRows(rows: OverviewRow[]): OverviewRow[] {
+  if (rows.length < 2) return rows;
+  const primary = rows.find((r) => r.isPrimary) ?? rows[0];
+  const primaryMonth = primary.latestMonth.title;
+  if (!primaryMonth || primaryMonth === 'n/a') return rows;
+  return rows.filter((row) => {
+    if (row === primary) return true;
+    const t = row.latestMonth.title;
+    if (!t || t === 'n/a') return true;
+    return t === primaryMonth;
+  });
+}
+
 type OverviewPanel = {
   title: string;
   icon: React.ReactNode;
@@ -500,15 +518,16 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       return row ? { ...row, sublabel: 'Land + Ocean' } : null;
     })(),
   ].filter((row): row is OverviewRow => Boolean(row));
+  const temperatureRowsPruned = pruneStaleComparisonRows(temperatureRows);
 
-  if (temperatureRows.length) {
+  if (temperatureRowsPruned.length) {
     panels.push({
       title: 'Temperature – Average',
       icon: <Thermometer className="text-orange-400" />,
       accentClass: 'bg-orange-600',
       accentBg: 'bg-orange-600/50',
       accentBorder: 'border-orange-400/80',
-      sections: [{ rows: temperatureRows }],
+      sections: [{ rows: temperatureRowsPruned }],
     });
   }
 
@@ -524,15 +543,16 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Sunshine?.yearly, data.nationalData?.varData?.Sunshine?.latestMonthStats, data.nationalData?.varData?.Sunshine?.latestThreeMonthStats, ' hrs', 0),
     ]),
   ].filter((row): row is OverviewRow => Boolean(row));
+  const sunshineRowsPruned = pruneStaleComparisonRows(sunshineRows);
 
-  if (sunshineRows.length) {
+  if (sunshineRowsPruned.length) {
     panels.push({
       title: 'Sunshine – Total Hours',
       icon: <Sun className="text-amber-400" />,
       accentClass: 'bg-amber-500',
       accentBg: 'bg-amber-500/50',
       accentBorder: 'border-amber-400/80',
-      sections: [{ rows: sunshineRows }],
+      sections: [{ rows: sunshineRowsPruned }],
     });
   }
 
@@ -564,6 +584,7 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       ),
     ]),
   ].filter((row): row is OverviewRow => Boolean(row));
+  const rainfallRowsPruned = pruneStaleComparisonRows(rainfallRows);
 
   const rainDaysRows = [
     buildOverviewRow(
@@ -577,8 +598,9 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.Raindays1mm?.yearly, data.nationalData?.varData?.Raindays1mm?.latestMonthStats, data.nationalData?.varData?.Raindays1mm?.latestThreeMonthStats, ' days', 0),
     ]),
   ].filter((row): row is OverviewRow => Boolean(row));
+  const rainDaysRowsPruned = pruneStaleComparisonRows(rainDaysRows);
 
-  if (rainfallRows.length || rainDaysRows.length) {
+  if (rainfallRowsPruned.length || rainDaysRowsPruned.length) {
     panels.push({
       title: 'Rainfall & Rain Days – Totals',
       icon: <CloudRain className="text-blue-400" />,
@@ -586,8 +608,8 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       accentBg: 'bg-blue-950/50',
       accentBorder: 'border-blue-400/80',
       sections: [
-        ...(rainfallRows.length ? [{ title: 'Rainfall / Precipitation', rows: rainfallRows }] : []),
-        ...(rainDaysRows.length ? [{ title: 'Rain Days (≥1mm)', rows: rainDaysRows }] : []),
+        ...(rainfallRowsPruned.length ? [{ title: 'Rainfall / Precipitation', rows: rainfallRowsPruned }] : []),
+        ...(rainDaysRowsPruned.length ? [{ title: 'Rain Days (≥1mm)', rows: rainDaysRowsPruned }] : []),
       ],
     });
   }
@@ -604,8 +626,9 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
       buildOverviewRow(nationalLabel || 'United Kingdom', data.nationalData?.varData?.AirFrost?.yearly, data.nationalData?.varData?.AirFrost?.latestMonthStats, data.nationalData?.varData?.AirFrost?.latestThreeMonthStats, ' days', 0, true),
     ]),
   ].filter((row): row is OverviewRow => Boolean(row));
+  const frostRowsPruned = pruneStaleComparisonRows(frostRows);
 
-  if (frostRows.length) {
+  if (frostRowsPruned.length) {
     panels.push({
       title: 'Frost Days – Total',
       icon: <Snowflake style={{ color: '#E6F8F6' }} />,
