@@ -28,17 +28,49 @@ export async function GET(
     return NextResponse.json({ error: 'Region not found' }, { status: 404 });
   }
 
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  // Use current month key after 21st (when most sources have published), else previous month
-  const cacheMonth = dayOfMonth >= 21
-    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  // Derive the cache key from the *actual* data month in the snapshot rather
+  // than calendar arithmetic. This ensures:
+  //  - the cache automatically invalidates whenever a snapshot is rebuilt and
+  //    the on-disk data month advances (e.g. Mar 2026 → Apr 2026), so users
+  //    always see the latest data after a CI push.
+  //  - two different data months can never collide in the same cache entry.
+  //
+  // We peek at a tiny header in the primary snapshot file to get the month
+  // label (e.g. "Apr 2026"). Falling back to the calendar-based key is safe
+  // if the file is missing or malformed.
+  async function getPrimaryDataMonth(): Promise<string> {
+    try {
+      if (region.type === 'country') {
+        const snap = await loadSnapshot(`country/${region.apiCode}.json`);
+        return snap?.latestMonthStats?.label ?? null;
+      }
+      if (region.type === 'us-state') {
+        const snap = await loadSnapshot(`us-state/${region.apiCode}.json`);
+        return snap?.paramData?.tavg?.latestMonthStats?.label ?? null;
+      }
+      if (region.type === 'uk-region') {
+        const snap = await loadSnapshot(`uk-region/${region.apiCode}.json`);
+        return snap?.varData?.Tmean?.latestMonthStats?.label ?? null;
+      }
+    } catch { /* fall through */ }
+    return null;
+  }
+
+  const primaryMonth = await getPrimaryDataMonth();
+  // Also peek at the global snapshot month so that if global advances after
+  // local (or vice versa), the combined cached response re-fetches automatically.
+  const globalSnap0 = await loadSnapshot('global-history.json');
+  const globalMonth = globalSnap0?.noaaStats?.landOcean?.latestMonthStats?.label ?? null;
+  // Cache key encodes both data months so any change to either busts the cache.
+  const dataCacheKey = primaryMonth && globalMonth
+    ? `${primaryMonth}|${globalMonth}`
     : (() => {
+        const now = new Date();
         const prev = new Date(now);
-        prev.setMonth(prev.getMonth() - 1);
+        if (now.getDate() < 21) prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${cacheMonth}-v21`;
+  const cacheKey = `climate:profile:${slug}:${dataCacheKey}-v22`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
@@ -53,10 +85,8 @@ export async function GET(
     let ukRegionData = null;
     let nationalData = null; // UK-wide or US-national for sub-national regions
     let owidCountryData = null; // OWID country data (for sub-national comparison)
-    let globalData = null;
-
-    // Always load global context
-    const globalPromise = loadSnapshot('global-history.json');
+    // Re-use the already-loaded global snapshot rather than reading it again.
+    let globalData: any = globalSnap0;
 
     if (region.type === 'country') {
       const [cRes, pRes] = await Promise.all([
@@ -91,8 +121,6 @@ export async function GET(
       nationalData = ukNationalRes;
     }
 
-    globalData = await globalPromise;
-
     // Build key stats for the crawlable summary
     const keyStats = buildKeyStats(region.type, countryData, usStateData, ukRegionData);
 
@@ -111,7 +139,7 @@ export async function GET(
       owidCountryData,
       globalData,
       keyStats,
-      lastUpdated: cacheMonth,
+      lastUpdated: dataCacheKey,
     };
 
     await setShortTerm(cacheKey, result);

@@ -481,7 +481,21 @@ function buildOverviewPanels(data: ProfileData, regionLabel: string, nationalLab
         1,
       ),
     ]),
+    // Only include the Global comparison row when global NOAA data is from the
+    // same month as the primary local series. Different months would appear
+    // side-by-side under a shared period header (e.g. "APR 2026"), falsely
+    // implying both values are for the same month. Charts can show all
+    // available data using the dotted-line provisional system instead.
     (() => {
+      const primaryLabel: string | undefined = useNationalAsPrimary
+        ? (nd!.varData?.Tmean?.latestMonthStats?.label ?? nd!.paramData?.tavg?.latestMonthStats?.label)
+        : (data.ukRegionData?.varData?.Tmean?.latestMonthStats?.label
+          ?? data.usStateData?.paramData?.tavg?.latestMonthStats?.label
+          ?? data.countryData?.latestMonthStats?.label);
+      const globalLabel: string | undefined =
+        data.globalData?.noaaStats?.landOcean?.latestMonthStats?.label
+        ?? data.globalData?.landLatestMonthStats?.label;
+      if (!primaryLabel || !globalLabel || primaryLabel !== globalLabel) return null;
       const row = buildOverviewRow('Global', data.globalData?.noaaStats?.landOcean?.yearly ?? data.globalData?.landYearlyData, data.globalData?.noaaStats?.landOcean?.latestMonthStats ?? data.globalData?.landLatestMonthStats, data.globalData?.noaaStats?.landOcean?.latestThreeMonthStats ?? data.globalData?.landLatestThreeMonthStats, '°C', 1);
       return row ? { ...row, sublabel: 'Land + Ocean' } : null;
     })(),
