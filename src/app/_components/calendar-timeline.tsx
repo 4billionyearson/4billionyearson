@@ -19,7 +19,7 @@
  */
 
 import React from 'react';
-import { Flower2, Leaf, Droplet } from 'lucide-react';
+import { Flower2, Leaf, Droplet, Sun } from 'lucide-react';
 
 const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -179,7 +179,7 @@ export default function CalendarTimeline({
 
 /* ───────────────────────── Constants ───────────────────────── */
 
-const TRACK_H = 48;       // overall row track height (px)
+const TRACK_H = 58;       // overall row track height (px) - leaves room for season icons under recent bar
 const BAR_TOP = 8;        // top offset of baseline bar
 const BAR_H = 14;         // bar thickness
 const RECENT_TOP = 26;    // top offset of recent bar
@@ -289,7 +289,10 @@ function BarRow({
  * across the year boundary. */
 const SEASON_STOPS: Array<[number, [number, number, number]]> = [
   [0.00, [101, 163, 13]],   // #65A30D spring green
-  [0.50, [234, 179, 8]],    // #EAB308 summer yellow
+  [0.18, [163, 203, 56]],   // #A3CB38 yellow-green
+  [0.35, [234, 179, 8]],    // #EAB308 summer yellow
+  [0.65, [234, 179, 8]],    // #EAB308 summer yellow (plateau)
+  [0.82, [217, 119, 6]],    // #D97706 amber-orange
   [1.00, [180, 83, 9]],     // #B45309 autumn russet
 ];
 function seasonColorAt(t: number): string {
@@ -311,7 +314,7 @@ function seasonColorAt(t: number): string {
 function seasonalGradient(t0: number, t1: number): string {
   // produce a linear-gradient with stops sampled across [t0, t1]
   const stops: string[] = [];
-  const n = 5;
+  const n = 8;
   for (let i = 0; i <= n; i++) {
     const u = i / n;
     const t = t0 + (t1 - t0) * u;
@@ -426,40 +429,39 @@ function renderBarSegments({
   );
 }
 
-/** Tiny flower / leaf icons sat at the start and end of the recent warm bar. */
+/** Spring flower / midsummer sun / autumn leaf icons placed UNDER the recent
+ *  warm bar so they don't overlap it. Each is tinted to match the season:
+ *  pink flower, amber sun, russet leaf. The sun sits at the bar's midpoint
+ *  (handles wrapping bars by computing the circular midpoint). */
 function SeasonalEndcaps({
   startPct, endPct, top,
 }: { startPct: number; endPct: number; top: number }) {
-  const iconSize = 12;
-  const cy = top + BAR_H / 2;
+  const iconSize = 14;
+  // Place icons centred just below the bar.
+  const cy = top + BAR_H + 7;
+  // Midpoint along the year axis: if bar wraps (end < start) the midpoint
+  // sits in the second half of the year.
+  const midPct = endPct >= startPct
+    ? (startPct + endPct) / 2
+    : ((startPct + endPct + 100) / 2) % 100;
+  const iconStyle = (leftPct: number, color: string): React.CSSProperties => ({
+    position: 'absolute',
+    left: `${leftPct}%`,
+    top: cy,
+    transform: 'translate(-50%, -50%)',
+    color,
+    filter: 'drop-shadow(0 0 1.5px rgba(0,0,0,0.7))',
+    lineHeight: 0,
+  });
   return (
     <>
-      <span
-        className="absolute pointer-events-none"
-        style={{
-          left: `${startPct}%`,
-          top: cy,
-          transform: 'translate(-50%, -50%)',
-          color: '#F0FDF4',
-          filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.55))',
-          lineHeight: 0,
-        }}
-        aria-hidden
-      >
+      <span className="pointer-events-none" style={iconStyle(startPct, '#F472B6')} aria-hidden>
         <Flower2 width={iconSize} height={iconSize} />
       </span>
-      <span
-        className="absolute pointer-events-none"
-        style={{
-          left: `${endPct}%`,
-          top: cy,
-          transform: 'translate(-50%, -50%)',
-          color: '#FFF7ED',
-          filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.55))',
-          lineHeight: 0,
-        }}
-        aria-hidden
-      >
+      <span className="pointer-events-none" style={iconStyle(midPct, '#FCD34D')} aria-hidden>
+        <Sun width={iconSize} height={iconSize} fill="#FCD34D" />
+      </span>
+      <span className="pointer-events-none" style={iconStyle(endPct, '#C2410C')} aria-hidden>
         <Leaf width={iconSize} height={iconSize} />
       </span>
     </>

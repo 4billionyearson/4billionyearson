@@ -251,6 +251,17 @@ export default function SeasonalShiftCard({
           />
         )}
 
+      {hasWetDry && rain &&
+        rain.wetSeasonOnsetDoyBaseline !== null &&
+        rain.wetSeasonOnsetDoyRecent !== null && (
+          <WetSeasonShiftBar
+            baselineDoy={rain.wetSeasonOnsetDoyBaseline}
+            recentDoy={rain.wetSeasonOnsetDoyRecent}
+            shiftDays={rain.wetSeasonOnsetShiftDays ?? 0}
+            annualRainPct={rain.annualTotalShiftPct}
+          />
+        )}
+
       <div className="flex gap-2 text-xs flex-wrap mt-4 mb-2">
         <TabButton active={effectiveView === 'monthly'} onClick={() => setView('monthly')}>
           Month-by-month
@@ -647,10 +658,10 @@ function WarmSeasonShiftBar({
     <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-3 mb-4">
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
         <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider">
-          Spring &amp; Autumn shift
+          Shifting summer <span className="text-gray-500 normal-case font-normal tracking-normal">(spring earlier · autumn later)</span>
         </div>
         <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
-          {deltaDays > 0 ? `+${deltaDays} days longer` : deltaDays < 0 ? `${deltaDays} days shorter` : 'no change'}
+          {deltaDays > 0 ? `+${deltaDays} days longer summer` : deltaDays < 0 ? `${Math.abs(deltaDays)} days shorter summer` : 'no change'}
         </div>
       </div>
       <CalendarTimeline rows={rows} labelColPx={150} />
@@ -659,6 +670,58 @@ function WarmSeasonShiftBar({
           {[springText, autumnText].filter(Boolean).join(' · ')}
         </div>
       )}
+    </div>
+  );
+}
+
+function WetSeasonShiftBar({
+  baselineDoy,
+  recentDoy,
+  shiftDays,
+  annualRainPct,
+}: {
+  baselineDoy: number;
+  recentDoy: number;
+  shiftDays: number;
+  annualRainPct: number;
+}) {
+  const shiftColor = shiftDays > 1 ? '#FBBF24' : shiftDays < -1 ? '#38BDF8' : '#9CA3AF';
+  const rows: TimelineRow[] = [
+    {
+      kind: 'point',
+      key: 'wet',
+      title: 'Wet-season onset',
+      sub: `Baseline: ${doyToLabel(baselineDoy)} · 25% of annual rain`,
+      delta: `Now: ${doyToLabel(recentDoy)}`,
+      deltaColor: '#7DD3FC',
+      color: '#38BDF8',
+      baselineDoy,
+      recentDoy,
+      pointStyle: 'wet',
+    },
+  ];
+  const onsetText = shiftDays === 0
+    ? 'no change'
+    : shiftDays > 0
+      ? `${Math.round(shiftDays)} days later`
+      : `${Math.abs(Math.round(shiftDays))} days earlier`;
+  const rainText = `${annualRainPct > 0 ? '+' : ''}${annualRainPct.toFixed(1)}% annual rain`;
+  return (
+    <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-3 mb-4">
+      <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
+        <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider inline-flex items-center gap-1.5">
+          <CloudRain className="h-3.5 w-3.5 text-sky-300" />
+          Shifting wet season
+          <span className="text-gray-500 normal-case font-normal tracking-normal">(rain timing &amp; total)</span>
+        </div>
+        <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
+          {onsetText}
+        </div>
+      </div>
+      <CalendarTimeline rows={rows} labelColPx={150} />
+      <div className="mt-2 text-xs font-mono text-center" style={{ color: shiftColor }}>
+        {rainText}
+      </div>
     </div>
   );
 }
