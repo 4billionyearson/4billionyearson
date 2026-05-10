@@ -179,7 +179,7 @@ export default function CalendarTimeline({
 
 /* ───────────────────────── Constants ───────────────────────── */
 
-const TRACK_H = 58;       // overall row track height (px) - leaves room for season icons under recent bar
+const TRACK_H = 64;       // overall row track height (px) - leaves room for season icons under recent bar
 const BAR_TOP = 8;        // top offset of baseline bar
 const BAR_H = 14;         // bar thickness
 const RECENT_TOP = 26;    // top offset of recent bar
@@ -346,10 +346,13 @@ function renderBarSegments({
 
   function recentSegStyle(progressFrom: number, progressTo: number): React.CSSProperties {
     if (seasonalPalette) {
+      // Stack a soft top-sheen over the seasonal gradient so the bar reads
+      // as a 3-D track rather than a flat block. Glow uses a warm amber
+      // regardless of cohort colour so all seasonal bars feel coherent.
       return {
         ...baseStyle,
-        backgroundImage: seasonalGradient(progressFrom, progressTo),
-        boxShadow: `inset 0 0 0 1px ${hexToRgba(color, 0.45)}, 0 0 14px ${hexToRgba(color, 0.30)}`,
+        backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 38%, rgba(0,0,0,0.18) 100%), ${seasonalGradient(progressFrom, progressTo)}`,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 0 0 1px rgba(0,0,0,0.25), 0 0 18px rgba(250,204,21,0.28)',
       };
     }
     return {
@@ -431,38 +434,50 @@ function renderBarSegments({
 
 /** Spring flower / midsummer sun / autumn leaf icons placed UNDER the recent
  *  warm bar so they don't overlap it. Each is tinted to match the season:
- *  pink flower, amber sun, russet leaf. The sun sits at the bar's midpoint
- *  (handles wrapping bars by computing the circular midpoint). */
+ *  spring-green flower, golden sun, russet leaf. The sun sits at the bar's
+ *  midpoint (handles wrapping bars by computing the circular midpoint). */
 function SeasonalEndcaps({
   startPct, endPct, top,
 }: { startPct: number; endPct: number; top: number }) {
-  const iconSize = 14;
-  // Place icons centred just below the bar.
-  const cy = top + BAR_H + 7;
+  const iconSize = 15;
+  // Place icons centred well below the bar so they read as labels not overlay.
+  const cy = top + BAR_H + 14;
   // Midpoint along the year axis: if bar wraps (end < start) the midpoint
   // sits in the second half of the year.
   const midPct = endPct >= startPct
     ? (startPct + endPct) / 2
     : ((startPct + endPct + 100) / 2) % 100;
-  const iconStyle = (leftPct: number, color: string): React.CSSProperties => ({
+  const iconStyle = (leftPct: number, color: string, glow: string): React.CSSProperties => ({
     position: 'absolute',
     left: `${leftPct}%`,
     top: cy,
     transform: 'translate(-50%, -50%)',
     color,
-    filter: 'drop-shadow(0 0 1.5px rgba(0,0,0,0.7))',
+    filter: `drop-shadow(0 0 3px ${glow}) drop-shadow(0 0 1px rgba(0,0,0,0.8))`,
     lineHeight: 0,
   });
   return (
     <>
-      <span className="pointer-events-none" style={iconStyle(startPct, '#F472B6')} aria-hidden>
-        <Flower2 width={iconSize} height={iconSize} />
+      <span
+        className="pointer-events-none"
+        style={iconStyle(startPct, '#86EFAC', 'rgba(74,222,128,0.55)')}
+        aria-hidden
+      >
+        <Flower2 width={iconSize} height={iconSize} strokeWidth={2.25} />
       </span>
-      <span className="pointer-events-none" style={iconStyle(midPct, '#FCD34D')} aria-hidden>
-        <Sun width={iconSize} height={iconSize} fill="#FCD34D" />
+      <span
+        className="pointer-events-none"
+        style={iconStyle(midPct, '#FCD34D', 'rgba(252,211,77,0.65)')}
+        aria-hidden
+      >
+        <Sun width={iconSize} height={iconSize} fill="#FDE68A" strokeWidth={2.25} />
       </span>
-      <span className="pointer-events-none" style={iconStyle(endPct, '#C2410C')} aria-hidden>
-        <Leaf width={iconSize} height={iconSize} />
+      <span
+        className="pointer-events-none"
+        style={iconStyle(endPct, '#FB923C', 'rgba(234,88,12,0.55)')}
+        aria-hidden
+      >
+        <Leaf width={iconSize} height={iconSize} strokeWidth={2.25} />
       </span>
     </>
   );
