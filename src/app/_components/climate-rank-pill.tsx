@@ -117,7 +117,7 @@ export default function ClimateRankPill({
     return (
       <Link
         href="/climate/rankings"
-        className="mt-3 inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5 px-3 py-2 text-xs md:text-sm text-gray-300 hover:border-[#D0A65E]/55 hover:bg-[#D0A65E]/10 transition-colors"
+        className="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5 px-3 py-2 text-xs md:text-sm text-gray-300 hover:border-[#D0A65E]/55 hover:bg-[#D0A65E]/10 transition-colors"
       >
         <span className="inline-flex items-center gap-1.5 font-semibold text-[#D0A65E]">
           <TrendingUp className="h-3.5 w-3.5" />
@@ -173,7 +173,7 @@ export default function ClimateRankPill({
   return (
     <Link
       href="/climate/rankings"
-      className="mt-3 inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5 px-3 py-2 text-xs md:text-sm text-gray-300 hover:border-[#D0A65E]/55 hover:bg-[#D0A65E]/10 transition-colors"
+      className="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5 px-3 py-2 text-xs md:text-sm text-gray-300 hover:border-[#D0A65E]/55 hover:bg-[#D0A65E]/10 transition-colors"
     >
       <span className="inline-flex items-center gap-1.5 font-semibold text-[#D0A65E]">
         <TrendingUp className="h-3.5 w-3.5" />

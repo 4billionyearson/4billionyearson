@@ -15,6 +15,7 @@ import {
   OverviewGrid,
   buildOverviewRow,
   pruneStaleComparisonRows,
+  parseMonthLabel,
   type OverviewPanel,
   type OverviewRow,
 } from '../_shared/overview-grid';
@@ -410,6 +411,15 @@ export default function GlobalProfile({
     }];
   }, [data]);
 
+  // Page-wide snapshot month: NOAA Land+Ocean is the slowest source on the
+  // global page, so it pins the cutoff. Any month past this on the spaghetti
+  // charts (e.g. OWID Land may have already published the next month) is
+  // rendered with a dashed line / "(provisional)" tooltip.
+  const pageSnapshotCut = useMemo(() => {
+    const label = data?.noaaStats?.landOcean?.latestMonthStats?.label ?? null;
+    return parseMonthLabel(label);
+  }, [data]);
+
   return (
     <main>
       <div className="container mx-auto px-3 md:px-4 pt-2 pb-6 md:pt-4 md:pb-8 font-sans text-gray-200">
@@ -424,7 +434,7 @@ export default function GlobalProfile({
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md px-4 py-3 md:px-6 md:py-4">
               <GlobalRankingsTeaser />
-              <div className="mb-3">
+              <div className="mt-3 mb-3 flex flex-wrap items-center gap-x-2 gap-y-2">
                 <NextSnapshotBadge latestDataLabel={latestDataLabel} />
               </div>
 
@@ -587,6 +597,7 @@ export default function GlobalProfile({
                         regionName="Global Land + Ocean"
                         dataSource="NOAA Climate at a Glance - Global Land+Ocean"
                         embedSlug="global-land-ocean"
+                        provisionalAfterMonth={pageSnapshotCut}
                         share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'monthly-history-land-ocean' }}
                         footer={<>The headline global series (land + ocean) - the dataset Copernicus, WMO and NOAA report against. Source: NOAA Climate at a Glance.</>}
                       />
@@ -597,6 +608,7 @@ export default function GlobalProfile({
                         regionName="Global Land"
                         dataSource="Our World in Data / ERA5"
                         embedSlug="global-land"
+                        provisionalAfterMonth={pageSnapshotCut}
                         share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'monthly-history-land' }}
                         footer={<>Land-only equivalent, on the same scale as the country, state and region climate pages (which have no ocean inside their borders). Source: Our World in Data / ERA5.</>}
                       />

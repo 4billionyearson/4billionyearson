@@ -93,7 +93,7 @@ export default function UpdateEmbedClient({ slug, regionName, monthLabel }: { sl
             </p>
           </div>
         )}
-        <div className="mb-3">
+        <div className="mt-3 mb-3">
           {isGlobal ? <GlobalRankingsTeaser /> : <ClimateRankPill slug={slug} />}
         </div>
       {loading && (

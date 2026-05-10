@@ -59,15 +59,17 @@ export default function NextSnapshotBadge({
     if (now.getDate() > 14) return null;
   }
 
-  // "April update · ~13–25 May"
+  // "April update · ~12–15 May"
   const comingMonth = LONG_MONTHS[lastMonthIdx];   // data month expected
   const updateMonth = LONG_MONTHS[currentMonthIdx]; // month the CI window runs in
-  // Default to NOAA global's publication window (13–25), since for nearly
-  // every page (country, region, US state, group, global, rankings) the
-  // page can't flip to the new month until NOAA global has published.
+  // Default to NOAA global's typical publication window. NOAA NCEI publishes
+  // the prior-month Monthly Global Climate Report in the second week of the
+  // following month (most months ~day 12–15). For nearly every page (country,
+  // region, US state, group, global, rankings) the page can't flip to the
+  // new month until NOAA global has published, so this window applies.
   // UK-only pages (where Met Office data alone gates the page) can pass
-  // "3–14" instead.
-  const days = windowDays ?? '13–25';
+  // "3–10" instead.
+  const days = windowDays ?? '12–15';
 
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/40 bg-sky-400/10 px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider text-sky-300">

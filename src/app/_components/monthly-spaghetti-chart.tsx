@@ -336,7 +336,7 @@ export default function MonthlySpaghettiChart({
                 return (
                   <g key={index}>
                     <circle cx={cx} cy={cy} r={5} fill={cfg.currentColor} stroke="#fff" strokeWidth={1.5} />
-                    <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} ${currentYear}: ${formatValue(cfg, raw)}`} monthIdx={latestMonthIdx} />
+                    <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} '${String(currentYear).slice(-2)}: ${formatValue(cfg, raw)}`} monthIdx={latestMonthIdx} />
                   </g>
                 );
               }}
@@ -362,7 +362,7 @@ export default function MonthlySpaghettiChart({
                   return (
                     <g key={index}>
                       <circle cx={cx} cy={cy} r={5} fill={cfg.currentColor} stroke="#fff" strokeWidth={1.5} />
-                      <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} ${currentYear}: ${formatValue(cfg, raw)} (provisional)`} monthIdx={latestMonthIdx} />
+                      <CalloutLabel cx={cx} cy={cy} color={cfg.currentColor} text={`${MONTH_LABELS[latestMonthIdx]} '${String(currentYear).slice(-2)}: ${formatValue(cfg, raw)} (provisional)`} monthIdx={latestMonthIdx} />
                     </g>
                   );
                 }}
@@ -450,9 +450,11 @@ interface TooltipPayloadEntry {
  * below the dot when the dot is near the top of the plot area.
  */
 function CalloutLabel({ cx, cy, color, text, monthIdx }: { cx: number; cy: number; color: string; text: string; monthIdx?: number }) {
-  // Approximate text width (monospace-ish at 11px)
-  const charW = 6.2;
-  const padX = 6;
+  // Approximate text width (monospace-ish at 11px). Tightened from 6.2/6
+  // so the rounded rect hugs the label — previously it had a noticeable
+  // gap on either end, especially on mobile.
+  const charW = 5.6;
+  const padX = 4;
   const padY = 3;
   const textW = text.length * charW;
   const rectW = textW + padX * 2;
