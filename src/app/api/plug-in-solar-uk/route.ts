@@ -358,10 +358,66 @@ async function validateUrl(url: string): Promise<boolean> {
 }
 
 /**
+ * News publisher domains we trust without a live HEAD check.
+ * Major news sites routinely block server-side HEAD/GET requests with
+ * 403/429 even when the article is live, which caused ALL news items to
+ * be dropped after every Gemini run. Mirrors retailerUrlTrustedWithoutFetch.
+ */
+const TRUSTED_NEWS_DOMAINS = [
+  'bbc.co.uk',
+  'bbc.com',
+  'theguardian.com',
+  'telegraph.co.uk',
+  'thetimes.co.uk',
+  'ft.com',
+  'independent.co.uk',
+  'dailymail.co.uk',
+  'mirror.co.uk',
+  'express.co.uk',
+  'sun.co.uk',
+  'thisismoney.co.uk',
+  'which.co.uk',
+  'moneysavingexpert.com',
+  'solarpowerportal.co.uk',
+  'theengineer.co.uk',
+  'electricalreview.co.uk',
+  'currentnews.co.uk',
+  'energymonitor.ai',
+  'rechargenews.com',
+  'pv-tech.org',
+  'pveurope.eu',
+  'solarpowerworldonline.com',
+  'electrek.co',
+  'cleantechnica.com',
+  'renewableenergyworld.com',
+  'energydigital.com',
+  'businessgreen.com',
+  'edie.net',
+  'gov.uk',
+  'parliament.uk',
+  'ofgem.gov.uk',
+  'theiet.org',
+  'bsigroup.com',
+  'reuters.com',
+  'apnews.com',
+  'bloomberg.com',
+];
+
+function newsUrlTrustedWithoutFetch(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return TRUSTED_NEWS_DOMAINS.some((d) => host === d || host.endsWith('.' + d));
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Strip out news items whose sourceUrl doesn't resolve. URLs already
  * present in the grounding-metadata set are trusted without a network
  * call (they came directly from Google's search index, so they were
- * live as of seconds ago).
+ * live as of seconds ago). Recognised news publisher domains are also
+ * trusted without a fetch — they routinely block server HEAD requests.
  */
 async function filterNewsBrokenLinks(
   parsed: PlugInSolarLiveData,
@@ -375,6 +431,9 @@ async function filterNewsBrokenLinks(
       const url = (item?.sourceUrl ?? '').trim();
       if (!url) return { item, valid: false };
       if (groundingUris.has(url.toLowerCase())) {
+        return { item, valid: true };
+      }
+      if (newsUrlTrustedWithoutFetch(url)) {
         return { item, valid: true };
       }
       const valid = await validateUrl(url);

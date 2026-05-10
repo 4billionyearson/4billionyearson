@@ -49,7 +49,7 @@ export function HeroVerdict({ data }: { data: PlugInSolarLiveData | null }) {
         </h2>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-[#D2E369]/50 bg-[#D2E369]/10 px-2.5 py-1 text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
           <RefreshCw className="h-3 w-3" />
-          Refreshed {formatToday(data?.generatedAt)}
+          {formatToday(data?.generatedAt)}
         </span>
       </div>
 
@@ -148,9 +148,12 @@ function formatInstallDate(dateStr: string | undefined): string {
 }
 
 function formatToday(generatedAt: string | undefined): string {
-  const d = generatedAt ? new Date(generatedAt) : new Date();
-  if (Number.isNaN(d.getTime())) return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (!generatedAt) return 'Pending';
+  const d = new Date(generatedAt);
+  if (Number.isNaN(d.getTime())) return 'Pending';
+  const date = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Europe/London' });
+  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' });
+  return `${date} · ${time}`;
 }
 
 type Tone = 'green' | 'orange' | 'rose' | 'lime' | 'sky';
