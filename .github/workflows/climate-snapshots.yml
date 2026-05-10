@@ -1,23 +1,39 @@
-name: Monthly — rebuild climate snapshots
+name: Daily — refresh climate snapshots
 
-# Runs on the 5th of each month at 04:00 UTC (both NOAA and OWID normally
-# have the previous month's data by then), and can be triggered manually
-# from the Actions tab.
+# Runs every day from the 3rd to the 25th of each month at 04:00 UTC.
+# Different upstream sources publish at different times within this window:
 #
-# Refreshes all pre-computed climate JSON snapshots under
-# public/data/climate/ by running the matching build scripts.
+#   Source                  Typical publication    Window used here
+#   ─────────────────────────────────────────────────────────────────
+#   Met Office HadUK        3rd – 10th             days  3–14
+#   OWID ERA5 (countries)   12th – 18th            days 10–25
+#   World Bank CCKP (precip)12th – 18th            days 10–25
+#   NOAA NCEI (global, US)  15th – 25th            days 13–25
+#
+# Each step checks the day-of-month and skips itself when outside its
+# window, keeping runtime short on early and late days of the month.
+#
+# The commit step only fires when at least one JSON file actually changed
+# compared to the previous commit, so the workflow is safe to run daily:
+# if no source has advanced yet, nothing is committed and Vercel is not
+# re-deployed.  Once a source does advance, the push triggers a new Vercel
+# deployment which starts with a fresh ISR cache — pages reflect the new
+# data on the very next request, with no 86400-second wait.
+#
+# The workflow can also be triggered manually from the Actions tab.
+
 on:
   schedule:
-    - cron: '0 4 5 * *'
+    - cron: '0 4 3-25 * *'
   workflow_dispatch:
 
 jobs:
   rebuild:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     permissions:
       contents: write
-      pull-requests: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,61 +47,123 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # ── Global (world-level NOAA + OWID) ────────────────────────────
-      - name: Rebuild global snapshot
-        run: node scripts/build-global-snapshot.mjs
-
-      # ── ENSO / Pacific oceans tracker (NOAA CPC + PSL) ──────────────
-      - name: Rebuild ENSO snapshot
-        run: node scripts/build-enso-snapshot.mjs
-
-      # ── Per-country monthly precipitation (World Bank CCKP) ─────────
-      # Must run BEFORE build-country-snapshots so the country profiles can
-      # enrich themselves with the monthly-comparison chart data.
-      - name: Rebuild country precipitation
-        run: node scripts/build-country-precip.mjs
-
-      # ── Per-country (OWID land temperature + precipitation) ─────────
-      - name: Rebuild country snapshots
-        run: node scripts/build-country-snapshots.mjs
-
-      # ── Resync countryAnomalies on the global snapshot ──────────────
-      # build-global-snapshot runs first (to produce monthlyAll etc.) but
-      # its countryAnomalies field is built from whatever country files
-      # were on disk at that moment. Re-run the patch now that the per-
-      # country snapshots have just been rebuilt, so the world map on the
-      # Global update page always reflects the latest month for every
-      # country.
-      - name: Resync country anomalies on global snapshot
-        run: node scripts/patch-country-anomalies.mjs
-
-      # ── US national (NOAA national time series) ─────────────────────
-      - name: Rebuild US national snapshot
-        run: node scripts/build-us-national-snapshot.mjs
-
-      # ── US states (NOAA statewide time series, ~30 min) ────────────
-      - name: Rebuild US state snapshots
-        run: node scripts/build-us-state-snapshots.mjs
-
-      # ── UK regions (Met Office datasets) ────────────────────────────
+      # ── UK regions (Met Office HadUK: publishes ~3rd–10th) ──────────
       - name: Rebuild UK region snapshots
-        run: node scripts/build-uk-region-snapshots.mjs
+        run: |
+          DAY=$(date -u +%-d)
+          if [ "$DAY" -gt 14 ]; then
+            echo "Day $DAY — outside UK snapshot window (3–14), skipping."
+            exit 0
+          fi
+          node scripts/build-uk-region-snapshots.mjs
+        continue-on-error: true
 
-      # ── Derived: global shifting-seasons + Köppen classifications ──
+      # ── Global (NOAA NCEI ~15th–25th; OWID ERA5 ~12th–18th) ─────────
+      - name: Rebuild global snapshot
+        run: |
+          DAY=$(date -u +%-d)
+          if [ "$DAY" -lt 10 ]; then
+            echo "Day $DAY — outside global snapshot window (10–25), skipping."
+            exit 0
+          fi
+          node scripts/build-global-snapshot.mjs
+        continue-on-error: true
+
+      # ── ENSO / Pacific oceans (NOAA CPC: same window as NOAA global) ─
+      - name: Rebuild ENSO snapshot
+        run: |
+          DAY=$(date -u +%-d)
+          if [ "$DAY" -lt 10 ]; then
+            echo "Day $DAY — outside ENSO window (10–25), skipping."
+            exit 0
+          fi
+          node scripts/build-enso-snapshot.mjs
+        continue-on-error: true
+
+      # ── Per-country precipitation (World Bank CCKP: ~12th–18th) ─────
+      # Must run BEFORE build-country-snapshots.
+      - name: Rebuild country precipitation
+        run: |
+          DAY=$(date -u +%-d)
+          if [ "$DAY" -lt 10 ]; then
+            echo "Day $DAY — outside country precip window (10–25), skipping."
+            exit 0
+          fi
+          node scripts/build-country-precip.mjs
+        continue-on-error: true
+
+      # ── Per-country snapshots (OWID ERA5: ~12th–18th) ─────────────────
+      - name: Rebuild country snapshots
+        run: |
+          DAY=$(date -u +%-d)
+          if [ "$DAY" -lt 10 ]; then
+            echo "Day $DAY — outside country snapshot window (10–25), skipping."
+            exit 0
+          fi
+          node scripts/build-country-snapshots.mjs
+        continue-on-error: true
+
+      # ── Resync countryAnomalies on the global snapshot ───────────────
+      # Re-run after per-country files are rebuilt so the world map always
+      # reflects the latest month for every country.
+      - name: Patch country anomalies on global snapshot
+        run: |
+          DAY=$(date -u +%-d)
+          if [ "$DAY" -lt 10 ]; then
+            echo "Day $DAY — skipping patch (no country data rebuilt yet)."
+            exit 0
+          fi
+          node scripts/patch-country-anomalies.mjs
+        continue-on-error: true
+
+      # ── US national (NOAA national time series: ~15th–25th) ──────────
+      - name: Rebuild US national snapshot
+        run: |
+          DAY=$(date -u +%-d)
+          if [ "$DAY" -lt 13 ]; then
+            echo "Day $DAY — outside US snapshot window (13–25), skipping."
+            exit 0
+          fi
+          node scripts/build-us-national-snapshot.mjs
+        continue-on-error: true
+
+      # ── US states (NOAA statewide: ~15th–25th, ~30 min) ─────────────
+      - name: Rebuild US state snapshots
+        run: |
+          DAY=$(date -u +%-d)
+          if [ "$DAY" -lt 13 ]; then
+            echo "Day $DAY — outside US state window (13–25), skipping."
+            exit 0
+          fi
+          node scripts/build-us-state-snapshots.mjs
+        continue-on-error: true
+
+      # ── Derived (run after all source scripts) ───────────────────────
       - name: Rebuild shifting-seasons global snapshot
         run: npm run build:climate-shift-global
+        continue-on-error: true
 
       - name: Rebuild climate rankings
         run: npm run build:climate-rankings
+        continue-on-error: true
 
+      # ── Commit only if data actually advanced ────────────────────────
+      # git diff --quiet exits 0 when nothing changed → no commit, no
+      # Vercel deploy, no wasted ISR bust.  When files do change, a push
+      # triggers a fresh Vercel deployment whose ISR cache starts cold, so
+      # users see updated data on the very next page load.
       - name: Commit updated snapshots
         run: |
+          git diff --stat -- public/data/climate/ public/data/seasons/
           if git diff --quiet -- public/data/climate/ public/data/seasons/; then
-            echo "No changes to commit."
+            echo "✓ No changes — all sources already current for this month."
             exit 0
           fi
+          CHANGED=$(git diff --name-only -- public/data/climate/ public/data/seasons/ | wc -l | tr -d ' ')
+          echo "Committing $CHANGED changed file(s)…"
           git config user.name "climate-snapshot-bot"
           git config user.email "climate-snapshot-bot@users.noreply.github.com"
           git add public/data/climate/ public/data/seasons/
           git commit -m "chore(climate): refresh snapshots ($(date -u +%Y-%m-%d))"
           git push
+          echo "✓ Pushed — Vercel will deploy updated data on the next request."
