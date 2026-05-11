@@ -131,29 +131,33 @@ function yearColor(year: number, minYear: number, maxYear: number, alpha = 1) {
   return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${alpha})`;
 }
 
-/* Season palette matching the shifting-seasons page. Summer reads as
- * yellow/gold, autumn as brown/amber, in line with how the year is usually
- * pictured. */
+/* Four-season palette — mirrors the icons & accent colours used on the
+ * shifting-seasons page so the visual language stays consistent across the
+ * site:
+ *   winter = ice blue (cyan-300, matches the Snowflake accent)
+ *   spring = fresh green (emerald-300, Flower2 accent)
+ *   summer = warm yellow (yellow-300)
+ *   autumn = chestnut brown (amber-700, Leaf-of-autumn)
+ */
 const SEASON_COLORS = {
-  winter: '#BAE6FD', // ice-blue
-  spring: '#86EFAC', // green
-  summer: '#FACC15', // yellow / gold
-  autumn: '#92400E', // brown / chestnut
+  winter: '#7DD3FC',
+  spring: '#86EFAC',
+  summer: '#FACC15',
+  autumn: '#B45309',
 };
-function seasonForMonth(m: number): keyof typeof SEASON_COLORS {
-  // 0-indexed month
-  if (m <= 1 || m === 11) return 'winter';
-  if (m <= 4) return 'spring';
-  if (m <= 7) return 'summer';
-  return 'autumn';
-}
+const SEASON_LABEL: Record<keyof typeof SEASON_COLORS, string> = {
+  winter: 'Winter',
+  spring: 'Spring',
+  summer: 'Summer',
+  autumn: 'Autumn',
+};
 
 /* ────────────────────────────────────────────────────────────────────────────
  * Polar geometry helpers
  * ──────────────────────────────────────────────────────────────────────── */
 
-const VB = 660;        // viewBox size — extra padding around R_LABEL for
-                       // season-crossing call-out lines outside the chart
+const VB = 720;        // viewBox size — padded to fit season-crossing
+                       // call-out labels outside the month-label ring
 const CX = VB / 2;
 const CY = VB / 2;
 const R_OUTER = 240;   // outermost data ring
@@ -565,7 +569,7 @@ export default function ClimateSpiralCard({
     <div id={sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
       <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
         <span className="shrink-0 mt-1 text-[#D0A65E]">{METRIC_ICON[metric]}</span>
-        <span className="min-w-0 flex-1">{regionName} – The 4BYO Climate Spiral</span>
+        <span className="min-w-0 flex-1">The 4BYO Climate Spiral – {regionName}</span>
       </h3>
       <p className="text-xs text-gray-400 mb-3">
         Every year is a closed loop running Jan→Dec, with the radius set by that month&apos;s value.
@@ -645,69 +649,121 @@ export default function ClimateSpiralCard({
                    data-driven pie wedges representing the growing seasons of
                    the oldest and newest decades — so the user can see at a
                    glance how the season has expanded. */}
+              {/* Season-tint background.
+               *
+               * Three modes:
+               * (a) showSeasons + temperate climate (shiftDecades.length>=2)
+               *     + temp metric: 4 wedges placed by the LATEST decade's
+               *     10°C crossings. Spring starts where the data says it
+               *     starts now, not at a fixed astronomical date.
+               * (b) showSeasons but no crossings (e.g. tropical/arid, or
+               *     non-temp metric): fall back to fixed meteorological
+               *     quarters (Mar–May spring, etc.).
+               * (c) showShiftTrail (overrides (a)): swap the 4-tint mode for
+               *     two over-lapping growing-season wedges — oldest decade
+               *     in early-blue, newest decade in modern-orange — so the
+               *     viewer sees the season expansion directly. */}
               {showSeasons && (() => {
-                const useShifted = showShiftTrail && shiftDecades.length >= 2 && metric === 'temp' && !anomaly;
-                if (useShifted) {
+                const r = R_OUTER + 4;
+                const wedgePath = (a1: number, a2: number) => {
+                  // Always sweep clockwise (positive direction).
+                  let span = a2 - a1;
+                  while (span <= 0) span += Math.PI * 2;
+                  const large = span > Math.PI ? 1 : 0;
+                  const [x1, y1] = polar(r, a1);
+                  const [x2, y2] = polar(r, a2);
+                  return `M ${CX} ${CY} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
+                };
+
+                const useShiftPreset = showShiftTrail && shiftDecades.length >= 2 && metric === 'temp' && !anomaly;
+                if (useShiftPreset) {
                   const first = shiftDecades[0];
                   const last = shiftDecades[shiftDecades.length - 1];
-                  const r = R_OUTER + 4;
-                  const wedgePath = (sp: number, au: number) => {
-                    const a1 = monthAngle(sp);
-                    const a2 = monthAngle(au);
-                    const span = a2 - a1;
-                    const large = span > Math.PI ? 1 : 0;
-                    const [x1, y1] = polar(r, a1);
-                    const [x2, y2] = polar(r, a2);
-                    return `M ${CX} ${CY} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
-                  };
-                  // Old growing season tinted brown/autumn (the season as it
-                  // *was* — shorter, ending earlier). New growing season
-                  // tinted summer-yellow (the longer, hotter season we live
-                  // in now). Where they overlap the colour blends; the
-                  // yellow crescents at each end are the months that have
-                  // been *added* to summer.
                   return (
                     <g>
-                      <path d={wedgePath(first.spring, first.autumn)} fill={SEASON_COLORS.autumn} opacity={0.22} />
-                      <path d={wedgePath(last.spring, last.autumn)} fill={SEASON_COLORS.summer} opacity={0.28} />
-                      <text
-                        x={CX} y={CY + R_OUTER * 0.55}
-                        textAnchor="middle"
-                        fontSize={10}
-                        fill="#FDE047"
-                        fontFamily="ui-monospace, monospace"
-                      >
-                        {last.decade}s growing season
-                      </text>
-                      <text
-                        x={CX} y={CY + R_OUTER * 0.55 + 13}
-                        textAnchor="middle"
-                        fontSize={9}
-                        fill="rgba(146,64,14,0.95)"
-                        fontFamily="ui-monospace, monospace"
-                      >
-                        {first.decade}s growing season
-                      </text>
+                      <path d={wedgePath(monthAngle(first.spring), monthAngle(first.autumn))} fill="#2a5eb8" opacity={0.22} />
+                      <path d={wedgePath(monthAngle(last.spring),  monthAngle(last.autumn))}  fill="#e8440a" opacity={0.28} />
+                      <text x={CX} y={CY + R_OUTER * 0.55}      textAnchor="middle" fontSize={10} fill="#FCA5A5" fontFamily="ui-monospace, monospace">{last.decade}s growing season</text>
+                      <text x={CX} y={CY + R_OUTER * 0.55 + 13} textAnchor="middle" fontSize={9}  fill="#7DA8E8" fontFamily="ui-monospace, monospace">{first.decade}s growing season</text>
                     </g>
                   );
                 }
+
+                // Data-driven 4-season boundaries (decimal-month angles).
+                // We have spring 10°C crossing & autumn 10°C crossing from
+                // the latest decade. Place summer-start at the midpoint of
+                // the warm half, winter-start at the midpoint of the cold
+                // half. All four wedges then derive from real data.
+                let springStart: number, summerStart: number, autumnStart: number, winterStart: number;
+                let derived = false;
+                if (shiftDecades.length >= 2 && metric === 'temp') {
+                  const last = shiftDecades[shiftDecades.length - 1];
+                  springStart = last.spring;
+                  autumnStart = last.autumn;
+                  const warmSpan = autumnStart - springStart;
+                  summerStart = springStart + warmSpan / 2;
+                  // Cold half wraps through Dec/Jan
+                  winterStart = autumnStart + (12 - warmSpan) / 2;
+                  if (winterStart >= 12) winterStart -= 12;
+                  derived = true;
+                } else {
+                  // Fixed meteorological quarters: spring=Mar (m=2),
+                  // summer=Jun (m=5), autumn=Sep (m=8), winter=Dec (m=11).
+                  springStart = 2;
+                  summerStart = 5;
+                  autumnStart = 8;
+                  winterStart = 11;
+                }
+
+                const bounds: Array<{ season: keyof typeof SEASON_COLORS; start: number; end: number }> = [
+                  { season: 'spring', start: springStart, end: summerStart },
+                  { season: 'summer', start: summerStart, end: autumnStart },
+                  { season: 'autumn', start: autumnStart, end: winterStart },
+                  { season: 'winter', start: winterStart, end: springStart },
+                ];
+
+                // Helper to find the angle at the wedge centroid (for labels).
+                const labelAngle = (a: number, b: number) => {
+                  let span = b - a;
+                  if (span <= 0) span += 12;
+                  let mid = a + span / 2;
+                  if (mid >= 12) mid -= 12;
+                  return monthAngle(mid);
+                };
+
                 return (
-                  <g opacity={0.22}>
-                    {Array.from({ length: 12 }, (_, m) => {
-                      const a1 = monthAngle(m) - Math.PI / 12;
-                      const a2 = monthAngle(m) + Math.PI / 12;
-                      const r = R_OUTER + 4;
-                      const [x1, y1] = polar(r, a1);
-                      const [x2, y2] = polar(r, a2);
-                      const fill = SEASON_COLORS[seasonForMonth(m)];
+                  <g>
+                    <g opacity={0.22}>
+                      {bounds.map((s) => (
+                        <path key={`wedge-${s.season}`} d={wedgePath(monthAngle(s.start), monthAngle(s.end))} fill={SEASON_COLORS[s.season]} />
+                      ))}
+                    </g>
+                    {/* Season name labels at the wedge centroid, mid-radius */}
+                    {bounds.map((s) => {
+                      const ang = labelAngle(s.start, s.end);
+                      const [lx, ly] = polar(R_OUTER * 0.70, ang);
                       return (
-                        <path
-                          key={`wedge-${m}`}
-                          d={`M ${CX} ${CY} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`}
-                          fill={fill}
-                        />
+                        <text
+                          key={`slab-${s.season}`}
+                          x={lx} y={ly}
+                          fontSize={11}
+                          fontWeight={600}
+                          fill={SEASON_COLORS[s.season]}
+                          opacity={0.55}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontFamily="ui-monospace, monospace"
+                          style={{ letterSpacing: '0.05em' }}
+                        >
+                          {SEASON_LABEL[s.season]}
+                        </text>
                       );
                     })}
+                    {derived && (
+                      <text x={CX} y={CY + R_OUTER + 32} textAnchor="middle" fontSize={9} fill="rgba(220,225,235,0.55)" fontFamily="ui-monospace, monospace">
+                        Season tints anchored to the latest decade&apos;s 10°C crossings
+                      </text>
+                    )}
                   </g>
                 );
               })()}
@@ -1070,54 +1126,46 @@ export default function ClimateSpiralCard({
                 const last = shiftDecades[shiftDecades.length - 1];
                 const r10 = valueToR(SHIFT_THRESHOLD, 3);
                 if (!Number.isFinite(r10) || r10 <= 0) return null;
+                // Old-decade ticks/labels in early-blue, new-decade in
+                // modern-orange — matches the year-colour ramp used by the
+                // spaghetti background and the two growing-season wedges.
                 type CO = { ang: number; label1: string; label2: string; colour: string };
                 const items: CO[] = [
-                  { ang: monthAngle(first.spring), label1: 'Spring starts', label2: `${first.decade}s`, colour: '#92400E' },
-                  { ang: monthAngle(last.spring),  label1: 'Spring starts', label2: `${last.decade}s`,  colour: '#FACC15' },
-                  { ang: monthAngle(first.autumn), label1: 'Autumn ends',   label2: `${first.decade}s`, colour: '#92400E' },
-                  { ang: monthAngle(last.autumn),  label1: 'Autumn ends',   label2: `${last.decade}s`,  colour: '#FACC15' },
+                  { ang: monthAngle(first.spring), label1: 'Spring starts', label2: `${first.decade}s`, colour: '#7DA8E8' },
+                  { ang: monthAngle(last.spring),  label1: 'Spring starts', label2: `${last.decade}s`,  colour: '#FCA5A5' },
+                  { ang: monthAngle(first.autumn), label1: 'Autumn ends',   label2: `${first.decade}s`, colour: '#7DA8E8' },
+                  { ang: monthAngle(last.autumn),  label1: 'Autumn ends',   label2: `${last.decade}s`,  colour: '#FCA5A5' },
                 ];
+                // Place label at the radial endpoint just past the month-
+                // label band. No horizontal tail — keeps every label within
+                // the SVG viewBox regardless of angle.
+                const rLabel = R_LABEL + R_LABEL_BAND_W / 2 + 16;
                 return (
                   <g pointerEvents="none">
                     {items.map((it, i) => {
-                      // Leader line: from 10°C ring out to just past the
-                      // label band. We bend it slightly: radial out to
-                      // R_LABEL+14, then a short horizontal tail toward the
-                      // outside so the text sits cleanly to the left/right.
                       const [x0, y0] = polar(r10, it.ang);
-                      const [x1, y1] = polar(R_OUTER + 4, it.ang);
-                      const [x2, y2] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 6, it.ang);
-                      const right = Math.cos(it.ang) >= 0;
-                      const tailLen = 22;
-                      const x3 = x2 + (right ? tailLen : -tailLen);
-                      const y3 = y2;
-                      const anchor: 'start' | 'end' = right ? 'start' : 'end';
+                      const [x1, y1] = polar(R_OUTER + 6, it.ang);
+                      const [x2, y2] = polar(rLabel, it.ang);
                       return (
                         <g key={`crossing-${i}`}>
                           <circle cx={x0} cy={y0} r={3} fill={it.colour} stroke="#0b0e16" strokeWidth={0.8} />
-                          <path
-                            d={`M ${x1.toFixed(2)} ${y1.toFixed(2)} L ${x2.toFixed(2)} ${y2.toFixed(2)} L ${x3.toFixed(2)} ${y3.toFixed(2)}`}
-                            fill="none"
-                            stroke={it.colour}
-                            strokeWidth={1}
-                            opacity={0.85}
-                          />
+                          <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={it.colour} strokeWidth={1} opacity={0.85} />
                           <text
-                            x={x3 + (right ? 3 : -3)} y={y3 - 1}
+                            x={x2} y={y2 - 4}
                             fontSize={10}
                             fontWeight={600}
                             fill={it.colour}
-                            textAnchor={anchor}
+                            textAnchor="middle"
                             dominantBaseline="alphabetic"
                             fontFamily="ui-monospace, monospace"
                           >
                             {it.label1}
                           </text>
                           <text
-                            x={x3 + (right ? 3 : -3)} y={y3 + 10}
+                            x={x2} y={y2 + 8}
                             fontSize={9}
-                            fill="rgba(220,225,235,0.75)"
-                            textAnchor={anchor}
+                            fill="rgba(220,225,235,0.78)"
+                            textAnchor="middle"
                             dominantBaseline="alphabetic"
                             fontFamily="ui-monospace, monospace"
                           >
