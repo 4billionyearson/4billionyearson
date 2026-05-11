@@ -338,20 +338,40 @@ export default function ClimateSpiralCard({
 
   const effectiveFromYear = yearFrom ?? Math.max(minYear, 1950);
 
-  /* Reference periods */
-  const baselineFrom = 1961;
-  const baselineTo = 1990;
-  const recentTo = Math.min(maxYear, new Date().getFullYear() - 1);
-  const recentFrom = Math.max(recentTo - 9, minYear);
+  /* Reference periods — user-adjustable.
+   * Defaults: WMO-standard 1961–1990 baseline + most-recent 10 completed
+   * years. Both ranges are clamped to [minYear, maxYear]. */
+  const defaultBaselineRange: [number, number] = useMemo(() => {
+    const from = Math.max(minYear, 1961);
+    const to = Math.min(maxYear, 1990);
+    return from < to ? [from, to] : [minYear, Math.min(maxYear, minYear + 29)];
+  }, [minYear, maxYear]);
+  const defaultRecentRange: [number, number] = useMemo(() => {
+    const calYear = new Date().getFullYear();
+    const to = Math.min(maxYear, calYear - 1);
+    const from = Math.max(minYear, to - 9);
+    return [from, to];
+  }, [minYear, maxYear]);
+
+  const [baselineRange, setBaselineRange] = useState<[number, number]>(defaultBaselineRange);
+  const [recentRange, setRecentRange] = useState<[number, number]>(defaultRecentRange);
+  const [baselineFrom, baselineTo] = baselineRange;
+  const [recentFrom, recentTo] = recentRange;
 
   const meanBaseline = useMemo(
     () => monthlyMeanProfile(yearMap, baselineFrom, baselineTo),
-    [yearMap],
+    [yearMap, baselineFrom, baselineTo],
   );
   const meanRecent = useMemo(
     () => monthlyMeanProfile(yearMap, recentFrom, recentTo),
     [yearMap, recentFrom, recentTo],
   );
+
+  /* Hover state for chart tooltip: nearest year at the mouse position. */
+  const [hover, setHover] = useState<
+    | { year: number; monthIdx: number; value: number; r: number; sx: number; sy: number }
+    | null
+  >(null);
 
   /* Value→radius scale: derive from data extent across all years to be drawn. */
   const { rMin, rMax, currentYear, recordYear } = useMemo(() => {
@@ -498,10 +518,10 @@ export default function ClimateSpiralCard({
       </h3>
       <p className="text-xs text-gray-400 mb-3">
         Every year is a closed loop running Jan→Dec, with the radius set by that month&apos;s value.
-        Blue years are older, red years more recent. The 1961–90 baseline mean ring sits inside the
-        most recent decade&apos;s ring, so any gap between them <em>is</em> climate change. On the
-        temperature view, the optional season-shift trail traces how the 10°C growing-season
-        threshold has crept earlier in spring and later in autumn, decade by decade.
+        Blue years are older, red years more recent. The dashed grey ring is your <em>baseline</em>
+        mean shape; the dashed red ring is your <em>comparison</em> mean shape — adjust either window
+        below to test what climate change looks like under different reference periods. Hover the
+        chart to inspect any year-month value.
       </p>
 
       {/* Metric tabs */}
@@ -526,8 +546,48 @@ export default function ClimateSpiralCard({
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 items-start">
         {/* ─── Left: Spiral chart ───────────────────────────────────────── */}
         <div>
-          <div className="w-full max-w-[600px] mx-auto">
-            <svg viewBox={`0 0 ${VB} ${VB}`} className="w-full h-auto select-none">
+          <div className="relative w-full max-w-[600px] mx-auto">
+            <svg
+              viewBox={`0 0 ${VB} ${VB}`}
+              className="w-full h-auto select-none cursor-crosshair"
+              onMouseMove={(e) => {
+                const svg = e.currentTarget;
+                const rect = svg.getBoundingClientRect();
+                if (rect.width === 0) return;
+                const sx = ((e.clientX - rect.left) / rect.width) * VB;
+                const sy = ((e.clientY - rect.top) / rect.height) * VB;
+                const dx = sx - CX;
+                const dy = sy - CY;
+                const rMouse = Math.hypot(dx, dy);
+                if (rMouse < 18 || rMouse > R_OUTER + 10) {
+                  setHover(null);
+                  return;
+                }
+                const ang = Math.atan2(dy, dx); // atan2 returns [-π, π], 0 = +x axis
+                // monthAngle(m) = (m/12)*2π - π/2. Inverse: m = ((ang + π/2)/(2π))*12
+                let monthFrac = ((ang + Math.PI / 2) / (Math.PI * 2)) * 12;
+                if (monthFrac < 0) monthFrac += 12;
+                const monthIdx = (Math.round(monthFrac) % 12 + 12) % 12;
+                // Find nearest year (smallest |r_year - r_mouse|).
+                let best: { year: number; value: number; r: number; d: number } | null = null;
+                for (const y of renderYears) {
+                  const arr = yearMap.get(y);
+                  if (!arr) continue;
+                  const v = arr[monthIdx];
+                  if (!Number.isFinite(v)) continue;
+                  const yr = valueToR(v, monthIdx);
+                  if (!Number.isFinite(yr)) continue;
+                  const d = Math.abs(yr - rMouse);
+                  if (!best || d < best.d) best = { year: y, value: v, r: yr, d };
+                }
+                if (best && best.d < 18) {
+                  setHover({ year: best.year, monthIdx, value: best.value, r: best.r, sx, sy });
+                } else {
+                  setHover(null);
+                }
+              }}
+              onMouseLeave={() => setHover(null)}
+            >
               {/* Season-wedge background */}
               {showSeasons && (
                 <g opacity={0.18}>
@@ -793,6 +853,29 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
+              {/* Hovered year: full ring highlight + marker dot. Sits above
+                   the spaghetti but below the month labels. */}
+              {hover && (() => {
+                const arr = yearMap.get(hover.year);
+                if (!arr) return null;
+                const pts = yearToPoints(arr);
+                const [mx, my] = polar(hover.r, monthAngle(hover.monthIdx));
+                return (
+                  <g pointerEvents="none">
+                    {pts && (
+                      <path
+                        d={smoothClosedPath(pts)}
+                        fill="none"
+                        stroke="#FDE68A"
+                        strokeWidth={2.2}
+                        opacity={0.95}
+                      />
+                    )}
+                    <circle cx={mx} cy={my} r={5} fill="#FDE68A" stroke="#0b0e16" strokeWidth={1.2} />
+                  </g>
+                );
+              })()}
+
               {/* Month labels (outside the rings) */}
               {Array.from({ length: 12 }, (_, m) => {
                 const ang = monthAngle(m);
@@ -813,6 +896,39 @@ export default function ClimateSpiralCard({
                 );
               })}
             </svg>
+
+            {/* Hover tooltip — positioned in viewBox % so it tracks the SVG
+                 regardless of responsive resize. */}
+            {hover && (() => {
+              const pctX = (hover.sx / VB) * 100;
+              const pctY = (hover.sy / VB) * 100;
+              const onLeft = pctX > 55;
+              const anomalyVal = anomaly && Number.isFinite(meanBaseline[hover.monthIdx])
+                ? hover.value - meanBaseline[hover.monthIdx]
+                : null;
+              const dec = METRIC_DECIMALS[metric];
+              return (
+                <div
+                  className="absolute pointer-events-none z-10 rounded-md border border-gray-700 bg-gray-950/95 px-2.5 py-1.5 text-[11px] font-mono shadow-lg whitespace-nowrap"
+                  style={{
+                    left: `${pctX}%`,
+                    top: `${pctY}%`,
+                    transform: `translate(${onLeft ? 'calc(-100% - 10px)' : '10px'}, -50%)`,
+                  }}
+                >
+                  <div className="text-[#FFF5E7] font-semibold">{hover.year}</div>
+                  <div className="text-gray-400 text-[10px]">{MONTH_LABELS[hover.monthIdx]}</div>
+                  <div className="text-gray-200 tabular-nums">
+                    {hover.value.toFixed(dec)} {METRIC_UNIT[metric]}
+                  </div>
+                  {anomalyVal !== null && (
+                    <div className={`tabular-nums ${anomalyVal >= 0 ? 'text-rose-300' : 'text-sky-300'}`}>
+                      {anomalyVal >= 0 ? '+' : ''}{anomalyVal.toFixed(dec)} vs baseline
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Controls under the chart */}
@@ -832,7 +948,7 @@ export default function ClimateSpiralCard({
             </label>
             <label className="inline-flex items-center gap-1.5">
               <input type="checkbox" checked={anomaly} onChange={(e) => setAnomaly(e.target.checked)} className="accent-[#D0A65E]" />
-              Anomaly (vs 1961–90)
+              Anomaly (vs {baselineFrom}–{baselineTo})
             </label>
             <label className="inline-flex items-center gap-1.5">
               <input type="checkbox" checked={highlightRecent} onChange={(e) => setHighlightRecent(e.target.checked)} className="accent-[#D0A65E]" />
@@ -856,6 +972,64 @@ export default function ClimateSpiralCard({
             )}
           </div>
 
+          {/* Compare periods — user-adjustable baseline & comparison windows */}
+          <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3">
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <h4 className="text-[10px] uppercase tracking-wider text-gray-500">Compare periods</h4>
+              <button
+                type="button"
+                onClick={() => {
+                  setBaselineRange(defaultBaselineRange);
+                  setRecentRange(defaultRecentRange);
+                }}
+                className="text-[10px] text-gray-400 hover:text-[#D0A65E] underline-offset-2 hover:underline"
+              >
+                Reset
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-3">
+              <div>
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="text-[10px] uppercase tracking-wider text-gray-500">Baseline</span>
+                  <span className="font-mono text-[11px] text-[#FFF5E7] tabular-nums">
+                    {baselineFrom}–{baselineTo}
+                    <span className="text-gray-500"> ({baselineTo - baselineFrom + 1}y)</span>
+                  </span>
+                </div>
+                <DualRangeSlider
+                  min={minYear}
+                  max={maxYear}
+                  value={baselineRange}
+                  onChange={setBaselineRange}
+                  accent="rgba(200,210,225,0.85)"
+                  minGap={4}
+                />
+              </div>
+              <div>
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="text-[10px] uppercase tracking-wider text-gray-500">Comparison</span>
+                  <span className="font-mono text-[11px] text-[#FFF5E7] tabular-nums">
+                    {recentFrom}–{recentTo}
+                    <span className="text-gray-500"> ({recentTo - recentFrom + 1}y)</span>
+                  </span>
+                </div>
+                <DualRangeSlider
+                  min={minYear}
+                  max={maxYear}
+                  value={recentRange}
+                  onChange={setRecentRange}
+                  accent="#FCA5A5"
+                  minGap={1}
+                />
+              </div>
+            </div>
+            <p className="mt-2 text-[10.5px] text-gray-500 leading-snug">
+              The grey ring is the mean of your <span className="text-gray-300">baseline</span> years.
+              The red ring is the mean of your <span className="text-rose-300">comparison</span> years.
+              Slide either window to test how much of the gap is climate change vs. baseline choice.
+            </p>
+          </div>
+
           {/* Legend */}
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[10.5px] text-gray-400">
             <span className="inline-flex items-center gap-1.5">
@@ -864,7 +1038,7 @@ export default function ClimateSpiralCard({
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: 'rgba(200,210,225,0.85)' }} />
-              1961–90 mean
+              {baselineFrom}–{baselineTo} mean
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: '#FCA5A5' }} />
@@ -916,6 +1090,74 @@ export default function ClimateSpiralCard({
       {dataSource && (
         <p className="text-[11px] text-gray-500 mt-4">{dataSource} · Paris rings vs UK CET 1850–1900 baseline.</p>
       )}
+    </div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * DualRangeSlider — two overlapping range inputs forming a [lo, hi] selector.
+ *   - Track + active range bar rendered as absolutely-positioned divs.
+ *   - Native thumbs styled via Tailwind arbitrary variants
+ *     (no globals.css change required).
+ *   - minGap keeps the handles from crossing.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+function DualRangeSlider({
+  min, max, value, onChange, accent = '#D0A65E', minGap = 1,
+}: {
+  min: number;
+  max: number;
+  value: [number, number];
+  onChange: (v: [number, number]) => void;
+  accent?: string;
+  minGap?: number;
+}) {
+  const [lo, hi] = value;
+  const pct = (n: number) => max === min ? 0 : ((n - min) / (max - min)) * 100;
+  const thumbStyles =
+    'pointer-events-none absolute inset-0 w-full appearance-none bg-transparent ' +
+    '[&::-webkit-slider-runnable-track]:bg-transparent ' +
+    '[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none ' +
+    '[&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 ' +
+    '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 ' +
+    '[&::-webkit-slider-thumb]:border-gray-900 [&::-webkit-slider-thumb]:cursor-pointer ' +
+    '[&::-webkit-slider-thumb]:shadow ' +
+    '[&::-moz-range-track]:bg-transparent ' +
+    '[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none ' +
+    '[&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:w-3.5 ' +
+    '[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 ' +
+    '[&::-moz-range-thumb]:border-gray-900 [&::-moz-range-thumb]:cursor-pointer';
+  return (
+    <div className="relative h-5 w-full select-none">
+      {/* base track */}
+      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-gray-700" />
+      {/* active range */}
+      <div
+        className="absolute top-1/2 -translate-y-1/2 h-1 rounded-full"
+        style={{ left: `${pct(lo)}%`, right: `${100 - pct(hi)}%`, background: accent }}
+      />
+      <input
+        type="range" min={min} max={max} value={lo} aria-label="Range start"
+        onChange={(e) => {
+          const n = Math.min(Number(e.target.value), hi - minGap);
+          if (Number.isFinite(n)) onChange([Math.max(min, n), hi]);
+        }}
+        className={thumbStyles}
+        style={{ ['--thumb-bg' as string]: accent, color: accent } as React.CSSProperties}
+      />
+      <input
+        type="range" min={min} max={max} value={hi} aria-label="Range end"
+        onChange={(e) => {
+          const n = Math.max(Number(e.target.value), lo + minGap);
+          if (Number.isFinite(n)) onChange([lo, Math.min(max, n)]);
+        }}
+        className={thumbStyles}
+        style={{ ['--thumb-bg' as string]: accent, color: accent } as React.CSSProperties}
+      />
+      <style jsx>{`
+        input[type='range']::-webkit-slider-thumb { background: ${accent}; }
+        input[type='range']::-moz-range-thumb { background: ${accent}; }
+      `}</style>
     </div>
   );
 }
