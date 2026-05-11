@@ -233,12 +233,7 @@ export default async function AIBooksPage() {
       "@type": "Product",
       "position": index + 1,
       "name": book.title,
-      "author": { "@type": "Person", "name": book.author },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": book.rating,
-        "bestRating": "5"
-      }
+      "author": { "@type": "Person", "name": book.author }
     }))
   };
 
