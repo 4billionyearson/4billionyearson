@@ -342,12 +342,18 @@ export default function ClimateSpiralCard({
   const effectiveFromYear = yearFrom ?? Math.max(minYear, 1950);
 
   /* Reference periods — user-adjustable.
-   * Defaults: WMO-standard 1961–1990 baseline + most-recent 10 completed
-   * years. Both ranges are clamped to [minYear, maxYear]. */
+   * Defaults: WMO-standard 1961–1990 baseline + historic-window (oldest 30y)
+   * + most-recent 10 completed years. All three ranges are clamped to
+   * [minYear, maxYear]. */
   const defaultBaselineRange: [number, number] = useMemo(() => {
     const from = Math.max(minYear, 1961);
     const to = Math.min(maxYear, 1990);
     return from < to ? [from, to] : [minYear, Math.min(maxYear, minYear + 29)];
+  }, [minYear, maxYear]);
+  const defaultHistoricRange: [number, number] = useMemo(() => {
+    const from = minYear;
+    const to = Math.min(maxYear, minYear + 29);
+    return [from, to];
   }, [minYear, maxYear]);
   const defaultRecentRange: [number, number] = useMemo(() => {
     const calYear = new Date().getFullYear();
@@ -357,13 +363,20 @@ export default function ClimateSpiralCard({
   }, [minYear, maxYear]);
 
   const [baselineRange, setBaselineRange] = useState<[number, number]>(defaultBaselineRange);
+  const [historicRange, setHistoricRange] = useState<[number, number]>(defaultHistoricRange);
   const [recentRange, setRecentRange] = useState<[number, number]>(defaultRecentRange);
   const [baselineFrom, baselineTo] = baselineRange;
+  const [historicFrom, historicTo] = historicRange;
   const [recentFrom, recentTo] = recentRange;
+  const [showHistoric, setShowHistoric] = useState(false);
 
   const meanBaseline = useMemo(
     () => monthlyMeanProfile(yearMap, baselineFrom, baselineTo),
     [yearMap, baselineFrom, baselineTo],
+  );
+  const meanHistoric = useMemo(
+    () => monthlyMeanProfile(yearMap, historicFrom, historicTo),
+    [yearMap, historicFrom, historicTo],
   );
   const meanRecent = useMemo(
     () => monthlyMeanProfile(yearMap, recentFrom, recentTo),
@@ -594,26 +607,76 @@ export default function ClimateSpiralCard({
               }}
               onMouseLeave={() => setHover(null)}
             >
-              {/* Season-wedge background */}
-              {showSeasons && (
-                <g opacity={0.18}>
-                  {Array.from({ length: 12 }, (_, m) => {
-                    const a1 = monthAngle(m) - Math.PI / 12;
-                    const a2 = monthAngle(m) + Math.PI / 12;
-                    const r = R_OUTER + 4;
+              {/* Season-wedge background.
+                   When the seasonal-shift trail is on (temp + absolute mode
+                   only), we replace the fixed astronomical tints with two
+                   data-driven pie wedges representing the growing seasons of
+                   the oldest and newest decades — so the user can see at a
+                   glance how the season has expanded. */}
+              {showSeasons && (() => {
+                const useShifted = showShiftTrail && shiftDecades.length >= 2 && metric === 'temp' && !anomaly;
+                if (useShifted) {
+                  const first = shiftDecades[0];
+                  const last = shiftDecades[shiftDecades.length - 1];
+                  const r = R_OUTER + 4;
+                  const wedgePath = (sp: number, au: number) => {
+                    const a1 = monthAngle(sp);
+                    const a2 = monthAngle(au);
+                    const span = a2 - a1;
+                    const large = span > Math.PI ? 1 : 0;
                     const [x1, y1] = polar(r, a1);
                     const [x2, y2] = polar(r, a2);
-                    const fill = SEASON_COLORS[seasonForMonth(m)];
-                    return (
-                      <path
-                        key={`wedge-${m}`}
-                        d={`M ${CX} ${CY} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`}
-                        fill={fill}
-                      />
-                    );
-                  })}
-                </g>
-              )}
+                    return `M ${CX} ${CY} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
+                  };
+                  // Old-decade wedge in autumn amber, new-decade wedge in
+                  // spring green. Where they overlap the colour mixes; the
+                  // green-only crescents at each end are the "newly extended"
+                  // months — exactly what you want to highlight.
+                  return (
+                    <g>
+                      <path d={wedgePath(first.spring, first.autumn)} fill="rgba(253,186,116,0.18)" />
+                      <path d={wedgePath(last.spring, last.autumn)} fill="rgba(134,239,172,0.22)" />
+                      <text
+                        x={CX} y={CY + R_OUTER * 0.55}
+                        textAnchor="middle"
+                        fontSize={10}
+                        fill="rgba(134,239,172,0.95)"
+                        fontFamily="ui-monospace, monospace"
+                      >
+                        {last.decade}s growing season
+                      </text>
+                      <text
+                        x={CX} y={CY + R_OUTER * 0.55 + 13}
+                        textAnchor="middle"
+                        fontSize={9}
+                        fill="rgba(253,186,116,0.85)"
+                        fontFamily="ui-monospace, monospace"
+                      >
+                        {first.decade}s growing season
+                      </text>
+                    </g>
+                  );
+                }
+                return (
+                  <g opacity={0.18}>
+                    {Array.from({ length: 12 }, (_, m) => {
+                      const a1 = monthAngle(m) - Math.PI / 12;
+                      const a2 = monthAngle(m) + Math.PI / 12;
+                      const r = R_OUTER + 4;
+                      const [x1, y1] = polar(r, a1);
+                      const [x2, y2] = polar(r, a2);
+                      const fill = SEASON_COLORS[seasonForMonth(m)];
+                      return (
+                        <path
+                          key={`wedge-${m}`}
+                          d={`M ${CX} ${CY} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`}
+                          fill={fill}
+                        />
+                      );
+                    })}
+                  </g>
+                );
+              })()}
 
               {/* Grid rings + tick labels */}
               {gridTicks.map((t) => {
@@ -726,6 +789,22 @@ export default function ClimateSpiralCard({
                     d={smoothClosedPath(pts)}
                     fill="none"
                     stroke="rgba(200,210,225,0.85)"
+                    strokeWidth={1.6}
+                    strokeDasharray="5 4"
+                  />
+                );
+              })()}
+
+              {/* Historic-period ring (user-chosen). Shown when toggle is
+                   on and the period is sensible. Mustard-amber to distinguish
+                   from baseline (cool grey) and modern (rose). */}
+              {showHistoric && meanHistoric.every(Number.isFinite) && (() => {
+                const pts: [number, number][] = meanHistoric.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
+                return (
+                  <path
+                    d={smoothClosedPath(pts)}
+                    fill="none"
+                    stroke="#D0A65E"
                     strokeWidth={1.6}
                     strokeDasharray="5 4"
                   />
@@ -1012,6 +1091,71 @@ export default function ClimateSpiralCard({
             )}
           </div>
 
+          {/* Presets — one-click chart configurations to tell a specific story */}
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+            <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">Presets</span>
+            <button
+              type="button"
+              onClick={() => {
+                if (available.includes('temp')) setMetric('temp');
+                setAnomaly(false);
+                setShowShiftTrail(true);
+                setShowSeasons(true);
+                setShowSpaghetti(false);
+                setHighlightRecent(false);
+                setShowRecordHigh(false);
+                setShowRecordLow(false);
+                setShowParis(false);
+                setShowHistoric(false);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700/60 bg-emerald-900/20 px-2.5 py-1 text-emerald-200 hover:bg-emerald-800/40 hover:border-emerald-500 transition-colors"
+              title="Configure the chart to highlight how growing-season length has shifted decade by decade"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+              Shifting seasons
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (available.includes('temp')) setMetric('temp');
+                setAnomaly(true);
+                setShowShiftTrail(false);
+                setShowSpaghetti(false);
+                setHighlightRecent(false);
+                setShowRecordHigh(false);
+                setShowRecordLow(false);
+                setShowParis(false);
+                setShowHistoric(true);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-md border border-rose-700/60 bg-rose-900/20 px-2.5 py-1 text-rose-200 hover:bg-rose-800/40 hover:border-rose-500 transition-colors"
+              title="Anomaly mode comparing the historic and modern windows against the baseline"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+              Then vs now
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAnomaly(false);
+                setShowShiftTrail(false);
+                setShowSeasons(true);
+                setShowSpaghetti(true);
+                setHighlightRecent(true);
+                setShowRecordHigh(true);
+                setShowRecordLow(true);
+                setShowParis(metric === 'temp');
+                setShowHistoric(false);
+                setBaselineRange(defaultBaselineRange);
+                setRecentRange(defaultRecentRange);
+                setHistoricRange(defaultHistoricRange);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-md border border-gray-700 bg-gray-800/60 px-2.5 py-1 text-gray-300 hover:bg-gray-700/60 hover:border-gray-500 transition-colors"
+              title="Restore the default overview"
+            >
+              Default view
+            </button>
+          </div>
+
           {/* Compare periods — user-adjustable baseline & comparison windows */}
           <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3">
             <div className="flex items-center justify-between mb-2 gap-2">
@@ -1020,7 +1164,9 @@ export default function ClimateSpiralCard({
                 type="button"
                 onClick={() => {
                   setBaselineRange(defaultBaselineRange);
+                  setHistoricRange(defaultHistoricRange);
                   setRecentRange(defaultRecentRange);
+                  setShowHistoric(false);
                 }}
                 className="inline-flex items-center gap-1 rounded border border-gray-700 bg-gray-800/60 px-2 py-0.5 text-[10px] text-gray-300 hover:bg-[#D0A65E]/20 hover:border-[#D0A65E]/60 hover:text-[#FFF5E7] transition-colors"
               >
@@ -1048,7 +1194,7 @@ export default function ClimateSpiralCard({
               </div>
               <div>
                 <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-[10px] uppercase tracking-wider text-gray-500">Comparison</span>
+                  <span className="text-[10px] uppercase tracking-wider text-gray-500">Modern</span>
                   <span className="font-mono text-[11px] text-[#FFF5E7] tabular-nums">
                     {recentFrom}–{recentTo}
                     <span className="text-gray-500"> ({recentTo - recentFrom + 1}y)</span>
@@ -1063,6 +1209,33 @@ export default function ClimateSpiralCard({
                   minGap={1}
                 />
               </div>
+              <div className="sm:col-span-2">
+                <div className="flex items-baseline justify-between mb-1">
+                  <label className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gray-500 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showHistoric}
+                      onChange={(e) => setShowHistoric(e.target.checked)}
+                      className="accent-[#D0A65E]"
+                    />
+                    Historic (add 3rd ring)
+                  </label>
+                  <span className={`font-mono text-[11px] tabular-nums ${showHistoric ? 'text-[#FFF5E7]' : 'text-gray-600'}`}>
+                    {historicFrom}–{historicTo}
+                    <span className={showHistoric ? 'text-gray-500' : 'text-gray-700'}> ({historicTo - historicFrom + 1}y)</span>
+                  </span>
+                </div>
+                <div className={showHistoric ? '' : 'opacity-40 pointer-events-none'}>
+                  <DualRangeSlider
+                    min={minYear}
+                    max={maxYear}
+                    value={historicRange}
+                    onChange={setHistoricRange}
+                    accent="#D0A65E"
+                    minGap={4}
+                  />
+                </div>
+              </div>
             </div>
             <p className="mt-2 text-[10.5px] text-gray-500 leading-snug">
               {anomaly ? (
@@ -1070,15 +1243,18 @@ export default function ClimateSpiralCard({
                   In <span className="text-gray-300">anomaly mode</span> every value is
                   shown as a delta from your baseline window, so the baseline ring would be
                   zero at every month — a perfect circle providing no information — and is
-                  therefore hidden. The <span className="text-rose-300">comparison ring</span>
-                  &nbsp;then traces, month by month, how much warmer (or colder) that window is
+                  therefore hidden. The <span className="text-rose-300">modern ring</span>
+                  {showHistoric && <> and <span className="text-[#D0A65E]">historic ring</span></>}
+                  &nbsp;trace, month by month, how much warmer (or colder) each window is
                   versus your baseline. Bulges where the warming is biggest, pinches where
                   it&apos;s smallest.
                 </>
               ) : (
                 <>
                   The grey ring is the mean of your <span className="text-gray-300">baseline</span> years.
-                  The red ring is the mean of your <span className="text-rose-300">comparison</span> years.
+                  The red ring is the mean of your <span className="text-rose-300">modern</span> years.
+                  {showHistoric && <> The gold ring is your <span className="text-[#D0A65E]">historic</span> period.</>}
+                  &nbsp;Slide any window to test how much of the gap is climate change vs. baseline choice.
                   Slide either window to test how much of the gap is climate change vs. baseline choice.
                 </>
               )}
@@ -1101,6 +1277,12 @@ export default function ClimateSpiralCard({
               <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: '#FCA5A5' }} />
               {recentFrom}–{recentTo} mean{anomaly ? ' (anomaly)' : ''}
             </span>
+            {showHistoric && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: '#D0A65E' }} />
+                {historicFrom}–{historicTo} mean{anomaly ? ' (anomaly)' : ''}
+              </span>
+            )}
             {showRecordHigh && recordYear > 0 && (
               <span className="inline-flex items-center gap-1.5">
                 <span className="inline-block h-[2px] w-6" style={{ background: '#DC2626' }} />
