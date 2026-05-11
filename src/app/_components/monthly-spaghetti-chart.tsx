@@ -61,7 +61,7 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
     currentColor: '#F97316',
     currentTextClass: 'text-orange-400',
     yLower: 'auto',
-    icon: <Thermometer className="h-5 w-5 shrink-0 text-orange-400 mt-1" />,
+    icon: <Thermometer className="h-5 w-5 shrink-0 text-orange-400" />,
   },
   precip: {
     longLabel: 'Monthly Rainfall',
@@ -76,7 +76,7 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
     currentColor: '#7DD3FC',
     currentTextClass: 'text-sky-200',
     yLower: 'zero',
-    icon: <CloudRain className="h-5 w-5 shrink-0 text-sky-400 mt-1" />,
+    icon: <CloudRain className="h-5 w-5 shrink-0 text-sky-400" />,
   },
   sunshine: {
     longLabel: 'Monthly Sunshine',
@@ -91,7 +91,7 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
     currentColor: '#FDE047',
     currentTextClass: 'text-yellow-200',
     yLower: 'zero',
-    icon: <Sun className="h-5 w-5 shrink-0 text-amber-300 mt-1" />,
+    icon: <Sun className="h-5 w-5 shrink-0 text-amber-300" />,
   },
   frost: {
     longLabel: 'Monthly Frost Days',
@@ -106,7 +106,7 @@ const METRIC_CONFIG: Record<SpaghettiMetric, MetricConfig> = {
     currentColor: '#A5F3FC',
     currentTextClass: 'text-cyan-200',
     yLower: 'zero',
-    icon: <Snowflake className="h-5 w-5 shrink-0 text-cyan-300 mt-1" />,
+    icon: <Snowflake className="h-5 w-5 shrink-0 text-cyan-300" />,
   },
 };
 
