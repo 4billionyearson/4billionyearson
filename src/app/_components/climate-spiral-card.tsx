@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Thermometer, CloudRain, Sun, Snowflake } from 'lucide-react';
 import type { MonthlyPoint, SpaghettiMetric } from './monthly-spaghetti-chart';
+import ShareBar from '@/app/climate/enso/_components/ShareBar';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * The 4BYO Climate Spiral
@@ -31,6 +32,12 @@ interface Props {
   provisionalAfterMonth?: { year: number; month: number } | null;
   /** Anchor id for deep links. */
   sectionId?: string;
+  /** Slug used to build the embed URL: /climate/embed/spiral/<embedSlug>. */
+  embedSlug?: string;
+  /** Anchor + canonical URL for the ShareBar. When omitted ShareBar is hidden. */
+  share?: { pageUrl: string; sectionId: string };
+  /** Hide the ShareBar entirely (used by the embed route). */
+  hideShare?: boolean;
 }
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -391,11 +398,24 @@ export default function ClimateSpiralCard({
   dataSource,
   provisionalAfterMonth = null,
   sectionId = 'climate-spiral',
+  embedSlug,
+  share,
+  hideShare = false,
 }: Props) {
   const available = METRIC_ORDER.filter((m) => (series[m]?.length ?? 0) > 0);
   const fallback: SpaghettiMetric = available[0] ?? 'temp';
   const [metric, setMetric] = useState<SpaghettiMetric>(fallback);
   const palette = METRIC_PALETTE[metric];
+
+  // Scroll-to-anchor when the URL hash matches our section id but the card
+  // mounted later (async profile pages).
+  useEffect(() => {
+    if (!share?.sectionId) return;
+    if (typeof window === 'undefined') return;
+    if (window.location.hash !== '#' + share.sectionId) return;
+    const el = document.getElementById(share.sectionId);
+    if (el) el.scrollIntoView({ block: 'start' });
+  }, [share?.sectionId]);
   const [anomaly, setAnomaly] = useState(false);
   const [showSeasons, setShowSeasons] = useState(true);
   const [highlightRecent, setHighlightRecent] = useState(true);
@@ -451,6 +471,7 @@ export default function ClimateSpiralCard({
   /* Playback state — see below for the RAF/interval effect that advances
    * the playhead. Declared here so the controls below can read it. */
   const [playYear, setPlayYear] = useState<number | null>(null);
+  const [playMonth, setPlayMonth] = useState<number | null>(null); // current-year finale phase
   const [playing, setPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(8); // years per second
   const playCutoff = playYear ?? Number.POSITIVE_INFINITY;
@@ -513,26 +534,46 @@ export default function ClimateSpiralCard({
   }, [yearMap, effectiveFromYear, anomaly, meanBaseline, metric]);
 
   /* Playback advancement — runs an interval that ticks the playhead one
-   * year per `1000/playSpeed`ms. Hooked here (rather than where the state
-   * is declared) because we need `currentYear`. */
+   * year per `1000/playSpeed`ms while moving through the historical
+   * window, then switches to a deliberately slower month-by-month finale
+   * once the playhead reaches the current year. */
   React.useEffect(() => {
     if (!playing) return;
+    // Finale: month-by-month at a fixed slow rate (~2 months/sec) so the
+    // climax of "everything you've seen, all the way up to NOW" lands
+    // visibly rather than flashing past.
+    if (playYear === currentYear && playMonth !== null) {
+      const id = window.setInterval(() => {
+        setPlayMonth((prev) => {
+          if (prev === null) return 0;
+          if (prev >= 11) {
+            setPlaying(false);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 450);
+      return () => window.clearInterval(id);
+    }
+    // Year-by-year phase.
     const intervalMs = Math.max(20, 1000 / playSpeed);
     const id = window.setInterval(() => {
       setPlayYear((prev) => {
         const cur = prev ?? (effectiveFromYear - 1);
-        if (cur >= currentYear) {
-          setPlaying(false);
+        if (cur >= currentYear - 1) {
+          // Hand off to the month-by-month finale on the next tick.
+          setPlayMonth(0);
           return currentYear;
         }
         return cur + 1;
       });
     }, intervalMs);
     return () => window.clearInterval(id);
-  }, [playing, playSpeed, effectiveFromYear, currentYear]);
+  }, [playing, playSpeed, effectiveFromYear, currentYear, playYear, playMonth]);
   // Stop + reset playback whenever the metric or start-year changes.
   React.useEffect(() => {
     setPlayYear(null);
+    setPlayMonth(null);
     setPlaying(false);
   }, [metric, effectiveFromYear]);
 
@@ -626,7 +667,9 @@ export default function ClimateSpiralCard({
    * benefit from seeing the same shifted-season backdrop). */
   const SHIFT_THRESHOLD = 10;
   const crossingDecades = useMemo(() => {
-    if (anomaly) return [];
+    // Shift wedges are derived from temperature only and are independent
+    // of whether the user is viewing anomalies — the seasonal cycle is
+    // the same physical phenomenon either way, so don't gate on `anomaly`.
     const tempPoints = series.temp;
     if (!tempPoints?.length) return [];
     const tempYearMap = buildYearMap(tempPoints, provisionalAfterMonth).yearMap;
@@ -639,7 +682,7 @@ export default function ClimateSpiralCard({
     }
     const crossings = computeYearCrossings(clamped, SHIFT_THRESHOLD);
     return decadalCrossings(crossings);
-  }, [anomaly, series, provisionalAfterMonth, playCutoff]);
+  }, [series, provisionalAfterMonth, playCutoff]);
   /** Approx days per month for shift-day computation. */
   const DAYS_PER_MONTH = 30.44;
 
@@ -657,7 +700,7 @@ export default function ClimateSpiralCard({
 
   /* ───────────────── Render ───────────────── */
   return (
-    <div id={sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+    <div id={share?.sectionId ?? sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
       <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
         <span className="shrink-0 mt-0.5 text-[#D0A65E]">{HEADER_ICON[metric]}</span>
         <span className="min-w-0 flex-1">The 4BYO Climate Spiral – {regionName}</span>
@@ -738,6 +781,21 @@ export default function ClimateSpiralCard({
             )}
           </div>
           <div className="relative w-full max-w-[760px] mx-auto">
+            {/* Playback year/month read-out — large, centred, sits above
+                 the chart so the audience can see the current frame's
+                 timestamp without looking down at the controls. */}
+            {playYear !== null && (
+              <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 z-10 px-3 py-1 rounded-full border border-[#D0A65E]/45 bg-[#0b0e16]/85 backdrop-blur-sm">
+                <span className="font-mono text-sm sm:text-base font-bold text-[#D0A65E] tabular-nums">
+                  {Math.max(effectiveFromYear, playYear)}
+                  {playYear === currentYear && playMonth !== null && (
+                    <span className="text-[#FFF5E7]">
+                      {' '}{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][playMonth]}
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
             <svg
               viewBox={`0 0 ${VB} ${VB}`}
               className="w-full h-auto select-none cursor-crosshair"
@@ -798,7 +856,7 @@ export default function ClimateSpiralCard({
                 if (showHistoric && meanHistoric.every(Number.isFinite)) {
                   consider('mean', 0, `${historicFrom}–${historicTo} mean`, meanHistoric[monthIdx], valueToR(meanHistoric[monthIdx], monthIdx));
                 }
-                if (best && (best as Best).d < 18) {
+                if (best && (best as Best).d < 28) {
                   const b = best as Best;
                   setHover({ kind: b.kind, year: b.year, label: b.label, monthIdx, value: b.value, r: b.r, sx, sy });
                 } else {
@@ -995,25 +1053,37 @@ export default function ClimateSpiralCard({
               })()}
 
               {/* Grid rings + tick labels */}
-              {gridTicks.map((t) => {
+              {gridTicks.map((t, i) => {
                 const r = tickToR(t);
                 const isZero = anomaly && t === 0;
+                // When ticks are tightly spaced (e.g. anomaly mode at 1°
+                // intervals near the chart centre at the start of an
+                // animation), labelling every tick produces an unreadable
+                // smear along the +x axis. Suppress the label on every
+                // other tick in that case — the ring itself still draws.
+                const labelEvery = anomaly ? 2 : 1;
+                const showLabel = isZero || i % labelEvery === 0;
                 return (
                   <g key={`ring-${t}`}>
                     <circle
                       cx={CX} cy={CY} r={r}
                       fill="none"
-                      stroke={isZero ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.09)'}
-                      strokeWidth={isZero ? 1 : 0.5}
+                      stroke={isZero ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.16)'}
+                      strokeWidth={isZero ? 1 : 0.6}
                       strokeDasharray={isZero ? '0' : '3 5'}
                     />
-                    <text
-                      x={CX + r + 4} y={CY - 3}
-                      fontSize={9} fill="rgba(255,255,255,0.32)"
-                      fontFamily="ui-monospace, monospace"
-                    >
-                      {anomaly && t > 0 ? '+' : ''}{t}{metric === 'temp' ? '°' : ''}
-                    </text>
+                    {showLabel && (
+                      <text
+                        x={CX + r + 4} y={CY - 3}
+                        fontSize={9} fill="rgba(255,255,255,0.45)"
+                        fontFamily="ui-monospace, monospace"
+                        paintOrder="stroke fill"
+                        stroke="rgba(11,14,22,0.85)"
+                        strokeWidth={2.5}
+                      >
+                        {anomaly && t > 0 ? '+' : ''}{t}{metric === 'temp' ? '°' : ''}
+                      </text>
+                    )}
                   </g>
                 );
               })}
@@ -1027,7 +1097,7 @@ export default function ClimateSpiralCard({
                   <line
                     key={`spoke-${m}`}
                     x1={x1} y1={y1} x2={x2} y2={y2}
-                    stroke="rgba(255,255,255,0.07)" strokeWidth={0.5}
+                    stroke="rgba(255,255,255,0.14)" strokeWidth={0.6}
                   />
                 );
               })}
@@ -1104,11 +1174,11 @@ export default function ClimateSpiralCard({
                   <path
                     d={smoothClosedPath(pts)}
                     fill="none"
-                    stroke="#CBD5E1"
-                    strokeWidth={1.4}
-                    strokeDasharray="2 4"
+                    stroke="#E5E7EB"
+                    strokeWidth={2.1}
+                    strokeDasharray="5 2"
                     strokeLinecap="round"
-                    opacity={0.85}
+                    opacity={0.95}
                   />
                 );
               })()}
@@ -1238,7 +1308,12 @@ export default function ClimateSpiralCard({
                 const arr = yearMap.get(currentYear)!;
                 const provSet = prov.get(currentYear) ?? new Set();
                 const provPts: { m: number; r: number; provisional: boolean }[] = [];
-                for (let m = 0; m < 12; m++) {
+                // Month-by-month finale: when playback enters the
+                // current-year phase, draw only Jan..playMonth inclusive
+                // so the user sees the latest year unfold one month at a
+                // time.
+                const monthLimit = playMonth !== null ? playMonth + 1 : 12;
+                for (let m = 0; m < Math.min(12, monthLimit); m++) {
                   const v = arr[m];
                   if (!Number.isFinite(v)) break;
                   provPts.push({ m, r: valueToR(v, m), provisional: provSet.has(m) });
@@ -1381,7 +1456,7 @@ export default function ClimateSpiralCard({
                    whenever Season tints are on (so the user always sees
                    *where* spring/autumn have moved to), independently of
                    the per-decade trail toggle. */}
-              {showSeasons && crossingDecades.length >= 2 && metric === 'temp' && !anomaly && (() => {
+              {showSeasons && crossingDecades.length >= 2 && (() => {
                 const first = crossingDecades[0];
                 const last = crossingDecades[crossingDecades.length - 1];
                 const r10 = valueToR(SHIFT_THRESHOLD, 3);
@@ -1470,6 +1545,19 @@ export default function ClimateSpiralCard({
                 ? hover.value - meanBaseline[hover.monthIdx]
                 : null;
               const dec = METRIC_DECIMALS[metric];
+              // Annotate the hovered line with context the user can't get
+              // from the value alone: is this a record year? how does it
+              // sit relative to the baseline?
+              const baselineMonthly = Number.isFinite(meanBaseline[hover.monthIdx]) ? meanBaseline[hover.monthIdx] : null;
+              const recentMonthly = Number.isFinite(meanRecent[hover.monthIdx]) ? meanRecent[hover.monthIdx] : null;
+              const tags: { label: string; cls: string }[] = [];
+              if (hover.kind === 'year') {
+                if (hover.year === recordYear) tags.push({ label: `${palette.highWord} year`, cls: 'text-rose-300 border-rose-400/60' });
+                if (hover.year === oppositeYear && oppositeYear !== recordYear) tags.push({ label: `${palette.lowWord} year`, cls: 'text-sky-300 border-sky-400/60' });
+                if (hover.year === currentYear) tags.push({ label: 'This year (in progress)', cls: 'text-amber-300 border-amber-400/60' });
+                if (hover.year >= recentFrom && hover.year <= recentTo) tags.push({ label: 'Modern window', cls: 'text-rose-200 border-rose-400/40' });
+                if (hover.year >= baselineFrom && hover.year <= baselineTo) tags.push({ label: 'Baseline window', cls: 'text-gray-200 border-gray-400/40' });
+              }
               return (
                 <div
                   className="absolute pointer-events-none z-10 rounded-md border border-gray-700 bg-gray-950/95 px-2.5 py-1.5 text-[11px] font-mono shadow-lg whitespace-nowrap"
@@ -1487,6 +1575,25 @@ export default function ClimateSpiralCard({
                   {anomalyVal !== null && (
                     <div className={`tabular-nums ${anomalyVal >= 0 ? 'text-rose-300' : 'text-sky-300'}`}>
                       {anomalyVal >= 0 ? '+' : ''}{anomalyVal.toFixed(dec)} vs baseline
+                    </div>
+                  )}
+                  {!anomaly && baselineMonthly !== null && hover.kind === 'year' && (
+                    <div className="tabular-nums text-gray-400 text-[10px]">
+                      Δ baseline: {(hover.value - baselineMonthly >= 0 ? '+' : '')}{(hover.value - baselineMonthly).toFixed(dec)} {METRIC_UNIT[metric]}
+                    </div>
+                  )}
+                  {!anomaly && recentMonthly !== null && hover.kind === 'year' && hover.year < recentFrom && (
+                    <div className="tabular-nums text-gray-400 text-[10px]">
+                      Δ modern: {(hover.value - recentMonthly >= 0 ? '+' : '')}{(hover.value - recentMonthly).toFixed(dec)} {METRIC_UNIT[metric]}
+                    </div>
+                  )}
+                  {tags.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {tags.map((t) => (
+                        <span key={t.label} className={`inline-flex items-center rounded-full border px-1.5 py-px text-[9px] ${t.cls}`}>
+                          {t.label}
+                        </span>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -1626,7 +1733,10 @@ export default function ClimateSpiralCard({
                 onClick={() => {
                   if (playing) { setPlaying(false); return; }
                   // If finished or unstarted, rewind first.
-                  if (playYear === null || playYear >= currentYear) setPlayYear(effectiveFromYear - 1);
+                  if (playYear === null || (playYear >= currentYear && playMonth !== null && playMonth >= 11)) {
+                    setPlayYear(effectiveFromYear - 1);
+                    setPlayMonth(null);
+                  }
                   setPlaying(true);
                 }}
                 className={`${TOGGLE_BASE} ${playing ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
@@ -1641,7 +1751,7 @@ export default function ClimateSpiralCard({
               </button>
               <button
                 type="button"
-                onClick={() => { setPlaying(false); setPlayYear(null); }}
+                onClick={() => { setPlaying(false); setPlayYear(null); setPlayMonth(null); }}
                 className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE}`}
                 title="Stop playback and show the full chart"
                 disabled={playYear === null && !playing}
@@ -1663,14 +1773,14 @@ export default function ClimateSpiralCard({
               <span className="font-mono text-[11px] text-[#FFF5E7] min-w-[3ch]">{playSpeed}×</span>
               {playYear !== null && (
                 <span className="font-mono text-[11px] text-[#D0A65E] ml-1 tabular-nums">
-                  {Math.max(effectiveFromYear, playYear)} / {currentYear}
+                  {Math.max(effectiveFromYear, playYear)}{playYear === currentYear && playMonth !== null ? `-${String(playMonth + 1).padStart(2, '0')}` : ''} / {currentYear}
                 </span>
               )}
             </div>
           </div>
 
           {/* Compare periods — user-adjustable baseline & comparison windows */}
-          <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3">
+          <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3 overflow-hidden">
             <div className="flex items-center justify-between mb-2 gap-2">
               <h4 className="text-[10px] uppercase tracking-wider text-gray-500">Compare periods</h4>
               <button
@@ -1812,6 +1922,25 @@ export default function ClimateSpiralCard({
       {dataSource && (
         <p className="text-[11px] text-gray-500 mt-4">{dataSource} · Paris rings vs UK CET 1850–1900 baseline.</p>
       )}
+
+      {share && !hideShare && (() => {
+        const embedUrl = embedSlug
+          ? `https://4billionyearson.org/climate/embed/spiral/${encodeURIComponent(embedSlug)}?metric=${metric}`
+          : undefined;
+        const title = `${regionName} – Climate Spiral`;
+        const embedCode = embedUrl
+          ? `<iframe\n  src="${embedUrl}"\n  width="100%" height="900"\n  style="border:none;"\n  title="${title} - 4 Billion Years On"\n></iframe>`
+          : undefined;
+        return (
+          <ShareBar
+            pageUrl={`${share.pageUrl}#${share.sectionId}`}
+            shareText={encodeURIComponent(`${title} - live data on 4 Billion Years On`)}
+            emailSubject={`${title} - 4 Billion Years On`}
+            embedUrl={embedUrl}
+            embedCode={embedCode}
+          />
+        );
+      })()}
     </div>
   );
 }

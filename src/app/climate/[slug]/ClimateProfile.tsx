@@ -1035,6 +1035,16 @@ export default function ClimateProfile({
                     {(monthlyAll?.length || rainfallMonthly?.length || sunshineMonthly?.length || frostMonthly?.length) ? (
                       <>
                         <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Trends" />
+                        {region.slug === 'uk' && (
+                          <ClimateSpiralCard
+                            series={spaghettiSeries}
+                            regionName={pageTitle}
+                            dataSource={chartSource}
+                            provisionalAfterMonth={pageSnapshotCut}
+                            embedSlug={slug}
+                            share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'climate-spiral' }}
+                          />
+                        )}
                         <MonthlySpaghettiCard
                           series={spaghettiSeries}
                           regionName={pageTitle}
@@ -1043,14 +1053,6 @@ export default function ClimateProfile({
                           provisionalAfterMonth={pageSnapshotCut}
                           share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'monthly-history' }}
                         />
-                        {region.slug === 'uk' && (
-                          <ClimateSpiralCard
-                            series={spaghettiSeries}
-                            regionName={pageTitle}
-                            dataSource={chartSource}
-                            provisionalAfterMonth={pageSnapshotCut}
-                          />
-                        )}
                       </>
                     ) : null}
 

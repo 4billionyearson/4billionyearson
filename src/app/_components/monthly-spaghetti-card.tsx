@@ -116,7 +116,7 @@ export default function MonthlySpaghettiCard({
   return (
     <div id={share?.sectionId} className={`${wrapperClass} scroll-mt-24`}>
       <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
-        <span className="shrink-0 mt-1 text-[#D0A65E]">{cfg.icon}</span>
+        <span className="shrink-0 mt-0.5 text-[#D0A65E]">{cfg.icon}</span>
         <span className="min-w-0 flex-1">{cardTitle}</span>
       </h3>
       {available.length > 1 && (
