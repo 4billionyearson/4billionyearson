@@ -454,7 +454,7 @@ function CalloutLabel({ cx, cy, color, text, monthIdx }: { cx: number; cy: numbe
   // so the rounded rect hugs the label — previously it had a noticeable
   // gap on either end, especially on mobile.
   const charW = 5.6;
-  const padX = 4;
+  const padX = 2;
   const padY = 3;
   const textW = text.length * charW;
   const rectW = textW + padX * 2;

@@ -12,6 +12,31 @@ interface SummaryResponse {
   source?: string;
 }
 
+function pathLabel(path: string): string {
+  const p = path.toLowerCase();
+  if (p === '/extreme-weather') return 'Extreme Weather tracker';
+  if (p === '/emissions') return 'Emissions dashboard';
+  if (p === '/energy-dashboard') return 'Energy dashboard';
+  if (p === '/greenhouse-gases') return 'Greenhouse Gases';
+  if (p === '/sea-levels-ice') return 'Sea Levels & Ice';
+  if (p === '/planetary-boundaries') return 'Planetary Boundaries';
+  if (p === '/climate-dashboard') return 'Climate dashboard';
+  if (p === '/climate/rankings') return 'climate rankings';
+  if (p === '/climate/global') return 'Global climate page';
+  if (p === '/climate/enso') return 'ENSO tracker';
+  if (p === '/climate/shifting-seasons') return 'Shifting Seasons';
+  if (p.startsWith('/climate/')) return 'climate page';
+  return path;
+}
+
+function linkifyPaths(html: string): string {
+  return html.replace(
+    /(^|[\s(\u2014\u2013\u2212])(\/(?:extreme-weather|emissions|energy-dashboard|climate\/[a-z0-9-]+|greenhouse-gases|sea-levels-ice|planetary-boundaries|climate-dashboard|climate\/rankings))(?=[\s).,;:\u2014\u2013\u2212]|$)/gi,
+    (_m, lead, path) =>
+      `${lead}<a href="${path}" class="border-b border-dotted border-teal-300/60 text-teal-300 hover:text-teal-200 hover:border-teal-200 transition-colors">${pathLabel(path)}</a>`,
+  );
+}
+
 function highlightRankings(text: string): string {
   const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const sup = 'warmest|coldest|hottest|coolest|wettest|driest|sunniest|highest|lowest|fewest|most|least';
@@ -22,7 +47,7 @@ function highlightRankings(text: string): string {
   const p1 = `(?:\\d+(?:st|nd|rd|th)|${wordOrd})\\s+(?:${sup})\\b${w}${rec}`;
   const p2 = `the\\s+(?:${supNoMost})\\b${w}\\s+(?:on record|in \\d+ years?(?:\\s+of records?)?|of \\d+ years?(?:\\s+on record)?)`;
   const re = new RegExp(`\\b(?:${p1}|${p2})`, 'gi');
-  return escaped.replace(re, (m) => `<strong class="text-white">${m}</strong>`);
+  return linkifyPaths(escaped.replace(re, (m) => `<strong class="text-white">${m}</strong>`));
 }
 
 export default function GroupSummaryPanel({
