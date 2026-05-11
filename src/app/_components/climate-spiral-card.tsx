@@ -715,8 +715,11 @@ export default function ClimateSpiralCard({
                   );
                 })}
 
-              {/* Baseline 1961–90 ring */}
-              {meanBaseline.every(Number.isFinite) && (() => {
+              {/* Baseline mean ring — hidden in anomaly mode, where it is
+                   redundant with the 0° tick circle drawn earlier. Drawing it
+                   anyway would imply “the baseline shape changes” which is
+                   misleading (it can’t — it’s being subtracted from itself). */}
+              {!anomaly && meanBaseline.every(Number.isFinite) && (() => {
                 const pts: [number, number][] = meanBaseline.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
                 return (
                   <path
@@ -1019,9 +1022,10 @@ export default function ClimateSpiralCard({
                   setBaselineRange(defaultBaselineRange);
                   setRecentRange(defaultRecentRange);
                 }}
-                className="text-[10px] text-gray-400 hover:text-[#D0A65E] underline-offset-2 hover:underline"
+                className="inline-flex items-center gap-1 rounded border border-gray-700 bg-gray-800/60 px-2 py-0.5 text-[10px] text-gray-300 hover:bg-[#D0A65E]/20 hover:border-[#D0A65E]/60 hover:text-[#FFF5E7] transition-colors"
               >
-                Reset
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+                Reset to defaults
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-3">
@@ -1061,15 +1065,22 @@ export default function ClimateSpiralCard({
               </div>
             </div>
             <p className="mt-2 text-[10.5px] text-gray-500 leading-snug">
-              The grey ring is the mean of your <span className="text-gray-300">baseline</span> years.
-              The red ring is the mean of your <span className="text-rose-300">comparison</span> years.
-              Slide either window to test how much of the gap is climate change vs. baseline choice.
-              {anomaly && (
-                <span className="block mt-1 text-gray-600">
-                  In anomaly mode the baseline ring is a perfect circle <em>by definition</em>
-                  (every month minus itself = 0). Switch to absolute mode to see the baseline&apos;s
-                  natural seasonal shape.
-                </span>
+              {anomaly ? (
+                <>
+                  In <span className="text-gray-300">anomaly mode</span> every value is
+                  shown as a delta from your baseline window, so the baseline ring would be
+                  zero at every month — a perfect circle providing no information — and is
+                  therefore hidden. The <span className="text-rose-300">comparison ring</span>
+                  &nbsp;then traces, month by month, how much warmer (or colder) that window is
+                  versus your baseline. Bulges where the warming is biggest, pinches where
+                  it&apos;s smallest.
+                </>
+              ) : (
+                <>
+                  The grey ring is the mean of your <span className="text-gray-300">baseline</span> years.
+                  The red ring is the mean of your <span className="text-rose-300">comparison</span> years.
+                  Slide either window to test how much of the gap is climate change vs. baseline choice.
+                </>
               )}
             </p>
           </div>
@@ -1080,13 +1091,15 @@ export default function ClimateSpiralCard({
               <span className="inline-block h-[2px] w-6" style={{ background: 'linear-gradient(90deg,#2a5eb8,#e8440a)' }} />
               {minYear} → {maxYear}
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: 'rgba(200,210,225,0.85)' }} />
-              {baselineFrom}–{baselineTo} mean
-            </span>
+            {!anomaly && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: 'rgba(200,210,225,0.85)' }} />
+                {baselineFrom}–{baselineTo} mean
+              </span>
+            )}
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: '#FCA5A5' }} />
-              {recentFrom}–{recentTo} mean
+              {recentFrom}–{recentTo} mean{anomaly ? ' (anomaly)' : ''}
             </span>
             {showRecordHigh && recordYear > 0 && (
               <span className="inline-flex items-center gap-1.5">
