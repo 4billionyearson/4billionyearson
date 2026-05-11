@@ -19,7 +19,7 @@ const CACHE_VERSION = 'v7';
 const LOOKBACK_DAYS = 7;
 
 function dateOffsetKey(daysAgo: number): string {
-  const d = new Date();
+  const d = new Date(Date.now() - 6 * 60 * 60 * 1000);
   d.setUTCDate(d.getUTCDate() - daysAgo);
   return `${CACHE_KEY_PREFIX}:${d.toISOString().slice(0, 10)}-${CACHE_VERSION}`;
 }

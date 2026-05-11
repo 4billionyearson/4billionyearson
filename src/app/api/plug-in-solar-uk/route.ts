@@ -59,15 +59,24 @@ function sourcePriority(uri: string): number {
   return 100;
 }
 
+// Shift back by the cron hour (06:00 UTC) so the day boundary aligns with
+// when the refresh actually runs, not UTC midnight. Without this, the cache
+// key rolls over at 00:00 UTC and any visitor before 06:00 UTC triggers a
+// premature full refresh.
+const CRON_HOUR_UTC = 6;
+
+function cronAlignedDate(daysAgo = 0): Date {
+  const d = new Date(Date.now() - CRON_HOUR_UTC * 60 * 60 * 1000);
+  d.setUTCDate(d.getUTCDate() - daysAgo);
+  return d;
+}
+
 function todayKey(): string {
-  const d = new Date();
-  return `${CACHE_KEY_PREFIX}:${d.toISOString().slice(0, 10)}-${CACHE_VERSION}`;
+  return `${CACHE_KEY_PREFIX}:${cronAlignedDate().toISOString().slice(0, 10)}-${CACHE_VERSION}`;
 }
 
 function dateOffsetKey(daysAgo: number): string {
-  const d = new Date();
-  d.setUTCDate(d.getUTCDate() - daysAgo);
-  return `${CACHE_KEY_PREFIX}:${d.toISOString().slice(0, 10)}-${CACHE_VERSION}`;
+  return `${CACHE_KEY_PREFIX}:${cronAlignedDate(daysAgo).toISOString().slice(0, 10)}-${CACHE_VERSION}`;
 }
 
 /** Find the most recent cached payload from today or up to N days back. */

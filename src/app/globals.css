@@ -299,7 +299,7 @@ html[data-embed] .relative.z-10 {
 }
 @media (min-width: 640px) {
   .cal-row {
-    grid-template-columns: var(--cal-label-col, 192px) minmax(0, 1fr);
+    grid-template-columns: minmax(var(--cal-label-col, 192px), max-content) minmax(0, 1fr);
     align-items: center;
   }
 }

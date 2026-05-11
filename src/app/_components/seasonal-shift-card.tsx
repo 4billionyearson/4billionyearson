@@ -665,7 +665,8 @@ function WarmSeasonShiftBar({
   return (
     <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-3 mb-4">
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
-        <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider">
+        <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider inline-flex items-center gap-1.5">
+          <Sun className="h-3.5 w-3.5" style={{ color: '#EAB308' }} />
           Shifting summer <span className="text-gray-500 normal-case font-normal tracking-normal">(spring earlier · autumn later)</span>
         </div>
         <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
@@ -701,7 +702,10 @@ function WetSeasonShiftBar({
   shiftDays: number;
   annualRainPct: number;
 }) {
-  const shiftColor = shiftDays > 1 ? '#FBBF24' : shiftDays < -1 ? '#38BDF8' : '#9CA3AF';
+  // Directional flip keyed to the wet-season palette:
+  // earlier = #7DD3FC (matches the "Now:" pill), later = amber, no change = gray.
+  const shiftColor = shiftDays > 1 ? '#FBBF24' : shiftDays < -1 ? '#7DD3FC' : '#9CA3AF';
+  const WET_BLUE = '#7DD3FC';
   const rows: TimelineRow[] = [
     {
       kind: 'point',
@@ -709,7 +713,7 @@ function WetSeasonShiftBar({
       title: 'Wet-season onset',
       sub: `Baseline: ${doyToLabel(baselineDoy)} · 25% of annual rain`,
       delta: `Now: ${doyToLabel(recentDoy)}`,
-      deltaColor: '#7DD3FC',
+      deltaColor: WET_BLUE,
       color: '#38BDF8',
       baselineDoy,
       recentDoy,
@@ -790,8 +794,8 @@ function ShiftExplanation({
       <p className="text-sm text-gray-300 mb-4">
         <strong className="text-[#FFF5E7]">{regionName}</strong> has both a clear warm/cold cycle
         (±{(amplitudeC / 2).toFixed(1)}°C) and a wet/dry cycle
-        {wetDryRatio ? ` (${wetDryRatio.toFixed(0)}× wet:dry ratio)` : ''}. Switch tabs to see how
-        each side of the annual rhythm is moving.
+        {wetDryRatio ? ` (${wetDryRatio.toFixed(0)}× wet:dry ratio)` : ''}. Both sides of the
+        annual rhythm are shown below.
       </p>
     );
   }

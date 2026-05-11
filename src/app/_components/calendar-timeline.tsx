@@ -198,11 +198,11 @@ function RowLabel({
   return (
     <div className="cal-row-label flex flex-col justify-center min-w-0">
       <div className="text-sm font-mono font-medium text-gray-100 leading-snug">{title}</div>
-      {sub && <div className="text-[11px] text-gray-500 mt-0.5 leading-snug">{sub}</div>}
+      {sub && <div className="text-[11px] text-gray-500 mt-0.5 leading-snug whitespace-nowrap">{sub}</div>}
       {delta && (
         <div className="mt-1.5">
           <span
-            className="inline-block text-[11px] font-mono px-1.5 py-0.5 rounded"
+            className="inline-block text-[11px] font-mono px-1.5 py-0.5 rounded whitespace-nowrap"
             style={{
               color: deltaColor ?? '#FDE68A',
               background: hexToRgba(deltaColor ?? '#FDE68A', 0.12),
