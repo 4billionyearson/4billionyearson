@@ -287,21 +287,25 @@ export default function ShiftingSeasonsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/climate/seasonal-shift')
-      .then((r) => {
-        if (!r.ok) throw new Error('Failed to load seasonal shift data');
-        return r.json() as Promise<ApiResponse>;
+    const fetchJson = async <T,>(url: string): Promise<T> => {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`Failed to load ${url}`);
+      return r.json() as Promise<T>;
+    };
+
+    Promise.all([
+      fetchJson<KyotoData>('/data/seasons/kyoto-cherry-blossom.json'),
+      fetchJson<SnowData>('/data/seasons/nh-snow-cover.json'),
+      fetchJson<EpaData>('/data/seasons/us-growing-season.json'),
+      fetchJson<{ updatedAt: string }>('/data/seasons/manifest.json'),
+      fetchJson<GlobalShiftData>('/data/seasons/shift-global.json'),
+    ])
+      .then(([kyoto, snow, epa, manifest, globalShiftData]) => {
+        setData({ kyoto, snow, epa, manifest });
+        setGlobalShift(globalShiftData);
       })
-      .then(setData)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    fetch('/data/seasons/shift-global.json')
-      .then((r) => (r.ok ? (r.json() as Promise<GlobalShiftData>) : null))
-      .then((d) => setGlobalShift(d))
-      .catch(() => {});
   }, []);
 
   /* Top-N leaderboards across all region types combined. */
