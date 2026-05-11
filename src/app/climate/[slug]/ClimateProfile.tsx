@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory, Globe2 } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import MonthlySpaghettiCard, { type SeriesMap } from '@/app/_components/monthly-spaghetti-card';
+import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
@@ -1042,6 +1043,14 @@ export default function ClimateProfile({
                           provisionalAfterMonth={pageSnapshotCut}
                           share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'monthly-history' }}
                         />
+                        {region.slug === 'uk' && (
+                          <ClimateSpiralCard
+                            series={spaghettiSeries}
+                            regionName={pageTitle}
+                            dataSource={chartSource}
+                            provisionalAfterMonth={pageSnapshotCut}
+                          />
+                        )}
                       </>
                     ) : null}
 
