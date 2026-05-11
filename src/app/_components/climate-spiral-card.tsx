@@ -77,6 +77,33 @@ const METRIC_AGG: Record<SpaghettiMetric, 'mean' | 'sum'> = {
 
 const METRIC_ORDER: SpaghettiMetric[] = ['temp', 'precip', 'sunshine', 'frost'];
 
+/** Per-metric colour palette — matches `monthly-spaghetti-chart` so the two
+ * panels read as one set, and uses intuitive extremes for each variable:
+ *  - temp: red = warmest, sky = coldest
+ *  - precip: deep blue = wettest, amber/brown = driest
+ *  - sunshine: amber = sunniest, slate = dullest
+ *  - frost: icy blue = frostiest, orange = mildest
+ */
+type MetricPalette = {
+  high: string; low: string; current: string;
+  highTextClass: string; lowTextClass: string; currentTextClass: string;
+  highWord: string; lowWord: string;
+};
+const METRIC_PALETTE: Record<SpaghettiMetric, MetricPalette> = {
+  temp:     { high: '#DC2626', low: '#38BDF8', current: '#F97316',
+              highTextClass: 'text-red-300',   lowTextClass: 'text-sky-300',   currentTextClass: 'text-orange-300',
+              highWord: 'Warmest',  lowWord: 'Coldest' },
+  precip:   { high: '#3B82F6', low: '#B45309', current: '#7DD3FC',
+              highTextClass: 'text-blue-300',  lowTextClass: 'text-amber-300', currentTextClass: 'text-sky-200',
+              highWord: 'Wettest',  lowWord: 'Driest' },
+  sunshine: { high: '#F59E0B', low: '#64748B', current: '#FDE047',
+              highTextClass: 'text-amber-300', lowTextClass: 'text-slate-400', currentTextClass: 'text-yellow-200',
+              highWord: 'Sunniest', lowWord: 'Dullest' },
+  frost:    { high: '#38BDF8', low: '#F97316', current: '#A5F3FC',
+              highTextClass: 'text-sky-300',   lowTextClass: 'text-orange-300',currentTextClass: 'text-cyan-200',
+              highWord: 'Frostiest', lowWord: 'Mildest' },
+};
+
 /* CET 1850–1900 monthly means (HadCET). Used only for Paris-ring placement
  * in UK temperature mode. */
 const UK_PREINDUSTRIAL_MONTHLY: number[] = [
@@ -318,6 +345,7 @@ export default function ClimateSpiralCard({
   const available = METRIC_ORDER.filter((m) => (series[m]?.length ?? 0) > 0);
   const fallback: SpaghettiMetric = available[0] ?? 'temp';
   const [metric, setMetric] = useState<SpaghettiMetric>(fallback);
+  const palette = METRIC_PALETTE[metric];
   const [anomaly, setAnomaly] = useState(false);
   const [showSeasons, setShowSeasons] = useState(true);
   const [highlightRecent, setHighlightRecent] = useState(true);
@@ -562,10 +590,10 @@ export default function ClimateSpiralCard({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 items-start">
-        {/* ─── Left: Spiral chart ───────────────────────────────────────── */}
+      <div className="flex flex-col gap-6">
+        {/* ─── Section 1: Spiral chart (full width, large on desktop) ───── */}
         <div>
-          <div className="relative w-full max-w-[600px] mx-auto">
+          <div className="relative w-full max-w-[760px] mx-auto">
             <svg
               viewBox={`0 0 ${VB} ${VB}`}
               className="w-full h-auto select-none cursor-crosshair"
@@ -891,7 +919,7 @@ export default function ClimateSpiralCard({
                   <path
                     d={smoothClosedPath(pts)}
                     fill="none"
-                    stroke="#DC2626"
+                    stroke={palette.high}
                     strokeWidth={2.4}
                     opacity={0.95}
                   />
@@ -907,7 +935,7 @@ export default function ClimateSpiralCard({
                   <path
                     d={smoothClosedPath(pts)}
                     fill="none"
-                    stroke="#38BDF8"
+                    stroke={palette.low}
                     strokeWidth={2.4}
                     opacity={0.95}
                   />
@@ -938,7 +966,7 @@ export default function ClimateSpiralCard({
                     <path
                       d={segs.join(' ')}
                       fill="none"
-                      stroke="#F97316"
+                      stroke={palette.current}
                       strokeWidth={2.6}
                       strokeLinecap="round"
                     />
@@ -948,7 +976,7 @@ export default function ClimateSpiralCard({
                         <circle
                           key={`cur-${p.m}`}
                           cx={x} cy={y} r={p.provisional ? 3 : 2.5}
-                          fill={p.provisional ? '#FED7AA' : '#F97316'}
+                          fill={p.provisional ? '#FED7AA' : palette.current}
                           stroke="#7C2D12" strokeWidth={0.5}
                         />
                       );
@@ -1285,18 +1313,18 @@ export default function ClimateSpiralCard({
             )}
             {showRecordHigh && recordYear > 0 && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6" style={{ background: '#DC2626' }} />
-                {metric === 'temp' ? 'Warmest' : metric === 'precip' ? 'Wettest' : metric === 'sunshine' ? 'Sunniest' : 'Frostiest'} ({recordYear})
+                <span className="inline-block h-[2px] w-6" style={{ background: palette.high }} />
+                {palette.highWord} ({recordYear})
               </span>
             )}
             {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6" style={{ background: '#38BDF8' }} />
-                {metric === 'temp' ? 'Coldest' : metric === 'precip' ? 'Driest' : metric === 'sunshine' ? 'Dullest' : 'Mildest'} ({oppositeYear})
+                <span className="inline-block h-[2px] w-6" style={{ background: palette.low }} />
+                {palette.lowWord} ({oppositeYear})
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6" style={{ background: '#F97316' }} />
+              <span className="inline-block h-[2px] w-6" style={{ background: palette.current }} />
               {currentYear} so far
             </span>
             {shiftDecades.length >= 2 && (
@@ -1314,27 +1342,35 @@ export default function ClimateSpiralCard({
           </div>
         </div>
 
-        {/* ─── Right: Sparklines + records ──────────────────────────────── */}
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            {METRIC_ORDER.filter((m) => annuals[m]?.length).map((m) => (
-              <Sparkline
-                key={m}
-                title={METRIC_LABEL[m]}
-                data={annuals[m]!}
-                color={m === 'temp' ? '#F97316' : m === 'precip' ? '#38BDF8' : m === 'sunshine' ? '#FBBF24' : '#A5F3FC'}
-                unit={METRIC_UNIT[m]}
-                decimals={METRIC_DECIMALS[m]}
-                active={metric === m}
-                onSelect={() => setMetric(m)}
-              />
-            ))}
+        {/* ─── Section 2: Annual records & trends ────────────────────────
+             On desktop, sparklines occupy a 2×2 grid on the left while the
+             records table sits on the right. On mobile they stack. */}
+        <div>
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-3 pb-1 border-b border-white/10">
+            Annual records &amp; trends
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+            <div className="grid grid-cols-2 gap-3 content-start">
+              {METRIC_ORDER.filter((m) => annuals[m]?.length).map((m) => (
+                <Sparkline
+                  key={m}
+                  title={METRIC_LABEL[m]}
+                  data={annuals[m]!}
+                  color={METRIC_PALETTE[m].current}
+                  unit={METRIC_UNIT[m]}
+                  decimals={METRIC_DECIMALS[m]}
+                  active={metric === m}
+                  onSelect={() => setMetric(m)}
+                />
+              ))}
+            </div>
+            <RecordsTable
+              metric={metric}
+              yearMap={yearMap}
+              currentYear={currentYear}
+              palette={palette}
+            />
           </div>
-          <RecordsTable
-            metric={metric}
-            yearMap={yearMap}
-            currentYear={currentYear}
-          />
         </div>
       </div>
 
@@ -1473,19 +1509,20 @@ function Sparkline({
  * ──────────────────────────────────────────────────────────────────────── */
 
 function RecordsTable({
-  metric, yearMap, currentYear,
+  metric, yearMap, currentYear, palette,
 }: {
   metric: SpaghettiMetric;
   yearMap: YearMap;
   currentYear: number;
+  palette: MetricPalette;
 }) {
   const agg = METRIC_AGG[metric];
   const unit = METRIC_UNIT[metric];
   const dec = METRIC_DECIMALS[metric];
   const [view, setView] = useState<'year' | 'seasons' | 'months'>('year');
 
-  const highLabel = metric === 'temp' ? 'Warmest' : metric === 'precip' ? 'Wettest' : metric === 'sunshine' ? 'Sunniest' : 'Frostiest';
-  const lowLabel = metric === 'temp' ? 'Coldest' : metric === 'precip' ? 'Driest' : metric === 'sunshine' ? 'Dullest' : 'Mildest';
+  const highLabel = palette.highWord;
+  const lowLabel = palette.lowWord;
 
   /* ── Year-view ─────────────────────────────────────────────────────── */
   const yearRows = useMemo(() => {
@@ -1576,18 +1613,18 @@ function RecordsTable({
           <tbody className="font-mono">
             <tr className="border-b border-gray-800/60">
               <td className="py-1 text-gray-400">{highLabel} year</td>
-              <td className="py-1 text-right text-red-300">{yearRows.high[0]}</td>
+              <td className={`py-1 text-right ${palette.highTextClass}`}>{yearRows.high[0]}</td>
               <td className="py-1 text-right text-gray-300 tabular-nums">{yearRows.high[1].toFixed(dec)} {unit}</td>
             </tr>
             <tr className="border-b border-gray-800/60">
               <td className="py-1 text-gray-400">{lowLabel} year</td>
-              <td className="py-1 text-right text-sky-300">{yearRows.low[0]}</td>
+              <td className={`py-1 text-right ${palette.lowTextClass}`}>{yearRows.low[0]}</td>
               <td className="py-1 text-right text-gray-300 tabular-nums">{yearRows.low[1].toFixed(dec)} {unit}</td>
             </tr>
             {yearRows.ytdRank && (
               <tr>
                 <td className="py-1 text-gray-400">{currentYear} so far</td>
-                <td className="py-1 text-right text-orange-300">#{yearRows.ytdRank.rank}<span className="text-gray-500"> of {yearRows.ytdRank.total}</span></td>
+                <td className={`py-1 text-right ${palette.currentTextClass}`}>#{yearRows.ytdRank.rank}<span className="text-gray-500"> of {yearRows.ytdRank.total}</span></td>
                 <td className="py-1 text-right text-gray-300 tabular-nums">{yearRows.ytdRank.value.toFixed(dec)} {unit}</td>
               </tr>
             )}
@@ -1610,13 +1647,13 @@ function RecordsTable({
                 <td className="py-1 text-gray-400">{s.label}</td>
                 <td className="py-1 text-right">
                   {s.high ? (
-                    <span className="text-red-300">{s.high[0]}</span>
+                    <span className={palette.highTextClass}>{s.high[0]}</span>
                   ) : <span className="text-gray-600">—</span>}
                   {s.high && <span className="text-gray-500 ml-1 tabular-nums">{s.high[1].toFixed(dec)}{METRIC_UNIT[metric] === '°C' ? '°' : ''}</span>}
                 </td>
                 <td className="py-1 text-right">
                   {s.low ? (
-                    <span className="text-sky-300">{s.low[0]}</span>
+                    <span className={palette.lowTextClass}>{s.low[0]}</span>
                   ) : <span className="text-gray-600">—</span>}
                   {s.low && <span className="text-gray-500 ml-1 tabular-nums">{s.low[1].toFixed(dec)}{METRIC_UNIT[metric] === '°C' ? '°' : ''}</span>}
                 </td>
@@ -1642,13 +1679,13 @@ function RecordsTable({
                   <td className="py-1 text-gray-400">{m.label}</td>
                   <td className="py-1 text-right">
                     {m.high ? (
-                      <span className="text-red-300">{m.high[0]}</span>
+                      <span className={palette.highTextClass}>{m.high[0]}</span>
                     ) : <span className="text-gray-600">—</span>}
                     {m.high && <span className="text-gray-500 ml-1 tabular-nums">{m.high[1].toFixed(dec)}{METRIC_UNIT[metric] === '°C' ? '°' : ''}</span>}
                   </td>
                   <td className="py-1 text-right">
                     {m.low ? (
-                      <span className="text-sky-300">{m.low[0]}</span>
+                      <span className={palette.lowTextClass}>{m.low[0]}</span>
                     ) : <span className="text-gray-600">—</span>}
                     {m.low && <span className="text-gray-500 ml-1 tabular-nums">{m.low[1].toFixed(dec)}{METRIC_UNIT[metric] === '°C' ? '°' : ''}</span>}
                   </td>
