@@ -101,6 +101,7 @@ export default function CalendarTimeline({
   className = '',
   labelColPx = 192,
   showAxis = true,
+  stacked = false,
 }: {
   rows: TimelineRow[];
   className?: string;
@@ -108,6 +109,10 @@ export default function CalendarTimeline({
   labelColPx?: number;
   /** render the Jan-Dec axis row at the bottom (default true) */
   showAxis?: boolean;
+  /** Force single-column (stacked) layout at all breakpoints — use when the
+   *  timeline is inside a narrow multi-column parent grid so the bar track
+   *  always appears below the label/pill rather than beside it. */
+  stacked?: boolean;
 }) {
   const cssVars: React.CSSProperties = {
     // @ts-expect-error CSS custom property
@@ -115,7 +120,7 @@ export default function CalendarTimeline({
   };
 
   return (
-    <div className={`cal-timeline ${className}`} style={cssVars}>
+    <div className={`cal-timeline${stacked ? ' cal-timeline--stacked' : ''} ${className}`} style={cssVars}>
       {rows.map((row) => {
         switch (row.kind) {
           case 'header':

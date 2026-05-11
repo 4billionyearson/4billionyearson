@@ -366,8 +366,8 @@ export default function GlobalSeasonalSummary({
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-x-6">
-          <CalendarTimeline rows={leftRows} labelColPx={196} showAxis={false} />
-          <CalendarTimeline rows={rightRows} labelColPx={196} showAxis={false} />
+          <CalendarTimeline rows={leftRows} labelColPx={196} showAxis={false} stacked />
+          <CalendarTimeline rows={rightRows} labelColPx={196} showAxis={false} stacked />
         </div>
       </div>
 

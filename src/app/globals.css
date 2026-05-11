@@ -303,3 +303,11 @@ html[data-embed] .relative.z-10 {
     align-items: center;
   }
 }
+/* Stacked variant: always single-column regardless of viewport — used when
+   the timeline is inside a narrow multi-column parent (e.g. the 2-col grid
+   on the global shifting seasons page). The label+pill sits above the bar. */
+.cal-timeline--stacked .cal-row,
+.cal-timeline--stacked .cal-row:is(*) {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
