@@ -122,10 +122,10 @@ function ChipToggle({
     >
       <span
         aria-hidden
-        className="inline-block h-2 w-2 rounded-full"
+        className="inline-block h-2 w-2 rounded-full shrink-0"
         style={{ background: active ? color : 'transparent', border: `1px solid ${active ? color : '#4B5563'}` }}
       />
-      <span className="leading-none">{children}</span>
+      <span className="leading-none whitespace-nowrap">{children}</span>
     </button>
   );
 }
@@ -706,7 +706,12 @@ export default function ClimateSpiralCard({
     const adj = anomaly && Number.isFinite(meanBaseline[monthIdx]) ? v - meanBaseline[monthIdx] : v;
     if (!Number.isFinite(adj)) return NaN;
     const t = (adj - scaleMin) / (scaleMax - scaleMin);
-    return Math.max(0, Math.min(R_OUTER, t * R_OUTER));
+    // In 3D mode push the radial scale well past the month-label ring
+    // so temperature variations remain visible against the vertically-
+    // stretched stack of years. The rim sits at R_LABEL+13 (~285);
+    // letting r reach ~340 lets warm/cold years bulge clearly past it.
+    const cap = view3D ? 340 : R_OUTER;
+    return Math.max(0, Math.min(cap, t * cap));
   }
 
   /* Build the polyline points for a given year's 12 monthly values. */
@@ -858,54 +863,55 @@ export default function ClimateSpiralCard({
       <div className="flex flex-col gap-6">
         {/* ─── Section 1: Spiral chart (full width, large on desktop) ───── */}
         <div>
-          {/* Series legend — placed *above* the chart and centered so it
-               doubles as a key while scrolling the controls below. */}
-          <div className="mb-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[10.5px] text-gray-400 max-w-[760px] mx-auto">
+          {/* Series legend — compact pill-row inset into the chart's
+               own max-width so it reads as part of the spiral panel
+               rather than floating above. Wraps gracefully on mobile. */}
+          <div className="w-full max-w-[920px] mx-auto mb-1 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-gray-400 rounded-md border border-gray-800/70 bg-gray-900/40 px-3 py-1.5">
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6" style={{ background: `linear-gradient(90deg,#4B5563,${palette.high})` }} />
-              {minYear} → {maxYear}
+              <span className="inline-block h-[2px] w-5" style={{ background: `linear-gradient(90deg,#4B5563,${palette.high})` }} />
+              {minYear}→{maxYear}
             </span>
             {!anomaly && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6 border-t-2 border-dotted" style={{ borderColor: '#CBD5E1' }} />
+                <span className="inline-block h-[2px] w-5 border-t-2 border-dotted" style={{ borderColor: '#CBD5E1' }} />
                 {baselineFrom}–{baselineTo} mean
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6 border-t-2 border-dashed" style={{ borderColor: '#EF4444' }} />
-              {recentFrom}–{recentTo} mean{anomaly ? ' (anomaly)' : ''}
+              <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: '#EF4444' }} />
+              {recentFrom}–{recentTo}{anomaly ? ' Δ' : ''}
             </span>
             {showHistoric && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6 border-t-2 border-dashed" style={{ borderColor: '#E6B765' }} />
-                {historicFrom}–{historicTo} mean{anomaly ? ' (anomaly)' : ''}
+                <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: '#E6B765' }} />
+                {historicFrom}–{historicTo}{anomaly ? ' Δ' : ''}
               </span>
             )}
             {showRecordHigh && recordYear > 0 && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6" style={{ background: palette.high }} />
+                <span className="inline-block h-[2px] w-5" style={{ background: palette.high }} />
                 {palette.highWord} ({recordYear})
               </span>
             )}
             {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6" style={{ background: palette.low }} />
+                <span className="inline-block h-[2px] w-5" style={{ background: palette.low }} />
                 {palette.lowWord} ({oppositeYear})
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6" style={{ background: palette.current }} />
+              <span className="inline-block h-[2px] w-5" style={{ background: palette.current }} />
               {currentYear} so far
             </span>
             {showShiftTrail && crossingDecades.length >= 2 && metric === 'temp' && !anomaly && (
               <>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="inline-block h-2 w-2 rounded-full" style={{ background: '#86EFAC' }} />
-                  Spring 10°C crossing
+                  Spring 10°C
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <span className="inline-block h-2 w-2 rounded-full" style={{ background: '#FDBA74' }} />
-                  Autumn 10°C crossing
+                  Autumn 10°C
                 </span>
               </>
             )}
@@ -1038,14 +1044,14 @@ export default function ClimateSpiralCard({
               })();
 
               const StatCard = ({ icon, label, value, sub, color, spark }: { icon: React.ReactNode; label: string; value: string; sub?: React.ReactNode; color: string; spark?: React.ReactNode }) => (
-                <div className="relative rounded-md border bg-gray-950/85 backdrop-blur-sm px-2 py-1 flex items-center gap-1.5" style={{ borderColor: `${color}55` }}>
-                  <div className="flex flex-col leading-none">
+                <div className="relative rounded-md border bg-gray-950/85 backdrop-blur-sm px-2 py-1 flex items-center gap-1.5 h-[42px] w-[168px] shrink-0" style={{ borderColor: `${color}55` }}>
+                  <div className="flex flex-col leading-none w-[72px] shrink-0">
                     <div className="flex items-center gap-1 text-[8.5px] uppercase tracking-wider text-gray-400">
                       <span style={{ color }}>{icon}</span>
                       {label}
                     </div>
-                    <div className="font-mono text-[13px] sm:text-sm font-bold tabular-nums mt-0.5" style={{ color: '#FFF5E7' }}>{value}</div>
-                    {sub && <div className="text-[9px] tabular-nums leading-tight">{sub}</div>}
+                    <div className="font-mono text-[13px] font-bold tabular-nums mt-0.5 truncate" style={{ color: '#FFF5E7' }}>{value}</div>
+                    {sub && <div className="text-[9px] tabular-nums leading-tight truncate">{sub}</div>}
                   </div>
                   {spark}
                 </div>
@@ -1053,8 +1059,8 @@ export default function ClimateSpiralCard({
               return (
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 z-10 pointer-events-none w-[calc(100%-0.5rem)] max-w-[1100px]">
                   <div className="rounded-xl border border-[#D0A65E]/45 bg-[#0b0e16]/90 px-3 py-1.5 shadow-2xl">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <div className="font-mono font-black tabular-nums text-2xl sm:text-3xl text-[#D0A65E] leading-none drop-shadow">
+                    <div className="flex items-center gap-2 overflow-x-auto">
+                      <div className="font-mono font-black tabular-nums text-2xl sm:text-3xl text-[#D0A65E] leading-none drop-shadow shrink-0 min-w-[88px]">
                         {displayYear}
                         {monthIdx !== null && (
                           <span className="text-[#FFF5E7] text-base sm:text-xl ml-1.5">{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][monthIdx]}</span>
@@ -1062,18 +1068,23 @@ export default function ClimateSpiralCard({
                       </div>
                       {isRecord && (
                         <span
-                          className="rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider animate-pulse"
+                          className="rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider animate-pulse shrink-0"
                           style={{ borderColor: recordColor, color: recordColor, background: `${recordColor}22`, boxShadow: `0 0 12px -2px ${recordColor}` }}
                         >
                           ◆ {recordLabel} on record
                         </span>
                       )}
                       {/* ENSO chip + sparkline bars (signed, colored by state) */}
-                      <div className={`flex items-center gap-1.5 rounded-md border px-1.5 py-1 ${ensoCls}`}>
-                        <span className="text-[9px] font-semibold uppercase tracking-wider leading-none whitespace-nowrap">
-                          {enso?.state === 'El Niño' ? 'El Niño' : enso?.state === 'La Niña' ? 'La Niña' : 'ENSO neutral'}
-                          {ensoAnom !== null ? <span className="ml-1 opacity-80">{ensoAnom >= 0 ? '+' : ''}{ensoAnom.toFixed(1)}°</span> : null}
-                        </span>
+                      <div className={`flex items-center gap-1.5 rounded-md border px-1.5 h-[42px] w-[168px] shrink-0 ${ensoCls}`}>
+                        <div className="flex flex-col leading-none w-[72px] shrink-0">
+                          <div className="text-[8.5px] font-semibold uppercase tracking-wider whitespace-nowrap">
+                            {enso?.state === 'El Niño' ? 'El Niño' : enso?.state === 'La Niña' ? 'La Niña' : 'ENSO'}
+                          </div>
+                          <div className="font-mono text-[13px] font-bold tabular-nums mt-0.5 truncate" style={{ color: '#FFF5E7' }}>
+                            {ensoAnom !== null ? `${ensoAnom >= 0 ? '+' : ''}${ensoAnom.toFixed(1)}°` : '—'}
+                          </div>
+                          <div className="text-[9px] tabular-nums leading-tight opacity-80 truncate">ONI</div>
+                        </div>
                         {oniAnnual.length > 0 && <Sparkline data={oniAnnual} current={displayYear} color="#cbd5e1" mode="bars" />}
                       </div>
                       {tempVal !== null && (
@@ -1123,7 +1134,7 @@ export default function ClimateSpiralCard({
               );
             })()}
             <svg
-              viewBox={view3D ? `0 -260 ${VB} ${VB + 260}` : `0 0 ${VB} ${VB}`}
+              viewBox={view3D ? `0 -40 ${VB} 660` : `0 0 ${VB} ${VB}`}
               className="w-full h-auto select-none cursor-crosshair"
               onMouseMove={(e) => {
                 const svg = e.currentTarget;
@@ -1363,25 +1374,38 @@ export default function ClimateSpiralCard({
                           <path d={wedgePath(monthAngle(newAutumn), monthAngle(oldAutumn))} fill="#7DD3FC" opacity={0.7} />
                         ) : null}
                       </g>
-                      {/* Season labels — bright and bold so they stay
-                          legible over the tinted wedges. */}
+                      {/* Season labels — bright bordered pills so they
+                          read as proper rim chips, matching the rest of
+                          the call-out furniture. */}
                       {labels.map((l) => {
                         const [lx, ly] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 22, l.mid);
+                        const w = l.text.length * 7 + 14;
                         return (
-                          <text
-                            key={`slab-${l.key}`}
-                            x={lx} y={ly}
-                            fontSize={13}
-                            fontWeight={700}
-                            fill={l.color}
-                            opacity={0.95}
-                            textAnchor="middle"
-                            dominantBaseline="central"
-                            fontFamily="ui-monospace, monospace"
-                            style={{ letterSpacing: '0.08em', textShadow: '0 0 4px rgba(0,0,0,0.85)' }}
-                          >
-                            {l.text}
-                          </text>
+                          <g key={`slab-${l.key}`}>
+                            <rect
+                              x={lx - w / 2}
+                              y={ly - 9}
+                              width={w}
+                              height={18}
+                              rx={9}
+                              fill="rgba(10,14,22,0.85)"
+                              stroke={l.color}
+                              strokeWidth={1}
+                              opacity={0.95}
+                            />
+                            <text
+                              x={lx} y={ly}
+                              fontSize={11}
+                              fontWeight={700}
+                              fill={l.color}
+                              textAnchor="middle"
+                              dominantBaseline="central"
+                              fontFamily="ui-monospace, monospace"
+                              style={{ letterSpacing: '0.08em' }}
+                            >
+                              {l.text}
+                            </text>
+                          </g>
                         );
                       })}
                     </g>
@@ -1405,21 +1429,35 @@ export default function ClimateSpiralCard({
                     {bounds.map((s) => {
                       const ang = labelAngle(s.start, s.end);
                       const [lx, ly] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 22, ang);
+                      const text = SEASON_LABEL[s.season];
+                      const color = SEASON_COLORS[s.season];
+                      const w = text.length * 7 + 14;
                       return (
-                        <text
-                          key={`slab-${s.season}`}
-                          x={lx} y={ly}
-                          fontSize={13}
-                          fontWeight={700}
-                          fill={SEASON_COLORS[s.season]}
-                          opacity={0.95}
-                          textAnchor="middle"
-                          dominantBaseline="central"
-                          fontFamily="ui-monospace, monospace"
-                          style={{ letterSpacing: '0.08em', textShadow: '0 0 4px rgba(0,0,0,0.85)' }}
-                        >
-                          {SEASON_LABEL[s.season]}
-                        </text>
+                        <g key={`slab-${s.season}`}>
+                          <rect
+                            x={lx - w / 2}
+                            y={ly - 9}
+                            width={w}
+                            height={18}
+                            rx={9}
+                            fill="rgba(10,14,22,0.85)"
+                            stroke={color}
+                            strokeWidth={1}
+                            opacity={0.95}
+                          />
+                          <text
+                            x={lx} y={ly}
+                            fontSize={11}
+                            fontWeight={700}
+                            fill={color}
+                            textAnchor="middle"
+                            dominantBaseline="central"
+                            fontFamily="ui-monospace, monospace"
+                            style={{ letterSpacing: '0.08em' }}
+                          >
+                            {text}
+                          </text>
+                        </g>
                       );
                     })}
                   </g>
@@ -1895,12 +1933,6 @@ export default function ClimateSpiralCard({
                 const last = crossingDecades[crossingDecades.length - 1];
                 const r10 = valueToR(SHIFT_THRESHOLD, 3);
                 if (!Number.isFinite(r10) || r10 <= 0) return null;
-                // Match the shifting-seasons map palette: cool blue
-                // (#2166ac) for the older decade, warm red (#b2182b)
-                // for the newer decade. Same diverging stops as the
-                // global-shift-map so the two views speak one language.
-                const oldCol = '#2166ac';
-                const newCol = '#b2182b';
                 // All call-out furniture lives *outside* the month-label
                 // band so it never overlaps month names or the spaghetti
                 // lines. Dots stay on the 10°C ring; leaders cross the
@@ -1909,14 +1941,21 @@ export default function ClimateSpiralCard({
                 const rYear = R_LABEL + R_LABEL_BAND_W / 2 + 22;
                 const rHeader = R_LABEL + R_LABEL_BAND_W / 2 + 52;
 
-                /** One consolidated call-out group. */
+                /** One consolidated call-out group. Spring uses the
+                 *  shifting-seasons spring-green, Autumn uses the
+                 *  amber-brown — so the colour vocabulary matches the
+                 *  season tints on the wheel and the legend dots. The
+                 *  *older* decade gets a muted shade of the same hue;
+                 *  the *newer* decade gets the saturated version. */
                 const renderGroup = (
-                  key: string,
+                  key: 'spring' | 'autumn',
                   header: string,
                   oldAng: number,
                   newAng: number,
                   shiftMonths: number,
                 ) => {
+                  const newCol = key === 'spring' ? '#86EFAC' : '#FDBA74';
+                  const oldCol = key === 'spring' ? '#4D7C5A' : '#7A4A1D';
                   const days = Math.round(Math.abs(shiftMonths) * DAYS_PER_MONTH);
                   const direction = header === 'Spring starts'
                     ? (shiftMonths > 0 ? 'earlier' : 'later')
@@ -1937,8 +1976,7 @@ export default function ClimateSpiralCard({
                       {/* radial leaders out to the year-label pills */}
                       <line x1={ox1} y1={oy1} x2={oxL} y2={oyL} stroke={oldCol} strokeWidth={1} opacity={0.85} />
                       <line x1={nx1} y1={ny1} x2={nxL} y2={nyL} stroke={newCol} strokeWidth={1} opacity={0.85} />
-                      {/* year-label pills — dark rounded backdrops so the
-                           text never fights with the spaghetti behind it. */}
+                      {/* year-label pills */}
                       <rect x={oxL - 18} y={oyL - 8} width={36} height={15} rx={7.5} fill="rgba(10,14,22,0.85)" stroke={oldCol} strokeWidth={0.8} />
                       <text x={oxL} y={oyL + 3} fontSize={10} fontWeight={700} fill={oldCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
                         {first.decade}s
@@ -1947,11 +1985,10 @@ export default function ClimateSpiralCard({
                       <text x={nxL} y={nyL + 3} fontSize={10} fontWeight={700} fill={newCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
                         {last.decade}s
                       </text>
-                      {/* consolidated header pill — "Spring starts" with
-                           shift in days. Positioned even further out so it
-                           doesn't fight with the year pills. */}
-                      <rect x={hx - 48} y={hy - 13} width={96} height={28} rx={6} fill="rgba(10,14,22,0.88)" stroke="rgba(255,255,255,0.18)" strokeWidth={0.8} />
-                      <text x={hx} y={hy - 2} fontSize={11} fontWeight={700} fill="rgba(245,245,245,0.95)" textAnchor="middle" fontFamily="ui-monospace, monospace">
+                      {/* consolidated header pill — coloured to match the
+                           season being annotated. */}
+                      <rect x={hx - 48} y={hy - 13} width={96} height={28} rx={6} fill="rgba(10,14,22,0.9)" stroke={newCol} strokeWidth={1} opacity={0.95} />
+                      <text x={hx} y={hy - 2} fontSize={11} fontWeight={700} fill={newCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
                         {header}
                       </text>
                       <text x={hx} y={hy + 10} fontSize={10} fill="rgba(220,225,235,0.85)" textAnchor="middle" fontFamily="ui-monospace, monospace">
