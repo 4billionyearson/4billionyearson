@@ -131,12 +131,14 @@ function yearColor(year: number, minYear: number, maxYear: number, alpha = 1) {
   return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${alpha})`;
 }
 
-/* Season palette matching the shifting-seasons page. */
+/* Season palette matching the shifting-seasons page. Summer reads as
+ * yellow/gold, autumn as brown/amber, in line with how the year is usually
+ * pictured. */
 const SEASON_COLORS = {
   winter: '#BAE6FD', // ice-blue
   spring: '#86EFAC', // green
-  summer: '#FDE68A', // warm gold
-  autumn: '#FDBA74', // amber
+  summer: '#FACC15', // yellow / gold
+  autumn: '#92400E', // brown / chestnut
 };
 function seasonForMonth(m: number): keyof typeof SEASON_COLORS {
   // 0-indexed month
@@ -150,11 +152,13 @@ function seasonForMonth(m: number): keyof typeof SEASON_COLORS {
  * Polar geometry helpers
  * ──────────────────────────────────────────────────────────────────────── */
 
-const VB = 600;        // viewBox size
+const VB = 660;        // viewBox size — extra padding around R_LABEL for
+                       // season-crossing call-out lines outside the chart
 const CX = VB / 2;
 const CY = VB / 2;
 const R_OUTER = 240;   // outermost data ring
-const R_LABEL = 268;   // month label radius
+const R_LABEL = 272;   // month label radius
+const R_LABEL_BAND_W = 26; // visual width of the month-label "track" ring
 
 function monthAngle(m: number): number {
   // m 0..11, Jan at top, clockwise
@@ -656,19 +660,21 @@ export default function ClimateSpiralCard({
                     const [x2, y2] = polar(r, a2);
                     return `M ${CX} ${CY} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
                   };
-                  // Old-decade wedge in autumn amber, new-decade wedge in
-                  // spring green. Where they overlap the colour mixes; the
-                  // green-only crescents at each end are the "newly extended"
-                  // months — exactly what you want to highlight.
+                  // Old growing season tinted brown/autumn (the season as it
+                  // *was* — shorter, ending earlier). New growing season
+                  // tinted summer-yellow (the longer, hotter season we live
+                  // in now). Where they overlap the colour blends; the
+                  // yellow crescents at each end are the months that have
+                  // been *added* to summer.
                   return (
                     <g>
-                      <path d={wedgePath(first.spring, first.autumn)} fill="rgba(253,186,116,0.18)" />
-                      <path d={wedgePath(last.spring, last.autumn)} fill="rgba(134,239,172,0.22)" />
+                      <path d={wedgePath(first.spring, first.autumn)} fill={SEASON_COLORS.autumn} opacity={0.22} />
+                      <path d={wedgePath(last.spring, last.autumn)} fill={SEASON_COLORS.summer} opacity={0.28} />
                       <text
                         x={CX} y={CY + R_OUTER * 0.55}
                         textAnchor="middle"
                         fontSize={10}
-                        fill="rgba(134,239,172,0.95)"
+                        fill="#FDE047"
                         fontFamily="ui-monospace, monospace"
                       >
                         {last.decade}s growing season
@@ -677,7 +683,7 @@ export default function ClimateSpiralCard({
                         x={CX} y={CY + R_OUTER * 0.55 + 13}
                         textAnchor="middle"
                         fontSize={9}
-                        fill="rgba(253,186,116,0.85)"
+                        fill="rgba(146,64,14,0.95)"
                         fontFamily="ui-monospace, monospace"
                       >
                         {first.decade}s growing season
@@ -686,7 +692,7 @@ export default function ClimateSpiralCard({
                   );
                 }
                 return (
-                  <g opacity={0.18}>
+                  <g opacity={0.22}>
                     {Array.from({ length: 12 }, (_, m) => {
                       const a1 = monthAngle(m) - Math.PI / 12;
                       const a2 = monthAngle(m) + Math.PI / 12;
@@ -816,39 +822,42 @@ export default function ClimateSpiralCard({
                   <path
                     d={smoothClosedPath(pts)}
                     fill="none"
-                    stroke="rgba(200,210,225,0.85)"
-                    strokeWidth={1.6}
-                    strokeDasharray="5 4"
+                    stroke="#CBD5E1"
+                    strokeWidth={1.4}
+                    strokeDasharray="2 4"
+                    strokeLinecap="round"
+                    opacity={0.85}
                   />
                 );
               })()}
 
-              {/* Historic-period ring (user-chosen). Shown when toggle is
-                   on and the period is sensible. Mustard-amber to distinguish
-                   from baseline (cool grey) and modern (rose). */}
+              {/* Historic-period ring (user-chosen). Long warm-gold dashes —
+                   the most ornamental of the three so it reads as the
+                   "looking back" period. */}
               {showHistoric && meanHistoric.every(Number.isFinite) && (() => {
                 const pts: [number, number][] = meanHistoric.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
                 return (
                   <path
                     d={smoothClosedPath(pts)}
                     fill="none"
-                    stroke="#D0A65E"
-                    strokeWidth={1.6}
-                    strokeDasharray="5 4"
+                    stroke="#E6B765"
+                    strokeWidth={1.8}
+                    strokeDasharray="10 4"
                   />
                 );
               })()}
 
-              {/* Recent decade ring */}
+              {/* Recent decade ring — vivid crimson, tight dash. Heaviest
+                   of the three so it dominates "now". */}
               {meanRecent.every(Number.isFinite) && (() => {
                 const pts: [number, number][] = meanRecent.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
                 return (
                   <path
                     d={smoothClosedPath(pts)}
                     fill="none"
-                    stroke="#FCA5A5"
-                    strokeWidth={1.6}
-                    strokeDasharray="5 4"
+                    stroke="#EF4444"
+                    strokeWidth={2.1}
+                    strokeDasharray="5 2"
                   />
                 );
               })()}
@@ -1008,6 +1017,28 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
+              {/* Month-label background "track" — a faint band giving the
+                   month names a visible home so they no longer float in
+                   space. */}
+              <circle
+                cx={CX} cy={CY} r={R_LABEL}
+                fill="none"
+                stroke="rgba(255,255,255,0.05)"
+                strokeWidth={R_LABEL_BAND_W}
+              />
+              <circle
+                cx={CX} cy={CY} r={R_LABEL - R_LABEL_BAND_W / 2}
+                fill="none"
+                stroke="rgba(255,255,255,0.10)"
+                strokeWidth={0.6}
+              />
+              <circle
+                cx={CX} cy={CY} r={R_LABEL + R_LABEL_BAND_W / 2}
+                fill="none"
+                stroke="rgba(255,255,255,0.10)"
+                strokeWidth={0.6}
+              />
+
               {/* Month labels (outside the rings) */}
               {Array.from({ length: 12 }, (_, m) => {
                 const ang = monthAngle(m);
@@ -1018,7 +1049,7 @@ export default function ClimateSpiralCard({
                     x={x} y={y}
                     fontSize={13}
                     fontWeight={600}
-                    fill="rgba(220,225,235,0.85)"
+                    fill="rgba(220,225,235,0.92)"
                     textAnchor="middle"
                     dominantBaseline="central"
                     fontFamily="ui-monospace, monospace"
@@ -1027,6 +1058,77 @@ export default function ClimateSpiralCard({
                   </text>
                 );
               })}
+
+              {/* Season-crossing call-outs — only when the shift trail is on.
+                   Draws four leader-lines from the 10°C ring out past the
+                   month-label band, each labelled with the decade & event:
+                   Spring start (oldest) / Spring start (newest) and
+                   Autumn end (oldest) / Autumn end (newest). This shows the
+                   *named* season boundaries the spiral has been hinting at. */}
+              {showShiftTrail && shiftDecades.length >= 2 && metric === 'temp' && !anomaly && (() => {
+                const first = shiftDecades[0];
+                const last = shiftDecades[shiftDecades.length - 1];
+                const r10 = valueToR(SHIFT_THRESHOLD, 3);
+                if (!Number.isFinite(r10) || r10 <= 0) return null;
+                type CO = { ang: number; label1: string; label2: string; colour: string };
+                const items: CO[] = [
+                  { ang: monthAngle(first.spring), label1: 'Spring starts', label2: `${first.decade}s`, colour: '#92400E' },
+                  { ang: monthAngle(last.spring),  label1: 'Spring starts', label2: `${last.decade}s`,  colour: '#FACC15' },
+                  { ang: monthAngle(first.autumn), label1: 'Autumn ends',   label2: `${first.decade}s`, colour: '#92400E' },
+                  { ang: monthAngle(last.autumn),  label1: 'Autumn ends',   label2: `${last.decade}s`,  colour: '#FACC15' },
+                ];
+                return (
+                  <g pointerEvents="none">
+                    {items.map((it, i) => {
+                      // Leader line: from 10°C ring out to just past the
+                      // label band. We bend it slightly: radial out to
+                      // R_LABEL+14, then a short horizontal tail toward the
+                      // outside so the text sits cleanly to the left/right.
+                      const [x0, y0] = polar(r10, it.ang);
+                      const [x1, y1] = polar(R_OUTER + 4, it.ang);
+                      const [x2, y2] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 6, it.ang);
+                      const right = Math.cos(it.ang) >= 0;
+                      const tailLen = 22;
+                      const x3 = x2 + (right ? tailLen : -tailLen);
+                      const y3 = y2;
+                      const anchor: 'start' | 'end' = right ? 'start' : 'end';
+                      return (
+                        <g key={`crossing-${i}`}>
+                          <circle cx={x0} cy={y0} r={3} fill={it.colour} stroke="#0b0e16" strokeWidth={0.8} />
+                          <path
+                            d={`M ${x1.toFixed(2)} ${y1.toFixed(2)} L ${x2.toFixed(2)} ${y2.toFixed(2)} L ${x3.toFixed(2)} ${y3.toFixed(2)}`}
+                            fill="none"
+                            stroke={it.colour}
+                            strokeWidth={1}
+                            opacity={0.85}
+                          />
+                          <text
+                            x={x3 + (right ? 3 : -3)} y={y3 - 1}
+                            fontSize={10}
+                            fontWeight={600}
+                            fill={it.colour}
+                            textAnchor={anchor}
+                            dominantBaseline="alphabetic"
+                            fontFamily="ui-monospace, monospace"
+                          >
+                            {it.label1}
+                          </text>
+                          <text
+                            x={x3 + (right ? 3 : -3)} y={y3 + 10}
+                            fontSize={9}
+                            fill="rgba(220,225,235,0.75)"
+                            textAnchor={anchor}
+                            dominantBaseline="alphabetic"
+                            fontFamily="ui-monospace, monospace"
+                          >
+                            {it.label2}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </g>
+                );
+              })()}
             </svg>
 
             {/* Hover tooltip — positioned in viewBox % so it tracks the SVG
@@ -1216,7 +1318,7 @@ export default function ClimateSpiralCard({
                   max={maxYear}
                   value={baselineRange}
                   onChange={setBaselineRange}
-                  accent="rgba(200,210,225,0.85)"
+                  accent="#CBD5E1"
                   minGap={4}
                 />
               </div>
@@ -1233,7 +1335,7 @@ export default function ClimateSpiralCard({
                   max={maxYear}
                   value={recentRange}
                   onChange={setRecentRange}
-                  accent="#FCA5A5"
+                  accent="#EF4444"
                   minGap={1}
                 />
               </div>
@@ -1259,7 +1361,7 @@ export default function ClimateSpiralCard({
                     max={maxYear}
                     value={historicRange}
                     onChange={setHistoricRange}
-                    accent="#D0A65E"
+                    accent="#E6B765"
                     minGap={4}
                   />
                 </div>
@@ -1297,17 +1399,17 @@ export default function ClimateSpiralCard({
             </span>
             {!anomaly && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: 'rgba(200,210,225,0.85)' }} />
+                <span className="inline-block h-[2px] w-6 border-t-2 border-dotted" style={{ borderColor: '#CBD5E1' }} />
                 {baselineFrom}–{baselineTo} mean
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: '#FCA5A5' }} />
+              <span className="inline-block h-[2px] w-6 border-t-2 border-dashed" style={{ borderColor: '#EF4444' }} />
               {recentFrom}–{recentTo} mean{anomaly ? ' (anomaly)' : ''}
             </span>
             {showHistoric && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: '#D0A65E' }} />
+                <span className="inline-block h-[2px] w-6 border-t-2 border-dashed" style={{ borderColor: '#E6B765' }} />
                 {historicFrom}–{historicTo} mean{anomaly ? ' (anomaly)' : ''}
               </span>
             )}
