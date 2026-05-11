@@ -651,22 +651,32 @@ export default function ClimateSpiralCard({
                    glance how the season has expanded. */}
               {/* Season-tint background.
                *
-               * Three modes:
-               * (a) showSeasons + temperate climate (shiftDecades.length>=2)
-               *     + temp metric: 4 wedges placed by the LATEST decade's
-               *     10°C crossings. Spring starts where the data says it
-               *     starts now, not at a fixed astronomical date.
-               * (b) showSeasons but no crossings (e.g. tropical/arid, or
-               *     non-temp metric): fall back to fixed meteorological
-               *     quarters (Mar–May spring, etc.).
-               * (c) showShiftTrail (overrides (a)): swap the 4-tint mode for
-               *     two over-lapping growing-season wedges — oldest decade
-               *     in early-blue, newest decade in modern-orange — so the
-               *     viewer sees the season expansion directly. */}
+               * When we have temp data + 10°C crossings for at least two
+               * decades, we render a full-year, four-season ring that
+               * encodes the shift directly in the tints themselves:
+               *
+               *   • Winter   — ice blue, wrapping through Dec/Jan,
+               *                from the latest decade's autumn end round
+               *                to the latest decade's spring start.
+               *   • Pale-green crescent — months that *used to be winter*
+               *                but in the latest decade are spring (i.e.
+               *                between newest and oldest spring start).
+               *   • Growing-season core — oldest spring start → oldest
+               *                autumn end, filled with a smooth gradient
+               *                from spring-green through summer-yellow to
+               *                autumn-brown so summer sits in the warm
+               *                middle without needing a summer-boundary
+               *                crossing (which we don't have data for).
+               *   • Pale-amber crescent — months that *used to be winter*
+               *                but in the latest decade are autumn
+               *                (oldest autumn end → newest autumn end).
+               *
+               * For non-temperate climates or non-temp metrics we fall
+               * back to fixed meteorological quarters using the same
+               * four-season palette. */}
               {showSeasons && (() => {
                 const r = R_OUTER + 4;
                 const wedgePath = (a1: number, a2: number) => {
-                  // Always sweep clockwise (positive direction).
                   let span = a2 - a1;
                   while (span <= 0) span += Math.PI * 2;
                   const large = span > Math.PI ? 1 : 0;
@@ -675,54 +685,28 @@ export default function ClimateSpiralCard({
                   return `M ${CX} ${CY} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`;
                 };
 
-                const useShiftPreset = showShiftTrail && shiftDecades.length >= 2 && metric === 'temp' && !anomaly;
-                if (useShiftPreset) {
-                  const first = shiftDecades[0];
-                  const last = shiftDecades[shiftDecades.length - 1];
-                  return (
-                    <g>
-                      <path d={wedgePath(monthAngle(first.spring), monthAngle(first.autumn))} fill="#2a5eb8" opacity={0.22} />
-                      <path d={wedgePath(monthAngle(last.spring),  monthAngle(last.autumn))}  fill="#e8440a" opacity={0.28} />
-                      <text x={CX} y={CY + R_OUTER * 0.55}      textAnchor="middle" fontSize={10} fill="#FCA5A5" fontFamily="ui-monospace, monospace">{last.decade}s growing season</text>
-                      <text x={CX} y={CY + R_OUTER * 0.55 + 13} textAnchor="middle" fontSize={9}  fill="#7DA8E8" fontFamily="ui-monospace, monospace">{first.decade}s growing season</text>
-                    </g>
-                  );
-                }
+                // Simple HEX interpolation between stops; t in [0..1].
+                const lerpHex = (a: string, b: string, t: number) => {
+                  const ah = a.replace('#', '');
+                  const bh = b.replace('#', '');
+                  const ar = parseInt(ah.slice(0, 2), 16);
+                  const ag = parseInt(ah.slice(2, 4), 16);
+                  const ab = parseInt(ah.slice(4, 6), 16);
+                  const br = parseInt(bh.slice(0, 2), 16);
+                  const bg = parseInt(bh.slice(2, 4), 16);
+                  const bb = parseInt(bh.slice(4, 6), 16);
+                  const r = Math.round(ar + (br - ar) * t);
+                  const g = Math.round(ag + (bg - ag) * t);
+                  const bl = Math.round(ab + (bb - ab) * t);
+                  return `rgb(${r},${g},${bl})`;
+                };
+                const growingColor = (t: number) => {
+                  // 0 = spring green, 0.5 = summer yellow, 1 = autumn brown.
+                  if (t <= 0.5) return lerpHex('#4ADE80', '#FACC15', t / 0.5);
+                  return lerpHex('#FACC15', '#B45309', (t - 0.5) / 0.5);
+                };
 
-                // Data-driven 4-season boundaries (decimal-month angles).
-                // We have spring 10°C crossing & autumn 10°C crossing from
-                // the latest decade. Place summer-start at the midpoint of
-                // the warm half, winter-start at the midpoint of the cold
-                // half. All four wedges then derive from real data.
-                let springStart: number, summerStart: number, autumnStart: number, winterStart: number;
-                let derived = false;
-                if (shiftDecades.length >= 2 && metric === 'temp') {
-                  const last = shiftDecades[shiftDecades.length - 1];
-                  springStart = last.spring;
-                  autumnStart = last.autumn;
-                  const warmSpan = autumnStart - springStart;
-                  summerStart = springStart + warmSpan / 2;
-                  // Cold half wraps through Dec/Jan
-                  winterStart = autumnStart + (12 - warmSpan) / 2;
-                  if (winterStart >= 12) winterStart -= 12;
-                  derived = true;
-                } else {
-                  // Fixed meteorological quarters: spring=Mar (m=2),
-                  // summer=Jun (m=5), autumn=Sep (m=8), winter=Dec (m=11).
-                  springStart = 2;
-                  summerStart = 5;
-                  autumnStart = 8;
-                  winterStart = 11;
-                }
-
-                const bounds: Array<{ season: keyof typeof SEASON_COLORS; start: number; end: number }> = [
-                  { season: 'spring', start: springStart, end: summerStart },
-                  { season: 'summer', start: summerStart, end: autumnStart },
-                  { season: 'autumn', start: autumnStart, end: winterStart },
-                  { season: 'winter', start: winterStart, end: springStart },
-                ];
-
-                // Helper to find the angle at the wedge centroid (for labels).
+                const haveCrossings = shiftDecades.length >= 2 && metric === 'temp';
                 const labelAngle = (a: number, b: number) => {
                   let span = b - a;
                   if (span <= 0) span += 12;
@@ -731,14 +715,95 @@ export default function ClimateSpiralCard({
                   return monthAngle(mid);
                 };
 
+                if (haveCrossings) {
+                  const first = shiftDecades[0];
+                  const last = shiftDecades[shiftDecades.length - 1];
+                  // Guard against odd ordering.
+                  const newSpring = last.spring;
+                  const oldSpring = first.spring;
+                  const oldAutumn = first.autumn;
+                  const newAutumn = last.autumn;
+                  // Growing-season gradient: split [oldSpring..oldAutumn]
+                  // into N thin wedges, each filled with a colour
+                  // interpolated through green → yellow → brown.
+                  const N = 28;
+                  const growSpan = oldAutumn - oldSpring;
+                  const gradWedges = Array.from({ length: N }, (_, i) => {
+                    const t0 = i / N;
+                    const t1 = (i + 1) / N;
+                    const m0 = oldSpring + growSpan * t0;
+                    const m1 = oldSpring + growSpan * t1;
+                    const col = growingColor((t0 + t1) / 2);
+                    return (
+                      <path
+                        key={`grow-${i}`}
+                        d={wedgePath(monthAngle(m0), monthAngle(m1))}
+                        fill={col}
+                      />
+                    );
+                  });
+
+                  // Three "named" zones used purely for label placement.
+                  const labels = [
+                    { key: 'spring', mid: labelAngle(newSpring, oldSpring + (oldAutumn - oldSpring) * 0.33), color: '#4ADE80', text: 'Spring' },
+                    { key: 'summer', mid: labelAngle(oldSpring + (oldAutumn - oldSpring) * 0.33, oldSpring + (oldAutumn - oldSpring) * 0.66), color: '#FACC15', text: 'Summer' },
+                    { key: 'autumn', mid: labelAngle(oldSpring + (oldAutumn - oldSpring) * 0.66, newAutumn), color: '#B45309', text: 'Autumn' },
+                    { key: 'winter', mid: labelAngle(newAutumn, newSpring), color: '#7DD3FC', text: 'Winter' },
+                  ];
+
+                  return (
+                    <g>
+                      <g opacity={0.32}>
+                        {/* Winter (always-cold half, ice blue) */}
+                        <path d={wedgePath(monthAngle(newAutumn), monthAngle(newSpring))} fill="#7DD3FC" />
+                        {/* Newly-added spring (pale green crescent) */}
+                        <path d={wedgePath(monthAngle(newSpring), monthAngle(oldSpring))} fill="#BBF7D0" />
+                        {/* Growing-season gradient core */}
+                        {gradWedges}
+                        {/* Newly-added autumn (pale amber crescent) */}
+                        <path d={wedgePath(monthAngle(oldAutumn), monthAngle(newAutumn))} fill="#FDBA74" />
+                      </g>
+                      {/* Season labels */}
+                      {labels.map((l) => {
+                        const [lx, ly] = polar(R_OUTER * 0.70, l.mid);
+                        return (
+                          <text
+                            key={`slab-${l.key}`}
+                            x={lx} y={ly}
+                            fontSize={11}
+                            fontWeight={700}
+                            fill={l.color}
+                            opacity={0.65}
+                            textAnchor="middle"
+                            dominantBaseline="central"
+                            fontFamily="ui-monospace, monospace"
+                            style={{ letterSpacing: '0.06em' }}
+                          >
+                            {l.text}
+                          </text>
+                        );
+                      })}
+                      <text x={CX} y={CY + R_OUTER + 36} textAnchor="middle" fontSize={9} fill="rgba(220,225,235,0.55)" fontFamily="ui-monospace, monospace">
+                        Pale crescents = months that used to be winter but now belong to spring (earlier) or autumn (later)
+                      </text>
+                    </g>
+                  );
+                }
+
+                // Fallback — fixed meteorological quarters.
+                const bounds: Array<{ season: keyof typeof SEASON_COLORS; start: number; end: number }> = [
+                  { season: 'spring', start: 2, end: 5 },
+                  { season: 'summer', start: 5, end: 8 },
+                  { season: 'autumn', start: 8, end: 11 },
+                  { season: 'winter', start: 11, end: 2 },
+                ];
                 return (
                   <g>
-                    <g opacity={0.22}>
+                    <g opacity={0.28}>
                       {bounds.map((s) => (
                         <path key={`wedge-${s.season}`} d={wedgePath(monthAngle(s.start), monthAngle(s.end))} fill={SEASON_COLORS[s.season]} />
                       ))}
                     </g>
-                    {/* Season name labels at the wedge centroid, mid-radius */}
                     {bounds.map((s) => {
                       const ang = labelAngle(s.start, s.end);
                       const [lx, ly] = polar(R_OUTER * 0.70, ang);
@@ -747,23 +812,18 @@ export default function ClimateSpiralCard({
                           key={`slab-${s.season}`}
                           x={lx} y={ly}
                           fontSize={11}
-                          fontWeight={600}
+                          fontWeight={700}
                           fill={SEASON_COLORS[s.season]}
-                          opacity={0.55}
+                          opacity={0.65}
                           textAnchor="middle"
                           dominantBaseline="central"
                           fontFamily="ui-monospace, monospace"
-                          style={{ letterSpacing: '0.05em' }}
+                          style={{ letterSpacing: '0.06em' }}
                         >
                           {SEASON_LABEL[s.season]}
                         </text>
                       );
                     })}
-                    {derived && (
-                      <text x={CX} y={CY + R_OUTER + 32} textAnchor="middle" fontSize={9} fill="rgba(220,225,235,0.55)" fontFamily="ui-monospace, monospace">
-                        Season tints anchored to the latest decade&apos;s 10°C crossings
-                      </text>
-                    )}
                   </g>
                 );
               })()}
