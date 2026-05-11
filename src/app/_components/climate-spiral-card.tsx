@@ -39,11 +39,51 @@ const TOGGLE_BASE = 'inline-flex h-7 items-center gap-1 rounded-full border px-2
 const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
 const TOGGLE_INACTIVE = 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 
+/** Pill-style toggle that mirrors the metric-chip look. When `active` it
+ *  picks up an outline + tinted fill in the supplied `color`, falling back
+ *  to the shared inactive style otherwise. Lets us replace the noisy
+ *  `<input type="checkbox">` controls with chips that wrap nicely on
+ *  mobile and align with the metric switcher above the chart. */
+function ChipToggle({
+  active, onChange, color = '#D0A65E', children,
+}: {
+  active: boolean;
+  onChange: (next: boolean) => void;
+  color?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!active)}
+      aria-pressed={active}
+      className={`${TOGGLE_BASE} ${active ? '' : TOGGLE_INACTIVE}`}
+      style={active ? { borderColor: `${color}8c`, background: `${color}1f`, color: '#FFF5E7' } : undefined}
+    >
+      <span
+        aria-hidden
+        className="inline-block h-2 w-2 rounded-full"
+        style={{ background: active ? color : 'transparent', border: `1px solid ${active ? color : '#4B5563'}` }}
+      />
+      <span className="leading-none">{children}</span>
+    </button>
+  );
+}
+
 const METRIC_ICON: Record<SpaghettiMetric, React.ReactNode> = {
   temp: <Thermometer className="h-3.5 w-3.5" />,
   precip: <CloudRain className="h-3.5 w-3.5" />,
   sunshine: <Sun className="h-3.5 w-3.5" />,
   frost: <Snowflake className="h-3.5 w-3.5" />,
+};
+
+/** Larger version of the metric icon for the section heading — matches the
+ *  size used on the monthly-spaghetti card so the two sections line up. */
+const HEADER_ICON: Record<SpaghettiMetric, React.ReactNode> = {
+  temp: <Thermometer className="h-5 w-5" />,
+  precip: <CloudRain className="h-5 w-5" />,
+  sunshine: <Sun className="h-5 w-5" />,
+  frost: <Snowflake className="h-5 w-5" />,
 };
 
 const METRIC_LABEL: Record<SpaghettiMetric, string> = {
@@ -158,8 +198,8 @@ const SEASON_LABEL: Record<keyof typeof SEASON_COLORS, string> = {
  * Polar geometry helpers
  * ──────────────────────────────────────────────────────────────────────── */
 
-const VB = 720;        // viewBox size — padded to fit season-crossing
-                       // call-out labels outside the month-label ring
+const VB = 800;        // viewBox size — padded to fit season-crossing
+                       // call-out label pills outside the month-label ring
 const CX = VB / 2;
 const CY = VB / 2;
 const R_OUTER = 240;   // outermost data ring
@@ -408,17 +448,24 @@ export default function ClimateSpiralCard({
   const [recentFrom, recentTo] = recentRange;
   const [showHistoric, setShowHistoric] = useState(false);
 
+  /* Playback state — see below for the RAF/interval effect that advances
+   * the playhead. Declared here so the controls below can read it. */
+  const [playYear, setPlayYear] = useState<number | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [playSpeed, setPlaySpeed] = useState(8); // years per second
+  const playCutoff = playYear ?? Number.POSITIVE_INFINITY;
+
   const meanBaseline = useMemo(
-    () => monthlyMeanProfile(yearMap, baselineFrom, baselineTo),
-    [yearMap, baselineFrom, baselineTo],
+    () => monthlyMeanProfile(yearMap, baselineFrom, Math.min(baselineTo, playCutoff)),
+    [yearMap, baselineFrom, baselineTo, playCutoff],
   );
   const meanHistoric = useMemo(
-    () => monthlyMeanProfile(yearMap, historicFrom, historicTo),
-    [yearMap, historicFrom, historicTo],
+    () => monthlyMeanProfile(yearMap, historicFrom, Math.min(historicTo, playCutoff)),
+    [yearMap, historicFrom, historicTo, playCutoff],
   );
   const meanRecent = useMemo(
-    () => monthlyMeanProfile(yearMap, recentFrom, recentTo),
-    [yearMap, recentFrom, recentTo],
+    () => monthlyMeanProfile(yearMap, recentFrom, Math.min(recentTo, playCutoff)),
+    [yearMap, recentFrom, recentTo, playCutoff],
   );
 
   /* Hover state for chart tooltip: nearest year at the mouse position.
@@ -465,6 +512,30 @@ export default function ClimateSpiralCard({
     };
   }, [yearMap, effectiveFromYear, anomaly, meanBaseline, metric]);
 
+  /* Playback advancement — runs an interval that ticks the playhead one
+   * year per `1000/playSpeed`ms. Hooked here (rather than where the state
+   * is declared) because we need `currentYear`. */
+  React.useEffect(() => {
+    if (!playing) return;
+    const intervalMs = Math.max(20, 1000 / playSpeed);
+    const id = window.setInterval(() => {
+      setPlayYear((prev) => {
+        const cur = prev ?? (effectiveFromYear - 1);
+        if (cur >= currentYear) {
+          setPlaying(false);
+          return currentYear;
+        }
+        return cur + 1;
+      });
+    }, intervalMs);
+    return () => window.clearInterval(id);
+  }, [playing, playSpeed, effectiveFromYear, currentYear]);
+  // Stop + reset playback whenever the metric or start-year changes.
+  React.useEffect(() => {
+    setPlayYear(null);
+    setPlaying(false);
+  }, [metric, effectiveFromYear]);
+
   /* For temp+absolute, anchor scale at sensible bounds so 0°C reads naturally. */
   const scaleMin = anomaly
     ? Math.min(rMin - 0.5, -2)
@@ -494,16 +565,18 @@ export default function ClimateSpiralCard({
     return pts;
   }
 
-  /* Decide which years to render in background vs highlight. */
+  /* Decide which years to render in background vs highlight. Playback
+   * (when active) clamps to `playCutoff`. */
   const renderYears = useMemo(() => {
     const out: number[] = [];
     for (const y of yearMap.keys()) {
       if (y < effectiveFromYear) continue;
+      if (y > playCutoff) continue;
       out.push(y);
     }
     out.sort((a, b) => a - b);
     return out;
-  }, [yearMap, effectiveFromYear]);
+  }, [yearMap, effectiveFromYear, playCutoff]);
 
   /* Gridlines */
   const gridTicks = useMemo(() => {
@@ -546,15 +619,27 @@ export default function ClimateSpiralCard({
     ];
   }, [metric, showParis, anomaly, meanBaseline]);
 
-  /* Decadal 10°C growing-season crossings (temp + absolute mode).
-   * Computed whenever we have temperature data so both the season-tint
-   * crescents AND the dedicated shift-trail overlay can use them. */
+  /* Decadal 10°C growing-season crossings.
+   * Always computed from the *temperature* series so the season-tint
+   * crescents work on every metric tab (the climatic shift itself is
+   * temperature-driven; rainfall / sunshine / frost charts still
+   * benefit from seeing the same shifted-season backdrop). */
   const SHIFT_THRESHOLD = 10;
   const crossingDecades = useMemo(() => {
-    if (metric !== 'temp' || anomaly) return [];
-    const crossings = computeYearCrossings(yearMap, SHIFT_THRESHOLD);
+    if (anomaly) return [];
+    const tempPoints = series.temp;
+    if (!tempPoints?.length) return [];
+    const tempYearMap = buildYearMap(tempPoints, provisionalAfterMonth).yearMap;
+    // Clamp to the playhead so shift-tints/trails build up year-by-year
+    // during animated playback.
+    const clamped: typeof tempYearMap = new Map();
+    for (const [y, arr] of tempYearMap) {
+      if (y > playCutoff) continue;
+      clamped.set(y, arr);
+    }
+    const crossings = computeYearCrossings(clamped, SHIFT_THRESHOLD);
     return decadalCrossings(crossings);
-  }, [metric, anomaly, yearMap]);
+  }, [anomaly, series, provisionalAfterMonth, playCutoff]);
   /** Approx days per month for shift-day computation. */
   const DAYS_PER_MONTH = 30.44;
 
@@ -573,17 +658,10 @@ export default function ClimateSpiralCard({
   /* ───────────────── Render ───────────────── */
   return (
     <div id={sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
-      <h3 className="text-xl font-bold font-mono text-white mb-1 flex items-start gap-2">
-        <span className="shrink-0 mt-1 text-[#D0A65E]">{METRIC_ICON[metric]}</span>
+      <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
+        <span className="shrink-0 mt-0.5 text-[#D0A65E]">{HEADER_ICON[metric]}</span>
         <span className="min-w-0 flex-1">The 4BYO Climate Spiral – {regionName}</span>
       </h3>
-      <p className="text-xs text-gray-400 mb-3">
-        Every year is a closed loop running Jan→Dec, with the radius set by that month&apos;s value.
-        Blue years are older, red years more recent. The dashed grey ring is your <em>baseline</em>
-        mean shape; the dashed red ring is your <em>comparison</em> mean shape — adjust either window
-        below to test what climate change looks like under different reference periods. Hover the
-        chart to inspect any year-month value.
-      </p>
 
       {/* Metric tabs */}
       {available.length > 1 && (
@@ -792,7 +870,7 @@ export default function ClimateSpiralCard({
                   return lerpHex('#FACC15', '#B45309', (t - 0.5) / 0.5);
                 };
 
-                const haveCrossings = crossingDecades.length >= 2 && metric === 'temp';
+                const haveCrossings = crossingDecades.length >= 2;
                 const labelAngle = (a: number, b: number) => {
                   let span = b - a;
                   if (span <= 0) span += 12;
@@ -839,18 +917,19 @@ export default function ClimateSpiralCard({
 
                   return (
                     <g>
-                      <g opacity={0.34}>
+                      <g opacity={0.38}>
                         {/* Winter (always-cold half, ice blue) */}
                         <path d={wedgePath(monthAngle(newAutumn), monthAngle(newSpring))} fill="#7DD3FC" />
                         {/* Crescent: months that used to be winter, now spring.
-                             Muted sage so it reads as "transition" without
-                             competing with the saturated growing-season core. */}
-                        <path d={wedgePath(monthAngle(newSpring), monthAngle(oldSpring))} fill="#A7C9A0" />
+                             Light fresh green — same family as the spring
+                             marker dots, lighter than the gradient core. */}
+                        <path d={wedgePath(monthAngle(newSpring), monthAngle(oldSpring))} fill="#BBF7D0" />
                         {/* Growing-season gradient core */}
                         {gradWedges}
                         {/* Crescent: months that used to be winter, now autumn.
-                             Muted taupe — same idea on the autumn side. */}
-                        <path d={wedgePath(monthAngle(oldAutumn), monthAngle(newAutumn))} fill="#C7A57A" />
+                             Saturated chestnut brown — matches the autumn
+                             marker dots, browner than the gradient tail. */}
+                        <path d={wedgePath(monthAngle(oldAutumn), monthAngle(newAutumn))} fill="#92400E" />
                       </g>
                       {/* Season labels — bright and bold so they stay
                           legible over the tinted wedges. */}
@@ -1119,7 +1198,7 @@ export default function ClimateSpiralCard({
               })()}
 
               {/* Record year — high extreme (warmest/wettest/etc.) */}
-              {showRecordHigh && recordYear > 0 && yearMap.get(recordYear) && (() => {
+              {showRecordHigh && recordYear > 0 && recordYear <= playCutoff && yearMap.get(recordYear) && (() => {
                 const arr = yearMap.get(recordYear)!;
                 const pts = yearToPoints(arr);
                 if (!pts) return null;
@@ -1135,7 +1214,7 @@ export default function ClimateSpiralCard({
               })()}
 
               {/* Record year — low extreme (coldest/driest/etc.) */}
-              {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && yearMap.get(oppositeYear) && (() => {
+              {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && oppositeYear <= playCutoff && yearMap.get(oppositeYear) && (() => {
                 const arr = yearMap.get(oppositeYear)!;
                 const pts = yearToPoints(arr);
                 if (!pts) return null;
@@ -1150,8 +1229,12 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
-              {/* Current year (Jan→latest completed month, open path) */}
-              {yearMap.get(currentYear) && (() => {
+              {/* Current year (Jan→latest completed month, open path).
+                   Segments between provisional months are dashed so the
+                   provisional tail visually advertises itself as "still
+                   subject to revision" — same convention as the spaghetti
+                   chart above. */}
+              {currentYear <= playCutoff && yearMap.get(currentYear) && (() => {
                 const arr = yearMap.get(currentYear)!;
                 const provSet = prov.get(currentYear) ?? new Set();
                 const provPts: { m: number; r: number; provisional: boolean }[] = [];
@@ -1161,23 +1244,48 @@ export default function ClimateSpiralCard({
                   provPts.push({ m, r: valueToR(v, m), provisional: provSet.has(m) });
                 }
                 if (provPts.length < 2) return null;
-                const segs: string[] = [];
-                let prev: { x: number; y: number } | null = null;
-                for (const p of provPts) {
+                // Build two separate paths: a solid path for the confirmed
+                // tail, and a dashed path for the provisional tail. The
+                // dashed path picks up from the *last confirmed point* so
+                // the user sees a continuous line.
+                const solidSegs: string[] = [];
+                const dashSegs: string[] = [];
+                let firstProvIdx = provPts.findIndex((p) => p.provisional);
+                if (firstProvIdx === -1) firstProvIdx = provPts.length;
+                const solidPts = provPts.slice(0, firstProvIdx);
+                const dashPts = firstProvIdx > 0
+                  ? provPts.slice(firstProvIdx - 1) // include last confirmed point
+                  : provPts;
+                solidPts.forEach((p, i) => {
                   const [x, y] = polar(p.r, monthAngle(p.m));
-                  if (prev) segs.push(`L ${x.toFixed(2)} ${y.toFixed(2)}`);
-                  else segs.push(`M ${x.toFixed(2)} ${y.toFixed(2)}`);
-                  prev = { x, y };
-                }
+                  solidSegs.push(`${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`);
+                });
+                dashPts.forEach((p, i) => {
+                  const [x, y] = polar(p.r, monthAngle(p.m));
+                  dashSegs.push(`${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`);
+                });
                 return (
                   <g>
-                    <path
-                      d={segs.join(' ')}
-                      fill="none"
-                      stroke={palette.current}
-                      strokeWidth={2.6}
-                      strokeLinecap="round"
-                    />
+                    {solidSegs.length >= 2 && (
+                      <path
+                        d={solidSegs.join(' ')}
+                        fill="none"
+                        stroke={palette.current}
+                        strokeWidth={2.6}
+                        strokeLinecap="round"
+                      />
+                    )}
+                    {dashSegs.length >= 2 && (
+                      <path
+                        d={dashSegs.join(' ')}
+                        fill="none"
+                        stroke={palette.current}
+                        strokeWidth={2.6}
+                        strokeLinecap="round"
+                        strokeDasharray="5 4"
+                        opacity={0.95}
+                      />
+                    )}
                     {provPts.map((p) => {
                       const [x, y] = polar(p.r, monthAngle(p.m));
                       return (
@@ -1283,57 +1391,60 @@ export default function ClimateSpiralCard({
                 // background.
                 const oldCol = '#7DA8E8';
                 const newCol = '#FCA5A5';
+                // All call-out furniture lives *outside* the month-label
+                // band so it never overlaps month names or the spaghetti
+                // lines. Dots stay on the 10°C ring; leaders cross the
+                // chart radially without bending.
                 const rDotOut = R_OUTER + 6;
-                const rYear = R_LABEL + R_LABEL_BAND_W / 2 + 12;
-                const rHeader = R_LABEL + R_LABEL_BAND_W / 2 + 30;
+                const rYear = R_LABEL + R_LABEL_BAND_W / 2 + 22;
+                const rHeader = R_LABEL + R_LABEL_BAND_W / 2 + 52;
 
-                /** One consolidated call-out group. `dir` is +1 for "earlier"
-                 *  (newer angle smaller) and -1 for "later". */
+                /** One consolidated call-out group. */
                 const renderGroup = (
                   key: string,
                   header: string,
                   oldAng: number,
                   newAng: number,
-                  shiftMonths: number, // positive if newer is *earlier* on the dial
+                  shiftMonths: number,
                 ) => {
                   const days = Math.round(Math.abs(shiftMonths) * DAYS_PER_MONTH);
                   const direction = header === 'Spring starts'
                     ? (shiftMonths > 0 ? 'earlier' : 'later')
                     : (shiftMonths > 0 ? 'later' : 'earlier');
-                  // Angular midpoint (small-arc) for the header.
-                  let midAng = (oldAng + newAng) / 2;
-                  // If the two angles wrap around -π / +π, midAng is still
-                  // close because the gap is small for any plausible shift.
+                  const midAng = (oldAng + newAng) / 2;
                   const [hx, hy] = polar(rHeader, midAng);
-                  // Old-decade dot + leader + year label.
                   const [ox0, oy0] = polar(r10, oldAng);
                   const [ox1, oy1] = polar(rDotOut, oldAng);
                   const [oxL, oyL] = polar(rYear, oldAng);
-                  // New-decade dot + leader + year label.
                   const [nx0, ny0] = polar(r10, newAng);
                   const [nx1, ny1] = polar(rDotOut, newAng);
                   const [nxL, nyL] = polar(rYear, newAng);
                   return (
                     <g key={key}>
-                      {/* dots on the 10°C ring */}
+                      {/* leader dots on the 10°C ring */}
                       <circle cx={ox0} cy={oy0} r={3} fill={oldCol} stroke="#0b0e16" strokeWidth={0.8} />
                       <circle cx={nx0} cy={ny0} r={3} fill={newCol} stroke="#0b0e16" strokeWidth={0.8} />
-                      {/* leader lines out to year labels */}
+                      {/* radial leaders out to the year-label pills */}
                       <line x1={ox1} y1={oy1} x2={oxL} y2={oyL} stroke={oldCol} strokeWidth={1} opacity={0.85} />
                       <line x1={nx1} y1={ny1} x2={nxL} y2={nyL} stroke={newCol} strokeWidth={1} opacity={0.85} />
-                      {/* year labels */}
-                      <text x={oxL} y={oyL + 3} fontSize={10} fontWeight={600} fill={oldCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
+                      {/* year-label pills — dark rounded backdrops so the
+                           text never fights with the spaghetti behind it. */}
+                      <rect x={oxL - 18} y={oyL - 8} width={36} height={15} rx={7.5} fill="rgba(10,14,22,0.85)" stroke={oldCol} strokeWidth={0.8} />
+                      <text x={oxL} y={oyL + 3} fontSize={10} fontWeight={700} fill={oldCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
                         {first.decade}s
                       </text>
-                      <text x={nxL} y={nyL + 3} fontSize={10} fontWeight={600} fill={newCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
+                      <rect x={nxL - 18} y={nyL - 8} width={36} height={15} rx={7.5} fill="rgba(10,14,22,0.85)" stroke={newCol} strokeWidth={0.8} />
+                      <text x={nxL} y={nyL + 3} fontSize={10} fontWeight={700} fill={newCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
                         {last.decade}s
                       </text>
-                      {/* shared header — "Spring starts" / "Autumn ends" plus
-                           shift days */}
-                      <text x={hx} y={hy - 4} fontSize={11} fontWeight={700} fill="rgba(245,245,245,0.95)" textAnchor="middle" fontFamily="ui-monospace, monospace" style={{ textShadow: '0 0 4px rgba(0,0,0,0.85)' }}>
+                      {/* consolidated header pill — "Spring starts" with
+                           shift in days. Positioned even further out so it
+                           doesn't fight with the year pills. */}
+                      <rect x={hx - 64} y={hy - 13} width={128} height={28} rx={6} fill="rgba(10,14,22,0.88)" stroke="rgba(255,255,255,0.18)" strokeWidth={0.8} />
+                      <text x={hx} y={hy - 2} fontSize={11} fontWeight={700} fill="rgba(245,245,245,0.95)" textAnchor="middle" fontFamily="ui-monospace, monospace">
                         {header}
                       </text>
-                      <text x={hx} y={hy + 9} fontSize={10} fill="rgba(220,225,235,0.85)" textAnchor="middle" fontFamily="ui-monospace, monospace" style={{ textShadow: '0 0 4px rgba(0,0,0,0.85)' }}>
+                      <text x={hx} y={hy + 10} fontSize={10} fill="rgba(220,225,235,0.85)" textAnchor="middle" fontFamily="ui-monospace, monospace">
                         {days} days {direction}
                       </text>
                     </g>
@@ -1383,10 +1494,15 @@ export default function ClimateSpiralCard({
             })()}
           </div>
 
-          {/* Controls under the chart */}
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-gray-300">
-            <label className="inline-flex items-center gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500">From</span>
+          {/* Controls — all chart-view toggles in a single mobile-friendly
+               grouped panel that visually echoes the Compare-periods box
+               below. Each toggle is a chip with the same dimensions as the
+               metric chips above so the two surfaces line up. Presets get
+               their own row but use the same chip style. */}
+          <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3 space-y-3">
+            {/* From-year slider — left-aligned, separates structure from view toggles */}
+            <div className="flex flex-wrap items-center gap-2 text-[12px] text-gray-300">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">From</span>
               <input
                 type="range"
                 min={minYear}
@@ -1394,114 +1510,163 @@ export default function ClimateSpiralCard({
                 step={5}
                 value={effectiveFromYear}
                 onChange={(e) => setYearFrom(Number(e.target.value))}
-                className="accent-[#D0A65E] w-24"
+                className="accent-[#D0A65E] w-28 sm:w-36"
               />
               <span className="font-mono text-[#FFF5E7] min-w-[3ch]">{effectiveFromYear}</span>
-            </label>
-            <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={anomaly} onChange={(e) => setAnomaly(e.target.checked)} className="accent-[#D0A65E]" />
-              Anomaly (vs {baselineFrom}–{baselineTo})
-            </label>
-            <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={showSpaghetti} onChange={(e) => setShowSpaghetti(e.target.checked)} style={{ accentColor: palette.high }} />
-              Year spaghetti
-            </label>
-            <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={highlightRecent} onChange={(e) => setHighlightRecent(e.target.checked)} style={{ accentColor: palette.high }} />
-              Highlight {recentFrom}–{recentTo}
-            </label>
-            <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={showRecordHigh} onChange={(e) => setShowRecordHigh(e.target.checked)} style={{ accentColor: palette.high }} />
-              {palette.highWord} year
-            </label>
-            <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={showRecordLow} onChange={(e) => setShowRecordLow(e.target.checked)} style={{ accentColor: palette.low }} />
-              {palette.lowWord} year
-            </label>
-            <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={showSeasons} onChange={(e) => setShowSeasons(e.target.checked)} style={{ accentColor: '#86EFAC' }} />
-              Season tints
-            </label>
-            {metric === 'temp' && (
-              <label className="inline-flex items-center gap-1.5">
-                <input type="checkbox" checked={showParis} onChange={(e) => setShowParis(e.target.checked)} style={{ accentColor: '#FBBF24' }} />
-                Paris rings
-              </label>
-            )}
-            {metric === 'temp' && !anomaly && (
-              <label className="inline-flex items-center gap-1.5">
-                <input type="checkbox" checked={showShiftTrail} onChange={(e) => setShowShiftTrail(e.target.checked)} style={{ accentColor: '#86EFAC' }} />
-                Season-shift trail
-              </label>
-            )}
-            {metric === 'temp' && anomaly && (
-              <span className="text-[10px] text-gray-500 italic">Season-shift trail only shown in absolute mode</span>
-            )}
-          </div>
+            </div>
 
-          {/* Presets — one-click chart configurations to tell a specific story */}
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
-            <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">Presets</span>
-            <button
-              type="button"
-              onClick={() => {
-                if (available.includes('temp')) setMetric('temp');
-                setAnomaly(false);
-                setShowShiftTrail(true);
-                setShowSeasons(true);
-                setShowSpaghetti(false);
-                setHighlightRecent(false);
-                setShowRecordHigh(false);
-                setShowRecordLow(false);
-                setShowParis(false);
-                setShowHistoric(false);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-md border border-emerald-700/60 bg-emerald-900/20 px-2.5 py-1 text-emerald-200 hover:bg-emerald-800/40 hover:border-emerald-500 transition-colors"
-              title="Configure the chart to highlight how growing-season length has shifted decade by decade"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
-              Shifting seasons
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (available.includes('temp')) setMetric('temp');
-                setAnomaly(true);
-                setShowShiftTrail(false);
-                setShowSpaghetti(false);
-                setHighlightRecent(false);
-                setShowRecordHigh(false);
-                setShowRecordLow(false);
-                setShowParis(false);
-                setShowHistoric(true);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-md border border-rose-700/60 bg-rose-900/20 px-2.5 py-1 text-rose-200 hover:bg-rose-800/40 hover:border-rose-500 transition-colors"
-              title="Anomaly mode comparing the historic and modern windows against the baseline"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
-              Then vs now
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAnomaly(false);
-                setShowShiftTrail(false);
-                setShowSeasons(true);
-                setShowSpaghetti(true);
-                setHighlightRecent(true);
-                setShowRecordHigh(true);
-                setShowRecordLow(true);
-                setShowParis(metric === 'temp');
-                setShowHistoric(false);
-                setBaselineRange(defaultBaselineRange);
-                setRecentRange(defaultRecentRange);
-                setHistoricRange(defaultHistoricRange);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-md border border-gray-700 bg-gray-800/60 px-2.5 py-1 text-gray-300 hover:bg-gray-700/60 hover:border-gray-500 transition-colors"
-              title="Restore the default overview"
-            >
-              Default view
-            </button>
+            {/* View toggles — chip style, wraps cleanly on mobile */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">View</span>
+              <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
+                Anomaly <span className="text-[10px] text-gray-400">vs {baselineFrom}–{baselineTo}</span>
+              </ChipToggle>
+              <ChipToggle active={showSpaghetti} onChange={setShowSpaghetti} color={palette.high}>
+                Year spaghetti
+              </ChipToggle>
+              <ChipToggle active={highlightRecent} onChange={setHighlightRecent} color={palette.high}>
+                Highlight {recentFrom}–{recentTo}
+              </ChipToggle>
+              <ChipToggle active={showRecordHigh} onChange={setShowRecordHigh} color={palette.high}>
+                {palette.highWord} year
+              </ChipToggle>
+              <ChipToggle active={showRecordLow} onChange={setShowRecordLow} color={palette.low}>
+                {palette.lowWord} year
+              </ChipToggle>
+              <ChipToggle active={showSeasons} onChange={setShowSeasons} color="#86EFAC">
+                Season tints
+              </ChipToggle>
+              {metric === 'temp' && (
+                <ChipToggle active={showParis} onChange={setShowParis} color="#FBBF24">
+                  Paris rings
+                </ChipToggle>
+              )}
+              {metric === 'temp' && !anomaly && (
+                <ChipToggle active={showShiftTrail} onChange={setShowShiftTrail} color="#86EFAC">
+                  Season-shift trail
+                </ChipToggle>
+              )}
+              {metric === 'temp' && anomaly && (
+                <span className="text-[10px] text-gray-500 italic self-center">Season-shift trail only shown in absolute mode</span>
+              )}
+            </div>
+
+            {/* Presets — one-click chart configurations to tell a specific story */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">Presets</span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (available.includes('temp')) setMetric('temp');
+                  setAnomaly(false);
+                  setShowShiftTrail(true);
+                  setShowSeasons(true);
+                  setShowSpaghetti(false);
+                  setHighlightRecent(false);
+                  setShowRecordHigh(false);
+                  setShowRecordLow(false);
+                  setShowParis(false);
+                  setShowHistoric(false);
+                }}
+                className={`${TOGGLE_BASE} border-emerald-700/60 bg-emerald-900/20 text-emerald-200 hover:bg-emerald-800/40 hover:border-emerald-500`}
+                title="Configure the chart to highlight how growing-season length has shifted decade by decade"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+                Shifting seasons
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (available.includes('temp')) setMetric('temp');
+                  setAnomaly(true);
+                  setShowShiftTrail(false);
+                  setShowSpaghetti(false);
+                  setHighlightRecent(false);
+                  setShowRecordHigh(false);
+                  setShowRecordLow(false);
+                  setShowParis(false);
+                  setShowHistoric(true);
+                }}
+                className={`${TOGGLE_BASE} border-rose-700/60 bg-rose-900/20 text-rose-200 hover:bg-rose-800/40 hover:border-rose-500`}
+                title="Anomaly mode comparing the historic and modern windows against the baseline"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+                Then vs now
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAnomaly(false);
+                  setShowShiftTrail(false);
+                  setShowSeasons(true);
+                  setShowSpaghetti(true);
+                  setHighlightRecent(true);
+                  setShowRecordHigh(true);
+                  setShowRecordLow(true);
+                  setShowParis(metric === 'temp');
+                  setShowHistoric(false);
+                  setBaselineRange(defaultBaselineRange);
+                  setRecentRange(defaultRecentRange);
+                  setHistoricRange(defaultHistoricRange);
+                }}
+                className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE}`}
+                title="Restore the default overview"
+              >
+                Default view
+              </button>
+            </div>
+
+            {/* Playback — animate the chart year-by-year from the start
+                 year up to the present, watching the spaghetti, means and
+                 season-shift trail build up live. */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-gray-800/70">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">Play</span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (playing) { setPlaying(false); return; }
+                  // If finished or unstarted, rewind first.
+                  if (playYear === null || playYear >= currentYear) setPlayYear(effectiveFromYear - 1);
+                  setPlaying(true);
+                }}
+                className={`${TOGGLE_BASE} ${playing ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+                aria-label={playing ? 'Pause animation' : 'Play animation'}
+              >
+                {playing ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg>
+                )}
+                {playing ? 'Pause' : (playYear !== null && playYear < currentYear ? 'Resume' : 'Play')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPlaying(false); setPlayYear(null); }}
+                className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE}`}
+                title="Stop playback and show the full chart"
+                disabled={playYear === null && !playing}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+                Reset
+              </button>
+              <span className="text-[10px] text-gray-500 ml-1">Speed</span>
+              <input
+                type="range"
+                min={2}
+                max={32}
+                step={1}
+                value={playSpeed}
+                onChange={(e) => setPlaySpeed(Number(e.target.value))}
+                className="accent-[#D0A65E] w-24"
+                aria-label="Playback speed (years per second)"
+              />
+              <span className="font-mono text-[11px] text-[#FFF5E7] min-w-[3ch]">{playSpeed}×</span>
+              {playYear !== null && (
+                <span className="font-mono text-[11px] text-[#D0A65E] ml-1 tabular-nums">
+                  {Math.max(effectiveFromYear, playYear)} / {currentYear}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Compare periods — user-adjustable baseline & comparison windows */}
