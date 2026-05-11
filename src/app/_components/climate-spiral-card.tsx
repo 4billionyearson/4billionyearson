@@ -1336,55 +1336,65 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
-              {/* Grid rings + tick labels */}
-              {gridTicks.map((t, i) => {
-                const r = tickToR(t);
-                const isZero = anomaly && t === 0;
-                // When ticks are tightly spaced (e.g. anomaly mode at 1°
-                // intervals near the chart centre at the start of an
-                // animation), labelling every tick produces an unreadable
-                // smear along the +x axis. Suppress the label on every
-                // other tick in that case — the ring itself still draws.
-                const labelEvery = anomaly ? 2 : 1;
-                const showLabel = isZero || i % labelEvery === 0;
+              {/* Grid rings + tick labels — wrapped in the same oblique-
+                   projection matrix as the month-label ring so in 3D
+                   mode the radial scaffolding tilts with the spiral
+                   rather than floating flat behind it. */}
+              {(() => {
+                const cosTilt = 0.55;
+                const dz = 220 / Math.max(1, maxYear - minYear);
+                const zTop = (maxYear - minYear) * dz;
+                const tilt = view3D
+                  ? `matrix(1 0 0 ${cosTilt} 0 ${(CY * (1 - cosTilt) - zTop).toFixed(2)})`
+                  : undefined;
                 return (
-                  <g key={`ring-${t}`}>
-                    <circle
-                      cx={CX} cy={CY} r={r}
-                      fill="none"
-                      stroke={isZero ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.16)'}
-                      strokeWidth={isZero ? 1 : 0.6}
-                      strokeDasharray={isZero ? '0' : '3 5'}
-                    />
-                    {showLabel && (
-                      <text
-                        x={CX + r + 4} y={CY - 3}
-                        fontSize={9} fill="rgba(255,255,255,0.45)"
-                        fontFamily="ui-monospace, monospace"
-                        paintOrder="stroke fill"
-                        stroke="rgba(11,14,22,0.85)"
-                        strokeWidth={2.5}
-                      >
-                        {anomaly && t > 0 ? '+' : ''}{t}{metric === 'temp' ? '°' : ''}
-                      </text>
-                    )}
+                  <g transform={tilt}>
+                    {gridTicks.map((t, i) => {
+                      const r = tickToR(t);
+                      const isZero = anomaly && t === 0;
+                      const labelEvery = anomaly ? 2 : 1;
+                      const showLabel = isZero || i % labelEvery === 0;
+                      return (
+                        <g key={`ring-${t}`}>
+                          <circle
+                            cx={CX} cy={CY} r={r}
+                            fill="none"
+                            stroke={isZero ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.16)'}
+                            strokeWidth={isZero ? 1 : 0.6}
+                            strokeDasharray={isZero ? '0' : '3 5'}
+                          />
+                          {showLabel && (
+                            <text
+                              x={CX + r + 4} y={CY - 3}
+                              fontSize={9} fill="rgba(255,255,255,0.45)"
+                              fontFamily="ui-monospace, monospace"
+                              paintOrder="stroke fill"
+                              stroke="rgba(11,14,22,0.85)"
+                              strokeWidth={2.5}
+                            >
+                              {anomaly && t > 0 ? '+' : ''}{t}{metric === 'temp' ? '°' : ''}
+                            </text>
+                          )}
+                        </g>
+                      );
+                    })}
+
+                    {/* Month spokes */}
+                    {Array.from({ length: 12 }, (_, m) => {
+                      const ang = monthAngle(m);
+                      const [x1, y1] = polar(0, ang);
+                      const [x2, y2] = polar(R_OUTER + 5, ang);
+                      return (
+                        <line
+                          key={`spoke-${m}`}
+                          x1={x1} y1={y1} x2={x2} y2={y2}
+                          stroke="rgba(255,255,255,0.14)" strokeWidth={0.6}
+                        />
+                      );
+                    })}
                   </g>
                 );
-              })}
-
-              {/* Month spokes */}
-              {Array.from({ length: 12 }, (_, m) => {
-                const ang = monthAngle(m);
-                const [x1, y1] = polar(0, ang);
-                const [x2, y2] = polar(R_OUTER + 5, ang);
-                return (
-                  <line
-                    key={`spoke-${m}`}
-                    x1={x1} y1={y1} x2={x2} y2={y2}
-                    stroke="rgba(255,255,255,0.14)" strokeWidth={0.6}
-                  />
-                );
-              })}
+              })()}
 
               {/* Paris rings — labels offset to upper-left diagonal to avoid the
                    Jan label, right-side tick labels, and other Paris ring. Flat
@@ -1651,7 +1661,7 @@ export default function ClimateSpiralCard({
                         stroke={palette.current}
                         strokeWidth={2.6}
                         strokeLinecap="round"
-                        strokeDasharray="5 4"
+                        strokeDasharray="0 6"
                         opacity={0.95}
                       />
                     )}
@@ -1887,13 +1897,25 @@ export default function ClimateSpiralCard({
               // sit relative to the baseline?
               const baselineMonthly = Number.isFinite(meanBaseline[hover.monthIdx]) ? meanBaseline[hover.monthIdx] : null;
               const recentMonthly = Number.isFinite(meanRecent[hover.monthIdx]) ? meanRecent[hover.monthIdx] : null;
+              // Top-level record callout (above the value). Uses the
+              // metric-aware vocabulary from the palette ("Warmest",
+              // "Dullest", etc.) and the matching accent colour so the
+              // user immediately spots that the line they're hovering is
+              // a record-holder. Falls back to chip-style tags for the
+              // softer "in baseline window" / "in modern window" bits.
+              const recordCallout = hover.kind === 'year'
+                ? (hover.year === recordYear
+                    ? { word: palette.highWord, color: palette.high }
+                    : (hover.year === oppositeYear && oppositeYear !== recordYear
+                        ? { word: palette.lowWord, color: palette.low }
+                        : null))
+                : null;
               const tags: { label: string; cls: string }[] = [];
               if (hover.kind === 'year') {
-                if (hover.year === recordYear) tags.push({ label: `${palette.highWord} year`, cls: 'text-rose-300 border-rose-400/60' });
-                if (hover.year === oppositeYear && oppositeYear !== recordYear) tags.push({ label: `${palette.lowWord} year`, cls: 'text-sky-300 border-sky-400/60' });
                 if (hover.year === currentYear) tags.push({ label: 'This year (in progress)', cls: 'text-amber-300 border-amber-400/60' });
                 if (hover.year >= recentFrom && hover.year <= recentTo) tags.push({ label: 'Modern window', cls: 'text-rose-200 border-rose-400/40' });
                 if (hover.year >= baselineFrom && hover.year <= baselineTo) tags.push({ label: 'Baseline window', cls: 'text-gray-200 border-gray-400/40' });
+                if (showHistoric && hover.year >= historicFrom && hover.year <= historicTo) tags.push({ label: 'Historic window', cls: 'text-amber-200 border-amber-300/40' });
               }
               return (
                 <div
@@ -1906,6 +1928,14 @@ export default function ClimateSpiralCard({
                 >
                   <div className="text-[#FFF5E7] font-semibold">{hover.label}</div>
                   <div className="text-gray-400 text-[10px]">{MONTH_LABELS[hover.monthIdx]}</div>
+                  {recordCallout && (
+                    <div
+                      className="mt-0.5 inline-block rounded-full border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                      style={{ color: recordCallout.color, borderColor: `${recordCallout.color}99`, background: `${recordCallout.color}22` }}
+                    >
+                      ◆ {recordCallout.word} on record
+                    </div>
+                  )}
                   <div className="text-gray-200 tabular-nums">
                     {hover.value.toFixed(dec)} {METRIC_UNIT[metric]}
                   </div>
@@ -2427,7 +2457,7 @@ function DualRangeSlider({
           if (Number.isFinite(n)) onChange([Math.max(min, n), hi]);
         }}
         className={thumbStyles}
-        style={{ ['--thumb-bg' as string]: accent, color: accent } as React.CSSProperties}
+        style={{ ['--thumb-bg' as string]: accent, accentColor: 'transparent' } as React.CSSProperties}
       />
       <input
         type="range" min={min} max={max} value={hi} aria-label="Range end"
@@ -2436,7 +2466,7 @@ function DualRangeSlider({
           if (Number.isFinite(n)) onChange([lo, Math.min(max, n)]);
         }}
         className={thumbStyles}
-        style={{ ['--thumb-bg' as string]: accent, color: accent } as React.CSSProperties}
+        style={{ ['--thumb-bg' as string]: accent, accentColor: 'transparent' } as React.CSSProperties}
       />
       <style jsx>{`
         input[type='range']::-webkit-slider-thumb { background: ${accent}; }
@@ -2489,7 +2519,7 @@ function SingleRangeSlider({
         type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         className={thumbStyles}
-        style={{ color: accent } as React.CSSProperties}
+        style={{ accentColor: 'transparent' } as React.CSSProperties}
       />
       <style jsx>{`
         input[type='range']::-webkit-slider-thumb { background: ${accent}; }

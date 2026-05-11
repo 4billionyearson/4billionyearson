@@ -351,7 +351,8 @@ export default function MonthlySpaghettiChart({
                 dataKey={`y${currentYear}_prov`}
                 stroke={cfg.currentColor}
                 strokeWidth={2.5}
-                strokeDasharray="6 4"
+                strokeDasharray="0 6"
+                strokeLinecap="round"
                 dot={(props: { cx?: number; cy?: number; index?: number; payload?: ChartRow }) => {
                   const { cx, cy, index, payload } = props;
                   if (index !== latestMonthIdx || cy == null || cx == null || !payload) {
@@ -418,7 +419,7 @@ export default function MonthlySpaghettiChart({
         {provisionalFromMonthIdx >= 0 && (
           <span className="flex items-center gap-1.5">
             <svg width="24" height="3" className="overflow-visible">
-              <line x1="0" y1="1.5" x2="24" y2="1.5" stroke={cfg.currentColor} strokeWidth="3" strokeDasharray="6 4" />
+              <line x1="0" y1="1.5" x2="24" y2="1.5" stroke={cfg.currentColor} strokeWidth="3" strokeDasharray="0 6" strokeLinecap="round" />
             </svg>
             <span className={`${cfg.currentTextClass} font-semibold`}>provisional</span>
           </span>
