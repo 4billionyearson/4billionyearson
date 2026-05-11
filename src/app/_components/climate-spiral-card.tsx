@@ -115,20 +115,22 @@ const UK_PREINDUSTRIAL_ANNUAL = UK_PREINDUSTRIAL_MONTHLY.reduce((a, b) => a + b,
  * Colour helpers
  * ──────────────────────────────────────────────────────────────────────── */
 
-function yearColor(year: number, minYear: number, maxYear: number, alpha = 1) {
+/** Background spaghetti year colour. Ramps from a cool slate-grey (oldest
+ *  years) up to the metric's "current/highlight" colour (newest years), so
+ *  each metric tab carries its own visual identity in line with the monthly
+ *  spaghetti chart above. */
+function yearColor(year: number, minYear: number, maxYear: number, alpha = 1, end: string = '#F97316') {
   const t = maxYear === minYear ? 1 : (year - minYear) / (maxYear - minYear);
-  let r: number, g: number, b: number;
-  if (t < 0.4) {
-    const u = t / 0.4;
-    r = 42 + u * 30; g = 94 + u * 60; b = 184 - u * 60;
-  } else if (t < 0.7) {
-    const u = (t - 0.4) / 0.3;
-    r = 72 + u * 168; g = 154 - u * 90; b = 124 - u * 84;
-  } else {
-    const u = (t - 0.7) / 0.3;
-    r = 240 + u * 15; g = 64 - u * 40; b = 40 - u * 25;
-  }
-  return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${alpha})`;
+  // Cool slate (#4B5563) at t=0 → palette end colour at t=1.
+  const startR = 75,  startG = 85,  startB = 99;
+  const eh = end.replace('#', '');
+  const er = parseInt(eh.slice(0, 2), 16);
+  const eg = parseInt(eh.slice(2, 4), 16);
+  const eb = parseInt(eh.slice(4, 6), 16);
+  const r = Math.round(startR + (er - startR) * t);
+  const g = Math.round(startG + (eg - startG) * t);
+  const b = Math.round(startB + (eb - startB) * t);
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 /* Four-season palette — mirrors the icons & accent colours used on the
@@ -419,9 +421,12 @@ export default function ClimateSpiralCard({
     [yearMap, recentFrom, recentTo],
   );
 
-  /* Hover state for chart tooltip: nearest year at the mouse position. */
+  /* Hover state for chart tooltip: nearest year at the mouse position.
+   *  `kind` distinguishes between an individual year line and one of the
+   *  mean reference rings. For mean rings `year` is reused as a display
+   *  caption (e.g. "1961–1990 mean"). */
   const [hover, setHover] = useState<
-    | { year: number; monthIdx: number; value: number; r: number; sx: number; sy: number }
+    | { kind: 'year' | 'mean'; year: number; label: string; monthIdx: number; value: number; r: number; sx: number; sy: number }
     | null
   >(null);
 
@@ -541,16 +546,17 @@ export default function ClimateSpiralCard({
     ];
   }, [metric, showParis, anomaly, meanBaseline]);
 
-  /* Decadal seasonal-shift trail (temp + absolute mode only).
-   * For each year, find when the monthly temperature first crosses the 10°C
-   * growing-season threshold upward (spring) and back downward (autumn).
-   * Aggregate into decades and plot on the 10°C ring. */
+  /* Decadal 10°C growing-season crossings (temp + absolute mode).
+   * Computed whenever we have temperature data so both the season-tint
+   * crescents AND the dedicated shift-trail overlay can use them. */
   const SHIFT_THRESHOLD = 10;
-  const shiftDecades = useMemo(() => {
-    if (metric !== 'temp' || anomaly || !showShiftTrail) return [];
+  const crossingDecades = useMemo(() => {
+    if (metric !== 'temp' || anomaly) return [];
     const crossings = computeYearCrossings(yearMap, SHIFT_THRESHOLD);
     return decadalCrossings(crossings);
-  }, [metric, anomaly, showShiftTrail, yearMap]);
+  }, [metric, anomaly, yearMap]);
+  /** Approx days per month for shift-day computation. */
+  const DAYS_PER_MONTH = 30.44;
 
   /* ───────────── Sparklines + records (right panel) ───────────── */
   const annuals = useMemo(() => {
@@ -601,6 +607,58 @@ export default function ClimateSpiralCard({
       <div className="flex flex-col gap-6">
         {/* ─── Section 1: Spiral chart (full width, large on desktop) ───── */}
         <div>
+          {/* Series legend — placed *above* the chart and centered so it
+               doubles as a key while scrolling the controls below. */}
+          <div className="mb-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[10.5px] text-gray-400 max-w-[760px] mx-auto">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block h-[2px] w-6" style={{ background: `linear-gradient(90deg,#4B5563,${palette.high})` }} />
+              {minYear} → {maxYear}
+            </span>
+            {!anomaly && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-[2px] w-6 border-t-2 border-dotted" style={{ borderColor: '#CBD5E1' }} />
+                {baselineFrom}–{baselineTo} mean
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block h-[2px] w-6 border-t-2 border-dashed" style={{ borderColor: '#EF4444' }} />
+              {recentFrom}–{recentTo} mean{anomaly ? ' (anomaly)' : ''}
+            </span>
+            {showHistoric && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-[2px] w-6 border-t-2 border-dashed" style={{ borderColor: '#E6B765' }} />
+                {historicFrom}–{historicTo} mean{anomaly ? ' (anomaly)' : ''}
+              </span>
+            )}
+            {showRecordHigh && recordYear > 0 && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-[2px] w-6" style={{ background: palette.high }} />
+                {palette.highWord} ({recordYear})
+              </span>
+            )}
+            {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-[2px] w-6" style={{ background: palette.low }} />
+                {palette.lowWord} ({oppositeYear})
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block h-[2px] w-6" style={{ background: palette.current }} />
+              {currentYear} so far
+            </span>
+            {showShiftTrail && crossingDecades.length >= 2 && metric === 'temp' && !anomaly && (
+              <>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: '#86EFAC' }} />
+                  Spring 10°C crossing
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-2 w-2 rounded-full" style={{ background: '#FDBA74' }} />
+                  Autumn 10°C crossing
+                </span>
+              </>
+            )}
+          </div>
           <div className="relative w-full max-w-[760px] mx-auto">
             <svg
               viewBox={`0 0 ${VB} ${VB}`}
@@ -623,20 +681,48 @@ export default function ClimateSpiralCard({
                 let monthFrac = ((ang + Math.PI / 2) / (Math.PI * 2)) * 12;
                 if (monthFrac < 0) monthFrac += 12;
                 const monthIdx = (Math.round(monthFrac) % 12 + 12) % 12;
-                // Find nearest year (smallest |r_year - r_mouse|).
-                let best: { year: number; value: number; r: number; d: number } | null = null;
+                // Find nearest *visible* line at this month. Skip years
+                // whose lines are toggled off so the tooltip never picks up
+                // invisible data. Also consider the three mean rings as
+                // hover targets.
+                type Best = { kind: 'year' | 'mean'; year: number; label: string; value: number; r: number; d: number };
+                let best: Best | null = null;
+                const consider = (kind: 'year' | 'mean', year: number, label: string, value: number, r: number) => {
+                  if (!Number.isFinite(r) || !Number.isFinite(value)) return;
+                  const d = Math.abs(r - rMouse);
+                  if (!best || d < best.d) best = { kind, year, label, value, r, d };
+                };
                 for (const y of renderYears) {
+                  // Hide individual year lines when overall spaghetti is off,
+                  // unless this year is itself separately shown (record/current).
+                  const isRecordHi = y === recordYear && showRecordHigh;
+                  const isRecordLo = y === oppositeYear && showRecordLow && oppositeYear !== recordYear;
+                  const isCurrent = y === currentYear;
+                  const inRecent = y >= recentFrom && y <= recentTo;
+                  const inSpaghetti = showSpaghetti && (inRecent ? highlightRecent : true);
+                  if (!isRecordHi && !isRecordLo && !isCurrent && !inSpaghetti) continue;
+                  if (y === recordYear && !showRecordHigh && !inSpaghetti) continue;
+                  if (y === oppositeYear && !showRecordLow && !inSpaghetti) continue;
                   const arr = yearMap.get(y);
                   if (!arr) continue;
                   const v = arr[monthIdx];
                   if (!Number.isFinite(v)) continue;
-                  const yr = valueToR(v, monthIdx);
-                  if (!Number.isFinite(yr)) continue;
-                  const d = Math.abs(yr - rMouse);
-                  if (!best || d < best.d) best = { year: y, value: v, r: yr, d };
+                  consider('year', y, String(y), v, valueToR(v, monthIdx));
                 }
-                if (best && best.d < 18) {
-                  setHover({ year: best.year, monthIdx, value: best.value, r: best.r, sx, sy });
+                // Mean rings: baseline (hidden in anomaly mode), recent
+                // (always shown), historic (gated).
+                if (!anomaly && meanBaseline.every(Number.isFinite)) {
+                  consider('mean', 0, `${baselineFrom}–${baselineTo} mean`, meanBaseline[monthIdx], valueToR(meanBaseline[monthIdx], monthIdx));
+                }
+                if (meanRecent.every(Number.isFinite)) {
+                  consider('mean', 0, `${recentFrom}–${recentTo} mean`, meanRecent[monthIdx], valueToR(meanRecent[monthIdx], monthIdx));
+                }
+                if (showHistoric && meanHistoric.every(Number.isFinite)) {
+                  consider('mean', 0, `${historicFrom}–${historicTo} mean`, meanHistoric[monthIdx], valueToR(meanHistoric[monthIdx], monthIdx));
+                }
+                if (best && (best as Best).d < 18) {
+                  const b = best as Best;
+                  setHover({ kind: b.kind, year: b.year, label: b.label, monthIdx, value: b.value, r: b.r, sx, sy });
                 } else {
                   setHover(null);
                 }
@@ -706,7 +792,7 @@ export default function ClimateSpiralCard({
                   return lerpHex('#FACC15', '#B45309', (t - 0.5) / 0.5);
                 };
 
-                const haveCrossings = shiftDecades.length >= 2 && metric === 'temp';
+                const haveCrossings = crossingDecades.length >= 2 && metric === 'temp';
                 const labelAngle = (a: number, b: number) => {
                   let span = b - a;
                   if (span <= 0) span += 12;
@@ -716,8 +802,8 @@ export default function ClimateSpiralCard({
                 };
 
                 if (haveCrossings) {
-                  const first = shiftDecades[0];
-                  const last = shiftDecades[shiftDecades.length - 1];
+                  const first = crossingDecades[0];
+                  const last = crossingDecades[crossingDecades.length - 1];
                   // Guard against odd ordering.
                   const newSpring = last.spring;
                   const oldSpring = first.spring;
@@ -753,39 +839,40 @@ export default function ClimateSpiralCard({
 
                   return (
                     <g>
-                      <g opacity={0.32}>
+                      <g opacity={0.34}>
                         {/* Winter (always-cold half, ice blue) */}
                         <path d={wedgePath(monthAngle(newAutumn), monthAngle(newSpring))} fill="#7DD3FC" />
-                        {/* Newly-added spring (pale green crescent) */}
-                        <path d={wedgePath(monthAngle(newSpring), monthAngle(oldSpring))} fill="#BBF7D0" />
+                        {/* Crescent: months that used to be winter, now spring.
+                             Muted sage so it reads as "transition" without
+                             competing with the saturated growing-season core. */}
+                        <path d={wedgePath(monthAngle(newSpring), monthAngle(oldSpring))} fill="#A7C9A0" />
                         {/* Growing-season gradient core */}
                         {gradWedges}
-                        {/* Newly-added autumn (pale amber crescent) */}
-                        <path d={wedgePath(monthAngle(oldAutumn), monthAngle(newAutumn))} fill="#FDBA74" />
+                        {/* Crescent: months that used to be winter, now autumn.
+                             Muted taupe — same idea on the autumn side. */}
+                        <path d={wedgePath(monthAngle(oldAutumn), monthAngle(newAutumn))} fill="#C7A57A" />
                       </g>
-                      {/* Season labels */}
+                      {/* Season labels — bright and bold so they stay
+                          legible over the tinted wedges. */}
                       {labels.map((l) => {
-                        const [lx, ly] = polar(R_OUTER * 0.70, l.mid);
+                        const [lx, ly] = polar(R_OUTER * 0.72, l.mid);
                         return (
                           <text
                             key={`slab-${l.key}`}
                             x={lx} y={ly}
-                            fontSize={11}
+                            fontSize={13}
                             fontWeight={700}
                             fill={l.color}
-                            opacity={0.65}
+                            opacity={0.95}
                             textAnchor="middle"
                             dominantBaseline="central"
                             fontFamily="ui-monospace, monospace"
-                            style={{ letterSpacing: '0.06em' }}
+                            style={{ letterSpacing: '0.08em', textShadow: '0 0 4px rgba(0,0,0,0.85)' }}
                           >
                             {l.text}
                           </text>
                         );
                       })}
-                      <text x={CX} y={CY + R_OUTER + 36} textAnchor="middle" fontSize={9} fill="rgba(220,225,235,0.55)" fontFamily="ui-monospace, monospace">
-                        Pale crescents = months that used to be winter but now belong to spring (earlier) or autumn (later)
-                      </text>
                     </g>
                   );
                 }
@@ -806,19 +893,19 @@ export default function ClimateSpiralCard({
                     </g>
                     {bounds.map((s) => {
                       const ang = labelAngle(s.start, s.end);
-                      const [lx, ly] = polar(R_OUTER * 0.70, ang);
+                      const [lx, ly] = polar(R_OUTER * 0.72, ang);
                       return (
                         <text
                           key={`slab-${s.season}`}
                           x={lx} y={ly}
-                          fontSize={11}
+                          fontSize={13}
                           fontWeight={700}
                           fill={SEASON_COLORS[s.season]}
-                          opacity={0.65}
+                          opacity={0.95}
                           textAnchor="middle"
                           dominantBaseline="central"
                           fontFamily="ui-monospace, monospace"
-                          style={{ letterSpacing: '0.06em' }}
+                          style={{ letterSpacing: '0.08em', textShadow: '0 0 4px rgba(0,0,0,0.85)' }}
                         >
                           {SEASON_LABEL[s.season]}
                         </text>
@@ -904,7 +991,7 @@ export default function ClimateSpiralCard({
                     key={`bg-${y}`}
                     d={smoothClosedPath(pts)}
                     fill="none"
-                    stroke={yearColor(y, minYear, maxYear, 0.32)}
+                    stroke={yearColor(y, minYear, maxYear, 0.32, palette.high)}
                     strokeWidth={0.7}
                   />
                 );
@@ -922,7 +1009,7 @@ export default function ClimateSpiralCard({
                       key={`hi-${y}`}
                       d={smoothClosedPath(pts)}
                       fill="none"
-                      stroke={yearColor(y, minYear, maxYear, 0.85)}
+                      stroke={yearColor(y, minYear, maxYear, 0.85, palette.high)}
                       strokeWidth={1.4}
                     />
                   );
@@ -980,57 +1067,53 @@ export default function ClimateSpiralCard({
 
               {/* Decadal seasonal-shift trail (temp + absolute only).
                    Each decade contributes a spring-crossing and autumn-crossing
-                   dot, sitting on the 10°C ring. Connected by a coloured curve. */}
-              {shiftDecades.length >= 2 && (() => {
+                   dot, sitting on the 10°C ring. Connected by a coloured curve.
+                   Spring dots are coloured in the spring-green family, autumn
+                   in the autumn-brown family — so the colour itself encodes
+                   which boundary you're looking at. Size grows from oldest
+                   decade (small) to newest (large) so the direction of travel
+                   is unmistakable. */}
+              {showShiftTrail && crossingDecades.length >= 2 && metric === 'temp' && !anomaly && (() => {
                 const r10 = valueToR(SHIFT_THRESHOLD, 3); // m=3 (April) representative; valueToR ignores m in absolute mode
                 if (!Number.isFinite(r10) || r10 <= 0) return null;
-                const springPts: [number, number, number][] = shiftDecades.map((d) => {
+                const SPRING_DARK = '#166534'; // emerald-800
+                const SPRING_LIGHT = '#86EFAC'; // emerald-300
+                const AUTUMN_DARK = '#7C2D12'; // brown-900
+                const AUTUMN_LIGHT = '#FDBA74'; // amber-300
+                const lerpPair = (a: string, b: string, t: number) => {
+                  const ah = a.replace('#', ''); const bh = b.replace('#', '');
+                  const ar = parseInt(ah.slice(0,2),16), ag = parseInt(ah.slice(2,4),16), ab = parseInt(ah.slice(4,6),16);
+                  const br = parseInt(bh.slice(0,2),16), bg = parseInt(bh.slice(2,4),16), bb = parseInt(bh.slice(4,6),16);
+                  return `rgb(${Math.round(ar+(br-ar)*t)},${Math.round(ag+(bg-ag)*t)},${Math.round(ab+(bb-ab)*t)})`;
+                };
+                const n = crossingDecades.length;
+                const springPts: [number, number, number, number][] = crossingDecades.map((d, i) => {
                   const [x, y] = polar(r10, monthAngle(d.spring));
-                  return [x, y, d.decade];
+                  return [x, y, d.decade, n === 1 ? 1 : i / (n - 1)];
                 });
-                const autumnPts: [number, number, number][] = shiftDecades.map((d) => {
+                const autumnPts: [number, number, number, number][] = crossingDecades.map((d, i) => {
                   const [x, y] = polar(r10, monthAngle(d.autumn));
-                  return [x, y, d.decade];
+                  return [x, y, d.decade, n === 1 ? 1 : i / (n - 1)];
                 });
-                const minD = shiftDecades[0].decade;
-                const maxD = shiftDecades[shiftDecades.length - 1].decade;
-                // Build polyline path (each segment colourable; using a single
-                // path with averaged colour keeps SVG light).
                 const springPath = springPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join(' ');
                 const autumnPath = autumnPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join(' ');
                 return (
                   <g>
-                    {/* Ghost 10°C ring */}
-                    <circle cx={CX} cy={CY} r={r10} fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth={0.8} strokeDasharray="2 6" />
-                    <text x={CX + r10 - 4} y={CY - 4} fontSize={9} fill="rgba(190,220,210,0.85)" textAnchor="end" fontFamily="ui-monospace, monospace">10°C threshold</text>
-                    {/* Spring trail */}
-                    <path d={springPath} fill="none" stroke="rgba(134,239,172,0.85)" strokeWidth={1.8} strokeLinecap="round" />
-                    {/* Autumn trail */}
-                    <path d={autumnPath} fill="none" stroke="rgba(253,186,116,0.85)" strokeWidth={1.8} strokeLinecap="round" />
-                    {/* Per-decade dots, year-coloured */}
-                    {springPts.map(([x, y, dec], i) => (
-                      <circle key={`sp-${dec}`} cx={x} cy={y} r={i === 0 || i === springPts.length - 1 ? 4 : 3} fill={yearColor(dec + 5, minD, maxD, 0.95)} stroke="#0b0e16" strokeWidth={0.8} />
+                    {/* Ghost 10°C ring (no text label — the season tints
+                         and call-outs already explain what this is). */}
+                    <circle cx={CX} cy={CY} r={r10} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth={0.7} strokeDasharray="2 6" />
+                    {/* Spring trail (light-green) */}
+                    <path d={springPath} fill="none" stroke={SPRING_LIGHT} strokeWidth={1.6} strokeLinecap="round" opacity={0.7} />
+                    {/* Autumn trail (light-amber) */}
+                    <path d={autumnPath} fill="none" stroke={AUTUMN_LIGHT} strokeWidth={1.6} strokeLinecap="round" opacity={0.7} />
+                    {/* Spring dots — dark→light green, small→large */}
+                    {springPts.map(([x, y, dec, t]) => (
+                      <circle key={`sp-${dec}`} cx={x} cy={y} r={2.5 + t * 2} fill={lerpPair(SPRING_DARK, SPRING_LIGHT, t)} stroke="#0b0e16" strokeWidth={0.8} />
                     ))}
-                    {autumnPts.map(([x, y, dec], i) => (
-                      <circle key={`au-${dec}`} cx={x} cy={y} r={i === 0 || i === autumnPts.length - 1 ? 4 : 3} fill={yearColor(dec + 5, minD, maxD, 0.95)} stroke="#0b0e16" strokeWidth={0.8} />
+                    {/* Autumn dots — dark→light brown, small→large */}
+                    {autumnPts.map(([x, y, dec, t]) => (
+                      <circle key={`au-${dec}`} cx={x} cy={y} r={2.5 + t * 2} fill={lerpPair(AUTUMN_DARK, AUTUMN_LIGHT, t)} stroke="#0b0e16" strokeWidth={0.8} />
                     ))}
-                    {/* Endpoint labels: oldest & newest decade */}
-                    {(() => {
-                      const first = shiftDecades[0];
-                      const last = shiftDecades[shiftDecades.length - 1];
-                      const [sx0, sy0] = polar(r10 - 14, monthAngle(first.spring));
-                      const [sx1, sy1] = polar(r10 - 14, monthAngle(last.spring));
-                      const [ax0, ay0] = polar(r10 - 14, monthAngle(first.autumn));
-                      const [ax1, ay1] = polar(r10 - 14, monthAngle(last.autumn));
-                      return (
-                        <g fontFamily="ui-monospace, monospace" fontSize={8.5}>
-                          <text x={sx0} y={sy0} fill={yearColor(first.decade + 5, minD, maxD, 0.95)} textAnchor="middle">{first.decade}s</text>
-                          <text x={sx1} y={sy1} fill={yearColor(last.decade + 5, minD, maxD, 0.95)} textAnchor="middle">{last.decade}s</text>
-                          <text x={ax0} y={ay0} fill={yearColor(first.decade + 5, minD, maxD, 0.95)} textAnchor="middle">{first.decade}s</text>
-                          <text x={ax1} y={ay1} fill={yearColor(last.decade + 5, minD, maxD, 0.95)} textAnchor="middle">{last.decade}s</text>
-                        </g>
-                      );
-                    })()}
                   </g>
                 );
               })()}
@@ -1110,12 +1193,17 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
-              {/* Hovered year: full ring highlight + marker dot. Sits above
-                   the spaghetti but below the month labels. */}
+              {/* Hovered line: full ring highlight + marker dot. Sits above
+                   the spaghetti but below the month labels. Works for both
+                   individual year lines and the mean reference rings. */}
               {hover && (() => {
-                const arr = yearMap.get(hover.year);
+                const arr = hover.kind === 'year' ? yearMap.get(hover.year) : (
+                  hover.label.startsWith(`${baselineFrom}–${baselineTo}`) ? meanBaseline :
+                  hover.label.startsWith(`${historicFrom}–${historicTo}`) ? meanHistoric :
+                  meanRecent
+                );
                 if (!arr) return null;
-                const pts = yearToPoints(arr);
+                const pts = arr.every(Number.isFinite) ? yearToPoints(arr) : null;
                 const [mx, my] = polar(hover.r, monthAngle(hover.monthIdx));
                 return (
                   <g pointerEvents="none">
@@ -1175,65 +1263,87 @@ export default function ClimateSpiralCard({
                 );
               })}
 
-              {/* Season-crossing call-outs — only when the shift trail is on.
-                   Draws four leader-lines from the 10°C ring out past the
-                   month-label band, each labelled with the decade & event:
-                   Spring start (oldest) / Spring start (newest) and
-                   Autumn end (oldest) / Autumn end (newest). This shows the
-                   *named* season boundaries the spiral has been hinting at. */}
-              {showShiftTrail && shiftDecades.length >= 2 && metric === 'temp' && !anomaly && (() => {
-                const first = shiftDecades[0];
-                const last = shiftDecades[shiftDecades.length - 1];
+              {/* Season-crossing call-outs.
+                   Two consolidated groups: "Spring starts" and "Autumn ends",
+                   each anchored at the angular midpoint between the oldest
+                   and newest decade crossing, with two coloured year sub-
+                   labels at the leader endpoints and a "+N days earlier /
+                   later" annotation. This replaces the previous four
+                   separate stacked labels that were overlapping. Shown
+                   whenever Season tints are on (so the user always sees
+                   *where* spring/autumn have moved to), independently of
+                   the per-decade trail toggle. */}
+              {showSeasons && crossingDecades.length >= 2 && metric === 'temp' && !anomaly && (() => {
+                const first = crossingDecades[0];
+                const last = crossingDecades[crossingDecades.length - 1];
                 const r10 = valueToR(SHIFT_THRESHOLD, 3);
                 if (!Number.isFinite(r10) || r10 <= 0) return null;
-                // Old-decade ticks/labels in early-blue, new-decade in
-                // modern-orange — matches the year-colour ramp used by the
-                // spaghetti background and the two growing-season wedges.
-                type CO = { ang: number; label1: string; label2: string; colour: string };
-                const items: CO[] = [
-                  { ang: monthAngle(first.spring), label1: 'Spring starts', label2: `${first.decade}s`, colour: '#7DA8E8' },
-                  { ang: monthAngle(last.spring),  label1: 'Spring starts', label2: `${last.decade}s`,  colour: '#FCA5A5' },
-                  { ang: monthAngle(first.autumn), label1: 'Autumn ends',   label2: `${first.decade}s`, colour: '#7DA8E8' },
-                  { ang: monthAngle(last.autumn),  label1: 'Autumn ends',   label2: `${last.decade}s`,  colour: '#FCA5A5' },
-                ];
-                // Place label at the radial endpoint just past the month-
-                // label band. No horizontal tail — keeps every label within
-                // the SVG viewBox regardless of angle.
-                const rLabel = R_LABEL + R_LABEL_BAND_W / 2 + 16;
+                // Cool-blue for the oldest decade, warm-coral for the newest
+                // — matches the year-colour ramp used in the spaghetti
+                // background.
+                const oldCol = '#7DA8E8';
+                const newCol = '#FCA5A5';
+                const rDotOut = R_OUTER + 6;
+                const rYear = R_LABEL + R_LABEL_BAND_W / 2 + 12;
+                const rHeader = R_LABEL + R_LABEL_BAND_W / 2 + 30;
+
+                /** One consolidated call-out group. `dir` is +1 for "earlier"
+                 *  (newer angle smaller) and -1 for "later". */
+                const renderGroup = (
+                  key: string,
+                  header: string,
+                  oldAng: number,
+                  newAng: number,
+                  shiftMonths: number, // positive if newer is *earlier* on the dial
+                ) => {
+                  const days = Math.round(Math.abs(shiftMonths) * DAYS_PER_MONTH);
+                  const direction = header === 'Spring starts'
+                    ? (shiftMonths > 0 ? 'earlier' : 'later')
+                    : (shiftMonths > 0 ? 'later' : 'earlier');
+                  // Angular midpoint (small-arc) for the header.
+                  let midAng = (oldAng + newAng) / 2;
+                  // If the two angles wrap around -π / +π, midAng is still
+                  // close because the gap is small for any plausible shift.
+                  const [hx, hy] = polar(rHeader, midAng);
+                  // Old-decade dot + leader + year label.
+                  const [ox0, oy0] = polar(r10, oldAng);
+                  const [ox1, oy1] = polar(rDotOut, oldAng);
+                  const [oxL, oyL] = polar(rYear, oldAng);
+                  // New-decade dot + leader + year label.
+                  const [nx0, ny0] = polar(r10, newAng);
+                  const [nx1, ny1] = polar(rDotOut, newAng);
+                  const [nxL, nyL] = polar(rYear, newAng);
+                  return (
+                    <g key={key}>
+                      {/* dots on the 10°C ring */}
+                      <circle cx={ox0} cy={oy0} r={3} fill={oldCol} stroke="#0b0e16" strokeWidth={0.8} />
+                      <circle cx={nx0} cy={ny0} r={3} fill={newCol} stroke="#0b0e16" strokeWidth={0.8} />
+                      {/* leader lines out to year labels */}
+                      <line x1={ox1} y1={oy1} x2={oxL} y2={oyL} stroke={oldCol} strokeWidth={1} opacity={0.85} />
+                      <line x1={nx1} y1={ny1} x2={nxL} y2={nyL} stroke={newCol} strokeWidth={1} opacity={0.85} />
+                      {/* year labels */}
+                      <text x={oxL} y={oyL + 3} fontSize={10} fontWeight={600} fill={oldCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
+                        {first.decade}s
+                      </text>
+                      <text x={nxL} y={nyL + 3} fontSize={10} fontWeight={600} fill={newCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
+                        {last.decade}s
+                      </text>
+                      {/* shared header — "Spring starts" / "Autumn ends" plus
+                           shift days */}
+                      <text x={hx} y={hy - 4} fontSize={11} fontWeight={700} fill="rgba(245,245,245,0.95)" textAnchor="middle" fontFamily="ui-monospace, monospace" style={{ textShadow: '0 0 4px rgba(0,0,0,0.85)' }}>
+                        {header}
+                      </text>
+                      <text x={hx} y={hy + 9} fontSize={10} fill="rgba(220,225,235,0.85)" textAnchor="middle" fontFamily="ui-monospace, monospace" style={{ textShadow: '0 0 4px rgba(0,0,0,0.85)' }}>
+                        {days} days {direction}
+                      </text>
+                    </g>
+                  );
+                };
+
                 return (
                   <g pointerEvents="none">
-                    {items.map((it, i) => {
-                      const [x0, y0] = polar(r10, it.ang);
-                      const [x1, y1] = polar(R_OUTER + 6, it.ang);
-                      const [x2, y2] = polar(rLabel, it.ang);
-                      return (
-                        <g key={`crossing-${i}`}>
-                          <circle cx={x0} cy={y0} r={3} fill={it.colour} stroke="#0b0e16" strokeWidth={0.8} />
-                          <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={it.colour} strokeWidth={1} opacity={0.85} />
-                          <text
-                            x={x2} y={y2 - 4}
-                            fontSize={10}
-                            fontWeight={600}
-                            fill={it.colour}
-                            textAnchor="middle"
-                            dominantBaseline="alphabetic"
-                            fontFamily="ui-monospace, monospace"
-                          >
-                            {it.label1}
-                          </text>
-                          <text
-                            x={x2} y={y2 + 8}
-                            fontSize={9}
-                            fill="rgba(220,225,235,0.78)"
-                            textAnchor="middle"
-                            dominantBaseline="alphabetic"
-                            fontFamily="ui-monospace, monospace"
-                          >
-                            {it.label2}
-                          </text>
-                        </g>
-                      );
-                    })}
+                    {renderGroup('spring', 'Spring starts', monthAngle(first.spring), monthAngle(last.spring), first.spring - last.spring)}
+                    {renderGroup('autumn', 'Autumn ends',   monthAngle(first.autumn), monthAngle(last.autumn), last.autumn - first.autumn)}
                   </g>
                 );
               })()}
@@ -1258,7 +1368,7 @@ export default function ClimateSpiralCard({
                     transform: `translate(${onLeft ? 'calc(-100% - 10px)' : '10px'}, -50%)`,
                   }}
                 >
-                  <div className="text-[#FFF5E7] font-semibold">{hover.year}</div>
+                  <div className="text-[#FFF5E7] font-semibold">{hover.label}</div>
                   <div className="text-gray-400 text-[10px]">{MONTH_LABELS[hover.monthIdx]}</div>
                   <div className="text-gray-200 tabular-nums">
                     {hover.value.toFixed(dec)} {METRIC_UNIT[metric]}
@@ -1293,34 +1403,34 @@ export default function ClimateSpiralCard({
               Anomaly (vs {baselineFrom}–{baselineTo})
             </label>
             <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={showSpaghetti} onChange={(e) => setShowSpaghetti(e.target.checked)} className="accent-[#D0A65E]" />
+              <input type="checkbox" checked={showSpaghetti} onChange={(e) => setShowSpaghetti(e.target.checked)} style={{ accentColor: palette.high }} />
               Year spaghetti
             </label>
             <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={highlightRecent} onChange={(e) => setHighlightRecent(e.target.checked)} className="accent-[#D0A65E]" />
+              <input type="checkbox" checked={highlightRecent} onChange={(e) => setHighlightRecent(e.target.checked)} style={{ accentColor: palette.high }} />
               Highlight {recentFrom}–{recentTo}
             </label>
             <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={showRecordHigh} onChange={(e) => setShowRecordHigh(e.target.checked)} className="accent-[#D0A65E]" />
-              {metric === 'temp' ? 'Warmest' : metric === 'precip' ? 'Wettest' : metric === 'sunshine' ? 'Sunniest' : 'Frostiest'} year
+              <input type="checkbox" checked={showRecordHigh} onChange={(e) => setShowRecordHigh(e.target.checked)} style={{ accentColor: palette.high }} />
+              {palette.highWord} year
             </label>
             <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={showRecordLow} onChange={(e) => setShowRecordLow(e.target.checked)} className="accent-[#D0A65E]" />
-              {metric === 'temp' ? 'Coldest' : metric === 'precip' ? 'Driest' : metric === 'sunshine' ? 'Dullest' : 'Mildest'} year
+              <input type="checkbox" checked={showRecordLow} onChange={(e) => setShowRecordLow(e.target.checked)} style={{ accentColor: palette.low }} />
+              {palette.lowWord} year
             </label>
             <label className="inline-flex items-center gap-1.5">
-              <input type="checkbox" checked={showSeasons} onChange={(e) => setShowSeasons(e.target.checked)} className="accent-[#D0A65E]" />
+              <input type="checkbox" checked={showSeasons} onChange={(e) => setShowSeasons(e.target.checked)} style={{ accentColor: '#86EFAC' }} />
               Season tints
             </label>
             {metric === 'temp' && (
               <label className="inline-flex items-center gap-1.5">
-                <input type="checkbox" checked={showParis} onChange={(e) => setShowParis(e.target.checked)} className="accent-[#D0A65E]" />
+                <input type="checkbox" checked={showParis} onChange={(e) => setShowParis(e.target.checked)} style={{ accentColor: '#FBBF24' }} />
                 Paris rings
               </label>
             )}
             {metric === 'temp' && !anomaly && (
               <label className="inline-flex items-center gap-1.5">
-                <input type="checkbox" checked={showShiftTrail} onChange={(e) => setShowShiftTrail(e.target.checked)} className="accent-[#D0A65E]" />
+                <input type="checkbox" checked={showShiftTrail} onChange={(e) => setShowShiftTrail(e.target.checked)} style={{ accentColor: '#86EFAC' }} />
                 Season-shift trail
               </label>
             )}
@@ -1499,57 +1609,7 @@ export default function ClimateSpiralCard({
             </p>
           </div>
 
-          {/* Legend */}
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[10.5px] text-gray-400">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6" style={{ background: 'linear-gradient(90deg,#2a5eb8,#e8440a)' }} />
-              {minYear} → {maxYear}
-            </span>
-            {!anomaly && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6 border-t-2 border-dotted" style={{ borderColor: '#CBD5E1' }} />
-                {baselineFrom}–{baselineTo} mean
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6 border-t-2 border-dashed" style={{ borderColor: '#EF4444' }} />
-              {recentFrom}–{recentTo} mean{anomaly ? ' (anomaly)' : ''}
-            </span>
-            {showHistoric && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6 border-t-2 border-dashed" style={{ borderColor: '#E6B765' }} />
-                {historicFrom}–{historicTo} mean{anomaly ? ' (anomaly)' : ''}
-              </span>
-            )}
-            {showRecordHigh && recordYear > 0 && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6" style={{ background: palette.high }} />
-                {palette.highWord} ({recordYear})
-              </span>
-            )}
-            {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-6" style={{ background: palette.low }} />
-                {palette.lowWord} ({oppositeYear})
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-6" style={{ background: palette.current }} />
-              {currentYear} so far
-            </span>
-            {shiftDecades.length >= 2 && (
-              <>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-block h-[2px] w-6" style={{ background: 'rgba(134,239,172,0.85)' }} />
-                  Spring 10°C crossing
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-block h-[2px] w-6" style={{ background: 'rgba(253,186,116,0.85)' }} />
-                  Autumn 10°C crossing
-                </span>
-              </>
-            )}
-          </div>
+          {/* Series legend lives above the chart now — see top of section. */}
         </div>
 
         {/* ─── Section 2: Annual records & trends ────────────────────────
