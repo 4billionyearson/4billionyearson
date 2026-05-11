@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm, setLiveTerm } from '@/lib/climate/redis';
 
+// CDN-cache the response. GDACS alerts still refresh because the
+// LIVE_CACHE_KEY Redis entry expires quickly and stale-while-revalidate
+// regenerates the page after 1h.
+export const revalidate = 3600;
+
 // Historical EM-DAT data - changes ~annually, safe to cache long.
 const HIST_CACHE_KEY = 'climate:extreme-weather:hist:v1';
 // Live GDACS events - must refresh often so new alerts surface quickly.

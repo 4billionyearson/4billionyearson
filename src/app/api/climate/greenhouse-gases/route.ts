@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
+// CDN cache the full response for 1h; Redis still caches upstream data.
+export const revalidate = 3600;
+
 const CACHE_KEY = 'climate:greenhouse-gases:v3';
 const CACHE_TTL_HOURS = 12;
 

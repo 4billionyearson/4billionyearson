@@ -2,6 +2,10 @@ import { AI_DC_LOCATIONS } from "./locations";
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
+// CDN-cache the response for 1h. Redis still caches upstream OWID + Epoch
+// fetches for 24h. On miss we hydrate from Redis in ~ms.
+export const revalidate = 3600;
+
 const CACHE_KEY = 'ai:dashboard:v22';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 

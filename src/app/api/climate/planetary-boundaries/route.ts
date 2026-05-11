@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
+// Cache the full response on Vercel's edge for 1h, then serve stale
+// while a fresh one regenerates. Redis still backs the underlying
+// upstream fetches, so the function body only runs on cache miss.
+export const revalidate = 3600;
+
 const CACHE_KEY = 'climate:planetary-boundaries';
 const CACHE_TTL_HOURS = 12;
 

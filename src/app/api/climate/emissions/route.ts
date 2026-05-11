@@ -1,4 +1,5 @@
 export const maxDuration = 60;
+export const revalidate = 3600; // CDN-cache response for 1h; Redis backs upstream.
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 

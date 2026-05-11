@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 
+// CDN-cache the response for 1h. Redis still caches the upstream OWID
+// fetches for 24h, so on cache miss we serve fast from Redis.
+export const revalidate = 3600;
+
 const CACHE_KEY = 'climate:energy:v6';
 const CACHE_TTL_HOURS = 24;
 

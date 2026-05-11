@@ -3,6 +3,12 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 export const runtime = 'nodejs';
+// Cache the rendered PNG for 24h on the CDN, then serve stale for up to 7
+// days while a fresh one is regenerated in the background. OG previews
+// barely change day-to-day (only the CO2/temp stats embedded in the
+// image do), so this safely cuts the bulk of crawler-driven function
+// invocations without making the previews look out of date.
+export const revalidate = 86400;
 export const alt = '4 Billion Years On - Climate, Energy, AI & Biotech Data';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
@@ -232,6 +238,15 @@ export default async function OgImage() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      // Belt-and-braces: even with `revalidate` set, the Node runtime
+      // won't always emit a Cache-Control header automatically. This
+      // makes downstream caches (Slack, Twitter, Discord, browsers)
+      // hold onto the image so they don't re-fetch on every share.
+      headers: {
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
+      },
+    }
   );
 }
