@@ -323,6 +323,9 @@ export default function ClimateSpiralCard({
   const [highlightRecent, setHighlightRecent] = useState(true);
   const [showParis, setShowParis] = useState(true);
   const [showShiftTrail, setShowShiftTrail] = useState(true);
+  const [showRecordHigh, setShowRecordHigh] = useState(true);
+  const [showRecordLow, setShowRecordLow] = useState(true);
+  const [showSpaghetti, setShowSpaghetti] = useState(true);
   const [yearFrom, setYearFrom] = useState<number | null>(null);
 
   const points = series[metric] ?? [];
@@ -374,8 +377,8 @@ export default function ClimateSpiralCard({
   >(null);
 
   /* Value→radius scale: derive from data extent across all years to be drawn. */
-  const { rMin, rMax, currentYear, recordYear } = useMemo(() => {
-    if (!yearMap.size) return { rMin: 0, rMax: 1, currentYear: 0, recordYear: 0 };
+  const { rMin, rMax, currentYear, recordYear, oppositeYear } = useMemo(() => {
+    if (!yearMap.size) return { rMin: 0, rMax: 1, currentYear: 0, recordYear: 0, oppositeYear: 0 };
     const calYear = new Date().getFullYear();
     const calMonth = new Date().getMonth() + 1;
     let lo = Infinity, hi = -Infinity;
@@ -390,18 +393,21 @@ export default function ClimateSpiralCard({
         if (adj > hi) hi = adj;
       });
     }
-    // Pick record year by metric's aggregate
+    // Pick record-high and record-low year by metric's annual aggregate.
     const annual = annualAggregate(yearMap, METRIC_AGG[metric]);
     let best = -Infinity; let bestY = 0;
+    let worst = Infinity; let worstY = 0;
     for (const [y, v] of annual.entries()) {
       if (y === calYear) continue;
       if (v > best) { best = v; bestY = y; }
+      if (v < worst) { worst = v; worstY = y; }
     }
     return {
       rMin: lo === Infinity ? 0 : lo,
       rMax: hi === -Infinity ? 1 : hi,
       currentYear: calYear,
       recordYear: bestY,
+      oppositeYear: worstY,
     };
   }, [yearMap, effectiveFromYear, anomaly, meanBaseline, metric]);
 
@@ -674,8 +680,8 @@ export default function ClimateSpiralCard({
               })}
 
               {/* Background year-spaghetti */}
-              {renderYears.map((y) => {
-                if (y === recordYear || y === currentYear) return null;
+              {showSpaghetti && renderYears.map((y) => {
+                if (y === recordYear || y === oppositeYear || y === currentYear) return null;
                 if (highlightRecent && y >= recentFrom) return null;
                 const arr = yearMap.get(y)!;
                 const pts = yearToPoints(arr);
@@ -692,8 +698,8 @@ export default function ClimateSpiralCard({
               })}
 
               {/* Recent-decade highlight */}
-              {highlightRecent && renderYears
-                .filter((y) => y >= recentFrom && y !== recordYear && y !== currentYear)
+              {showSpaghetti && highlightRecent && renderYears
+                .filter((y) => y >= recentFrom && y !== recordYear && y !== oppositeYear && y !== currentYear)
                 .map((y) => {
                   const arr = yearMap.get(y)!;
                   const pts = yearToPoints(arr);
@@ -760,18 +766,18 @@ export default function ClimateSpiralCard({
                 return (
                   <g>
                     {/* Ghost 10°C ring */}
-                    <circle cx={CX} cy={CY} r={r10} fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth={0.6} strokeDasharray="2 6" />
-                    <text x={CX + r10 - 4} y={CY - 4} fontSize={8.5} fill="rgba(180,210,200,0.65)" textAnchor="end" fontFamily="ui-monospace, monospace">10°C threshold</text>
+                    <circle cx={CX} cy={CY} r={r10} fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth={0.8} strokeDasharray="2 6" />
+                    <text x={CX + r10 - 4} y={CY - 4} fontSize={9} fill="rgba(190,220,210,0.85)" textAnchor="end" fontFamily="ui-monospace, monospace">10°C threshold</text>
                     {/* Spring trail */}
-                    <path d={springPath} fill="none" stroke="rgba(160,180,210,0.55)" strokeWidth={1.2} strokeLinecap="round" />
+                    <path d={springPath} fill="none" stroke="rgba(134,239,172,0.85)" strokeWidth={1.8} strokeLinecap="round" />
                     {/* Autumn trail */}
-                    <path d={autumnPath} fill="none" stroke="rgba(160,180,210,0.55)" strokeWidth={1.2} strokeLinecap="round" />
+                    <path d={autumnPath} fill="none" stroke="rgba(253,186,116,0.85)" strokeWidth={1.8} strokeLinecap="round" />
                     {/* Per-decade dots, year-coloured */}
                     {springPts.map(([x, y, dec], i) => (
-                      <circle key={`sp-${dec}`} cx={x} cy={y} r={i === 0 || i === springPts.length - 1 ? 3.6 : 2.6} fill={yearColor(dec + 5, minD, maxD, 0.95)} stroke="#0b0e16" strokeWidth={0.6} />
+                      <circle key={`sp-${dec}`} cx={x} cy={y} r={i === 0 || i === springPts.length - 1 ? 4 : 3} fill={yearColor(dec + 5, minD, maxD, 0.95)} stroke="#0b0e16" strokeWidth={0.8} />
                     ))}
                     {autumnPts.map(([x, y, dec], i) => (
-                      <circle key={`au-${dec}`} cx={x} cy={y} r={i === 0 || i === autumnPts.length - 1 ? 3.6 : 2.6} fill={yearColor(dec + 5, minD, maxD, 0.95)} stroke="#0b0e16" strokeWidth={0.6} />
+                      <circle key={`au-${dec}`} cx={x} cy={y} r={i === 0 || i === autumnPts.length - 1 ? 4 : 3} fill={yearColor(dec + 5, minD, maxD, 0.95)} stroke="#0b0e16" strokeWidth={0.8} />
                     ))}
                     {/* Endpoint labels: oldest & newest decade */}
                     {(() => {
@@ -794,8 +800,8 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
-              {/* Record year (warmest/wettest etc.) */}
-              {recordYear > 0 && yearMap.get(recordYear) && (() => {
+              {/* Record year — high extreme (warmest/wettest/etc.) */}
+              {showRecordHigh && recordYear > 0 && yearMap.get(recordYear) && (() => {
                 const arr = yearMap.get(recordYear)!;
                 const pts = yearToPoints(arr);
                 if (!pts) return null;
@@ -804,6 +810,22 @@ export default function ClimateSpiralCard({
                     d={smoothClosedPath(pts)}
                     fill="none"
                     stroke="#DC2626"
+                    strokeWidth={2.4}
+                    opacity={0.95}
+                  />
+                );
+              })()}
+
+              {/* Record year — low extreme (coldest/driest/etc.) */}
+              {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && yearMap.get(oppositeYear) && (() => {
+                const arr = yearMap.get(oppositeYear)!;
+                const pts = yearToPoints(arr);
+                if (!pts) return null;
+                return (
+                  <path
+                    d={smoothClosedPath(pts)}
+                    fill="none"
+                    stroke="#38BDF8"
                     strokeWidth={2.4}
                     opacity={0.95}
                   />
@@ -951,8 +973,20 @@ export default function ClimateSpiralCard({
               Anomaly (vs {baselineFrom}–{baselineTo})
             </label>
             <label className="inline-flex items-center gap-1.5">
+              <input type="checkbox" checked={showSpaghetti} onChange={(e) => setShowSpaghetti(e.target.checked)} className="accent-[#D0A65E]" />
+              Year spaghetti
+            </label>
+            <label className="inline-flex items-center gap-1.5">
               <input type="checkbox" checked={highlightRecent} onChange={(e) => setHighlightRecent(e.target.checked)} className="accent-[#D0A65E]" />
               Highlight {recentFrom}–{recentTo}
+            </label>
+            <label className="inline-flex items-center gap-1.5">
+              <input type="checkbox" checked={showRecordHigh} onChange={(e) => setShowRecordHigh(e.target.checked)} className="accent-[#D0A65E]" />
+              {metric === 'temp' ? 'Warmest' : metric === 'precip' ? 'Wettest' : metric === 'sunshine' ? 'Sunniest' : 'Frostiest'} year
+            </label>
+            <label className="inline-flex items-center gap-1.5">
+              <input type="checkbox" checked={showRecordLow} onChange={(e) => setShowRecordLow(e.target.checked)} className="accent-[#D0A65E]" />
+              {metric === 'temp' ? 'Coldest' : metric === 'precip' ? 'Driest' : metric === 'sunshine' ? 'Dullest' : 'Mildest'} year
             </label>
             <label className="inline-flex items-center gap-1.5">
               <input type="checkbox" checked={showSeasons} onChange={(e) => setShowSeasons(e.target.checked)} className="accent-[#D0A65E]" />
@@ -969,6 +1003,9 @@ export default function ClimateSpiralCard({
                 <input type="checkbox" checked={showShiftTrail} onChange={(e) => setShowShiftTrail(e.target.checked)} className="accent-[#D0A65E]" />
                 Season-shift trail
               </label>
+            )}
+            {metric === 'temp' && anomaly && (
+              <span className="text-[10px] text-gray-500 italic">Season-shift trail only shown in absolute mode</span>
             )}
           </div>
 
@@ -1027,6 +1064,13 @@ export default function ClimateSpiralCard({
               The grey ring is the mean of your <span className="text-gray-300">baseline</span> years.
               The red ring is the mean of your <span className="text-rose-300">comparison</span> years.
               Slide either window to test how much of the gap is climate change vs. baseline choice.
+              {anomaly && (
+                <span className="block mt-1 text-gray-600">
+                  In anomaly mode the baseline ring is a perfect circle <em>by definition</em>
+                  (every month minus itself = 0). Switch to absolute mode to see the baseline&apos;s
+                  natural seasonal shape.
+                </span>
+              )}
             </p>
           </div>
 
@@ -1044,10 +1088,16 @@ export default function ClimateSpiralCard({
               <span className="inline-block h-[2px] w-6 border-t border-dashed" style={{ borderColor: '#FCA5A5' }} />
               {recentFrom}–{recentTo} mean
             </span>
-            {recordYear > 0 && (
+            {showRecordHigh && recordYear > 0 && (
               <span className="inline-flex items-center gap-1.5">
                 <span className="inline-block h-[2px] w-6" style={{ background: '#DC2626' }} />
-                Record year ({recordYear})
+                {metric === 'temp' ? 'Warmest' : metric === 'precip' ? 'Wettest' : metric === 'sunshine' ? 'Sunniest' : 'Frostiest'} ({recordYear})
+              </span>
+            )}
+            {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-[2px] w-6" style={{ background: '#38BDF8' }} />
+                {metric === 'temp' ? 'Coldest' : metric === 'precip' ? 'Driest' : metric === 'sunshine' ? 'Dullest' : 'Mildest'} ({oppositeYear})
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
@@ -1055,10 +1105,16 @@ export default function ClimateSpiralCard({
               {currentYear} so far
             </span>
             {shiftDecades.length >= 2 && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#94A3B8' }} />
-                10°C crossing per decade
-              </span>
+              <>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-[2px] w-6" style={{ background: 'rgba(134,239,172,0.85)' }} />
+                  Spring 10°C crossing
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-[2px] w-6" style={{ background: 'rgba(253,186,116,0.85)' }} />
+                  Autumn 10°C crossing
+                </span>
+              </>
             )}
           </div>
         </div>
