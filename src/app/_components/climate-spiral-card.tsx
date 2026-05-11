@@ -710,7 +710,7 @@ export default function ClimateSpiralCard({
     // so temperature variations remain visible against the vertically-
     // stretched stack of years. The rim sits at R_LABEL+13 (~285);
     // letting r reach ~340 lets warm/cold years bulge clearly past it.
-    const cap = view3D ? 340 : R_OUTER;
+    const cap = view3D ? 380 : R_OUTER;
     return Math.max(0, Math.min(cap, t * cap));
   }
 
@@ -1043,98 +1043,111 @@ export default function ClimateSpiralCard({
                 return arr;
               })();
 
-              const StatCard = ({ icon, label, value, sub, color, spark }: { icon: React.ReactNode; label: string; value: string; sub?: React.ReactNode; color: string; spark?: React.ReactNode }) => (
-                <div className="relative rounded-md border bg-gray-950/85 backdrop-blur-sm px-2 py-1 flex items-center gap-1.5 h-[42px] w-[168px] shrink-0" style={{ borderColor: `${color}55` }}>
-                  <div className="flex flex-col leading-none w-[72px] shrink-0">
-                    <div className="flex items-center gap-1 text-[8.5px] uppercase tracking-wider text-gray-400">
-                      <span style={{ color }}>{icon}</span>
-                      {label}
-                    </div>
-                    <div className="font-mono text-[13px] font-bold tabular-nums mt-0.5 truncate" style={{ color: '#FFF5E7' }}>{value}</div>
-                    {sub && <div className="text-[9px] tabular-nums leading-tight truncate">{sub}</div>}
-                  </div>
-                  {spark}
-                </div>
-              );
               return (
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 z-10 pointer-events-none w-[calc(100%-0.5rem)] max-w-[1100px]">
-                  <div className="rounded-xl border border-[#D0A65E]/45 bg-[#0b0e16]/90 px-3 py-1.5 shadow-2xl">
-                    <div className="flex items-center gap-2 overflow-x-auto">
-                      <div className="font-mono font-black tabular-nums text-2xl sm:text-3xl text-[#D0A65E] leading-none drop-shadow shrink-0 min-w-[88px]">
-                        {displayYear}
-                        {monthIdx !== null && (
-                          <span className="text-[#FFF5E7] text-base sm:text-xl ml-1.5">{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][monthIdx]}</span>
-                        )}
-                      </div>
-                      {isRecord && (
-                        <span
-                          className="rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider animate-pulse shrink-0"
-                          style={{ borderColor: recordColor, color: recordColor, background: `${recordColor}22`, boxShadow: `0 0 12px -2px ${recordColor}` }}
-                        >
-                          ◆ {recordLabel} on record
-                        </span>
+                <>
+                  {/* Top-centre: prominent year + record + ENSO chip.
+                       Floats over the chart's empty top area so the
+                       headline information reads first. */}
+                  <div className="absolute left-1/2 -translate-x-1/2 top-1 z-10 pointer-events-none flex items-center gap-2">
+                    <div className="font-mono font-black tabular-nums text-3xl sm:text-4xl text-[#D0A65E] leading-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
+                      {displayYear}
+                      {monthIdx !== null && (
+                        <span className="text-[#FFF5E7] text-lg sm:text-2xl ml-1.5">{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][monthIdx]}</span>
                       )}
-                      {/* ENSO chip + sparkline bars (signed, colored by state) */}
-                      <div className={`flex items-center gap-1.5 rounded-md border px-1.5 h-[42px] w-[168px] shrink-0 ${ensoCls}`}>
-                        <div className="flex flex-col leading-none w-[72px] shrink-0">
-                          <div className="text-[8.5px] font-semibold uppercase tracking-wider whitespace-nowrap">
-                            {enso?.state === 'El Niño' ? 'El Niño' : enso?.state === 'La Niña' ? 'La Niña' : 'ENSO'}
-                          </div>
-                          <div className="font-mono text-[13px] font-bold tabular-nums mt-0.5 truncate" style={{ color: '#FFF5E7' }}>
-                            {ensoAnom !== null ? `${ensoAnom >= 0 ? '+' : ''}${ensoAnom.toFixed(1)}°` : '—'}
-                          </div>
-                          <div className="text-[9px] tabular-nums leading-tight opacity-80 truncate">ONI</div>
-                        </div>
-                        {oniAnnual.length > 0 && <Sparkline data={oniAnnual} current={displayYear} color="#cbd5e1" mode="bars" />}
-                      </div>
-                      {tempVal !== null && (
-                        <StatCard
-                          icon={<Thermometer className="h-3 w-3" />}
-                          label="Temp"
-                          value={`${fmt(tempVal, 1)}°C`}
-                          color={METRIC_PALETTE.temp.current}
-                          sub={tempAnom !== null ? (
-                            <span className={tempAnom >= 0 ? 'text-rose-300' : 'text-sky-300'}>
-                              {tempAnom >= 0 ? '+' : ''}{fmt(tempAnom, 2)}° vs base
-                            </span>
-                          ) : null}
-                          spark={annuals.temp && annuals.temp.length > 1 && <Sparkline data={annuals.temp} current={displayYear} color={METRIC_PALETTE.temp.current} />}
-                        />
-                      )}
-                      {(() => { const v = metricValue('precip'); return v !== null && (
-                        <StatCard
-                          icon={<CloudRain className="h-3 w-3" />}
-                          label="Rain"
-                          value={`${fmt(v, 0)} mm`}
-                          color={METRIC_PALETTE.precip.current}
-                          spark={annuals.precip && annuals.precip.length > 1 && <Sparkline data={annuals.precip} current={displayYear} color={METRIC_PALETTE.precip.current} />}
-                        />
-                      ); })()}
-                      {(() => { const v = metricValue('sunshine'); return v !== null && (
-                        <StatCard
-                          icon={<Sun className="h-3 w-3" />}
-                          label="Sun"
-                          value={`${fmt(v, 0)} h`}
-                          color={METRIC_PALETTE.sunshine.current}
-                          spark={annuals.sunshine && annuals.sunshine.length > 1 && <Sparkline data={annuals.sunshine} current={displayYear} color={METRIC_PALETTE.sunshine.current} />}
-                        />
-                      ); })()}
-                      {(() => { const v = metricValue('frost'); return v !== null && (
-                        <StatCard
-                          icon={<Snowflake className="h-3 w-3" />}
-                          label="Frost"
-                          value={`${fmt(v, 0)} d`}
-                          color={METRIC_PALETTE.frost.current}
-                          spark={annuals.frost && annuals.frost.length > 1 && <Sparkline data={annuals.frost} current={displayYear} color={METRIC_PALETTE.frost.current} />}
-                        />
-                      ); })()}
                     </div>
+                    {isRecord && (
+                      <span
+                        className="rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider animate-pulse"
+                        style={{ borderColor: recordColor, color: recordColor, background: `${recordColor}22`, boxShadow: `0 0 12px -2px ${recordColor}` }}
+                      >
+                        ◆ {recordLabel} on record
+                      </span>
+                    )}
                   </div>
-                </div>
+
+                  {/* Bottom-left chip: ENSO + ONI sparkline. */}
+                  <div className={`absolute left-2 bottom-2 z-10 pointer-events-none rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-center gap-2 ${ensoCls}`}>
+                    <div className="flex flex-col leading-tight">
+                      <div className="text-[8.5px] font-semibold uppercase tracking-wider whitespace-nowrap">
+                        {enso?.state === 'El Niño' ? 'El Niño' : enso?.state === 'La Niña' ? 'La Niña' : 'ENSO'}
+                      </div>
+                      <div className="font-mono text-sm font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
+                        {ensoAnom !== null ? `${ensoAnom >= 0 ? '+' : ''}${ensoAnom.toFixed(1)}°` : '—'}
+                        <span className="text-[9px] font-normal opacity-70 ml-1">ONI</span>
+                      </div>
+                    </div>
+                    {oniAnnual.length > 0 && <Sparkline data={oniAnnual} current={displayYear} color="#cbd5e1" mode="bars" />}
+                  </div>
+
+                  {/* Bottom-right chip: the *active* metric (the one the
+                       user picked at the top of the card) shown large
+                       with sparkline. The other three metrics sit on a
+                       compact row above it as muted mini-chips so the
+                       user keeps situational awareness without the row
+                       becoming the headline. */}
+                  {(() => {
+                    const activeVal = metricValue(metric);
+                    const activeAnnual = annuals[metric];
+                    if (activeVal === null) return null;
+                    const unit = METRIC_UNIT[metric];
+                    const dp = metric === 'temp' ? 1 : 0;
+                    const activeColor = METRIC_PALETTE[metric].current;
+                    const allOthers: { m: SpaghettiMetric; icon: React.ReactNode; label: string }[] = [
+                      { m: 'temp' as const, icon: <Thermometer className="h-3 w-3" />, label: 'T' },
+                      { m: 'precip' as const, icon: <CloudRain className="h-3 w-3" />, label: 'R' },
+                      { m: 'sunshine' as const, icon: <Sun className="h-3 w-3" />, label: 'S' },
+                      { m: 'frost' as const, icon: <Snowflake className="h-3 w-3" />, label: 'F' },
+                    ];
+                    const others = allOthers.filter((x) => x.m !== metric && available.includes(x.m));
+                    return (
+                      <div className="absolute right-2 bottom-2 z-10 pointer-events-none flex flex-col items-end gap-1">
+                        {/* Other-metrics row */}
+                        {others.length > 0 && (
+                          <div className="flex items-center gap-1">
+                            {others.map((o) => {
+                              const v = metricValue(o.m);
+                              if (v === null) return null;
+                              const d = o.m === 'temp' ? 1 : 0;
+                              const c = METRIC_PALETTE[o.m].current;
+                              return (
+                                <div key={o.m} className="rounded-md border bg-[#0b0e16]/80 backdrop-blur-sm px-1.5 py-0.5 flex items-center gap-1" style={{ borderColor: `${c}40` }}>
+                                  <span style={{ color: c }}>{o.icon}</span>
+                                  <span className="font-mono text-[10.5px] font-semibold tabular-nums text-gray-200">{fmt(v, d)}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        {/* Active-metric headline chip */}
+                        <div className="rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-center gap-2.5" style={{ borderColor: `${activeColor}66`, boxShadow: `0 0 14px -6px ${activeColor}` }}>
+                          <div className="flex flex-col leading-tight">
+                            <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-gray-400">
+                              <span style={{ color: activeColor }}>{METRIC_ICON[metric]}</span>
+                              {METRIC_LABEL[metric]}
+                            </div>
+                            <div className="font-mono text-base font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
+                              {fmt(activeVal, dp)} <span className="text-[10px] opacity-70">{unit}</span>
+                            </div>
+                            {metric === 'temp' && tempAnom !== null && (
+                              <div className="text-[9.5px] tabular-nums leading-tight">
+                                <span className={tempAnom >= 0 ? 'text-rose-300' : 'text-sky-300'}>
+                                  {tempAnom >= 0 ? '+' : ''}{fmt(tempAnom, 2)}° vs base
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          {activeAnnual && activeAnnual.length > 1 && (
+                            <Sparkline data={activeAnnual} current={displayYear} color={activeColor} />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </>
               );
             })()}
             <svg
-              viewBox={view3D ? `0 -40 ${VB} 660` : `0 0 ${VB} ${VB}`}
+              viewBox={view3D ? `-40 -60 ${VB + 80} 720` : `0 0 ${VB} ${VB}`}
               className="w-full h-auto select-none cursor-crosshair"
               onMouseMove={(e) => {
                 const svg = e.currentTarget;
@@ -1235,6 +1248,8 @@ export default function ClimateSpiralCard({
                * four-season palette. */}
               {!view3D && showSeasons && (() => {
                 const r = R_OUTER + 4;
+                // One narrow wedge between two angles. Total span of all
+                // wedges should equal 2π so the ring is complete.
                 const wedgePath = (a1: number, a2: number) => {
                   let span = a2 - a1;
                   while (span <= 0) span += Math.PI * 2;
@@ -1254,18 +1269,40 @@ export default function ClimateSpiralCard({
                   const br = parseInt(bh.slice(0, 2), 16);
                   const bg = parseInt(bh.slice(2, 4), 16);
                   const bb = parseInt(bh.slice(4, 6), 16);
-                  const r = Math.round(ar + (br - ar) * t);
-                  const g = Math.round(ag + (bg - ag) * t);
+                  const rr = Math.round(ar + (br - ar) * t);
+                  const gg = Math.round(ag + (bg - ag) * t);
                   const bl = Math.round(ab + (bb - ab) * t);
-                  return `rgb(${r},${g},${bl})`;
-                };
-                const growingColor = (t: number) => {
-                  // 0 = spring green, 0.5 = summer yellow, 1 = autumn brown.
-                  if (t <= 0.5) return lerpHex('#4ADE80', '#FACC15', t / 0.5);
-                  return lerpHex('#FACC15', '#B45309', (t - 0.5) / 0.5);
+                  return `rgb(${rr},${gg},${bl})`;
                 };
 
-                const haveCrossings = crossingDecades.length >= 2;
+                /** Anchors define the *peak* of each season — the angle
+                 *  where its colour is at full saturation. The N narrow
+                 *  wedges between them are coloured by smoothly blending
+                 *  the two adjacent anchors, giving a continuous angular
+                 *  gradient with no visible wedge edges. */
+                type Anchor = { ang: number; color: string };
+
+                /** Sample colour at any angle by finding the two nearest
+                 *  anchors (handling wrap) and linearly interpolating. */
+                const sampleColor = (ang: number, anchors: Anchor[]): string => {
+                  const TWO_PI = Math.PI * 2;
+                  const norm = (a: number) => ((a % TWO_PI) + TWO_PI) % TWO_PI;
+                  const a = norm(ang);
+                  const sorted = anchors.map((x) => ({ ...x, ang: norm(x.ang) })).sort((p, q) => p.ang - q.ang);
+                  for (let i = 0; i < sorted.length; i++) {
+                    const cur = sorted[i];
+                    const nxt = sorted[(i + 1) % sorted.length];
+                    let span = nxt.ang - cur.ang;
+                    if (span <= 0) span += TWO_PI;
+                    let off = a - cur.ang;
+                    if (off < 0) off += TWO_PI;
+                    if (off <= span) {
+                      return lerpHex(cur.color, nxt.color, off / span);
+                    }
+                  }
+                  return sorted[0].color;
+                };
+
                 const labelAngle = (a: number, b: number) => {
                   let span = b - a;
                   if (span <= 0) span += 12;
@@ -1274,188 +1311,92 @@ export default function ClimateSpiralCard({
                   return monthAngle(mid);
                 };
 
-                if (haveCrossings) {
-                  const first = crossingDecades[0];
+                // Build the four season anchors. When we have decade
+                // crossings we use the *modern* spring/autumn boundaries
+                // so the gradient's green/brown peaks track the actual
+                // growing-season shift. Otherwise we fall back to fixed
+                // meteorological quarters.
+                let anchors: Anchor[];
+                let labels: { key: string; mid: number; color: string; text: string }[];
+                if (crossingDecades.length >= 2) {
                   const last = crossingDecades[crossingDecades.length - 1];
-                  // Guard against odd ordering.
                   const newSpring = last.spring;
-                  const oldSpring = first.spring;
-                  const oldAutumn = first.autumn;
                   const newAutumn = last.autumn;
-                  // Directional sanity: the crescent fills should only
-                  // render when the boundary has moved in the *expected*
-                  // warming direction (spring earlier, autumn later). If
-                  // an intermediate playback frame has the new boundary
-                  // on the wrong side of the old one, draw the opposite
-                  // wedge in cool-blue to indicate winter encroachment
-                  // instead of letting `wedgePath` sweep the long way
-                  // around (which fills almost the whole year with the
-                  // crescent colour and looks like a bug).
-                  const springWarming = newSpring < oldSpring;
-                  const autumnWarming = newAutumn > oldAutumn;
-                  // The growing-season gradient is meant to span the
-                  // *historic* growing window, oldSpring → oldAutumn.
-                  // If those happen to be reversed (e.g. only one decade
-                  // pair, or noisy early data) collapse the gradient to
-                  // zero rather than fill the whole circle.
-                  const N = 28;
-                  const growSpan = Math.max(0, oldAutumn - oldSpring);
-                  const gradWedges = Array.from({ length: N }, (_, i) => {
-                    const t0 = i / N;
-                    const t1 = (i + 1) / N;
-                    const m0 = oldSpring + growSpan * t0;
-                    const m1 = oldSpring + growSpan * t1;
-                    const col = growingColor((t0 + t1) / 2);
-                    return (
-                      <path
-                        key={`grow-${i}`}
-                        d={wedgePath(monthAngle(m0), monthAngle(m1))}
-                        fill={col}
-                      />
-                    );
-                  });
-
-                  // Three "named" zones used purely for label placement.
-                  const labels = [
-                    { key: 'spring', mid: labelAngle(newSpring, oldSpring + (oldAutumn - oldSpring) * 0.33), color: '#4ADE80', text: 'Spring' },
-                    { key: 'summer', mid: labelAngle(oldSpring + (oldAutumn - oldSpring) * 0.33, oldSpring + (oldAutumn - oldSpring) * 0.66), color: '#FACC15', text: 'Summer' },
-                    { key: 'autumn', mid: labelAngle(oldSpring + (oldAutumn - oldSpring) * 0.66, newAutumn), color: '#B45309', text: 'Autumn' },
-                    { key: 'winter', mid: labelAngle(newAutumn, newSpring), color: '#7DD3FC', text: 'Winter' },
+                  const growSpan = Math.max(0.5, newAutumn - newSpring);
+                  // Winter peak = month opposite the middle of summer.
+                  const summerMid = newSpring + growSpan * 0.5;
+                  const winterMidMonth = (summerMid + 6) % 12;
+                  anchors = [
+                    { ang: monthAngle(winterMidMonth), color: '#1e3a8a' }, // deep winter navy
+                    { ang: monthAngle(newSpring + growSpan * 0.16), color: '#86EFAC' }, // spring green
+                    { ang: monthAngle(summerMid), color: '#FACC15' }, // summer yellow
+                    { ang: monthAngle(newSpring + growSpan * 0.84), color: '#B45309' }, // autumn russet
                   ];
-
-                  return (
-                    <g>
-                      <g opacity={0.38}>
-                        {/* Winter (always-cold half) — gradient sub-wedges
-                             so the middle of winter reads as the coldest
-                             point, easing back to the boundary tone at
-                             either end. Coldest = deep navy #1e3a8a. */}
-                        {(() => {
-                          let span = monthAngle(newSpring) - monthAngle(newAutumn);
-                          while (span <= 0) span += Math.PI * 2;
-                          const aStart = monthAngle(newAutumn);
-                          const N = 18;
-                          const winterMid = '#1e3a8a';
-                          const winterEdge = '#7DD3FC';
-                          return Array.from({ length: N }, (_, i) => {
-                            const t0 = i / N;
-                            const t1 = (i + 1) / N;
-                            const tMid = (t0 + t1) / 2;
-                            // 0 at middle of winter (tMid=0.5), 1 at the edges
-                            const distFromMid = Math.abs(tMid - 0.5) * 2;
-                            const col = lerpHex(winterMid, winterEdge, distFromMid);
-                            const a1 = aStart + span * t0;
-                            const a2 = aStart + span * t1;
-                            return <path key={`win-${i}`} d={wedgePath(a1, a2)} fill={col} />;
-                          });
-                        })()}
-                        {/* Crescent: months that used to be winter, now spring.
-                             Light fresh green — same family as the spring
-                             marker dots, lighter than the gradient core.
-                             Only rendered when the warming-direction holds;
-                             otherwise we draw the *opposite* wedge in the
-                             winter blue to show that spring arrived later
-                             this decade than in the baseline pair. */}
-                        {springWarming ? (
-                          <path d={wedgePath(monthAngle(newSpring), monthAngle(oldSpring))} fill="#BBF7D0" />
-                        ) : newSpring > oldSpring ? (
-                          <path d={wedgePath(monthAngle(oldSpring), monthAngle(newSpring))} fill="#7DD3FC" opacity={0.7} />
-                        ) : null}
-                        {/* Growing-season gradient core (only meaningful when
-                             oldAutumn > oldSpring). */}
-                        {growSpan > 0 && gradWedges}
-                        {/* Crescent: months that used to be winter, now autumn.
-                             Saturated chestnut brown — matches the autumn
-                             marker dots, browner than the gradient tail.
-                             Same direction-guard as spring. */}
-                        {autumnWarming ? (
-                          <path d={wedgePath(monthAngle(oldAutumn), monthAngle(newAutumn))} fill="#92400E" />
-                        ) : newAutumn < oldAutumn ? (
-                          <path d={wedgePath(monthAngle(newAutumn), monthAngle(oldAutumn))} fill="#7DD3FC" opacity={0.7} />
-                        ) : null}
-                      </g>
-                      {/* Season labels — bright bordered pills so they
-                          read as proper rim chips, matching the rest of
-                          the call-out furniture. */}
-                      {labels.map((l) => {
-                        const [lx, ly] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 22, l.mid);
-                        const w = l.text.length * 7 + 14;
-                        return (
-                          <g key={`slab-${l.key}`}>
-                            <rect
-                              x={lx - w / 2}
-                              y={ly - 9}
-                              width={w}
-                              height={18}
-                              rx={9}
-                              fill="rgba(10,14,22,0.85)"
-                              stroke={l.color}
-                              strokeWidth={1}
-                              opacity={0.95}
-                            />
-                            <text
-                              x={lx} y={ly}
-                              fontSize={11}
-                              fontWeight={700}
-                              fill={l.color}
-                              textAnchor="middle"
-                              dominantBaseline="central"
-                              fontFamily="ui-monospace, monospace"
-                              style={{ letterSpacing: '0.08em' }}
-                            >
-                              {l.text}
-                            </text>
-                          </g>
-                        );
-                      })}
-                    </g>
-                  );
+                  labels = [
+                    { key: 'winter', mid: monthAngle(winterMidMonth), color: '#7DD3FC', text: 'Winter' },
+                    { key: 'spring', mid: labelAngle(newSpring, newSpring + growSpan * 0.33), color: '#86EFAC', text: 'Spring' },
+                    { key: 'summer', mid: labelAngle(newSpring + growSpan * 0.33, newSpring + growSpan * 0.66), color: '#FACC15', text: 'Summer' },
+                    { key: 'autumn', mid: labelAngle(newSpring + growSpan * 0.66, newAutumn), color: '#FDBA74', text: 'Autumn' },
+                  ];
+                } else {
+                  anchors = [
+                    { ang: monthAngle(0.5), color: '#1e3a8a' },  // mid-winter
+                    { ang: monthAngle(3.5), color: '#86EFAC' },  // mid-spring
+                    { ang: monthAngle(6.5), color: '#FACC15' },  // mid-summer
+                    { ang: monthAngle(9.5), color: '#B45309' },  // mid-autumn
+                  ];
+                  labels = [
+                    { key: 'winter', mid: monthAngle(0.5), color: '#7DD3FC', text: 'Winter' },
+                    { key: 'spring', mid: monthAngle(3.5), color: '#86EFAC', text: 'Spring' },
+                    { key: 'summer', mid: monthAngle(6.5), color: '#FACC15', text: 'Summer' },
+                    { key: 'autumn', mid: monthAngle(9.5), color: '#FDBA74', text: 'Autumn' },
+                  ];
                 }
 
-                // Fallback — fixed meteorological quarters.
-                const bounds: Array<{ season: keyof typeof SEASON_COLORS; start: number; end: number }> = [
-                  { season: 'spring', start: 2, end: 5 },
-                  { season: 'summer', start: 5, end: 8 },
-                  { season: 'autumn', start: 8, end: 11 },
-                  { season: 'winter', start: 11, end: 2 },
-                ];
+                // Render the gradient as N narrow wedges. Higher N =
+                // smoother blend; 144 wedges gives 2.5° per wedge which
+                // is well below the eye's discrimination threshold at
+                // this radius.
+                const N = 144;
+                const step = (Math.PI * 2) / N;
+                const a0 = -Math.PI / 2; // start at top (Jan)
+                const wedges = Array.from({ length: N }, (_, i) => {
+                  const a1 = a0 + i * step;
+                  const a2 = a0 + (i + 1) * step;
+                  const mid = (a1 + a2) / 2;
+                  const col = sampleColor(mid, anchors);
+                  return <path key={`gseg-${i}`} d={wedgePath(a1, a2)} fill={col} />;
+                });
+
                 return (
                   <g>
-                    <g opacity={0.28}>
-                      {bounds.map((s) => (
-                        <path key={`wedge-${s.season}`} d={wedgePath(monthAngle(s.start), monthAngle(s.end))} fill={SEASON_COLORS[s.season]} />
-                      ))}
-                    </g>
-                    {bounds.map((s) => {
-                      const ang = labelAngle(s.start, s.end);
-                      const [lx, ly] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 22, ang);
-                      const text = SEASON_LABEL[s.season];
-                      const color = SEASON_COLORS[s.season];
-                      const w = text.length * 7 + 14;
+                    <g opacity={0.42}>{wedges}</g>
+                    {labels.map((l) => {
+                      const [lx, ly] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 22, l.mid);
+                      const w = l.text.length * 7 + 18;
                       return (
-                        <g key={`slab-${s.season}`}>
+                        <g key={`slab-${l.key}`}>
                           <rect
                             x={lx - w / 2}
-                            y={ly - 9}
+                            y={ly - 10}
                             width={w}
-                            height={18}
-                            rx={9}
-                            fill="rgba(10,14,22,0.85)"
-                            stroke={color}
-                            strokeWidth={1}
-                            opacity={0.95}
+                            height={20}
+                            rx={10}
+                            fill={`${l.color}22`}
+                            stroke={l.color}
+                            strokeWidth={1.2}
                           />
                           <text
                             x={lx} y={ly}
                             fontSize={11}
                             fontWeight={700}
-                            fill={color}
+                            fill={l.color}
                             textAnchor="middle"
                             dominantBaseline="central"
                             fontFamily="ui-monospace, monospace"
                             style={{ letterSpacing: '0.08em' }}
                           >
-                            {text}
+                            {l.text}
                           </text>
                         </g>
                       );
@@ -2266,7 +2207,11 @@ export default function ClimateSpiralCard({
                Means / Seasons / Mode) so the chip soup is easier to
                scan. The From-year + Spaghetti-boost sliders live at the
                top of the panel; Presets sit beneath the toggle groups. */}
-          <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3 space-y-3">
+          {/* Controls + Compare panels — on wide screens (lg+) sit side-
+               by-side so we use the full row width; on narrower screens
+               they stack vertically. */}
+          <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
+          <div className="rounded-lg border border-gray-800 bg-gray-900/40 p-3 space-y-3">
             <div className="flex flex-wrap items-center gap-3 text-[12px] text-gray-300">
               <span className="uppercase tracking-wider text-[10px] text-gray-500">From</span>
               <div className="w-28 sm:w-36">
@@ -2296,21 +2241,23 @@ export default function ClimateSpiralCard({
 
             {/* Mode — anomaly toggle + 3D promotion. Sits at the top of
                  the toggle stack so the user finds 3D immediately. */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Mode</span>
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 sm:mr-1 sm:w-12">Mode</span>
+              <div className="flex flex-wrap items-center gap-2">
               <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
                 Anomaly <span className="text-[10px] text-gray-400">vs {baselineFrom}–{baselineTo}</span>
               </ChipToggle>
               <ChipToggle active={view3D} onChange={setView3D} color="#A78BFA">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></svg>
                 3D <span className="text-[10px] text-gray-400">height = time</span>
               </ChipToggle>
+              </div>
             </div>
 
             {/* Lines — per-year spaghetti + the highlighted recent decade
                  + the warmest/coldest year rings. */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Lines</span>
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 sm:mr-1 sm:w-12">Lines</span>
+              <div className="flex flex-wrap items-center gap-2">
               <ChipToggle active={showSpaghetti} onChange={setShowSpaghetti} color={palette.high}>
                 Year spaghetti
               </ChipToggle>
@@ -2323,12 +2270,14 @@ export default function ClimateSpiralCard({
               <ChipToggle active={showRecordLow} onChange={setShowRecordLow} color={palette.low}>
                 {palette.lowWord} year
               </ChipToggle>
+              </div>
             </div>
 
             {/* Means — dashed reference rings. Baseline only meaningful
                  in absolute mode; modern always available. */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Means</span>
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 sm:mr-1 sm:w-12">Means</span>
+              <div className="flex flex-wrap items-center gap-2">
               {!anomaly && (
                 <ChipToggle active={showBaselineRing} onChange={setShowBaselineRing} color="#9CA3AF">
                   Baseline ring <span className="text-[10px] text-gray-400">{baselineFrom}–{baselineTo}</span>
@@ -2340,12 +2289,14 @@ export default function ClimateSpiralCard({
               <ChipToggle active={showHistoric} onChange={setShowHistoric} color="#94A3B8">
                 Historic ring <span className="text-[10px] text-gray-400">{historicFrom}–{historicTo}</span>
               </ChipToggle>
+              </div>
             </div>
 
             {/* Seasons — tints, shift trail, Paris rings. Hidden cleanly
                  when the relevant metric/mode doesn't support them. */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Seasons</span>
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 sm:mr-1 sm:w-12">Seasons</span>
+              <div className="flex flex-wrap items-center gap-2">
               <ChipToggle active={showSeasons} onChange={setShowSeasons} color="#86EFAC">
                 Season tints
               </ChipToggle>
@@ -2362,11 +2313,12 @@ export default function ClimateSpiralCard({
               {metric === 'temp' && anomaly && (
                 <span className="text-[10px] text-gray-500 italic self-center">Season-shift trail only shown in absolute mode</span>
               )}
+              </div>
             </div>
           </div>
 
           {/* Compare periods — user-adjustable baseline & comparison windows */}
-          <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3 overflow-hidden">
+          <div className="rounded-lg border border-gray-800 bg-gray-900/40 p-3 overflow-hidden">
             <div className="flex items-center justify-between mb-2 gap-2">
               <h4 className="text-[10px] uppercase tracking-wider text-gray-500">Compare periods</h4>
               <button
@@ -2468,6 +2420,7 @@ export default function ClimateSpiralCard({
                 </>
               )}
             </p>
+          </div>
           </div>
 
           {/* Series legend lives above the chart now — see top of section. */}
