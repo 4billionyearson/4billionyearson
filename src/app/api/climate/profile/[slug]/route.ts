@@ -1,5 +1,9 @@
 export const maxDuration = 60;
-export const dynamic = 'force-dynamic';
+// CDN-cache the response for 1h. The route reads only the `slug` path
+// param and a Redis-backed snapshot keyed by data month, so caching is
+// safe; cache busts automatically when the data month advances because
+// the Redis cache key includes the month label.
+export const revalidate = 3600;
 import { NextResponse } from 'next/server';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';

@@ -1,2 +1,44 @@
 {
+  // ── File watching ────────────────────────────────────────────────
+  // VS Code watches every file in the workspace by default. With
+  // `.next/` (rebuilt on every change), `node_modules/` (hundreds of
+  // thousands of files), and our large `public/data/**` JSON
+  // snapshots, that can saturate the file-watcher and freeze the
+  // editor. Excluding them gives the TS server and ESLint room to
+  // breathe.
+  "files.watcherExclude": {
+    "**/.next/**": true,
+    "**/node_modules/**": true,
+    "**/.vercel/**": true,
+    "**/public/data/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true
+  },
+  // Keep Cmd-Shift-F search fast and uncluttered.
+  "search.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/public/data": true,
+    "**/.vercel": true
+  },
+  // Hide build/output folders from the file tree.
+  "files.exclude": {
+    "**/.next": true,
+    "**/.vercel": true
+  },
+
+  // ── TypeScript server ────────────────────────────────────────────
+  // climate-spiral-card.tsx alone is ~2700 lines with deeply nested
+  // inline types; the default 3GB ceiling can crash tsserver under
+  // load. Raise it and use fs-events for lower CPU watching.
+  "typescript.tsserver.maxTsServerMemory": 6144,
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriority"
+  },
+
+  // ── ESLint ───────────────────────────────────────────────────────
+  // Lint on save instead of every keystroke - keeps typing snappy.
+  "eslint.run": "onSave"
 }
