@@ -82,6 +82,19 @@ function ensoForYear(year: number): { state: string; strength?: string } | null 
   return { state: 'Neutral' };
 }
 
+/** Representative peak ONI anomaly for a strength bucket. Used as a
+ *  fallback for years where we haven't loaded the live ONI history
+ *  (i.e. anything pre-2016). Sign comes from the state. */
+function approxOniForStrength(state: string, strength?: string): number {
+  const sign = state === 'El Niño' ? 1 : state === 'La Niña' ? -1 : 0;
+  const mag = strength === 'Very strong' ? 2.2
+    : strength === 'Strong' ? 1.7
+    : strength === 'Moderate' ? 1.2
+    : strength === 'Weak' ? 0.7
+    : 0;
+  return sign * mag;
+}
+
 const TOGGLE_BASE = 'inline-flex h-7 items-center gap-1 rounded-full border px-2.5 text-[12px] font-medium transition-colors';
 const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
 const TOGGLE_INACTIVE = 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
@@ -464,11 +477,15 @@ export default function ClimateSpiralCard({
   const [showRecordHigh, setShowRecordHigh] = useState(true);
   const [showRecordLow, setShowRecordLow] = useState(true);
   const [showSpaghetti, setShowSpaghetti] = useState(true);
-  /** User-adjustable opacity multiplier for the year-spaghetti lines (and
-   *  highlighted recent decade). At 1.0 the lines render at the original
-   *  baked-in alpha; at 0.0 they vanish entirely. Lets the user dial down
-   *  background noise during playback so the current-year tracer pops. */
-  const [lineAlpha, setLineAlpha] = useState(1);
+  /** User-adjustable "boost" on the year-spaghetti opacity. At 0 the
+   *  lines render at their original baked-in alpha (subtle, lets the
+   *  reference rings dominate); at 1.0 they ramp up to fully opaque,
+   *  useful when sharing a still or pointing at a specific year. */
+  const [lineAlpha, setLineAlpha] = useState(0);
+  /** Convert the user-facing 0..1 boost into stroke-alpha multipliers
+   *  for the background and recent-decade highlight passes. */
+  const bgAlpha = Math.min(1, 0.32 + 0.68 * lineAlpha);
+  const hiAlpha = Math.min(1, 0.85 + 0.15 * lineAlpha);
   /** 3D mode — re-projects each year's loop onto a tilted plane and
    *  stacks them vertically so height encodes time. */
   const [view3D, setView3D] = useState(false);
@@ -515,6 +532,34 @@ export default function ClimateSpiralCard({
   const [historicFrom, historicTo] = historicRange;
   const [recentFrom, recentTo] = recentRange;
   const [showHistoric, setShowHistoric] = useState(false);
+  /** Show/hide the dashed baseline mean ring. Hidden automatically in
+   *  anomaly mode (would be a zero-radius circle). */
+  const [showBaselineRing, setShowBaselineRing] = useState(true);
+  /** Show/hide the dashed modern mean ring. */
+  const [showRecentRing, setShowRecentRing] = useState(true);
+
+  /** Live ONI history → map of year → peak |ONI| anomaly (signed).
+   *  Populated lazily once from `/data/climate/enso.json` so the HUD
+   *  can show the actual anomaly for the modern era. Older years fall
+   *  back to the strength-bucket approximation in `approxOniForStrength`. */
+  const [oniByYear, setOniByYear] = useState<Map<number, number>>(new Map());
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch('/data/climate/enso.json')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (cancelled || !j?.oni?.history) return;
+        const m = new Map<number, number>();
+        for (const row of j.oni.history as Array<{ year: number; anom: number }>) {
+          const cur = m.get(row.year);
+          // Keep the peak absolute anomaly per year (signed).
+          if (cur === undefined || Math.abs(row.anom) > Math.abs(cur)) m.set(row.year, row.anom);
+        }
+        setOniByYear(m);
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, []);
 
   /* Playback state — see below for the RAF/interval effect that advances
    * the playhead. Declared here so the controls below can read it. */
@@ -581,6 +626,22 @@ export default function ClimateSpiralCard({
     };
   }, [yearMap, effectiveFromYear, anomaly, meanBaseline, metric]);
 
+  /* Latest month index (0-11) for the current year that has actual,
+   * non-provisional data. Drives where the month-by-month finale stops:
+   * we only animate as far as the real data goes, not all the way to
+   * Dec on years where we're mid-year. Falls back to 11 if the current
+   * year has all 12 months. */
+  const latestRealMonthIdx = useMemo(() => {
+    const arr = yearMap.get(currentYear);
+    if (!arr) return -1;
+    const provSet = prov.get(currentYear) ?? new Set<number>();
+    let last = -1;
+    for (let m = 0; m < 12; m++) {
+      if (Number.isFinite(arr[m]) && !provSet.has(m)) last = m;
+    }
+    return last;
+  }, [yearMap, prov, currentYear]);
+
   /* Playback advancement — runs an interval that ticks the playhead one
    * year per `1000/playSpeed`ms while moving through the historical
    * window, then switches to a deliberately slower month-by-month finale
@@ -589,12 +650,14 @@ export default function ClimateSpiralCard({
     if (!playing) return;
     // Finale: month-by-month at a fixed slow rate (~2 months/sec) so the
     // climax of "everything you've seen, all the way up to NOW" lands
-    // visibly rather than flashing past.
+    // visibly rather than flashing past. Stops at the latest real
+    // (non-provisional) month so we don't pretend we have data we don't.
+    const finaleEnd = latestRealMonthIdx >= 0 ? latestRealMonthIdx : 11;
     if (playYear === currentYear && playMonth !== null) {
       const id = window.setInterval(() => {
         setPlayMonth((prev) => {
           if (prev === null) return 0;
-          if (prev >= 11) {
+          if (prev >= finaleEnd) {
             setPlaying(false);
             return prev;
           }
@@ -617,7 +680,7 @@ export default function ClimateSpiralCard({
       });
     }, intervalMs);
     return () => window.clearInterval(id);
-  }, [playing, playSpeed, effectiveFromYear, currentYear, playYear, playMonth]);
+  }, [playing, playSpeed, effectiveFromYear, currentYear, playYear, playMonth, latestRealMonthIdx]);
   // Stop + reset playback whenever the metric or start-year changes.
   React.useEffect(() => {
     setPlayYear(null);
@@ -763,7 +826,7 @@ export default function ClimateSpiralCard({
 
   /* ───────────────── Render ───────────────── */
   return (
-    <div id={share?.sectionId ?? sectionId} className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+    <div id={share?.sectionId ?? sectionId} className="bg-[#0b0e16] p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
       <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
         <span className="shrink-0 mt-0.5 text-[#D0A65E]">{HEADER_ICON[metric]}</span>
         <span className="min-w-0 flex-1">The 4BYO Climate Spiral – {regionName}</span>
@@ -843,7 +906,7 @@ export default function ClimateSpiralCard({
               </>
             )}
           </div>
-          <div className="relative w-full max-w-[760px] mx-auto">
+          <div className="relative w-full max-w-[920px] mx-auto">
             {/* Playback stats strip — when the playhead is active, replaces
                  the small year chip with a full HUD: prominent year,
                  anomaly/temp/rain/sun/frost mini-cards, ENSO state and a
@@ -886,6 +949,13 @@ export default function ClimateSpiralCard({
                   })()
                 : null;
               const enso = ensoForYear(displayYear);
+              // Prefer live ONI for the displayed year; fall back to the
+              // strength-bucket approximation for older years where we
+              // don't have monthly ONI data baked in.
+              const liveOni = oniByYear.get(displayYear);
+              const ensoAnom = liveOni !== undefined
+                ? liveOni
+                : (enso && enso.state !== 'Neutral' ? approxOniForStrength(enso.state, enso.strength) : null);
               const isRecord = displayYear === recordYear || displayYear === oppositeYear;
               const recordLabel = displayYear === recordYear ? palette.highWord : palette.lowWord;
               const recordColor = displayYear === recordYear ? palette.high : palette.low;
@@ -906,8 +976,8 @@ export default function ClimateSpiralCard({
                 </div>
               );
               return (
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 z-10 pointer-events-none">
-                  <div className="rounded-xl border border-[#D0A65E]/45 bg-[#0b0e16]/85 backdrop-blur-md px-3 py-2 shadow-2xl">
+                <div className="absolute left-1/2 -translate-x-1/2 top-0 z-10 pointer-events-none w-[calc(100%-0.5rem)] max-w-[920px]">
+                  <div className="rounded-xl border border-[#D0A65E]/45 bg-[#0b0e16]/90 px-3 py-2 shadow-2xl">
                     <div className="flex items-baseline gap-3">
                       <div className="font-mono font-black tabular-nums text-2xl sm:text-3xl text-[#D0A65E] leading-none drop-shadow">
                         {displayYear}
@@ -925,11 +995,13 @@ export default function ClimateSpiralCard({
                       )}
                       {enso && enso.state !== 'Neutral' && (
                         <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${ensoCls}`}>
-                          {enso.state}{enso.strength ? ` · ${enso.strength}` : ''}
+                          {enso.state}{enso.strength ? ` · ${enso.strength}` : ''}{ensoAnom !== null ? ` · ONI ${ensoAnom >= 0 ? '+' : ''}${ensoAnom.toFixed(1)}°C` : ''}
                         </span>
                       )}
                       {enso && enso.state === 'Neutral' && (
-                        <span className="rounded-full border border-gray-700 bg-gray-900/40 px-2 py-0.5 text-[10px] text-gray-400">ENSO neutral</span>
+                        <span className="rounded-full border border-gray-700 bg-gray-900/40 px-2 py-0.5 text-[10px] text-gray-400">
+                          ENSO neutral{liveOni !== undefined ? ` · ONI ${liveOni >= 0 ? '+' : ''}${liveOni.toFixed(1)}°C` : ''}
+                        </span>
                       )}
                     </div>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -1153,8 +1225,29 @@ export default function ClimateSpiralCard({
                   return (
                     <g>
                       <g opacity={0.38}>
-                        {/* Winter (always-cold half, ice blue) */}
-                        <path d={wedgePath(monthAngle(newAutumn), monthAngle(newSpring))} fill="#7DD3FC" />
+                        {/* Winter (always-cold half) — gradient sub-wedges
+                             so the middle of winter reads as the coldest
+                             point, easing back to the boundary tone at
+                             either end. Coldest = deep navy #1e3a8a. */}
+                        {(() => {
+                          let span = monthAngle(newSpring) - monthAngle(newAutumn);
+                          while (span <= 0) span += Math.PI * 2;
+                          const aStart = monthAngle(newAutumn);
+                          const N = 18;
+                          const winterMid = '#1e3a8a';
+                          const winterEdge = '#7DD3FC';
+                          return Array.from({ length: N }, (_, i) => {
+                            const t0 = i / N;
+                            const t1 = (i + 1) / N;
+                            const tMid = (t0 + t1) / 2;
+                            // 0 at middle of winter (tMid=0.5), 1 at the edges
+                            const distFromMid = Math.abs(tMid - 0.5) * 2;
+                            const col = lerpHex(winterMid, winterEdge, distFromMid);
+                            const a1 = aStart + span * t0;
+                            const a2 = aStart + span * t1;
+                            return <path key={`win-${i}`} d={wedgePath(a1, a2)} fill={col} />;
+                          });
+                        })()}
                         {/* Crescent: months that used to be winter, now spring.
                              Light fresh green — same family as the spring
                              marker dots, lighter than the gradient core.
@@ -1183,7 +1276,7 @@ export default function ClimateSpiralCard({
                       {/* Season labels — bright and bold so they stay
                           legible over the tinted wedges. */}
                       {labels.map((l) => {
-                        const [lx, ly] = polar(R_OUTER * 0.72, l.mid);
+                        const [lx, ly] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 22, l.mid);
                         return (
                           <text
                             key={`slab-${l.key}`}
@@ -1221,7 +1314,7 @@ export default function ClimateSpiralCard({
                     </g>
                     {bounds.map((s) => {
                       const ang = labelAngle(s.start, s.end);
-                      const [lx, ly] = polar(R_OUTER * 0.72, ang);
+                      const [lx, ly] = polar(R_LABEL + R_LABEL_BAND_W / 2 + 22, ang);
                       return (
                         <text
                           key={`slab-${s.season}`}
@@ -1332,7 +1425,7 @@ export default function ClimateSpiralCard({
                     key={`bg-${y}`}
                     d={smoothClosedPath(project3D(pts, y))}
                     fill="none"
-                    stroke={yearColor(y, minYear, maxYear, 0.32 * lineAlpha, palette.high)}
+                    stroke={yearColor(y, minYear, maxYear, bgAlpha, palette.high)}
                     strokeWidth={0.7}
                   />
                 );
@@ -1350,7 +1443,7 @@ export default function ClimateSpiralCard({
                       key={`hi-${y}`}
                       d={smoothClosedPath(project3D(pts, y))}
                       fill="none"
-                      stroke={yearColor(y, minYear, maxYear, 0.85 * lineAlpha, palette.high)}
+                      stroke={yearColor(y, minYear, maxYear, hiAlpha, palette.high)}
                       strokeWidth={1.4}
                     />
                   );
@@ -1360,7 +1453,7 @@ export default function ClimateSpiralCard({
                    redundant with the 0° tick circle drawn earlier. Drawing it
                    anyway would imply “the baseline shape changes” which is
                    misleading (it can’t — it’s being subtracted from itself). */}
-              {!anomaly && meanBaseline.every(Number.isFinite) && (() => {
+              {!anomaly && showBaselineRing && meanBaseline.every(Number.isFinite) && (() => {
                 const pts: [number, number][] = meanBaseline.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
                 // Baseline ring sits at z corresponding to the midpoint of
                 // its window, so in 3D it floats at the right height.
@@ -1397,7 +1490,7 @@ export default function ClimateSpiralCard({
 
               {/* Recent decade ring — vivid crimson, tight dash. Heaviest
                    of the three so it dominates "now". */}
-              {meanRecent.every(Number.isFinite) && (() => {
+              {showRecentRing && meanRecent.every(Number.isFinite) && (() => {
                 const pts: [number, number][] = meanRecent.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
                 const recentMid = (recentFrom + recentTo) / 2;
                 return (
@@ -1574,6 +1667,24 @@ export default function ClimateSpiralCard({
                         />
                       );
                     })}
+                    {/* Pulsing month-marker — only during the month-by-
+                         month finale of playback. Anchored at the latest
+                         drawn point so the eye is led to where the spiral
+                         is currently extending. */}
+                    {playYear === currentYear && playMonth !== null && provPts.length > 0 && (() => {
+                      const last = provPts[provPts.length - 1];
+                      const [x, y] = polar(last.r, monthAngle(last.m));
+                      const [px, py] = proj(x, y);
+                      return (
+                        <g key="play-marker" pointerEvents="none">
+                          <circle cx={px} cy={py} r={11} fill={palette.current} opacity={0.18}>
+                            <animate attributeName="r" values="11;18;11" dur="1.2s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.35;0.05;0.35" dur="1.2s" repeatCount="indefinite" />
+                          </circle>
+                          <circle cx={px} cy={py} r={6} fill={palette.current} stroke="#FFF5E7" strokeWidth={1.4} />
+                        </g>
+                      );
+                    })()}
                   </g>
                 );
               })()}
@@ -1614,45 +1725,62 @@ export default function ClimateSpiralCard({
 
               {/* Month-label background "track" — a faint band giving the
                    month names a visible home so they no longer float in
-                   space. */}
-              <circle
-                cx={CX} cy={CY} r={R_LABEL}
-                fill="none"
-                stroke="rgba(255,255,255,0.05)"
-                strokeWidth={R_LABEL_BAND_W}
-              />
-              <circle
-                cx={CX} cy={CY} r={R_LABEL - R_LABEL_BAND_W / 2}
-                fill="none"
-                stroke="rgba(255,255,255,0.10)"
-                strokeWidth={0.6}
-              />
-              <circle
-                cx={CX} cy={CY} r={R_LABEL + R_LABEL_BAND_W / 2}
-                fill="none"
-                stroke="rgba(255,255,255,0.10)"
-                strokeWidth={0.6}
-              />
-
-              {/* Month labels (outside the rings) */}
-              {Array.from({ length: 12 }, (_, m) => {
-                const ang = monthAngle(m);
-                const [x, y] = polar(R_LABEL, ang);
+                   space. In 3D mode we tilt the whole label group with
+                   the same oblique projection as the spaghetti so the
+                   month ring still reads as the rim of the chart. */}
+              {(() => {
+                // Match `project3D` constants so the labels line up with
+                // the top of the year-stack (current year is at the top
+                // of the spiral in 3D mode).
+                const cosTilt = 0.55;
+                const dz = 220 / Math.max(1, maxYear - minYear);
+                const zTop = (maxYear - minYear) * dz;
+                const tilt = view3D
+                  ? `matrix(1 0 0 ${cosTilt} 0 ${(CY * (1 - cosTilt) - zTop).toFixed(2)})`
+                  : undefined;
                 return (
-                  <text
-                    key={`mlab-${m}`}
-                    x={x} y={y}
-                    fontSize={13}
-                    fontWeight={600}
-                    fill="rgba(220,225,235,0.92)"
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontFamily="ui-monospace, monospace"
-                  >
-                    {MONTH_LABELS[m]}
-                  </text>
+                  <g transform={tilt}>
+                    <circle
+                      cx={CX} cy={CY} r={R_LABEL}
+                      fill="none"
+                      stroke="rgba(255,255,255,0.05)"
+                      strokeWidth={R_LABEL_BAND_W}
+                    />
+                    <circle
+                      cx={CX} cy={CY} r={R_LABEL - R_LABEL_BAND_W / 2}
+                      fill="none"
+                      stroke="rgba(255,255,255,0.10)"
+                      strokeWidth={0.6}
+                    />
+                    <circle
+                      cx={CX} cy={CY} r={R_LABEL + R_LABEL_BAND_W / 2}
+                      fill="none"
+                      stroke="rgba(255,255,255,0.10)"
+                      strokeWidth={0.6}
+                    />
+
+                    {/* Month labels (outside the rings) */}
+                    {Array.from({ length: 12 }, (_, m) => {
+                      const ang = monthAngle(m);
+                      const [x, y] = polar(R_LABEL, ang);
+                      return (
+                        <text
+                          key={`mlab-${m}`}
+                          x={x} y={y}
+                          fontSize={13}
+                          fontWeight={600}
+                          fill="rgba(220,225,235,0.92)"
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontFamily="ui-monospace, monospace"
+                        >
+                          {MONTH_LABELS[m]}
+                        </text>
+                      );
+                    })}
+                  </g>
                 );
-              })}
+              })()}
 
               {/* Season-crossing call-outs.
                    Two consolidated groups: "Spring starts" and "Autumn ends",
@@ -1669,11 +1797,12 @@ export default function ClimateSpiralCard({
                 const last = crossingDecades[crossingDecades.length - 1];
                 const r10 = valueToR(SHIFT_THRESHOLD, 3);
                 if (!Number.isFinite(r10) || r10 <= 0) return null;
-                // Cool-blue for the oldest decade, warm-coral for the newest
-                // — matches the year-colour ramp used in the spaghetti
-                // background.
-                const oldCol = '#7DA8E8';
-                const newCol = '#FCA5A5';
+                // Match the shifting-seasons map palette: cool blue
+                // (#2166ac) for the older decade, warm red (#b2182b)
+                // for the newer decade. Same diverging stops as the
+                // global-shift-map so the two views speak one language.
+                const oldCol = '#2166ac';
+                const newCol = '#b2182b';
                 // All call-out furniture lives *outside* the month-label
                 // band so it never overlaps month names or the spaghetti
                 // lines. Dots stay on the 10°C ring; leaders cross the
@@ -1723,7 +1852,7 @@ export default function ClimateSpiralCard({
                       {/* consolidated header pill — "Spring starts" with
                            shift in days. Positioned even further out so it
                            doesn't fight with the year pills. */}
-                      <rect x={hx - 64} y={hy - 13} width={128} height={28} rx={6} fill="rgba(10,14,22,0.88)" stroke="rgba(255,255,255,0.18)" strokeWidth={0.8} />
+                      <rect x={hx - 48} y={hy - 13} width={96} height={28} rx={6} fill="rgba(10,14,22,0.88)" stroke="rgba(255,255,255,0.18)" strokeWidth={0.8} />
                       <text x={hx} y={hy - 2} fontSize={11} fontWeight={700} fill="rgba(245,245,245,0.95)" textAnchor="middle" fontFamily="ui-monospace, monospace">
                         {header}
                       </text>
@@ -1809,15 +1938,111 @@ export default function ClimateSpiralCard({
             })()}
           </div>
 
-          {/* Controls — all chart-view toggles in a single mobile-friendly
-               grouped panel that visually echoes the Compare-periods box
-               below. Each toggle is a chip with the same dimensions as the
-               metric chips above so the two surfaces line up. Presets get
-               their own row but use the same chip style. */}
+          {/* Playback bar — sits *directly below* the chart so it reads
+               as a media-player control attached to the visualisation
+               (rather than buried inside the View-controls panel). Step
+               buttons let the user scrub year-by-year (or month-by-month
+               in the finale window) without restarting the animation. */}
+          <div className="mt-3 rounded-xl border border-[#D0A65E]/40 bg-[#0b0e16] p-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setPlaying(false);
+                // In the month-by-month finale, step a month back; otherwise step a year.
+                if (playYear === currentYear && playMonth !== null) {
+                  if (playMonth > 0) setPlayMonth(playMonth - 1);
+                  else { setPlayMonth(null); setPlayYear(currentYear - 1); }
+                } else {
+                  const cur = playYear ?? effectiveFromYear;
+                  setPlayYear(Math.max(effectiveFromYear, cur - 1));
+                  setPlayMonth(null);
+                }
+              }}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} h-9 px-3`}
+              title="Step one year (or month, in the finale) back"
+              aria-label="Step back"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5L9 12l11 7V5z"/></svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (playing) { setPlaying(false); return; }
+                if (playYear === null || (playYear >= currentYear && playMonth !== null && playMonth >= (latestRealMonthIdx >= 0 ? latestRealMonthIdx : 11))) {
+                  setPlayYear(effectiveFromYear - 1);
+                  setPlayMonth(null);
+                }
+                setPlaying(true);
+              }}
+              className={`${TOGGLE_BASE} h-9 px-4 font-semibold ${playing ? '' : ''}`}
+              style={playing
+                ? { borderColor: '#D0A65E', background: '#D0A65E22', color: '#FFF5E7' }
+                : { borderColor: '#D0A65E', background: '#D0A65E', color: '#0b0e16' }}
+              aria-label={playing ? 'Pause animation' : 'Play animation'}
+            >
+              {playing ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg>
+              )}
+              {playing ? 'Pause' : (playYear !== null && playYear < currentYear ? 'Resume' : 'Play')}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPlaying(false);
+                // In the month-by-month finale, step a month forward; otherwise step a year.
+                if (playYear === currentYear && playMonth !== null) {
+                  const lastM = latestRealMonthIdx >= 0 ? latestRealMonthIdx : 11;
+                  if (playMonth < lastM) setPlayMonth(playMonth + 1);
+                } else {
+                  const cur = playYear ?? (effectiveFromYear - 1);
+                  if (cur >= currentYear - 1) { setPlayYear(currentYear); setPlayMonth(0); }
+                  else { setPlayYear(cur + 1); setPlayMonth(null); }
+                }
+              }}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} h-9 px-3`}
+              title="Step one year (or month, in the finale) forward"
+              aria-label="Step forward"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 5l11 7-11 7zM16 5h2v14h-2z"/></svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setPlaying(false); setPlayYear(null); setPlayMonth(null); }}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} h-9 px-3`}
+              title="Stop playback and show the full chart"
+              disabled={playYear === null && !playing}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+              Reset
+            </button>
+            <div className="flex items-center gap-2 ml-1">
+              <span className="text-[10px] uppercase tracking-wider text-gray-500">Speed</span>
+              <input
+                type="range"
+                min={2}
+                max={32}
+                step={1}
+                value={playSpeed}
+                onChange={(e) => setPlaySpeed(Number(e.target.value))}
+                className="accent-[#D0A65E] w-24"
+                aria-label="Playback speed (years per second)"
+              />
+              <span className="font-mono text-[11px] text-[#FFF5E7] min-w-[3ch]">{playSpeed}×</span>
+            </div>
+            {playYear !== null && (
+              <span className="font-mono text-[12px] text-[#D0A65E] ml-auto tabular-nums">
+                {Math.max(effectiveFromYear, playYear)}{playYear === currentYear && playMonth !== null ? `-${String(playMonth + 1).padStart(2, '0')}` : ''} / {currentYear}
+              </span>
+            )}
+          </div>
+
+          {/* Controls — view toggles grouped into clear sections (Lines /
+               Means / Seasons / Mode) so the chip soup is easier to
+               scan. The From-year + Spaghetti-boost sliders live at the
+               top of the panel; Presets sit beneath the toggle groups. */}
           <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3 space-y-3">
-            {/* From-year slider — uses the same DualRangeSlider-style track
-                 so it visually unifies with the Compare-periods sliders
-                 below. */}
             <div className="flex flex-wrap items-center gap-3 text-[12px] text-gray-300">
               <span className="uppercase tracking-wider text-[10px] text-gray-500">From</span>
               <div className="w-28 sm:w-36">
@@ -1831,7 +2056,7 @@ export default function ClimateSpiralCard({
                 />
               </div>
               <span className="font-mono text-[#FFF5E7] min-w-[3ch]">{effectiveFromYear}</span>
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 ml-2">Spaghetti</span>
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 ml-2">Spaghetti boost</span>
               <div className="w-24 sm:w-28">
                 <SingleRangeSlider
                   min={0}
@@ -1842,18 +2067,26 @@ export default function ClimateSpiralCard({
                   accent={palette.high}
                 />
               </div>
-              <span className="font-mono text-[#FFF5E7] min-w-[3ch] tabular-nums">{Math.round(lineAlpha * 100)}%</span>
+              <span className="font-mono text-[#FFF5E7] min-w-[3ch] tabular-nums">+{Math.round(lineAlpha * 100)}%</span>
             </div>
 
-            {/* View toggles — chip style, wraps cleanly on mobile */}
+            {/* Mode — anomaly toggle + 3D promotion. Sits at the top of
+                 the toggle stack so the user finds 3D immediately. */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">View</span>
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Mode</span>
               <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
                 Anomaly <span className="text-[10px] text-gray-400">vs {baselineFrom}–{baselineTo}</span>
               </ChipToggle>
               <ChipToggle active={view3D} onChange={setView3D} color="#A78BFA">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></svg>
                 3D <span className="text-[10px] text-gray-400">height = time</span>
               </ChipToggle>
+            </div>
+
+            {/* Lines — per-year spaghetti + the highlighted recent decade
+                 + the warmest/coldest year rings. */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Lines</span>
               <ChipToggle active={showSpaghetti} onChange={setShowSpaghetti} color={palette.high}>
                 Year spaghetti
               </ChipToggle>
@@ -1866,6 +2099,29 @@ export default function ClimateSpiralCard({
               <ChipToggle active={showRecordLow} onChange={setShowRecordLow} color={palette.low}>
                 {palette.lowWord} year
               </ChipToggle>
+            </div>
+
+            {/* Means — dashed reference rings. Baseline only meaningful
+                 in absolute mode; modern always available. */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Means</span>
+              {!anomaly && (
+                <ChipToggle active={showBaselineRing} onChange={setShowBaselineRing} color="#9CA3AF">
+                  Baseline ring <span className="text-[10px] text-gray-400">{baselineFrom}–{baselineTo}</span>
+                </ChipToggle>
+              )}
+              <ChipToggle active={showRecentRing} onChange={setShowRecentRing} color={palette.current}>
+                Modern ring <span className="text-[10px] text-gray-400">{recentFrom}–{recentTo}</span>
+              </ChipToggle>
+              <ChipToggle active={showHistoric} onChange={setShowHistoric} color="#94A3B8">
+                Historic ring <span className="text-[10px] text-gray-400">{historicFrom}–{historicTo}</span>
+              </ChipToggle>
+            </div>
+
+            {/* Seasons — tints, shift trail, Paris rings. Hidden cleanly
+                 when the relevant metric/mode doesn't support them. */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Seasons</span>
               <ChipToggle active={showSeasons} onChange={setShowSeasons} color="#86EFAC">
                 Season tints
               </ChipToggle>
@@ -1885,8 +2141,8 @@ export default function ClimateSpiralCard({
             </div>
 
             {/* Presets — one-click chart configurations to tell a specific story */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">Presets</span>
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-gray-800/70">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 w-12">Presets</span>
               <button
                 type="button"
                 onClick={() => {
@@ -1938,6 +2194,8 @@ export default function ClimateSpiralCard({
                   setShowRecordLow(true);
                   setShowParis(metric === 'temp');
                   setShowHistoric(false);
+                  setShowBaselineRing(true);
+                  setShowRecentRing(true);
                   setBaselineRange(defaultBaselineRange);
                   setRecentRange(defaultRecentRange);
                   setHistoricRange(defaultHistoricRange);
@@ -1947,61 +2205,6 @@ export default function ClimateSpiralCard({
               >
                 Default view
               </button>
-            </div>
-
-            {/* Playback — animate the chart year-by-year from the start
-                 year up to the present, watching the spaghetti, means and
-                 season-shift trail build up live. */}
-            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-gray-800/70">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1">Play</span>
-              <button
-                type="button"
-                onClick={() => {
-                  if (playing) { setPlaying(false); return; }
-                  // If finished or unstarted, rewind first.
-                  if (playYear === null || (playYear >= currentYear && playMonth !== null && playMonth >= 11)) {
-                    setPlayYear(effectiveFromYear - 1);
-                    setPlayMonth(null);
-                  }
-                  setPlaying(true);
-                }}
-                className={`${TOGGLE_BASE} ${playing ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-                aria-label={playing ? 'Pause animation' : 'Play animation'}
-              >
-                {playing ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
-                ) : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg>
-                )}
-                {playing ? 'Pause' : (playYear !== null && playYear < currentYear ? 'Resume' : 'Play')}
-              </button>
-              <button
-                type="button"
-                onClick={() => { setPlaying(false); setPlayYear(null); setPlayMonth(null); }}
-                className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE}`}
-                title="Stop playback and show the full chart"
-                disabled={playYear === null && !playing}
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
-                Reset
-              </button>
-              <span className="text-[10px] text-gray-500 ml-1">Speed</span>
-              <input
-                type="range"
-                min={2}
-                max={32}
-                step={1}
-                value={playSpeed}
-                onChange={(e) => setPlaySpeed(Number(e.target.value))}
-                className="accent-[#D0A65E] w-24"
-                aria-label="Playback speed (years per second)"
-              />
-              <span className="font-mono text-[11px] text-[#FFF5E7] min-w-[3ch]">{playSpeed}×</span>
-              {playYear !== null && (
-                <span className="font-mono text-[11px] text-[#D0A65E] ml-1 tabular-nums">
-                  {Math.max(effectiveFromYear, playYear)}{playYear === currentYear && playMonth !== null ? `-${String(playMonth + 1).padStart(2, '0')}` : ''} / {currentYear}
-                </span>
-              )}
             </div>
           </div>
 
