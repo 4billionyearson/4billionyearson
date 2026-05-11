@@ -9951,15 +9951,10 @@
   "soi": {
     "latest": {
       "year": 2026,
-      "month": 3,
-      "value": 1.2
+      "month": 4,
+      "value": -0.6
     },
     "history": [
-      {
-        "year": 2006,
-        "month": 4,
-        "value": 1.1
-      },
       {
         "year": 2006,
         "month": 5,
@@ -11154,6 +11149,11 @@
         "year": 2026,
         "month": 3,
         "value": 1.2
+      },
+      {
+        "year": 2026,
+        "month": 4,
+        "value": -0.6
       }
     ]
   },
@@ -12447,5 +12447,5 @@
     "metOfficeImpactLaNinaTemp": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-temp.jpg",
     "metOfficeImpactLaNinaPrecip": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-precip.jpg"
   },
-  "generatedAt": "2026-05-05T05:10:20.631Z"
+  "generatedAt": "2026-05-11T05:30:42.734Z"
 }

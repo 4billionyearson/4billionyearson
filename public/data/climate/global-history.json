@@ -12246,24 +12246,14 @@
       "unit": "ppm",
       "latest": {
         "year": 2026,
-        "month": 2,
-        "value": 429.35
+        "month": 4,
+        "value": 431.12
       },
-      "yoy": 2.26,
-      "tenYr": 25.1,
+      "yoy": 1.48,
+      "tenYr": 23.52,
       "preindustrial": 280,
-      "vsPreindustrialPct": 53.34,
+      "vsPreindustrialPct": 53.97,
       "sparkline": [
-        {
-          "year": 2021,
-          "month": 3,
-          "value": 417.61
-        },
-        {
-          "year": 2021,
-          "month": 4,
-          "value": 419.01
-        },
         {
           "year": 2021,
           "month": 5,
@@ -12553,6 +12543,16 @@
           "year": 2026,
           "month": 2,
           "value": 429.35
+        },
+        {
+          "year": 2026,
+          "month": 3,
+          "value": 430.15
+        },
+        {
+          "year": 2026,
+          "month": 4,
+          "value": 431.12
         }
       ]
     },
@@ -12560,29 +12560,19 @@
       "label": "Methane",
       "unit": "ppb",
       "latest": {
-        "year": 2025,
-        "month": 11,
-        "value": 1945.85
+        "year": 2026,
+        "month": 1,
+        "value": 1940.43
       },
-      "yoy": 5.85,
-      "tenYr": 101.31,
+      "yoy": 4.94,
+      "tenYr": 97.96,
       "preindustrial": 722,
-      "vsPreindustrialPct": 169.51,
+      "vsPreindustrialPct": 168.76,
       "sparkline": [
-        {
-          "year": 2020,
-          "month": 12,
-          "value": 1890.97
-        },
-        {
-          "year": 2021,
-          "month": 1,
-          "value": 1888.62
-        },
         {
           "year": 2021,
           "month": 2,
-          "value": 1886.66
+          "value": 1886.64
         },
         {
           "year": 2021,
@@ -12592,12 +12582,12 @@
         {
           "year": 2021,
           "month": 4,
-          "value": 1890.8
+          "value": 1890.82
         },
         {
           "year": 2021,
           "month": 5,
-          "value": 1891.28
+          "value": 1891.27
         },
         {
           "year": 2021,
@@ -12607,12 +12597,12 @@
         {
           "year": 2021,
           "month": 7,
-          "value": 1885.99
+          "value": 1886
         },
         {
           "year": 2021,
           "month": 8,
-          "value": 1892.32
+          "value": 1892.31
         },
         {
           "year": 2021,
@@ -12622,27 +12612,27 @@
         {
           "year": 2021,
           "month": 10,
-          "value": 1907.92
+          "value": 1907.93
         },
         {
           "year": 2021,
           "month": 11,
-          "value": 1909.23
+          "value": 1909.22
         },
         {
           "year": 2021,
           "month": 12,
-          "value": 1907.95
+          "value": 1907.96
         },
         {
           "year": 2022,
           "month": 1,
-          "value": 1906.33
+          "value": 1906.34
         },
         {
           "year": 2022,
           "month": 2,
-          "value": 1906.42
+          "value": 1906.4
         },
         {
           "year": 2022,
@@ -12652,27 +12642,27 @@
         {
           "year": 2022,
           "month": 4,
-          "value": 1908.84
+          "value": 1908.86
         },
         {
           "year": 2022,
           "month": 5,
-          "value": 1907.49
+          "value": 1907.48
         },
         {
           "year": 2022,
           "month": 6,
-          "value": 1904.83
+          "value": 1904.82
         },
         {
           "year": 2022,
           "month": 7,
-          "value": 1904
+          "value": 1904.01
         },
         {
           "year": 2022,
           "month": 8,
-          "value": 1908.32
+          "value": 1908.31
         },
         {
           "year": 2022,
@@ -12682,7 +12672,7 @@
         {
           "year": 2022,
           "month": 10,
-          "value": 1919.46
+          "value": 1919.47
         },
         {
           "year": 2022,
@@ -12692,17 +12682,17 @@
         {
           "year": 2022,
           "month": 12,
-          "value": 1922.02
+          "value": 1922.07
         },
         {
           "year": 2023,
           "month": 1,
-          "value": 1919.9
+          "value": 1919.94
         },
         {
           "year": 2023,
           "month": 2,
-          "value": 1918.93
+          "value": 1918.91
         },
         {
           "year": 2023,
@@ -12712,7 +12702,7 @@
         {
           "year": 2023,
           "month": 4,
-          "value": 1919.7
+          "value": 1919.73
         },
         {
           "year": 2023,
@@ -12722,22 +12712,22 @@
         {
           "year": 2023,
           "month": 6,
-          "value": 1915.05
+          "value": 1915.04
         },
         {
           "year": 2023,
           "month": 7,
-          "value": 1912.94
+          "value": 1912.95
         },
         {
           "year": 2023,
           "month": 8,
-          "value": 1916.7
+          "value": 1916.68
         },
         {
           "year": 2023,
           "month": 9,
-          "value": 1924.38
+          "value": 1924.37
         },
         {
           "year": 2023,
@@ -12747,42 +12737,42 @@
         {
           "year": 2023,
           "month": 11,
-          "value": 1931.55
+          "value": 1931.54
         },
         {
           "year": 2023,
           "month": 12,
-          "value": 1931.15
+          "value": 1931.16
         },
         {
           "year": 2024,
           "month": 1,
-          "value": 1928.22
+          "value": 1928.2
         },
         {
           "year": 2024,
           "month": 2,
-          "value": 1925.73
+          "value": 1925.55
         },
         {
           "year": 2024,
           "month": 3,
-          "value": 1927.15
+          "value": 1926.94
         },
         {
           "year": 2024,
           "month": 4,
-          "value": 1928.55
+          "value": 1928.48
         },
         {
           "year": 2024,
           "month": 5,
-          "value": 1925.56
+          "value": 1925.55
         },
         {
           "year": 2024,
           "month": 6,
-          "value": 1921.35
+          "value": 1921.34
         },
         {
           "year": 2024,
@@ -12792,82 +12782,92 @@
         {
           "year": 2024,
           "month": 8,
-          "value": 1924.85
+          "value": 1924.82
         },
         {
           "year": 2024,
           "month": 9,
-          "value": 1934.31
+          "value": 1934.25
         },
         {
           "year": 2024,
           "month": 10,
-          "value": 1940.75
+          "value": 1940.74
         },
         {
           "year": 2024,
           "month": 11,
-          "value": 1940
+          "value": 1940.07
         },
         {
           "year": 2024,
           "month": 12,
-          "value": 1937.41
+          "value": 1937.57
         },
         {
           "year": 2025,
           "month": 1,
-          "value": 1935.39
+          "value": 1935.49
         },
         {
           "year": 2025,
           "month": 2,
-          "value": 1933.83
+          "value": 1933.74
         },
         {
           "year": 2025,
           "month": 3,
-          "value": 1933.64
+          "value": 1933.53
         },
         {
           "year": 2025,
           "month": 4,
-          "value": 1934.48
+          "value": 1934.51
         },
         {
           "year": 2025,
           "month": 5,
-          "value": 1933.03
+          "value": 1933.1
         },
         {
           "year": 2025,
           "month": 6,
-          "value": 1928.79
+          "value": 1928.83
         },
         {
           "year": 2025,
           "month": 7,
-          "value": 1926.54
+          "value": 1926.36
         },
         {
           "year": 2025,
           "month": 8,
-          "value": 1930.61
+          "value": 1930.19
         },
         {
           "year": 2025,
           "month": 9,
-          "value": 1939.45
+          "value": 1939.16
         },
         {
           "year": 2025,
           "month": 10,
-          "value": 1946.16
+          "value": 1945.97
         },
         {
           "year": 2025,
           "month": 11,
-          "value": 1945.85
+          "value": 1945.97
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "value": 1942.36
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "value": 1940.43
         }
       ]
     },
@@ -12875,25 +12875,15 @@
       "label": "Nitrous oxide",
       "unit": "ppb",
       "latest": {
-        "year": 2025,
-        "month": 11,
-        "value": 339.46
+        "year": 2026,
+        "month": 1,
+        "value": 339.72
       },
-      "yoy": 1.38,
+      "yoy": 1.28,
       "tenYr": 10.85,
       "preindustrial": 270,
-      "vsPreindustrialPct": 25.73,
+      "vsPreindustrialPct": 25.82,
       "sparkline": [
-        {
-          "year": 2020,
-          "month": 12,
-          "value": 333.76
-        },
-        {
-          "year": 2021,
-          "month": 1,
-          "value": 333.88
-        },
         {
           "year": 2021,
           "month": 2,
@@ -13152,7 +13142,7 @@
         {
           "year": 2025,
           "month": 5,
-          "value": 338.64
+          "value": 338.65
         },
         {
           "year": 2025,
@@ -13167,7 +13157,7 @@
         {
           "year": 2025,
           "month": 8,
-          "value": 338.88
+          "value": 338.87
         },
         {
           "year": 2025,
@@ -13177,12 +13167,22 @@
         {
           "year": 2025,
           "month": 10,
-          "value": 339.21
+          "value": 339.2
         },
         {
           "year": 2025,
           "month": 11,
-          "value": 339.46
+          "value": 339.47
+        },
+        {
+          "year": 2025,
+          "month": 12,
+          "value": 339.65
+        },
+        {
+          "year": 2026,
+          "month": 1,
+          "value": 339.72
         }
       ]
     }
@@ -36375,7 +36375,7 @@
     "plus2_0": 15.5
   },
   "lastUpdated": "2026-05-v9",
-  "generatedAt": "2026-05-05T07:53:32.021Z",
+  "generatedAt": "2026-05-11T05:30:37.093Z",
   "sources": [
     {
       "label": "NOAA Climate at a Glance — Global Land+Ocean",
