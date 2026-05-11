@@ -889,7 +889,7 @@ export default async function ClimateGroupProfile({
               </div>
             )}
             {region.isAggregate ? (
-              <p className="mb-3 text-xs text-amber-200/80 flex items-start gap-1.5">
+              <p className="mt-2 mb-3 text-xs text-amber-200/80 flex items-start gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" />
                 <span>
                   This is a 4BYO aggregate. NOAA does not publish a standalone continental land series for {region.name},
