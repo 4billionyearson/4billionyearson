@@ -69,7 +69,14 @@ export default function PlugInSolarGuide({
   /** From Vercel geo — same as book pages for Amazon Associates. */
   countryCode: string;
 }) {
-  if (cacheMiss) {
+  // Cold-start only: show the full-page notice when we have NO usable
+  // data at all. When `cacheMiss` is true but `data` is non-null we have
+  // a stale-cache fallback (yesterday's payload or older) — that's the
+  // normal stale-while-revalidate path, so we render the whole page
+  // silently and let the LastUpdatedBadge in the hero tell users when
+  // it was last refreshed. The background warm-up still runs from
+  // page.tsx, so a hard refresh in a couple of minutes shows fresh data.
+  if (data == null) {
     return (
       <main className="min-h-[65vh] flex flex-col justify-center font-sans text-gray-200">
         <div className="container mx-auto px-4 max-w-lg w-full py-12">
@@ -78,7 +85,7 @@ export default function PlugInSolarGuide({
           </h1>
           <DailyRefreshNotice
             cacheMiss={cacheMiss}
-            hasPayload={data != null}
+            hasPayload={false}
             source={payloadSource}
           />
         </div>
@@ -369,7 +376,11 @@ export default function PlugInSolarGuide({
 
           {/* ─── News feed ─── */}
           <Section icon={<Newspaper className="h-5 w-5" />} title="Latest UK plug-in solar news" id="news">
-            <NewsFeed items={data?.news} />
+            <NewsFeed
+              items={data?.news}
+              source={data?.newsSource}
+              generatedAt={data?.newsGeneratedAt}
+            />
           </Section>
 
           {/* ─── FAQ ─── */}

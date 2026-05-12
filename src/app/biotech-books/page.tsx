@@ -212,7 +212,7 @@ export default async function BiotechBooksPage() {
     "@context": "https://schema.org",
     "@type": "ItemList",
     "itemListElement": BOOKS.map((book, index) => ({
-      "@type": "Product",
+      "@type": "Book",
       "position": index + 1,
       "name": book.title,
       "author": { "@type": "Person", "name": book.author }

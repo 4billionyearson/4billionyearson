@@ -170,7 +170,7 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('');
   lines.push('  changeLog: array of 0-5 entries describing what has actually changed since the previous cache (passed to you below). Each entry: { date (YYYY-MM-DD = today), summary (max 140 chars) }. If nothing has materially changed, return an empty array. DO NOT FABRICATE CHANGES.');
   lines.push('');
-  lines.push('  news: array of 5-10 recent news items relevant to UK plug-in solar in the last 14 days. Each: { date (YYYY-MM-DD), headline (max 100 chars), summary (1-2 sentences, max 240 chars), sourceTitle, sourceUrl (absolute https) }. Sort newest first.');
+  lines.push('  news: array of 5-10 recent news items relevant to UK plug-in solar since 16 March 2026 (when the UK government announced legalisation). Prioritise the most recent items but do not omit key milestones (e.g. the 16 March DESNZ announcement, the 15 April BS 7671 Amendment 4 publication) just because they are older than a week. Each: { date (YYYY-MM-DD), headline (max 100 chars), summary (1-2 sentences, max 240 chars), sourceTitle, sourceUrl (absolute https) }. Sort newest first.');
   lines.push('');
   lines.push('  groundingSources: leave empty []; the API route fills this from the Google Search grounding metadata.');
   lines.push('');

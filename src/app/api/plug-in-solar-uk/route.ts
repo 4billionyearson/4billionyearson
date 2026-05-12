@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { getCached, setDailyTerm } from '@/lib/climate/redis';
+import { acquireLock, getCached, releaseLock, setDailyTerm } from '@/lib/climate/redis';
 import {
   FULLY_AVAILABLE_FALLBACK,
   LEGAL_IN_SHOPS_TIMELINE_TITLE,
@@ -59,11 +59,12 @@ function sourcePriority(uri: string): number {
   return 100;
 }
 
-// Shift back by the cron hour (06:00 UTC) so the day boundary aligns with
+// Shift back by the cron hour (09:00 UTC) so the day boundary aligns with
 // when the refresh actually runs, not UTC midnight. Without this, the cache
-// key rolls over at 00:00 UTC and any visitor before 06:00 UTC triggers a
-// premature full refresh.
-const CRON_HOUR_UTC = 6;
+// key rolls over at 00:00 UTC and any visitor before 09:00 UTC triggers a
+// premature full refresh. Cron was moved from 06:00 UTC -> 09:00 UTC because
+// Google Search's grounding index was cold at 06:00, returning empty news.
+const CRON_HOUR_UTC = 9;
 
 function cronAlignedDate(daysAgo = 0): Date {
   const d = new Date(Date.now() - CRON_HOUR_UTC * 60 * 60 * 1000);
@@ -578,6 +579,40 @@ export async function GET(request: Request) {
     );
   }
 
+  // Concurrency guard — the Gemini call routinely takes 2–5 minutes, and
+  // during a cron-driven cache rollover dozens of visitors can fan in to
+  // this route. Without a lock each visitor would fire its own Gemini
+  // call (= cost + rate-limit risk + duplicate writes). We use a Redis
+  // SET NX with a 6-minute TTL so only the first caller does the work;
+  // every other caller falls through to the stale cache below.
+  const refreshLockKey = `${CACHE_KEY_PREFIX}:refresh-lock-${CACHE_VERSION}`;
+  const REFRESH_LOCK_TTL_SECONDS = 6 * 60;
+  const acquired = await acquireLock(refreshLockKey, REFRESH_LOCK_TTL_SECONDS);
+  if (!acquired) {
+    // Another worker is already refreshing — serve the most recent
+    // cached payload so the user doesn't wait behind a duplicate
+    // Gemini call. page.tsx renders this as stale-cache (silent SWR).
+    const stale = await readMostRecentCache();
+    if (stale) {
+      return NextResponse.json({ ...stale, source: 'stale-cache', message: 'Refresh in progress' });
+    }
+    return NextResponse.json(
+      { error: 'Refresh in progress, no cache yet', retryable: true },
+      { status: 503 },
+    );
+  }
+
+  try {
+    return await runRefresh(apiKey, cacheKey);
+  } finally {
+    // Release the lock as soon as the work is done so a manual `?nocache=1`
+    // re-run can fire immediately. If we crash mid-flight the TTL will
+    // expire it within 6 minutes.
+    await releaseLock(refreshLockKey);
+  }
+}
+
+async function runRefresh(apiKey: string, cacheKey: string): Promise<NextResponse> {
   // Use the most recent cached payload (today missed, so this will be
   // yesterday's at best) as the comparison baseline for the change log.
   const previous = await readMostRecentCache();
@@ -687,6 +722,42 @@ export async function GET(request: Request) {
     }
   } catch (err) {
     console.warn('[plug-in-solar-uk] seed scrape threw - keeping Gemini products only:', err);
+  }
+
+  // News fallback: the cron runs at 09:00 UTC, when Google Search's
+  // grounding index is sometimes cold for the current day and Gemini
+  // returns an empty `news` array (or one that gets fully stripped by
+  // URL validation). If we end up with fewer than 3 news items but the
+  // previous cache had usable news, splice the previous payload's news
+  // in so the live page never shows the "News feed regenerating" empty
+  // state for a whole day. Items older than 60 days are dropped.
+  const MIN_NEWS_ITEMS = 3;
+  const NEWS_FALLBACK_MAX_AGE_DAYS = 60;
+  // Default: this run pulled fresh news.
+  parsed.newsSource = 'fresh';
+  parsed.newsGeneratedAt = parsed.generatedAt;
+  if ((parsed.news?.length ?? 0) < MIN_NEWS_ITEMS && Array.isArray(previous?.news)) {
+    const cutoff = Date.now() - NEWS_FALLBACK_MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
+    const existingKeys = new Set(
+      (parsed.news ?? []).map((n) => `${n.date}|${n.headline}`.toLowerCase()),
+    );
+    const fallbackItems = (previous?.news ?? []).filter((n) => {
+      const t = Date.parse(`${n.date}T00:00:00Z`);
+      if (!Number.isFinite(t) || t < cutoff) return false;
+      return !existingKeys.has(`${n.date}|${n.headline}`.toLowerCase());
+    });
+    if (fallbackItems.length > 0) {
+      const before = parsed.news?.length ?? 0;
+      parsed.news = [...(parsed.news ?? []), ...fallbackItems].slice(0, 10);
+      // Mark this payload's news as a fallback and carry through the
+      // original generation timestamp from the previous payload so the
+      // pill on the page reflects when the news was actually pulled.
+      parsed.newsSource = 'fallback';
+      parsed.newsGeneratedAt = previous?.newsGeneratedAt ?? previous?.generatedAt ?? parsed.generatedAt;
+      console.warn(
+        `[plug-in-solar-uk] news fallback: fresh run returned ${before} items, spliced in ${parsed.news.length - before} from previous cache`,
+      );
+    }
   }
 
   // Cache for 24 hours and tell Next.js to invalidate the SSR HTML +

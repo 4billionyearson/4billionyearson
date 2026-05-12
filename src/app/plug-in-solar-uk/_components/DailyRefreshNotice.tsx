@@ -1,14 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Loader2, RefreshCw } from 'lucide-react';
 
-const COUNTDOWN_START = 45;
-
 /**
- * Shown when today's Redis key missed and the page fired a background warm-up.
- * Stale or empty payloads can make pills and prices look wrong until refresh — this
- * sets expectations and offers an explicit reload.
+ * Shown only on a true cold start — when neither today's cache nor any
+ * recent stale-cache fallback is available. In that case the page would
+ * otherwise be blank, so we show a clear "first-time generation" notice
+ * and an explicit reload button.
+ *
+ * In the normal stale-while-revalidate flow (today's cache miss but a
+ * previous-day fallback exists), PlugInSolarGuide renders the full page
+ * silently using the stale payload and this notice is NOT shown — the
+ * tiny LastUpdatedBadge in the hero is enough.
  */
 export function DailyRefreshNotice({
   cacheMiss,
@@ -20,17 +23,6 @@ export function DailyRefreshNotice({
   /** `no-cache` | `stale-cache` from page.tsx */
   source: string;
 }) {
-  const [seconds, setSeconds] = useState(COUNTDOWN_START);
-
-  useEffect(() => {
-    if (!cacheMiss) return;
-    setSeconds(COUNTDOWN_START);
-    const id = window.setInterval(() => {
-      setSeconds((s) => (s > 0 ? s - 1 : 0));
-    }, 1000);
-    return () => window.clearInterval(id);
-  }, [cacheMiss]);
-
   if (!cacheMiss) return null;
 
   const empty = !hasPayload || source === 'no-cache';
@@ -51,14 +43,15 @@ export function DailyRefreshNotice({
         />
         <div className="min-w-0 space-y-1">
           <p className={`text-sm font-semibold ${empty ? 'text-orange-50' : 'text-[#FFF5E7]'}`}>
-            {empty ? "Today's data is on its way" : 'Showing the most recent saved data'}
+            {empty
+              ? "Generating today's UK plug-in solar briefing"
+              : 'Showing the most recent saved data'}
           </p>
           <p className={`text-sm leading-relaxed ${empty ? 'text-orange-100/90' : 'text-gray-300'}`}>
             {empty
-              ? 'The page will be ready in under a minute. Reload to see the latest.'
-              : 'A fresh update is running in the background. Reload in a moment if anything looks out of date.'}
+              ? "This is the first request since the cache rolled over. We re-research the regulations, products and prices against primary UK sources — it usually takes 2–5 minutes. Try reloading shortly."
+              : 'A fresh update is running in the background. Reload in a few minutes if anything looks out of date.'}
           </p>
-          <p className="text-xs font-mono text-gray-500">Ready in roughly {seconds}s</p>
         </div>
       </div>
       <button
@@ -67,7 +60,7 @@ export function DailyRefreshNotice({
         className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#D2E369] bg-[#D2E369]/15 px-4 py-2.5 text-sm font-semibold text-[#D2E369] hover:bg-[#D2E369]/25 transition-colors shrink-0"
       >
         <RefreshCw className="h-4 w-4" aria-hidden />
-        Refresh page
+        Reload
       </button>
     </div>
   );

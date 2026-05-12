@@ -69,3 +69,35 @@ export async function setLiveTerm(key: string, value: unknown): Promise<void> {
     console.warn('Redis set failed:', e);
   }
 }
+
+/**
+ * Acquire a short-lived lock using SET NX EX. Returns true if THIS caller
+ * acquired the lock (and is therefore responsible for the work), false if
+ * another worker already holds it. Used to dedup expensive refresh jobs
+ * (e.g. multi-minute Gemini calls) when many visitors hit a cold cache.
+ *
+ * No-op (returns true) when Redis isn't configured — the caller will just
+ * run unguarded, which is the right behaviour for local dev.
+ */
+export async function acquireLock(key: string, ttlSeconds: number): Promise<boolean> {
+  const r = getRedis();
+  if (!r) return true;
+  try {
+    const res = await r.set(key, '1', { ex: ttlSeconds, nx: true });
+    return res === 'OK';
+  } catch (e) {
+    console.warn('Redis lock failed:', e);
+    // Fail-open: better to occasionally double-run than to deadlock.
+    return true;
+  }
+}
+
+export async function releaseLock(key: string): Promise<void> {
+  const r = getRedis();
+  if (!r) return;
+  try {
+    await r.del(key);
+  } catch {
+    /* swallow — lock will expire naturally */
+  }
+}

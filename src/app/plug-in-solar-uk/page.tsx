@@ -22,9 +22,12 @@ export const revalidate = 86400;
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
 const CACHE_VERSION = 'v7';
 const LOOKBACK_DAYS = 7;
+// Cache-day boundary aligned to the cron hour (09:00 UTC). Must match
+// CRON_HOUR_UTC inside /api/plug-in-solar-uk/route.ts.
+const CRON_HOUR_UTC = 9;
 
 function dateOffsetKey(daysAgo: number): string {
-  const d = new Date(Date.now() - 6 * 60 * 60 * 1000);
+  const d = new Date(Date.now() - CRON_HOUR_UTC * 60 * 60 * 1000);
   d.setUTCDate(d.getUTCDate() - daysAgo);
   return `${CACHE_KEY_PREFIX}:${d.toISOString().slice(0, 10)}-${CACHE_VERSION}`;
 }

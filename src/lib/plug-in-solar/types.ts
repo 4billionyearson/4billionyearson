@@ -181,6 +181,17 @@ export interface PlugInSolarLiveData {
   changeLog: ChangeLogItem[];
   /** Last 5-10 dated news items. */
   news: NewsItem[];
+  /**
+   * Provenance of the `news` array on this payload:
+   *  - `fresh`    — items came from today's Gemini run.
+   *  - `fallback` — today's run returned too few items, so previous-cache
+   *                 items were spliced in. The Updated pill on the news
+   *                 section shows this so we can tell at a glance whether
+   *                 the cron actually pulled fresh news.
+   */
+  newsSource?: 'fresh' | 'fallback';
+  /** ISO timestamp when the current `news` array was originally generated. */
+  newsGeneratedAt?: string;
   /** Google Search grounding citations. */
   groundingSources: { title: string; uri: string }[];
 }
