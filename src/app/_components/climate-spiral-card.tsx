@@ -2138,6 +2138,7 @@ export default function ClimateSpiralCard({
                 aria-label="Playback speed (years per second)"
               />
               <span className="font-mono text-[11px] text-[#FFF5E7] min-w-[3ch]">{playSpeed}×</span>
+            </div>{/* end speed div */}
             </div>{/* end playbar flex */}
           </div>{/* end Playbar panel */}
 
