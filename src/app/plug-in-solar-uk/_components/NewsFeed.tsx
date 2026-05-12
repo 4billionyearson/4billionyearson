@@ -84,7 +84,7 @@ function NewsUpdatedPill({
   let title: string;
   if (generatedAt) {
     const formatted = formatTimestamp(generatedAt);
-    label = isFallback ? `Cached · ${formatted}` : `Live · ${formatted}`;
+    label = isFallback ? `Cached · ${formatted}` : formatted;
     title = isFallback
       ? `Today's cron returned too few news items; showing items last pulled ${generatedAt}.`
       : `News pulled fresh from Google Search at ${generatedAt}.`;
@@ -111,16 +111,16 @@ function NewsUpdatedPill({
 function formatTimestamp(iso: string): string {
   try {
     const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return 'Updated';
-    return `Updated ${d.toLocaleString('en-GB', {
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleString('en-GB', {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
       minute: '2-digit',
       timeZone: 'Europe/London',
-    })}`;
+    }).toUpperCase();
   } catch {
-    return 'Updated';
+    return '—';
   }
 }
 
