@@ -610,17 +610,17 @@
   },
   "weekly": {
     "latest": {
-      "date": "2026-04-29",
+      "date": "2026-05-06",
       "year": 2026,
-      "month": 4,
-      "day": 29,
+      "month": 5,
+      "day": 6,
       "nino12": {
         "sst": 26.4,
-        "anom": 1.3
+        "anom": 1.6
       },
       "nino3": {
-        "sst": 28.4,
-        "anom": 1
+        "sst": 28.5,
+        "anom": 1.1
       },
       "nino34": {
         "sst": 28.8,
@@ -632,28 +632,6 @@
       }
     },
     "weekly": [
-      {
-        "date": "2018-11-14",
-        "year": 2018,
-        "month": 11,
-        "day": 14,
-        "nino12": {
-          "sst": 22.6,
-          "anom": 0.9
-        },
-        "nino3": {
-          "sst": 26.1,
-          "anom": 1
-        },
-        "nino34": {
-          "sst": 27.6,
-          "anom": 0.9
-        },
-        "nino4": {
-          "sst": 29.4,
-          "anom": 0.8
-        }
-      },
       {
         "date": "2018-11-21",
         "year": 2018,
@@ -9153,10 +9131,10 @@
         "day": 15,
         "nino12": {
           "sst": 27.4,
-          "anom": 1.8
+          "anom": 1.7
         },
         "nino3": {
-          "sst": 28.2,
+          "sst": 28.1,
           "anom": 0.6
         },
         "nino34": {
@@ -9211,11 +9189,33 @@
           "sst": 29.6,
           "anom": 0.9
         }
+      },
+      {
+        "date": "2026-05-06",
+        "year": 2026,
+        "month": 5,
+        "day": 6,
+        "nino12": {
+          "sst": 26.4,
+          "anom": 1.6
+        },
+        "nino3": {
+          "sst": 28.5,
+          "anom": 1.1
+        },
+        "nino34": {
+          "sst": 28.8,
+          "anom": 0.9
+        },
+        "nino4": {
+          "sst": 29.6,
+          "anom": 0.9
+        }
       }
     ],
     "baseline": "1991–2020",
-    "firstWeek": "2018-11-14",
-    "lastWeek": "2026-04-29"
+    "firstWeek": "2018-11-21",
+    "lastWeek": "2026-05-06"
   },
   "mei": {
     "latest": {
@@ -12447,5 +12447,5 @@
     "metOfficeImpactLaNinaTemp": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-temp.jpg",
     "metOfficeImpactLaNinaPrecip": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-precip.jpg"
   },
-  "generatedAt": "2026-05-11T05:30:42.734Z"
+  "generatedAt": "2026-05-12T05:24:05.476Z"
 }
