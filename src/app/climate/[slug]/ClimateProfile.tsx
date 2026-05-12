@@ -1043,6 +1043,7 @@ export default function ClimateProfile({
                             provisionalAfterMonth={pageSnapshotCut}
                             embedSlug={slug}
                             share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'climate-spiral' }}
+                            showEnso
                           />
                         )}
                         <MonthlySpaghettiCard

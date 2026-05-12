@@ -100,7 +100,7 @@ function parseOni(text) {
     anomaly: last.anom,
     season: last.season,
     seasonYear: last.year,
-    history: parsed.slice(-120).map((p) => ({ season: p.season, year: p.year, anom: p.anom })),
+    history: parsed.map((p) => ({ season: p.season, year: p.year, anom: p.anom })),
   };
 }
 

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Thermometer, CloudRain, Sun, Snowflake } from 'lucide-react';
+import { Thermometer, CloudRain, Sun, Snowflake, Waves } from 'lucide-react';
 import type { MonthlyPoint, SpaghettiMetric } from './monthly-spaghetti-chart';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
+import RecordsTable from './climate-records-table';
 
 /* ────────────────────────────────────────────────────────────────────────────
- * The 4BYO Climate Spiral
+ * The 4BYO Climate Helix
  *
  * A radial / polar take on the year-on-year monthly chart. Each year is a
  * closed loop running Jan→Dec→Jan, with radius encoding the month's value.
@@ -38,6 +39,9 @@ interface Props {
   share?: { pageUrl: string; sectionId: string };
   /** Hide the ShareBar entirely (used by the embed route). */
   hideShare?: boolean;
+  /** Show the ENSO HUD card. Defaults to false; only relevant for regions
+   *  where ENSO has a clear teleconnection (e.g. UK, US, Australia, India). */
+  showEnso?: boolean;
 }
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -454,6 +458,7 @@ export default function ClimateSpiralCard({
   embedSlug,
   share,
   hideShare = false,
+  showEnso = false,
 }: Props) {
   const available = METRIC_ORDER.filter((m) => (series[m]?.length ?? 0) > 0);
   const fallback: SpaghettiMetric = available[0] ?? 'temp';
@@ -502,6 +507,18 @@ export default function ClimateSpiralCard({
     () => buildYearMap(points, provisionalAfterMonth),
     [points, provisionalAfterMonth],
   );
+
+  // Build a yearMap per available metric so the Records section can let
+  // the user pick a different variable from the spiral above.
+  const allYearMaps = useMemo(() => {
+    const out: Partial<Record<SpaghettiMetric, YearMap>> = {};
+    for (const m of METRIC_ORDER) {
+      const pts = series[m];
+      if (!pts?.length) continue;
+      out[m] = buildYearMap(pts, provisionalAfterMonth).yearMap;
+    }
+    return out;
+  }, [series, provisionalAfterMonth]);
 
   // Reset yearFrom when metric changes (different series may have different min).
   React.useEffect(() => {
@@ -556,10 +573,9 @@ export default function ClimateSpiralCard({
       .then((j) => {
         if (cancelled || !j?.oni?.history) return;
         const m = new Map<number, number>();
+        // Data arrives chronologically — keep the most recent season per year.
         for (const row of j.oni.history as Array<{ year: number; anom: number }>) {
-          const cur = m.get(row.year);
-          // Keep the peak absolute anomaly per year (signed).
-          if (cur === undefined || Math.abs(row.anom) > Math.abs(cur)) m.set(row.year, row.anom);
+          m.set(row.year, row.anom);
         }
         setOniByYear(m);
       })
@@ -876,22 +892,28 @@ export default function ClimateSpiralCard({
     if (mode === 'bars') {
       const absMax = Math.max(...data.map((d) => Math.abs(d.value)), 1.2);
       const mid = h / 2;
+      const last = visible[visible.length - 1];
+      const lastX = (xFor(last.year) / w) * 100;
+      const lastYRaw = mid - (last.value / absMax) * (mid * 0.95);
+      const lastYPct = (lastYRaw / h) * 100;
+      const lastDotColor = last.value > 0.5 ? '#fb7185' : last.value < -0.5 ? '#38bdf8' : '#cbd5e1';
       return (
-        <svg viewBox="0 0 70 22" width="100%" height={h} preserveAspectRatio="none" className="overflow-visible">
-          <line x1={0} y1={mid} x2={w} y2={mid} stroke="rgba(255,255,255,0.18)" strokeWidth={0.5} />
-          {visible.map((d, i) => {
-            const x = xFor(d.year);
-            const yTop = mid - (d.value / absMax) * (mid * 0.95);
-            const c = d.value > 0.5 ? '#fb7185' : d.value < -0.5 ? '#38bdf8' : 'rgba(180,180,180,0.55)';
-            return <line key={i} x1={x} y1={mid} x2={x} y2={yTop} stroke={c} strokeWidth={1.1} strokeLinecap="round" />;
-          })}
-          {(() => {
-            const last = visible[visible.length - 1];
-            const x = xFor(last.year);
-            const y2 = mid - (last.value / absMax) * (mid * 0.95);
-            return <circle cx={x} cy={y2} r={1.8} fill={last.value > 0.5 ? '#fb7185' : last.value < -0.5 ? '#38bdf8' : '#cbd5e1'} />;
-          })()}
-        </svg>
+        <div className="relative w-full" style={{ height: h }}>
+          <svg viewBox="0 0 70 22" width="100%" height={h} preserveAspectRatio="none" className="overflow-visible absolute inset-0">
+            <line x1={0} y1={mid} x2={w} y2={mid} stroke="rgba(255,255,255,0.18)" strokeWidth={0.5} />
+            {visible.map((d, i) => {
+              const x = xFor(d.year);
+              const yTop = mid - (d.value / absMax) * (mid * 0.95);
+              const c = d.value > 0.5 ? '#fb7185' : d.value < -0.5 ? '#38bdf8' : 'rgba(180,180,180,0.55)';
+              return <line key={i} x1={x} y1={mid} x2={x} y2={yTop} stroke={c} strokeWidth={1.1} strokeLinecap="round" />;
+            })}
+          </svg>
+          {/* Dot rendered as HTML so it stays circular regardless of SVG aspect ratio */}
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{ width: 5, height: 5, background: lastDotColor, left: `${lastX}%`, top: `${lastYPct}%`, transform: 'translate(-50%, -50%)' }}
+          />
+        </div>
       );
     }
     const lo = Math.min(...data.map((d) => d.value));
@@ -930,13 +952,21 @@ export default function ClimateSpiralCard({
         }).join(' ');
       }
     }
+    const lastDotX = (xFor(last.year) / w) * 100;
+    const lastDotY = (yFor(last.value) / h) * 100;
     return (
-      <svg viewBox="0 0 70 22" width="100%" height={h} preserveAspectRatio="none" className="overflow-visible">
-        <polyline fill="none" stroke={`${color}33`} strokeWidth={0.7} points={data.map((d) => `${xFor(d.year).toFixed(1)},${yFor(d.value).toFixed(1)}`).join(' ')} />
-        <polyline fill="none" stroke={`${color}66`} strokeWidth={1.3} strokeLinejoin="round" strokeLinecap="round" points={pts} />
-        {trendPts && <polyline fill="none" stroke={color} strokeWidth={2} opacity={0.95} strokeLinejoin="round" strokeLinecap="round" points={trendPts} />}
-        <circle cx={xFor(last.year)} cy={yFor(last.value)} r={1.9} fill={color} />
-      </svg>
+      <div className="relative w-full" style={{ height: h }}>
+        <svg viewBox="0 0 70 22" width="100%" height={h} preserveAspectRatio="none" className="overflow-visible absolute inset-0">
+          <polyline fill="none" stroke={`${color}33`} strokeWidth={0.7} points={data.map((d) => `${xFor(d.year).toFixed(1)},${yFor(d.value).toFixed(1)}`).join(' ')} />
+          <polyline fill="none" stroke={`${color}66`} strokeWidth={1.3} strokeLinejoin="round" strokeLinecap="round" points={pts} />
+          {trendPts && <polyline fill="none" stroke={color} strokeWidth={2} opacity={0.95} strokeLinejoin="round" strokeLinecap="round" points={trendPts} />}
+        </svg>
+        {/* Dot rendered as HTML so it stays circular regardless of SVG aspect ratio */}
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{ width: 5, height: 5, background: color, left: `${lastDotX}%`, top: `${lastDotY}%`, transform: 'translate(-50%, -50%)' }}
+        />
+      </div>
     );
   };
 
@@ -944,7 +974,7 @@ export default function ClimateSpiralCard({
     <div id={share?.sectionId ?? sectionId} className="bg-[#0b0e16] p-2 sm:p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
       <h3 className="text-xl font-bold font-mono text-white mb-3 flex items-start gap-2">
         <span className="shrink-0 mt-0.5 text-[#D0A65E]">{HEADER_ICON[metric]}</span>
-        <span className="min-w-0 flex-1">The 4BYO Climate Spiral – {regionName}</span>
+        <span className="min-w-0 flex-1">The 4BYO Climate Helix – {regionName}</span>
       </h3>
 
       {/* Metric tabs moved to the row below the playback bar */}
@@ -969,7 +999,7 @@ export default function ClimateSpiralCard({
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: '#EF4444' }} />
+              <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: metric === 'temp' ? '#22D3EE' : '#EF4444' }} />
               {recentFrom}–{recentTo}{anomaly ? ' Δ' : ' mean'}
             </span>
             {showHistoric && (
@@ -995,7 +1025,7 @@ export default function ClimateSpiralCard({
               {currentYear} so far
             </span>
           </div>
-          <div className="relative w-full max-w-[920px] mx-auto sm:py-4">
+          <div className={`relative w-full ${view3D ? 'max-w-[920px]' : 'max-w-[820px]'} mx-auto sm:py-4`}>
             {/* Playback stats strip — when the playhead is active, replaces
                  the small year chip with a full HUD: prominent year,
                  anomaly/temp/rain/sun/frost mini-cards, ENSO state and a
@@ -1070,28 +1100,70 @@ export default function ClimateSpiralCard({
                 const [vbX, vbY, vbW, vbH] = view3D ? [68, 10, 664, 620] : [68, 100, 664, 600];
                 const sx = vbX + mx * vbW;
                 const sy = vbY + my * vbH;
-                const dx = sx - CX;
-                const dy = sy - CY;
-                const rMouse = Math.hypot(dx, dy);
-                if (rMouse < 18 || rMouse > R_OUTER + 44) {
-                  setHover(null);
-                  return;
+                // 2D radial gate. In 3D we can't bail early using this because
+                // the rings are vertically squashed and z-stacked — the cursor
+                // can be outside R_OUTER radially yet still on a tilted ring.
+                if (!view3D) {
+                  const dx2 = sx - CX;
+                  const dy2 = sy - CY;
+                  const r2 = Math.hypot(dx2, dy2);
+                  if (r2 < 18 || r2 > R_OUTER + 44) {
+                    setHover(null);
+                    return;
+                  }
                 }
-                const ang = Math.atan2(dy, dx); // atan2 returns [-π, π], 0 = +x axis
-                // monthAngle(m) = (m/12)*2π - π/2. Inverse: m = ((ang + π/2)/(2π))*12
-                let monthFrac = ((ang + Math.PI / 2) / (Math.PI * 2)) * 12;
-                if (monthFrac < 0) monthFrac += 12;
-                const monthIdx = (Math.round(monthFrac) % 12 + 12) % 12;
-                // Find nearest *visible* line at this month. Skip years
-                // whose lines are toggled off so the tooltip never picks up
-                // invisible data. Also consider the three mean rings as
-                // hover targets.
-                type Best = { kind: 'year' | 'mean'; year: number; label: string; value: number; r: number; d: number };
+                // 3D projection constants (mirror project3D so we can invert it)
+                const span3D = Math.max(1, maxYear - minYear);
+                const dz3D = 220 / span3D;
+                const cosTilt3D = 0.55;
+                /** Invert project3D for a given year: recover the
+                 *  pre-projection (x,y) the user is hovering over, given
+                 *  the screen coords (sx,sy) and that year's z stack offset. */
+                const unprojectFor = (year: number): [number, number] => {
+                  if (!view3D) return [sx, sy];
+                  const z = (year - minYear) * dz3D;
+                  const yOrig = (sy + z - CY) / cosTilt3D + CY;
+                  return [sx, yOrig];
+                };
+                /** Compute the polar (r, monthIdx) the cursor maps to for a
+                 *  given candidate year, using that year's inverse projection. */
+                const polarFor = (year: number): { r: number; monthIdx: number } | null => {
+                  const [ux, uy] = unprojectFor(year);
+                  const dx = ux - CX;
+                  const dy = uy - CY;
+                  const r = Math.hypot(dx, dy);
+                  if (r < 6 || r > R_OUTER + 80) return null;
+                  const ang = Math.atan2(dy, dx);
+                  let monthFrac = ((ang + Math.PI / 2) / (Math.PI * 2)) * 12;
+                  if (monthFrac < 0) monthFrac += 12;
+                  const monthIdx = (Math.round(monthFrac) % 12 + 12) % 12;
+                  return { r, monthIdx };
+                };
+                // Find nearest *visible* line. In 2D, polarFor returns the
+                // same (r, monthIdx) for every year so this collapses to a
+                // single radial sweep. In 3D, each year has its own polar
+                // mapping because of its vertical z-offset, so we recompute
+                // per-candidate and compare 2D screen distance to its
+                // projected line point.
+                type Best = { kind: 'year' | 'mean'; year: number; label: string; value: number; r: number; monthIdx: number; d: number };
                 let best: Best | null = null;
-                const consider = (kind: 'year' | 'mean', year: number, label: string, value: number, r: number) => {
-                  if (!Number.isFinite(r) || !Number.isFinite(value)) return;
-                  const d = Math.abs(r - rMouse);
-                  if (!best || d < best.d) best = { kind, year, label, value, r, d };
+                const consider = (kind: 'year' | 'mean', yearLabel: number, label: string, arr: number[] | null, anchorYear: number) => {
+                  if (!arr) return;
+                  const pf = polarFor(anchorYear);
+                  if (!pf) return;
+                  const { monthIdx } = pf;
+                  const v = arr[monthIdx];
+                  if (!Number.isFinite(v)) return;
+                  const r = valueToR(v, monthIdx);
+                  if (!Number.isFinite(r)) return;
+                  let d: number;
+                  if (view3D) {
+                    const [px, py] = project3D([polar(r, monthAngle(monthIdx))], anchorYear)[0];
+                    d = Math.hypot(px - sx, py - sy);
+                  } else {
+                    d = Math.abs(r - pf.r);
+                  }
+                  if (!best || d < best.d) best = { kind, year: yearLabel, label, value: v, r, monthIdx, d };
                 };
                 for (const y of renderYears) {
                   // Hide individual year lines when overall spaghetti is off,
@@ -1106,24 +1178,30 @@ export default function ClimateSpiralCard({
                   if (y === oppositeYear && !showRecordLow && !inSpaghetti) continue;
                   const arr = yearMap.get(y);
                   if (!arr) continue;
-                  const v = arr[monthIdx];
-                  if (!Number.isFinite(v)) continue;
-                  consider('year', y, String(y), v, valueToR(v, monthIdx));
+                  consider('year', y, String(y), arr, y);
                 }
                 // Mean rings: baseline (hidden in anomaly mode), recent
                 // (always shown), historic (gated).
                 if (!anomaly && meanBaseline.every(Number.isFinite)) {
-                  consider('mean', 0, `${baselineFrom}–${baselineTo} mean`, meanBaseline[monthIdx], valueToR(meanBaseline[monthIdx], monthIdx));
+                  consider('mean', 0, `${baselineFrom}–${baselineTo} mean`, meanBaseline, (baselineFrom + baselineTo) / 2);
                 }
                 if (meanRecent.every(Number.isFinite)) {
-                  consider('mean', 0, `${recentFrom}–${recentTo} mean`, meanRecent[monthIdx], valueToR(meanRecent[monthIdx], monthIdx));
+                  consider('mean', 0, `${recentFrom}–${recentTo} mean`, meanRecent, (recentFrom + recentTo) / 2);
                 }
                 if (showHistoric && meanHistoric.every(Number.isFinite)) {
-                  consider('mean', 0, `${historicFrom}–${historicTo} mean`, meanHistoric[monthIdx], valueToR(meanHistoric[monthIdx], monthIdx));
+                  consider('mean', 0, `${historicFrom}–${historicTo} mean`, meanHistoric, (historicFrom + historicTo) / 2);
                 }
                 if (best && (best as Best).d < 28) {
                   const b = best as Best;
-                  setHover({ kind: b.kind, year: b.year, label: b.label, monthIdx, value: b.value, r: b.r, sx, sy });
+                  // Anchor the tooltip to the *projected* line point so it
+                  // pins to the actual on-screen line in 3D mode. In 2D this
+                  // is identical to (sx, sy).
+                  const anchorYear = b.kind === 'year' ? b.year :
+                    b.label.startsWith(`${baselineFrom}–${baselineTo}`) ? (baselineFrom + baselineTo) / 2 :
+                    b.label.startsWith(`${historicFrom}–${historicTo}`) ? (historicFrom + historicTo) / 2 :
+                    (recentFrom + recentTo) / 2;
+                  const [ax, ay] = project3D([polar(b.r, monthAngle(b.monthIdx))], anchorYear)[0];
+                  setHover({ kind: b.kind, year: b.year, label: b.label, monthIdx: b.monthIdx, value: b.value, r: b.r, sx: ax, sy: ay });
                 } else {
                   setHover(null);
                 }
@@ -1499,16 +1577,19 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
-              {/* Recent decade ring — vivid crimson, tight dash. Heaviest
-                   of the three so it dominates "now". */}
+              {/* Recent decade ring — dashed. In temp mode the crimson would
+                   blend with the warm-toned spaghetti gradient, so we swap to
+                   a vivid cyan (the site's accent on the cool side of the
+                   wheel) to keep maximum contrast against the year lines. */}
               {showRecentRing && meanRecent.every(Number.isFinite) && (() => {
                 const pts: [number, number][] = meanRecent.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
                 const recentMid = (recentFrom + recentTo) / 2;
+                const recentStroke = metric === 'temp' ? '#22D3EE' : '#EF4444';
                 return (
                   <path
                     d={smoothClosedPath(project3D(pts, recentMid))}
                     fill="none"
-                    stroke="#EF4444"
+                    stroke={recentStroke}
                     strokeWidth={2.1}
                     strokeDasharray="5 2"
                   />
@@ -1804,7 +1885,7 @@ export default function ClimateSpiralCard({
                   const newCol = key === 'spring' ? '#86EFAC' : '#FDBA74';
                   const oldCol = key === 'spring' ? '#5DB585' : '#C47A35';
                   const days = Math.round(Math.abs(shiftMonths) * DAYS_PER_MONTH);
-                  const direction = header === 'Spr start'
+                  const direction = header === 'Spr Start'
                     ? (shiftMonths > 0 ? 'earlier' : 'later')
                     : (shiftMonths > 0 ? 'later' : 'earlier');
                   const signedDays = `${direction === 'earlier' ? '-' : '+'}${days} days`;
@@ -1869,8 +1950,8 @@ export default function ClimateSpiralCard({
 
                 return (
                   <g transform={tilt3D} pointerEvents="none">
-                    {renderGroup('spring', 'Spr start', monthAngle(first.spring), monthAngle(last.spring), first.spring - last.spring)}
-                    {renderGroup('autumn', 'Aut end',   monthAngle(first.autumn), monthAngle(last.autumn), last.autumn - first.autumn)}
+                    {renderGroup('spring', 'Spr Start', monthAngle(first.spring), monthAngle(last.spring), first.spring - last.spring)}
+                    {renderGroup('autumn', 'Aut End',   monthAngle(first.autumn), monthAngle(last.autumn), last.autumn - first.autumn)}
                   </g>
                 );
               })()}
@@ -2054,7 +2135,7 @@ export default function ClimateSpiralCard({
           </div>{/* end chart column */}
 
           {/* Sidebar: HUD + control panels */}
-          <div className="w-full xl:w-[280px] xl:shrink-0 flex flex-col">
+          <div className="w-full xl:w-[280px] xl:shrink-0 flex flex-col mt-4 xl:mt-0">
           {/* HUD info row */}
           {(() => {
             const displayYear = playYear === currentYear && playMonth !== null
@@ -2071,7 +2152,8 @@ export default function ClimateSpiralCard({
               ? 'border-rose-400/60 bg-rose-500/15 text-rose-200'
               : enso?.state === 'La Niña'
                 ? 'border-sky-400/60 bg-sky-500/15 text-sky-200'
-                : 'border-gray-600 bg-gray-800/50 text-gray-300';
+                : 'border-gray-600 text-gray-300';
+            const ensoIconColor = enso?.state === 'El Niño' ? '#fb7185' : enso?.state === 'La Niña' ? '#38bdf8' : '#94a3b8';
             const oniAnnual: { year: number; value: number }[] = oniByYear.size === 0
               ? []
               : [...oniByYear.entries()].sort((a, b) => a[0] - b[0]).map(([y, v]) => ({ year: y, value: v }));
@@ -2179,21 +2261,26 @@ export default function ClimateSpiralCard({
                       </div>
                     );
                   })}
-                  {/* ENSO — always shown, in same row */}
+                  {/* ENSO — only shown for regions with a clear ENSO teleconnection */}
+                  {showEnso && (
                   <div className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-center gap-2 h-[72px] min-w-[140px] xl:w-full flex-shrink-0 ${ensoCls}`}>
                     <div className="flex flex-col leading-tight w-[58px] shrink-0">
-                      <div className="text-[8.5px] font-semibold uppercase tracking-wider whitespace-nowrap">
+                      <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider whitespace-nowrap text-gray-400">
+                        <span style={{ color: ensoIconColor }}><Waves className="h-3 w-3" /></span>
                         {enso?.state === 'El Niño' ? 'El Niño' : enso?.state === 'La Niña' ? 'La Niña' : 'ENSO'}
                       </div>
-                      <div className="font-mono text-sm font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
+                      <div className="font-mono text-base font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
                         {ensoAnom !== null ? `${ensoAnom >= 0 ? '+' : ''}${ensoAnom.toFixed(1)}°` : '—'}
-                        <span className="text-[9px] font-normal opacity-70 ml-1">ONI</span>
+                      </div>
+                      <div className="text-[9.5px] tabular-nums leading-tight text-gray-400 whitespace-nowrap">
+                        ONI 3-mo mean
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       {oniAnnual.length > 0 && <HudSparkline data={oniAnnual} current={displayYear} color="#cbd5e1" mode="bars" />}
                     </div>
                   </div>
+                  )}
                 </div>
               </div>
             );
@@ -2304,12 +2391,51 @@ export default function ClimateSpiralCard({
               <ChipToggle active={view3D} onChange={setView3D} color="#A78BFA">
                 3D
               </ChipToggle>
-              <ChipToggle active={showSeasons} onChange={setShowSeasons} color="#86EFAC">
-                Season-Shift
-              </ChipToggle>
-              <ChipToggle active={showShiftTrail} onChange={setShowShiftTrail} color="#86EFAC">
-                Season-Trail
-              </ChipToggle>
+              {/* Seasons + Trail — segmented pill group. When Seasons is on,
+                  Trail appears as a nested segment sharing the same bordered
+                  container (Linear/Vercel "split button" pattern), which
+                  communicates the sub-option relationship through physical
+                  containment rather than a separate connector. */}
+              {showSeasons ? (
+                <div
+                  className="inline-flex h-7 items-center rounded-full border overflow-hidden"
+                  style={{ borderColor: '#86EFAC8c', background: '#86EFAC1f' }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => { setShowSeasons(false); setShowShiftTrail(false); }}
+                    aria-pressed
+                    className="inline-flex h-full items-center gap-1 px-2.5 text-[12px] font-medium text-[#FFF5E7] hover:bg-white/[0.04] transition-colors"
+                  >
+                    <span aria-hidden className="inline-block h-2 w-2 rounded-full shrink-0" style={{ background: '#86EFAC', border: '1px solid #86EFAC' }} />
+                    <span className="leading-none whitespace-nowrap">Seasons</span>
+                  </button>
+                  <div aria-hidden className="h-3.5 w-px self-center" style={{ background: '#86EFAC55' }} />
+                  <button
+                    type="button"
+                    onClick={() => setShowShiftTrail(!showShiftTrail)}
+                    aria-pressed={showShiftTrail}
+                    className="inline-flex h-full items-center gap-1 px-2.5 text-[12px] font-medium transition-colors hover:bg-white/[0.04]"
+                    style={{ color: showShiftTrail ? '#FFF5E7' : '#9CA3AF' }}
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-2 w-2 rounded-full shrink-0"
+                      style={{ background: showShiftTrail ? '#86EFAC' : 'transparent', border: `1px solid ${showShiftTrail ? '#86EFAC' : '#4B5563'}` }}
+                    />
+                    <span className="leading-none whitespace-nowrap">Trail</span>
+                  </button>
+                </div>
+              ) : (
+                <ChipToggle active={false} onChange={(v) => { setShowSeasons(v); if (!v) setShowShiftTrail(false); }} color="#86EFAC">
+                  Seasons
+                </ChipToggle>
+              )}
+              {metric === 'temp' && (
+                <ChipToggle active={showParis} onChange={setShowParis} color="#FBBF24">
+                  Paris Rings
+                </ChipToggle>
+              )}
             </div>
           </div>{/* end Mode panel */}
 
@@ -2498,19 +2624,6 @@ export default function ClimateSpiralCard({
               </div>
             </div>
 
-            {/* Seasons — Paris rings only now; tints + trail moved to Mode panel */}
-            {metric === 'temp' && (
-            <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 sm:mr-1 sm:w-12">Seasons</span>
-              <div className="flex flex-wrap items-center gap-2">
-              {metric === 'temp' && (
-                <ChipToggle active={showParis} onChange={setShowParis} color="#FBBF24">
-                  Paris Rings
-                </ChipToggle>
-              )}
-              </div>
-            </div>
-            )}
             </div>)}
           </div>
 
@@ -2575,7 +2688,7 @@ export default function ClimateSpiralCard({
                   max={maxYear}
                   value={recentRange}
                   onChange={setRecentRange}
-                  accent="#EF4444"
+                  accent={metric === 'temp' ? '#22D3EE' : '#EF4444'}
                   minGap={1}
                 />
               </div>
@@ -2639,18 +2752,25 @@ export default function ClimateSpiralCard({
 
         {/*
         ─── Section 2: Records ────────────────────────────────────────
+        */}
         <div>
-          <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-3 pb-1 border-b border-white/10">
-            Records
-          </h3>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+            <h3 className="text-[11px] font-bold font-mono uppercase tracking-[0.25em] text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-4 py-1.5 rounded-full border border-[#D0A65E]/50 shadow-lg">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#D0A65E]" style={{ boxShadow: '0 0 8px #D0A65E' }} />
+              Records
+            </h3>
+            <div className="h-px bg-[#D0A65E]/30 flex-1" />
+          </div>
           <RecordsTable
             metric={metric}
             yearMap={yearMap}
             currentYear={currentYear}
             palette={palette}
+            allSeries={allYearMaps}
+            allPalettes={METRIC_PALETTE}
           />
         </div>
-        */}
       </div>
 
       {dataSource && (
@@ -2890,258 +3010,3 @@ function Sparkline({
   );
 }
 
-/* ────────────────────────────────────────────────────────────────────────────
- * Records table
- * ──────────────────────────────────────────────────────────────────────── */
-
-function RecordsTable({
-  metric, yearMap, currentYear, palette,
-}: {
-  metric: SpaghettiMetric;
-  yearMap: YearMap;
-  currentYear: number;
-  palette: MetricPalette;
-}) {
-  const agg = METRIC_AGG[metric];
-  const unit = METRIC_UNIT[metric];
-  const dec = METRIC_DECIMALS[metric];
-  const [view, setView] = useState<'year' | 'seasons' | 'months'>('year');
-
-  const highLabel = palette.highWord;
-  const lowLabel = palette.lowWord;
-  const degSuffix = unit === '°C' ? '°' : '';
-
-  /* ── Year-view ─────────────────────────────────────────────────────── */
-  const yearRows = useMemo(() => {
-    const annual = annualAggregate(yearMap, agg);
-    const entries = [...annual.entries()];
-    if (entries.length === 0) return null;
-    const sorted = [...entries].sort((a, b) => b[1] - a[1]);
-    const high = sorted[0];
-    const low = sorted[sorted.length - 1];
-    const curArr = yearMap.get(currentYear);
-    let ytdRank: { rank: number; total: number; value: number } | null = null;
-    if (curArr) {
-      const ytdMonths: number[] = [];
-      curArr.forEach((v) => { if (Number.isFinite(v)) ytdMonths.push(v); });
-      if (ytdMonths.length >= 2) {
-        const ytdValue = agg === 'mean'
-          ? ytdMonths.reduce((a, b) => a + b, 0) / ytdMonths.length
-          : ytdMonths.reduce((a, b) => a + b, 0);
-        const N = ytdMonths.length;
-        const scores: { year: number; v: number }[] = [];
-        for (const [y, arr] of yearMap.entries()) {
-          if (y === currentYear) continue;
-          const slice = arr.slice(0, N);
-          if (slice.some((v) => !Number.isFinite(v))) continue;
-          const s = agg === 'mean' ? slice.reduce((a, b) => a + b, 0) / N : slice.reduce((a, b) => a + b, 0);
-          scores.push({ year: y, v: s });
-        }
-        scores.sort((a, b) => b.v - a.v);
-        const rank = scores.filter((s) => s.v > ytdValue).length + 1;
-        ytdRank = { rank, total: scores.length + 1, value: ytdValue };
-      }
-    }
-    return { high, low, ytdRank };
-  }, [yearMap, agg, currentYear]);
-
-  /* ── Seasons-view ──────────────────────────────────────────────────── */
-  const seasonData = useMemo(() => {
-    const seasons: Array<{ key: 'DJF' | 'MAM' | 'JJA' | 'SON'; label: string; color: string }> = [
-      { key: 'DJF', label: 'Winter', color: '#7DD3FC' },
-      { key: 'MAM', label: 'Spring', color: '#86EFAC' },
-      { key: 'JJA', label: 'Summer', color: '#FACC15' },
-      { key: 'SON', label: 'Autumn', color: '#FDBA74' },
-    ];
-    return seasons.map((s) => {
-      const map = seasonalAggregate(yearMap, s.key, agg);
-      const entries = [...map.entries()];
-      if (entries.length === 0) return { ...s, high: null as null | [number, number], low: null as null | [number, number], rank: null as null | { rank: number; total: number; value: number } };
-      const sorted = [...entries].sort((a, b) => b[1] - a[1]);
-      const curVal = map.get(currentYear);
-      let rank: { rank: number; total: number; value: number } | null = null;
-      if (curVal !== undefined) {
-        const others = [...map.entries()].filter(([y]) => y !== currentYear);
-        const r = others.filter(([, v]) => v > curVal).length + 1;
-        rank = { rank: r, total: others.length + 1, value: curVal };
-      }
-      return { ...s, high: sorted[0] as [number, number], low: sorted[sorted.length - 1] as [number, number], rank };
-    });
-  }, [yearMap, agg, currentYear]);
-
-  /* ── Months-view ───────────────────────────────────────────────────── */
-  const monthData = useMemo(() => {
-    return MONTH_LABELS.map((label, m) => {
-      const map = monthlySeries(yearMap, m);
-      const entries = [...map.entries()];
-      if (entries.length === 0) return { label, high: null as null | [number, number], low: null as null | [number, number], rank: null as null | { rank: number; total: number; value: number } };
-      const sorted = [...entries].sort((a, b) => b[1] - a[1]);
-      const curVal = map.get(currentYear);
-      let rank: { rank: number; total: number; value: number } | null = null;
-      if (curVal !== undefined) {
-        const others = [...map.entries()].filter(([y]) => y !== currentYear);
-        const r = others.filter(([, v]) => v > curVal).length + 1;
-        rank = { rank: r, total: others.length + 1, value: curVal };
-      }
-      return { label, high: sorted[0] as [number, number], low: sorted[sorted.length - 1] as [number, number], rank };
-    });
-  }, [yearMap, currentYear]);
-
-  if (!yearRows) return null;
-
-  const TabBar = () => (
-    <div className="inline-flex rounded-md border border-gray-700 overflow-hidden text-[10px] shrink-0">
-      {(['year', 'seasons', 'months'] as const).map((v) => (
-        <button
-          key={v}
-          type="button"
-          onClick={() => setView(v)}
-          className={`px-2.5 py-1 transition-colors ${view === v ? 'bg-[#D0A65E]/15 text-[#FFF5E7]' : 'text-gray-400 hover:bg-white/[0.04]'}`}
-        >
-          {v === 'year' ? 'Year' : v === 'seasons' ? 'Seasons' : 'Months'}
-        </button>
-      ))}
-    </div>
-  );
-
-  /* Shared stat card */
-  const StatCard = ({ label, year, value, rankInfo, accentClass, accentHex, isCurrent = false }: {
-    label: string; year?: number; value: number; rankInfo?: { rank: number; total: number } | null;
-    accentClass: string; accentHex: string; isCurrent?: boolean;
-  }) => (
-    <div
-      className="rounded-lg border bg-[#0b0e16]/70 backdrop-blur-sm px-3 py-2.5 flex flex-col gap-0.5 flex-1"
-      style={{ borderColor: `${accentHex}44`, boxShadow: `0 0 16px -6px ${accentHex}66` }}
-    >
-      <div className="text-[9px] uppercase tracking-wider text-gray-500 font-semibold">{label}</div>
-      {year !== undefined && (
-        <div className={`font-mono text-2xl font-black tabular-nums leading-none ${accentClass}`}>{year}</div>
-      )}
-      {isCurrent && rankInfo && (
-        <div className={`font-mono text-2xl font-black tabular-nums leading-none ${accentClass}`}>
-          #{rankInfo.rank}<span className="text-sm font-normal text-gray-500"> of {rankInfo.total}</span>
-        </div>
-      )}
-      <div className="font-mono text-sm tabular-nums text-gray-300">{value.toFixed(dec)}<span className="text-gray-500 text-xs ml-0.5">{unit}</span></div>
-    </div>
-  );
-
-  return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3 gap-2">
-        <h4 className="text-[11px] font-bold uppercase tracking-wider" style={{ color: palette.current }}>
-          {METRIC_LABEL[metric]}
-        </h4>
-        <TabBar />
-      </div>
-
-      {/* ── Year view ── */}
-      {view === 'year' && (
-        <div className="flex gap-3 flex-wrap sm:flex-nowrap">
-          <StatCard
-            label={`${highLabel} year`}
-            year={yearRows.high[0]}
-            value={yearRows.high[1]}
-            accentClass={palette.highTextClass}
-            accentHex={palette.high}
-          />
-          <StatCard
-            label={`${lowLabel} year`}
-            year={yearRows.low[0]}
-            value={yearRows.low[1]}
-            accentClass={palette.lowTextClass}
-            accentHex={palette.low}
-          />
-          {yearRows.ytdRank && (
-            <StatCard
-              label={`${currentYear} so far`}
-              value={yearRows.ytdRank.value}
-              rankInfo={{ rank: yearRows.ytdRank.rank, total: yearRows.ytdRank.total }}
-              accentClass={palette.currentTextClass}
-              accentHex={palette.current}
-              isCurrent
-            />
-          )}
-        </div>
-      )}
-
-      {/* ── Seasons view ── */}
-      {view === 'seasons' && (
-        <div className="grid grid-cols-2 gap-3">
-          {seasonData.map((s) => (
-            <div key={s.key}
-              className="rounded-lg border bg-[#0b0e16]/70 backdrop-blur-sm px-3 py-2.5"
-              style={{ borderColor: `${s.color}33`, boxShadow: `0 0 14px -8px ${s.color}88` }}
-            >
-              <div className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: s.color }}>{s.label}</div>
-              <div className="space-y-1">
-                {s.high && (
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-[9px] uppercase tracking-wider text-gray-500">{highLabel}</span>
-                    <span className="font-mono text-sm">
-                      <span className={`font-bold ${palette.highTextClass}`}>{s.high[0]}</span>
-                      <span className="text-gray-400 ml-1.5">{s.high[1].toFixed(dec)}{degSuffix}</span>
-                    </span>
-                  </div>
-                )}
-                {s.low && (
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-[9px] uppercase tracking-wider text-gray-500">{lowLabel}</span>
-                    <span className="font-mono text-sm">
-                      <span className={`font-bold ${palette.lowTextClass}`}>{s.low[0]}</span>
-                      <span className="text-gray-400 ml-1.5">{s.low[1].toFixed(dec)}{degSuffix}</span>
-                    </span>
-                  </div>
-                )}
-                {s.rank && (
-                  <div className="flex items-baseline justify-between pt-1 border-t border-white/[0.06]">
-                    <span className="text-[9px] uppercase tracking-wider text-gray-500">{currentYear}</span>
-                    <span className="font-mono text-sm">
-                      <span className={`font-bold ${palette.currentTextClass}`}>#{s.rank.rank}</span>
-                      <span className="text-gray-600 text-xs"> of {s.rank.total}</span>
-                      <span className="text-gray-400 ml-1.5">{s.rank.value.toFixed(dec)}{degSuffix}</span>
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ── Months view ── */}
-      {view === 'months' && (
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-          {monthData.map((m) => (
-            <div key={m.label}
-              className="rounded-lg border border-gray-800/80 bg-[#0b0e16]/60 px-2.5 py-2"
-            >
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">{m.label}</div>
-              <div className="space-y-0.5">
-                {m.high && (
-                  <div className="flex items-baseline justify-between gap-1">
-                    <span className={`font-mono text-[11px] font-bold ${palette.highTextClass}`}>{m.high[0]}</span>
-                    <span className="font-mono text-[10px] text-gray-500 tabular-nums">{m.high[1].toFixed(dec)}{degSuffix}</span>
-                  </div>
-                )}
-                {m.low && (
-                  <div className="flex items-baseline justify-between gap-1">
-                    <span className={`font-mono text-[11px] font-bold ${palette.lowTextClass}`}>{m.low[0]}</span>
-                    <span className="font-mono text-[10px] text-gray-500 tabular-nums">{m.low[1].toFixed(dec)}{degSuffix}</span>
-                  </div>
-                )}
-                {m.rank && (
-                  <div className="flex items-baseline justify-between gap-1 pt-1 border-t border-white/[0.05]">
-                    <span className={`font-mono text-[11px] font-bold ${palette.currentTextClass}`}>#{m.rank.rank}</span>
-                    <span className="font-mono text-[10px] text-gray-500 tabular-nums">{m.rank.value.toFixed(dec)}{degSuffix}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}

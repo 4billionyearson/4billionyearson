@@ -81,6 +81,7 @@ export default function SpiralEmbedClient({ slug }: { slug: string }) {
       regionName={regionName || ''}
       dataSource={dataSource}
       hideShare
+      showEnso={slug === 'uk'}
     />
   );
 }
