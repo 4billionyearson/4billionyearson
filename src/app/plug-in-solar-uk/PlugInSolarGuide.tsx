@@ -379,7 +379,10 @@ export default function PlugInSolarGuide({
             <NewsFeed
               items={data?.news}
               source={data?.newsSource}
-              generatedAt={data?.newsGeneratedAt}
+              // Legacy payloads (written before newsGeneratedAt existed)
+              // still carry a top-level generatedAt — fall back to it so
+              // the pill never silently shows "Updated daily".
+              generatedAt={data?.newsGeneratedAt ?? data?.generatedAt}
             />
           </Section>
 

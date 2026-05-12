@@ -2050,8 +2050,8 @@ export default function ClimateSpiralCard({
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 items-start">
           {/* Playbar panel */}
           <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
-            <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">Playback</div>
             <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Playback</span>
             <button
               type="button"
               onClick={() => {
@@ -2138,14 +2138,13 @@ export default function ClimateSpiralCard({
                 aria-label="Playback speed (years per second)"
               />
               <span className="font-mono text-[11px] text-[#FFF5E7] min-w-[3ch]">{playSpeed}×</span>
-            </div>
             </div>{/* end playbar flex */}
           </div>{/* end Playbar panel */}
 
           {/* Mode panel */}
           <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
-            <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">Mode</div>
             <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Mode</span>
               <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
                 Anomaly <span className="text-[10px] text-gray-400">vs {baselineFrom}–{baselineTo}</span>
               </ChipToggle>
@@ -2158,8 +2157,8 @@ export default function ClimateSpiralCard({
           {/* Metric panel */}
           {available.length > 1 && (
           <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
-            <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">Metric</div>
             <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Metric</span>
                 {available.map((m) => (
                   <button
                     key={m}
@@ -2178,8 +2177,8 @@ export default function ClimateSpiralCard({
 
           {/* Presets panel */}
           <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
-            <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">Presets</div>
             <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Presets</span>
               {(() => {
                 const isShiftingSeasons = !anomaly && showShiftTrail && showSeasons && !showSpaghetti && !highlightRecent && !showRecordHigh && !showRecordLow && !showParis && !showHistoric;
                 const isThenVsNow      = anomaly  && !showShiftTrail && !showSpaghetti && !highlightRecent && !showRecordHigh && !showRecordLow && !showParis && showHistoric;
