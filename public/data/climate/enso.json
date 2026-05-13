@@ -15209,7 +15209,7 @@
         "label": "AMJ",
         "seasonAnchorYear": 2026,
         "mean": 0.62,
-        "dynMean": 0.76,
+        "dynMean": 0.75,
         "statMean": 0.4,
         "modelCount": 26,
         "models": [
@@ -15220,7 +15220,7 @@
           },
           {
             "name": "AUS-RELATIVE",
-            "type": "Dynamical",
+            "type": "Relative",
             "value": 1
           },
           {
@@ -15350,7 +15350,7 @@
         "label": "MJJ",
         "seasonAnchorYear": 2026,
         "mean": 0.93,
-        "dynMean": 1.12,
+        "dynMean": 1.1,
         "statMean": 0.62,
         "modelCount": 26,
         "models": [
@@ -15361,7 +15361,7 @@
           },
           {
             "name": "AUS-RELATIVE",
-            "type": "Dynamical",
+            "type": "Relative",
             "value": 1.37
           },
           {
@@ -15491,7 +15491,7 @@
         "label": "JJA",
         "seasonAnchorYear": 2026,
         "mean": 1.2,
-        "dynMean": 1.44,
+        "dynMean": 1.42,
         "statMean": 0.82,
         "modelCount": 26,
         "models": [
@@ -15502,7 +15502,7 @@
           },
           {
             "name": "AUS-RELATIVE",
-            "type": "Dynamical",
+            "type": "Relative",
             "value": 1.67
           },
           {
@@ -15632,7 +15632,7 @@
         "label": "JAS",
         "seasonAnchorYear": 2026,
         "mean": 1.42,
-        "dynMean": 1.71,
+        "dynMean": 1.69,
         "statMean": 0.97,
         "modelCount": 26,
         "models": [
@@ -15643,7 +15643,7 @@
           },
           {
             "name": "AUS-RELATIVE",
-            "type": "Dynamical",
+            "type": "Relative",
             "value": 2.03
           },
           {
@@ -16422,5 +16422,5 @@
     "metOfficeImpactLaNinaTemp": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-temp.jpg",
     "metOfficeImpactLaNinaPrecip": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-precip.jpg"
   },
-  "generatedAt": "2026-05-12T14:08:55.889Z"
+  "generatedAt": "2026-05-13T05:27:31.937Z"
 }
