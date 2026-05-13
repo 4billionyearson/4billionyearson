@@ -151,7 +151,7 @@ const HEADER_ICON: Record<SpaghettiMetric, React.ReactNode> = {
 };
 
 const METRIC_LABEL: Record<SpaghettiMetric, string> = {
-  temp: 'Temperature',
+  temp: 'Temp',
   precip: 'Rainfall',
   sunshine: 'Sunshine',
   frost: 'Frost',
@@ -2194,7 +2194,7 @@ export default function ClimateSpiralCard({
               // xl: vertical stack in sidebar; below xl: horizontal row (all metrics + ENSO on sm+, active+ENSO on mobile)
               <div className="mb-3">
                 {/* All cards in one row (horizontal on mobile/tablet, vertical stack on xl) */}
-                <div className="flex flex-row xl:flex-col gap-3 flex-wrap">
+                <div className="flex flex-row xl:flex-col gap-3">
                   {allOthers.filter((x) => available.includes(x.m)).map((o) => {
                     const isActive = o.m === metric;
                     const v = metricValueFn(o.m);
@@ -2216,7 +2216,7 @@ export default function ClimateSpiralCard({
                       // Active metric: full card with sparkline, always visible
                       return (
                         <div key={o.m}
-                          className="rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-center gap-2.5 h-[72px] min-w-[140px] xl:w-full flex-1 xl:flex-none"
+                          className="rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-center gap-2.5 h-[72px] xl:w-full flex-1 basis-0 min-w-0 xl:flex-none"
                           style={{ borderColor: `${c}66`, boxShadow: `0 0 14px -6px ${c}` }}
                         >
                           <div className="flex flex-col leading-tight">
@@ -2240,7 +2240,7 @@ export default function ClimateSpiralCard({
                     // Non-active metrics: full card with sparkline on sm+, hidden on mobile
                     return (
                       <div key={o.m}
-                        className="hidden sm:flex rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 items-center gap-2.5 h-[72px] min-w-[140px] xl:w-full flex-1 xl:flex-none"
+                        className="hidden sm:flex rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 items-center gap-2.5 h-[72px] xl:w-full flex-1 basis-0 min-w-0 xl:flex-none"
                         style={{ borderColor: `${c}40` }}
                       >
                         <div className="flex flex-col leading-tight">
@@ -2263,7 +2263,7 @@ export default function ClimateSpiralCard({
                   })}
                   {/* ENSO — only shown for regions with a clear ENSO teleconnection */}
                   {showEnso && (
-                  <div className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-center gap-2 h-[72px] min-w-[140px] xl:w-full flex-shrink-0 ${ensoCls}`}>
+                  <div className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-center gap-2 h-[72px] xl:w-full flex-1 basis-0 min-w-0 xl:flex-none ${ensoCls}`}>
                     <div className="flex flex-col leading-tight w-[58px] shrink-0">
                       <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider whitespace-nowrap text-gray-400">
                         <span style={{ color: ensoIconColor }}><Waves className="h-3 w-3" /></span>

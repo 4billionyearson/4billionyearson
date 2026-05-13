@@ -205,9 +205,9 @@ function RowLabel({
       <div className="text-sm font-mono font-medium text-gray-100 leading-snug">{title}</div>
       {sub && <div className="text-[11px] text-gray-500 mt-0.5 leading-snug whitespace-nowrap">{sub}</div>}
       {delta && (
-        <div className="mt-1.5">
+        <div className="mt-1.5 min-w-0">
           <span
-            className="inline-block text-[11px] font-mono px-1.5 py-0.5 rounded whitespace-nowrap"
+            className="inline-flex flex-wrap items-center gap-x-1 text-[11px] font-mono px-1 py-0.5 rounded"
             style={{
               color: deltaColor ?? '#FDE68A',
               background: hexToRgba(deltaColor ?? '#FDE68A', 0.12),

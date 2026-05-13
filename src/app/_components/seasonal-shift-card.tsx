@@ -637,13 +637,13 @@ function WarmSeasonShiftBar({
   const springText = springShiftDays === 0
     ? null
     : springShiftDays < 0
-      ? `Spring ${Math.abs(Math.round(springShiftDays))} days earlier`
-      : `Spring ${Math.round(springShiftDays)} days later`;
+      ? `Spr ${Math.abs(Math.round(springShiftDays))} days earlier`
+      : `Spr ${Math.round(springShiftDays)} days later`;
   const autumnText = autumnShiftDays === 0
     ? null
     : autumnShiftDays > 0
-      ? `Autumn ${Math.round(autumnShiftDays)} days later`
-      : `Autumn ${Math.abs(Math.round(autumnShiftDays))} days earlier`;
+      ? `Aut ${Math.round(autumnShiftDays)} days later`
+      : `Aut ${Math.abs(Math.round(autumnShiftDays))} days earlier`;
 
   const rows: TimelineRow[] = [
     {
@@ -675,12 +675,9 @@ function WarmSeasonShiftBar({
       </div>
       <CalendarTimeline rows={rows} labelColPx={150} />
       {(springText || autumnText) && (
-        <div className="mt-2 text-xs font-mono text-center">
+        <div className="mt-2 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-xs font-mono">
           {springText && (
             <span style={{ color: SPRING_HUE }}>{springText}</span>
-          )}
-          {springText && autumnText && (
-            <span className="text-gray-500"> · </span>
           )}
           {autumnText && (
             <span style={{ color: AUTUMN_HUE }}>{autumnText}</span>

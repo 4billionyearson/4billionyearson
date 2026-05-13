@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { REGION_IMPACTS, PAST_EVENTS, type ImpactPhase } from '@/lib/climate/enso-impacts';
 import EnsoRegionMap from './EnsoRegionMap';
+import EnsoImpactTracker from './EnsoImpactTracker';
 import ForecastSection from './_components/ForecastSection';
 import ShareBar from './_components/ShareBar';
 import { StaticFAQPanel } from '@/app/_components/seo/StaticFAQPanel';
@@ -529,52 +530,10 @@ export default function EnsoPage() {
             )}
 
             <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-              El Niño years push global temperatures higher; La Niña years temporarily damp them - though the underlying greenhouse-gas trend continues either way.
+              El Niño years push global temperatures higher; La Niña years temporarily damp them — though the underlying greenhouse-gas trend continues either way.
               Thresholds: <span className="text-rose-400 font-mono">≥ +0.5°C</span> El Niño ·{' '}
-              <span className="text-sky-400 font-mono">≤ −0.5°C</span> La Niña · otherwise Neutral.{' '}
-              Data: NOAA CPC -{' '}
-              <a
-                href="https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
-              >
-                ONI (3-month mean)
-              </a>
-              {' '}-{' '}
-              <a
-                href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
-              >
-                weekly Niño-region SSTs
-              </a>
-              .{' '}
-              <details className="inline group">
-                <summary className="inline cursor-pointer select-none list-none text-gray-500 hover:text-gray-300 transition-colors">
-                  <span className="group-open:rotate-90 inline-block transition-transform text-[10px] mr-0.5">▶</span>
-                  Why do these figures differ from NOAA&rsquo;s weekly report?
-                </summary>
-                <span className="block mt-1.5 pl-3 border-l border-gray-700 text-gray-500">
-                  As of February 2026, NOAA&rsquo;s official reports switched to <em>relative</em> anomalies,
-                  which subtract out the background global warming signal (~+0.5°C) across the tropical Pacific.
-                  The figures here use <em>traditional</em> anomalies from the source files above - the same
-                  method used by IRI/Columbia forecast models - so they run roughly +0.5°C warmer than NOAA&rsquo;s
-                  latest published values. Traditional anomalies reflect actual Pacific temperatures; relative anomalies
-                  isolate the pure ENSO signal by removing global warming from the comparison.{' '}
-                  <a
-                    href="https://www.weather.gov/media/notification/pdf_2026/pns26-05_Relative_ONI.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sky-400 underline underline-offset-2 hover:text-sky-300 transition-colors"
-                  >
-                    NOAA PNS26-05
-                  </a>
-                </span>
-              </details>
+              <span className="text-sky-400 font-mono">≤ −0.5°C</span> La Niña · otherwise Neutral.
             </p>
-
             <ShareBar
               pageUrl="https://4billionyearson.org/climate/enso#current-state"
               shareText={encodeURIComponent('Current ENSO state - El Nino / La Nina tracker with live NOAA data')}
@@ -586,6 +545,20 @@ export default function EnsoPage() {
         );
       })()}
       </div>
+
+      {/* ═══ GLOBAL IMPACT TRACKER ═════════════════════════════════════════ */}
+      {oni && oni.history && oni.history.length > 0 && (
+      <div id="impact" className="scroll-mt-24">
+        <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impact Tracker (1950 → today)" />
+        <SectionCard
+          icon={<Globe2 className="text-[#D0A65E]" />}
+          title="ENSO's Footprint Around the World"
+          subtitle="Scrub the timeline below — colours show how each country's temperature or rainfall departed from its 1961–1990 baseline in that ENSO year. The four boxes over the equatorial Pacific mark the Niño SST regions."
+        >
+          <EnsoImpactTracker oniHistory={oni.history} />
+        </SectionCard>
+      </div>
+      )}
 
       {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
       <div id="forecast" className="scroll-mt-24">

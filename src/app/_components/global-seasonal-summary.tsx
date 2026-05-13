@@ -236,12 +236,12 @@ export default function GlobalSeasonalSummary({
   function warmDelta(c: WarmCohort): React.ReactNode {
     return (
       <>
-        <span style={{ color: SPRING_HUE }}>Spring {fmtShift(c.meanSpringShift)}</span>
-        <span className="text-gray-500"> · </span>
-        <span style={{ color: AUTUMN_HUE }}>Autumn {fmtShift(c.meanAutumnShift)}</span>
+        <span style={{ color: SPRING_HUE }}>Spr {fmtShift(c.meanSpringShift)}</span>
+        <span className="text-gray-500">·</span>
+        <span style={{ color: AUTUMN_HUE }}>Aut {fmtShift(c.meanAutumnShift)}</span>
         {c.meanNetMonths !== null && (
           <>
-            <span className="text-gray-500"> · </span>
+            <span className="text-gray-500">·</span>
             <span>{fmtMonths(c.meanNetMonths)}</span>
           </>
         )}
@@ -345,7 +345,7 @@ export default function GlobalSeasonalSummary({
         </strong> and shortened in <strong className="text-cyan-300">{data!.globalStats.wetDryStats.wetSeasonsShorter}</strong> tropical/arid regions.
       </p>
 
-      <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-3 sm:p-5">
+      <div className="rounded-xl border border-gray-700/50 bg-gray-800/60 p-2 sm:p-4">
         <div className="flex items-center justify-between gap-2 flex-wrap mb-4">
           <div className="text-xs text-gray-400 uppercase tracking-wider font-mono">
             Jan <span className="text-gray-500">→</span> Dec · Baseline vs Now
