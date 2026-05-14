@@ -195,12 +195,20 @@ html[data-embed] .relative.z-10 {
   color: rgba(30, 41, 59, 0.6);
 }
 
-/* Richer sea colour on Voyager map tiles */
-.leaflet-tile-pane img {
+/* Richer sea colour on Voyager map tiles. Apply the filter to the whole tile
+  pane, not each tile image, so mobile browsers don't reveal seams at tile
+  boundaries. */
+.leaflet-tile-pane {
   filter: saturate(3);
-  /* Eliminate 1px white seams between tiles at non-integer DPR */
-  margin: -1px;
-  padding: 1px;
+}
+
+/* Fractional zoom on mobile can expose hairline gaps between adjacent tiles.
+  A transparent outline/backface hint closes those seams without shifting
+  tile coordinates, so vector overlays stay aligned. */
+.leaflet-tile-pane img {
+  outline: 1px solid transparent;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Smooth recolour when the user changes Level / Metric / Stretch on a

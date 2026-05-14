@@ -101,6 +101,9 @@ export interface WorldMapShellProps {
   preset?: WorldMapPreset;
   /** 'light' = CARTO voyager (default), 'dark' = CARTO dark_nolabels. */
   theme?: 'light' | 'dark';
+  /** Render the raster tile basemap. Disable for maps whose vector layer
+   *  already carries the full geography and where tile seams are undesirable. */
+  showTiles?: boolean;
   /** Tile layer opacity. Climate Map dims its tiles to let choropleth pop. */
   tileOpacity?: number;
   /** Min zoom. Default `0` (allows fractional zoom below 1 on wide-short
@@ -248,6 +251,7 @@ function WorldFitter({ preset }: { preset: WorldMapPreset }) {
 export function WorldMapShell({
   preset = 'world',
   theme = 'light',
+  showTiles = true,
   tileOpacity = 1,
   minZoom = 0,
   maxZoom = 10,
@@ -281,19 +285,21 @@ export function WorldMapShell({
         style={{ background: bg }}
       >
         <WorldFitter preset={preset} />
-        <TileLayer
-          attribution={TILE_ATTRIBUTION}
-          url={tileUrl}
-          opacity={tileOpacity}
-          // The `pacific` view spans one world width starting at lon -330,
-          // so the western half of the visible canvas needs a wrap copy.
-          // The `world` view is biased a few degrees east of the prime
-          // meridian to fit the shifted Chukotka peninsula (~+190°) inside
-          // the right edge, so it also needs wrap so the basemap doesn't
-          // disappear into a black strip past +180. Only `usa` and `uk`
-          // (which sit comfortably within a single world copy) use noWrap.
-          noWrap={preset === 'usa' || preset === 'uk'}
-        />
+        {showTiles ? (
+          <TileLayer
+            attribution={TILE_ATTRIBUTION}
+            url={tileUrl}
+            opacity={tileOpacity}
+            // The `pacific` view spans one world width starting at lon -330,
+            // so the western half of the visible canvas needs a wrap copy.
+            // The `world` view is biased a few degrees east of the prime
+            // meridian to fit the shifted Chukotka peninsula (~+190°) inside
+            // the right edge, so it also needs wrap so the basemap doesn't
+            // disappear into a black strip past +180. Only `usa` and `uk`
+            // (which sit comfortably within a single world copy) use noWrap.
+            noWrap={preset === 'usa' || preset === 'uk'}
+          />
+        ) : null}
         {children}
       </MapContainer>
     </div>

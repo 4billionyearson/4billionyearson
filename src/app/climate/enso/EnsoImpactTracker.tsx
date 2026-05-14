@@ -564,6 +564,7 @@ const Inner = dynamic<InnerProps>(
         <WorldMapShell
           preset="pacific"
           theme="light"
+          showTiles={false}
           maxZoom={6}
           className="border border-gray-800"
         >
@@ -980,7 +981,7 @@ export default function EnsoImpactTracker({
     <div>
       {/* Header — prominent year/state + metric/window toggles (no title — page heading above is sufficient) */}
       <div className="flex flex-wrap items-end justify-between gap-2 mb-3">
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           {mode === 'year' && (
             <>
               <span className="font-mono font-black tabular-nums text-2xl sm:text-5xl text-[#D0A65E] leading-none">{year}</span>
