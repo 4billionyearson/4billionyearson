@@ -200,7 +200,7 @@ const LABELED_PLACES: Array<{ name: string; lat: number; lon: number }> = [
   { name: 'Russia',                   lat: 60,  lon: 97  - 360 },     // -263 — Siberian warming
   // ── Africa ─────────────────────────────────────────────────────────────
   { name: 'Egypt',                    lat: 27,  lon: 30  - 360 },     // -330 — North Africa
-  { name: 'Nigeria',                  lat: 9,   lon: 8   - 360 },     // -352 — West Africa / Sahel
+  { name: 'Nigeria',                  lat: 13,  lon: 8   - 360 },     // -352 — West Africa / Sahel
   { name: 'Kenya',                    lat: 0,   lon: 38  - 360 },     // -322 — East Africa (El Niño → wetter)
   { name: 'South Africa',             lat: -29, lon: 24  - 360 },     // -336 — Southern Africa (El Niño → drier)
   // ── Middle East / Central Asia ─────────────────────────────────────────
@@ -213,8 +213,15 @@ const LABELED_PLACES: Array<{ name: string; lat: number; lon: number }> = [
   // ── Southeast Asia / Oceania ───────────────────────────────────────────
   { name: 'Indonesia',                lat: -2,  lon: 118 - 360 },     // -242 — strongest El Niño drought
   { name: 'Philippines',              lat: 13,  lon: 122 - 360 },     // -238
-  { name: 'Australia',                lat: -25, lon: 135 - 360 },     // -225 — El Niño → drought
+  { name: 'Australia',                lat: -33, lon: 135 - 360 },     // -225 — El Niño → drought
 ];
+
+// Reduced badge set for mobile — 10 well-spaced countries with the clearest
+// ENSO signals, one per major region to avoid crowding the narrow viewport.
+const MOBILE_LABELED_NAMES = new Set([
+  'Canada', 'United States of America', 'Brazil', 'Peru',
+  'Russia', 'Kenya', 'India', 'Indonesia', 'Australia', 'South Africa',
+]);
 
 function labelTextFor(
   v: number | null | undefined,
@@ -247,6 +254,7 @@ type InnerProps = {
   mode: Mode;
   year: number;
   ensoAnom: number;
+  isMobile: boolean;
   onHover: (info: { name: string; value: number | null } | null) => void;
 };
 
@@ -255,11 +263,11 @@ type InnerProps = {
 // the Leaflet view that is centred at −205° longitude.
 const PACIFIC_CONTINENT_LABELS: { name: string; pos: [number, number] }[] = [
   { name: 'North America', pos: [47, -100] },
-  { name: 'South America', pos: [-15, -58] },
+  { name: 'South America', pos: [-24, -58] },
   { name: 'Europe',        pos: [54, 15 - 360] },   // −345
-  { name: 'Africa',        pos: [5,  18 - 360] },   // −342
-  { name: 'Asia',          pos: [44, 90 - 360] },   // −270
-  { name: 'Oceania',       pos: [-25, 134 - 360] }, // −226
+  { name: 'Africa',        pos: [3,  28 - 360] },   // −332
+  { name: 'Asia',          pos: [40, 115 - 360] },  // −245
+  { name: 'Oceania',       pos: [-22, 134 - 360] }, // −226
 ];
 // Countries shown at the intermediate zoom level (zoom 2.4–3.8).
 // Keep to the largest / most climatically relevant nations.
@@ -418,7 +426,7 @@ const Inner = dynamic<InnerProps>(
       return null;
     }
 
-    function MapInner({ values, metric, mode, year, ensoAnom, onHover }: InnerProps) {
+    function MapInner({ values, metric, mode, year, ensoAnom, isMobile, onHover }: InnerProps) {
       const [geo, setGeo] = useState<FC | null>(null);
       // Only remount the GeoJSON layer when mode or metric changes.
       // Year changes are handled imperatively via geoRef so the DOM elements
@@ -592,7 +600,7 @@ const Inner = dynamic<InnerProps>(
           {/* Permanent numeric data badges for classic teleconnection countries.
               Rendered after PacificMapLabels so they appear above name labels.
               In corr mode the value is r; in year/simulate mode it is the anomaly. */}
-          {LABELED_PLACES.map((p) => {
+          {(isMobile ? LABELED_PLACES.filter(p => MOBILE_LABELED_NAMES.has(p.name)) : LABELED_PLACES).map((p) => {
             const v = values[p.name];
             const text = labelTextFor(v, metric, mode);
             if (!text) return null;
@@ -617,13 +625,13 @@ const Inner = dynamic<InnerProps>(
               />
             );
           })}
-          {/* ENSO Monitoring Region label — sits just above the Niño boxes */}
+          {/* ENSO region label — sits just above the Niño boxes */}
           <Marker
             position={[8, -148]}
             interactive={false}
             icon={Lm.divIcon({
               className: '',
-              html: `<span style="display:block;white-space:nowrap;font:700 9px ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:1px;color:rgba(30,41,59,0.75);text-shadow:0 0 3px rgba(255,255,255,0.7);transform:translate(-50%,-50%)">ENSO Monitoring Region</span>`,
+              html: `<span style="display:block;white-space:nowrap;font:700 9px ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:1px;color:rgba(30,41,59,0.75);text-shadow:0 0 3px rgba(255,255,255,0.7);transform:translate(-50%,-50%)">ENSO region</span>`,
               iconSize: [0, 0],
               iconAnchor: [0, 0],
             })}
@@ -750,6 +758,15 @@ export default function EnsoImpactTracker({
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(4); // years per second
   const [hovered, setHovered] = useState<{ name: string; value: number | null } | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   // Load pre-computed impact dataset.
   useEffect(() => {
@@ -1167,12 +1184,11 @@ export default function EnsoImpactTracker({
           the Pacific-centred fit. The relative wrapper is needed so the
           absolute-positioned hover info panel stays inside the map area. */}
       <div className="relative">
-        <Inner values={activeValues} metric={metric} mode={mode} year={year} ensoAnom={mode === 'simulate' ? oniSlider : ensoAnom} onHover={setHovered} />
+        <Inner values={activeValues} metric={metric} mode={mode} year={year} ensoAnom={mode === 'simulate' ? oniSlider : ensoAnom} isMobile={isMobile} onHover={setHovered} />
         {/* Bottom hover info panel — replaces mouse-following Leaflet tooltips,
             works on both desktop and mobile touch. */}
         <div
-          className="absolute bottom-0 left-0 right-0 z-[1001] bg-gray-950/95 backdrop-blur-sm border-t border-gray-700/60 px-3 py-2 pointer-events-none"
-          style={{ transition: 'opacity 150ms ease' }}
+          className={`absolute bottom-0 left-0 right-0 z-[1001] bg-gray-950/95 backdrop-blur-sm border-t border-gray-700/60 px-3 py-2 pointer-events-none transition-opacity duration-150 ${hovered ? 'opacity-100' : 'opacity-0'}`}
         >
           {hovered ? (() => {
             const { name, value } = hovered;

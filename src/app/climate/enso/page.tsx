@@ -565,7 +565,7 @@ export default function EnsoPage() {
       <div id="impact" className="scroll-mt-24">
         <SectionCard
           icon={<Globe2 className="text-[#D0A65E]" />}
-          title="ENSO's Footprint Around the World"
+          title="ENSO's World Footprint"
         >
           <EnsoImpactTracker oniHistory={oni!.history} />
           <ShareBar
