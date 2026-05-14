@@ -198,6 +198,9 @@ html[data-embed] .relative.z-10 {
 /* Richer sea colour on Voyager map tiles */
 .leaflet-tile-pane img {
   filter: saturate(3);
+  /* Eliminate 1px white seams between tiles at non-integer DPR */
+  margin: -1px;
+  padding: 1px;
 }
 
 /* Smooth recolour when the user changes Level / Metric / Stretch on a

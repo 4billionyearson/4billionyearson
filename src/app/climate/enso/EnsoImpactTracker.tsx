@@ -263,7 +263,7 @@ type InnerProps = {
 // the Leaflet view that is centred at −205° longitude.
 const PACIFIC_CONTINENT_LABELS: { name: string; pos: [number, number] }[] = [
   { name: 'North America', pos: [47, -100] },
-  { name: 'South America', pos: [-24, -58] },
+  { name: 'South America', pos: [-24, -100] },
   { name: 'Europe',        pos: [54, 15 - 360] },   // −345
   { name: 'Africa',        pos: [3,  28 - 360] },   // −332
   { name: 'Asia',          pos: [40, 115 - 360] },  // −245
@@ -627,7 +627,7 @@ const Inner = dynamic<InnerProps>(
           })}
           {/* ENSO region label — sits just above the Niño boxes */}
           <Marker
-            position={[8, -148]}
+            position={[11, -148]}
             interactive={false}
             icon={Lm.divIcon({
               className: '',
@@ -977,9 +977,9 @@ export default function EnsoImpactTracker({
   const stepYear = (delta: number) => setYear((y) => Math.max(minYear, Math.min(maxYear, y + delta)));
 
   return (
-    <div className="rounded-xl border border-gray-700/50 bg-gray-800/30 p-3 sm:p-4">
+    <div>
       {/* Header — prominent year/state + metric/window toggles (no title — page heading above is sufficient) */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <div className="flex flex-wrap items-end justify-between gap-2 mb-3">
         <div className="flex items-center gap-3 flex-wrap">
           {mode === 'year' && (
             <>
@@ -1016,8 +1016,8 @@ export default function EnsoImpactTracker({
             aria-pressed={mode === 'simulate'}
             className={`${TOGGLE_BASE} ${mode === 'simulate' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
           >Simulate</button>
-                {/* Metric: Temp / Rain */}
-          <span className="inline-block h-4 w-px bg-gray-700 mx-0.5" aria-hidden />
+          {/* Metric: Temp / Rain */}
+          <span className="inline-block h-4 w-px bg-gray-700 mx-0.5 shrink-0" aria-hidden />
           <button
             type="button"
             onClick={() => setMetric('temp')}
@@ -1218,7 +1218,7 @@ export default function EnsoImpactTracker({
       </div>
 
       {/* Legend strip */}
-      <div className="rounded-lg border border-gray-700/50 bg-gray-900/30 px-3 py-2 mt-2 flex items-center justify-between gap-2 flex-wrap text-[10px] font-mono text-gray-400">
+      <div className="px-1 py-2 mt-1 flex items-center justify-between gap-2 flex-wrap text-[10px] font-mono text-gray-400">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sky-400">
             {mode === 'corr'
@@ -1247,7 +1247,7 @@ export default function EnsoImpactTracker({
         <div className="hidden sm:block text-gray-500">
           {mode === 'corr' ? 'Map fixed; year scrubber inactive'
             : mode === 'simulate' ? 'Map driven by ENSO strength slider'
-            : 'Niño boxes coloured by peak ONI in selected year'}
+            : null}
         </div>
       </div>
 
@@ -1301,7 +1301,7 @@ export default function EnsoImpactTracker({
 
       {/* Scrubber + playback controls — shown in Year mode only */}
       {mode === 'year' && (
-      <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2 mt-3">
+      <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2 mt-1">
         <div className="flex items-center justify-between gap-2 mb-1.5">
           <span className="text-[10px] uppercase tracking-wider text-gray-500">Playback · {mode === 'year' ? year : mode === 'simulate' ? `ONI ${oniSlider >= 0 ? '+' : ''}${oniSlider.toFixed(1)}°C` : '1950-present'}</span>
         </div>
