@@ -6,7 +6,7 @@ import type { FeatureCollection, Feature } from 'geojson';
 import type { Layer, PathOptions } from 'leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { WorldMapShell } from '../../_components/world-map-shell';
+import { WorldMapShell, fixAntimeridian } from '../../_components/world-map-shell';
 import {
   METRICS,
   type MetricKey,
@@ -205,36 +205,9 @@ interface GroupRow {
   latestLabel: string | null;
 }
 
-// Antimeridian fix (reused from emissions-choropleth-map).
-// Without this, Russia / Fiji / Antarctica render a giant horizontal
-// strip across the equirectangular projection because the ring wraps
-// from +170°E to −170°W.
-function fixAntimeridian(geo: FeatureCollection): FeatureCollection {
-  const targets = new Set(['Russia', 'Fiji', 'Antarctica']);
-  return {
-    ...geo,
-    features: geo.features.map((f) => {
-      if (!targets.has((f.properties as any)?.name)) return f;
-      if (f.geometry.type === 'MultiPolygon') {
-        const fixed: number[][][][] = [];
-        for (const polygon of (f.geometry as any).coordinates as number[][][][]) {
-          for (const ring of polygon) {
-            const hasHigh = ring.some((c) => c[0] > 170);
-            const hasLow = ring.some((c) => c[0] < -170);
-            if (hasHigh && hasLow) {
-              fixed.push([ring.map((c) => (c[0] < 0 ? [c[0] + 360, c[1]] : [...c]))]);
-              fixed.push([ring.map((c) => (c[0] > 0 ? [c[0] - 360, c[1]] : [...c]))]);
-            } else {
-              fixed.push([ring]);
-            }
-          }
-        }
-        return { ...f, geometry: { type: 'MultiPolygon', coordinates: fixed } };
-      }
-      return f;
-    }),
-  };
-}
+// Antimeridian fix is centralised in `world-map-shell` so every world map
+// on the site renders Russia / Fiji / Antarctica the same way across the
+// dateline (single east-shifted copy = no left-edge splinter).
 
 // Color ramp: anomaly (°C) → hex. Blue below 0, orange/red above.
 // Now delegates to colorForMetric(metric, value, windowSel) so the same map can render
@@ -1063,6 +1036,7 @@ export default function ClimateMap({
   const style = useCallback((feature: Feature | undefined): PathOptions => {
     if (!feature) return { fillColor: '#1f2937', fillOpacity: 0.8, weight: 0.4, color: '#0b1220' };
     const name = ((feature.properties as any)?.name as string) ?? '';
+    const wrappedDateline = Boolean((feature.properties as any)?.__wrappedDateline);
     const norm = normalizeName(name);
     let rec = lookup.get(norm);
     // HadCRUT/Berkeley have no Western Sahara row — fall back to Morocco
@@ -1072,7 +1046,8 @@ export default function ClimateMap({
     return {
       fillColor: value != null ? colorForMetric(metric, value, windowSel, customScale ?? undefined) : '#1f2937',
       fillOpacity: 0.85,
-      weight: 0.4,
+      stroke: !wrappedDateline,
+      weight: wrappedDateline ? 0 : 0.4,
       color: '#0b1220',
     };
   }, [lookup, pick, metric, windowSel, customScale]);

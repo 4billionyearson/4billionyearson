@@ -15,14 +15,14 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Check, ChevronDown, Code2, Copy, History, Link2, Mail, Share2 } from 'lucide-react';
+import { Activity, Check, ChevronDown, Code2, Copy, History, Link2, Mail, Share2 } from 'lucide-react';
 import type { EnsoSnapshot, ForecastSeason, PlumePeriod } from '../types';
 
 /* ─── Share bar ───────────────────────────────────────────────────────────── */
 
 const PAGE_URL = 'https://4billionyearson.org/climate/enso#forecast';
 const EMBED_URL = 'https://4billionyearson.org/climate/enso/embed/forecast';
-const EMBED_CODE = `<iframe\n  src="${EMBED_URL}"\n  width="100%" height="520"\n  style="border:none;"\n  title="ENSO Forecast - 4 Billion Years On"\n></iframe>`;
+const EMBED_CODE = `<iframe\n  src="${EMBED_URL}"\n  width="100%" height="620"\n  style="border:none;"\n  title="ENSO Forecast - 4 Billion Years On"\n></iframe>`;
 
 const SHARE_TEXT = encodeURIComponent('ENSO Forecast - El Nino / La Nina tracker with the latest NOAA forecast');
 const SHARE_URL  = encodeURIComponent(PAGE_URL);
@@ -231,6 +231,7 @@ const ACCENT = '#D0A65E';
 const TT_CONTENT = { backgroundColor: '#0f172a', border: `1px solid ${ACCENT}`, borderRadius: 8, fontSize: 12, color: '#f3f4f6' } as const;
 const TT_LABEL = { color: '#ffffff', fontWeight: 600, marginBottom: 4 } as const;
 const TT_ITEM = { color: '#e5e7eb' } as const;
+const TT_CURSOR = { fill: 'rgba(208,166,94,0.08)' } as const;
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -285,6 +286,7 @@ function SectionCard({
 
 export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
   const { oni, weekly, plume } = data;
+  const [indicatorsOpen, setIndicatorsOpen] = useState(false);
 
   if (!oni) return null;
 
@@ -865,6 +867,121 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
           </div>
         </div>
       )}
+
+      {/* ─── Do the Indicators Agree? (collapsible) ──────────────────────── */}
+      {(data.weekly || data.mei || data.soi) && (() => {
+        const FIVE_YEARS_MS = 5 * 365.25 * 24 * 3600 * 1000;
+        const nowMs = Date.now();
+        const startMs = nowMs - FIVE_YEARS_MS;
+        const ninoSeries = (data.weekly?.weekly ?? [])
+          .map((w) => ({ t: Date.parse(w.date), v: w.nino34.anom }))
+          .filter((p) => Number.isFinite(p.t) && p.t >= startMs);
+        const meiSeries = (data.mei?.history ?? [])
+          .map((m) => ({
+            t: Date.UTC(m.year, Math.max(0, Math.min(11, m.seasonIndex - 1)), 15),
+            v: m.value,
+          }))
+          .filter((p) => p.t >= startMs);
+        const soiSeries = (data.soi?.history ?? [])
+          .map((s) => ({
+            t: Date.UTC(s.year, s.month - 1, 15),
+            v: -s.value,
+            raw: s.value,
+          }))
+          .filter((p) => p.t >= startMs);
+        const startYear = new Date(startMs).getUTCFullYear();
+        const endYear = new Date(nowMs).getUTCFullYear();
+        const yearTicks: number[] = [];
+        for (let y = startYear; y <= endYear; y++) yearTicks.push(Date.UTC(y, 0, 1));
+        const fmtIndDate = (t: number) => `${new Date(t).getUTCFullYear()}`;
+        const fmtIndFull = (t: number) => {
+          const d = new Date(t);
+          return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+        };
+        const lastNino = ninoSeries[ninoSeries.length - 1];
+        const lastMei  = meiSeries[meiSeries.length - 1];
+        const lastSoi  = soiSeries[soiSeries.length - 1];
+        return (
+          <div className="mt-4 rounded-xl border border-gray-700/50">
+            <button
+              type="button"
+              onClick={() => setIndicatorsOpen((v) => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-900/60 hover:border-[#D0A65E]/40 hover:bg-gray-900/80 transition-all text-left"
+            >
+              <span className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-amber-300 shrink-0" />
+                <span className="text-sm font-semibold font-mono text-white">Do the Indicators Agree?</span>
+                <span className="hidden sm:inline text-xs text-gray-500 font-normal">Niño 3.4 · MEI · SOI</span>
+              </span>
+              <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-300 shrink-0 ${indicatorsOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <div className={`grid transition-all duration-500 ease-out ${indicatorsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+              <div className="overflow-hidden">
+                <div className="px-4 pt-2 pb-4 border-t border-gray-700/50">
+                  <p className="text-xs text-gray-400 mb-3">Three ENSO indicators on one axis: Niño 3.4 (ocean), MEI v2 (ocean+atmosphere) and −SOI (sign-flipped so all three rise together for El Niño). When all three climb past +0.5, the forecast has independent support.</p>
+                  <div className="h-[340px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart margin={{ top: 10, right: 28, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis
+                          dataKey="t"
+                          type="number"
+                          domain={[startMs, nowMs]}
+                          ticks={yearTicks}
+                          tickFormatter={fmtIndDate}
+                          stroke="#9CA3AF"
+                          fontSize={10}
+                          allowDuplicatedCategory={false}
+                        />
+                        <YAxis
+                          stroke="#9CA3AF"
+                          fontSize={10}
+                          width={36}
+                          domain={[-3, 3]}
+                          ticks={[-3, -2, -1, 0, 1, 2, 3]}
+                          tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
+                        />
+                        <Tooltip
+                          contentStyle={TT_CONTENT}
+                          labelStyle={TT_LABEL}
+                          itemStyle={TT_ITEM}
+                          cursor={TT_CURSOR}
+                          labelFormatter={(t: any) => (typeof t === 'number' ? fmtIndFull(t) : '')}
+                          formatter={(v: any, name: any) => [
+                            typeof v === 'number' ? fmtSigned(v, 2) : '-',
+                            name,
+                          ]}
+                        />
+                        <ReferenceLine y={0.5} stroke="#f43f5e" strokeDasharray="3 3" />
+                        <ReferenceLine y={-0.5} stroke="#0ea5e9" strokeDasharray="3 3" />
+                        <ReferenceLine y={0} stroke="#6B7280" />
+                        <Line data={ninoSeries} dataKey="v" name="Niño 3.4 SST anomaly (°C)" type="monotone" stroke="#fbbf24" strokeWidth={1.6} dot={false} isAnimationActive={false} />
+                        <Line data={meiSeries} dataKey="v" name="MEI v2 (index)" type="monotone" stroke="#a78bfa" strokeWidth={1.8} dot={false} isAnimationActive={false} />
+                        <Line data={soiSeries} dataKey="v" name="−SOI (sign-flipped)" type="monotone" stroke="#34d399" strokeWidth={1.6} strokeDasharray="4 2" dot={false} isAnimationActive={false} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
+                    <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-[2px] bg-amber-400" /> Niño 3.4 weekly SST anomaly (°C)</span>
+                    <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-[2px] bg-violet-400" /> MEI v2 (bi-monthly, 5 variables)</span>
+                    <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-[2px] bg-emerald-400" style={{ borderTop: '2px dashed #34d399', height: 0 }} /> −SOI (sign-flipped)</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">
+                    <strong className="text-gray-200">Latest:</strong>{' '}
+                    Niño 3.4 = <span className="font-mono text-amber-300">{typeof lastNino?.v === 'number' ? fmtSigned(lastNino.v) : '-'}</span>°C{' '}
+                    · MEI v2 = <span className="font-mono text-violet-300">{typeof lastMei?.v === 'number' ? fmtSigned(lastMei.v) : '-'}</span>{' '}
+                    · −SOI = <span className="font-mono text-emerald-300">{typeof lastSoi?.v === 'number' ? fmtSigned(lastSoi.v) : '-'}</span>{' '}
+                    (SOI raw = <span className="font-mono">{typeof (lastSoi as any)?.raw === 'number' ? fmtSigned((lastSoi as any).raw, 1) : '-'}</span>).
+                  </p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Indicators: <a href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA CPC Niño-region SSTs</a>, <a href="https://psl.noaa.gov/enso/mei/" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA PSL MEI v2</a>, <a href="https://www.cpc.ncep.noaa.gov/data/indices/soi" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">NOAA CPC SOI</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <p className="text-xs text-gray-500 mt-3">
         Sources:{' '}

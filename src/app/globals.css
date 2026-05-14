@@ -115,6 +115,21 @@ html[data-embed] .relative.z-10 {
   box-shadow: none !important;
 }
 
+/* Hover tooltips for the ENSO Impact Tracker (correlation / year /
+   composite maps). Match the dark card chrome used elsewhere so the
+   text is legible against the basemap. */
+.enso-impact-tooltip.leaflet-tooltip,
+.enso-nino-tooltip.leaflet-tooltip {
+  background: rgba(9, 13, 21, 0.94) !important;
+  border: 1px solid rgba(208, 166, 94, 0.28) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+  padding: 5px 9px !important;
+  border-radius: 6px !important;
+  color: #fff5e7 !important;
+  font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace !important;
+  white-space: nowrap !important;
+}
+
 /* Hover tooltips for the Global Shift map (Shifting Seasons page) */
 .global-shift-tooltip.leaflet-tooltip {
   background: rgba(9, 13, 21, 0.94) !important;

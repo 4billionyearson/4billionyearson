@@ -5,7 +5,7 @@ import { GeoJSON, useMap, useMapEvents, Marker } from "react-leaflet";
 import type { FeatureCollection, Feature } from "geojson";
 import type { Layer, PathOptions } from "leaflet";
 import L from "leaflet";
-import { WorldMapShell } from "./world-map-shell";
+import { WorldMapShell, fixAntimeridian } from "./world-map-shell";
 
 /* Compute the visual centroid of a GeoJSON feature */
 function featureCentroid(feature: Feature): [number, number] | null {
@@ -177,36 +177,9 @@ interface EnergyEntry {
   renewablesShare: number;
 }
 
-// Fix GeoJSON features crossing the antimeridian (Russia, Fiji, Antarctica)
-// by splitting rings that span both sides into separate polygons
-function fixAntimeridian(geo: FeatureCollection): FeatureCollection {
-  const ANTI_COUNTRIES = new Set(["Russia", "Fiji", "Antarctica"]);
-  return {
-    ...geo,
-    features: geo.features.map((f) => {
-      if (!ANTI_COUNTRIES.has(f.properties?.name)) return f;
-      if (f.geometry.type === "MultiPolygon") {
-        const fixed: number[][][][] = [];
-        for (const polygon of (f.geometry as any).coordinates as number[][][][]) {
-          for (const ring of polygon) {
-            const hasHigh = ring.some((c: number[]) => c[0] > 170);
-            const hasLow = ring.some((c: number[]) => c[0] < -170);
-            if (hasHigh && hasLow) {
-              // Split into east and west halves
-              const east = ring.map((c: number[]) => c[0] < 0 ? [c[0] + 360, c[1]] : [...c]);
-              const west = ring.map((c: number[]) => c[0] > 0 ? [c[0] - 360, c[1]] : [...c]);
-              fixed.push([east], [west]);
-            } else {
-              fixed.push([ring]);
-            }
-          }
-        }
-        return { ...f, geometry: { type: "MultiPolygon", coordinates: fixed } };
-      }
-      return f;
-    }),
-  };
-}
+// Antimeridian fix centralised in `world-map-shell` so every world map
+// on the site renders Russia / Fiji / Antarctica the same way across the
+// dateline.
 
 // Color scale: red (0%) → yellow (25%) → green (50%) → cyan (75%+)
 function getColor(value: number | undefined) {
@@ -422,13 +395,15 @@ export default function EnergyChoroplethMap({ selectedCountry, selectedState }: 
       if (!feature || !energyData) {
         return { fillColor: "#1e293b", fillOpacity: 0.7, weight: 0.5, color: "#475569" };
       }
+      const wrappedDateline = Boolean((feature.properties as any)?.__wrappedDateline);
       const geoName = feature.properties?.name || "";
       const owidName = NAME_MAP[geoName] || geoName;
       const value = energyData.get(owidName);
       return {
         fillColor: getColor(value),
         fillOpacity: 0.8,
-        weight: 0.5,
+        stroke: !wrappedDateline,
+        weight: wrappedDateline ? 0 : 0.5,
         color: "#334155",
       };
     },

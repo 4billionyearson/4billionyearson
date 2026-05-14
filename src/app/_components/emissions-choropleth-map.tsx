@@ -5,7 +5,7 @@ import { GeoJSON, useMap, useMapEvents, Marker } from "react-leaflet";
 import type { FeatureCollection, Feature } from "geojson";
 import type { Layer, PathOptions } from "leaflet";
 import L from "leaflet";
-import { WorldMapShell } from "./world-map-shell";
+import { WorldMapShell, fixAntimeridian } from "./world-map-shell";
 import "leaflet/dist/leaflet.css";
 import { ChipDropdown } from "@/app/_components/responsive-segmented-control";
 
@@ -91,35 +91,6 @@ const NAME_MAP: Record<string, string> = {
   "Lao PDR": "Laos",
   Brunei: "Brunei",
 };
-
-/* ─── Antimeridian fix ──────────────────────────────────────────────────── */
-
-function fixAntimeridian(geo: FeatureCollection): FeatureCollection {
-  const targets = new Set(["Russia", "Fiji", "Antarctica"]);
-  return {
-    ...geo,
-    features: geo.features.map((f) => {
-      if (!targets.has(f.properties?.name)) return f;
-      if (f.geometry.type === "MultiPolygon") {
-        const fixed: number[][][][] = [];
-        for (const polygon of (f.geometry as any).coordinates as number[][][][]) {
-          for (const ring of polygon) {
-            const hasHigh = ring.some((c: number[]) => c[0] > 170);
-            const hasLow = ring.some((c: number[]) => c[0] < -170);
-            if (hasHigh && hasLow) {
-              fixed.push([ring.map((c: number[]) => (c[0] < 0 ? [c[0] + 360, c[1]] : [...c]))]);
-              fixed.push([ring.map((c: number[]) => (c[0] > 0 ? [c[0] - 360, c[1]] : [...c]))]);
-            } else {
-              fixed.push([ring]);
-            }
-          }
-        }
-        return { ...f, geometry: { type: "MultiPolygon", coordinates: fixed } };
-      }
-      return f;
-    }),
-  };
-}
 
 /* ─── Color scales ──────────────────────────────────────────────────────── */
 
@@ -491,6 +462,7 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
   const style = useCallback(
     (feature: Feature | undefined): PathOptions => {
       if (!feature) return { fillColor: "#1e293b", fillOpacity: 0.7, weight: 0.5, color: "#475569" };
+      const wrappedDateline = Boolean((feature.properties as any)?.__wrappedDateline);
       const geoName = feature.properties?.name || "";
       const owidName = NAME_MAP[geoName] || geoName;
       const { entry } = resolveEntry(owidName, geoName);
@@ -498,7 +470,8 @@ export default function EmissionsChoroplethMap({ countryMapData }: Props) {
       return {
         fillColor: colorFor(value),
         fillOpacity: 0.8,
-        weight: level === 'continents' ? 0.2 : 0.5,
+        stroke: !wrappedDateline,
+        weight: wrappedDateline ? 0 : level === 'continents' ? 0.2 : 0.5,
         color: "#334155",
       };
     },

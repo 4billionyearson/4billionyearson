@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { Thermometer, CloudRain, Sun, Snowflake } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -451,13 +451,18 @@ interface TooltipPayloadEntry {
  * below the dot when the dot is near the top of the plot area.
  */
 function CalloutLabel({ cx, cy, color, text, monthIdx }: { cx: number; cy: number; color: string; text: string; monthIdx?: number }) {
-  // Approximate text width (monospace-ish at 11px). Tightened from 6.2/6
-  // so the rounded rect hugs the label — previously it had a noticeable
-  // gap on either end, especially on mobile.
-  const charW = 5.6;
-  const padX = 3;
-  const padY = 3;
-  const textW = text.length * charW;
+  // Measure the rendered text so the rounded rect hugs it regardless of
+  // glyph mix. Falls back to a conservative estimate on first paint / SSR.
+  const textRef = useRef<SVGTextElement | null>(null);
+  const [measuredW, setMeasuredW] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    if (textRef.current) {
+      const w = textRef.current.getBBox().width;
+      if (w > 0 && Math.abs(w - (measuredW ?? 0)) > 0.5) setMeasuredW(w);
+    }
+  }, [text, measuredW]);
+  const padX = 4;
+  const textW = measuredW ?? text.length * 5.8;
   const rectW = textW + padX * 2;
   const rectH = 16;
 
@@ -498,7 +503,7 @@ function CalloutLabel({ cx, cy, color, text, monthIdx }: { cx: number; cy: numbe
         stroke={color}
         strokeWidth={1}
       />
-      <text x={textX} y={textY} textAnchor={textAnchor} fill={color} fontSize={11} fontWeight="bold">
+      <text ref={textRef} x={textX} y={textY} textAnchor={textAnchor} fill={color} fontSize={11} fontWeight="bold">
         {text}
       </text>
     </g>

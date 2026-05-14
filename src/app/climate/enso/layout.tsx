@@ -4,13 +4,19 @@ import { ENSO_FAQ } from './enso-faq';
 const URL = 'https://4billionyearson.org/climate/enso';
 
 export const metadata: Metadata = {
-  title: 'El Niño / La Niña - ENSO Tracker, Regional Impacts & Forecast',
+  title: 'El Niño / La Niña - ENSO Tracker, Global Impact Map & Forecast',
   description:
-    "Weekly ENSO tracker: Niño 3.4 SST anomalies, NOAA ONI, MEI v2 and SOI. Global impact maps showing which regions get warmer, cooler, wetter or drier under each phase. Met Office plume forecasts, past major events from 1982 to 2024, and how ENSO interacts with climate change.",
+    "Interactive ENSO tracker: explore how El Niño and La Niña affect every country's temperature and rainfall since 1950. Live Niño 3.4 SST anomalies, NOAA ONI, MEI v2 and SOI indicators. Scrubbable world map showing ENSO's teleconnection footprint, Met Office plume forecasts, and how ENSO interacts with climate change.",
   keywords: [
     'El Niño',
     'La Niña',
     'ENSO',
+    'ENSO global impact map',
+    'ENSO footprint',
+    'ENSO teleconnection',
+    'El Niño world map',
+    'La Niña world map',
+    'ENSO country impacts',
     'Niño 3.4',
     'Oceanic Niño Index',
     'ONI',
@@ -23,24 +29,28 @@ export const metadata: Metadata = {
     'ENSO impacts',
     'El Niño regional impacts',
     'La Niña regional impacts',
+    'ENSO correlation',
+    'ENSO temperature anomaly',
+    'ENSO rainfall anomaly',
     'ENSO and climate change',
     'NOAA CPC',
     'NOAA PSL',
     'Met Office GloSea',
+    'Berkeley Earth temperature',
   ],
   alternates: { canonical: URL },
   openGraph: {
-    title: 'El Niño / La Niña - ENSO Tracker',
+    title: 'El Niño / La Niña - ENSO Global Impact Tracker',
     description:
-      'Where in the El Niño / La Niña cycle is the Pacific right now? Weekly Niño 3.4 SST anomalies, ONI, MEI, SOI and the live NOAA forecast plume.',
+      "Interactive map: where is El Niño / La Niña right now, and how does it affect every country's temperature and rainfall? Live Niño 3.4, ONI, MEI, SOI and NOAA forecast plume.",
     type: 'article',
     url: URL,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'El Niño / La Niña - ENSO Tracker',
+    title: 'El Niño / La Niña - ENSO Global Impact Tracker',
     description:
-      'Live ENSO indicators: weekly Niño 3.4, ONI 3-month, MEI v2, SOI and NOAA forecast probabilities.',
+      'Interactive world map of ENSO teleconnections since 1950. Live Niño 3.4, ONI 3-month, MEI v2, SOI and NOAA forecast probabilities.',
   },
 };
 
@@ -48,13 +58,17 @@ export default function EnsoLayout({ children }: { children: React.ReactNode }) 
   const datasetSchema = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'El Niño / La Niña - live ENSO indicators',
+    name: 'ENSO Global Impact Tracker — per-country temperature & rainfall anomalies 1950–present',
     description:
-      'Live indicators of the El Niño-Southern Oscillation cycle, combining weekly Niño-region SST anomalies, the Oceanic Niño Index, the Multivariate ENSO Index v2 and the Southern Oscillation Index. Pacific tropical SST maps and the CPC probability forecast are embedded as live NOAA images.',
-    url: URL,
+      'Interactive dataset of per-country temperature and rainfall anomalies relative to the 1961–1990 baseline for every year from 1950 to the present, linked to NOAA Oceanic Niño Index values. Includes ENSO teleconnection correlations (Pearson r vs ONI) and regression-based simulated impacts for hypothetical El Niño / La Niña strengths. Also includes live ENSO indicators: weekly Niño-region SST anomalies, the Oceanic Niño Index, MEI v2, and the Southern Oscillation Index.',
+    url: `${URL}#impact`,
     temporalCoverage: '1950/..',
-    spatialCoverage: { '@type': 'Place', name: 'Equatorial Pacific Ocean' },
+    spatialCoverage: { '@type': 'Place', name: 'Global' },
     variableMeasured: [
+      { '@type': 'PropertyValue', name: 'Annual and Mar–May mean temperature anomaly vs 1961–1990 baseline (per country, °C)' },
+      { '@type': 'PropertyValue', name: 'Annual and Mar–May mean precipitation anomaly vs 1961–1990 baseline (per country, %)' },
+      { '@type': 'PropertyValue', name: 'Pearson r correlation of country temperature/rainfall with ONI (1950–present, detrended)' },
+      { '@type': 'PropertyValue', name: 'Regression-based simulated anomaly per country for given ONI (°C or %)' },
       { '@type': 'PropertyValue', name: 'Niño 3.4 sea-surface temperature anomaly (weekly)' },
       { '@type': 'PropertyValue', name: 'Oceanic Niño Index - 3-month running mean of Niño 3.4 SST' },
       { '@type': 'PropertyValue', name: 'Multivariate ENSO Index v2 (bi-monthly)' },
@@ -71,6 +85,16 @@ export default function EnsoLayout({ children }: { children: React.ReactNode }) 
       url: 'https://4billionyearson.org',
     },
     isBasedOn: [
+      {
+        '@type': 'CreativeWork',
+        name: 'Berkeley Earth Land + Ocean Temperature (country-level annual)',
+        url: 'https://berkeleyearth.org/data/',
+      },
+      {
+        '@type': 'CreativeWork',
+        name: 'World Bank Climate Knowledge Portal — precipitation (country-level annual)',
+        url: 'https://climateknowledgeportal.worldbank.org/',
+      },
       {
         '@type': 'CreativeWork',
         name: 'NOAA CPC Oceanic Niño Index (ONI)',
