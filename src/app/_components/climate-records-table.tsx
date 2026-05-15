@@ -231,7 +231,7 @@ export default function RecordsTable({ metric: parentMetric, yearMap: parentYear
       const map = seasonalAggregate(yearMap, s.key, agg);
       const entries: YearEntry[] = [...map.entries()];
       if (entries.length === 0) {
-        return { ...s, high: null as YearEntry | null, low: null as YearEntry | null, rank: null as RankInfo | null };
+        return { ...s, high: null as YearEntry | null, low: null as YearEntry | null, rank: null as RankInfo | null, rankYear: currentYear };
       }
       const sorted = [...entries].sort((a, b) => b[1] - a[1]);
       const high = sorted[0] as YearEntry;
