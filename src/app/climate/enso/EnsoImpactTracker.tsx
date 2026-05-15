@@ -55,6 +55,17 @@ const TOGGLE_BASE = 'inline-flex h-7 items-center gap-1 rounded-full border px-2
 const TOGGLE_ACTIVE = 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]';
 const TOGGLE_INACTIVE = 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]';
 
+const FOOTPRINT_PREFS_KEY = 'enso-footprint-prefs';
+function loadFootprintPrefs(): Record<string, unknown> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(FOOTPRINT_PREFS_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
+}
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 type OniRow = { season: string; year: number; anom: number };
