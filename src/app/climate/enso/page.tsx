@@ -320,15 +320,19 @@ export default function EnsoPage() {
 
   // Scroll to the hashed section after data renders (the element doesn't exist
   // during the loading spinner phase, so the browser's native scroll fails).
+  // Two-pass: 150ms gets us close; 600ms corrects layout shifts from charts
+  // finishing paint (Recharts, heavy SVG sections, etc.).
   useEffect(() => {
     if (!data) return;
     const hash = window.location.hash;
     if (!hash) return;
-    const id = setTimeout(() => {
+    const scroll = () => {
       const el = document.querySelector(hash);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 150);
-    return () => clearTimeout(id);
+    };
+    const id1 = setTimeout(scroll, 150);
+    const id2 = setTimeout(scroll, 600);
+    return () => { clearTimeout(id1); clearTimeout(id2); };
   }, [data]);
 
   if (error) {
