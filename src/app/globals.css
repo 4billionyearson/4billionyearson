@@ -285,6 +285,12 @@ html[data-embed] .relative.z-10 {
   animation: metric-swap 280ms ease-out both;
 }
 
+/* Fade-in for newly revealed year rings during Climate Helix playback. */
+@keyframes helix-year-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* Calendar-year timeline component (src/app/_components/calendar-timeline.tsx).
    Each row is its own [label | track] grid so labels and bars stay visually
    bound. Mobile collapses to a single column. Alternating row backgrounds

@@ -744,20 +744,20 @@ export default function EnsoImpactTracker({
   oniHistory: OniRow[];
 }) {
   const [impact, setImpact] = useState<ImpactData | null>(null);
-  const [year, setYear] = useState(1998); // super-El-Niño aftermath as default
-  const [metric, setMetric] = useState<Metric>('temp');
-  const [aggWindow, setAggWindow] = useState<AggWindow>('mam');
-  const [mode, setMode] = useState<Mode>('year');
+  const [year, setYear] = useState(() => (loadFootprintPrefs().year as number) ?? 1998);
+  const [metric, setMetric] = useState<Metric>(() => (loadFootprintPrefs().metric as Metric) ?? 'temp');
+  const [aggWindow, setAggWindow] = useState<AggWindow>(() => (loadFootprintPrefs().aggWindow as AggWindow) ?? 'mam');
+  const [mode, setMode] = useState<Mode>(() => (loadFootprintPrefs().mode as Mode) ?? 'year');
   // ENSO strength slider for Composite mode — units are °C of ONI (Niño-3.4
   // SST anomaly). Standard event thresholds: ±0.5 = weak, ±1 = moderate,
   // ±1.5 = strong, ±2 = very strong (e.g. 1997, 2015).
-  const [oniSlider, setOniSlider] = useState(1.5);
+  const [oniSlider, setOniSlider] = useState(() => (loadFootprintPrefs().oniSlider as number) ?? 1.5);
   // Season slider for Composite mode — 12 NOAA-style overlapping 3-month
   // windows. JFM is the canonical post-peak window where the lagged land
   // response to a DJF SST peak is cleanest worldwide.
-  const [season, setSeason] = useState<Season>('JFM');
+  const [season, setSeason] = useState<Season>(() => (loadFootprintPrefs().season as Season) ?? 'JFM');
   const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(4); // years per second
+  const [speed, setSpeed] = useState(() => (loadFootprintPrefs().speed as number) ?? 4); // years per second
   const [hovered, setHovered] = useState<{ name: string; value: number | null } | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -768,6 +768,16 @@ export default function EnsoImpactTracker({
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
+
+  // Persist display preferences whenever they change.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(FOOTPRINT_PREFS_KEY, JSON.stringify({
+        year, metric, aggWindow, mode, oniSlider, season, speed,
+      }));
+    } catch { /* storage unavailable */ }
+  }, [year, metric, aggWindow, mode, oniSlider, season, speed]);
 
   // Load pre-computed impact dataset.
   useEffect(() => {

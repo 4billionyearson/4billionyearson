@@ -362,7 +362,7 @@ export default function EnsoPage() {
     );
   }
 
-  const { oni, weekly, mei, soi, images, generatedAt } = data;
+  const { oni, weekly, mei, soi, generatedAt } = data;
   const plume = data.plume;
 
   // Top-level forecast summary so the Current State header can hint at the
@@ -562,24 +562,25 @@ export default function EnsoPage() {
 
       {/* ENSO Footprint tracker - first card in Global Impact */}
       {oni && oni.history && oni.history.length > 0 && (
-      <div id="impact" className="scroll-mt-24">
+      <div id="footprint" className="scroll-mt-24">
         <SectionCard
           icon={<Globe2 className="text-[#D0A65E]" />}
           title="ENSO's World Footprint"
         >
           <EnsoImpactTracker oniHistory={oni!.history} />
           <ShareBar
-            pageUrl="https://4billionyearson.org/climate/enso#impact"
+            pageUrl="https://4billionyearson.org/climate/enso#footprint"
             shareText={encodeURIComponent('Interactive ENSO global impact map - see how El Nino & La Nina affect every country\'s temperature & rainfall')}
             emailSubject="ENSO Global Impact Tracker"
-            embedUrl="https://4billionyearson.org/climate/enso/embed/impact-tracker"
-            embedCode={`<iframe\n  src="https://4billionyearson.org/climate/enso/embed/impact-tracker"\n  width="100%" height="820"\n  style="border:none;"\n  title="ENSO Global Impact Tracker - 4 Billion Years On"\n></iframe>`}
+            embedUrl="https://4billionyearson.org/climate/enso/embed/footprint-tracker"
+            embedCode={`<iframe\n  src="https://4billionyearson.org/climate/enso/embed/footprint-tracker"\n  width="100%" height="820"\n  style="border:none;"\n  title="ENSO Global Impact Tracker - 4 Billion Years On"\n></iframe>`}
             align="right"
           />
         </SectionCard>
       </div>
       )}
 
+      <div id="world-weather" className="scroll-mt-24">
       <SectionCard
         icon={<Globe2 className="text-[#D0A65E]" />}
         title="Impact on World Weather"
@@ -681,50 +682,13 @@ export default function EnsoPage() {
             })}
         </div>
         <ShareBar
-          pageUrl="https://4billionyearson.org/climate/enso#impacts"
+          pageUrl="https://4billionyearson.org/climate/enso#world-weather"
           shareText={encodeURIComponent('El Nino / La Nina regional weather impacts - ENSO Tracker')}
           emailSubject="El Nino / La Nina regional weather impacts - ENSO Tracker"
           embedUrl="https://4billionyearson.org/climate/enso/embed/impacts"
           embedCode={`<iframe\n  src="https://4billionyearson.org/climate/enso/embed/impacts"\n  width="100%" height="900"\n  style="border:none;"\n  title="ENSO Regional Weather Impacts - 4 Billion Years On"\n></iframe>`}
         />
       </SectionCard>
-
-      {/* Met Office schematic maps - the canonical reference */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SectionCard
-          icon={<Thermometer className="text-rose-300" />}
-          title={phase === 'el-nino' ? 'El Niño Temperature Impacts' : 'La Niña Temperature Impacts'}
-          subtitle="Met Office schematic, based on Davey et al. (2013). Coloured regions are likely warmer (red) or cooler (blue) than normal during the labelled season when the phase is active."
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={phase === 'el-nino' ? images.metOfficeImpactElNinoTemp : images.metOfficeImpactLaNinaTemp}
-            alt={`${phase === 'el-nino' ? 'El Niño' : 'La Niña'} temperature impacts schematic`}
-            className="w-full rounded-lg border border-gray-700/50 bg-white"
-            loading="lazy"
-          />
-          <p className="text-[11px] text-gray-500 mt-2">
-            Source:{' '}
-            <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office GPC outlooks (Davey et al. 2013)</a>. © Crown Copyright.
-          </p>
-        </SectionCard>
-        <SectionCard
-          icon={<CloudRain className="text-emerald-300" />}
-          title={phase === 'el-nino' ? 'El Niño Rainfall Impacts' : 'La Niña Rainfall Impacts'}
-          subtitle="Met Office schematic. Wetter regions in green, drier in brown. Precipitation teleconnections are noisier than temperature, so probabilities are typically lower."
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={phase === 'el-nino' ? images.metOfficeImpactElNinoPrecip : images.metOfficeImpactLaNinaPrecip}
-            alt={`${phase === 'el-nino' ? 'El Niño' : 'La Niña'} precipitation impacts schematic`}
-            className="w-full rounded-lg border border-gray-700/50 bg-white"
-            loading="lazy"
-          />
-          <p className="text-[11px] text-gray-500 mt-2">
-            Source:{' '}
-            <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office GPC outlooks (Davey et al. 2013)</a>. © Crown Copyright.
-          </p>
-        </SectionCard>
       </div>
 
       {/* Met Office plume forecasts removed - the IRI/CCSR plume already

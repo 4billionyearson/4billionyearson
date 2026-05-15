@@ -101,11 +101,11 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('');
   lines.push('  tldr: 50-80 word plain-text paragraph for AI search snippet bait. Lead with current status (yes / partial / no), one cost figure, one product example, and the next big date to watch.');
   lines.push('');
-  lines.push('  legalStatus: 120-180 word plain-text paragraph (no headings, no bold) explaining the current legal position. Must reference Amendment 4, the BSI product standard timeline, and G98. End by stating one specific thing to watch for in the next 1-3 months.');
+  lines.push('  legalStatus: 60-90 word plain-text paragraph (no headings, no bold) explaining the current legal position. Cover: Amendment 4 published, BSI product standard pending (expected July 2026), G98 still required. End with the single next milestone to watch.');
   lines.push('');
   lines.push('  fullyAvailableDate: best-estimate for when certified kits are on mainstream shop shelves ("Legal & in the shops"): the BSI plug-in solar product standard has published and major UK retailers routinely stock compliant kits. Often the same mid-July 2026 window as the BSI technical publication. This is NOT the BS 7671 Amendment 4 transition end on 2 October 2026—that milestone is already on the static timeline; never put 2026-10-02 in fullyAvailableDate. Shape: { date (YYYY-MM-DD), label (exact string "Legal & in the shops"), rationale (1-2 sentences; you may state that technical BSI and shop-floor timing align when they do), confidence ("high"|"medium"|"low") }.');
   lines.push('');
-  lines.push('  regulations: an object with EXACTLY these four string keys, each a 60-120 word paragraph:');
+  lines.push('  regulations: an object with EXACTLY these four string keys, each a 40-60 word paragraph:');
   lines.push('    bs7671: Amendment 4 - what it changed, when it took effect, transition deadline.');
   lines.push('    g98: G98 notification process, who notifies, timeframe (28 days).');
   lines.push('    bsi: The BSI product standard - status today, expected publication, what it will cover.');
@@ -166,7 +166,7 @@ export function buildPlugInSolarPrompt(args: {
   lines.push('    sourceLabel: short human label, e.g. "Ofgem cap from 1 Jul 2026".');
   lines.push('    asOf: YYYY-MM-DD when these rates were last verified.');
   lines.push('');
-  lines.push('  segStatus: 60-100 word paragraph on Smart Export Guarantee availability for plug-in solar today (status, why, what is changing).');
+  lines.push('  segStatus: 30-50 word paragraph on SEG availability for plug-in solar today: not available (MCS gap), simplified pathway expected ~2027, surplus exported without payment until then.');
   lines.push('');
   lines.push('  changeLog: array of 0-5 entries describing what has actually changed since the previous cache (passed to you below). Each entry: { date (YYYY-MM-DD = today), summary (max 140 chars) }. If nothing has materially changed, return an empty array. DO NOT FABRICATE CHANGES.');
   lines.push('');

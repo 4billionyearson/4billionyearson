@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory, Globe2 } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory, Globe2, Trophy } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import MonthlySpaghettiCard, { type SeriesMap } from '@/app/_components/monthly-spaghetti-card';
-import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
+import type { SpaghettiMetric } from '@/app/_components/monthly-spaghetti-chart';
+import ClimateSpiralCard, { buildYearMap, METRIC_PALETTE } from '@/app/_components/climate-spiral-card';
+import RecordsTable from '@/app/_components/climate-records-table';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
@@ -32,6 +34,46 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
       </h2>
       <div className="h-px bg-[#D0A65E]/30 flex-1" />
     </div>
+  );
+}
+
+// ─── Records Section ─────────────────────────────────────────────────────────
+// Standalone wrapper that lives after the Shifting Seasons card. It builds its
+// own YearMaps from the raw series so the component is self-contained and the
+// Records table no longer lives inside the Climate Helix card.
+function RecordsSection({
+  series,
+  provisionalAfterMonth,
+}: {
+  series: SeriesMap;
+  provisionalAfterMonth?: { year: number; month: number } | null;
+}) {
+  const allYearMaps = useMemo(() => {
+    const out: Partial<Record<SpaghettiMetric, Map<number, number[]>>> = {};
+    const metrics: SpaghettiMetric[] = ['temp', 'precip', 'sunshine', 'frost'];
+    for (const m of metrics) {
+      const pts = series[m];
+      if (!pts?.length) continue;
+      out[m] = buildYearMap(pts, provisionalAfterMonth ?? null).yearMap;
+    }
+    return out;
+  }, [series, provisionalAfterMonth]);
+
+  const defaultMetric: SpaghettiMetric =
+    allYearMaps.temp ? 'temp' : ((Object.keys(allYearMaps)[0] as SpaghettiMetric | undefined) ?? 'temp');
+  const defaultYearMap = allYearMaps[defaultMetric];
+  if (!defaultYearMap?.size) return null;
+  const currentYear = Math.max(...defaultYearMap.keys());
+
+  return (
+    <RecordsTable
+      metric={defaultMetric}
+      yearMap={defaultYearMap}
+      currentYear={currentYear}
+      palette={METRIC_PALETTE[defaultMetric]}
+      allSeries={allYearMaps}
+      allPalettes={METRIC_PALETTE}
+    />
   );
 }
 
@@ -1071,6 +1113,17 @@ export default function ClimateProfile({
                           embedCode: `<iframe\n  src="https://4billionyearson.org/climate/embed/seasons/${encodeURIComponent(slug)}"\n  width="100%" height="720"\n  style="border:none;"\n  title="Shifting Seasons - ${pageTitle} - 4 Billion Years On"\n></iframe>`,
                         }}
                       />
+                    ) : null}
+
+                    {/* Records */}
+                    {(spaghettiSeries.temp?.length || spaghettiSeries.precip?.length || spaghettiSeries.sunshine?.length || spaghettiSeries.frost?.length) ? (
+                      <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+                        <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
+                          <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
+                          <span className="min-w-0 flex-1">Records</span>
+                        </h2>
+                        <RecordsSection series={spaghettiSeries} provisionalAfterMonth={pageSnapshotCut} />
+                      </div>
                     ) : null}
 
                     {/* Sunshine + Frost - paired side-by-side on lg (both single-column) */}

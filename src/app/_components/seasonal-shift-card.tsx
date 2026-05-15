@@ -198,10 +198,8 @@ export default function SeasonalShiftCard({
       />
 
       {hasTempSeasons ? (
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
-          <StatTile label={`${baselineStart}–${baselineEnd}`} value={temp.baselineLen.toFixed(1)} sub="months above annual mean" />
-          <StatTile label={`${recentStart}–${recentEnd}`} value={temp.recentLen.toFixed(1)} sub="months above annual mean" />
-        </div>
+        <>
+        </>
       ) : hasWetDry && rain ? (
         <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
           <StatTile label={`${baselineStart}–${baselineEnd}`} value={`${rain.baselineAnnualMm}`} sub="mm / yr" />

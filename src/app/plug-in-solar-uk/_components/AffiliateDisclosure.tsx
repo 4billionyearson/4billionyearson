@@ -22,15 +22,11 @@ export function AffiliateDisclosure({ variant = 'inline' }: { variant?: 'inline'
               relevant to the UK market right now - not because anyone has paid us to feature them.
             </p>
             <p>
-              Only links to the <strong className="font-semibold text-[#FFF5E7]">Amazon</strong>{' '}
-              site from the products table (specific product pages with a /dp/ or /gp/product/ URL)
-              use our Amazon Associates account — the same programme as our energy, climate and AI
-              book pages. For UK, Ireland and US visitors those Amazon URLs include our affiliate
-              tag; if you buy after clicking, we may earn a small commission at no extra cost to
-              you. Links to manufacturer sites (for example EcoFlow), other retailers or anywhere
-              that is not Amazon are ordinary outbound links — we do not earn commission from them
-              here. The choice of which products appear, and what we say about them, is never
-              influenced by affiliate availability. Pages, paragraphs and rankings are not for sale.
+              Amazon product-page links from the table use our Associates account — the same
+              programme as our book pages. UK, Ireland and US visitors may generate a small
+              commission for us at no extra cost to you. All other links (manufacturer sites,
+              other retailers) are ordinary outbound links — we earn nothing from them.
+              What we list and how we rank it is never influenced by affiliate availability.
             </p>
             <p className="text-xs text-gray-500">
               Have a correction or want to suggest a kit we have missed? Email us at

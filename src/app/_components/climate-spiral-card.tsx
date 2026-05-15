@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Thermometer, CloudRain, Sun, Snowflake, Waves } from 'lucide-react';
 import type { MonthlyPoint, SpaghettiMetric } from './monthly-spaghetti-chart';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
-import RecordsTable from './climate-records-table';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * The 4BYO Climate Helix
@@ -193,9 +192,9 @@ type MetricPalette = {
   highTextClass: string; lowTextClass: string; currentTextClass: string;
   highWord: string; lowWord: string;
 };
-const METRIC_PALETTE: Record<SpaghettiMetric, MetricPalette> = {
-  temp:     { high: '#DC2626', low: '#38BDF8', current: '#F97316',
-              highTextClass: 'text-red-300',   lowTextClass: 'text-sky-300',   currentTextClass: 'text-orange-300',
+export const METRIC_PALETTE: Record<SpaghettiMetric, MetricPalette> = {
+  temp:     { high: '#DC2626', low: '#38BDF8', current: '#FBBF24',
+              highTextClass: 'text-red-300',   lowTextClass: 'text-sky-300',   currentTextClass: 'text-amber-300',
               highWord: 'Warmest',  lowWord: 'Coldest' },
   precip:   { high: '#3B82F6', low: '#B45309', current: '#7DD3FC',
               highTextClass: 'text-blue-300',  lowTextClass: 'text-amber-300', currentTextClass: 'text-sky-200',
@@ -203,8 +202,8 @@ const METRIC_PALETTE: Record<SpaghettiMetric, MetricPalette> = {
   sunshine: { high: '#F59E0B', low: '#64748B', current: '#FDE047',
               highTextClass: 'text-amber-300', lowTextClass: 'text-slate-400', currentTextClass: 'text-yellow-200',
               highWord: 'Sunniest', lowWord: 'Dullest' },
-  frost:    { high: '#38BDF8', low: '#F97316', current: '#A5F3FC',
-              highTextClass: 'text-sky-300',   lowTextClass: 'text-orange-300',currentTextClass: 'text-cyan-200',
+  frost:    { high: '#38BDF8', low: '#F97316', current: '#8cedbc',
+              highTextClass: 'text-sky-300',   lowTextClass: 'text-orange-300',currentTextClass: 'text-[#8cedbc]',
               highWord: 'Frostiest', lowWord: 'Mildest' },
 };
 
@@ -306,7 +305,7 @@ function smoothClosedPath(points: [number, number][]): string {
 type YearMap = Map<number, number[]>; // year → 12-length array (nulls become NaN)
 type Provisional = Map<number, Set<number>>; // year → set of provisional months
 
-function buildYearMap(points: MonthlyPoint[] | undefined, provAfter: { year: number; month: number } | null) {
+export function buildYearMap(points: MonthlyPoint[] | undefined, provAfter: { year: number; month: number } | null) {
   const out: YearMap = new Map();
   const prov: Provisional = new Map();
   if (!points?.length) return { yearMap: out, prov, minYear: 0, maxYear: 0 };
@@ -449,6 +448,17 @@ function monthlySeries(yearMap: YearMap, monthIdx: number): Map<number, number> 
  * Main component
  * ──────────────────────────────────────────────────────────────────────── */
 
+/* ── Preference persistence ──────────────────────────────────────────────
+ * Saved to localStorage under this key so the user's last display settings
+ * survive navigation and tab closes. Read once via lazy useState initialiser;
+ * written back any time a persisted setting changes. */
+const HELIX_PREFS_KEY = '4byo-helix-prefs';
+function loadHelixPrefs(): Record<string, unknown> {
+  if (typeof window === 'undefined') return {};
+  try { return JSON.parse(localStorage.getItem(HELIX_PREFS_KEY) ?? '{}'); }
+  catch { return {}; }
+}
+
 export default function ClimateSpiralCard({
   series,
   regionName,
@@ -462,7 +472,11 @@ export default function ClimateSpiralCard({
 }: Props) {
   const available = METRIC_ORDER.filter((m) => (series[m]?.length ?? 0) > 0);
   const fallback: SpaghettiMetric = available[0] ?? 'temp';
-  const [metric, setMetric] = useState<SpaghettiMetric>(fallback);
+  const [metric, setMetric] = useState<SpaghettiMetric>(() => {
+    const saved = loadHelixPrefs().metric as SpaghettiMetric | undefined;
+    if (saved && available.includes(saved)) return saved;
+    return fallback;
+  });
   const palette = METRIC_PALETTE[metric];
 
   // Scroll-to-anchor when the URL hash matches our section id but the card
@@ -474,19 +488,19 @@ export default function ClimateSpiralCard({
     const el = document.getElementById(share.sectionId);
     if (el) el.scrollIntoView({ block: 'start' });
   }, [share?.sectionId]);
-  const [anomaly, setAnomaly] = useState(false);
-  const [showSeasons, setShowSeasons] = useState(true);
-  const [highlightRecent, setHighlightRecent] = useState(true);
-  const [showParis, setShowParis] = useState(true);
-  const [showShiftTrail, setShowShiftTrail] = useState(true);
-  const [showRecordHigh, setShowRecordHigh] = useState(true);
-  const [showRecordLow, setShowRecordLow] = useState(true);
-  const [showSpaghetti, setShowSpaghetti] = useState(true);
+  const [anomaly, setAnomaly] = useState(() => (loadHelixPrefs().anomaly as boolean) ?? false);
+  const [showSeasons, setShowSeasons] = useState(() => (loadHelixPrefs().showSeasons as boolean) ?? true);
+  const [highlightRecent, setHighlightRecent] = useState(() => (loadHelixPrefs().highlightRecent as boolean) ?? true);
+  const [showParis, setShowParis] = useState(() => (loadHelixPrefs().showParis as boolean) ?? true);
+  const [showShiftTrail, setShowShiftTrail] = useState(() => (loadHelixPrefs().showShiftTrail as boolean) ?? true);
+  const [showRecordHigh, setShowRecordHigh] = useState(() => (loadHelixPrefs().showRecordHigh as boolean) ?? true);
+  const [showRecordLow, setShowRecordLow] = useState(() => (loadHelixPrefs().showRecordLow as boolean) ?? true);
+  const [showSpaghetti, setShowSpaghetti] = useState(() => (loadHelixPrefs().showSpaghetti as boolean) ?? true);
   /** User-adjustable "boost" on the year-spaghetti opacity. At 0 the
    *  lines render at their original baked-in alpha (subtle, lets the
    *  reference rings dominate); at 1.0 they ramp up to fully opaque,
    *  useful when sharing a still or pointing at a specific year. */
-  const [lineAlpha, setLineAlpha] = useState(2);
+  const [lineAlpha, setLineAlpha] = useState(() => (loadHelixPrefs().lineAlpha as number) ?? 2);
   /** Convert the user-facing 0..1 boost into stroke-alpha multipliers
    *  for the background and recent-decade highlight passes. */
   const bgAlpha = Math.min(1, 0.32 + 0.68 * lineAlpha);
@@ -497,7 +511,7 @@ export default function ClimateSpiralCard({
   const hiWidth = 1.4 * Math.max(1, Math.min(2.5, lineAlpha * 0.7 + 0.3));
   /** 3D mode — re-projects each year's loop onto a tilted plane and
    *  stacks them vertically so height encodes time. */
-  const [view3D, setView3D] = useState(false);
+  const [view3D, setView3D] = useState(() => (loadHelixPrefs().view3D as boolean) ?? false);
   const [yearFrom, setYearFrom] = useState<number | null>(null);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
@@ -507,18 +521,6 @@ export default function ClimateSpiralCard({
     () => buildYearMap(points, provisionalAfterMonth),
     [points, provisionalAfterMonth],
   );
-
-  // Build a yearMap per available metric so the Records section can let
-  // the user pick a different variable from the spiral above.
-  const allYearMaps = useMemo(() => {
-    const out: Partial<Record<SpaghettiMetric, YearMap>> = {};
-    for (const m of METRIC_ORDER) {
-      const pts = series[m];
-      if (!pts?.length) continue;
-      out[m] = buildYearMap(pts, provisionalAfterMonth).yearMap;
-    }
-    return out;
-  }, [series, provisionalAfterMonth]);
 
   // Reset yearFrom when metric changes (different series may have different min).
   React.useEffect(() => {
@@ -554,12 +556,12 @@ export default function ClimateSpiralCard({
   const [baselineFrom, baselineTo] = baselineRange;
   const [historicFrom, historicTo] = historicRange;
   const [recentFrom, recentTo] = recentRange;
-  const [showHistoric, setShowHistoric] = useState(false);
+  const [showHistoric, setShowHistoric] = useState(() => (loadHelixPrefs().showHistoric as boolean) ?? false);
   /** Show/hide the dashed baseline mean ring. Hidden automatically in
    *  anomaly mode (would be a zero-radius circle). */
-  const [showBaselineRing, setShowBaselineRing] = useState(true);
+  const [showBaselineRing, setShowBaselineRing] = useState(() => (loadHelixPrefs().showBaselineRing as boolean) ?? true);
   /** Show/hide the dashed modern mean ring. */
-  const [showRecentRing, setShowRecentRing] = useState(true);
+  const [showRecentRing, setShowRecentRing] = useState(() => (loadHelixPrefs().showRecentRing as boolean) ?? true);
 
   /** Live ONI history → map of year → peak |ONI| anomaly (signed).
    *  Populated lazily once from `/data/climate/enso.json` so the HUD
@@ -588,7 +590,22 @@ export default function ClimateSpiralCard({
   const [playYear, setPlayYear] = useState<number | null>(null);
   const [playMonth, setPlayMonth] = useState<number | null>(null); // current-year finale phase
   const [playing, setPlaying] = useState(false);
-  const [playSpeed, setPlaySpeed] = useState(8); // years per second
+  const [playSpeed, setPlaySpeed] = useState(() => (loadHelixPrefs().playSpeed as number) ?? 8); // years per second
+
+  // Persist display preferences whenever they change.
+  // Must come after playSpeed is declared to avoid a TDZ reference error.
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(HELIX_PREFS_KEY, JSON.stringify({
+        metric, anomaly, showSeasons, highlightRecent, showParis, showShiftTrail,
+        showRecordHigh, showRecordLow, showSpaghetti, lineAlpha, view3D,
+        showHistoric, showBaselineRing, showRecentRing, playSpeed,
+      }));
+    } catch { /* storage unavailable */ }
+  }, [metric, anomaly, showSeasons, highlightRecent, showParis, showShiftTrail,
+      showRecordHigh, showRecordLow, showSpaghetti, lineAlpha, view3D,
+      showHistoric, showBaselineRing, showRecentRing, playSpeed]);
   const playCutoff = playYear ?? Number.POSITIVE_INFINITY;
 
   const meanBaseline = useMemo(
@@ -994,12 +1011,12 @@ export default function ClimateSpiralCard({
             </span>
             {!anomaly && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: '#CBD5E1' }} />
+                <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: metric === 'temp' ? '#22D3EE' : metric === 'precip' ? '#A78BFA' : (metric === 'frost') ? '#C4B5FD' : '#92400E', borderTopWidth: '3px' }} />
                 {baselineFrom}–{baselineTo} mean
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: metric === 'temp' ? '#22D3EE' : '#EF4444' }} />
+              <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: metric === 'temp' ? '#E5E7EB' : '#E8E8E8' }} />
               {recentFrom}–{recentTo}{anomaly ? ' Δ' : ' mean'}
             </span>
             {showHistoric && (
@@ -1016,7 +1033,7 @@ export default function ClimateSpiralCard({
             )}
             {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-5" style={{ background: (metric === 'precip' || metric === 'frost') ? '#C4B5FD' : palette.low }} />
+                <span className="inline-block h-[2px] w-5" style={{ background: metric === 'precip' ? '#A78BFA' : (metric === 'frost') ? '#C4B5FD' : metric === 'sunshine' ? '#92400E' : palette.low }} />
                 {palette.lowWord} ({oppositeYear})
               </span>
             )}
@@ -1078,7 +1095,7 @@ export default function ClimateSpiralCard({
                   {showLow && (
                     <span
                       className={`inline-flex items-center rounded-full border px-1 sm:px-2 py-[2px] sm:py-0.5 leading-none text-[6px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.08em] ${lowSteps === 0 ? 'animate-pulse' : ''}`}
-                      style={(metric === 'precip' || metric === 'frost') ? { borderColor: '#C4B5FD', color: '#C4B5FD', background: 'rgba(196,181,253,0.10)', boxShadow: '0 0 10px -3px rgba(196,181,253,0.6)' } : { borderColor: palette.low, color: palette.low, background: `${palette.low}1a`, boxShadow: `0 0 10px -3px ${palette.low}99` }}
+                      style={metric === 'precip' ? { borderColor: '#A78BFA', color: '#A78BFA', background: 'rgba(167,139,250,0.10)', boxShadow: '0 0 10px -3px rgba(167,139,250,0.6)' } : metric === 'frost' ? { borderColor: '#C4B5FD', color: '#C4B5FD', background: 'rgba(196,181,253,0.10)', boxShadow: '0 0 10px -3px rgba(196,181,253,0.6)' } : { borderColor: palette.low, color: palette.low, background: `${palette.low}1a`, boxShadow: `0 0 10px -3px ${palette.low}99` }}
                     >
                       <span className="sm:hidden inline-flex items-center gap-0.5">{pillIcon(palette.lowWord)} {oppositeYear}</span>
                       <span className="hidden sm:inline-flex items-center gap-0.5">{pillIcon(palette.lowWord, true)} {palette.lowWord} on record · {oppositeYear}</span>
@@ -1509,6 +1526,7 @@ export default function ClimateSpiralCard({
                 const arr = yearMap.get(y)!;
                 const pts = yearToPoints(arr);
                 if (!pts) return null;
+                const isNewYear = playing && y === playYear;
                 return (
                   <path
                     key={`bg-${y}`}
@@ -1516,6 +1534,7 @@ export default function ClimateSpiralCard({
                     fill="none"
                     stroke={yearColor(y, minYear, maxYear, bgAlpha, palette.high)}
                     strokeWidth={bgWidth}
+                    style={isNewYear ? { animation: 'helix-year-in 180ms ease-out both' } : undefined}
                   />
                 );
               })}
@@ -1527,6 +1546,7 @@ export default function ClimateSpiralCard({
                   const arr = yearMap.get(y)!;
                   const pts = yearToPoints(arr);
                   if (!pts) return null;
+                  const isNewYear = playing && y === playYear;
                   return (
                     <path
                       key={`hi-${y}`}
@@ -1534,6 +1554,7 @@ export default function ClimateSpiralCard({
                       fill="none"
                       stroke={yearColor(y, minYear, maxYear, hiAlpha, palette.high)}
                       strokeWidth={hiWidth}
+                      style={isNewYear ? { animation: 'helix-year-in 180ms ease-out both' } : undefined}
                     />
                   );
                 })}
@@ -1547,12 +1568,13 @@ export default function ClimateSpiralCard({
                 // Baseline ring sits at z corresponding to the midpoint of
                 // its window, so in 3D it floats at the right height.
                 const baselineYear = (baselineFrom + baselineTo) / 2;
+                const baselineStroke = metric === 'temp' ? '#22D3EE' : metric === 'precip' ? '#A78BFA' : metric === 'frost' ? '#C4B5FD' : '#92400E';
                 return (
                   <path
                     d={smoothClosedPath(project3D(pts, baselineYear))}
                     fill="none"
-                    stroke="#E5E7EB"
-                    strokeWidth={2.1}
+                    stroke={baselineStroke}
+                    strokeWidth={3.0}
                     strokeDasharray="4 8"
                     strokeLinecap="round"
                     opacity={0.95}
@@ -1584,7 +1606,7 @@ export default function ClimateSpiralCard({
               {showRecentRing && meanRecent.every(Number.isFinite) && (() => {
                 const pts: [number, number][] = meanRecent.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
                 const recentMid = (recentFrom + recentTo) / 2;
-                const recentStroke = metric === 'temp' ? '#22D3EE' : '#EF4444';
+                const recentStroke = metric === 'temp' ? '#E5E7EB' : metric === 'precip' ? '#E8E8E8' : '#E8E8E8';
                 return (
                   <path
                     d={smoothClosedPath(project3D(pts, recentMid))}
@@ -1622,8 +1644,8 @@ export default function ClimateSpiralCard({
                 const pts = yearToPoints(arr);
                 if (!pts) return null;
                 const d = smoothClosedPath(project3D(pts, oppositeYear));
-                // Soft violet for precip/frost (avoids clash with their blue/cyan current-year colour); palette.low for others
-                const loCol = (metric === 'precip' || metric === 'frost') ? '#C4B5FD' : palette.low;
+                // Soft violet for precip/frost; dark amber-brown for sunshine; palette.low for others
+                const loCol = metric === 'precip' ? '#A78BFA' : metric === 'frost' ? '#C4B5FD' : metric === 'sunshine' ? '#92400E' : palette.low;
                 return (
                   <g filter="url(#record-glow)">
                     {/* marching dashes layer */}
@@ -1723,7 +1745,7 @@ export default function ClimateSpiralCard({
                         <circle
                           key={`cur-${p.m}`}
                           cx={px} cy={py} r={p.provisional ? 3 : 2.5}
-                          fill={p.provisional ? '#FED7AA' : palette.current}
+                          fill={palette.current}
                           stroke="#7C2D12" strokeWidth={0.5}
                         />
                       );
@@ -2611,11 +2633,11 @@ export default function ClimateSpiralCard({
               <span className="uppercase tracking-wider text-[10px] text-gray-500 sm:mr-1 sm:w-12">Means</span>
               <div className="flex flex-wrap items-center gap-2">
               {!anomaly && (
-                <ChipToggle active={showBaselineRing} onChange={setShowBaselineRing} color="#9CA3AF">
+                <ChipToggle active={showBaselineRing} onChange={setShowBaselineRing} color={metric === 'temp' ? '#22D3EE' : metric === 'precip' ? '#A78BFA' : metric === 'frost' ? '#C4B5FD' : '#92400E'}>
                   Baseline Ring <span className="text-[10px] text-gray-400">{baselineFrom}–{baselineTo}</span>
                 </ChipToggle>
               )}
-              <ChipToggle active={showRecentRing} onChange={setShowRecentRing} color={palette.current}>
+              <ChipToggle active={showRecentRing} onChange={setShowRecentRing} color={metric === 'temp' ? '#E5E7EB' : '#E8E8E8'}>
                 Modern Ring <span className="text-[10px] text-gray-400">{recentFrom}–{recentTo}</span>
               </ChipToggle>
               <ChipToggle active={showHistoric} onChange={setShowHistoric} color="#94A3B8">
@@ -2748,28 +2770,6 @@ export default function ClimateSpiralCard({
           </div>
 
           {/* Series legend lives above the chart now — see top of section. */}
-        </div>
-
-        {/*
-        ─── Section 2: Records ────────────────────────────────────────
-        */}
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-px bg-[#D0A65E]/30 flex-1" />
-            <h3 className="text-[11px] font-bold font-mono uppercase tracking-[0.25em] text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-4 py-1.5 rounded-full border border-[#D0A65E]/50 shadow-lg">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#D0A65E]" style={{ boxShadow: '0 0 8px #D0A65E' }} />
-              Records
-            </h3>
-            <div className="h-px bg-[#D0A65E]/30 flex-1" />
-          </div>
-          <RecordsTable
-            metric={metric}
-            yearMap={yearMap}
-            currentYear={currentYear}
-            palette={palette}
-            allSeries={allYearMaps}
-            allPalettes={METRIC_PALETTE}
-          />
         </div>
       </div>
 

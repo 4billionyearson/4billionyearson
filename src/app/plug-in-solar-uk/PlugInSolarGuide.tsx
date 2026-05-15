@@ -11,8 +11,6 @@ import {
   TrendingUp,
   BookOpen,
   Info,
-  ExternalLink,
-  Globe2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { QuickTLDR } from '@/app/_components/seo/QuickTLDR';
@@ -39,7 +37,6 @@ import {
   INSTALL_STEPS,
   PLUG_IN_SOLAR_FAQ,
   GLOSSARY,
-  UK_DEVOLVED_REGULATORY_NOTES,
 } from './_data/static';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 
@@ -252,25 +249,11 @@ export default function PlugInSolarGuide({
                 ) : (
                   <RegeneratingNote />
                 )}
-              </Section>
-
-              <Section icon={<Globe2 className="h-5 w-5" />} title="England, Scotland, Wales & Northern Ireland">
-                <p className="text-sm text-gray-400 mb-3 leading-relaxed">
-                  Most of this guide applies UK-wide for product safety and BS 7671, but who you
-                  notify and the exact paperwork can differ. Use your own country&apos;s network
-                  operator (NIE Networks in Northern Ireland; GB DNOs elsewhere).
+                <p className="mt-3 text-xs text-gray-500 leading-relaxed">
+                  These regulations apply across England, Scotland, Wales and Northern Ireland.
+                  For G98 notifications, use NIE Networks if you are in Northern Ireland; elsewhere,
+                  use your regional GB Distribution Network Operator (DNO).
                 </p>
-                <ul className="space-y-3">
-                  {UK_DEVOLVED_REGULATORY_NOTES.map((n) => (
-                    <li
-                      key={n.title}
-                      className="rounded-xl border border-[#D2E369]/20 bg-gray-900/40 p-4"
-                    >
-                      <h4 className="text-sm font-semibold text-[#D2E369]">{n.title}</h4>
-                      <p className="mt-1 text-sm text-gray-300 leading-relaxed">{n.body}</p>
-                    </li>
-                  ))}
-                </ul>
               </Section>
             </div>
           </div>
@@ -300,25 +283,36 @@ export default function PlugInSolarGuide({
               answer if you rent, live in a flat or balcony, can't afford a £6,000+ install, or
               just want to dip a toe in.
             </p>
-            <div className="overflow-hidden rounded-xl border border-[#D2E369]/30 bg-gray-950/60">
-              <table className="w-full text-sm">
-                <thead className="bg-[#D2E369]/5 border-b border-[#D2E369]/20">
-                  <tr className="text-left text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
-                    <th className="px-4 py-3"></th>
-                    <th className="px-4 py-3">Plug-in solar</th>
-                    <th className="px-4 py-3">Full rooftop solar</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-800">
-                  {PLUG_IN_VS_ROOFTOP.map((row) => (
-                    <tr key={row.question}>
-                      <td className="px-4 py-3 align-top text-gray-400 font-medium">{row.question}</td>
-                      <td className="px-4 py-3 align-top text-[#FFF5E7]">{row.plugIn}</td>
-                      <td className="px-4 py-3 align-top text-gray-300">{row.rooftop}</td>
+            <div className={
+              '-mx-3 px-3 md:mx-0 md:px-0 overflow-x-auto pb-2 ' +
+              '[&::-webkit-scrollbar]:h-1.5 ' +
+              '[&::-webkit-scrollbar-track]:bg-[#D2E369]/5 ' +
+              '[&::-webkit-scrollbar-track]:rounded-full ' +
+              '[&::-webkit-scrollbar-thumb]:bg-[#D2E369]/40 ' +
+              '[&::-webkit-scrollbar-thumb]:rounded-full ' +
+              '[scrollbar-color:rgba(210,227,105,0.4)_rgba(210,227,105,0.05)] ' +
+              '[scrollbar-width:thin]'
+            }>
+              <div className="overflow-hidden rounded-xl border border-[#D2E369]/30 bg-gray-950/60 min-w-[640px]">
+                <table className="w-full text-sm">
+                  <thead className="bg-[#D2E369]/5 border-b border-[#D2E369]/20">
+                    <tr className="text-left text-[11px] font-mono uppercase tracking-wider text-[#D2E369]">
+                      <th className="px-4 py-3"></th>
+                      <th className="px-4 py-3">Plug-in solar</th>
+                      <th className="px-4 py-3">Full rooftop solar</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800">
+                    {PLUG_IN_VS_ROOFTOP.map((row) => (
+                      <tr key={row.question}>
+                        <td className="px-4 py-3 align-top text-gray-400 font-medium">{row.question}</td>
+                        <td className="px-4 py-3 align-top text-[#FFF5E7]">{row.plugIn}</td>
+                        <td className="px-4 py-3 align-top text-gray-300">{row.rooftop}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
             <p className="mt-3 text-sm text-gray-400">
               For full-roof solar costs, capacity, and SEG rates by country, see our{' '}
@@ -359,7 +353,7 @@ export default function PlugInSolarGuide({
           <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
             <Section
               icon={<Info className="h-5 w-5" />}
-              title="Smart Export Guarantee: will you get paid?"
+              title="SEG: will you get paid?"
               fillGridHeight
             >
               {data?.segStatus ? (
@@ -410,35 +404,6 @@ export default function PlugInSolarGuide({
           <Section icon={<BookOpen className="h-5 w-5" />} title="Primary UK sources">
             <PrimarySources />
           </Section>
-
-          {/* ─── Today's grounding citations (Gemini's Google Search) ─── */}
-          {data?.groundingSources && data.groundingSources.length > 0 && (
-            <Section
-              icon={<BookOpen className="h-5 w-5" />}
-              title="Today's grounding citations"
-            >
-              <p className="text-sm text-gray-400 mb-3">
-                The additional pages Gemini's Google Search grounding consulted for today's
-                refresh. Official UK sources are listed first; trade press and other secondary
-                sources follow.
-              </p>
-              <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {data.groundingSources.map((s, i) => (
-                  <li key={i}>
-                    <a
-                      href={s.uri}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-gray-400 hover:text-[#D2E369] transition-colors flex items-start gap-1.5"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                      <span>{s.title}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          )}
 
           {/* ─── Editorial independence ─── */}
           <AffiliateDisclosure variant="footer" />

@@ -130,11 +130,9 @@ interface StatCardProps {
 function StatCard({ label, year, value, rankInfo, accentClass, accentHex, isCurrent = false, decimals, unit }: StatCardProps) {
   return (
     <div
-      className="group relative rounded-xl border bg-gray-950/80 backdrop-blur-md px-4 py-3 flex flex-col gap-1 flex-1 overflow-hidden transition-all duration-300 hover:bg-gray-950/95"
-      style={{ borderColor: `${accentHex}55`, boxShadow: `0 0 20px -8px ${accentHex}77` }}
+      className="rounded-xl border bg-gray-800/40 backdrop-blur-md px-4 py-3 flex flex-col gap-1 flex-1 overflow-hidden"
+      style={{ borderColor: `${accentHex}55` }}
     >
-      {/* Top accent bar */}
-      <div className="absolute inset-x-0 top-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent 0%, ${accentHex} 50%, transparent 100%)` }} />
       <div className="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-bold font-mono">{label}</div>
       {year !== undefined && (
         <div className={`font-mono text-3xl font-black tabular-nums leading-none ${accentClass}`} style={{ textShadow: `0 0 18px ${accentHex}55` }}>{year}</div>
@@ -238,14 +236,15 @@ export default function RecordsTable({ metric: parentMetric, yearMap: parentYear
       const sorted = [...entries].sort((a, b) => b[1] - a[1]);
       const high = sorted[0] as YearEntry;
       const low = sorted[sorted.length - 1] as YearEntry;
-      const curVal = map.get(currentYear);
+      const latestYear = Math.max(...map.keys());
+      const curVal = map.get(latestYear);
       let rank: RankInfo | null = null;
       if (curVal !== undefined) {
-        const others = entries.filter(([y]) => y !== currentYear);
+        const others = entries.filter(([y]) => y !== latestYear);
         const r = others.filter(([, v]) => v > curVal).length + 1;
         rank = { rank: r, total: others.length + 1, value: curVal };
       }
-      return { ...s, high, low, rank };
+      return { ...s, high, low, rank, rankYear: latestYear };
     });
   }, [yearMap, agg, currentYear]);
 
@@ -350,19 +349,17 @@ export default function RecordsTable({ metric: parentMetric, yearMap: parentYear
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {seasonData.map((s) => {
             const currentLabel = s.key === 'DJF'
-              ? `${String(currentYear - 1).slice(-2)}/${String(currentYear).slice(-2)}`
-              : String(currentYear);
+              ? `${s.rankYear - 1}/${String(s.rankYear).slice(-2)}`
+              : String(s.rankYear);
             return (
               <div
                 key={s.key}
-                className="group relative rounded-xl border bg-gray-950/80 backdrop-blur-md px-4 py-3 overflow-hidden transition-all duration-300 hover:bg-gray-950/95"
-                style={{ borderColor: `${s.color}55`, boxShadow: `0 0 18px -8px ${s.color}99` }}
+                className="rounded-xl border bg-gray-800/40 backdrop-blur-md px-4 py-3"
+                style={{ borderColor: `${s.color}55` }}
               >
-                {/* Top accent bar */}
-                <div className="absolute inset-x-0 top-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent 0%, ${s.color} 50%, transparent 100%)` }} />
                 <div className="flex items-center gap-2 mb-2.5">
-                  <div className="h-1.5 w-1.5 rounded-full" style={{ background: s.color, boxShadow: `0 0 8px ${s.color}` }} />
-                  <div className="text-[11px] font-bold font-mono uppercase tracking-[0.18em]" style={{ color: s.color }}>{s.label}</div>
+                  <div className="h-1.5 w-1.5 rounded-full" style={{ background: s.color }} />
+                  <div className="text-[13px] font-bold font-mono uppercase tracking-[0.18em]" style={{ color: s.color }}>{s.label}</div>
                 </div>
                 <div className="space-y-1.5">
                   {s.high && (
@@ -371,9 +368,9 @@ export default function RecordsTable({ metric: parentMetric, yearMap: parentYear
                         <ArrowUp className={`h-3 w-3 ${palette.highTextClass}`} />
                         {highLabel}
                       </span>
-                      <span className="font-mono text-base tabular-nums">
-                        <span className={`font-bold ${palette.highTextClass}`}>{s.high[0]}</span>
-                        <span className="text-gray-200 ml-2">{s.high[1].toFixed(dec)}{degSuffix}</span>
+                      <span className="font-mono text-base tabular-nums inline-flex items-baseline">
+                        <span className={`font-bold ${palette.highTextClass} w-[3rem] text-right`}>{s.high[0]}</span>
+                        <span className="text-gray-200 w-[4.5rem] text-right">{s.high[1].toFixed(dec)}{degSuffix}</span>
                       </span>
                     </div>
                   )}
@@ -383,22 +380,23 @@ export default function RecordsTable({ metric: parentMetric, yearMap: parentYear
                         <ArrowDown className={`h-3 w-3 ${palette.lowTextClass}`} />
                         {lowLabel}
                       </span>
-                      <span className="font-mono text-base tabular-nums">
-                        <span className={`font-bold ${palette.lowTextClass}`}>{s.low[0]}</span>
-                        <span className="text-gray-200 ml-2">{s.low[1].toFixed(dec)}{degSuffix}</span>
+                      <span className="font-mono text-base tabular-nums inline-flex items-baseline">
+                        <span className={`font-bold ${palette.lowTextClass} w-[3rem] text-right`}>{s.low[0]}</span>
+                        <span className="text-gray-200 w-[4.5rem] text-right">{s.low[1].toFixed(dec)}{degSuffix}</span>
                       </span>
                     </div>
                   )}
                   {s.rank && (
                     <div className="flex items-baseline justify-between pt-1.5 border-t border-white/[0.08]">
-                      <span className="flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-gray-400 font-mono font-semibold">
-                        <Circle className={`h-2 w-2 fill-current ${palette.currentTextClass}`} />
+                      <span className="flex items-center gap-1 font-mono font-bold text-[13px] tabular-nums" style={{ color: s.color }}>
+                        <Circle className="h-2 w-2 fill-current" />
                         {currentLabel}
                       </span>
-                      <span className="font-mono text-base tabular-nums">
-                        <span className={`font-bold ${palette.currentTextClass}`}>#{s.rank.rank}</span>
-                        <span className="text-gray-500 text-xs"> of {s.rank.total}</span>
-                        <span className="text-gray-200 ml-2">{s.rank.value.toFixed(dec)}{degSuffix}</span>
+                      <span className="font-mono text-base tabular-nums inline-flex items-baseline">
+                        <span className="font-bold" style={{ color: s.color }}>#{s.rank.rank}</span>
+                        <span className="text-gray-500 text-xs mx-1">of</span>
+                        <span className="text-gray-500 text-xs">{s.rank.total}</span>
+                        <span className="text-gray-200 w-[4.5rem] text-right">{s.rank.value.toFixed(dec)}{degSuffix}</span>
                       </span>
                     </div>
                   )}
@@ -415,9 +413,10 @@ export default function RecordsTable({ metric: parentMetric, yearMap: parentYear
           {monthData.map((m) => (
             <div
               key={m.label}
-              className="group relative rounded-lg border border-[#D0A65E]/20 bg-gray-950/75 backdrop-blur-sm px-3 py-2.5 transition-all duration-300 hover:border-[#D0A65E]/50 hover:bg-gray-950/95"
+              className="rounded-lg border bg-gray-800/40 backdrop-blur-sm px-3 py-2.5"
+              style={{ borderColor: '#D0A65E33' }}
             >
-              <div className="text-[11px] font-bold font-mono uppercase tracking-[0.18em] text-[#D0A65E] mb-2">{m.label}</div>
+              <div className="text-[13px] font-bold font-mono uppercase tracking-[0.18em] text-[#D0A65E] mb-2">{m.label}</div>
               <div className="space-y-1.5">
                 {m.high && (
                   <div className="flex items-baseline justify-between gap-2">
@@ -439,8 +438,7 @@ export default function RecordsTable({ metric: parentMetric, yearMap: parentYear
                 )}
                 {m.rank && (
                   <div className="flex items-baseline justify-between gap-2 pt-1.5 border-t border-white/[0.08]">
-                    <span className="flex items-center gap-1 shrink-0">
-                      <Circle className={`h-2 w-2 fill-current ${palette.currentTextClass}`} />
+                    <span className="shrink-0">
                       <span className={`font-mono text-[13px] font-bold tabular-nums ${palette.currentTextClass}`}>#{m.rank.rank}</span>
                     </span>
                     <span className="font-mono text-[12px] text-gray-200 tabular-nums">{m.rank.value.toFixed(dec)}{degSuffix}</span>
