@@ -811,7 +811,12 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
                     )}
                     </>
                   ) : (
-                    <>Models favour <span className="font-semibold text-gray-200">neutral</span> conditions through the forecast window.{' '}
+                    <>{currentOni >= 0.5
+                      ? <>The Pacific is currently <span className="font-semibold text-rose-300">El Niño-leaning</span> (Niño&nbsp;3.4 at {fmtSigned(currentOni, 1)}°C), but models do not forecast a sustained event.{' '}</>
+                      : currentOni <= -0.5
+                        ? <>The Pacific is currently <span className="font-semibold text-sky-300">La Niña-leaning</span> (Niño&nbsp;3.4 at {fmtSigned(currentOni, 1)}°C), but models do not forecast a sustained event.{' '}</>
+                        : <>Models favour <span className="font-semibold text-gray-200">neutral</span> conditions through the forecast window.{' '}</>
+                    }
                     {peakSeason && peakSeason.pElNino >= 30 && (
                       <>El Niño probability peaks at{' '}
                       <span className="font-mono font-semibold text-gray-200">{peakSeason.pElNino}%</span> in{' '}

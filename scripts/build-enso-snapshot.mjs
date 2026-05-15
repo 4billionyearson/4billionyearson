@@ -32,7 +32,7 @@ const SOURCES = {
   weekly: 'https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for',
   mei: 'https://psl.noaa.gov/enso/mei/data/meiv2.data',
   soi: 'https://www.cpc.ncep.noaa.gov/data/indices/soi',
-  forecast: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php',
+  forecast: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities/',
   // IRI/Columbia ENSO plume - dynamical & statistical model forecasts of
   // 3-month-rolling Niño 3.4 SST anomaly. Each issue covers 9 forecast
   // periods starting ~1 month after the issue date. Issued ~19th of month.
@@ -267,11 +267,17 @@ function parseForecast(html) {
     });
   }
   if (!seasons.length) return null;
-  // Find the date-stamped probability image URL.
-  const imgMatch = html.match(/figures\/(CPCoff_ENSOprobs_\d{6}\.png)/);
-  const imageUrl = imgMatch
-    ? `https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/figures/${imgMatch[1]}`
-    : null;
+  // Find the probability image URL — the path changed in 2025 from:
+  //   figures/CPCoff_ENSOprobs_YYYYMM.png
+  // to:
+  //   /archives/enso/roni/images/YYYY/enso-probs-current.png
+  const newImgMatch = html.match(/\/archives\/enso\/roni\/images\/(\d{4})\/enso-probs-current\.png/);
+  const oldImgMatch = html.match(/figures\/(CPCoff_ENSOprobs_\d{6}\.png)/);
+  const imageUrl = newImgMatch
+    ? `https://www.cpc.ncep.noaa.gov${newImgMatch[0]}`
+    : oldImgMatch
+      ? `https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/figures/${oldImgMatch[1]}`
+      : null;
   return { seasons, imageUrl };
 }
 

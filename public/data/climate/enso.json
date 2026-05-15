@@ -15132,7 +15132,74 @@
       }
     ]
   },
-  "forecast": null,
+  "forecast": {
+    "seasons": [
+      {
+        "season": "AMJ",
+        "label": "AMJ Apr May Jun",
+        "pLaNina": 0,
+        "pNeutral": 84,
+        "pElNino": 16
+      },
+      {
+        "season": "MJJ",
+        "label": "MJJ May Jun Jul",
+        "pLaNina": 0,
+        "pNeutral": 18,
+        "pElNino": 82
+      },
+      {
+        "season": "JJA",
+        "label": "JJA Jun Jul Aug",
+        "pLaNina": 0,
+        "pNeutral": 8,
+        "pElNino": 92
+      },
+      {
+        "season": "JAS",
+        "label": "JAS Jul Aug Sep",
+        "pLaNina": 0,
+        "pNeutral": 4,
+        "pElNino": 96
+      },
+      {
+        "season": "ASO",
+        "label": "ASO Aug Sep Oct",
+        "pLaNina": 0,
+        "pNeutral": 2,
+        "pElNino": 98
+      },
+      {
+        "season": "SON",
+        "label": "SON Sep Oct Nov",
+        "pLaNina": 0,
+        "pNeutral": 2,
+        "pElNino": 98
+      },
+      {
+        "season": "OND",
+        "label": "OND Oct Nov Dec",
+        "pLaNina": 0,
+        "pNeutral": 2,
+        "pElNino": 98
+      },
+      {
+        "season": "NDJ",
+        "label": "NDJ Nov Dec Jan",
+        "pLaNina": 0,
+        "pNeutral": 2,
+        "pElNino": 98
+      },
+      {
+        "season": "DJF",
+        "label": "DJF Dec Jan Feb",
+        "pLaNina": 0,
+        "pNeutral": 4,
+        "pElNino": 96
+      }
+    ],
+    "imageUrl": "https://www.cpc.ncep.noaa.gov/archives/enso/roni/images/2026/enso-probs-current.png"
+  },
   "plume": {
     "issueYear": 2026,
     "issueMonth": 3,
@@ -16335,7 +16402,7 @@
     "weekly": "https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for",
     "mei": "https://psl.noaa.gov/enso/mei/data/meiv2.data",
     "soi": "https://www.cpc.ncep.noaa.gov/data/indices/soi",
-    "forecast": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities.php",
+    "forecast": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities/",
     "plume": "https://ensoforecast.iri.columbia.edu/plumes_json",
     "cnn": "https://aiclimate.snu.ac.kr/enso/",
     "metOffice": "https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina"
@@ -16345,7 +16412,7 @@
     "tropicalSstAnimation": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/sstanim.gif",
     "subsurfaceAnomaly": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ocean/weeklyenso_clim_81-10/wkteq_xz_anm.gif",
     "hovmollerSst": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_update/ssttlon5_c.gif",
-    "cpcProbabilityForecast": null,
+    "cpcProbabilityForecast": "https://www.cpc.ncep.noaa.gov/archives/enso/roni/images/2026/enso-probs-current.png",
     "metOfficePlumeNino34": "https://www.metoffice.gov.uk/images/elnino/20260501/nino34_anom_20260501.png",
     "metOfficePlumeNino3": "https://www.metoffice.gov.uk/images/elnino/20260501/nino3_anom_20260501.png",
     "metOfficePlumeNino4": "https://www.metoffice.gov.uk/images/elnino/20260501/nino4_anom_20260501.png",
@@ -16355,5 +16422,5 @@
     "metOfficeImpactLaNinaTemp": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-temp.jpg",
     "metOfficeImpactLaNinaPrecip": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-precip.jpg"
   },
-  "generatedAt": "2026-05-15T05:27:30.133Z"
+  "generatedAt": "2026-05-15T20:54:24.088Z"
 }

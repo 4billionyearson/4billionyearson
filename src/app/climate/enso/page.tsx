@@ -382,6 +382,13 @@ export default function EnsoPage() {
   });
   const forecastFirst50 = forecastWithYear.find((s) => s.pElNino >= 50) || null;
   const forecastFirst50La = forecastWithYear.find((s) => s.pLaNina >= 50) || null;
+  const weeklyAnom = weekly?.latest?.nino34?.anom ?? 0;
+  const oniAnom = oni?.anomaly ?? 0;
+  const neutralLabel = weeklyAnom >= 0.5 || oniAnom >= 0.5
+    ? 'El Niño-leaning · no sustained event forecast'
+    : weeklyAnom <= -0.5 || oniAnom <= -0.5
+      ? 'La Niña-leaning · no sustained event forecast'
+      : 'Neutral conditions favoured through the forecast window';
   const forecastVerdict: { phase: 'el-nino' | 'la-nina' | null; label: string | null } =
     forecastFirst50
       ? {
@@ -393,7 +400,7 @@ export default function EnsoPage() {
             phase: 'la-nina',
             label: `La Niña Predicted by ${seasonMiddleMonth(forecastFirst50La.season, forecastFirst50La.anchorYear)}`,
           }
-        : { phase: null, label: 'Neutral conditions favoured through the forecast window' };
+        : { phase: null, label: neutralLabel };
 
   return (
     <main>
