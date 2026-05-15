@@ -879,27 +879,38 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
       {seasons.length > 0 && (
         <div className="mt-3">
           <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-1.5 font-mono">
-            Season-by-season El Niño probability
+            {isForecastingLaNina ? 'Season-by-season La Niña probability' : 'Season-by-season El Niño probability'}
           </p>
           <div className="flex gap-1">
-            {seasons.map((s) => (
-              <div
-                key={s.season}
-                className="flex-1 flex flex-col items-center"
-                title={`${s.label}: ${s.pElNino}% El Niño · ${s.pNeutral}% Neutral · ${s.pLaNina}% La Niña`}
-              >
-                <div className="w-full h-12 bg-gray-800/40 rounded-sm overflow-hidden flex flex-col-reverse border border-gray-700/40">
-                  <div
-                    className={s.pElNino >= 50 ? 'bg-rose-500' : 'bg-rose-500/40'}
-                    style={{ height: `${s.pElNino}%` }}
-                  />
+            {seasons.map((s) => {
+              const showLaNina = isForecastingLaNina;
+              const pct = showLaNina ? s.pLaNina : s.pElNino;
+              const isHighlight = pct >= 50;
+              return (
+                <div
+                  key={s.season}
+                  className="flex-1 flex flex-col items-center"
+                  title={`${s.label}: ${s.pElNino}% El Niño · ${s.pNeutral}% Neutral · ${s.pLaNina}% La Niña`}
+                >
+                  <div className="w-full h-12 bg-gray-800/40 rounded-sm overflow-hidden flex flex-col-reverse border border-gray-700/40">
+                    <div
+                      className={showLaNina
+                        ? (isHighlight ? 'bg-sky-500' : 'bg-sky-500/40')
+                        : (isHighlight ? 'bg-rose-500' : 'bg-rose-500/40')}
+                      style={{ height: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="text-[9px] font-mono text-gray-400 mt-1">{s.season}</span>
+                  <span className={`text-[10px] font-mono font-bold ${
+                    isHighlight
+                      ? (showLaNina ? 'text-sky-300' : 'text-rose-300')
+                      : 'text-gray-500'
+                  }`}>
+                    {pct}%
+                  </span>
                 </div>
-                <span className="text-[9px] font-mono text-gray-400 mt-1">{s.season}</span>
-                <span className={`text-[10px] font-mono font-bold ${s.pElNino >= 50 ? 'text-rose-300' : 'text-gray-500'}`}>
-                  {s.pElNino}%
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
