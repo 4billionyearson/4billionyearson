@@ -366,6 +366,9 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
     null,
   );
   const isForecastingElNino = !!first50;
+  const firstLaNina50 = seasons.find((s) => s.pLaNina >= 50);
+  const isForecastingLaNina = !isForecastingElNino && !!firstLaNina50;
+  const hasNoaaData = seasons.length > 0 || (data?.plume?.periods?.length ?? 0) > 0;
 
   const plumePeaks = (data?.plume?.periods || [])
     .map((p) => p.dynMean ?? p.mean)
@@ -751,44 +754,72 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
       </div>
 
       {/* Forecast narrative boxes */}
-      {(isForecastingElNino || cnnPoints.length > 1) && (
+      {(hasNoaaData || cnnPoints.length > 1) && (
         <>
           <p className="text-[11px] uppercase tracking-wider text-gray-400 font-mono mt-4 mb-2">What&apos;s coming</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-            {/* NOAA box */}
-            {isForecastingElNino && (
-              <div className="rounded-xl border border-rose-500/30 bg-gradient-to-br from-rose-950/30 to-gray-900/30 p-4">
-                <p className="text-[11px] uppercase tracking-wider text-rose-300/80 font-mono mb-2">NOAA forecast</p>
+            {/* NOAA box — shown for El Niño, La Niña, or neutral outlooks */}
+            {hasNoaaData && (
+              <div className={`rounded-xl border p-4 bg-gradient-to-br to-gray-900/30 ${
+                isForecastingElNino
+                  ? 'border-rose-500/30 from-rose-950/30'
+                  : isForecastingLaNina
+                    ? 'border-sky-500/30 from-sky-950/30'
+                    : 'border-gray-500/30 from-gray-800/30'
+              }`}>
+                <p className={`text-[11px] uppercase tracking-wider font-mono mb-2 ${
+                  isForecastingElNino ? 'text-rose-300/80' : isForecastingLaNina ? 'text-sky-300/80' : 'text-gray-400/80'
+                }`}>NOAA forecast</p>
                 <p className="text-sm text-gray-100 leading-relaxed">
-                  A new <span className="font-semibold text-rose-300">El Niño</span> looks increasingly likely.{' '}
-                  {first50 && (
-                    <>
-                      Probability first crosses{' '}
-                      <span className="font-mono font-semibold text-rose-200">50%</span> in{' '}
-                      <span className="font-mono">{first50.label}</span>
-                      {' '}({first50.pElNino}% chance) - this is the official &ldquo;start&rdquo; of the event
-                      {first90 && (
-                        <>
-                          . It then climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in{' '}
-                          <span className="font-mono">{first90.label}</span>
-                        </>
-                      )}
-                      {peakSeason && (
-                        <>
-                          {' '}and peaks at{' '}
-                          <span className="font-mono font-semibold text-rose-200">{peakSeason.pElNino}%</span> in{' '}
-                          <span className="font-mono">{peakSeason.label}</span>
-                        </>
-                      )}
-                      {last90 && first90 && first90.season !== last90.season && (
-                        <>
-                          , staying above 90% through <span className="font-mono">{last90.label}</span>
-                        </>
-                      )}
-                      .
+                  {isForecastingElNino ? (
+                    <>A new <span className="font-semibold text-rose-300">El Niño</span> looks increasingly likely.{' '}
+                    {first50 && (
+                      <>
+                        Probability first crosses{' '}
+                        <span className="font-mono font-semibold text-rose-200">50%</span> in{' '}
+                        <span className="font-mono">{first50.label}</span>
+                        {' '}({first50.pElNino}% chance) - this is the official &ldquo;start&rdquo; of the event
+                        {first90 && (
+                          <>
+                            . It then climbs above <span className="font-mono font-semibold text-rose-200">90%</span> in{' '}
+                            <span className="font-mono">{first90.label}</span>
+                          </>
+                        )}
+                        {peakSeason && (
+                          <>
+                            {' '}and peaks at{' '}
+                            <span className="font-mono font-semibold text-rose-200">{peakSeason.pElNino}%</span> in{' '}
+                            <span className="font-mono">{peakSeason.label}</span>
+                          </>
+                        )}
+                        {last90 && first90 && first90.season !== last90.season && (
+                          <>, staying above 90% through <span className="font-mono">{last90.label}</span></>
+                        )}
+                        .
+                      </>
+                    )}{' '}
                     </>
-                  )}{' '}
+                  ) : isForecastingLaNina ? (
+                    <><span className="font-semibold text-sky-300">La Niña</span> conditions look increasingly likely.{' '}
+                    {firstLaNina50 && (
+                      <>Probability first crosses{' '}
+                      <span className="font-mono font-semibold text-sky-200">50%</span> in{' '}
+                      <span className="font-mono">{firstLaNina50.label}</span>
+                      {' '}({firstLaNina50.pLaNina}% chance).{' '}
+                      </>
+                    )}
+                    </>
+                  ) : (
+                    <>Models favour <span className="font-semibold text-gray-200">neutral</span> conditions through the forecast window.{' '}
+                    {peakSeason && peakSeason.pElNino >= 30 && (
+                      <>El Niño probability peaks at{' '}
+                      <span className="font-mono font-semibold text-gray-200">{peakSeason.pElNino}%</span> in{' '}
+                      <span className="font-mono">{peakSeason.label}</span>.{' '}
+                      </>
+                    )}
+                    </>
+                  )}
                   The dashed red curve traces the multi-model{' '}
                   <a href="https://iri.columbia.edu/our-expertise/climate/forecasts/enso/current/?enso_tab=enso-sst_table" target="_blank" rel="noopener noreferrer" className="text-rose-300 underline decoration-rose-400/40 underline-offset-2 hover:decoration-rose-300">
                     IRI/CCSR plume forecast
@@ -796,12 +827,17 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
                   {plume && (
                     <>(issued {plume.issueMonth}/{plume.issueYear}, {plume.periods[0]?.modelCount ?? 0} dynamical &amp; statistical models). </>
                   )}
-                  Peak intensity reaches{' '}
-                  <span className="font-mono font-semibold text-rose-200">{fmtSigned(predictedPeakOni, 1)}°C</span>
-                  {plumePeakPeriod && (
-                    <>{' '}in <span className="font-mono">{plumePeakPeriod.label} {plumePeakPeriod.seasonAnchorYear}</span></>
+                  {plumePeaks.length > 0 && (
+                    <>Peak model-mean reaches{' '}
+                    <span className={`font-mono font-semibold ${
+                      isForecastingElNino ? 'text-rose-200' : isForecastingLaNina ? 'text-sky-200' : 'text-gray-200'
+                    }`}>{fmtSigned(predictedPeakOni, 1)}°C</span>
+                    {plumePeakPeriod && (
+                      <>{' '}in <span className="font-mono">{plumePeakPeriod.label} {plumePeakPeriod.seasonAnchorYear}</span></>
+                    )}
+                    {' '}- the dynamical-model average.{' '}
+                    </>
                   )}
-                  {' '}- the dynamical-model average.
                 </p>
               </div>
             )}
