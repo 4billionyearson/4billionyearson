@@ -86,7 +86,26 @@ type ImpactData = {
 
 type Metric = 'temp' | 'precip';
 type AggWindow = 'annual' | 'mam';
-type Mode = 'year' | 'corr' | 'simulate';
+type Mode = 'year' | 'corr' | 'simulate' | 'forecast';
+type TempLayerMode = 'signal' | 'total';
+
+/** Forecast-related types — mirror the shapes already on `EnsoSnapshot` in page.tsx. */
+type ForecastSeasonProp = {
+  season: string;       // 'DJF'..'NDJ'
+  label: string;        // e.g. 'Oct–Dec 2026'
+  pLaNina: number;      // %
+  pNeutral: number;     // %
+  pElNino: number;      // %
+  anchorYear: number;   // calendar year of the season's reference month
+  modelOni?: number | null; // IRI plume multi-model mean Niño-3.4 anomaly, if available
+};
+
+type CnnForecastProp = {
+  issueYearMonth: number;        // YYYYMM the CNN forecast was issued
+  points: { yyyymm: number; nino34: number }[];
+};
+
+type ForecastSource = 'noaa' | 'cnn';
 
 const ENSO_GEOJSON_NAME_ALIASES: Record<string, string> = {
   'Ivory Coast': "Côte d'Ivoire",
@@ -109,6 +128,51 @@ const SEASON_LABEL: Record<Season, string> = {
   AMJ: 'Apr–Jun', MJJ: 'May–Jul', JJA: 'Jun–Aug', JAS: 'Jul–Sep',
   ASO: 'Aug–Oct', SON: 'Sep–Nov', OND: 'Oct–Dec', NDJ: 'Nov–Jan',
 };
+
+type SimPhase = {
+  id: string;
+  season: Season;
+  lag: number;
+  offset: number;
+  phase: 'build' | 'peak' | 'after';
+};
+
+const SIM_PHASES: SimPhase[] = [
+  { id: 'JJA_BUILD', season: 'JJA', lag: 0, offset: -6, phase: 'build' },
+  { id: 'JAS_BUILD', season: 'JAS', lag: 0, offset: -5, phase: 'build' },
+  { id: 'ASO_BUILD', season: 'ASO', lag: 0, offset: -4, phase: 'build' },
+  { id: 'SON_BUILD', season: 'SON', lag: 0, offset: -3, phase: 'build' },
+  { id: 'OND_BUILD', season: 'OND', lag: 0, offset: -2, phase: 'build' },
+  { id: 'NDJ_BUILD', season: 'NDJ', lag: 0, offset: -1, phase: 'build' },
+  { id: 'DJF_PEAK', season: 'DJF', lag: 1, offset: 0, phase: 'peak' },
+  { id: 'JFM_AFTER', season: 'JFM', lag: 1, offset: 1, phase: 'after' },
+  { id: 'FMA_AFTER', season: 'FMA', lag: 1, offset: 2, phase: 'after' },
+  { id: 'MAM_AFTER', season: 'MAM', lag: 1, offset: 3, phase: 'after' },
+  { id: 'AMJ_AFTER', season: 'AMJ', lag: 1, offset: 4, phase: 'after' },
+  { id: 'MJJ_AFTER', season: 'MJJ', lag: 1, offset: 5, phase: 'after' },
+  { id: 'JJA_AFTER', season: 'JJA', lag: 1, offset: 6, phase: 'after' },
+  { id: 'JAS_AFTER', season: 'JAS', lag: 1, offset: 7, phase: 'after' },
+];
+
+const DEFAULT_SIM_PHASE_ID = 'MAM_AFTER';
+
+function simPhaseIdFromLegacySeason(season: Season | undefined): string {
+  switch (season) {
+    case 'DJF': return 'DJF_PEAK';
+    case 'JFM': return 'JFM_AFTER';
+    case 'FMA': return 'FMA_AFTER';
+    case 'MAM': return 'MAM_AFTER';
+    case 'AMJ': return 'AMJ_AFTER';
+    case 'MJJ': return 'MJJ_AFTER';
+    case 'JJA': return 'JJA_AFTER';
+    case 'JAS': return 'JAS_AFTER';
+    case 'ASO': return 'ASO_BUILD';
+    case 'SON': return 'SON_BUILD';
+    case 'OND': return 'OND_BUILD';
+    case 'NDJ': return 'NDJ_BUILD';
+    default: return DEFAULT_SIM_PHASE_ID;
+  }
+}
 
 /* ─────────────────────────────────────────────────────────────────────────
  *  Colour scale — diverging red/blue, transparent at zero so neutral land
@@ -230,7 +294,7 @@ const LABELED_PLACES: Array<{ name: string; lat: number; lon: number }> = [
 // Reduced badge set for mobile — 10 well-spaced countries with the clearest
 // ENSO signals, one per major region to avoid crowding the narrow viewport.
 const MOBILE_LABELED_NAMES = new Set([
-  'Canada', 'United States of America', 'Brazil', 'Peru',
+  'Canada', 'United States of America', 'Peru',
   'Russia', 'Kenya', 'India', 'Indonesia', 'Australia', 'South Africa',
 ]);
 
@@ -747,30 +811,259 @@ function Scrubber({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
+ *  Forecast strip — compact two-line plot rendered inside the Forecast
+ *  control panel. Always shows BOTH NOAA (probabilistic plume → expected
+ *  ONI line) and SNU CNN (deterministic monthly ONI) so the reader can
+ *  see where the two models agree or diverge, with the inactive source
+ *  dimmed. An amber playhead marks the active forecast horizon.
+ * ───────────────────────────────────────────────────────────────────────── */
+function ForecastStrip({
+  forecast,
+  cnn,
+  activeIdx,
+  onPick,
+  activeSrc,
+}: {
+  forecast: ForecastSeasonProp[];
+  cnn: CnnForecastProp | null;
+  activeIdx: number;
+  onPick: (i: number) => void;
+  activeSrc: ForecastSource;
+}) {
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const W = 800, H = 60, padX = 8, padY = 6;
+  // NOAA / IRI plume ONI per horizon: prefer the joined plume value so the
+  // strip matches the main forecast section, and fall back to a coarse
+  // probability-difference proxy only when the plume value is absent.
+  const noaaPts = forecast.map((s, i) => {
+    const oni = (typeof s.modelOni === 'number' && Number.isFinite(s.modelOni))
+      ? s.modelOni
+      : ((s.pElNino - s.pLaNina) / 100);
+    return { i, label: s.label, season: s.season, anchorYear: s.anchorYear, oni };
+  });
+  // CNN: align CNN ONI to each forecast horizon by computing the same
+  // 3-month rolling average as the map uses.
+  const SEASON_MONTHS_LOCAL: Record<string, number[]> = {
+    DJF: [12, 1, 2], JFM: [1, 2, 3], FMA: [2, 3, 4], MAM: [3, 4, 5],
+    AMJ: [4, 5, 6], MJJ: [5, 6, 7], JJA: [6, 7, 8], JAS: [7, 8, 9],
+    ASO: [8, 9, 10], SON: [9, 10, 11], OND: [10, 11, 12], NDJ: [11, 12, 1],
+  };
+  const cnnLookup = new Map(cnn?.points.map((p) => [p.yyyymm, p.nino34]) ?? []);
+  const cnnPts: { i: number; oni: number | null }[] = forecast.map((s, i) => {
+    const months = SEASON_MONTHS_LOCAL[s.season];
+    if (!months || !cnn) return { i, oni: null };
+    const ym = (y: number, m: number) => y * 100 + m;
+    let targets: number[];
+    if (s.season === 'DJF') targets = [ym(s.anchorYear - 1, 12), ym(s.anchorYear, 1), ym(s.anchorYear, 2)];
+    else if (s.season === 'NDJ') targets = [ym(s.anchorYear, 11), ym(s.anchorYear, 12), ym(s.anchorYear + 1, 1)];
+    else targets = months.map((m) => ym(s.anchorYear, m));
+    let sum = 0; let n = 0;
+    for (const t of targets) {
+      const v = cnnLookup.get(t);
+      if (v === undefined || !Number.isFinite(v)) return { i, oni: null };
+      sum += v; n++;
+    }
+    return { i, oni: n === 3 ? sum / 3 : null };
+  });
+
+  const allVals: number[] = [
+    ...noaaPts.map((p) => p.oni),
+    ...cnnPts.map((p) => p.oni).filter((v): v is number => v !== null && Number.isFinite(v)),
+  ];
+  const absMax = Math.max(1.5, ...allVals.map((v) => Math.abs(v)));
+  const xFor = (i: number) => padX + (i / Math.max(1, forecast.length - 1)) * (W - 2 * padX);
+  const yFor = (v: number) => H / 2 - (v / absMax) * (H / 2 - padY);
+
+  // Polyline path strings
+  const noaaPath = noaaPts.map((p, k) => `${k === 0 ? 'M' : 'L'} ${xFor(p.i).toFixed(1)} ${yFor(p.oni).toFixed(1)}`).join(' ');
+  // CNN path may have gaps for missing months — split into runs of finite values
+  const cnnRuns: string[] = [];
+  let run: string[] = [];
+  for (const p of cnnPts) {
+    if (p.oni === null) {
+      if (run.length) cnnRuns.push(run.join(' '));
+      run = [];
+    } else {
+      run.push(`${run.length === 0 ? 'M' : 'L'} ${xFor(p.i).toFixed(1)} ${yFor(p.oni).toFixed(1)}`);
+    }
+  }
+  if (run.length) cnnRuns.push(run.join(' '));
+
+  const noaaDim = activeSrc !== 'noaa';
+  const cnnDim = activeSrc !== 'cnn';
+  const focusIdx = hoverIdx ?? activeIdx;
+  const focusSeason = forecast[focusIdx];
+  const focusNoaa = noaaPts[focusIdx]?.oni ?? null;
+  const focusCnn = cnnPts[focusIdx]?.oni ?? null;
+  const fmtOni = (v: number | null | undefined) => {
+    if (v === null || v === undefined || !Number.isFinite(v)) return '—';
+    return `${v >= 0 ? '+' : ''}${v.toFixed(2)}°C`;
+  };
+  const focusDelta = (typeof focusNoaa === 'number' && typeof focusCnn === 'number')
+    ? focusCnn - focusNoaa
+    : null;
+
+  const onClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const xPx = e.clientX - rect.left;
+    const t = (xPx - padX) / Math.max(1, rect.width - 2 * padX);
+    const i = Math.round(Math.max(0, Math.min(1, t)) * (forecast.length - 1));
+    onPick(i);
+  };
+
+  return (
+    <div className="relative select-none">
+      <div className="mb-0.5 min-h-[30px] flex items-center justify-center">
+        <div className="max-w-full overflow-x-auto rounded-md border border-gray-700/70 bg-gray-900/90 px-2 py-0.5 shadow-lg">
+          <div className="flex items-center gap-2 whitespace-nowrap text-[10px] sm:text-[11px] font-mono">
+            <span className="text-[#FFF5E7]">{focusSeason ? `${focusSeason.season} ${focusSeason.anchorYear}` : 'Forecast'}</span>
+            <span className="text-rose-300">NOAA {fmtOni(focusNoaa)}</span>
+            <span className="text-violet-300">CNN {fmtOni(focusCnn)}</span>
+            {focusDelta !== null && (
+              <span className="text-amber-300">Δ {focusDelta >= 0 ? '+' : ''}{focusDelta.toFixed(2)}°C</span>
+            )}
+          </div>
+        </div>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" onClick={onClick} className="block cursor-pointer">
+        {/* Threshold guides */}
+        <line x1={padX} y1={yFor(0.5)}  x2={W - padX} y2={yFor(0.5)}  stroke="rgba(244,63,94,0.25)" strokeWidth={0.5} strokeDasharray="3 3" />
+        <line x1={padX} y1={yFor(-0.5)} x2={W - padX} y2={yFor(-0.5)} stroke="rgba(14,165,233,0.25)" strokeWidth={0.5} strokeDasharray="3 3" />
+        <line x1={padX} y1={H / 2} x2={W - padX} y2={H / 2} stroke="rgba(255,255,255,0.15)" strokeWidth={0.5} />
+        {/* NOAA expected-ONI line */}
+        <path d={noaaPath} fill="none" stroke={noaaDim ? 'rgba(244,63,94,0.35)' : '#f43f5e'} strokeWidth={noaaDim ? 1 : 1.6} strokeDasharray="4 3" />
+        {/* CNN deterministic line */}
+        {cnnRuns.map((d, k) => (
+          <path key={k} d={d} fill="none" stroke={cnnDim ? 'rgba(167,139,250,0.35)' : '#a78bfa'} strokeWidth={cnnDim ? 1 : 1.6} />
+        ))}
+        {hoverIdx !== null && (
+          <line x1={xFor(hoverIdx)} y1={2} x2={xFor(hoverIdx)} y2={H - 2} stroke="rgba(208,166,94,0.45)" strokeWidth={0.9} strokeDasharray="2 2" />
+        )}
+        {/* Points + invisible hit-areas so every horizon has a proper in-app
+            hover readout instead of relying on native browser titles. */}
+        {noaaPts.map((p) => {
+          const emphasized = p.i === activeIdx || p.i === hoverIdx;
+          return (
+            <circle
+              key={`n${p.i}`}
+              cx={xFor(p.i)}
+              cy={yFor(p.oni)}
+              r={emphasized ? (noaaDim ? 1.7 : 2.3) : (noaaDim ? 1.3 : 1.8)}
+              fill={noaaDim ? 'rgba(244,63,94,0.5)' : '#f43f5e'}
+            />
+          );
+        })}
+        {cnnPts.filter((p) => p.oni !== null).map((p) => {
+          const emphasized = p.i === activeIdx || p.i === hoverIdx;
+          return (
+            <circle
+              key={`c${p.i}`}
+              cx={xFor(p.i)}
+              cy={yFor(p.oni as number)}
+              r={emphasized ? (cnnDim ? 1.7 : 2.3) : (cnnDim ? 1.3 : 1.8)}
+              fill={cnnDim ? 'rgba(167,139,250,0.5)' : '#a78bfa'}
+            />
+          );
+        })}
+        {forecast.map((s, i) => {
+          const cn = cnnPts[i]?.oni;
+          const no = noaaPts[i]?.oni;
+          const noStr = fmtOni(no);
+          const cnStr = fmtOni(cn);
+          return (
+            <g key={`hit${i}`}>
+              <rect
+                x={xFor(i) - (W / Math.max(1, forecast.length)) / 2}
+                y={0}
+                width={W / Math.max(1, forecast.length)}
+                height={H}
+                fill="transparent"
+                focusable="false"
+                style={{ cursor: 'pointer' }}
+                aria-label={`${s.label}: NOAA/IRI ${noStr}, CNN ${cnStr}`}
+                onClick={(e) => { e.stopPropagation(); onPick(i); }}
+                onMouseEnter={() => setHoverIdx(i)}
+                onMouseMove={() => setHoverIdx(i)}
+                onMouseLeave={() => setHoverIdx((current) => (current === i ? null : current))}
+              />
+            </g>
+          );
+        })}
+        {/* Playhead */}
+        <line x1={xFor(activeIdx)} y1={2} x2={xFor(activeIdx)} y2={H - 2} stroke="#D0A65E" strokeWidth={1.5} />
+      </svg>
+      <div className="mt-1 flex text-[9px] font-mono" style={{ paddingLeft: `${(padX / W) * 100}%`, paddingRight: `${(padX / W) * 100}%` }}>
+        {forecast.map((s, i) => {
+          const tone = i === hoverIdx ? 'text-[#FFF5E7]' : i === activeIdx ? 'text-[#D0A65E]' : 'text-gray-500';
+          const yearBreak = i === 0 || s.anchorYear !== forecast[i - 1]?.anchorYear;
+          return (
+            <div
+              key={`lbl${i}`}
+              className="min-w-0 flex-1 text-center px-[1px] pointer-events-none"
+            >
+              <div className={`whitespace-nowrap leading-none ${tone}`}>{s.season}</div>
+              <div className="mt-0.5 text-[8px] leading-none text-gray-600">{yearBreak ? s.anchorYear : '\u00a0'}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-0.5 flex items-center justify-center gap-3 text-[10px] font-mono text-gray-500">
+        <span className="inline-flex items-center gap-1">
+          <span className="inline-block h-[2px] w-4 align-middle" style={{ background: '#f43f5e' }} />
+          NOAA / IRI plume
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="inline-block h-[2px] w-4 align-middle" style={{ background: '#a78bfa' }} />
+          SNU CNN
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
  *  Main tracker component
  * ───────────────────────────────────────────────────────────────────────── */
 export default function EnsoImpactTracker({
   oniHistory,
+  forecast,
+  cnnForecast,
 }: {
   oniHistory: OniRow[];
+  forecast?: ForecastSeasonProp[];
+  cnnForecast?: CnnForecastProp | null;
 }) {
   const [impact, setImpact] = useState<ImpactData | null>(null);
   const [year, setYear] = useState(() => (loadFootprintPrefs().year as number) ?? 1998);
   const [metric, setMetric] = useState<Metric>(() => (loadFootprintPrefs().metric as Metric) ?? 'temp');
   const [aggWindow, setAggWindow] = useState<AggWindow>(() => (loadFootprintPrefs().aggWindow as AggWindow) ?? 'mam');
   const [mode, setMode] = useState<Mode>(() => (loadFootprintPrefs().mode as Mode) ?? 'year');
+  const [tempLayerMode, setTempLayerMode] = useState<TempLayerMode>(() => (loadFootprintPrefs().tempLayerMode as TempLayerMode) ?? 'signal');
   // ENSO strength slider for Composite mode — units are °C of ONI (Niño-3.4
   // SST anomaly). Standard event thresholds: ±0.5 = weak, ±1 = moderate,
   // ±1.5 = strong, ±2 = very strong (e.g. 1997, 2015).
   const [oniSlider, setOniSlider] = useState(() => (loadFootprintPrefs().oniSlider as number) ?? 1.5);
-  // Season slider for Composite mode — 12 NOAA-style overlapping 3-month
-  // windows. JFM is the canonical post-peak window where the lagged land
-  // response to a DJF SST peak is cleanest worldwide.
-  const [season, setSeason] = useState<Season>(() => (loadFootprintPrefs().season as Season) ?? 'JFM');
+  const [simPhaseId, setSimPhaseId] = useState<string>(() => {
+    const prefs = loadFootprintPrefs();
+    const saved = prefs.simPhaseId as string | undefined;
+    if (saved && SIM_PHASES.some((phase) => phase.id === saved)) return saved;
+    return simPhaseIdFromLegacySeason(prefs.season as Season | undefined);
+  });
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(() => (loadFootprintPrefs().speed as number) ?? 4); // years per second
+  // Forecast mode — slider over NOAA's published forecast horizons + active
+  // source (NOAA probabilistic plume vs SNU CNN deterministic).
+  const [forecastIdx, setForecastIdx] = useState<number>(0);
+  const [forecastSrc, setForecastSrc] = useState<ForecastSource>(() => (loadFootprintPrefs().forecastSrc as ForecastSource) ?? 'noaa');
+  const [forecastSpeed, setForecastSpeed] = useState(() => (loadFootprintPrefs().forecastSpeed as number) ?? 1);
+  const [forecastPlaying, setForecastPlaying] = useState(false);
   const [hovered, setHovered] = useState<{ name: string; value: number | null } | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const simPhase = SIM_PHASES.find((phase) => phase.id === simPhaseId) ?? SIM_PHASES.find((phase) => phase.id === DEFAULT_SIM_PHASE_ID)!;
+  const simPhaseText = simPhase.phase === 'peak'
+    ? `${simPhase.season} peak`
+    : `${simPhase.season} ${simPhase.phase === 'build' ? 'build-up' : 'aftermath'}`;
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 639px)');
@@ -785,10 +1078,10 @@ export default function EnsoImpactTracker({
     if (typeof window === 'undefined') return;
     try {
       localStorage.setItem(FOOTPRINT_PREFS_KEY, JSON.stringify({
-        year, metric, aggWindow, mode, oniSlider, season, speed,
+        year, metric, aggWindow, mode, tempLayerMode, oniSlider, season: simPhase.season, simPhaseId, speed, forecastSrc, forecastSpeed,
       }));
     } catch { /* storage unavailable */ }
-  }, [year, metric, aggWindow, mode, oniSlider, season, speed]);
+  }, [year, metric, aggWindow, mode, tempLayerMode, oniSlider, simPhase.season, simPhaseId, speed, forecastSrc, forecastSpeed]);
 
   // Load pre-computed impact dataset.
   useEffect(() => {
@@ -799,6 +1092,11 @@ export default function EnsoImpactTracker({
       .catch(() => undefined);
     return () => { cancelled = true; };
   }, []);
+
+  const minYear = impact?.years[0] ?? 1950;
+  // Cap at last full calendar year so partial-year data doesn't show at end of playback
+  const dataMaxYear = impact?.years[impact.years.length - 1] ?? new Date().getFullYear();
+  const maxYear = Math.min(dataMaxYear, new Date().getFullYear() - 1);
 
   // Playback loop — advance one year per (1000/speed) ms; auto-stop at last
   // FULL year. We cap at (currentCalendarYear - 1) so partial-year data for
@@ -819,18 +1117,44 @@ export default function EnsoImpactTracker({
     return () => clearInterval(id);
   }, [playing, speed, impact]);
 
+  useEffect(() => {
+    if (!forecastPlaying || mode !== 'forecast' || !forecast || forecast.length === 0) return;
+    const id = setInterval(() => {
+      setForecastIdx((idx) => {
+        if (idx >= forecast.length - 1) {
+          setForecastPlaying(false);
+          return idx;
+        }
+        return idx + 1;
+      });
+    }, Math.max(220, 1100 / forecastSpeed));
+    return () => clearInterval(id);
+  }, [forecastPlaying, mode, forecast, forecastSpeed]);
+
+  useEffect(() => {
+    if (mode !== 'forecast') setForecastPlaying(false);
+  }, [mode]);
+
   // Build a featureName → anomaly lookup for the current year/metric/window.
+  const countryBucketForWindow = (window: string, wantedMetric: Metric): Record<string, (number | null)[]> | undefined => {
+    if (!impact) return undefined;
+    const seasonal = (impact as any).seasonal as Record<string, any> | undefined;
+    return (
+      seasonal?.[window]?.[wantedMetric]?.country
+      ?? (window === 'annual'
+        ? (impact as any).annual?.[wantedMetric]?.country
+        : window === 'MAM'
+          ? (impact as any).mam?.[wantedMetric]?.country
+          : undefined)
+    ) as Record<string, (number | null)[]> | undefined;
+  };
+
   const valuesByName = useMemo(() => {
     if (!impact) return {};
     const yIdx = impact.years.indexOf(year);
     if (yIdx < 0) return {};
     const w = aggWindow === 'annual' ? 'annual' : 'MAM';
-    const seasonal = (impact as any).seasonal as Record<string, any> | undefined;
-    const bucket =
-      (seasonal?.[w]?.[metric]?.country
-        ?? (aggWindow === 'annual'
-          ? (impact as any).annual?.[metric]?.country
-          : (impact as any).mam?.[metric]?.country)) as Record<string, (number | null)[]> | undefined;
+    const bucket = countryBucketForWindow(w, metric);
     if (!bucket) return {};
     const out: Record<string, number | null> = {};
     for (const iso3 of Object.keys(bucket)) {
@@ -840,6 +1164,7 @@ export default function EnsoImpactTracker({
       out[name] = arr?.[yIdx] ?? null;
     }
     return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [impact, year, metric, aggWindow]);
 
   // Per-year peak ONI across the full history, aligned to impact.years.
@@ -958,13 +1283,9 @@ export default function EnsoImpactTracker({
   // they pair with peak-ONI(Y−1); late-year windows (JJA…NDJ) are leading
   // up to that year's NDJ peak, so they pair with peak-ONI(Y).
   const compositeStats = useMemo(
-    () => {
-      const earlyYear = new Set(['DJF', 'JFM', 'FMA', 'MAM', 'AMJ', 'MJJ']);
-      const lag = earlyYear.has(season) ? 1 : 0;
-      return computeEnsoStats(season, lag);
-    },
+    () => computeEnsoStats(simPhase.season, simPhase.lag),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [impact, metric, season, oniByYear],
+    [impact, metric, simPhase.season, simPhase.lag, oniByYear],
   );
   const slopeByName = compositeStats.slope;
 
@@ -978,11 +1299,311 @@ export default function EnsoImpactTracker({
     return out;
   }, [slopeByName, oniSlider]);
 
+  /* ──────────────────────────────────────────────────────────────────────
+   *  Forecast mode — categorical historical composites
+   * ──────────────────────────────────────────────────────────────────────
+   *  For each (window, country) we precompute three composite anomalies:
+   *    C_EN  = mean detrended anomaly across years where peak ONI ≥ +0.5
+   *    C_LN  = mean detrended anomaly across years where peak ONI ≤ −0.5
+   *    C_N   = mean detrended anomaly across neutral years
+   *  We then blend by probability:
+   *    value = P_EN·C_EN + P_LN·C_LN + P_N·C_N
+   *  This is the standard NOAA "composite analogue" approach. It saturates
+   *  cleanly at extreme ONI (no linear extrapolation issues) and works
+   *  identically for the NOAA probabilistic plume and an SNU CNN
+   *  deterministic forecast (whose ONI is converted to soft probabilities
+   *  via a sigmoid).
+   * ────────────────────────────────────────────────────────────────────── */
+  const compositesByWindow = useMemo(() => {
+    if (!impact) return {} as Record<string, { countries: Record<string, { en: number | null; ln: number | null; n: number | null }>; meanONI: { en: number; ln: number; n: number } }>;
+    const seasonal = (impact as any).seasonal as Record<string, any> | undefined;
+    const earlyYear = new Set(['DJF', 'JFM', 'FMA', 'MAM', 'AMJ', 'MJJ']);
+    const out: Record<string, { countries: Record<string, { en: number | null; ln: number | null; n: number | null }>; meanONI: { en: number; ln: number; n: number } }> = {};
+    for (const w of SEASONS) {
+      const bucket = (seasonal?.[w]?.[metric]?.country
+        ?? (w === 'MAM' ? (impact as any).mam?.[metric]?.country : undefined)) as Record<string, (number | null)[]> | undefined;
+      if (!bucket) continue;
+      const lag = earlyYear.has(w) ? 1 : 0;
+      // Compute mean ONI within each bucket once for this window (same set
+      // of years for every country). Used downstream to rescale composites
+      // so a deterministic forecast (e.g. CNN ONI = +2°C) produces map
+      // magnitudes consistent with Simulate at +2, rather than the historical
+      // EN-event average (~+1.2°C).
+      let mEnS = 0, mEnN = 0, mLnS = 0, mLnN = 0, mNuS = 0, mNuN = 0;
+      for (let i = 0; i < impact.years.length; i++) {
+        const oni = oniByYear.get(impact.years[i] - lag);
+        if (oni === undefined || !Number.isFinite(oni)) continue;
+        if (oni >= 0.5)      { mEnS += oni; mEnN++; }
+        else if (oni <= -0.5){ mLnS += oni; mLnN++; }
+        else                 { mNuS += oni; mNuN++; }
+      }
+      const meanONI = {
+        en: mEnN > 0 ? mEnS / mEnN : 1.2,
+        ln: mLnN > 0 ? mLnS / mLnN : -1.0,
+        n:  mNuN > 0 ? mNuS / mNuN : 0,
+      };
+      const perWindow: Record<string, { en: number | null; ln: number | null; n: number | null }> = {};
+      for (const iso3 of Object.keys(bucket)) {
+        const name = impact.countryNames[iso3] ? mapEnsoCountryName(impact.countryNames[iso3]) : null;
+        if (!name) continue;
+        const series = detrend(bucket[iso3] ?? []);
+        let enS = 0, enN = 0, lnS = 0, lnN = 0, nuS = 0, nuN = 0;
+        for (let i = 0; i < series.length; i++) {
+          const v = series[i];
+          if (!Number.isFinite(v)) continue;
+          const oni = oniByYear.get(impact.years[i] - lag);
+          if (oni === undefined || !Number.isFinite(oni)) continue;
+          if (oni >= 0.5)      { enS += v; enN++; }
+          else if (oni <= -0.5){ lnS += v; lnN++; }
+          else                 { nuS += v; nuN++; }
+        }
+        perWindow[name] = {
+          en: enN >= 5 ? enS / enN : null,
+          ln: lnN >= 5 ? lnS / lnN : null,
+          n:  nuN >= 5 ? nuS / nuN : null,
+        };
+      }
+      out[w] = { countries: perWindow, meanONI };
+    }
+    return out;
+    // detrend is stable; impact / metric / oniByYear are the dependencies that
+    // actually change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [impact, metric, oniByYear]);
+
+  /** Sigmoid mapping a deterministic Niño-3.4 anomaly to soft EN/LN/Neutral
+   *  probabilities. The 0.5°C threshold and 0.4°C transition width are
+   *  loosely calibrated to NOAA's own categorical thresholds, so a +0.5°C
+   *  forecast yields ~50% El Niño probability and a +1.5°C forecast yields
+   *  >95% El Niño. Returns probabilities summing to 1. */
+  const oniToProbs = (oni: number): { en: number; ln: number; n: number } => {
+    if (!Number.isFinite(oni)) return { en: 0, ln: 0, n: 1 };
+    const sig = (z: number) => 1 / (1 + Math.exp(-z));
+    // Narrower transition (0.25 vs 0.4) so the CNN probability vector
+    // diverges more sharply from NOAA's plume when the two disagree.
+    const W = 0.25;
+    let pEN = sig((oni - 0.5) / W);
+    let pLN = sig((-oni - 0.5) / W);
+    // EN+LN can mildly overlap near zero — clip overlap by renormalising
+    // against neutral.
+    let pN = Math.max(0, 1 - pEN - pLN);
+    const sum = pEN + pLN + pN;
+    if (sum > 0) { pEN /= sum; pLN /= sum; pN /= sum; }
+    return { en: pEN, ln: pLN, n: pN };
+  };
+
+  /** Convert the CNN monthly Niño-3.4 trajectory into a 3-month rolling
+   *  average aligned with a NOAA season label (e.g. 'OND') for a given
+   *  anchor year. Returns null if any of the three months is missing. */
+  const cnnAnomForSeason = (sourcePoints: { yyyymm: number; nino34: number }[] | undefined, label: string, anchorYear: number): number | null => {
+    if (!sourcePoints || sourcePoints.length === 0) return null;
+    const SEASON_MONTHS_LOCAL: Record<string, number[]> = {
+      DJF: [12, 1, 2], JFM: [1, 2, 3], FMA: [2, 3, 4], MAM: [3, 4, 5],
+      AMJ: [4, 5, 6], MJJ: [5, 6, 7], JJA: [6, 7, 8], JAS: [7, 8, 9],
+      ASO: [8, 9, 10], SON: [9, 10, 11], OND: [10, 11, 12], NDJ: [11, 12, 1],
+    };
+    const months = SEASON_MONTHS_LOCAL[label];
+    if (!months) return null;
+    const ym = (y: number, m: number) => y * 100 + m;
+    // NOAA naming: DJF/NDJ are anchored to the year of January / December
+    // respectively. For simplicity, build the calendar year/month for each
+    // of the three months relative to `anchorYear`. We assume `anchorYear`
+    // is the seasonMiddleMonth's year (matches forecastWithYear in page.tsx).
+    let targets: number[];
+    if (label === 'DJF') targets = [ym(anchorYear - 1, 12), ym(anchorYear, 1), ym(anchorYear, 2)];
+    else if (label === 'NDJ') targets = [ym(anchorYear, 11), ym(anchorYear, 12), ym(anchorYear + 1, 1)];
+    else targets = months.map((m) => ym(anchorYear, m));
+    const lookup = new Map(sourcePoints.map((p) => [p.yyyymm, p.nino34]));
+    let sum = 0; let n = 0;
+    for (const t of targets) {
+      const v = lookup.get(t);
+      if (v === undefined || !Number.isFinite(v)) return null;
+      sum += v; n++;
+    }
+    return n === 3 ? sum / 3 : null;
+  };
+
+  // Forecast state — slider position over the NOAA forecast horizons + active source.
+  const forecastHorizon = (forecast && forecast.length > 0)
+    ? forecast[Math.max(0, Math.min(forecast.length - 1, forecastIdx))]
+    : null;
+
+  // Probabilities used by the map for the active source × horizon.
+  // `oni` is the implied / forecast Niño-3.4 anomaly for that horizon:
+  //  • NOAA: actual IRI plume multi-model mean when available, otherwise
+  //    a probability-weighted bucket mean as a fallback.
+  //  • CNN: the actual deterministic 3-month rolling forecast value.
+  const forecastProbs = useMemo(() => {
+    if (!forecastHorizon) return null;
+    const win = compositesByWindow[forecastHorizon.season];
+    const meanONI = win?.meanONI ?? { en: 1.2, ln: -1.0, n: 0 };
+    if (forecastSrc === 'noaa') {
+      const en = forecastHorizon.pElNino / 100;
+      const ln = forecastHorizon.pLaNina / 100;
+      const n  = forecastHorizon.pNeutral / 100;
+      const impliedOni = en * meanONI.en + ln * meanONI.ln + n * meanONI.n;
+      const oni = (typeof forecastHorizon.modelOni === 'number' && Number.isFinite(forecastHorizon.modelOni))
+        ? forecastHorizon.modelOni
+        : impliedOni;
+      return { en, ln, n, oni };
+    }
+    // CNN: read the rolling 3-month nino34 for that season, then sigmoid.
+    const cnnAnom = cnnAnomForSeason(cnnForecast?.points, forecastHorizon.season, forecastHorizon.anchorYear);
+    if (cnnAnom === null) return null;
+    return { ...oniToProbs(cnnAnom), oni: cnnAnom };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forecastHorizon, forecastSrc, cnnForecast, compositesByWindow]);
+
+  /** Helper: build the (probability-blended) composite-map values for a
+   *  specific source + horizon. Returns name → anomaly in physical units
+   *  (°C for temp, % for precip). */
+  const blendedComposite = (src: ForecastSource, horizon: ForecastSeasonProp | null): Record<string, number | null> => {
+    if (!horizon) return {};
+    const win = compositesByWindow[horizon.season];
+    if (!win) return {};
+    const perWindow = win.countries;
+    const meanONI = win.meanONI;
+    let probs: { en: number; ln: number; n: number } | null;
+    let expectedONI: number | null = null;
+    if (src === 'noaa') {
+      probs = { en: horizon.pElNino / 100, ln: horizon.pLaNina / 100, n: horizon.pNeutral / 100 };
+      // When the IRI plume's model-mean ONI is available for this horizon,
+      // treat it as the deterministic "expected" Niño-3.4 and rescale the
+      // composite to match — so NOAA Forecast magnitudes line up with
+      // Simulate at that ONI rather than with the historical EN/LN mean.
+      if (typeof horizon.modelOni === 'number' && Number.isFinite(horizon.modelOni)) {
+        expectedONI = horizon.modelOni;
+      }
+    } else {
+      const a = cnnAnomForSeason(cnnForecast?.points, horizon.season, horizon.anchorYear);
+      probs = a !== null ? oniToProbs(a) : null;
+      expectedONI = a;
+    }
+    if (!probs) return {};
+    // Blended bucket-mean ONI consistent with this probability vector.
+    const blendONI = probs.en * meanONI.en + probs.ln * meanONI.ln + probs.n * meanONI.n;
+    let scale = 1;
+    if (expectedONI !== null && Math.abs(blendONI) > 0.1
+        && Math.sign(expectedONI) === Math.sign(blendONI)) {
+      scale = Math.max(0.3, Math.min(2.5, expectedONI / blendONI));
+    }
+    const out: Record<string, number | null> = {};
+    for (const [name, c] of Object.entries(perWindow)) {
+      let pSum = 0; let vSum = 0;
+      if (c.en !== null) { vSum += c.en * probs.en; pSum += probs.en; }
+      if (c.ln !== null) { vSum += c.ln * probs.ln; pSum += probs.ln; }
+      if (c.n  !== null) { vSum += c.n  * probs.n;  pSum += probs.n; }
+      out[name] = pSum >= 0.5 ? (vSum / pSum) * scale : null;
+    }
+    return out;
+  };
+
+  // Active-source map (driving the choropleth).
+  const forecastByName = useMemo(
+    () => blendedComposite(forecastSrc, forecastHorizon),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [forecastSrc, forecastHorizon, compositesByWindow, cnnForecast],
+  );
+  // Shadow map (the *other* source) — used for the dual tooltip.
+  const forecastByNameShadow = useMemo(
+    () => blendedComposite(forecastSrc === 'noaa' ? 'cnn' : 'noaa', forecastHorizon),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [forecastSrc, forecastHorizon, compositesByWindow, cnnForecast],
+  );
+
+  const showBackgroundWarming = metric === 'temp'
+    && tempLayerMode === 'total'
+    && (mode === 'simulate' || mode === 'forecast');
+
+  const fitTrendAtYear = (arr: (number | null)[], targetYear: number): number | null => {
+    if (!impact) return null;
+    let n = 0;
+    let sx = 0;
+    let sy = 0;
+    let sxx = 0;
+    let sxy = 0;
+    for (let i = 0; i < arr.length; i++) {
+      const v = arr[i];
+      if (v === null || v === undefined || !Number.isFinite(v)) continue;
+      const x = impact.years[i];
+      n++;
+      sx += x;
+      sy += v;
+      sxx += x * x;
+      sxy += x * v;
+    }
+    if (n < 10) return null;
+    const denom = n * sxx - sx * sx;
+    const b = denom === 0 ? 0 : (n * sxy - sx * sy) / denom;
+    const a = (sy - b * sx) / n;
+    const y = a + b * targetYear;
+    return Number.isFinite(y) ? y : null;
+  };
+
+  const warmingWindow = mode === 'forecast'
+    ? forecastHorizon?.season ?? null
+    : mode === 'simulate'
+      ? simPhase.season
+      : null;
+  const warmingTargetYear = mode === 'forecast'
+    ? forecastHorizon?.anchorYear ?? null
+    : mode === 'simulate'
+      ? maxYear
+      : null;
+
+  const warmingByName = useMemo(() => {
+    if (!impact || !showBackgroundWarming || !warmingWindow || warmingTargetYear === null) return {};
+    const bucket = countryBucketForWindow(warmingWindow, 'temp');
+    if (!bucket) return {};
+    const out: Record<string, number | null> = {};
+    for (const iso3 of Object.keys(bucket)) {
+      const name = impact.countryNames[iso3] ? mapEnsoCountryName(impact.countryNames[iso3]) : null;
+      if (!name) continue;
+      out[name] = fitTrendAtYear(bucket[iso3] ?? [], warmingTargetYear);
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [impact, showBackgroundWarming, warmingWindow, warmingTargetYear]);
+
+  const mergeSignalWithBackground = (
+    signal: Record<string, number | null>,
+    background: Record<string, number | null>,
+  ) => {
+    if (!showBackgroundWarming) return signal;
+    const out: Record<string, number | null> = {};
+    for (const [name, value] of Object.entries(signal)) {
+      if (value === null || value === undefined || !Number.isFinite(value)) {
+        out[name] = null;
+        continue;
+      }
+      const bg = background[name];
+      out[name] = (typeof bg === 'number' && Number.isFinite(bg)) ? value + bg : value;
+    }
+    return out;
+  };
+
+  const compositeByNameWithWarming = useMemo(
+    () => mergeSignalWithBackground(compositeByName, warmingByName),
+    [compositeByName, warmingByName, showBackgroundWarming],
+  );
+
+  const forecastByNameWithWarming = useMemo(
+    () => mergeSignalWithBackground(forecastByName, warmingByName),
+    [forecastByName, warmingByName, showBackgroundWarming],
+  );
+
+  const forecastByNameShadowWithWarming = useMemo(
+    () => mergeSignalWithBackground(forecastByNameShadow, warmingByName),
+    [forecastByNameShadow, warmingByName, showBackgroundWarming],
+  );
+
   const activeValues = mode === 'corr'
     ? correlationByName
     : mode === 'simulate'
-      ? compositeByName
-      : valuesByName;
+      ? compositeByNameWithWarming
+      : mode === 'forecast'
+        ? forecastByNameWithWarming
+        : valuesByName;
 
   const ensoAnom = useMemo(() => peakOniForYear(oniHistory, year), [oniHistory, year]);
   const state = ensoState(ensoAnom);
@@ -992,30 +1613,71 @@ export default function EnsoImpactTracker({
       ? 'border-sky-500/60 bg-sky-500/15 text-sky-300'
       : 'border-gray-600 text-gray-300';
 
-  const minYear = impact?.years[0] ?? 1950;
-  // Cap at last full calendar year so partial-year data doesn't show at end of playback
-  const dataMaxYear = impact?.years[impact.years.length - 1] ?? new Date().getFullYear();
-  const maxYear = Math.min(dataMaxYear, new Date().getFullYear() - 1);
   const stepYear = (delta: number) => setYear((y) => Math.max(minYear, Math.min(maxYear, y + delta)));
+  const legendLeftLabel = mode === 'corr'
+    ? metric === 'temp' ? 'La Niña-like' : 'Drier in El Niño'
+    : metric === 'temp' ? 'Cooler' : 'Drier';
+  const legendRightLabel = mode === 'corr'
+    ? metric === 'temp' ? 'El Niño-like' : 'Wetter in El Niño'
+    : metric === 'temp' ? 'Warmer' : 'Wetter';
+  const legendLeftClass = metric === 'temp' ? 'text-sky-400' : 'text-rose-400';
+  const legendRightClass = metric === 'temp' ? 'text-rose-400' : 'text-sky-400';
+  const legendNote = mode === 'corr'
+    ? metric === 'temp'
+      ? 'Pearson r vs ONI (±0.6) - faded = |r|<0.2'
+      : 'Pearson r vs ONI - red=drier, blue=wetter - faded = |r|<0.2'
+    : mode === 'year' || showBackgroundWarming
+      ? `scale ±${metric === 'temp' ? '3°C' : '100%'} vs 1961-1990`
+      : `ENSO signal scale ±${metric === 'temp' ? '3°C' : '100%'}`;
+  const legendDetail = mode === 'corr'
+    ? 'Map fixed; year scrubber inactive'
+    : mode === 'simulate'
+      ? showBackgroundWarming ? 'Map driven by ENSO strength slider + warming' : 'Map driven by ENSO strength slider'
+      : mode === 'forecast'
+        ? showBackgroundWarming ? 'Map driven by forecast horizon + warming' : 'Map driven by forecast horizon'
+        : null;
 
   return (
     <div>
       {/* Header — prominent year/state + metric/window toggles (no title — page heading above is sufficient) */}
       <div className="flex flex-wrap items-end justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex min-h-[28px] items-center gap-2 flex-wrap">
           {mode === 'year' && (
-            <>
-              <span className="font-mono font-black tabular-nums text-2xl sm:text-5xl text-[#D0A65E] leading-none">{year}</span>
-              <span className={`inline-flex self-end mb-0.5 items-center rounded-full border px-1 sm:px-2 py-[2px] sm:py-0.5 leading-none text-[7px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.08em] ${stateCls}`}>
+            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 whitespace-nowrap text-[#D0A65E]">
+              <span className="font-mono font-black tabular-nums text-[15px] sm:text-5xl leading-none">{year}</span>
+              <span className={`inline-flex self-end sm:mb-0.5 items-center rounded-full border px-1 sm:px-2 py-[2px] sm:py-0.5 leading-none text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.08em] ${stateCls}`}>
                 {state} {ensoAnom >= 0 ? '+' : ''}{ensoAnom.toFixed(2)}°
               </span>
-            </>
+            </span>
           )}
           {mode === 'corr' && (
-            <span className="font-mono font-semibold text-base text-[#D0A65E]">ENSO Teleconnection · 1950–{maxYear}</span>
+            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 whitespace-nowrap font-mono font-semibold text-[15px] sm:text-base text-[#D0A65E]">ENSO Teleconnection · 1950–{maxYear}</span>
           )}
           {mode === 'simulate' && (
-            <span className="font-mono font-semibold text-base text-[#D0A65E]">{season} · ONI {oniSlider >= 0 ? '+' : ''}{oniSlider.toFixed(1)}°C</span>
+            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 whitespace-nowrap font-mono font-semibold text-[15px] sm:text-base text-[#D0A65E]">
+              <span>{simPhaseText}</span>
+              <span>- ONI {oniSlider >= 0 ? '+' : ''}{oniSlider.toFixed(1)}°C</span>
+              {showBackgroundWarming && (
+                <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-gray-400">- ENSO + warming</span>
+              )}
+            </span>
+          )}
+          {mode === 'forecast' && forecastHorizon && (
+            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 whitespace-nowrap font-mono font-semibold text-[15px] sm:text-base text-[#D0A65E]">
+              <span>Forecast</span>
+              <span className="sm:hidden">- {forecastHorizon.season}</span>
+              <span className="hidden sm:inline">- {forecastHorizon.label}</span>
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-gray-400">
+                - <span className="sm:hidden">{forecastSrc === 'noaa' ? 'NOAA' : 'CNN'}</span>
+                <span className="hidden sm:inline">{forecastSrc === 'noaa' ? 'NOAA / IRI' : 'SNU CNN'}</span>
+              </span>
+              {showBackgroundWarming && (
+                <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-gray-400">
+                  - <span className="sm:hidden">+ warm</span>
+                  <span className="hidden sm:inline">ENSO + warming</span>
+                </span>
+              )}
+            </span>
           )}
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -1038,16 +1700,93 @@ export default function EnsoImpactTracker({
             aria-pressed={mode === 'simulate'}
             className={`${TOGGLE_BASE} ${mode === 'simulate' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
           >Simulate</button>
+          {(forecast && forecast.length > 0) && (
+            <button
+              type="button"
+              onClick={() => setMode('forecast')}
+              aria-pressed={mode === 'forecast'}
+              className={`${TOGGLE_BASE} ${mode === 'forecast' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+            >Forecast</button>
+          )}
           {/* Metric: Temp / Rain */}
           <span className="inline-block h-4 w-px bg-gray-700 mx-0.5 shrink-0" aria-hidden />
-          <button
-            type="button"
-            onClick={() => setMetric('temp')}
-            aria-pressed={metric === 'temp'}
-            className={`${TOGGLE_BASE} ${metric === 'temp' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-          >
-            <Thermometer className="h-3 w-3" /> Temp
-          </button>
+          {(mode === 'simulate' || mode === 'forecast') ? (
+            <div
+              className="inline-flex h-7 items-center rounded-full border overflow-hidden"
+              style={{
+                borderColor: metric === 'temp' ? '#D0A65E8c' : '#374151',
+                background: metric === 'temp' ? '#D0A65E1f' : 'rgba(17,24,39,0.45)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setMetric('temp')}
+                aria-pressed={metric === 'temp'}
+                className="inline-flex h-full items-center gap-1 px-2.5 text-[11px] sm:text-[12px] font-medium transition-colors hover:bg-white/[0.04]"
+                style={{ color: metric === 'temp' ? '#FFF5E7' : '#D1D5DB' }}
+              >
+                <Thermometer className="h-3 w-3" />
+                <span className="leading-none whitespace-nowrap">Temp</span>
+              </button>
+              <div aria-hidden className="h-3.5 w-px self-center" style={{ background: metric === 'temp' ? '#D0A65E55' : '#4B5563' }} />
+              <Tip text="Shows the ENSO teleconnection signal after removing each country's long-term warming trend.">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMetric('temp');
+                    setTempLayerMode('signal');
+                  }}
+                  aria-pressed={metric === 'temp' && tempLayerMode === 'signal'}
+                  className="inline-flex h-full items-center gap-1 px-2.5 text-[11px] sm:text-[12px] font-medium transition-colors hover:bg-white/[0.04]"
+                  style={{
+                    color: metric === 'temp' && tempLayerMode === 'signal' ? '#FFF5E7' : '#9CA3AF',
+                    background: metric === 'temp' && tempLayerMode === 'signal' ? 'rgba(255,255,255,0.04)' : 'transparent',
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    className="inline-block h-2 w-2 rounded-full shrink-0"
+                    style={{ background: metric === 'temp' && tempLayerMode === 'signal' ? '#D0A65E' : 'transparent', border: `1px solid ${metric === 'temp' && tempLayerMode === 'signal' ? '#D0A65E' : '#4B5563'}` }}
+                  />
+                  <span className="leading-none whitespace-nowrap">ENSO</span>
+                </button>
+              </Tip>
+              <div aria-hidden className="h-3.5 w-px self-center" style={{ background: metric === 'temp' ? '#D0A65E33' : '#4B5563' }} />
+              <Tip text={mode === 'forecast' && forecastHorizon
+                ? `Adds each country's linear background warming trend extrapolated to ${forecastHorizon.anchorYear}, so the map reads as a likely real-world anomaly versus 1961-1990.`
+                : `Adds each country's linear background warming trend for ${maxYear}, so the map reads as a likely real-world anomaly versus 1961-1990.`}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMetric('temp');
+                    setTempLayerMode('total');
+                  }}
+                  aria-pressed={metric === 'temp' && tempLayerMode === 'total'}
+                  className="inline-flex h-full items-center gap-1 px-2.5 text-[11px] sm:text-[12px] font-medium transition-colors hover:bg-white/[0.04]"
+                  style={{
+                    color: metric === 'temp' && tempLayerMode === 'total' ? '#FFF5E7' : '#9CA3AF',
+                    background: metric === 'temp' && tempLayerMode === 'total' ? 'rgba(255,255,255,0.04)' : 'transparent',
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    className="inline-block h-2 w-2 rounded-full shrink-0"
+                    style={{ background: metric === 'temp' && tempLayerMode === 'total' ? '#D0A65E' : 'transparent', border: `1px solid ${metric === 'temp' && tempLayerMode === 'total' ? '#D0A65E' : '#4B5563'}` }}
+                  />
+                  <span className="leading-none whitespace-nowrap">ENSO + warming</span>
+                </button>
+              </Tip>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMetric('temp')}
+              aria-pressed={metric === 'temp'}
+              className={`${TOGGLE_BASE} ${metric === 'temp' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+            >
+              <Thermometer className="h-3 w-3" /> Temp
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setMetric('precip')}
@@ -1056,9 +1795,9 @@ export default function EnsoImpactTracker({
           >
             <CloudRain className="h-3 w-3" /> Rain
           </button>
-          {/* Window: Annual / MAM (hidden in Simulate mode — the season
-              slider replaces it) */}
-          {mode !== 'simulate' && (
+          {/* Window: Annual / MAM (hidden in Simulate & Forecast modes — the
+              season slider / horizon slider replaces it) */}
+          {mode !== 'simulate' && mode !== 'forecast' && (
             <>
               <span className="inline-block h-4 w-px bg-gray-700 mx-0.5" aria-hidden />
           <Tip text="Mar-May average - the 3-month window when ENSO’s lagged impact on land temperatures typically peaks (e.g. UK, East Africa, South Asia)">
@@ -1082,6 +1821,68 @@ export default function EnsoImpactTracker({
         </div>
       </div>
 
+      {mode === 'year' && (
+        <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2 mb-3">
+          <div className="hidden sm:flex items-center justify-between gap-2 mb-1.5">
+            <span className="text-[10px] uppercase tracking-wider text-gray-500">Playback - {year}</span>
+          </div>
+          <Scrubber history={oniHistory} year={year} onChange={setYear} />
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 mt-2">
+            <button
+              type="button"
+              onClick={() => stepYear(-1)}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+              aria-label="Previous year"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5L9 12l11 7V5z"/></svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => setPlaying((p) => !p)}
+              className={`${TOGGLE_BASE} px-3 sm:px-4 font-semibold shrink-0`}
+              style={playing
+                ? { borderColor: '#D0A65E', background: '#D0A65E22', color: '#FFF5E7' }
+                : { borderColor: '#D0A65E', background: '#D0A65E', color: '#0b0e16' }}
+              aria-label={playing ? 'Pause animation' : 'Play animation'}
+            >
+              {playing
+                ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span className="hidden sm:inline">Pause</span></>
+                : <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg><span className="hidden sm:inline">Play</span></>}
+            </button>
+            <button
+              type="button"
+              onClick={() => stepYear(1)}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+              aria-label="Next year"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 5l11 7-11 7zM16 5h2v14h-2z"/></svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setPlaying(false); setYear(minYear); }}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+              <span className="hidden sm:inline">Reset</span>
+            </button>
+            <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
+              <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-gray-500">Speed</span>
+              <input
+                type="range"
+                min={1}
+                max={16}
+                step={1}
+                value={speed}
+                onChange={(e) => setSpeed(Number(e.target.value))}
+                className="w-14 sm:w-20 min-w-0 accent-[#D0A65E]"
+                aria-label="Playback speed (years per second)"
+              />
+              <span className="font-mono text-[10px] sm:text-[11px] text-[#FFF5E7] tabular-nums min-w-[2.5ch] sm:min-w-[3ch] shrink-0">{speed}×</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ENSO strength + season sliders — only visible in Simulate mode */}
       {mode === 'simulate' && (() => {
         const s = oniSlider;
@@ -1091,109 +1892,85 @@ export default function EnsoImpactTracker({
           Math.abs(s) >= 1.5 ? 'Strong' :
           Math.abs(s) >= 1 ? 'Moderate' :
           Math.abs(s) >= 0.5 ? 'Weak' : '—';
-        const chipCls = s >= 0.5
-          ? 'border-rose-500/60 bg-rose-500/15 text-rose-300'
+        const phaseTextCls = s >= 0.5
+          ? 'text-rose-300'
           : s <= -0.5
-            ? 'border-sky-500/60 bg-sky-500/15 text-sky-300'
-            : 'border-gray-600 text-gray-300';
-
-        // Season slider is expressed as an offset from the ENSO peak month (DJF = 0).
-        // Negative offsets = build-up phase; positive = aftermath/land response.
-        // Mapping: offset → SEASONS index (DJF is index 0, wrapping circularly).
-        // Range: −4 (ASO, 4 months before peak) .. +7 (JAS, 7 months after peak)
-        // covering all 12 NOAA windows.
-        const DJF_IDX = 0; // DJF is index 0 in SEASONS
-        const seasonOffset = ((SEASONS.indexOf(season) - DJF_IDX + 12) % 12);
-        // Map raw index difference to signed offset: 0..5 = +0..+5; 6..11 = -6..-1
-        const signedOffset = seasonOffset <= 7 ? seasonOffset : seasonOffset - 12;
-        // Offset label helpers
-        const offsetLabel = (o: number) => {
-          const idx = ((DJF_IDX + o) % 12 + 12) % 12;
-          return SEASONS[idx];
-        };
+            ? 'text-sky-300'
+            : 'text-gray-300';
 
         return (
           <div className="rounded-lg border border-gray-700/60 bg-gray-900/40 p-3 mb-3">
             <div className="grid grid-cols-1 md:grid-cols-2 md:gap-0 gap-4">
 
-              {/* ── Strength slider ── */}
               <div className="md:pr-5">
-                <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
-                  <div>
-                    <div className="text-[13px] font-semibold text-gray-200 font-mono">ENSO Strength</div>
-                    <div className="text-[11px] text-gray-500 mt-0.5">How strong is the event?</div>
+                <div className="mb-3">
+                  <div className="text-[13px] font-semibold text-gray-200 font-mono">ENSO Strength</div>
+                  <div className={`mt-1.5 text-[11px] font-mono ${phaseTextCls}`}>
+                    {phase !== 'Neutral' ? `${phase} - ${strength}` : 'Neutral'} - {s >= 0 ? '+' : ''}{s.toFixed(1)}°C
                   </div>
-                  <span className={`text-[12px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full border font-semibold ${chipCls}`}>
-                    {phase !== 'Neutral' ? `${phase} · ${strength}` : 'Neutral'} &nbsp;{s >= 0 ? '+' : ''}{s.toFixed(1)}°C
-                  </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-[11px] font-mono text-sky-400 whitespace-nowrap">La Niña<br/><span className="text-[10px] text-sky-400/70">(cooler)</span></span>
+                  <span className="text-[11px] font-mono text-sky-400 whitespace-nowrap">La Niña</span>
                   <input
                     type="range"
-                    min={-2}
-                    max={2}
+                    min={-2.5}
+                    max={3}
                     step={0.1}
                     value={oniSlider}
                     onChange={(e) => setOniSlider(Number(e.target.value))}
                     className="flex-1 accent-[#D0A65E]"
                     aria-label="ENSO strength (ONI in °C)"
                   />
-                  <span className="text-[11px] font-mono text-rose-400 whitespace-nowrap text-right">El Niño<br/><span className="text-[10px] text-rose-400/70">(warmer)</span></span>
+                  <span className="text-[11px] font-mono text-rose-400 whitespace-nowrap text-right">El Niño</span>
                 </div>
                 <div className="flex justify-between text-[10px] font-mono text-gray-500 mt-1 px-14">
-                  <span>−2</span><span>−1</span><span>0</span><span>+1</span><span>+2</span>
+                  <span>−2</span><span>−1</span><span>0</span><span>+1</span><span>+2</span><span>+3</span>
                 </div>
+                {Math.abs(oniSlider) > 2.5 && (
+                  <div className="mt-1 text-[10px] font-mono text-amber-300/90 leading-snug">
+                    Beyond observed range - values past ±2.5°C are linear extrapolations
+                    of historical regression. Real teleconnections may saturate.
+                  </div>
+                )}
               </div>
 
-              {/* ── Season / timing slider ── */}
               <div className="md:pl-5 md:border-l md:border-gray-700/40">
-                <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
-                  <div>
-                    <div className="text-[13px] font-semibold text-gray-200 font-mono">Time of Year</div>
-                    <div className="text-[11px] text-gray-500 mt-0.5">Before or after the event peaks?</div>
-                  </div>
-                  <span className="text-[12px] font-mono font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-[#D0A65E]/50 bg-[#D0A65E]/10 text-[#FFE5B4]">
-                    {season} · {SEASON_LABEL[season]}
-                  </span>
+                <div className="mb-1.5">
+                  <div className="text-[13px] font-semibold text-gray-200 font-mono">Time of Year</div>
                 </div>
-                {/* Slider: min=−4 (ASO, 4 months before peak), max=+7 (JAS, 7 months after) */}
-                {/* Simple edge labels only — ▼ in tick row marks the DJF peak position */}
                 <div className="flex justify-between text-[10px] font-mono text-gray-400 mb-1 select-none">
                   <span>← Build-up</span>
                   <span>Aftermath →</span>
                 </div>
                 <input
                   type="range"
-                  min={-4}
-                  max={7}
+                  min={SIM_PHASES[0].offset}
+                  max={SIM_PHASES[SIM_PHASES.length - 1].offset}
                   step={1}
-                  value={signedOffset}
+                  value={simPhase.offset}
                   onChange={(e) => {
-                    const o = Number(e.target.value);
-                    setSeason(SEASONS[((DJF_IDX + o) % 12 + 12) % 12]);
+                    const next = SIM_PHASES.find((phaseDef) => phaseDef.offset === Number(e.target.value));
+                    if (next) setSimPhaseId(next.id);
                   }}
                   className="w-full accent-[#D0A65E]"
                   aria-label="Season offset from ENSO peak (DJF)"
                 />
-                {/* Tick labels — ▼ marks DJF (the ENSO peak), first letter otherwise */}
-                <div className="flex text-[9px] font-mono text-gray-500 mt-0.5 select-none">
-                  {[-4,-3,-2,-1,0,1,2,3,4,5,6,7].map((o) => {
-                    const lbl = offsetLabel(o);
-                    const isActive = lbl === season;
-                    const isPeak = o === 0;
+                <div className="flex text-[8px] font-mono text-gray-500 mt-0.5 select-none">
+                  {SIM_PHASES.map((phaseDef) => {
+                    const isActive = phaseDef.id === simPhase.id;
+                    const isPeak = phaseDef.phase === 'peak';
                     return (
                       <span
-                        key={o}
+                        key={phaseDef.id}
                         className={`flex-1 text-center ${isPeak ? 'text-[#D0A65E] font-bold' : isActive ? 'text-[#FFF5E7]' : ''}`}
                       >
-                        {isPeak ? '▼' : lbl[0]}
+                        {isPeak ? '▼' : phaseDef.season}
                       </span>
                     );
                   })}
                 </div>
-                <div className="mt-1.5 text-[10px] font-mono text-gray-500">
-                  ▼ = DJF (Dec–Jan–Feb) — the typical peak of an El Niño or La Niña
+                <div className="mt-1.5 text-[9px] sm:text-[10px] font-mono text-gray-500 whitespace-nowrap">
+                  ▼ = peak DJF (Dec-Jan-Feb)
                 </div>
               </div>
 
@@ -1202,11 +1979,119 @@ export default function EnsoImpactTracker({
         );
       })()}
 
+      {/* Forecast panel — only visible in Forecast mode. Lets the reader
+          drive the map from either the NOAA probabilistic plume or the
+          SNU CNN (Ham et al. 2019) deterministic forecast, and scrub
+          forward through the published horizons. */}
+      {mode === 'forecast' && forecast && forecast.length > 0 && (() => {
+        const probs = forecastProbs;
+
+        return (
+          <div className="rounded-lg border border-gray-700/60 bg-gray-900/40 p-3 mb-3">
+            {/* Source toggle */}
+            <div className="mb-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] uppercase tracking-wider text-gray-500 mr-1">Source</span>
+                <button
+                  type="button"
+                  onClick={() => setForecastSrc('noaa')}
+                  aria-pressed={forecastSrc === 'noaa'}
+                  className={`${TOGGLE_BASE} ${forecastSrc === 'noaa' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+                >NOAA / IRI</button>
+                <button
+                  type="button"
+                  onClick={() => setForecastSrc('cnn')}
+                  aria-pressed={forecastSrc === 'cnn'}
+                  disabled={!cnnForecast || cnnForecast.points.length === 0}
+                  className={`${TOGGLE_BASE} ${forecastSrc === 'cnn' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE} disabled:opacity-40 disabled:cursor-not-allowed`}
+                  title={!cnnForecast ? 'SNU CNN forecast unavailable' : 'SNU CNN (Ham et al. 2019)'}
+                >SNU CNN</button>
+              </div>
+            </div>
+
+            {/* Mini forecast strip — both forecasts always plotted; the inactive
+                one is dimmed so the reader keeps visual context. */}
+            <div className="mt-0.5">
+              <ForecastStrip
+                forecast={forecast}
+                cnn={cnnForecast || null}
+                activeIdx={forecastIdx}
+                onPick={(i) => setForecastIdx(i)}
+                activeSrc={forecastSrc}
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 mt-2.5">
+              <button
+                type="button"
+                onClick={() => setForecastIdx((idx) => Math.max(0, idx - 1))}
+                className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+                aria-label="Previous forecast horizon"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5L9 12l11 7V5z"/></svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!forecastPlaying && forecastIdx >= forecast.length - 1) setForecastIdx(0);
+                  setForecastPlaying((p) => !p);
+                }}
+                className={`${TOGGLE_BASE} px-3 sm:px-4 font-semibold shrink-0`}
+                style={forecastPlaying
+                  ? { borderColor: '#D0A65E', background: '#D0A65E22', color: '#FFF5E7' }
+                  : { borderColor: '#D0A65E', background: '#D0A65E', color: '#0b0e16' }}
+                aria-label={forecastPlaying ? 'Pause forecast playback' : 'Play forecast playback'}
+              >
+                {forecastPlaying
+                  ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span className="hidden sm:inline">Pause</span></>
+                  : <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg><span className="hidden sm:inline">Play</span></>}
+              </button>
+              <button
+                type="button"
+                onClick={() => setForecastIdx((idx) => Math.min(forecast.length - 1, idx + 1))}
+                className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+                aria-label="Next forecast horizon"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 5l11 7-11 7zM16 5h2v14h-2z"/></svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setForecastPlaying(false); setForecastIdx(0); }}
+                className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+                <span className="hidden sm:inline">Reset</span>
+              </button>
+              <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
+                <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-gray-500">Speed</span>
+                <input
+                  type="range"
+                  min={1}
+                  max={6}
+                  step={1}
+                  value={forecastSpeed}
+                  onChange={(e) => setForecastSpeed(Number(e.target.value))}
+                  className="w-12 sm:w-16 min-w-0 accent-[#D0A65E]"
+                  aria-label="Forecast playback speed (horizons per second)"
+                />
+                <span className="font-mono text-[10px] sm:text-[11px] text-[#FFF5E7] tabular-nums min-w-[2.5ch] sm:min-w-[3ch] shrink-0">{forecastSpeed}×</span>
+              </div>
+            </div>
+
+            {probs && (
+              <p className="mt-2 text-[10px] font-mono text-gray-500 leading-snug">
+                {forecastSrc === 'noaa' ? 'NOAA / IRI blend' : 'CNN-derived blend'} - EN {(probs.en * 100).toFixed(0)}% · LN {(probs.ln * 100).toFixed(0)}% · N {(probs.n * 100).toFixed(0)}%
+              </p>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Map — the WorldMapShell inside `Inner` handles sizing, tiles and
           the Pacific-centred fit. The relative wrapper is needed so the
           absolute-positioned hover info panel stays inside the map area. */}
       <div className="relative">
-        <Inner values={activeValues} metric={metric} mode={mode} year={year} ensoAnom={mode === 'simulate' ? oniSlider : ensoAnom} isMobile={isMobile} onHover={setHovered} />
+        <Inner values={activeValues} metric={metric} mode={mode} year={year} ensoAnom={mode === 'simulate' ? oniSlider : mode === 'forecast' ? (forecastProbs?.oni ?? 0) : ensoAnom} isMobile={isMobile} onHover={setHovered} />
         {/* Bottom hover info panel — replaces mouse-following Leaflet tooltips,
             works on both desktop and mobile touch. */}
         <div
@@ -1214,23 +2099,80 @@ export default function EnsoImpactTracker({
         >
           {hovered ? (() => {
             const { name, value } = hovered;
+            const bgValue = metric === 'temp' ? warmingByName[name] ?? null : null;
+            const simSignal = mode === 'simulate' ? compositeByName[name] ?? null : null;
             let valStr = '';
             if (value === null || value === undefined) {
               valStr = 'no data';
             } else if (mode === 'corr') {
-              const dir = (metric === 'temp' ? value : -value) >= 0 ? 'in phase with El Niño' : 'in phase with La Niña';
-              valStr = `r = ${value >= 0 ? '+' : ''}${value.toFixed(2)} · ${dir}`;
+              const dir = metric === 'temp'
+                ? (value >= 0 ? 'El Niño-linked' : 'La Niña-linked')
+                : (value >= 0 ? 'wetter in El Niño' : 'drier in El Niño');
+              valStr = `r = ${value >= 0 ? '+' : ''}${value.toFixed(2)} - ${dir}`;
             } else if (metric === 'temp') {
-              valStr = `${value >= 0 ? '+' : ''}${value.toFixed(2)}°C vs 1961–90 baseline`;
+              valStr = mode === 'year' || showBackgroundWarming
+                ? `${value >= 0 ? '+' : ''}${value.toFixed(2)}°C vs 1961-90`
+                : `${value >= 0 ? '+' : ''}${value.toFixed(2)}°C ENSO signal`;
             } else {
-              valStr = `${value >= 0 ? '+' : ''}${value.toFixed(0)}% precipitation vs 1961–90 baseline`;
+              valStr = mode === 'year'
+                ? `${value >= 0 ? '+' : ''}${value.toFixed(0)}% vs 1961-90`
+                : `${value >= 0 ? '+' : ''}${value.toFixed(0)}% ENSO signal`;
             }
-            const modeCtx = mode === 'year' ? `${year}` : mode === 'corr' ? 'Correlation with ONI' : 'Simulated response';
+            const modeCtx = mode === 'year'
+              ? `${year}`
+              : mode === 'corr'
+                ? 'ONI correlation'
+                : mode === 'forecast'
+                  ? `${forecastHorizon?.season ?? 'Forecast'}${showBackgroundWarming ? ' + warming' : ''}`
+                  : showBackgroundWarming
+                    ? 'Simulated + warming'
+                    : 'Simulated';
+              const fmtBreakout = (v: number | null | undefined) => {
+                if (v === null || v === undefined || !Number.isFinite(v as number)) return '—';
+                if (metric === 'temp') return `${v >= 0 ? '+' : ''}${(v as number).toFixed(2)}°C`;
+                return `${v >= 0 ? '+' : ''}${(v as number).toFixed(0)}%`;
+              };
+              const simulateBreakout = mode === 'simulate' && metric === 'temp' && showBackgroundWarming ? (
+                <>
+                  <span className="text-[11px] font-mono text-amber-200/90">ENSO {fmtBreakout(simSignal)}</span>
+                <span className="text-[11px] font-mono text-gray-400">warm {fmtBreakout(bgValue)}</span>
+                  <span className="text-[11px] font-mono text-[#FFF5E7]">total {fmtBreakout(value)}</span>
+                </>
+              ) : null;
+            // In Forecast mode, show BOTH NOAA & CNN values + delta, so the
+            // tooltip itself is the comparison surface (Option C).
+            const dualForecast = mode === 'forecast' ? (() => {
+                const noaaSignal = forecastSrc === 'noaa' ? (forecastByName[name] ?? null) : (forecastByNameShadow[name] ?? null);
+                const cnnSignal  = forecastSrc === 'cnn'  ? (forecastByName[name] ?? null) : (forecastByNameShadow[name] ?? null);
+                const noaaTotal = forecastSrc === 'noaa' ? value : forecastByNameShadowWithWarming[name];
+                const cnnTotal  = forecastSrc === 'cnn'  ? value : forecastByNameShadowWithWarming[name];
+                const dPart = (typeof noaaTotal === 'number' && typeof cnnTotal === 'number') ? (() => {
+                  const d = (cnnTotal as number) - (noaaTotal as number);
+                  const dStr = metric === 'temp' ? `${d >= 0 ? '+' : ''}${d.toFixed(2)}°C` : `${d >= 0 ? '+' : ''}${d.toFixed(0)}%`;
+                  return <span className="text-[11px] font-mono text-amber-300">Δ total {dStr}</span>;
+              })() : null;
+              return (
+                <>
+                    {metric === 'temp' && showBackgroundWarming && (
+                    <span className="text-[11px] font-mono text-gray-400">warm {fmtBreakout(bgValue)}</span>
+                    )}
+                    <span className="text-[11px] font-mono text-rose-300/90">
+                    NOAA {metric === 'temp' && showBackgroundWarming ? `sig ${fmtBreakout(noaaSignal)} total ${fmtBreakout(noaaTotal)}` : fmtBreakout(noaaTotal)}
+                    </span>
+                    <span className="text-[11px] font-mono text-violet-300/90">
+                    CNN {metric === 'temp' && showBackgroundWarming ? `sig ${fmtBreakout(cnnSignal)} total ${fmtBreakout(cnnTotal)}` : fmtBreakout(cnnTotal)}
+                    </span>
+                  {dPart}
+                </>
+              );
+            })() : null;
             return (
               <div className="flex items-baseline gap-2 flex-wrap">
                 <span className="text-[13px] font-semibold text-white">{name}</span>
-                <span className="text-[12px] font-mono text-gray-300">{valStr}</span>
-                <span className="text-[10px] text-gray-500 ml-auto">{modeCtx}</span>
+                {mode === 'forecast'
+                  ? dualForecast
+                    : simulateBreakout ?? <span className="text-[12px] font-mono text-gray-300">{valStr}</span>}
+                <span className="hidden sm:inline text-[10px] text-gray-500 sm:ml-auto">{modeCtx}</span>
               </div>
             );
           })() : (
@@ -1242,11 +2184,7 @@ export default function EnsoImpactTracker({
       {/* Legend strip */}
       <div className="px-1 py-2 mt-1 flex items-center justify-between gap-2 flex-wrap text-[10px] font-mono text-gray-400">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sky-400">
-            {mode === 'corr'
-              ? <>La Niña&ndash;like{metric === 'temp' ? ' (cooler)' : ' (wetter)'}</>
-              : (metric === 'temp' ? 'Cooler' : 'Drier')}
-          </span>
+          <span className={legendLeftClass}>{legendLeftLabel}</span>
           <span
             className="inline-block h-2 w-36 rounded"
             style={{
@@ -1255,21 +2193,11 @@ export default function EnsoImpactTracker({
                 : 'linear-gradient(90deg, rgba(244,63,94,0.85), rgba(100,116,139,0.15), rgba(14,165,233,0.85))',
             }}
           />
-          <span className="text-rose-400">
-            {mode === 'corr'
-              ? <>El Niño&ndash;like{metric === 'temp' ? ' (warmer)' : ' (drier)'}</>
-              : (metric === 'temp' ? 'Warmer' : 'Wetter')}
-          </span>
-          <span className="text-gray-500 ml-1">
-            {mode === 'corr'
-              ? 'Pearson r vs ONI (±0.6) · faded = |r|<0.2'
-              : `scale ±${metric === 'temp' ? '3°C' : '100%'} vs 1961–1990`}
-          </span>
+          <span className={legendRightClass}>{legendRightLabel}</span>
+          <span className="text-gray-500 ml-1">{legendNote}</span>
         </div>
         <div className="hidden sm:block text-gray-500">
-          {mode === 'corr' ? 'Map fixed; year scrubber inactive'
-            : mode === 'simulate' ? 'Map driven by ENSO strength slider'
-            : null}
+          {legendDetail}
         </div>
       </div>
 
@@ -1279,40 +2207,64 @@ export default function EnsoImpactTracker({
       {mode === 'corr' && (() => {
         const entries = Object.entries(correlationByName)
           .filter(([, v]) => typeof v === 'number' && Number.isFinite(v as number)) as Array<[string, number]>;
-        // For precip we display r as-is (sign represents wetter-with-El-Niño
-        // when positive, since the colour function flips it). For temp, positive
-        // r already means warmer-with-El-Niño.
         const sorted = [...entries].sort((a, b) => b[1] - a[1]);
         const topPos = sorted.slice(0, 6);
         const topNeg = sorted.slice(-6).reverse();
-        const label = metric === 'temp'
-          ? { pos: 'Warmer in El Niño / cooler in La Niña', neg: 'Cooler in El Niño / warmer in La Niña' }
-          : { pos: 'Drier in El Niño / wetter in La Niña',  neg: 'Wetter in El Niño / drier in La Niña' };
+        const posMeta = metric === 'temp'
+          ? {
+              box: 'border-rose-900/40 bg-rose-950/20',
+              heading: 'text-rose-400/80',
+              value: 'text-rose-400',
+              title: 'Strongest El Niño-like',
+              desc: 'Warmer in El Niño / cooler in La Niña',
+            }
+          : {
+              box: 'border-sky-900/40 bg-sky-950/20',
+              heading: 'text-sky-400/80',
+              value: 'text-sky-400',
+              title: 'Strongest wetter-with-El Niño',
+              desc: 'Wetter in El Niño / drier in La Niña',
+            };
+        const negMeta = metric === 'temp'
+          ? {
+              box: 'border-sky-900/40 bg-sky-950/20',
+              heading: 'text-sky-400/80',
+              value: 'text-sky-400',
+              title: 'Strongest La Niña-like',
+              desc: 'Cooler in El Niño / warmer in La Niña',
+            }
+          : {
+              box: 'border-rose-900/40 bg-rose-950/20',
+              heading: 'text-rose-400/80',
+              value: 'text-rose-400',
+              title: 'Strongest drier-with-El Niño',
+              desc: 'Drier in El Niño / wetter in La Niña',
+            };
         const fmt = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}`;
         return (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-            <div className="rounded border border-rose-900/40 bg-rose-950/20 p-2">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-rose-400/80 mb-1">
-                Strongest El Niño–like · {label.pos}
+            <div className={`rounded border p-2 ${posMeta.box}`}>
+              <div className={`text-[10px] font-mono uppercase tracking-wider mb-1 ${posMeta.heading}`}>
+                {posMeta.title} · {posMeta.desc}
               </div>
               <ul className="space-y-0.5 text-[11px] font-mono text-gray-300">
                 {topPos.map(([n, v]) => (
                   <li key={n} className="flex justify-between gap-2">
                     <span className="truncate">{n}</span>
-                    <span className="text-rose-400 tabular-nums">{fmt(v)}</span>
+                    <span className={`${posMeta.value} tabular-nums`}>{fmt(v)}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded border border-sky-900/40 bg-sky-950/20 p-2">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-sky-400/80 mb-1">
-                Strongest La Niña–like · {label.neg}
+            <div className={`rounded border p-2 ${negMeta.box}`}>
+              <div className={`text-[10px] font-mono uppercase tracking-wider mb-1 ${negMeta.heading}`}>
+                {negMeta.title} · {negMeta.desc}
               </div>
               <ul className="space-y-0.5 text-[11px] font-mono text-gray-300">
                 {topNeg.map(([n, v]) => (
                   <li key={n} className="flex justify-between gap-2">
                     <span className="truncate">{n}</span>
-                    <span className="text-sky-400 tabular-nums">{fmt(v)}</span>
+                    <span className={`${negMeta.value} tabular-nums`}>{fmt(v)}</span>
                   </li>
                 ))}
               </ul>
@@ -1321,73 +2273,6 @@ export default function EnsoImpactTracker({
         );
       })()}
 
-      {/* Scrubber + playback controls — shown in Year mode only */}
-      {mode === 'year' && (
-      <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2 mt-1">
-        <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className="text-[10px] uppercase tracking-wider text-gray-500">Playback · {mode === 'year' ? year : mode === 'simulate' ? `ONI ${oniSlider >= 0 ? '+' : ''}${oniSlider.toFixed(1)}°C` : '1950-present'}</span>
-        </div>
-        <Scrubber history={oniHistory} year={year} onChange={setYear} />
-        <div className="flex flex-wrap items-center gap-2 mt-2">
-          {/* Step back */}
-          <button
-            type="button"
-            onClick={() => stepYear(-1)}
-            className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-3`}
-            aria-label="Previous year"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5L9 12l11 7V5z"/></svg>
-          </button>
-          {/* Play / Pause */}
-          <button
-            type="button"
-            onClick={() => setPlaying((p) => !p)}
-            className={`${TOGGLE_BASE} px-4 font-semibold`}
-            style={playing
-              ? { borderColor: '#D0A65E', background: '#D0A65E22', color: '#FFF5E7' }
-              : { borderColor: '#D0A65E', background: '#D0A65E', color: '#0b0e16' }}
-            aria-label={playing ? 'Pause animation' : 'Play animation'}
-          >
-            {playing
-              ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg> Pause</>
-              : <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg> Play</>}
-          </button>
-          {/* Step forward */}
-          <button
-            type="button"
-            onClick={() => stepYear(1)}
-            className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-3`}
-            aria-label="Next year"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 5l11 7-11 7zM16 5h2v14h-2z"/></svg>
-          </button>
-          {/* Reset */}
-          <button
-            type="button"
-            onClick={() => { setPlaying(false); setYear(minYear); }}
-            className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-3`}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
-            Reset
-          </button>
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="text-[10px] uppercase tracking-wider text-gray-500">Speed</span>
-            <input
-              type="range"
-              min={1}
-              max={16}
-              step={1}
-              value={speed}
-              onChange={(e) => setSpeed(Number(e.target.value))}
-              className="w-20 accent-[#D0A65E]"
-              aria-label="Playback speed (years per second)"
-            />
-            <span className="font-mono text-[11px] text-[#FFF5E7] tabular-nums min-w-[3ch]">{speed}×</span>
-          </div>
-        </div>
-      </div>
-      )}
-
       <p className="text-[11px] text-gray-500 mt-3 leading-snug">
         {mode === 'corr' ? (
           <>
@@ -1395,15 +2280,30 @@ export default function EnsoImpactTracker({
             How closely does each country track ENSO? Colour shows the Pearson r between its{' '}
             {aggWindow === 'annual' ? 'Jan-Dec' : 'Mar-May'} {metric === 'temp' ? 'temperature' : 'rainfall'} anomaly
             and that year&rsquo;s peak ONI (1950-present, both series detrended).
-            Red = in phase with El Nino; blue = opposite. Faded = weak link (|r|&nbsp;&lt;&nbsp;0.2).
+            {metric === 'temp'
+              ? ' Red = in phase with El Nino; blue = opposite.'
+              : ' Blue = wetter in El Nino / drier in La Nina; red = drier in El Nino / wetter in La Nina.'}
+            {' '}Faded = weak link (|r|&nbsp;&lt;&nbsp;0.2).
           </>
         ) : mode === 'simulate' ? (
           <>
             <strong className="text-gray-300">Simulate.</strong>{' '}
             Expected {metric === 'temp' ? 'temperature' : 'rainfall'} anomaly in{' '}
-            <strong className="text-gray-300">{season}</strong> at the selected ONI level,
+            <strong className="text-gray-300">{simPhaseText}</strong> at the selected ONI level,
             estimated from each country&rsquo;s detrended historical response to ENSO.
-            Season slider shows how the imprint shifts across the calendar year.
+            Season slider spans a typical ENSO cycle from early build-up to late aftermath.
+            {metric === 'temp' && ' The ENSO + warming toggle adds each country\'s fitted background warming trend for the latest full observed year.'}
+          </>
+        ) : mode === 'forecast' ? (
+          <>
+            <strong className="text-gray-300">Forecast.</strong>{' '}
+            Probability-weighted historical composite for the selected horizon —
+            P(EN)·C<sub>EN</sub> + P(LN)·C<sub>LN</sub> + P(N)·C<sub>N</sub> per country.
+            Switch source to compare the <span className="text-rose-300">NOAA / IRI plume</span> with the{' '}
+            <span className="text-violet-300">SNU CNN (Ham et al. 2019)</span> deterministic forecast;
+            the tooltip shows both values and their delta.
+            {metric === 'temp' && ' The ENSO + warming toggle adds a fitted background warming trend extrapolated to the selected forecast year.'}
+            {' '}CNN forecasts: Seoul National University ACE Lab.
           </>
         ) : (
           <>

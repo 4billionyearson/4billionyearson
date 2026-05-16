@@ -2311,8 +2311,8 @@ export default function ClimateSpiralCard({
           <div className="mt-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
           {/* Playbar panel */}
           <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
-            <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Playback</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Playback</span>
             <button
               type="button"
               onClick={() => {
@@ -2327,7 +2327,7 @@ export default function ClimateSpiralCard({
                   setPlayMonth(null);
                 }
               }}
-              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-3`}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
               title="Step one year (or month, in the finale) back"
               aria-label="Step back"
             >
@@ -2343,7 +2343,7 @@ export default function ClimateSpiralCard({
                 }
                 setPlaying(true);
               }}
-              className={`${TOGGLE_BASE} px-4 font-semibold ${playing ? '' : ''}`}
+              className={`${TOGGLE_BASE} px-3 sm:px-4 font-semibold shrink-0 ${playing ? '' : ''}`}
               style={playing
                 ? { borderColor: '#D0A65E', background: '#D0A65E22', color: '#FFF5E7' }
                 : { borderColor: '#D0A65E', background: '#D0A65E', color: '#0b0e16' }}
@@ -2354,7 +2354,7 @@ export default function ClimateSpiralCard({
               ) : (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg>
               )}
-              {playing ? 'Pause' : 'Play'}
+              <span className="hidden sm:inline">{playing ? 'Pause' : 'Play'}</span>
             </button>
             <button
               type="button"
@@ -2370,7 +2370,7 @@ export default function ClimateSpiralCard({
                   else { setPlayYear(cur + 1); setPlayMonth(null); }
                 }
               }}
-              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-3`}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
               title="Step one year (or month, in the finale) forward"
               aria-label="Step forward"
             >
@@ -2379,15 +2379,15 @@ export default function ClimateSpiralCard({
             <button
               type="button"
               onClick={() => { setPlaying(false); setPlayYear(null); setPlayMonth(null); }}
-              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-3`}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
               title="Stop playback and show the full chart"
               disabled={playYear === null && !playing}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
-              Reset
+              <span className="hidden sm:inline">Reset</span>
             </button>
-            <div className="flex items-center gap-2 ml-1">
-              <span className="text-[10px] uppercase tracking-wider text-gray-500">Speed</span>
+            <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
+              <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-gray-500">Speed</span>
               <input
                 type="range"
                 min={2}
@@ -2395,10 +2395,10 @@ export default function ClimateSpiralCard({
                 step={1}
                 value={playSpeed}
                 onChange={(e) => setPlaySpeed(Number(e.target.value))}
-                className="accent-[#D0A65E] w-16"
+                className="accent-[#D0A65E] w-12 sm:w-16 min-w-0"
                 aria-label="Playback speed (years per second)"
               />
-              <span className="font-mono text-[11px] text-[#FFF5E7] min-w-[3ch]">{playSpeed}×</span>
+              <span className="font-mono text-[10px] sm:text-[11px] text-[#FFF5E7] min-w-[2.5ch] sm:min-w-[3ch] shrink-0">{playSpeed}×</span>
             </div>{/* end speed div */}
             </div>{/* end playbar flex */}
           </div>{/* end Playbar panel */}

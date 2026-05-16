@@ -833,14 +833,14 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
                     <>(issued {plume.issueMonth}/{plume.issueYear}, {plume.periods[0]?.modelCount ?? 0} dynamical &amp; statistical models). </>
                   )}
                   {plumePeaks.length > 0 && (
-                    <>Peak model-mean reaches{' '}
+                    <>Peak dynamical mean reaches{' '}
                     <span className={`font-mono font-semibold ${
                       isForecastingElNino ? 'text-rose-200' : isForecastingLaNina ? 'text-sky-200' : 'text-gray-200'
                     }`}>{fmtSigned(predictedPeakOni, 1)}°C</span>
                     {plumePeakPeriod && (
                       <>{' '}in <span className="font-mono">{plumePeakPeriod.label} {plumePeakPeriod.seasonAnchorYear}</span></>
                     )}
-                    {' '}- the dynamical-model average.{' '}
+                    {' '}- from the IRI dynamical-model ensemble.{' '}
                     </>
                   )}
                 </p>

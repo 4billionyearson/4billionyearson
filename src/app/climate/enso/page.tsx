@@ -382,7 +382,13 @@ export default function EnsoPage() {
     const idx = SEASON_LABELS.indexOf(s.season);
     if (prevIdx >= 0 && idx >= 0 && idx < prevIdx) runYear += 1;
     if (idx >= 0) prevIdx = idx;
-    return { ...s, anchorYear: runYear };
+    // Join the IRI plume value for this horizon, preferring the dynamical
+    // mean so the footprint uses the same plume number highlighted in the
+    // main Forecast section. Fall back to the all-model mean if needed.
+    const plumeMatch = plume?.periods.find((p) =>
+      p.label === s.season && p.seasonAnchorYear === runYear);
+    const modelOni = plumeMatch?.dynMean ?? plumeMatch?.mean ?? null;
+    return { ...s, anchorYear: runYear, modelOni };
   });
   const forecastFirst50 = forecastWithYear.find((s) => s.pElNino >= 50) || null;
   const forecastFirst50La = forecastWithYear.find((s) => s.pLaNina >= 50) || null;
@@ -578,7 +584,11 @@ export default function EnsoPage() {
           icon={<Globe2 className="text-[#D0A65E]" />}
           title="ENSO's World Footprint"
         >
-          <EnsoImpactTracker oniHistory={oni!.history} />
+          <EnsoImpactTracker
+            oniHistory={oni!.history}
+            forecast={forecastWithYear}
+            cnnForecast={data.cnnForecast}
+          />
           <ShareBar
             pageUrl="https://4billionyearson.org/climate/enso#footprint"
             shareText={encodeURIComponent('Interactive ENSO global impact map - see how El Nino & La Nina affect every country\'s temperature & rainfall')}

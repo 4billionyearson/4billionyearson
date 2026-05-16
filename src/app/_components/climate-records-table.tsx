@@ -138,8 +138,9 @@ function StatCard({ label, year, value, rankInfo, accentClass, accentHex, isCurr
         <div className={`font-mono text-3xl font-black tabular-nums leading-none ${accentClass}`} style={{ textShadow: `0 0 18px ${accentHex}55` }}>{year}</div>
       )}
       {isCurrent && rankInfo && (
-        <div className={`font-mono text-3xl font-black tabular-nums leading-none ${accentClass}`} style={{ textShadow: `0 0 18px ${accentHex}55` }}>
-          #{rankInfo.rank}<span className="text-sm font-normal text-gray-500"> of {rankInfo.total}</span>
+        <div className={`inline-flex items-baseline gap-1 whitespace-nowrap font-mono text-3xl font-black tabular-nums leading-none ${accentClass}`} style={{ textShadow: `0 0 18px ${accentHex}55` }}>
+          <span>#{rankInfo.rank}</span>
+          <span className="text-sm font-normal text-gray-500">of {rankInfo.total}</span>
         </div>
       )}
       <div className="font-mono text-[15px] tabular-nums text-gray-200">{value.toFixed(decimals)}<span className="text-gray-500 text-xs ml-0.5">{unit}</span></div>

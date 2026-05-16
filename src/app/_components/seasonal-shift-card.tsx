@@ -665,7 +665,7 @@ function WarmSeasonShiftBar({
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
         <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider inline-flex items-center gap-1.5">
           <Sun className="h-3.5 w-3.5" style={{ color: '#EAB308' }} />
-          Shifting summer <span className="text-gray-500 normal-case font-normal tracking-normal">(spring earlier · autumn later)</span>
+          Shifting summer
         </div>
         <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
           {deltaDays > 0 ? `+${deltaDays} days longer summer` : deltaDays < 0 ? `${Math.abs(deltaDays)} days shorter summer` : 'no change'}
