@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { getCached } from '@/lib/climate/redis';
 import { getCountryCode } from '@/lib/amazon';
+import { sanitisePlugInSolarPayload } from '@/lib/plug-in-solar/newsUrls';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 import PlugInSolarGuide from './PlugInSolarGuide';
 
@@ -36,13 +37,13 @@ async function readCachedPayload(): Promise<{ data: PlugInSolarLiveData | null; 
   // Try today first
   const todaysKey = dateOffsetKey(0);
   const today = await getCached<PlugInSolarLiveData>(todaysKey);
-  if (today) return { data: today, cacheMiss: false, source: 'cache' };
+  if (today) return { data: sanitisePlugInSolarPayload(today), cacheMiss: false, source: 'cache' };
 
   // Fallback: walk back up to LOOKBACK_DAYS so the page never renders
   // empty on a Gemini failure.
   for (let i = 1; i <= LOOKBACK_DAYS; i++) {
     const stale = await getCached<PlugInSolarLiveData>(dateOffsetKey(i));
-    if (stale) return { data: stale, cacheMiss: true, source: 'stale-cache' };
+    if (stale) return { data: sanitisePlugInSolarPayload(stale), cacheMiss: true, source: 'stale-cache' };
   }
   return { data: null, cacheMiss: true, source: 'no-cache' };
 }

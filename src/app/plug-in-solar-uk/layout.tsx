@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getCached } from '@/lib/climate/redis';
+import { sanitisePlugInSolarPayload } from '@/lib/plug-in-solar/newsUrls';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
 import { PLUG_IN_SOLAR_FAQ } from './_data/static';
 import { INSTALL_STEPS } from './_data/static';
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
 };
 
 const CACHE_KEY_PREFIX = 'plug-in-solar-uk';
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const LOOKBACK_DAYS = 7;
 // Cache-day boundary aligned to the cron hour (09:00 UTC). Must match
 // CRON_HOUR_UTC inside /api/plug-in-solar-uk/route.ts.
@@ -63,7 +64,7 @@ function dateOffsetKey(daysAgo: number): string {
 async function readMostRecent(): Promise<PlugInSolarLiveData | null> {
   for (let i = 0; i <= LOOKBACK_DAYS; i++) {
     const cached = await getCached<PlugInSolarLiveData>(dateOffsetKey(i));
-    if (cached) return cached;
+    if (cached) return sanitisePlugInSolarPayload(cached);
   }
   return null;
 }

@@ -8,6 +8,7 @@ import {
   FULLY_AVAILABLE_FALLBACK,
   LEGAL_IN_SHOPS_TIMELINE_TITLE,
 } from '@/app/plug-in-solar-uk/_data/static';
+import { isKnownBrokenPlugInSolarNewsUrl, sanitisePlugInSolarPayload } from '@/lib/plug-in-solar/newsUrls';
 import { sanitiseRetailerProductUrl } from '@/lib/plug-in-solar/retailerUrls';
 import { buildPlugInSolarPrompt, PLUG_IN_SOLAR_RESPONSE_SCHEMA } from '@/lib/plug-in-solar/prompt';
 import { buildSeedProductRows, SEED_PRODUCTS } from '@/lib/plug-in-solar/seedProducts';
@@ -84,7 +85,7 @@ function dateOffsetKey(daysAgo: number): string {
 export async function readMostRecentCache(): Promise<PlugInSolarLiveData | null> {
   for (let i = 0; i <= PREVIOUS_LOOKBACK_DAYS; i++) {
     const cached = await getCached<PlugInSolarLiveData>(dateOffsetKey(i));
-    if (cached) return cached;
+    if (cached) return sanitisePlugInSolarPayload(cached);
   }
   return null;
 }
@@ -386,7 +387,6 @@ const TRUSTED_NEWS_DOMAINS = [
   'express.co.uk',
   'sun.co.uk',
   'thisismoney.co.uk',
-  'which.co.uk',
   'moneysavingexpert.com',
   'solarpowerportal.co.uk',
   'theengineer.co.uk',
@@ -406,7 +406,6 @@ const TRUSTED_NEWS_DOMAINS = [
   'gov.uk',
   'parliament.uk',
   'ofgem.gov.uk',
-  'theiet.org',
   'bsigroup.com',
   'reuters.com',
   'apnews.com',
@@ -440,6 +439,9 @@ async function filterNewsBrokenLinks(
     parsed.news.map(async (item) => {
       const url = (item?.sourceUrl ?? '').trim();
       if (!url) return { item, valid: false };
+      if (isKnownBrokenPlugInSolarNewsUrl(url)) {
+        return { item, valid: false };
+      }
       if (groundingUris.has(url.toLowerCase())) {
         return { item, valid: true };
       }
@@ -564,7 +566,7 @@ export async function GET(request: Request) {
   if (!skipCache) {
     const cached = await getCached<PlugInSolarLiveData>(cacheKey);
     if (cached) {
-      return NextResponse.json({ ...cached, source: 'cache' });
+      return NextResponse.json({ ...sanitisePlugInSolarPayload(cached), source: 'cache' });
     }
   }
 
