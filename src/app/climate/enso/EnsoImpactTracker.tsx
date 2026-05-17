@@ -823,12 +823,14 @@ function ForecastStrip({
   activeIdx,
   onPick,
   activeSrc,
+  hidePill = false,
 }: {
   forecast: ForecastSeasonProp[];
   cnn: CnnForecastProp | null;
   activeIdx: number;
   onPick: (i: number) => void;
   activeSrc: ForecastSource;
+  hidePill?: boolean;
 }) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   const W = 800, H = 60, padX = 8, padY = 6;
@@ -914,28 +916,30 @@ function ForecastStrip({
 
   return (
     <div className="relative select-none">
-      <div className="mb-0.5 min-h-[30px] flex items-center justify-center">
-        <div className="max-w-full overflow-x-auto rounded-md border border-gray-700/70 bg-gray-900/90 px-2 py-0.5 shadow-lg">
-          <div className="flex items-center gap-2 whitespace-nowrap text-[10px] sm:text-[11px] font-mono">
-            <span className="text-[#FFF5E7]">{focusSeason ? `${focusSeason.season} ${focusSeason.anchorYear}` : 'Forecast'}</span>
-            <span className="text-rose-300">NOAA {fmtOni(focusNoaa)}</span>
-            <span className="text-violet-300">CNN {fmtOni(focusCnn)}</span>
-            {focusDelta !== null && (
-              <span className="text-amber-300">Δ {focusDelta >= 0 ? '+' : ''}{focusDelta.toFixed(2)}°C</span>
-            )}
+      {!hidePill && (
+        <div className="mb-0.5 min-h-[30px] flex items-center justify-center">
+          <div className="max-w-full overflow-x-auto rounded-md border border-gray-700/70 bg-gray-900/90 px-2 py-0.5 shadow-lg">
+            <div className="flex items-center gap-2 whitespace-nowrap text-[10px] sm:text-[11px] font-mono">
+              <span className="text-[#FFF5E7]">{focusSeason ? `${focusSeason.season} ${focusSeason.anchorYear}` : 'Forecast'}</span>
+              <span className="text-rose-300">NOAA {fmtOni(focusNoaa)}</span>
+              <span className="text-violet-300">CNN {fmtOni(focusCnn)}</span>
+              {focusDelta !== null && (
+                <span className="text-amber-300">Δ {focusDelta >= 0 ? '+' : ''}{focusDelta.toFixed(2)}°C</span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} preserveAspectRatio="none" onClick={onClick} className="block cursor-pointer">
         {/* Threshold guides */}
         <line x1={padX} y1={yFor(0.5)}  x2={W - padX} y2={yFor(0.5)}  stroke="rgba(244,63,94,0.25)" strokeWidth={0.5} strokeDasharray="3 3" />
         <line x1={padX} y1={yFor(-0.5)} x2={W - padX} y2={yFor(-0.5)} stroke="rgba(14,165,233,0.25)" strokeWidth={0.5} strokeDasharray="3 3" />
         <line x1={padX} y1={H / 2} x2={W - padX} y2={H / 2} stroke="rgba(255,255,255,0.15)" strokeWidth={0.5} />
         {/* NOAA expected-ONI line */}
-        <path d={noaaPath} fill="none" stroke={noaaDim ? 'rgba(244,63,94,0.35)' : '#f43f5e'} strokeWidth={noaaDim ? 1 : 1.6} strokeDasharray="4 3" />
+        <path d={noaaPath} fill="none" stroke={noaaDim ? 'rgba(248,113,113,0.45)' : '#f87171'} strokeWidth={noaaDim ? 1.5 : 2.2} strokeDasharray="5 3" />
         {/* CNN deterministic line */}
         {cnnRuns.map((d, k) => (
-          <path key={k} d={d} fill="none" stroke={cnnDim ? 'rgba(167,139,250,0.35)' : '#a78bfa'} strokeWidth={cnnDim ? 1 : 1.6} />
+          <path key={k} d={d} fill="none" stroke={cnnDim ? 'rgba(196,181,253,0.45)' : '#c4b5fd'} strokeWidth={cnnDim ? 1.5 : 2.2} />
         ))}
         {hoverIdx !== null && (
           <line x1={xFor(hoverIdx)} y1={2} x2={xFor(hoverIdx)} y2={H - 2} stroke="rgba(208,166,94,0.45)" strokeWidth={0.9} strokeDasharray="2 2" />
@@ -949,7 +953,7 @@ function ForecastStrip({
               key={`n${p.i}`}
               cx={xFor(p.i)}
               cy={yFor(p.oni)}
-              r={emphasized ? (noaaDim ? 1.7 : 2.3) : (noaaDim ? 1.3 : 1.8)}
+              r={emphasized ? (noaaDim ? 2.8 : 3.4) : (noaaDim ? 2.1 : 2.7)}
               fill={noaaDim ? 'rgba(244,63,94,0.5)' : '#f43f5e'}
             />
           );
@@ -961,7 +965,7 @@ function ForecastStrip({
               key={`c${p.i}`}
               cx={xFor(p.i)}
               cy={yFor(p.oni as number)}
-              r={emphasized ? (cnnDim ? 1.7 : 2.3) : (cnnDim ? 1.3 : 1.8)}
+              r={emphasized ? (cnnDim ? 2.8 : 3.4) : (cnnDim ? 2.1 : 2.7)}
               fill={cnnDim ? 'rgba(167,139,250,0.5)' : '#a78bfa'}
             />
           );
@@ -993,30 +997,21 @@ function ForecastStrip({
         {/* Playhead */}
         <line x1={xFor(activeIdx)} y1={2} x2={xFor(activeIdx)} y2={H - 2} stroke="#D0A65E" strokeWidth={1.5} />
       </svg>
-      <div className="mt-1 flex text-[9px] font-mono" style={{ paddingLeft: `${(padX / W) * 100}%`, paddingRight: `${(padX / W) * 100}%` }}>
+      <div className="relative mt-1 text-[9px] font-mono" style={{ height: '28px' }}>
         {forecast.map((s, i) => {
           const tone = i === hoverIdx ? 'text-[#FFF5E7]' : i === activeIdx ? 'text-[#D0A65E]' : 'text-gray-500';
           const yearBreak = i === 0 || s.anchorYear !== forecast[i - 1]?.anchorYear;
           return (
             <div
               key={`lbl${i}`}
-              className="min-w-0 flex-1 text-center px-[1px] pointer-events-none"
+              className="absolute -translate-x-1/2 text-center pointer-events-none"
+              style={{ left: `${(xFor(i) / W) * 100}%` }}
             >
               <div className={`whitespace-nowrap leading-none ${tone}`}>{s.season}</div>
               <div className="mt-0.5 text-[8px] leading-none text-gray-600">{yearBreak ? s.anchorYear : '\u00a0'}</div>
             </div>
           );
         })}
-      </div>
-      <div className="mt-0.5 flex items-center justify-center gap-3 text-[10px] font-mono text-gray-500">
-        <span className="inline-flex items-center gap-1">
-          <span className="inline-block h-[2px] w-4 align-middle" style={{ background: '#f43f5e' }} />
-          NOAA / IRI plume
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <span className="inline-block h-[2px] w-4 align-middle" style={{ background: '#a78bfa' }} />
-          SNU CNN
-        </span>
       </div>
     </div>
   );
@@ -1040,6 +1035,7 @@ export default function EnsoImpactTracker({
   const [aggWindow, setAggWindow] = useState<AggWindow>(() => (loadFootprintPrefs().aggWindow as AggWindow) ?? 'mam');
   const [mode, setMode] = useState<Mode>(() => (loadFootprintPrefs().mode as Mode) ?? 'year');
   const [tempLayerMode, setTempLayerMode] = useState<TempLayerMode>(() => (loadFootprintPrefs().tempLayerMode as TempLayerMode) ?? 'signal');
+  const [yearTempLayerMode, setYearTempLayerMode] = useState<TempLayerMode>(() => (loadFootprintPrefs().yearTempLayerMode as TempLayerMode) ?? 'total');
   // ENSO strength slider for Composite mode — units are °C of ONI (Niño-3.4
   // SST anomaly). Standard event thresholds: ±0.5 = weak, ±1 = moderate,
   // ±1.5 = strong, ±2 = very strong (e.g. 1997, 2015).
@@ -1058,12 +1054,17 @@ export default function EnsoImpactTracker({
   const [forecastSrc, setForecastSrc] = useState<ForecastSource>(() => (loadFootprintPrefs().forecastSrc as ForecastSource) ?? 'noaa');
   const [forecastSpeed, setForecastSpeed] = useState(() => (loadFootprintPrefs().forecastSpeed as number) ?? 1);
   const [forecastPlaying, setForecastPlaying] = useState(false);
+  const forecastHeaderRef = useRef<HTMLDivElement | null>(null);
+  const forecastSourceRef = useRef<HTMLDivElement | null>(null);
+  const forecastDataPillRef = useRef<HTMLDivElement | null>(null);
+  const [forecastPillLayout, setForecastPillLayout] = useState<'stacked' | 'row' | 'overlay'>('stacked');
   const [hovered, setHovered] = useState<{ name: string; value: number | null } | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const simPhase = SIM_PHASES.find((phase) => phase.id === simPhaseId) ?? SIM_PHASES.find((phase) => phase.id === DEFAULT_SIM_PHASE_ID)!;
+  const activeTempLayerMode = mode === 'year' ? yearTempLayerMode : tempLayerMode;
   const simPhaseText = simPhase.phase === 'peak'
     ? `${simPhase.season} peak`
-    : `${simPhase.season} ${simPhase.phase === 'build' ? 'build-up' : 'aftermath'}`;
+    : `${simPhase.season} ${simPhase.phase === 'build' ? 'Build-up' : 'Aftermath'}`;
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 639px)');
@@ -1078,10 +1079,10 @@ export default function EnsoImpactTracker({
     if (typeof window === 'undefined') return;
     try {
       localStorage.setItem(FOOTPRINT_PREFS_KEY, JSON.stringify({
-        year, metric, aggWindow, mode, tempLayerMode, oniSlider, season: simPhase.season, simPhaseId, speed, forecastSrc, forecastSpeed,
+        year, metric, aggWindow, mode, tempLayerMode, yearTempLayerMode, oniSlider, season: simPhase.season, simPhaseId, speed, forecastSrc, forecastSpeed,
       }));
     } catch { /* storage unavailable */ }
-  }, [year, metric, aggWindow, mode, tempLayerMode, oniSlider, simPhase.season, simPhaseId, speed, forecastSrc, forecastSpeed]);
+  }, [year, metric, aggWindow, mode, tempLayerMode, yearTempLayerMode, oniSlider, simPhase.season, simPhaseId, speed, forecastSrc, forecastSpeed]);
 
   // Load pre-computed impact dataset.
   useEffect(() => {
@@ -1211,6 +1212,25 @@ export default function EnsoImpactTracker({
       ? NaN
       : (v as number) - (a + b * i)));
   };
+
+  const yearSignalByName = useMemo(() => {
+    if (!impact) return {};
+    const yIdx = impact.years.indexOf(year);
+    if (yIdx < 0) return {};
+    const windowKey = aggWindow === 'annual' ? 'annual' : 'MAM';
+    const bucket = countryBucketForWindow(windowKey, 'temp');
+    if (!bucket) return {};
+    const out: Record<string, number | null> = {};
+    for (const iso3 of Object.keys(bucket)) {
+      const name = impact.countryNames[iso3] ? mapEnsoCountryName(impact.countryNames[iso3]) : null;
+      if (!name) continue;
+      const series = detrend(bucket[iso3] ?? []);
+      const value = series[yIdx];
+      out[name] = Number.isFinite(value) ? value : null;
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [impact, year, aggWindow]);
 
   /**
    * Compute per-country Pearson r AND regression slope β between each
@@ -1454,6 +1474,42 @@ export default function EnsoImpactTracker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forecastHorizon, forecastSrc, cnnForecast, compositesByWindow]);
 
+  useEffect(() => {
+    if (!forecastHorizon) {
+      setForecastPillLayout('stacked');
+      return;
+    }
+    const container = forecastHeaderRef.current;
+    const source = forecastSourceRef.current;
+    const pill = forecastDataPillRef.current;
+    if (!container || !source || !pill || typeof ResizeObserver === 'undefined') {
+      setForecastPillLayout('stacked');
+      return;
+    }
+    let rafId = 0;
+    const measure = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const containerWidth = container.clientWidth;
+        const sourceWidth = source.offsetWidth;
+        const pillWidth = pill.offsetWidth;
+        const canOverlay = !isMobile && ((containerWidth - pillWidth) / 2) >= (sourceWidth + 12);
+        const canShareRow = !isMobile && containerWidth >= (sourceWidth + pillWidth + 24);
+        const nextLayout = canOverlay ? 'overlay' : canShareRow ? 'row' : 'stacked';
+        setForecastPillLayout((prev) => (prev === nextLayout ? prev : nextLayout));
+      });
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    observer.observe(source);
+    observer.observe(pill);
+    measure();
+    return () => {
+      cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
+  }, [forecastHorizon, isMobile]);
+
   /** Helper: build the (probability-blended) composite-map values for a
    *  specific source + horizon. Returns name → anomaly in physical units
    *  (°C for temp, % for precip). */
@@ -1511,8 +1567,12 @@ export default function EnsoImpactTracker({
     [forecastSrc, forecastHorizon, compositesByWindow, cnnForecast],
   );
 
+  const showTempLayerControls = mode === 'year' || mode === 'simulate' || mode === 'forecast';
+  const useYearSignalLayer = mode === 'year'
+    && metric === 'temp'
+    && activeTempLayerMode === 'signal';
   const showBackgroundWarming = metric === 'temp'
-    && tempLayerMode === 'total'
+    && activeTempLayerMode === 'total'
     && (mode === 'simulate' || mode === 'forecast');
 
   const fitTrendAtYear = (arr: (number | null)[], targetYear: number): number | null => {
@@ -1603,13 +1663,28 @@ export default function EnsoImpactTracker({
       ? compositeByNameWithWarming
       : mode === 'forecast'
         ? forecastByNameWithWarming
-        : valuesByName;
+        : useYearSignalLayer
+          ? yearSignalByName
+          : valuesByName;
 
   const ensoAnom = useMemo(() => peakOniForYear(oniHistory, year), [oniHistory, year]);
   const state = ensoState(ensoAnom);
   const stateCls = state === 'El Niño'
     ? 'border-rose-500/60 bg-rose-500/15 text-rose-300'
     : state === 'La Niña'
+      ? 'border-sky-500/60 bg-sky-500/15 text-sky-300'
+      : 'border-gray-600 text-gray-300';
+
+  const simState = ensoState(oniSlider);
+  const simStateCls = simState === 'El Niño'
+    ? 'border-rose-500/60 bg-rose-500/15 text-rose-300'
+    : simState === 'La Niña'
+      ? 'border-sky-500/60 bg-sky-500/15 text-sky-300'
+      : 'border-gray-600 text-gray-300';
+  const fcastState = forecastProbs ? ensoState(forecastProbs.oni) : null;
+  const fcastStateCls = fcastState === 'El Niño'
+    ? 'border-rose-500/60 bg-rose-500/15 text-rose-300'
+    : fcastState === 'La Niña'
       ? 'border-sky-500/60 bg-sky-500/15 text-sky-300'
       : 'border-gray-600 text-gray-300';
 
@@ -1626,7 +1701,7 @@ export default function EnsoImpactTracker({
     ? metric === 'temp'
       ? 'Pearson r vs ONI (±0.6) - faded = |r|<0.2'
       : 'Pearson r vs ONI - red=drier, blue=wetter - faded = |r|<0.2'
-    : mode === 'year' || showBackgroundWarming
+    : (mode === 'year' && !useYearSignalLayer) || showBackgroundWarming
       ? `scale ±${metric === 'temp' ? '3°C' : '100%'} vs 1961-1990`
       : `ENSO signal scale ±${metric === 'temp' ? '3°C' : '100%'}`;
   const legendDetail = mode === 'corr'
@@ -1644,62 +1719,49 @@ export default function EnsoImpactTracker({
         <div className="flex min-h-[28px] items-center gap-2 flex-wrap">
           {mode === 'year' && (
             <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 whitespace-nowrap text-[#D0A65E]">
-              <span className="font-mono font-black tabular-nums text-[15px] sm:text-5xl leading-none">{year}</span>
-              <span className={`inline-flex self-end sm:mb-0.5 items-center rounded-full border px-1 sm:px-2 py-[2px] sm:py-0.5 leading-none text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.08em] ${stateCls}`}>
+              <span className="font-mono font-black tabular-nums text-2xl sm:text-5xl leading-none">{year}</span>
+              <span className={`relative -translate-y-[2px] sm:-translate-y-[3px] inline-flex items-center rounded-full border px-1 sm:px-2 py-[2px] sm:py-0.5 leading-none text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.08em] ${stateCls}`}>
                 {state} {ensoAnom >= 0 ? '+' : ''}{ensoAnom.toFixed(2)}°
               </span>
             </span>
           )}
           {mode === 'corr' && (
-            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 whitespace-nowrap font-mono font-semibold text-[15px] sm:text-base text-[#D0A65E]">ENSO Teleconnection · 1950–{maxYear}</span>
+            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 flex-wrap text-[#D0A65E]">
+              <span className="font-mono font-black tabular-nums text-2xl sm:text-5xl leading-none">1950–{maxYear}</span>
+              <span className="font-mono font-semibold text-base sm:text-2xl leading-none text-white">Correlation</span>
+            </span>
           )}
           {mode === 'simulate' && (
-            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 whitespace-nowrap font-mono font-semibold text-[15px] sm:text-base text-[#D0A65E]">
-              <span>{simPhaseText}</span>
-              <span>- ONI {oniSlider >= 0 ? '+' : ''}{oniSlider.toFixed(1)}°C</span>
-              {showBackgroundWarming && (
-                <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-gray-400">- ENSO + warming</span>
-              )}
+            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 flex-wrap text-[#D0A65E]">
+              <span className="font-mono font-black tabular-nums text-2xl sm:text-5xl leading-none">{simPhase.season}</span>
+              <span className="font-mono font-semibold text-base sm:text-2xl leading-none text-white">
+                {simPhase.phase === 'peak' ? 'Peak' : simPhase.phase === 'build' ? 'Build-up' : 'Aftermath'}
+              </span>
+              <span className={`relative -translate-y-[2px] sm:-translate-y-[3px] inline-flex items-center rounded-full border px-1 sm:px-2 py-[2px] sm:py-0.5 leading-none text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.08em] ${simStateCls}`}>
+                {simState} {oniSlider >= 0 ? '+' : ''}{oniSlider.toFixed(2)}°
+              </span>
             </span>
           )}
           {mode === 'forecast' && forecastHorizon && (
-            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 whitespace-nowrap font-mono font-semibold text-[15px] sm:text-base text-[#D0A65E]">
-              <span>Forecast</span>
-              <span className="sm:hidden">- {forecastHorizon.season}</span>
-              <span className="hidden sm:inline">- {forecastHorizon.label}</span>
-              <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-gray-400">
-                - <span className="sm:hidden">{forecastSrc === 'noaa' ? 'NOAA' : 'CNN'}</span>
-                <span className="hidden sm:inline">{forecastSrc === 'noaa' ? 'NOAA / IRI' : 'SNU CNN'}</span>
-              </span>
-              {showBackgroundWarming && (
-                <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-gray-400">
-                  - <span className="sm:hidden">+ warm</span>
-                  <span className="hidden sm:inline">ENSO + warming</span>
+            <span className="inline-flex max-w-full items-baseline gap-1 sm:gap-2 flex-wrap text-[#D0A65E]">
+              <span className="font-mono font-black tabular-nums text-2xl sm:text-5xl leading-none">{forecastHorizon.anchorYear}</span>
+              <span className="font-mono font-semibold text-base sm:text-2xl leading-none text-white">{forecastHorizon.season}</span>
+              {fcastState && (
+                <span className={`relative -translate-y-[2px] sm:-translate-y-[3px] inline-flex items-center rounded-full border px-1 sm:px-2 py-[2px] sm:py-0.5 leading-none text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.08em] ${fcastStateCls}`}>
+                  {fcastState} {forecastProbs!.oni >= 0 ? '+' : ''}{forecastProbs!.oni.toFixed(2)}°
                 </span>
               )}
             </span>
           )}
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
-          {/* Mode: Year / Correlation / Simulate */}
+          {/* Mode: Year / Forecast / Simulate / Correlation */}
           <button
             type="button"
             onClick={() => setMode('year')}
             aria-pressed={mode === 'year'}
             className={`${TOGGLE_BASE} ${mode === 'year' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
           >Year</button>
-          <button
-            type="button"
-            onClick={() => setMode('corr')}
-            aria-pressed={mode === 'corr'}
-            className={`${TOGGLE_BASE} ${mode === 'corr' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-          >Correlation</button>
-          <button
-            type="button"
-            onClick={() => setMode('simulate')}
-            aria-pressed={mode === 'simulate'}
-            className={`${TOGGLE_BASE} ${mode === 'simulate' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-          >Simulate</button>
           {(forecast && forecast.length > 0) && (
             <button
               type="button"
@@ -1708,14 +1770,26 @@ export default function EnsoImpactTracker({
               className={`${TOGGLE_BASE} ${mode === 'forecast' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
             >Forecast</button>
           )}
+          <button
+            type="button"
+            onClick={() => setMode('simulate')}
+            aria-pressed={mode === 'simulate'}
+            className={`${TOGGLE_BASE} ${mode === 'simulate' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+          >Simulate</button>
+          <button
+            type="button"
+            onClick={() => setMode('corr')}
+            aria-pressed={mode === 'corr'}
+            className={`${TOGGLE_BASE} ${mode === 'corr' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
+          >Correlation</button>
           {/* Metric: Temp / Rain */}
           <span className="inline-block h-4 w-px bg-gray-700 mx-0.5 shrink-0" aria-hidden />
-          {(mode === 'simulate' || mode === 'forecast') ? (
+          {showTempLayerControls ? (
             <div
               className="inline-flex h-7 items-center rounded-full border overflow-hidden"
               style={{
                 borderColor: metric === 'temp' ? '#D0A65E8c' : '#374151',
-                background: metric === 'temp' ? '#D0A65E1f' : 'rgba(17,24,39,0.45)',
+                background: 'rgba(17,24,39,0.45)',
               }}
             >
               <button
@@ -1734,19 +1808,20 @@ export default function EnsoImpactTracker({
                   type="button"
                   onClick={() => {
                     setMetric('temp');
-                    setTempLayerMode('signal');
+                    if (mode === 'year') setYearTempLayerMode('signal');
+                    else setTempLayerMode('signal');
                   }}
-                  aria-pressed={metric === 'temp' && tempLayerMode === 'signal'}
+                  aria-pressed={metric === 'temp' && activeTempLayerMode === 'signal'}
                   className="inline-flex h-full items-center gap-1 px-2.5 text-[11px] sm:text-[12px] font-medium transition-colors hover:bg-white/[0.04]"
                   style={{
-                    color: metric === 'temp' && tempLayerMode === 'signal' ? '#FFF5E7' : '#9CA3AF',
-                    background: metric === 'temp' && tempLayerMode === 'signal' ? 'rgba(255,255,255,0.04)' : 'transparent',
+                    color: metric === 'temp' && activeTempLayerMode === 'signal' ? '#FFF5E7' : '#9CA3AF',
+                    background: 'transparent',
                   }}
                 >
                   <span
                     aria-hidden
                     className="inline-block h-2 w-2 rounded-full shrink-0"
-                    style={{ background: metric === 'temp' && tempLayerMode === 'signal' ? '#D0A65E' : 'transparent', border: `1px solid ${metric === 'temp' && tempLayerMode === 'signal' ? '#D0A65E' : '#4B5563'}` }}
+                    style={{ background: metric === 'temp' && activeTempLayerMode === 'signal' ? '#D0A65E' : 'transparent', border: `1px solid ${metric === 'temp' && activeTempLayerMode === 'signal' ? '#D0A65E' : '#4B5563'}` }}
                   />
                   <span className="leading-none whitespace-nowrap">ENSO</span>
                 </button>
@@ -1754,26 +1829,29 @@ export default function EnsoImpactTracker({
               <div aria-hidden className="h-3.5 w-px self-center" style={{ background: metric === 'temp' ? '#D0A65E33' : '#4B5563' }} />
               <Tip text={mode === 'forecast' && forecastHorizon
                 ? `Adds each country's linear background warming trend extrapolated to ${forecastHorizon.anchorYear}, so the map reads as a likely real-world anomaly versus 1961-1990.`
-                : `Adds each country's linear background warming trend for ${maxYear}, so the map reads as a likely real-world anomaly versus 1961-1990.`}>
+                : mode === 'year'
+                  ? `Shows the full observed anomaly for ${year}, including both ENSO's imprint and the background warming trend, versus 1961-1990.`
+                  : `Adds each country's linear background warming trend for ${maxYear}, so the map reads as a likely real-world anomaly versus 1961-1990.`}>
                 <button
                   type="button"
                   onClick={() => {
                     setMetric('temp');
-                    setTempLayerMode('total');
+                    if (mode === 'year') setYearTempLayerMode('total');
+                    else setTempLayerMode('total');
                   }}
-                  aria-pressed={metric === 'temp' && tempLayerMode === 'total'}
+                  aria-pressed={metric === 'temp' && activeTempLayerMode === 'total'}
                   className="inline-flex h-full items-center gap-1 px-2.5 text-[11px] sm:text-[12px] font-medium transition-colors hover:bg-white/[0.04]"
                   style={{
-                    color: metric === 'temp' && tempLayerMode === 'total' ? '#FFF5E7' : '#9CA3AF',
-                    background: metric === 'temp' && tempLayerMode === 'total' ? 'rgba(255,255,255,0.04)' : 'transparent',
+                    color: metric === 'temp' && activeTempLayerMode === 'total' ? '#FFF5E7' : '#9CA3AF',
+                    background: 'transparent',
                   }}
                 >
                   <span
                     aria-hidden
                     className="inline-block h-2 w-2 rounded-full shrink-0"
-                    style={{ background: metric === 'temp' && tempLayerMode === 'total' ? '#D0A65E' : 'transparent', border: `1px solid ${metric === 'temp' && tempLayerMode === 'total' ? '#D0A65E' : '#4B5563'}` }}
+                    style={{ background: metric === 'temp' && activeTempLayerMode === 'total' ? '#D0A65E' : 'transparent', border: `1px solid ${metric === 'temp' && activeTempLayerMode === 'total' ? '#D0A65E' : '#4B5563'}` }}
                   />
-                  <span className="leading-none whitespace-nowrap">ENSO + warming</span>
+                  <span className="leading-none whitespace-nowrap">ENSO + Warming</span>
                 </button>
               </Tip>
             </div>
@@ -1899,12 +1977,12 @@ export default function EnsoImpactTracker({
             : 'text-gray-300';
 
         return (
-          <div className="rounded-lg border border-gray-700/60 bg-gray-900/40 p-3 mb-3">
+          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 p-3 mb-3">
             <div className="grid grid-cols-1 md:grid-cols-2 md:gap-0 gap-4">
 
               <div className="md:pr-5">
                 <div className="mb-3">
-                  <div className="text-[13px] font-semibold text-gray-200 font-mono">ENSO Strength</div>
+                  <div className="text-[10px] uppercase tracking-wider text-gray-500">ENSO Strength</div>
                   <div className={`mt-1.5 text-[11px] font-mono ${phaseTextCls}`}>
                     {phase !== 'Neutral' ? `${phase} - ${strength}` : 'Neutral'} - {s >= 0 ? '+' : ''}{s.toFixed(1)}°C
                   </div>
@@ -1936,7 +2014,7 @@ export default function EnsoImpactTracker({
 
               <div className="md:pl-5 md:border-l md:border-gray-700/40">
                 <div className="mb-1.5">
-                  <div className="text-[13px] font-semibold text-gray-200 font-mono">Time of Year</div>
+                  <div className="text-[10px] uppercase tracking-wider text-gray-500">Time of Year</div>
                 </div>
                 <div className="flex justify-between text-[10px] font-mono text-gray-400 mb-1 select-none">
                   <span>← Build-up</span>
@@ -1987,17 +2065,27 @@ export default function EnsoImpactTracker({
         const probs = forecastProbs;
 
         return (
-          <div className="rounded-lg border border-gray-700/60 bg-gray-900/40 p-3 mb-3">
-            {/* Source toggle */}
-            <div className="mb-2">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] uppercase tracking-wider text-gray-500 mr-1">Source</span>
+          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 p-3 mb-3">
+            {/* Source toggle + data pill.
+                Stacks on narrow widths, shares the source row at medium
+                widths, then becomes a truly centered overlay once the
+                full row is wide enough to avoid collisions. */}
+            <div
+              ref={forecastHeaderRef}
+              className={`mb-2 ${forecastPillLayout === 'stacked'
+                ? 'flex flex-col gap-y-1.5'
+                : forecastPillLayout === 'row'
+                  ? 'flex items-center gap-x-3 gap-y-1.5'
+                  : 'relative min-h-7'}`}
+            >
+              <div ref={forecastSourceRef} className={`inline-flex max-w-full self-start items-center gap-1.5 ${forecastPillLayout === 'overlay' ? 'relative z-10' : ''}`}>
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-500">Source</span>
                 <button
                   type="button"
                   onClick={() => setForecastSrc('noaa')}
                   aria-pressed={forecastSrc === 'noaa'}
                   className={`${TOGGLE_BASE} ${forecastSrc === 'noaa' ? TOGGLE_ACTIVE : TOGGLE_INACTIVE}`}
-                >NOAA / IRI</button>
+                >NOAA/IRI</button>
                 <button
                   type="button"
                   onClick={() => setForecastSrc('cnn')}
@@ -2007,6 +2095,29 @@ export default function EnsoImpactTracker({
                   title={!cnnForecast ? 'SNU CNN forecast unavailable' : 'SNU CNN (Ham et al. 2019)'}
                 >SNU CNN</button>
               </div>
+              {forecastHorizon && (() => {
+                const fmtV = (v: number | null | undefined) =>
+                  (v == null || !Number.isFinite(v as number)) ? '—' : `${(v as number) >= 0 ? '+' : ''}${(v as number).toFixed(2)}°C`;
+                const noaaV = forecastProbs?.oni ?? null;
+                const cnnV = cnnAnomForSeason(cnnForecast?.points, forecastHorizon.season, forecastHorizon.anchorYear);
+                const delta = (typeof noaaV === 'number' && typeof cnnV === 'number') ? cnnV - noaaV : null;
+                return (
+                  <div className={forecastPillLayout === 'overlay'
+                    ? 'absolute inset-0 flex items-center justify-center'
+                    : forecastPillLayout === 'row'
+                      ? 'flex flex-1 justify-center'
+                      : 'flex justify-center'}>
+                    <div ref={forecastDataPillRef} className="flex items-center gap-2 whitespace-nowrap text-[10px] sm:text-[11px] font-mono rounded-md border border-gray-700/70 bg-gray-900/90 px-2 py-0.5">
+                      <span className="text-[#FFF5E7]">{forecastHorizon.season} {forecastHorizon.anchorYear}</span>
+                      <span className="text-rose-300">NOAA {fmtV(noaaV)}</span>
+                      <span className="text-violet-300">CNN {fmtV(cnnV)}</span>
+                      {delta !== null && (
+                        <span className="text-amber-300">Δ {delta >= 0 ? '+' : ''}{delta.toFixed(2)}°C</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Mini forecast strip — both forecasts always plotted; the inactive
@@ -2018,6 +2129,7 @@ export default function EnsoImpactTracker({
                 activeIdx={forecastIdx}
                 onPick={(i) => setForecastIdx(i)}
                 activeSrc={forecastSrc}
+                hidePill
               />
             </div>
 
@@ -2078,11 +2190,7 @@ export default function EnsoImpactTracker({
               </div>
             </div>
 
-            {probs && (
-              <p className="mt-2 text-[10px] font-mono text-gray-500 leading-snug">
-                {forecastSrc === 'noaa' ? 'NOAA / IRI blend' : 'CNN-derived blend'} - EN {(probs.en * 100).toFixed(0)}% · LN {(probs.ln * 100).toFixed(0)}% · N {(probs.n * 100).toFixed(0)}%
-              </p>
-            )}
+
           </div>
         );
       })()}
@@ -2101,6 +2209,8 @@ export default function EnsoImpactTracker({
             const { name, value } = hovered;
             const bgValue = metric === 'temp' ? warmingByName[name] ?? null : null;
             const simSignal = mode === 'simulate' ? compositeByName[name] ?? null : null;
+            const yearSignalVal = (mode === 'year' && metric === 'temp') ? (yearSignalByName[name] ?? null) : null;
+            const showsYearTempSignal = mode === 'year' && metric === 'temp' && activeTempLayerMode === 'signal';
             let valStr = '';
             if (value === null || value === undefined) {
               valStr = 'no data';
@@ -2110,16 +2220,16 @@ export default function EnsoImpactTracker({
                 : (value >= 0 ? 'wetter in El Niño' : 'drier in El Niño');
               valStr = `r = ${value >= 0 ? '+' : ''}${value.toFixed(2)} - ${dir}`;
             } else if (metric === 'temp') {
-              valStr = mode === 'year' || showBackgroundWarming
-                ? `${value >= 0 ? '+' : ''}${value.toFixed(2)}°C vs 1961-90`
-                : `${value >= 0 ? '+' : ''}${value.toFixed(2)}°C ENSO signal`;
+              valStr = showsYearTempSignal || (!showBackgroundWarming && mode !== 'year')
+                ? `${value >= 0 ? '+' : ''}${value.toFixed(2)}°C ENSO signal`
+                : `${value >= 0 ? '+' : ''}${value.toFixed(2)}°C vs 1961-90`;
             } else {
               valStr = mode === 'year'
                 ? `${value >= 0 ? '+' : ''}${value.toFixed(0)}% vs 1961-90`
                 : `${value >= 0 ? '+' : ''}${value.toFixed(0)}% ENSO signal`;
             }
             const modeCtx = mode === 'year'
-              ? `${year}`
+              ? `${year}${metric === 'temp' ? ` - ${activeTempLayerMode === 'signal' ? 'ENSO' : 'ENSO + Warming'}` : ''}`
               : mode === 'corr'
                 ? 'ONI correlation'
                 : mode === 'forecast'
@@ -2139,6 +2249,12 @@ export default function EnsoImpactTracker({
                   <span className="text-[11px] font-mono text-[#FFF5E7]">total {fmtBreakout(value)}</span>
                 </>
               ) : null;
+            const yearBreakout = mode === 'year' && metric === 'temp' && activeTempLayerMode === 'total' && yearSignalVal !== null && value !== null ? (
+              <>
+                <span className="text-[11px] font-mono text-amber-200/90">ENSO {fmtBreakout(yearSignalVal)}</span>
+                <span className="text-[11px] font-mono text-[#FFF5E7]">total {fmtBreakout(value)}</span>
+              </>
+            ) : null;
             // In Forecast mode, show BOTH NOAA & CNN values + delta, so the
             // tooltip itself is the comparison surface (Option C).
             const dualForecast = mode === 'forecast' ? (() => {
@@ -2171,7 +2287,7 @@ export default function EnsoImpactTracker({
                 <span className="text-[13px] font-semibold text-white">{name}</span>
                 {mode === 'forecast'
                   ? dualForecast
-                    : simulateBreakout ?? <span className="text-[12px] font-mono text-gray-300">{valStr}</span>}
+                    : yearBreakout ?? simulateBreakout ?? <span className="text-[12px] font-mono text-gray-300">{valStr}</span>}
                 <span className="hidden sm:inline text-[10px] text-gray-500 sm:ml-auto">{modeCtx}</span>
               </div>
             );
@@ -2299,11 +2415,17 @@ export default function EnsoImpactTracker({
             <strong className="text-gray-300">Forecast.</strong>{' '}
             Probability-weighted historical composite for the selected horizon —
             P(EN)·C<sub>EN</sub> + P(LN)·C<sub>LN</sub> + P(N)·C<sub>N</sub> per country.
-            Switch source to compare the <span className="text-rose-300">NOAA / IRI plume</span> with the{' '}
+            Switch source to compare the <span className="text-rose-300">NOAA/IRI plume</span> with the{' '}
             <span className="text-violet-300">SNU CNN (Ham et al. 2019)</span> deterministic forecast;
             the tooltip shows both values and their delta.
             {metric === 'temp' && ' The ENSO + warming toggle adds a fitted background warming trend extrapolated to the selected forecast year.'}
             {' '}CNN forecasts: Seoul National University ACE Lab.
+          </>
+        ) : metric === 'temp' && activeTempLayerMode === 'signal' ? (
+          <>
+            Detrended observed temperature anomaly for {year}{' '}
+            ({aggWindow === 'annual' ? 'Jan-Dec' : 'Mar-May'}), isolating ENSO&rsquo;s signal after removing each country&rsquo;s linear warming trend.
+            Switch to <span className="text-gray-300">ENSO + Warming</span> to restore the full anomaly versus the 1961-1990 baseline.
           </>
         ) : (
           <>

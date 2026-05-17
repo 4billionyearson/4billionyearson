@@ -176,16 +176,18 @@ function SectionCard({
   icon,
   title,
   subtitle,
+  headerClassName,
   children,
 }: {
   icon?: React.ReactNode;
   title: string;
   subtitle?: string;
+  headerClassName?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-      <div className="mb-3">
+      <div className={headerClassName ?? 'mb-3'}>
         <h3 className="text-xl font-bold font-mono text-white flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-5 [&>svg]:w-5">
           {icon}
           <span className="min-w-0 flex-1">{title}</span>
@@ -583,6 +585,7 @@ export default function EnsoPage() {
         <SectionCard
           icon={<Globe2 className="text-[#D0A65E]" />}
           title="ENSO's World Footprint"
+          headerClassName="mb-2"
         >
           <EnsoImpactTracker
             oniHistory={oni!.history}
