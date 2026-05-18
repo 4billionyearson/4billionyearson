@@ -176,7 +176,10 @@ export default function HelixClientSection({
                   dataSource={regionData.source}
                   embedSlug={selectedRegion.slug}
                   sectionId="region-helix"
-                  hideShare
+                  share={{
+                    pageUrl: `https://4billionyearson.org/climate/${selectedRegion.slug}`,
+                    sectionId: 'climate-spiral',
+                  }}
                   seasonScheme={regionData.seasonScheme}
                   showEnso={regionData.ensoOn}
                 />

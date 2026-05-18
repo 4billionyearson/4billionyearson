@@ -119,8 +119,8 @@ export function detectSeasonScheme(opts: {
         const Pmin = Math.min(...P);
         const ratio = Pmin > 0 ? Pmax / Pmin : Number.POSITIVE_INFINITY;
         if (ratio >= WET_DRY_RATIO_THRESHOLD) {
-          const nhRain = NH_SUMMER_MONTHS.reduce((a, m) => a + P[m], 0);
-          const shRain = SH_SUMMER_MONTHS.reduce((a, m) => a + P[m], 0);
+          const nhRain = NH_SUMMER_MONTHS.reduce<number>((a, m) => a + P[m], 0);
+          const shRain = SH_SUMMER_MONTHS.reduce<number>((a, m) => a + P[m], 0);
           return schemeOf(nhRain >= shRain ? 'wet-dry-NH' : 'wet-dry-SH');
         }
       }
@@ -128,8 +128,8 @@ export function detectSeasonScheme(opts: {
       if (P) {
         const summerMonths = isNH ? NH_SUMMER_MONTHS : SH_SUMMER_MONTHS;
         const winterMonths = isNH ? SH_SUMMER_MONTHS : NH_SUMMER_MONTHS;
-        const summerRain = summerMonths.reduce((a, m) => a + P[m], 0);
-        const winterRain = winterMonths.reduce((a, m) => a + P[m], 0);
+        const summerRain = summerMonths.reduce<number>((a, m) => a + P[m], 0);
+        const winterRain = winterMonths.reduce<number>((a, m) => a + P[m], 0);
         if (winterRain > 0 && summerRain / winterRain < 0.5) {
           return schemeOf('mediterranean');
         }
@@ -143,8 +143,8 @@ export function detectSeasonScheme(opts: {
     const Pmin = Math.min(...P);
     const ratio = Pmin > 0 ? Pmax / Pmin : Number.POSITIVE_INFINITY;
     if (ratio >= WET_DRY_RATIO_THRESHOLD) {
-      const nhRain = NH_SUMMER_MONTHS.reduce((a, m) => a + P[m], 0);
-      const shRain = SH_SUMMER_MONTHS.reduce((a, m) => a + P[m], 0);
+      const nhRain = NH_SUMMER_MONTHS.reduce<number>((a, m) => a + P[m], 0);
+      const shRain = SH_SUMMER_MONTHS.reduce<number>((a, m) => a + P[m], 0);
       return schemeOf(nhRain >= shRain ? 'wet-dry-NH' : 'wet-dry-SH');
     }
   }
