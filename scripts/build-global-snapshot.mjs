@@ -230,7 +230,10 @@ function parseNoaa(json, baseline) {
   for (const [key, val] of Object.entries(json.data)) {
     const year = parseInt(key.substring(0, 4), 10);
     const month = parseInt(key.substring(4, 6), 10);
-    const anomaly = parseFloat(val.anomaly ?? val.value);
+    const rawAnomaly = typeof val === 'number'
+      ? val
+      : val.departure ?? val.anomaly ?? val.value;
+    const anomaly = parseFloat(rawAnomaly);
     if (Number.isNaN(anomaly)) continue;
     monthly.push({
       date: `${year}-${String(month).padStart(2, '0')}`,
