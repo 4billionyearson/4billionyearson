@@ -453,6 +453,9 @@ function MapLabels({
       : zoom <= 3
         ? countryLabels.filter(({ name }) => MAJOR_COUNTRIES.has(name))
         : countryLabels;
+  const uniqueVisibleCountry = visibleCountry.filter(
+    ({ name }, index, arr) => arr.findIndex((entry) => entry.name === name) === index,
+  );
 
   const countryFont = zoom <= 2 ? 13 : 10;
   const countryCls = zoom <= 2 ? "continent-label" : "country-label";
@@ -462,7 +465,7 @@ function MapLabels({
 
   return (
     <>
-      {visibleCountry.map(({ name, pos }) => {
+      {uniqueVisibleCountry.map(({ name, pos }) => {
         const display = LABEL_DISPLAY_NAME[name] ?? name;
         // Hide the country label for US / UK when their sub-region labels take over
         if (showStates && name === "United States of America") return null;

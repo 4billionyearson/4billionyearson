@@ -57,6 +57,9 @@ interface MonthlySpaghettiCardProps {
    *  whose source has already advanced to April will still render April as
    *  provisional dashes while the page is still a "March update". */
   provisionalAfterMonth?: { year: number; month: number } | null;
+  /** Global warm-only temperature series can opt into a tighter local
+   *  y-domain so the lines fill more of the chart. */
+  tempScaleMode?: 'standard' | 'auto' | 'auto-relaxed';
 }
 
 export default function MonthlySpaghettiCard({
@@ -70,6 +73,7 @@ export default function MonthlySpaghettiCard({
   hideShare = false,
   inline = false,
   provisionalAfterMonth = null,
+  tempScaleMode = 'standard',
 }: MonthlySpaghettiCardProps) {
   const available = TAB_ORDER.filter((m) => (series[m]?.length ?? 0) > 0);
   const fallback: SpaghettiMetric = available[0] ?? 'temp';
@@ -142,6 +146,7 @@ export default function MonthlySpaghettiCard({
           monthlyAll={data}
           regionName={regionName}
           metric={metric}
+          tempScaleMode={tempScaleMode}
           dataSource={dataSource}
           provisionalAfterMonth={provisionalAfterMonth}
           hideTitle

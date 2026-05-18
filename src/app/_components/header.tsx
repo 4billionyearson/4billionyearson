@@ -210,6 +210,13 @@ const Header = () => {
                 >
                   Rankings<MonthlyBadge />
                 </Link>
+                <Link
+                  href="/climate/helix"
+                  className={desktopDropdownItemClass(pathname === '/climate/helix', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
+                  onClick={closeMenu}
+                >
+                  4BYO Climate Helix<MonthlyBadge />
+                </Link>
                 <Link href="/climate-dashboard" className={desktopDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
                   Dashboard<MonthlyBadge />
                 </Link>
@@ -437,6 +444,13 @@ const Header = () => {
                   onClick={closeMenu}
                 >
                   Rankings<MonthlyBadge />
+                </Link>
+                <Link
+                  href="/climate/helix"
+                  className={mobileDropdownItemClass(pathname === '/climate/helix', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')}
+                  onClick={closeMenu}
+                >
+                  4BYO Climate Helix<MonthlyBadge />
                 </Link>
                 <Link href="/climate-dashboard" className={mobileDropdownItemClass(pathname === '/climate-dashboard', 'text-[#D0A65E]', 'hover:text-[#E8C97A]')} onClick={closeMenu}>
                   Dashboard<MonthlyBadge />

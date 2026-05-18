@@ -124,6 +124,9 @@ interface SpaghettiChartProps {
   monthlyAll: MonthlyPoint[];
   regionName: string;
   metric?: SpaghettiMetric;
+  /** Global warm-only temperature series can opt into a tighter local
+   *  domain so the lines use more of the chart height. */
+  tempScaleMode?: 'standard' | 'auto' | 'auto-relaxed';
   /** Optional override for the title, otherwise built from regionName + metric. */
   title?: string;
   dataSource?: string;
@@ -139,6 +142,7 @@ export default function MonthlySpaghettiChart({
   monthlyAll,
   regionName,
   metric = 'temp',
+  tempScaleMode = 'standard',
   title,
   dataSource,
   hideTitle = false,
@@ -247,10 +251,20 @@ export default function MonthlySpaghettiChart({
       rows.push(row);
     }
 
+    const tempRange = globalMax - globalMin;
+    const tempAutoPad = tempScaleMode === 'auto-relaxed'
+      ? Math.max(0.42, tempRange * 0.22)
+      : Math.max(0.18, tempRange * 0.1);
     const yLowerBound = cfg.yLower === 'zero'
       ? 0
-      : Math.floor(globalMin - 1);
-    const headroom = cfg.yLower === 'zero' ? Math.max(2, (globalMax - yLowerBound) * 0.15) : 3;
+      : metric === 'temp' && tempScaleMode !== 'standard'
+        ? globalMin - tempAutoPad
+        : Math.floor(globalMin - 1);
+    const yUpperBound = cfg.yLower === 'zero'
+      ? globalMax + Math.max(2, (globalMax - yLowerBound) * 0.15)
+      : metric === 'temp' && tempScaleMode !== 'standard'
+        ? globalMax + tempAutoPad
+        : Math.ceil(globalMax + 3);
 
     return {
       chartData: rows,
@@ -259,7 +273,7 @@ export default function MonthlySpaghettiChart({
       currentYear: highlightCurrent,
       currentIsLatestFallback: usingFallback,
       yMin: yLowerBound,
-      yMax: Math.ceil(globalMax + headroom),
+      yMax: yUpperBound,
       startYear: Math.min(...displayYears),
       latestMonthIdx: (() => {
         const cm = byYear.get(highlightCurrent);
@@ -268,11 +282,17 @@ export default function MonthlySpaghettiChart({
       })(),
       provisionalFromMonthIdx: firstProvMonth > 0 ? firstProvMonth - 1 : -1,
     };
-  }, [monthlyAll, cfg, provisionalAfterMonth]);
+  }, [monthlyAll, cfg, provisionalAfterMonth, metric, tempScaleMode]);
 
   if (chartData.length === 0) return null;
 
   const headingTitle = title ?? `${regionName} – ${cfg.longLabel} – All Years`;
+  const yTickFormatter = (value: number) => {
+    if (metric === 'temp' && tempScaleMode !== 'standard') {
+      return Number.isInteger(value) ? `${value.toFixed(0)}` : `${value.toFixed(1)}`;
+    }
+    return `${Math.round(value)}`;
+  };
 
   return (
     <div>
@@ -298,7 +318,7 @@ export default function MonthlySpaghettiChart({
               tick={{ fill: '#9CA3AF', fontSize: 11 }}
               axisLine={{ stroke: '#555' }}
               tickLine={false}
-              tickFormatter={(v: number) => `${Math.round(v)}`}
+              tickFormatter={yTickFormatter}
               width={52}
             />
 

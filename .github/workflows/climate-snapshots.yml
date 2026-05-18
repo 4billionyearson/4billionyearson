@@ -33,6 +33,10 @@ jobs:
     timeout-minutes: 120
     permissions:
       contents: write
+    env:
+      CLIMATE_RUN_LOG: .climate-snapshot-run/run.jsonl
+      CLIMATE_RUN_SUMMARY_MD: .climate-snapshot-run/summary.md
+      CLIMATE_RUN_SUMMARY_JSON: .climate-snapshot-run/summary.json
 
     steps:
       - name: Checkout
@@ -49,57 +53,67 @@ jobs:
 
       # ── UK regions (Met Office HadUK: publishes ~3rd–10th) ──────────
       - name: Rebuild UK region snapshots
-        run: |
-          DAY=$(date -u +%-d)
-          if [ "$DAY" -gt 14 ]; then
-            echo "Day $DAY — outside UK snapshot window (3–14), skipping."
-            exit 0
-          fi
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild UK region snapshots"
+          --window-start 3
+          --window-end 14
+          --outputs "public/data/climate/uk-region"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
           node scripts/build-uk-region-snapshots.mjs
         continue-on-error: true
 
       # ── Global (NOAA NCEI ~15th–25th; OWID ERA5 ~12th–18th) ─────────
       - name: Rebuild global snapshot
-        run: |
-          DAY=$(date -u +%-d)
-          if [ "$DAY" -lt 10 ]; then
-            echo "Day $DAY — outside global snapshot window (10–25), skipping."
-            exit 0
-          fi
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild global snapshot"
+          --window-start 10
+          --window-end 25
+          --outputs "public/data/climate/global-history.json"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
           node scripts/build-global-snapshot.mjs
         continue-on-error: true
 
       # ── ENSO / Pacific oceans (NOAA CPC: same window as NOAA global) ─
       - name: Rebuild ENSO snapshot
-        run: |
-          DAY=$(date -u +%-d)
-          if [ "$DAY" -lt 10 ]; then
-            echo "Day $DAY — outside ENSO window (10–25), skipping."
-            exit 0
-          fi
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild ENSO snapshot"
+          --window-start 10
+          --window-end 25
+          --outputs "public/data/climate/enso.json"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
           node scripts/build-enso-snapshot.mjs
         continue-on-error: true
 
       # ── Per-country precipitation (World Bank CCKP: ~12th–18th) ─────
       # Must run BEFORE build-country-snapshots.
       - name: Rebuild country precipitation
-        run: |
-          DAY=$(date -u +%-d)
-          if [ "$DAY" -lt 10 ]; then
-            echo "Day $DAY — outside country precip window (10–25), skipping."
-            exit 0
-          fi
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild country precipitation"
+          --window-start 10
+          --window-end 25
+          --outputs "public/data/climate/country-precip"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
           node scripts/build-country-precip.mjs
         continue-on-error: true
 
       # ── Per-country snapshots (OWID ERA5: ~12th–18th) ─────────────────
       - name: Rebuild country snapshots
-        run: |
-          DAY=$(date -u +%-d)
-          if [ "$DAY" -lt 10 ]; then
-            echo "Day $DAY — outside country snapshot window (10–25), skipping."
-            exit 0
-          fi
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild country snapshots"
+          --window-start 10
+          --window-end 25
+          --outputs "public/data/climate/country"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
           node scripts/build-country-snapshots.mjs
         continue-on-error: true
 
@@ -107,45 +121,83 @@ jobs:
       # Re-run after per-country files are rebuilt so the world map always
       # reflects the latest month for every country.
       - name: Patch country anomalies on global snapshot
-        run: |
-          DAY=$(date -u +%-d)
-          if [ "$DAY" -lt 10 ]; then
-            echo "Day $DAY — skipping patch (no country data rebuilt yet)."
-            exit 0
-          fi
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Patch country anomalies on global snapshot"
+          --window-start 10
+          --window-end 25
+          --outputs "public/data/climate/global-history.json"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
           node scripts/patch-country-anomalies.mjs
         continue-on-error: true
 
       # ── US national (NOAA national time series: ~15th–25th) ──────────
       - name: Rebuild US national snapshot
-        run: |
-          DAY=$(date -u +%-d)
-          if [ "$DAY" -lt 13 ]; then
-            echo "Day $DAY — outside US snapshot window (13–25), skipping."
-            exit 0
-          fi
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild US national snapshot"
+          --window-start 13
+          --window-end 25
+          --outputs "public/data/climate/us-national.json"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
           node scripts/build-us-national-snapshot.mjs
         continue-on-error: true
 
       # ── US states (NOAA statewide: ~15th–25th, ~30 min) ─────────────
       - name: Rebuild US state snapshots
-        run: |
-          DAY=$(date -u +%-d)
-          if [ "$DAY" -lt 13 ]; then
-            echo "Day $DAY — outside US state window (13–25), skipping."
-            exit 0
-          fi
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild US state snapshots"
+          --window-start 13
+          --window-end 25
+          --outputs "public/data/climate/us-state"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
           node scripts/build-us-state-snapshots.mjs
         continue-on-error: true
 
       # ── Derived (run after all source scripts) ───────────────────────
       - name: Rebuild shifting-seasons global snapshot
-        run: npm run build:climate-shift-global
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild shifting-seasons global snapshot"
+          --outputs "public/data/seasons/shift-global.json"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
+          npm run build:climate-shift-global
         continue-on-error: true
 
       - name: Rebuild climate rankings
-        run: npm run build:climate-rankings
+        run: >
+          node scripts/climate-step-log.mjs run
+          --name "Rebuild climate rankings"
+          --outputs "public/data/climate/rankings.json,public/data/climate/rankings-previous.json"
+          --log-path "$CLIMATE_RUN_LOG"
+          --
+          npm run build:climate-rankings
         continue-on-error: true
+
+      - name: Build climate run summary
+        if: always()
+        run: |
+          node scripts/climate-step-log.mjs summarize \
+            --log-path "$CLIMATE_RUN_LOG" \
+            --md-path "$CLIMATE_RUN_SUMMARY_MD" \
+            --json-path "$CLIMATE_RUN_SUMMARY_JSON"
+          cat "$CLIMATE_RUN_SUMMARY_MD" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload climate run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: climate-snapshot-run-${{ github.run_number }}
+          path: |
+            ${{ env.CLIMATE_RUN_LOG }}
+            ${{ env.CLIMATE_RUN_SUMMARY_MD }}
+            ${{ env.CLIMATE_RUN_SUMMARY_JSON }}
+          if-no-files-found: warn
 
       # ── Commit only if data actually advanced ────────────────────────
       # git diff --quiet exits 0 when nothing changed → no commit, no

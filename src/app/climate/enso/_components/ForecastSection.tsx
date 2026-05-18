@@ -972,7 +972,7 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
                 <div className="px-4 pt-2 pb-4 border-t border-gray-700/50">
                   <p className="text-xs text-gray-400 mb-3">Three ENSO indicators on one axis: Niño 3.4 (ocean), MEI v2 (ocean+atmosphere) and −SOI (sign-flipped so all three rise together for El Niño). When all three climb past +0.5, the forecast has independent support.</p>
                   <div className="h-[340px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                    {indicatorsOpen ? <ResponsiveContainer width="100%" height="100%">
                       <ComposedChart margin={{ top: 10, right: 28, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                         <XAxis
@@ -1011,7 +1011,7 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
                         <Line data={meiSeries} dataKey="v" name="MEI v2 (index)" type="monotone" stroke="#a78bfa" strokeWidth={1.8} dot={false} isAnimationActive={false} />
                         <Line data={soiSeries} dataKey="v" name="−SOI (sign-flipped)" type="monotone" stroke="#34d399" strokeWidth={1.6} strokeDasharray="4 2" dot={false} isAnimationActive={false} />
                       </ComposedChart>
-                    </ResponsiveContainer>
+                    </ResponsiveContainer> : null}
                   </div>
                   <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
                     <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-[2px] bg-amber-400" /> Niño 3.4 weekly SST anomaly (°C)</span>

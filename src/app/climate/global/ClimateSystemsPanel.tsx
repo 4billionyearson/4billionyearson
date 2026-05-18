@@ -232,10 +232,13 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
   }
 
   const cnnXMax = cnnPoints.length > 0 ? cnnPoints[cnnPoints.length - 1].x + 0.1 : 0;
-  const xMax = Math.max(
-    currentYear + 1.5,
-    (elNinoEnd ?? currentYear + 1) + 0.5,
-    Math.min(cnnXMax, currentYear + 2.5),
+  const xMax = Math.min(
+    Math.max(
+      currentYear + 1.5,
+      (elNinoEnd ?? currentYear + 1) + 0.5,
+      cnnXMax,
+    ),
+    todayX + 2.5,
   );
   const yearTicks: number[] = [];
   for (let y = currentYear - yearsBack + 1; y <= Math.ceil(xMax); y++) yearTicks.push(y);
@@ -258,6 +261,18 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
     }
   }
   chartData.sort((a, b) => a.x - b.x);
+
+  const allYValues: number[] = [
+    ...observedPoints.map((p) => p.anom).filter((v): v is number => v != null),
+    ...forecastPoints.map((p) => p.fcAnom).filter((v): v is number => v != null),
+    ...cnnPoints.map((p) => p.cnnAnom),
+  ];
+  const rawYMin = allYValues.length ? Math.min(...allYValues) : -3;
+  const rawYMax = allYValues.length ? Math.max(...allYValues) : 3;
+  const yDomainMin = Math.floor(rawYMin - 0.4);
+  const yDomainMax = Math.ceil(rawYMax + 0.4);
+  const yTicks: number[] = [];
+  for (let value = yDomainMin; value <= yDomainMax; value++) yTicks.push(value);
 
   // ── Past event labels (same logic as the full ENSO tracker page) ─────────
   type EnsoEvent = { phase: 'el-nino' | 'la-nina'; weak: boolean; startX: number; endX: number; peak: number };
@@ -356,7 +371,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="x" type="number" domain={[xMin, xMax]} ticks={yearTicks} tickFormatter={(v) => String(Math.round(v))} stroke="#9CA3AF" fontSize={10} allowDecimals={false} />
-              <YAxis stroke="#9CA3AF" fontSize={10} width={30} domain={[-3, 3]} ticks={[-2, -1, 0, 1, 2]} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
+              <YAxis stroke="#9CA3AF" fontSize={10} width={30} domain={[yDomainMin, yDomainMax]} ticks={yTicks} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`} />
               <Tooltip
                 contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12, color: '#f3f4f6' }}
                 formatter={(value: any, name: any) => {

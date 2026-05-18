@@ -73,20 +73,25 @@ function parseArgs(argv) {
   return { onlyList };
 }
 
+const MET_OFFICE_PROVISIONAL_WINDOW_END_UTC = 10;
+
 // Mark the latest monthly data point as provisional, but only if it falls in
-// the previous calendar month - i.e. it was just published by the Met Office
-// and hasn't yet been QC-revised in a subsequent monthly snapshot. Older
-// points are treated as final.
+// the previous calendar month during the early-month publication window.
+// Later runs in the month should clear the provisional flag once the page has
+// caught up to the newly published snapshot.
 function tagLatestProvisional(points) {
   if (!points.length) return points;
   const sorted = [...points].sort((a, b) => a.year - b.year || a.month - b.month);
   const last = sorted[sorted.length - 1];
   const now = new Date();
+  const utcDay = now.getUTCDate();
   // Previous calendar month (Date math handles January wrap-around).
-  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const prevYear = prev.getFullYear();
-  const prevMonth = prev.getMonth() + 1;
-  const isProvisional = last.year === prevYear && last.month === prevMonth;
+  const prev = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+  const prevYear = prev.getUTCFullYear();
+  const prevMonth = prev.getUTCMonth() + 1;
+  const isProvisional = utcDay <= MET_OFFICE_PROVISIONAL_WINDOW_END_UTC
+    && last.year === prevYear
+    && last.month === prevMonth;
   return sorted.map((p) =>
     isProvisional && p.year === last.year && p.month === last.month
       ? { ...p, provisional: true }

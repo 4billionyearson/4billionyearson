@@ -5,8 +5,12 @@ import Link from 'next/link';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Legend, BarChart, Bar, Cell, ComposedChart,
 } from 'recharts';
-import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, Wind, Info, BookOpen, Scale, Factory, Leaf, Ruler } from 'lucide-react';
+import { Thermometer, Globe2, Loader2, ExternalLink, AlertTriangle, Database, Wind, Info, BookOpen, Scale, Factory, Leaf, Ruler, Trophy } from 'lucide-react';
 import MonthlySpaghettiCard from '@/app/_components/monthly-spaghetti-card';
+import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
+import RecordsSection from '@/app/_components/climate-records-section';
+import GlobalHelixCard, { type HelixSeriesTab } from './GlobalHelixCard';
+import { DEFAULT_SCHEME } from '@/lib/climate/season-scheme';
 import GlobalSeasonalSummary from '@/app/_components/global-seasonal-summary';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { GLOBAL_CLIMATE_FAQ } from './global-faq';
@@ -590,6 +594,42 @@ export default function GlobalProfile({
               {(data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0) || data.landMonthlyAll?.length > 0 ? (
                 <>
                   <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Temperature" />
+                  {(() => {
+                    // Tabbed Climate Helix above the spaghetti pair. Same data,
+                    // shown as a radial year-on-year dial. Wedge overlays are
+                    // suppressed (aseasonal scheme) because the global series
+                    // averages NH summer with SH winter — seasons aren't
+                    // meaningful for a single hemispheric/global trace.
+                    const tabs: HelixSeriesTab[] = [];
+                    const globalParisReference = Number.isFinite(data.preIndustrialBaseline)
+                      ? {
+                          monthly: Array.from({ length: 12 }, () => data.preIndustrialBaseline),
+                          label: `global 1850–1900 mean (${data.preIndustrialBaseline.toFixed(1)}°C)`,
+                        }
+                      : undefined;
+                    if (data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0) {
+                      tabs.push({
+                        key: 'land-ocean',
+                        label: 'Land + Ocean',
+                        series: { temp: data.landOceanMonthlyAll },
+                        regionName: 'Global Land + Ocean',
+                        dataSource: 'NOAA Climate at a Glance — Global Land+Ocean',
+                        embedSlug: 'global-land-ocean',
+                        parisReference: globalParisReference,
+                      });
+                    }
+                    if (data.landMonthlyAll?.length > 0) {
+                      tabs.push({
+                        key: 'land',
+                        label: 'Land',
+                        series: { temp: data.landMonthlyAll },
+                        regionName: 'Global Land',
+                        dataSource: 'Our World in Data / ERA5',
+                        embedSlug: 'global-land',
+                      });
+                    }
+                    return <GlobalHelixCard tabs={tabs} provisionalAfterMonth={pageSnapshotCut} />;
+                  })()}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (
                       <MonthlySpaghettiCard
@@ -598,6 +638,7 @@ export default function GlobalProfile({
                         dataSource="NOAA Climate at a Glance - Global Land+Ocean"
                         embedSlug="global-land-ocean"
                         provisionalAfterMonth={pageSnapshotCut}
+                        tempScaleMode="auto-relaxed"
                         share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'monthly-history-land-ocean' }}
                         footer={<>The headline global series (land + ocean) - the dataset Copernicus, WMO and NOAA report against. Source: NOAA Climate at a Glance.</>}
                       />
@@ -609,11 +650,45 @@ export default function GlobalProfile({
                         dataSource="Our World in Data / ERA5"
                         embedSlug="global-land"
                         provisionalAfterMonth={pageSnapshotCut}
+                        tempScaleMode="auto"
                         share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'monthly-history-land' }}
                         footer={<>Land-only equivalent, on the same scale as the country, state and region climate pages (which have no ocean inside their borders). Source: Our World in Data / ERA5.</>}
                       />
                     )}
                   </div>
+                  {/* Records (warmest / coldest years and months) computed from
+                      the headline Land+Ocean series when available, otherwise
+                      from the land-only series. */}
+                  {(() => {
+                    const recordsSeries = (data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0)
+                      ? { temp: data.landOceanMonthlyAll }
+                      : (data.landMonthlyAll?.length > 0 ? { temp: data.landMonthlyAll } : null);
+                    const recordsSource = (data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0)
+                      ? 'NOAA Climate at a Glance — Global Land+Ocean'
+                      : (data.landMonthlyAll?.length > 0 ? 'Our World in Data / ERA5' : null);
+                    if (!recordsSeries) return null;
+                    return (
+                      <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+                        <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
+                          <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
+                          <span className="min-w-0 flex-1">Records – Global Temperature</span>
+                        </h2>
+                        <RecordsSection series={recordsSeries} provisionalAfterMonth={pageSnapshotCut} />
+                        {recordsSource && (
+                          <p className="text-[11px] text-gray-500 mt-3">{recordsSource}</p>
+                        )}
+                        <div className="mt-3">
+                          <ShareBar
+                            pageUrl="https://4billionyearson.org/climate/global#climate-records"
+                            shareText={encodeURIComponent('Global climate records - 4 Billion Years On')}
+                            emailSubject="Global climate records - 4 Billion Years On"
+                            wrapperClassName="relative flex justify-end"
+                            align="right"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </>
               ) : null}
 

@@ -458,6 +458,9 @@ function MapLabels({
         : level === 'uk-regions' || level === 'uk-countries'
           ? countryLabels.filter(({ name }) => name !== 'United Kingdom')
           : countryLabels;
+  const uniqueVisibleCountries = visibleCountries.filter(
+    ({ name }, index, arr) => arr.findIndex((entry) => entry.name === name) === index,
+  );
 
   const fontSize = zoom <= 2 ? 13 : 10;
   const cls = zoom <= 2 ? 'continent-label' : 'country-label';
@@ -476,7 +479,7 @@ function MapLabels({
 
   return (
     <>
-      {!hideCountryLabels && visibleCountries.map(({ name, pos }) => (
+      {!hideCountryLabels && uniqueVisibleCountries.map(({ name, pos }) => (
         <Marker
           key={`c-${name}`}
           position={pos}

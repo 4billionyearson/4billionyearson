@@ -21,6 +21,11 @@ async function loadSnapshot(relativePath: string): Promise<any | null> {
   }
 }
 
+function buildSnapshotToken(name: string, label: string | null | undefined, generatedAt: string | null | undefined): string | null {
+  if (!label && !generatedAt) return null;
+  return `${name}:${label ?? 'na'}@${generatedAt ?? 'na'}`;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -32,50 +37,84 @@ export async function GET(
     return NextResponse.json({ error: 'Region not found' }, { status: 404 });
   }
 
-  // Derive the cache key from the *actual* data month in the snapshot rather
-  // than calendar arithmetic. This ensures:
-  //  - the cache automatically invalidates whenever a snapshot is rebuilt and
-  //    the on-disk data month advances (e.g. Mar 2026 → Apr 2026), so users
-  //    always see the latest data after a CI push.
-  //  - two different data months can never collide in the same cache entry.
-  //
-  // We peek at a tiny header in the primary snapshot file to get the month
-  // label (e.g. "Apr 2026"). Falling back to the calendar-based key is safe
-  // if the file is missing or malformed.
-  async function getPrimaryDataMonth(): Promise<string | null> {
-    if (!region) return null;
-    try {
-      if (region.type === 'country') {
-        const snap = await loadSnapshot(`country/${region.apiCode}.json`);
-        return snap?.latestMonthStats?.label ?? null;
-      }
-      if (region.type === 'us-state') {
-        const snap = await loadSnapshot(`us-state/${region.apiCode}.json`);
-        return snap?.paramData?.tavg?.latestMonthStats?.label ?? null;
-      }
-      if (region.type === 'uk-region') {
-        const snap = await loadSnapshot(`uk-region/${region.apiCode}.json`);
-        return snap?.varData?.Tmean?.latestMonthStats?.label ?? null;
-      }
-    } catch { /* fall through */ }
-    return null;
-  }
-
-  const primaryMonth = await getPrimaryDataMonth();
-  // Also peek at the global snapshot month so that if global advances after
-  // local (or vice versa), the combined cached response re-fetches automatically.
+  // Build the cache key from both the latest month labels and the generatedAt
+  // stamps of every snapshot that can affect the combined page payload. Using
+  // labels alone is not enough: a same-month rebuild can change monthlyAll
+  // values or provisional flags without advancing the month label.
   const globalSnap0 = await loadSnapshot('global-history.json');
   const globalMonth = globalSnap0?.noaaStats?.landOcean?.latestMonthStats?.label ?? null;
-  // Cache key encodes both data months so any change to either busts the cache.
-  const dataCacheKey = primaryMonth && globalMonth
-    ? `${primaryMonth}|${globalMonth}`
+  const globalGeneratedAt = globalSnap0?.generatedAt ?? null;
+
+  let primaryMonth: string | null = null;
+  let primaryGeneratedAt: string | null = null;
+  let nationalMonth: string | null = null;
+  let nationalGeneratedAt: string | null = null;
+  let supportMonth: string | null = null;
+  let supportGeneratedAt: string | null = null;
+  let precipMonth: string | null = null;
+  let precipGeneratedAt: string | null = null;
+
+  if (region.type === 'country') {
+    const primarySnap = await loadSnapshot(`country/${region.apiCode}.json`);
+    primaryMonth = primarySnap?.latestMonthStats?.label ?? null;
+    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
+
+    const precipSnap = await loadSnapshot(`country-precip/${region.apiCode}.json`);
+    precipMonth = precipSnap?.latestMonthStats?.label ?? null;
+    precipGeneratedAt = precipSnap?.generatedAt ?? null;
+
+    if (region.apiCode === 'GBR') {
+      const nationalSnap = await loadSnapshot('uk-region/uk-uk.json');
+      nationalMonth = nationalSnap?.varData?.Tmean?.latestMonthStats?.label ?? null;
+      nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+    } else if (region.apiCode === 'USA') {
+      const nationalSnap = await loadSnapshot('us-national.json');
+      nationalMonth = nationalSnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
+      nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+    }
+  } else if (region.type === 'us-state') {
+    const primarySnap = await loadSnapshot(`us-state/${region.apiCode}.json`);
+    primaryMonth = primarySnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
+    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
+
+    const supportSnap = await loadSnapshot('country/USA.json');
+    supportMonth = supportSnap?.latestMonthStats?.label ?? null;
+    supportGeneratedAt = supportSnap?.generatedAt ?? null;
+
+    const nationalSnap = await loadSnapshot('us-national.json');
+    nationalMonth = nationalSnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
+    nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+  } else if (region.type === 'uk-region') {
+    const primarySnap = await loadSnapshot(`uk-region/${region.apiCode}.json`);
+    primaryMonth = primarySnap?.varData?.Tmean?.latestMonthStats?.label ?? null;
+    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
+
+    const supportSnap = await loadSnapshot('country/GBR.json');
+    supportMonth = supportSnap?.latestMonthStats?.label ?? null;
+    supportGeneratedAt = supportSnap?.generatedAt ?? null;
+
+    const nationalSnap = await loadSnapshot('uk-region/uk-uk.json');
+    nationalMonth = nationalSnap?.varData?.Tmean?.latestMonthStats?.label ?? null;
+    nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+  }
+
+  const dataCacheKeyParts = [
+    buildSnapshotToken('primary', primaryMonth, primaryGeneratedAt),
+    buildSnapshotToken('global', globalMonth, globalGeneratedAt),
+    buildSnapshotToken('national', nationalMonth, nationalGeneratedAt),
+    buildSnapshotToken('support', supportMonth, supportGeneratedAt),
+    buildSnapshotToken('precip', precipMonth, precipGeneratedAt),
+  ].filter((part): part is string => Boolean(part));
+
+  const dataCacheKey = dataCacheKeyParts.length
+    ? dataCacheKeyParts.join('|')
     : (() => {
         const now = new Date();
         const prev = new Date(now);
         if (now.getDate() < 21) prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${dataCacheKey}-v22`;
+  const cacheKey = `climate:profile:${slug}:${dataCacheKey}-v23`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);

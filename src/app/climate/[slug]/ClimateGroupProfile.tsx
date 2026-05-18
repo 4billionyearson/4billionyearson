@@ -11,6 +11,9 @@ import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
 import GroupSummaryPanel from './GroupSummaryPanel';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import MonthlySpaghettiCard from '@/app/_components/monthly-spaghetti-card';
+import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
+import RecordsSection from '@/app/_components/climate-records-section';
+import { detectSeasonScheme } from '@/lib/climate/season-scheme';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
@@ -516,6 +519,24 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
       {/* Spaghetti chart + seasonal-shift cards (member-country aggregate absolutes) */}
       {absolutes?.monthlyAll?.length ? (
         <>
+          {(() => {
+            // Continent and US-climate-region groups span large areas that
+            // often mix hemispheres or climate zones; detectSeasonScheme will
+            // typically classify them as aseasonal (Africa, Americas) or
+            // temperate-NH (Europe, Asia, US regions). Helix renders without
+            // season wedges when aseasonal.
+            const scheme = detectSeasonScheme({ tempMonthly: absolutes.monthlyAll });
+            return (
+              <ClimateSpiralCard
+                series={{ temp: absolutes.monthlyAll }}
+                regionName={region.name}
+                dataSource={`4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`}
+                embedSlug={region.slug}
+                share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-spiral' }}
+                seasonScheme={scheme}
+              />
+            );
+          })()}
           <MonthlySpaghettiCard
             series={{ temp: absolutes.monthlyAll }}
             regionName={region.name}
@@ -523,6 +544,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             embedSlug={region.slug}
             share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'monthly-history' }}
           />
+          <RecordsSection series={{ temp: absolutes.monthlyAll }} />
           <SeasonalShiftCard
             monthlyAll={absolutes.monthlyAll}
             regionName={region.name}

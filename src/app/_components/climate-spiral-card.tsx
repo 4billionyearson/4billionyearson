@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Thermometer, CloudRain, Sun, Snowflake, Waves } from 'lucide-react';
 import type { MonthlyPoint, SpaghettiMetric } from './monthly-spaghetti-chart';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
+import { DEFAULT_SCHEME, type SeasonScheme } from '@/lib/climate/season-scheme';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * The 4BYO Climate Helix
@@ -41,6 +42,26 @@ interface Props {
   /** Show the ENSO HUD card. Defaults to false; only relevant for regions
    *  where ENSO has a clear teleconnection (e.g. UK, US, Australia, India). */
   showEnso?: boolean;
+  /** Optional chart-side accessory control. Used by the global helix to
+   *  place the Land / Land+Ocean switch in the same slot as the seasonal
+   *  chart picker on region pages. */
+  chartOverlayAccessory?: React.ReactNode;
+  /** Mobile inline copy of the chart-side accessory control. */
+  chartInlineAccessory?: React.ReactNode;
+  /** Season-system descriptor for the region. Controls hemispheric flip
+   *  of the season-wedge ring, whether the 10°C growing-season crossings
+   *  trail is rendered, and whether the wedges use the 4-season or 2-season
+   *  wet/dry palette. Defaults to temperate-NH (the original UK behaviour). */
+  seasonScheme?: SeasonScheme;
+  /** Pre-industrial monthly climatology used to anchor the Paris +1.5/+2°C
+   *  rings. Only meaningful when `metric === 'temp'`. When omitted, the
+   *  Paris-rings toggle is hidden. Global helix surfaces can pass a shared
+   *  1850–1900 monthly baseline here. */
+  parisReference?: { monthly: number[]; label?: string };
+  /** Absolute-temperature scale mode. Regional helixes default to a loose
+   *  zero anchor so 0 °C reads naturally; global warm-only series can opt
+   *  into `auto` to use more of the radius for their narrower real range. */
+  tempScaleMode?: 'zero-anchored' | 'auto';
 }
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -108,19 +129,24 @@ const TOGGLE_INACTIVE = 'border-gray-700 bg-gray-900/45 text-gray-300 hover:bord
  *  `<input type="checkbox">` controls with chips that wrap nicely on
  *  mobile and align with the metric switcher above the chart. */
 function ChipToggle({
-  active, onChange, color = '#D0A65E', children,
+  active, onChange, color = '#D0A65E', className = '', compactAtXl = false, children,
 }: {
   active: boolean;
   onChange: (next: boolean) => void;
   color?: string;
+  className?: string;
+  compactAtXl?: boolean;
   children: React.ReactNode;
 }) {
+  const baseClass = compactAtXl
+    ? 'inline-flex h-7 items-center gap-0.5 rounded-full border px-2 text-[12px] font-medium transition-colors'
+    : TOGGLE_BASE;
   return (
     <button
       type="button"
       onClick={() => onChange(!active)}
       aria-pressed={active}
-      className={`${TOGGLE_BASE} ${active ? '' : TOGGLE_INACTIVE}`}
+      className={`${baseClass} ${active ? '' : TOGGLE_INACTIVE} ${className}`}
       style={active ? { borderColor: `${color}8c`, background: `${color}1f`, color: '#FFF5E7' } : undefined}
     >
       <span
@@ -130,6 +156,138 @@ function ChipToggle({
       />
       <span className="leading-none whitespace-nowrap">{children}</span>
     </button>
+  );
+}
+
+/** Segmented Seasons control.
+ *
+ *  The Summer / Wet-season system picker now lives by the chart, so this
+ *  pill only needs to render Seasons | Trail in a single rounded row.
+ *  The outer padding matches the other chips again; only the divider-facing
+ *  edges stay slightly tighter so the pill can still sit beside 3D in the
+ *  tighter Mode rows. */
+function SeasonsPill({
+  showShiftTrail,
+  setShowShiftTrail,
+  setShowSeasons,
+  shiftSystem,
+  setShiftSystem,
+  effectiveSystem,
+  showSystemPicker,
+}: {
+  showShiftTrail: boolean;
+  setShowShiftTrail: (v: boolean) => void;
+  setShowSeasons: (v: boolean) => void;
+  shiftSystem: 'auto' | 'temperate' | 'wet-season';
+  setShiftSystem: (v: 'auto' | 'temperate' | 'wet-season') => void;
+  effectiveSystem: 'temperate' | 'wet-season';
+  showSystemPicker: boolean;
+}) {
+  void shiftSystem; // kept on the prop surface for future "auto" toggling
+  // The Summer / Wet-season picker has been pulled out of the pill and
+  // rendered as a floating chip on the chart, so the pill now only ever
+  // contains Seasons | Trail and never needs to wrap — we render a single
+  // `rounded-full` row at every breakpoint.
+
+  const segBase =
+    'inline-flex h-full items-center gap-1 text-[12px] font-medium transition-colors hover:bg-white/[0.04]';
+  const segStart = 'pl-2.5 pr-1.5 xl:pr-1';
+  const segEnd = 'pl-1.5 pr-2.5 xl:pl-1';
+  const segMid = 'px-2.5';
+  const Divider = () => (
+    <div aria-hidden className="h-3.5 w-px self-center shrink-0" style={{ background: '#86EFAC55' }} />
+  );
+
+  const seasonsBtn = (
+    <button
+      key="seasons"
+      type="button"
+      onClick={() => { setShowSeasons(false); setShowShiftTrail(false); }}
+      aria-pressed
+      className={`${segBase} ${segStart} text-[#FFF5E7]`}
+      title="Hide season overlay"
+    >
+      <span aria-hidden className="inline-block h-2 w-2 rounded-full shrink-0" style={{ background: '#86EFAC', border: '1px solid #86EFAC' }} />
+      <span className="leading-none whitespace-nowrap">Seasons</span>
+    </button>
+  );
+  const trailBtn = (
+    <button
+      key="trail"
+      type="button"
+      onClick={() => setShowShiftTrail(!showShiftTrail)}
+      aria-pressed={showShiftTrail}
+      className={`${segBase} ${segEnd}`}
+      style={{ color: showShiftTrail ? '#FFF5E7' : '#9CA3AF' }}
+      title="Show the decadal shift trail"
+    >
+      <span
+        aria-hidden
+        className="inline-block h-2 w-2 rounded-full shrink-0"
+        style={{ background: showShiftTrail ? '#86EFAC' : 'transparent', border: `1px solid ${showShiftTrail ? '#86EFAC' : '#4B5563'}` }}
+      />
+      <span className="leading-none whitespace-nowrap">Trail</span>
+    </button>
+  );
+  const summerBtn = (
+    <button
+      key="summer"
+      type="button"
+      onClick={() => setShiftSystem('temperate')}
+      aria-pressed={effectiveSystem === 'temperate'}
+      className={`${segBase} ${segMid}`}
+      style={{ color: effectiveSystem === 'temperate' ? '#FFF5E7' : '#9CA3AF' }}
+      title="Track the warm-season (spring/autumn) crossings"
+    >
+      <span
+        aria-hidden
+        className="inline-block h-2 w-2 rounded-full shrink-0"
+        style={{
+          background: effectiveSystem === 'temperate' ? '#FACC15' : 'transparent',
+          border: `1px solid ${effectiveSystem === 'temperate' ? '#FACC15' : '#4B5563'}`,
+        }}
+      />
+      <span className="leading-none whitespace-nowrap">Summer</span>
+    </button>
+  );
+  const wetBtn = (
+    <button
+      key="wet"
+      type="button"
+      onClick={() => setShiftSystem('wet-season')}
+      aria-pressed={effectiveSystem === 'wet-season'}
+      className={`${segBase} ${segMid}`}
+      style={{ color: effectiveSystem === 'wet-season' ? '#FFF5E7' : '#9CA3AF' }}
+      title="Track the wet-season onset & end crossings"
+    >
+      <span
+        aria-hidden
+        className="inline-block h-2 w-2 rounded-full shrink-0"
+        style={{
+          background: effectiveSystem === 'wet-season' ? '#3B82F6' : 'transparent',
+          border: `1px solid ${effectiveSystem === 'wet-season' ? '#3B82F6' : '#4B5563'}`,
+        }}
+      />
+      <span className="leading-none whitespace-nowrap">Wet&nbsp;season</span>
+    </button>
+  );
+
+  return (
+    <div
+      className="inline-flex h-7 flex-row items-stretch rounded-full border overflow-hidden"
+      style={{ borderColor: '#86EFAC8c', background: '#86EFAC1f' }}
+    >
+      {seasonsBtn}
+      <Divider />
+      {trailBtn}
+      {showSystemPicker && (
+        <>
+          <Divider />
+          {summerBtn}
+          {wetBtn}
+        </>
+      )}
+    </div>
   );
 }
 
@@ -143,10 +301,10 @@ const METRIC_ICON: Record<SpaghettiMetric, React.ReactNode> = {
 /** Larger version of the metric icon for the section heading — matches the
  *  size used on the monthly-spaghetti card so the two sections line up. */
 const HEADER_ICON: Record<SpaghettiMetric, React.ReactNode> = {
-  temp: <Thermometer className="h-5 w-5" />,
-  precip: <CloudRain className="h-5 w-5" />,
+  temp:     <Thermometer className="h-5 w-5" />,
+  precip:   <CloudRain className="h-5 w-5" />,
   sunshine: <Sun className="h-5 w-5" />,
-  frost: <Snowflake className="h-5 w-5" />,
+  frost:    <Snowflake className="h-5 w-5" />,
 };
 
 const METRIC_LABEL: Record<SpaghettiMetric, string> = {
@@ -207,13 +365,6 @@ export const METRIC_PALETTE: Record<SpaghettiMetric, MetricPalette> = {
               highWord: 'Frostiest', lowWord: 'Mildest' },
 };
 
-/* CET 1850–1900 monthly means (HadCET). Used only for Paris-ring placement
- * in UK temperature mode. */
-const UK_PREINDUSTRIAL_MONTHLY: number[] = [
-  3.3, 3.5, 5.0, 7.4, 10.3, 13.3, 15.1, 14.8, 12.7, 9.2, 5.5, 4.0,
-];
-const UK_PREINDUSTRIAL_ANNUAL = UK_PREINDUSTRIAL_MONTHLY.reduce((a, b) => a + b, 0) / 12;
-
 /* ────────────────────────────────────────────────────────────────────────────
  * Colour helpers
  * ──────────────────────────────────────────────────────────────────────── */
@@ -268,6 +419,10 @@ const CY = VB / 2;
 const R_OUTER = 240;   // outermost data ring
 const R_LABEL = 272;   // month label radius
 const R_LABEL_BAND_W = 26; // visual width of the month-label "track" ring
+// Tight 2D viewBox — just enough padding for the season-callout pills
+// after tangential offset; keeps the chart filling its container on mobile.
+const HELIX_VIEWBOX_2D = { x: 64, y: 86, width: 672, height: 630 };
+const HELIX_VIEWBOX_3D = { x: 64, y: 24, width: 672, height: 566 };
 
 function monthAngle(m: number): number {
   // m 0..11, Jan at top, clockwise
@@ -354,32 +509,72 @@ function annualAggregate(yearMap: YearMap, agg: 'mean' | 'sum'): Map<number, num
 /* Per-year fractional month at which temperature first rises through the
  * threshold (spring crossing) and first falls back below it (autumn crossing).
  * Returns NaN when the threshold isn't crossed (anomalously cold/warm year).
- * Northern-hemisphere only — fine for UK; if we extend to tropical regions
- * later this needs the wrap-around logic from shift-analysis.ts. */
+ *
+ * Hemisphere-aware:
+ *   - NH: search spring in m=1..6 (Jan→Jul), autumn in m=7..11 (Jul→Dec).
+ *   - SH: warm season straddles year boundary, so search spring in m=7..11
+ *         (Jul→Dec) and autumn in m=1..6 of the FOLLOWING year — we use
+ *         the next year's January values when available.
+ * In SH mode the returned month index runs 6..18 (so plotting can simply
+ * project to angle ((m % 12) / 12 * 2π) without breaking the year loop). */
 function computeYearCrossings(
   yearMap: YearMap,
   threshold: number,
+  isNH: boolean = true,
 ): Map<number, { spring: number; autumn: number }> {
   const out = new Map<number, { spring: number; autumn: number }>();
-  for (const [y, arr] of yearMap.entries()) {
-    if (arr.some((v) => !Number.isFinite(v))) continue;
-    let spring = NaN; let autumn = NaN;
-    for (let m = 1; m <= 6; m++) {
-      if (arr[m - 1] < threshold && arr[m] >= threshold) {
-        const frac = (threshold - arr[m - 1]) / (arr[m] - arr[m - 1]);
-        spring = (m - 1) + frac;
-        break;
+  if (isNH) {
+    for (const [y, arr] of yearMap.entries()) {
+      if (arr.some((v) => !Number.isFinite(v))) continue;
+      let spring = NaN; let autumn = NaN;
+      for (let m = 1; m <= 6; m++) {
+        if (arr[m - 1] < threshold && arr[m] >= threshold) {
+          const frac = (threshold - arr[m - 1]) / (arr[m] - arr[m - 1]);
+          spring = (m - 1) + frac;
+          break;
+        }
+      }
+      for (let m = 7; m <= 11; m++) {
+        if (arr[m - 1] >= threshold && arr[m] < threshold) {
+          const frac = (arr[m - 1] - threshold) / (arr[m - 1] - arr[m]);
+          autumn = (m - 1) + frac;
+          break;
+        }
+      }
+      if (Number.isFinite(spring) && Number.isFinite(autumn)) {
+        out.set(y, { spring, autumn });
       }
     }
-    for (let m = 7; m <= 11; m++) {
-      if (arr[m - 1] >= threshold && arr[m] < threshold) {
-        const frac = (arr[m - 1] - threshold) / (arr[m - 1] - arr[m]);
-        autumn = (m - 1) + frac;
-        break;
+  } else {
+    // SH: warm season is centred on summer (Dec/Jan/Feb).
+    for (const [y, arr] of yearMap.entries()) {
+      if (arr.some((v) => !Number.isFinite(v))) continue;
+      const next = yearMap.get(y + 1);
+      let spring = NaN; let autumn = NaN;
+      // Spring rise: Jul→Dec of year y.
+      for (let m = 7; m <= 11; m++) {
+        if (arr[m - 1] < threshold && arr[m] >= threshold) {
+          const frac = (threshold - arr[m - 1]) / (arr[m] - arr[m - 1]);
+          spring = (m - 1) + frac;
+          break;
+        }
       }
-    }
-    if (Number.isFinite(spring) && Number.isFinite(autumn)) {
-      out.set(y, { spring, autumn });
+      // Autumn fall: continues into Jan→Jul of year y+1.
+      if (next && next.slice(0, 7).every(Number.isFinite)) {
+        // Build a 12-month extension from y's Dec into y+1's months.
+        const ext = [arr[11], ...next.slice(0, 7)];
+        for (let m = 1; m <= 7; m++) {
+          if (ext[m - 1] >= threshold && ext[m] < threshold) {
+            const frac = (ext[m - 1] - threshold) / (ext[m - 1] - ext[m]);
+            // m=1 → crossing in Dec/Jan → 11+frac, m=2 → Jan/Feb → 12+frac, etc.
+            autumn = 11 + (m - 1) + frac;
+            break;
+          }
+        }
+      }
+      if (Number.isFinite(spring) && Number.isFinite(autumn)) {
+        out.set(y, { spring, autumn });
+      }
     }
   }
   return out;
@@ -469,14 +664,15 @@ export default function ClimateSpiralCard({
   share,
   hideShare = false,
   showEnso = false,
+  chartOverlayAccessory,
+  chartInlineAccessory,
+  seasonScheme = DEFAULT_SCHEME,
+  parisReference,
+  tempScaleMode = 'zero-anchored',
 }: Props) {
   const available = METRIC_ORDER.filter((m) => (series[m]?.length ?? 0) > 0);
   const fallback: SpaghettiMetric = available[0] ?? 'temp';
-  const [metric, setMetric] = useState<SpaghettiMetric>(() => {
-    const saved = loadHelixPrefs().metric as SpaghettiMetric | undefined;
-    if (saved && available.includes(saved)) return saved;
-    return fallback;
-  });
+  const [metric, setMetric] = useState<SpaghettiMetric>(fallback);
   const palette = METRIC_PALETTE[metric];
 
   // Scroll-to-anchor when the URL hash matches our section id but the card
@@ -488,19 +684,19 @@ export default function ClimateSpiralCard({
     const el = document.getElementById(share.sectionId);
     if (el) el.scrollIntoView({ block: 'start' });
   }, [share?.sectionId]);
-  const [anomaly, setAnomaly] = useState(() => (loadHelixPrefs().anomaly as boolean) ?? false);
-  const [showSeasons, setShowSeasons] = useState(() => (loadHelixPrefs().showSeasons as boolean) ?? true);
-  const [highlightRecent, setHighlightRecent] = useState(() => (loadHelixPrefs().highlightRecent as boolean) ?? true);
-  const [showParis, setShowParis] = useState(() => (loadHelixPrefs().showParis as boolean) ?? true);
-  const [showShiftTrail, setShowShiftTrail] = useState(() => (loadHelixPrefs().showShiftTrail as boolean) ?? true);
-  const [showRecordHigh, setShowRecordHigh] = useState(() => (loadHelixPrefs().showRecordHigh as boolean) ?? true);
-  const [showRecordLow, setShowRecordLow] = useState(() => (loadHelixPrefs().showRecordLow as boolean) ?? true);
-  const [showSpaghetti, setShowSpaghetti] = useState(() => (loadHelixPrefs().showSpaghetti as boolean) ?? true);
+  const [anomaly, setAnomaly] = useState(false);
+  const [showSeasons, setShowSeasons] = useState(true);
+  const [highlightRecent, setHighlightRecent] = useState(true);
+  const [showParis, setShowParis] = useState(true);
+  const [showShiftTrail, setShowShiftTrail] = useState(true);
+  const [showRecordHigh, setShowRecordHigh] = useState(true);
+  const [showRecordLow, setShowRecordLow] = useState(true);
+  const [showSpaghetti, setShowSpaghetti] = useState(true);
   /** User-adjustable "boost" on the year-spaghetti opacity. At 0 the
    *  lines render at their original baked-in alpha (subtle, lets the
    *  reference rings dominate); at 1.0 they ramp up to fully opaque,
    *  useful when sharing a still or pointing at a specific year. */
-  const [lineAlpha, setLineAlpha] = useState(() => (loadHelixPrefs().lineAlpha as number) ?? 2);
+  const [lineAlpha, setLineAlpha] = useState(2);
   /** Convert the user-facing 0..1 boost into stroke-alpha multipliers
    *  for the background and recent-decade highlight passes. */
   const bgAlpha = Math.min(1, 0.32 + 0.68 * lineAlpha);
@@ -511,10 +707,12 @@ export default function ClimateSpiralCard({
   const hiWidth = 1.4 * Math.max(1, Math.min(2.5, lineAlpha * 0.7 + 0.3));
   /** 3D mode — re-projects each year's loop onto a tilted plane and
    *  stacks them vertically so height encodes time. */
-  const [view3D, setView3D] = useState(() => (loadHelixPrefs().view3D as boolean) ?? false);
+  const [view3D, setView3D] = useState(false);
   const [yearFrom, setYearFrom] = useState<number | null>(null);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const ensoCardRef = useRef<HTMLDivElement | null>(null);
+  const [showEnsoCorrelation, setShowEnsoCorrelation] = useState(true);
 
   const points = series[metric] ?? [];
   const { yearMap, prov, minYear, maxYear } = useMemo(
@@ -556,12 +754,13 @@ export default function ClimateSpiralCard({
   const [baselineFrom, baselineTo] = baselineRange;
   const [historicFrom, historicTo] = historicRange;
   const [recentFrom, recentTo] = recentRange;
-  const [showHistoric, setShowHistoric] = useState(() => (loadHelixPrefs().showHistoric as boolean) ?? false);
+  const [showHistoric, setShowHistoric] = useState(false);
   /** Show/hide the dashed baseline mean ring. Hidden automatically in
    *  anomaly mode (would be a zero-radius circle). */
-  const [showBaselineRing, setShowBaselineRing] = useState(() => (loadHelixPrefs().showBaselineRing as boolean) ?? true);
+  const [showBaselineRing, setShowBaselineRing] = useState(true);
   /** Show/hide the dashed modern mean ring. */
-  const [showRecentRing, setShowRecentRing] = useState(() => (loadHelixPrefs().showRecentRing as boolean) ?? true);
+  const [showRecentRing, setShowRecentRing] = useState(true);
+  const chartViewBox = view3D ? HELIX_VIEWBOX_3D : HELIX_VIEWBOX_2D;
 
   /** Live ONI history → map of year → peak |ONI| anomaly (signed).
    *  Populated lazily once from `/data/climate/enso.json` so the HUD
@@ -590,7 +789,34 @@ export default function ClimateSpiralCard({
   const [playYear, setPlayYear] = useState<number | null>(null);
   const [playMonth, setPlayMonth] = useState<number | null>(null); // current-year finale phase
   const [playing, setPlaying] = useState(false);
-  const [playSpeed, setPlaySpeed] = useState(() => (loadHelixPrefs().playSpeed as number) ?? 8); // years per second
+  const [playSpeed, setPlaySpeed] = useState(8); // years per second
+
+  // Restore saved preferences once after mount to avoid SSR hydration mismatch.
+  // (localStorage is unavailable during server render; initializing from it causes
+  // the server HTML and client VDOM to diverge.)
+  const _availableRef = React.useRef(available);
+  React.useEffect(() => {
+    const prefs = loadHelixPrefs();
+    const avail = _availableRef.current;
+    if (prefs.metric) {
+      const saved = prefs.metric as SpaghettiMetric;
+      if (avail.includes(saved)) setMetric(saved);
+    }
+    if (prefs.anomaly !== undefined) setAnomaly(prefs.anomaly as boolean);
+    if (prefs.showSeasons !== undefined) setShowSeasons(prefs.showSeasons as boolean);
+    if (prefs.highlightRecent !== undefined) setHighlightRecent(prefs.highlightRecent as boolean);
+    if (prefs.showParis !== undefined) setShowParis(prefs.showParis as boolean);
+    if (prefs.showShiftTrail !== undefined) setShowShiftTrail(prefs.showShiftTrail as boolean);
+    if (prefs.showRecordHigh !== undefined) setShowRecordHigh(prefs.showRecordHigh as boolean);
+    if (prefs.showRecordLow !== undefined) setShowRecordLow(prefs.showRecordLow as boolean);
+    if (prefs.showSpaghetti !== undefined) setShowSpaghetti(prefs.showSpaghetti as boolean);
+    if (prefs.lineAlpha !== undefined) setLineAlpha(prefs.lineAlpha as number);
+    if (prefs.view3D !== undefined) setView3D(prefs.view3D as boolean);
+    if (prefs.showHistoric !== undefined) setShowHistoric(prefs.showHistoric as boolean);
+    if (prefs.showBaselineRing !== undefined) setShowBaselineRing(prefs.showBaselineRing as boolean);
+    if (prefs.showRecentRing !== undefined) setShowRecentRing(prefs.showRecentRing as boolean);
+    if (prefs.playSpeed !== undefined) setPlaySpeed(prefs.playSpeed as number);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persist display preferences whenever they change.
   // Must come after playSpeed is declared to avoid a TDZ reference error.
@@ -606,6 +832,22 @@ export default function ClimateSpiralCard({
   }, [metric, anomaly, showSeasons, highlightRecent, showParis, showShiftTrail,
       showRecordHigh, showRecordLow, showSpaghetti, lineAlpha, view3D,
       showHistoric, showBaselineRing, showRecentRing, playSpeed]);
+
+  React.useEffect(() => {
+    if (!showEnso) return;
+    const el = ensoCardRef.current;
+    if (!el) return;
+
+    const update = () => {
+      setShowEnsoCorrelation(el.clientWidth >= 245);
+    };
+
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => update());
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [showEnso]);
   const playCutoff = playYear ?? Number.POSITIVE_INFINITY;
 
   const meanBaseline = useMemo(
@@ -674,7 +916,12 @@ export default function ClimateSpiralCard({
     return {
       rMin: lo === Infinity ? 0 : lo,
       rMax: hi === -Infinity ? 1 : hi,
-      currentYear: calYear,
+      // Clamp the playback / display "current" year to the last year of
+      // available data. For metrics whose series ends before the real
+      // calendar year (e.g. India rain ends 2024 while we're in 2026)
+      // this stops playback over-running into empty years and makes the
+      // "<year> so far" pill display the actual most-recent data year.
+      currentYear: maxYear > 0 ? Math.min(calYear, maxYear) : calYear,
       recordYear: bestY,
       oppositeYear: worstY,
     };
@@ -741,16 +988,31 @@ export default function ClimateSpiralCard({
     setPlaying(false);
   }, [metric, effectiveFromYear]);
 
-  /* For temp+absolute, anchor scale at sensible bounds so 0°C reads naturally. */
+  /* Temperature scale modes.
+   * Regional series keep the older, more generously anchored ranges; global
+   * warm-only series can opt into `auto` so both absolute and anomaly views
+   * use the available radius more efficiently. */
+  const tempAbsolutePad = Math.max(0.15, (rMax - rMin) * 0.08);
+  const tempAnomalyPad = Math.max(0.12, (rMax - rMin) * 0.1);
   const scaleMin = anomaly
-    ? Math.min(rMin - 0.5, -2)
+    ? metric === 'temp' && tempScaleMode === 'auto'
+      ? Math.min(rMin - tempAnomalyPad, 0)
+      : Math.min(rMin - 0.5, -2)
     : metric === 'temp'
-      ? Math.min(rMin - 0.5, -1)
+      ? tempScaleMode === 'auto'
+        ? rMin - tempAbsolutePad
+        : Math.min(rMin - 0.5, -1)
       : 0;
   const scaleMax = anomaly
-    ? Math.max(rMax + 0.5, 2.5)
+    ? metric === 'temp' && tempScaleMode === 'auto'
+      ? Math.max(rMax + tempAnomalyPad, 0)
+      : Math.max(rMax + 0.5, 2.5)
+    : metric === 'temp'
+      ? tempScaleMode === 'auto'
+        ? rMax + tempAbsolutePad
+        : rMax * 1.05
     : metric === 'frost'  ? Math.max(rMax * 1.05, 12)
-    : metric === 'precip' ? Math.max(rMax * 1.05, 105)
+    : metric === 'precip' ? rMax * 1.05
     : rMax * 1.05;
 
   function valueToR(v: number, monthIdx: number): number {
@@ -810,29 +1072,52 @@ export default function ClimateSpiralCard({
     const range = scaleMax - scaleMin;
     if (range <= 0) return ticks;
     let step: number;
-    if (metric === 'temp') step = anomaly ? 1 : 5;
+    if (metric === 'temp') {
+      if (tempScaleMode === 'auto') {
+        step = range <= 2.5 ? 0.5 : range <= 6 ? 1 : range <= 12 ? 2 : 5;
+      } else {
+        step = anomaly ? 1 : 5;
+      }
+    }
     else if (metric === 'precip') step = 50;
     else if (metric === 'sunshine') step = 50;
     else step = 5; // frost days
     const first = Math.ceil(scaleMin / step) * step;
     for (let v = first; v <= scaleMax; v += step) {
-      ticks.push(v);
+      ticks.push(Number(v.toFixed(4)));
     }
     return ticks;
-  }, [scaleMin, scaleMax, metric, anomaly]);
+  }, [scaleMin, scaleMax, metric, anomaly, tempScaleMode]);
+
+  function formatGridTick(v: number): string {
+    if (metric !== 'temp') return `${v}`;
+    const rounded = Math.abs(v) < 0.0001 ? 0 : v;
+    const text = Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1);
+    return `${anomaly && rounded > 0 ? '+' : ''}${text}°`;
+  }
 
   function tickToR(v: number): number {
     const t = (v - scaleMin) / (scaleMax - scaleMin);
     return Math.max(0, Math.min(R_OUTER, t * R_OUTER));
   }
 
-  /* Paris rings (UK temp only). */
+  /* Paris rings (temp only, requires a pre-industrial reference).
+   * Global helix surfaces can pass a shared 1850–1900 baseline here.
+   * Without `parisReference` we render no rings (and below we hide the
+   * toggle entirely). */
+  const parisRef = parisReference?.monthly;
+  const parisAnnualRef = useMemo(() => {
+    if (!parisRef || parisRef.length !== 12) return null;
+    const sum = parisRef.reduce((a, b) => a + b, 0);
+    if (!Number.isFinite(sum)) return null;
+    return sum / 12;
+  }, [parisRef]);
   const parisRings = useMemo(() => {
-    if (metric !== 'temp' || !showParis) return [];
+    if (metric !== 'temp' || !showParis || parisAnnualRef == null) return [];
     if (anomaly) {
-      // Offset between 1961-90 mean and 1850-1900 mean (UK CET annual):
+      // Offset between baseline mean and pre-industrial mean:
       const baselineAnnual = meanBaseline.reduce((a, b) => a + b, 0) / 12;
-      const offset = baselineAnnual - UK_PREINDUSTRIAL_ANNUAL; // ~0.7°C for UK
+      const offset = baselineAnnual - parisAnnualRef; // e.g. ~0.7°C for UK
       return [
         { label: 'Paris +1.5°C', anomaly: 1.5 - offset },
         { label: 'Paris +2°C', anomaly: 2.0 - offset },
@@ -840,18 +1125,51 @@ export default function ClimateSpiralCard({
     }
     // Absolute mode: rings at constant annual temps relative to pre-industrial.
     return [
-      { label: 'Paris +1.5°C', absolute: UK_PREINDUSTRIAL_ANNUAL + 1.5 },
-      { label: 'Paris +2°C', absolute: UK_PREINDUSTRIAL_ANNUAL + 2.0 },
+      { label: 'Paris +1.5°C', absolute: parisAnnualRef + 1.5 },
+      { label: 'Paris +2°C', absolute: parisAnnualRef + 2.0 },
     ];
-  }, [metric, showParis, anomaly, meanBaseline]);
+  }, [metric, showParis, anomaly, meanBaseline, parisAnnualRef]);
 
-  /* Decadal 10°C growing-season crossings.
+  /* Decadal growing-season crossings.
    * Always computed from the *temperature* series so the season-tint
    * crescents work on every metric tab (the climatic shift itself is
    * temperature-driven; rainfall / sunshine / frost charts still
-   * benefit from seeing the same shifted-season backdrop). */
-  const SHIFT_THRESHOLD = 10;
+   * benefit from seeing the same shifted-season backdrop).
+   *
+   * Threshold: the region's own baseline annual mean is used for ALL
+   * region types, matching the Shifting Seasons section's detection
+   * logic exactly (single source of truth). This handles Arctic/subarctic
+   * regions like Greenland whose temps never cross 10 °C, as well as
+   * tropical regions like India. Gated on amplitude ≥ 5 °C so flat
+   * regions (polar, deep-tropical) still skip this entirely. */
+  const TEMP_AMPLITUDE_MIN_C = 5;
+  const tempShiftThreshold = useMemo<number | null>(() => {
+    // Derive a per-region threshold from the unclamped baseline
+    // temperature climatology for ALL region types.
+    const tempPoints = series.temp;
+    if (!tempPoints?.length) return null;
+    const tm = buildYearMap(tempPoints, provisionalAfterMonth).yearMap;
+    const months = new Array<number>(12).fill(0);
+    const counts = new Array<number>(12).fill(0);
+    for (const [y, arr] of tm) {
+      if (y < baselineFrom || y > baselineTo) continue;
+      for (let m = 0; m < 12; m++) {
+        const v = arr[m];
+        if (!Number.isFinite(v)) continue;
+        months[m] += v;
+        counts[m] += 1;
+      }
+    }
+    for (let m = 0; m < 12; m++) if (counts[m] < 5) return null;
+    const monthly = months.map((s, m) => s / counts[m]);
+    const amp = Math.max(...monthly) - Math.min(...monthly);
+    if (amp < TEMP_AMPLITUDE_MIN_C) return null;
+    const annualMean = monthly.reduce((a, b) => a + b, 0) / 12;
+    return annualMean;
+  }, [series, provisionalAfterMonth, seasonScheme.kind, baselineFrom, baselineTo]);
+
   const crossingDecades = useMemo(() => {
+    if (tempShiftThreshold === null) return [];
     // Shift wedges are derived from temperature only and are independent
     // of whether the user is viewing anomalies — the seasonal cycle is
     // the same physical phenomenon either way, so don't gate on `anomaly`.
@@ -865,11 +1183,93 @@ export default function ClimateSpiralCard({
       if (y > playCutoff) continue;
       clamped.set(y, arr);
     }
-    const crossings = computeYearCrossings(clamped, SHIFT_THRESHOLD);
+    const crossings = computeYearCrossings(clamped, tempShiftThreshold, seasonScheme.isNH);
     return decadalCrossings(crossings);
-  }, [series, provisionalAfterMonth, playCutoff]);
+  }, [series, provisionalAfterMonth, playCutoff, tempShiftThreshold, seasonScheme.isNH]);
+
+  /* Monthly rainfall climatology used by the wet/dry season wedges in
+   * tropical and Mediterranean schemes. Returns 12 mean monthly values
+   * (mm) or null when we don't have a rainfall series. */
+  const precipClimatology = useMemo(() => {
+    const pts = series.precip;
+    if (!pts?.length) return null;
+    const sums = new Array<number>(12).fill(0);
+    const counts = new Array<number>(12).fill(0);
+    for (const p of pts) {
+      if (!Number.isFinite(p.value)) continue;
+      const m = p.month - 1;
+      if (m < 0 || m > 11) continue;
+      sums[m] += p.value;
+      counts[m] += 1;
+    }
+    for (let m = 0; m < 12; m++) if (counts[m] < 5) return null;
+    return sums.map((s, m) => s / counts[m]);
+  }, [series.precip]);
   /** Approx days per month for shift-day computation. */
   const DAYS_PER_MONTH = 30.44;
+
+  /* Wet-season decadal crossings. For wet/dry & mediterranean schemes we
+   * compute, per year, the fractional month index where cumulative rainfall
+   * first passes 25 % of the annual total (wet-season onset) and 75 % (wet-
+   * season end). We then group into decades the same way as the temperate
+   * 10 °C crossings so the shift-trail renderer can be reused.
+   *
+   * Returns [] outside wet/dry schemes or when we don't have a usable
+   * rainfall series. The result is a parallel of `crossingDecades` with
+   * `spring` re-used as "onset" and `autumn` as "end" so downstream
+   * geometry code can stay identical. */
+  const wetSeasonCrossingDecades = useMemo(() => {
+    if (!seasonScheme.isWetDry) return [];
+    const pts = series.precip;
+    if (!pts?.length) return [];
+    const yearMap = buildYearMap(pts, provisionalAfterMonth).yearMap;
+    const out = new Map<number, { spring: number; autumn: number }>();
+    for (const [y, arr] of yearMap.entries()) {
+      if (y > playCutoff) continue;
+      if (arr.some((v) => !Number.isFinite(v))) continue;
+      const total = arr.reduce((a: number, b: number) => a + b, 0);
+      if (!(total > 0)) continue;
+      const t25 = total * 0.25;
+      const t75 = total * 0.75;
+      let onset = NaN;
+      let end = NaN;
+      let running = 0;
+      for (let m = 0; m < 12; m++) {
+        const next = running + arr[m];
+        if (!Number.isFinite(onset) && next >= t25) {
+          const frac = (t25 - running) / Math.max(arr[m], 0.001);
+          onset = m + frac;
+        }
+        if (!Number.isFinite(end) && next >= t75) {
+          const frac = (t75 - running) / Math.max(arr[m], 0.001);
+          end = m + frac;
+        }
+        running = next;
+      }
+      if (Number.isFinite(onset) && Number.isFinite(end)) {
+        out.set(y, { spring: onset, autumn: end });
+      }
+    }
+    return decadalCrossings(out);
+  }, [seasonScheme.isWetDry, series.precip, provisionalAfterMonth, playCutoff]);
+
+  /* Which shift system to overlay on the Helix. `temperate` shows the
+   * 10 °C spring/autumn crossings; `wet-season` shows the 25 %/75 %
+   * cumulative-rainfall crossings; `auto` (default) picks whichever
+   * matches the scheme — wet-season for wet/dry & mediterranean, else
+   * temperate. The UI exposes a tab picker whenever both are available. */
+  const [shiftSystem, setShiftSystem] = useState<'auto' | 'temperate' | 'wet-season'>('auto');
+  const hasTempShift = crossingDecades.length >= 2;
+  const hasWetShift = wetSeasonCrossingDecades.length >= 2;
+  const activeShiftSystem: 'temperate' | 'wet-season' | null = (() => {
+    if (shiftSystem === 'temperate') return hasTempShift ? 'temperate' : null;
+    if (shiftSystem === 'wet-season') return hasWetShift ? 'wet-season' : null;
+    // auto
+    if (seasonScheme.isWetDry && hasWetShift) return 'wet-season';
+    if (hasTempShift) return 'temperate';
+    if (hasWetShift) return 'wet-season';
+    return null;
+  })();
 
   /* ───────────── Sparklines + records (right panel) ───────────── */
   const annuals = useMemo(() => {
@@ -1003,16 +1403,30 @@ export default function ClimateSpiralCard({
           <div className="xl:flex xl:items-stretch xl:gap-4">
           {/* Chart column */}
           <div className="xl:flex-1 xl:min-w-0">
-          {/* Series legend */}
+          {/* Series legend.
+               Order: full year range → 1961–1990 baseline → low-extreme year
+               → recent-decade mean → high-extreme year → current year. The
+               baseline chip uses the same dashed underline (and same colour
+               as the low-extreme year) in both anomaly and absolute modes so
+               the legend mirrors the dashed reference rings on the chart. */}
           <div className="max-w-[920px] mx-auto mb-3 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-gray-400 rounded-md border border-gray-800/70 bg-gray-900/40 px-3 py-1.5 w-fit">
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block h-[2px] w-5" style={{ background: `linear-gradient(90deg,#4B5563,${palette.high})` }} />
               {minYear}→{maxYear}
             </span>
-            {!anomaly && (
+            {(() => {
+              const baselineLegendColor = metric === 'precip' ? '#A78BFA' : metric === 'frost' ? '#C4B5FD' : metric === 'sunshine' ? '#92400E' : palette.low;
+              return (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: baselineLegendColor }} />
+                  {baselineFrom}–{baselineTo} baseline{anomaly ? ' (Δ=0)' : ''}
+                </span>
+              );
+            })()}
+            {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-5 border-t-2 border-dashed" style={{ borderColor: metric === 'temp' ? '#22D3EE' : metric === 'precip' ? '#A78BFA' : (metric === 'frost') ? '#C4B5FD' : '#92400E', borderTopWidth: '3px' }} />
-                {baselineFrom}–{baselineTo} mean
+                <span className="inline-block h-[2px] w-5" style={{ background: metric === 'precip' ? '#A78BFA' : (metric === 'frost') ? '#C4B5FD' : metric === 'sunshine' ? '#92400E' : palette.low }} />
+                {palette.lowWord} ({oppositeYear})
               </span>
             )}
             <span className="inline-flex items-center gap-1.5">
@@ -1031,18 +1445,12 @@ export default function ClimateSpiralCard({
                 {palette.highWord} ({recordYear})
               </span>
             )}
-            {showRecordLow && oppositeYear > 0 && oppositeYear !== recordYear && (
-              <span className="inline-flex items-center gap-1.5">
-                <span className="inline-block h-[2px] w-5" style={{ background: metric === 'precip' ? '#A78BFA' : (metric === 'frost') ? '#C4B5FD' : metric === 'sunshine' ? '#92400E' : palette.low }} />
-                {palette.lowWord} ({oppositeYear})
-              </span>
-            )}
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block h-[2px] w-5" style={{ background: palette.current }} />
-              {currentYear} so far
+              {currentYear === new Date().getFullYear() ? `${currentYear} so far` : currentYear}
             </span>
           </div>
-          <div className={`relative w-full ${view3D ? 'max-w-[920px]' : 'max-w-[820px]'} mx-auto sm:py-4`}>
+          <div className={`relative w-full mx-auto ${view3D ? 'max-w-[920px] sm:pt-2 sm:pb-1' : 'max-w-[820px] sm:py-4'}`}>
             {/* Playback stats strip — when the playhead is active, replaces
                  the small year chip with a full HUD: prominent year,
                  anomaly/temp/rain/sun/frost mini-cards, ENSO state and a
@@ -1105,7 +1513,7 @@ export default function ClimateSpiralCard({
               );
             })()}
             <svg
-              viewBox={view3D ? `68 10 664 620` : `68 100 664 600`}
+              viewBox={`${chartViewBox.x} ${chartViewBox.y} ${chartViewBox.width} ${chartViewBox.height}`}
               className="w-full h-auto select-none cursor-crosshair"
               onMouseMove={(e) => {
                 const svg = e.currentTarget;
@@ -1114,9 +1522,8 @@ export default function ClimateSpiralCard({
                 // Map mouse to the ACTUAL viewBox coordinates (not full 800-unit space)
                 const mx = (e.clientX - rect.left) / rect.width;
                 const my = (e.clientY - rect.top) / rect.height;
-                const [vbX, vbY, vbW, vbH] = view3D ? [68, 10, 664, 620] : [68, 100, 664, 600];
-                const sx = vbX + mx * vbW;
-                const sy = vbY + my * vbH;
+                const sx = chartViewBox.x + mx * chartViewBox.width;
+                const sy = chartViewBox.y + my * chartViewBox.height;
                 // 2D radial gate. In 3D we can't bail early using this because
                 // the rings are vertically squashed and z-stacked — the cursor
                 // can be outside R_OUTER radially yet still on a tilted ring.
@@ -1230,6 +1637,14 @@ export default function ClimateSpiralCard({
                   <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
                   <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                 </filter>
+                <filter id="paris-glow-15" x="-8%" y="-8%" width="116%" height="116%" colorInterpolationFilters="sRGB">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="coloredBlur" />
+                  <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+                <filter id="paris-glow-2" x="-8%" y="-8%" width="116%" height="116%" colorInterpolationFilters="sRGB">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="coloredBlur" />
+                  <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
               </defs>
               {/* Season-wedge background.
                    When the seasonal-shift trail is on (temp + absolute mode
@@ -1331,14 +1746,62 @@ export default function ClimateSpiralCard({
                   return monthAngle(mid);
                 };
 
-                // Build the four season anchors. When we have decade
-                // crossings we use the *modern* spring/autumn boundaries
-                // so the gradient's green/brown peaks track the actual
-                // growing-season shift. Otherwise we fall back to fixed
-                // meteorological quarters.
+                // Build season anchors according to the region's
+                // climate scheme. Four-season palette for temperate NH/SH;
+                // two-wedge wet/dry palette for tropical & Mediterranean
+                // climates; aseasonal regions skip the wedge ring entirely
+                // (we return null below).
                 let anchors: Anchor[];
                 let labels: { key: string; mid: number; color: string; text: string }[];
-                if (crossingDecades.length >= 2) {
+
+                if (seasonScheme.isAseasonal) {
+                  return null;
+                }
+
+                /* Which palette to paint? Source of truth is the
+                   user's active shift system (set via the Seasons pill's
+                   inner segmented control). For wet-dry regions where
+                   only the wet-season system exists this falls back to
+                   the wet/dry palette; for temperate regions it falls
+                   back to the 4-season palette. The crucial behaviour
+                   is that a wet-dry region like India *can* opt into
+                   the 4-season palette when "Summer" is selected,
+                   because its temperature climatology still has a
+                   meaningful warm/cool swing. */
+                const tintSystem: 'temperate' | 'wet-season' =
+                  activeShiftSystem ?? (seasonScheme.isWetDry ? 'wet-season' : 'temperate');
+
+                if (tintSystem === 'wet-season') {
+                  // 2-wedge wet/dry. Wet peak = month with max climatology
+                  // precip; dry peak = month with min. If no precip series,
+                  // fall back to canonical NH (wet=Jul, dry=Jan) or SH (wet=Jan, dry=Jul).
+                  let wetMid = seasonScheme.isNH ? 6 : 0;
+                  let dryMid = seasonScheme.isNH ? 0 : 6;
+                  if (precipClimatology) {
+                    const Pmax = Math.max(...precipClimatology);
+                    const Pmin = Math.min(...precipClimatology);
+                    wetMid = precipClimatology.indexOf(Pmax) + 0.5;
+                    dryMid = precipClimatology.indexOf(Pmin) + 0.5;
+                  }
+                  // Build smooth 2-wedge ring by sampling 4 anchors:
+                  // dry peak, transition, wet peak, transition.
+                  anchors = [
+                    { ang: monthAngle(dryMid - 0.75), color: '#B45309' }, // dry plateau start
+                    { ang: monthAngle(dryMid),         color: '#B45309' }, // dry peak (amber/brown)
+                    { ang: monthAngle(dryMid + 0.75), color: '#B45309' }, // dry plateau end
+                    { ang: monthAngle(wetMid - 0.75), color: '#3B82F6' }, // wet plateau start
+                    { ang: monthAngle(wetMid),         color: '#3B82F6' }, // wet peak (deep blue)
+                    { ang: monthAngle(wetMid + 0.75), color: '#3B82F6' }, // wet plateau end
+                  ];
+                  labels = [
+                    { key: 'wet', mid: monthAngle(wetMid), color: '#3B82F6', text: 'Wet' },
+                    { key: 'dry', mid: monthAngle(dryMid), color: '#B45309', text: 'Dry' },
+                  ];
+                } else if (crossingDecades.length >= 2) {
+                  // Temperate scheme with enough data to derive the
+                  // *modern* growing-season boundaries from the temperature
+                  // record. Anchors are positioned in fractional-month
+                  // coordinates relative to the spring crossing.
                   const last = crossingDecades[crossingDecades.length - 1];
                   const newSpring = last.spring;
                   const newAutumn = last.autumn;
@@ -1346,38 +1809,53 @@ export default function ClimateSpiralCard({
                   // Winter peak = month opposite the middle of summer.
                   const summerMid = newSpring + growSpan * 0.5;
                   const winterMidMonth = (summerMid + 6) % 12;
+                  // Labels use the local hemisphere names — data positions
+                  // are already computed for the correct calendar months, so
+                  // no swapping is needed (cold peak is in June/July for SH
+                  // just as it is in Dec/Jan for NH).
+                  const winterLabel = 'Winter';
+                  const summerLabel = 'Summer';
+                  const springLabel = 'Spring';
+                  const autumnLabel = 'Autumn';
                   anchors = [
-                    { ang: monthAngle(winterMidMonth - 0.75), color: '#7DD3FC' }, // winter plateau start
-                    { ang: monthAngle(winterMidMonth),         color: '#7DD3FC' }, // winter peak
-                    { ang: monthAngle(winterMidMonth + 0.75), color: '#7DD3FC' }, // winter plateau end
-                    { ang: monthAngle(newSpring + growSpan * 0.16), color: '#86EFAC' }, // spring green
-                    { ang: monthAngle(summerMid - 0.75), color: '#FACC15' }, // summer plateau start
-                    { ang: monthAngle(summerMid),         color: '#FACC15' }, // summer peak
-                    { ang: monthAngle(summerMid + 0.75), color: '#FACC15' }, // summer plateau end
-                    { ang: monthAngle(newSpring + growSpan * 0.84), color: '#B45309' }, // autumn russet
+                    { ang: monthAngle(winterMidMonth - 0.75), color: '#7DD3FC' },
+                    { ang: monthAngle(winterMidMonth),         color: '#7DD3FC' },
+                    { ang: monthAngle(winterMidMonth + 0.75), color: '#7DD3FC' },
+                    { ang: monthAngle(newSpring + growSpan * 0.16), color: '#86EFAC' },
+                    { ang: monthAngle(summerMid - 0.75), color: '#FACC15' },
+                    { ang: monthAngle(summerMid),         color: '#FACC15' },
+                    { ang: monthAngle(summerMid + 0.75), color: '#FACC15' },
+                    { ang: monthAngle(newSpring + growSpan * 0.84), color: '#B45309' },
                   ];
                   labels = [
-                    { key: 'winter', mid: monthAngle(winterMidMonth), color: '#7DD3FC', text: 'Winter' },
-                    { key: 'spring', mid: labelAngle(newSpring, newSpring + growSpan * 0.33), color: '#86EFAC', text: 'Spring' },
-                    { key: 'summer', mid: labelAngle(newSpring + growSpan * 0.33, newSpring + growSpan * 0.66), color: '#FACC15', text: 'Summer' },
-                    { key: 'autumn', mid: labelAngle(newSpring + growSpan * 0.66, newAutumn), color: '#FDBA74', text: 'Autumn' },
+                    { key: 'winter', mid: monthAngle(winterMidMonth), color: '#7DD3FC', text: winterLabel },
+                    { key: 'spring', mid: labelAngle(newSpring, newSpring + growSpan * 0.33), color: '#86EFAC', text: springLabel },
+                    { key: 'summer', mid: labelAngle(newSpring + growSpan * 0.33, newSpring + growSpan * 0.66), color: '#FACC15', text: summerLabel },
+                    { key: 'autumn', mid: labelAngle(newSpring + growSpan * 0.66, newAutumn), color: '#FDBA74', text: autumnLabel },
                   ];
                 } else {
+                  // Fixed meteorological quarters. NH: winter=DJF, spring=MAM,
+                  // summer=JJA, autumn=SON. SH flips winter↔summer and spring↔autumn,
+                  // so what's in MAM is "autumn" and what's in SON is "spring".
+                  const winterMid = seasonScheme.isNH ? 0.5 : 6.5;
+                  const springMid = seasonScheme.isNH ? 3.5 : 9.5;
+                  const summerMid = seasonScheme.isNH ? 6.5 : 0.5;
+                  const autumnMid = seasonScheme.isNH ? 9.5 : 3.5;
                   anchors = [
-                    { ang: monthAngle(11.75), color: '#7DD3FC' }, // winter plateau start
-                    { ang: monthAngle(0.5),   color: '#7DD3FC' }, // winter peak
-                    { ang: monthAngle(1.25),  color: '#7DD3FC' }, // winter plateau end
-                    { ang: monthAngle(3.5),   color: '#86EFAC' }, // spring peak
-                    { ang: monthAngle(5.75),  color: '#FACC15' }, // summer plateau start
-                    { ang: monthAngle(6.5),   color: '#FACC15' }, // summer peak
-                    { ang: monthAngle(7.25),  color: '#FACC15' }, // summer plateau end
-                    { ang: monthAngle(9.5),   color: '#B45309' }, // autumn peak
+                    { ang: monthAngle(winterMid - 0.75), color: '#7DD3FC' },
+                    { ang: monthAngle(winterMid),        color: '#7DD3FC' },
+                    { ang: monthAngle(winterMid + 0.75), color: '#7DD3FC' },
+                    { ang: monthAngle(springMid),        color: '#86EFAC' },
+                    { ang: monthAngle(summerMid - 0.75), color: '#FACC15' },
+                    { ang: monthAngle(summerMid),        color: '#FACC15' },
+                    { ang: monthAngle(summerMid + 0.75), color: '#FACC15' },
+                    { ang: monthAngle(autumnMid),        color: '#B45309' },
                   ];
                   labels = [
-                    { key: 'winter', mid: monthAngle(0.5), color: '#7DD3FC', text: 'Winter' },
-                    { key: 'spring', mid: monthAngle(3.5), color: '#86EFAC', text: 'Spring' },
-                    { key: 'summer', mid: monthAngle(6.5), color: '#FACC15', text: 'Summer' },
-                    { key: 'autumn', mid: monthAngle(9.5), color: '#FDBA74', text: 'Autumn' },
+                    { key: 'winter', mid: monthAngle(winterMid), color: '#7DD3FC', text: 'Winter' },
+                    { key: 'spring', mid: monthAngle(springMid), color: '#86EFAC', text: 'Spring' },
+                    { key: 'summer', mid: monthAngle(summerMid), color: '#FACC15', text: 'Summer' },
+                    { key: 'autumn', mid: monthAngle(autumnMid), color: '#FDBA74', text: 'Autumn' },
                   ];
                 }
 
@@ -1447,9 +1925,7 @@ export default function ClimateSpiralCard({
                   <g transform={tilt}>
                     {gridTicks.map((t, i) => {
                       const r = tickToR(t);
-                      const isZero = anomaly && t === 0;
-                      const labelEvery = anomaly ? 2 : 1;
-                      const showLabel = isZero || i % labelEvery === 0;
+                      const isZero = anomaly && Math.abs(t) < 0.0001;
                       return (
                         <g key={`ring-${t}`}>
                           <circle
@@ -1459,18 +1935,6 @@ export default function ClimateSpiralCard({
                             strokeWidth={isZero ? 1 : 0.6}
                             strokeDasharray={isZero ? '0' : '3 5'}
                           />
-                          {showLabel && (
-                            <text
-                              x={CX + r + 4} y={CY - 3}
-                              fontSize={9} fill="rgba(255,255,255,0.45)"
-                              fontFamily="ui-monospace, monospace"
-                              paintOrder="stroke fill"
-                              stroke="rgba(11,14,22,0.85)"
-                              strokeWidth={2.5}
-                            >
-                              {anomaly && t > 0 ? '+' : ''}{t}{metric === 'temp' ? '°' : ''}
-                            </text>
-                          )}
                         </g>
                       );
                     })}
@@ -1492,26 +1956,45 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
-              {/* Paris rings — labels offset to upper-left diagonal to avoid the
-                   Jan label, right-side tick labels, and other Paris ring. Flat
-                   circles, hidden in 3D mode where they'd float at the base. */}
-              {!view3D && parisRings.map((ring, i) => {
+              {/* Paris rings — keep both labels in the Nov→Dec sector so they
+                   clear the Nov month marker and sit away from the Jan/top
+                   clutter. In 3D mode the rings sit on the same tilted base
+                   plane as the grid instead of disappearing entirely. */}
+              {parisRings.map((ring, i) => {
                 const r = anomaly
                   ? tickToR((ring as { anomaly: number }).anomaly)
                   : tickToR((ring as { absolute: number }).absolute);
                 if (!Number.isFinite(r) || r <= 0 || r > R_OUTER) return null;
                 const color = i === 0 ? '#FBBF24' : '#EF4444';
-                // i=0 → upper-left at 10 o'clock, i=1 → 8 o'clock (further down/left)
-                const labelAng = i === 0 ? -Math.PI * 0.75 : -Math.PI * 0.82;
+                const labelAng = i === 0 ? monthAngle(10.6) : monthAngle(10.84);
                 const [lx, ly] = polar(r, labelAng);
+                const projectedLy = view3D ? CY + (ly - CY) * 0.55 : ly;
                 return (
                   <g key={`paris-${i}`}>
-                    <circle cx={CX} cy={CY} r={r} fill="none" stroke={color} strokeWidth={1.1} strokeDasharray="2 4" opacity={0.75} />
+                    {view3D ? (
+                      <ellipse
+                        cx={CX}
+                        cy={CY}
+                        rx={r}
+                        ry={r * 0.55}
+                        fill="none"
+                        stroke={color}
+                        strokeWidth={1.5}
+                        strokeDasharray="3 4"
+                        opacity={0.95}
+                        filter={`url(#paris-glow-${i === 0 ? '15' : '2'})`}
+                      />
+                    ) : (
+                      <circle cx={CX} cy={CY} r={r} fill="none" stroke={color} strokeWidth={1.5} strokeDasharray="3 4" opacity={0.95} filter={`url(#paris-glow-${i === 0 ? '15' : '2'})`} />
+                    )}
                     <text
-                      x={lx - 6} y={ly - 4}
+                      x={lx - 6} y={projectedLy - 4}
                       fontSize={9} fill={color}
                       textAnchor="end"
                       fontFamily="ui-monospace, monospace"
+                      paintOrder="stroke fill"
+                      stroke="rgba(11,14,22,0.92)"
+                      strokeWidth={2.5}
                     >
                       {ring.label}
                     </text>
@@ -1559,24 +2042,21 @@ export default function ClimateSpiralCard({
                   );
                 })}
 
-              {/* Baseline mean ring — hidden in anomaly mode, where it is
-                   redundant with the 0° tick circle drawn earlier. Drawing it
-                   anyway would imply “the baseline shape changes” which is
-                   misleading (it can’t — it’s being subtracted from itself). */}
-              {!anomaly && showBaselineRing && meanBaseline.every(Number.isFinite) && (() => {
+              {/* Baseline mean ring. In absolute mode it traces the 1961–1990
+                   monthly means; in anomaly mode the same values are passed
+                   to valueToR which subtracts the baseline back out, so the
+                   ring resolves to the Δ=0 circle in both views. */}
+              {showBaselineRing && meanBaseline.every(Number.isFinite) && (() => {
                 const pts: [number, number][] = meanBaseline.map((v, m) => polar(valueToR(v, m), monthAngle(m)));
-                // Baseline ring sits at z corresponding to the midpoint of
-                // its window, so in 3D it floats at the right height.
                 const baselineYear = (baselineFrom + baselineTo) / 2;
-                const baselineStroke = metric === 'temp' ? '#22D3EE' : metric === 'precip' ? '#A78BFA' : metric === 'frost' ? '#C4B5FD' : '#92400E';
+                const baselineStroke = metric === 'precip' ? '#A78BFA' : metric === 'frost' ? '#C4B5FD' : metric === 'sunshine' ? '#92400E' : palette.low;
                 return (
                   <path
                     d={smoothClosedPath(project3D(pts, baselineYear))}
                     fill="none"
                     stroke={baselineStroke}
-                    strokeWidth={3.0}
-                    strokeDasharray="4 8"
-                    strokeLinecap="round"
+                    strokeWidth={2.1}
+                    strokeDasharray="5 2"
                     opacity={0.95}
                   />
                 );
@@ -1593,8 +2073,8 @@ export default function ClimateSpiralCard({
                     d={smoothClosedPath(project3D(pts, histYear))}
                     fill="none"
                     stroke="#E6B765"
-                    strokeWidth={1.8}
-                    strokeDasharray="10 4"
+                    strokeWidth={2.1}
+                    strokeDasharray="5 2"
                   />
                 );
               })()}
@@ -1772,6 +2252,35 @@ export default function ClimateSpiralCard({
                 );
               })()}
 
+              {/* Grid tick labels — rendered above the spaghetti so the values
+                   remain readable in dense global views. In 3D we keep the
+                   text upright while anchoring it to the tilted floor plane. */}
+              {gridTicks.map((t, i) => {
+                const r = tickToR(t);
+                const isZero = anomaly && Math.abs(t) < 0.0001;
+                const showLabel = metric === 'temp' && tempScaleMode === 'auto'
+                  ? true
+                  : isZero || i % (anomaly ? 2 : 1) === 0 || i === gridTicks.length - 1;
+                if (!showLabel) return null;
+                const labelY = view3D ? CY - 2 : CY - 3;
+                return (
+                  <text
+                    key={`ring-label-${t}`}
+                    x={CX + r + 6}
+                    y={labelY}
+                    fontSize={9}
+                    fontWeight={500}
+                    fill="rgba(255,255,255,0.45)"
+                    fontFamily="ui-monospace, monospace"
+                    paintOrder="stroke fill"
+                    stroke="rgba(11,14,22,0.85)"
+                    strokeWidth={2.5}
+                  >
+                    {formatGridTick(t)}
+                  </text>
+                );
+              })}
+
               {/* Hovered line: full ring highlight + marker dot. Sits above
                    the spaghetti but below the month labels. Works for both
                    individual year lines and the mean reference rings. */}
@@ -1875,11 +2384,27 @@ export default function ClimateSpiralCard({
                    whenever Season tints are on (so the user always sees
                    *where* spring/autumn have moved to), independently of
                    the per-decade trail toggle. */}
-              {showSeasons && crossingDecades.length >= 2 && (() => {
+              {showSeasons && activeShiftSystem && (() => {
                 const cosTilt = 0.55;
                 const tilt3D = view3D ? `matrix(1 0 0 ${cosTilt} 0 ${(CY * (1 - cosTilt)).toFixed(2)})` : undefined;
-                const first = crossingDecades[0];
-                const last = crossingDecades[crossingDecades.length - 1];
+                const decades = activeShiftSystem === 'wet-season' ? wetSeasonCrossingDecades : crossingDecades;
+                if (decades.length < 2) return null;
+                const first = decades[0];
+                const last = decades[decades.length - 1];
+                const isWet = activeShiftSystem === 'wet-season';
+                // For climates whose wet season straddles the calendar-year
+                // boundary (Mediterranean, SH wet-dry), the 25%-cumulative
+                // threshold falls in Jan/Feb (= wet-season END) and the 75%
+                // threshold falls in Oct/Nov (= wet-season START). Swap both
+                // the labels and the shiftMonths sign so they read correctly.
+                const isWrappingWetSeason = isWet && (
+                  seasonScheme.kind === 'mediterranean' ||
+                  seasonScheme.kind === 'wet-dry-SH'
+                );
+                // Threshold below which we hide the dots/arc/leaders and
+                // show only a single text pill noting the shift is
+                // negligible. ~3 days is "a couple of days".
+                const TINY_SHIFT_DAYS = 3;
                 // Arc sits on the outer edge of the colour ring for all metrics.
                 const r10 = R_OUTER;
                 if (r10 <= 0) return null;
@@ -1889,6 +2414,11 @@ export default function ClimateSpiralCard({
                 // chart radially without bending.
                 const rDotOut = R_OUTER + 6;
                 const rYear = R_LABEL + R_LABEL_BAND_W / 2 - 2;
+                // rHeader sits just outside the month-label band; the actual
+                // separation from the year-decade pills is achieved by sliding
+                // the header pill *tangentially* around the rim (see
+                // totalOffset below) rather than radially outwards, so the
+                // chart can stay tightly framed on mobile.
                 const rHeader = R_LABEL + R_LABEL_BAND_W / 2 + 12;
 
                 /** One consolidated call-out group. Spring uses the
@@ -1904,22 +2434,63 @@ export default function ClimateSpiralCard({
                   newAng: number,
                   shiftMonths: number,
                 ) => {
-                  const newCol = key === 'spring' ? '#86EFAC' : '#FDBA74';
-                  const oldCol = key === 'spring' ? '#5DB585' : '#C47A35';
+                  // Colour vocabulary: temperate spring/autumn keep the
+                  // existing green/amber pair; wet-season onset/end use a
+                  // blue pair so the viewer can tell the two systems apart
+                  // at a glance.
+                  const newCol = isWet
+                    ? (key === 'spring' ? '#60A5FA' : '#3B82F6')
+                    : (key === 'spring' ? '#86EFAC' : '#FDBA74');
+                  const oldCol = isWet
+                    ? (key === 'spring' ? '#1E40AF' : '#1D4ED8')
+                    : (key === 'spring' ? '#5DB585' : '#C47A35');
                   const days = Math.round(Math.abs(shiftMonths) * DAYS_PER_MONTH);
-                  const direction = header === 'Spr Start'
+                  // Direction wording: for an *earlier* spring/onset the
+                  // sign is negative; for a *later* autumn/end the sign is
+                  // positive. Wet-season borrows the same semantics.
+                  const direction = header.includes('Start')
                     ? (shiftMonths > 0 ? 'earlier' : 'later')
                     : (shiftMonths > 0 ? 'later' : 'earlier');
-                  const signedDays = `${direction === 'earlier' ? '-' : '+'}${days} days`;
+                  const signedDays = days === 0
+                    ? '~0 days'
+                    : `${direction === 'earlier' ? '\u2212' : '+'}${days} days`;
                   // Compute angular delta first — reused for arc and header placement
                   let delta = newAng - oldAng;
                   while (delta > Math.PI) delta -= 2 * Math.PI;
                   while (delta < -Math.PI) delta += 2 * Math.PI;
+                  // Negligible-shift mode: skip the geometry overlays and
+                  // show only a small text pill anchored at the *new*
+                  // position so the user still sees where the marker is.
+                  if (days < TINY_SHIFT_DAYS) {
+                    const [hx, hy] = polar(rHeader, newAng);
+                    // For sub-threshold shifts just show the numerical delta
+                    // (e.g. "±1 day") — the longer "no significant shift"
+                    // phrasing overflowed the pill and pushed it off-canvas.
+                    const note = signedDays;
+                    const boxW = Math.max(header.length, note.length) * 6 + 16;
+                    return (
+                      <g key={key}>
+                        <line x1={CX} y1={CY} x2={polar(R_OUTER, newAng)[0]} y2={polar(R_OUTER, newAng)[1]} stroke={newCol} strokeWidth={1.2} strokeDasharray="3 4" opacity={0.6} />
+                        <circle cx={polar(R_OUTER, newAng)[0]} cy={polar(R_OUTER, newAng)[1]} r={4} fill={newCol} stroke="#0b0e16" strokeWidth={1} />
+                        <rect x={hx - boxW / 2} y={hy - 16} width={boxW} height={34} rx={6} fill="rgba(10,14,22,0.9)" stroke={newCol} strokeWidth={1} opacity={0.95} />
+                        <text x={hx} y={hy - 3} fontSize={11} fontWeight={700} fill={newCol} textAnchor="middle" fontFamily="ui-monospace, monospace">
+                          {header}
+                        </text>
+                        <text x={hx} y={hy + 11} fontSize={9} fill="rgba(220,225,235,0.85)" textAnchor="middle" fontFamily="ui-monospace, monospace">
+                          {note}
+                        </text>
+                      </g>
+                    );
+                  }
                   // Fix angular offset: measure from newAng to the *inner edge* of the header pill,
                   // not its centre. Compute boxW here so we can convert boxW/2 → angle at rHeader.
                   const boxW = Math.max(header.length, signedDays.length) * 6 + 16;
                   const edgeAngOffset = (boxW / 2) / rHeader; // radians from centre to inner edge
-                  const totalOffset = 0.05 + edgeAngOffset;   // 0.05 rad gap + half-pill
+                  // Small base offset (radians) so the header pill slides
+                  // just clear of the year-decade pill at cardinal positions;
+                  // edgeAngOffset adds half a pill-width so longer labels
+                  // still don't overlap.
+                  const totalOffset = 0.11 + edgeAngOffset;
                   const headerAng = newAng + (delta < 0 ? -totalOffset : totalOffset);
                   const [hx, hy] = polar(rHeader, headerAng);
                   const [ox0, oy0] = polar(r10, oldAng);
@@ -1972,43 +2543,77 @@ export default function ClimateSpiralCard({
 
                 return (
                   <g transform={tilt3D} pointerEvents="none">
-                    {renderGroup('spring', 'Spr Start', monthAngle(first.spring), monthAngle(last.spring), first.spring - last.spring)}
-                    {renderGroup('autumn', 'Aut End',   monthAngle(first.autumn), monthAngle(last.autumn), last.autumn - first.autumn)}
+                    {isWrappingWetSeason ? (
+                      // Autumn (75 %) mark = wet-season onset; spring (25 %) = wet-season end.
+                      // shiftMonths signs are negated vs the normal case so that
+                      // "moved earlier" still prints "−N days".
+                      <>
+                        {renderGroup('autumn', 'Wet Start', monthAngle(first.autumn), monthAngle(last.autumn), first.autumn - last.autumn)}
+                        {renderGroup('spring', 'Wet End',   monthAngle(first.spring), monthAngle(last.spring), last.spring - first.spring)}
+                      </>
+                    ) : (
+                      <>
+                        {renderGroup('spring', isWet ? 'Wet Start' : 'Spr Start', monthAngle(first.spring), monthAngle(last.spring), first.spring - last.spring)}
+                        {renderGroup('autumn', isWet ? 'Wet End'   : 'Aut End',   monthAngle(first.autumn), monthAngle(last.autumn), last.autumn - first.autumn)}
+                      </>
+                    )}
                   </g>
                 );
               })()}
 
               {/* Decadal seasonal-shift trail — rendered last so dots sit
-                   on top of the callout arcs rather than under them. */}
-              {showShiftTrail && crossingDecades.length >= 2 && (() => {
+                   on top of the callout arcs rather than under them. The
+                   trail follows whichever shift system is currently
+                   selected (temperate 10 °C crossings or wet-season 25 %/
+                   75 % cumulative-rainfall crossings). */}
+              {showShiftTrail && activeShiftSystem && (() => {
+                const decadesTrail = activeShiftSystem === 'wet-season' ? wetSeasonCrossingDecades : crossingDecades;
+                if (decadesTrail.length < 2) return null;
+                const isWetTrail = activeShiftSystem === 'wet-season';
                 const cosTilt = 0.55;
                 const tilt3D = view3D ? `matrix(1 0 0 ${cosTilt} 0 ${(CY * (1 - cosTilt)).toFixed(2)})` : undefined;
                 const r10 = R_OUTER;
-                const SPRING_DARK = '#166534';
-                const SPRING_LIGHT = '#86EFAC';
-                const AUTUMN_DARK = '#7C2D12';
-                const AUTUMN_LIGHT = '#FDBA74';
+                const SPRING_DARK = isWetTrail ? '#1E3A8A' : '#166534';
+                const SPRING_LIGHT = isWetTrail ? '#60A5FA' : '#86EFAC';
+                const AUTUMN_DARK = isWetTrail ? '#1E40AF' : '#7C2D12';
+                const AUTUMN_LIGHT = isWetTrail ? '#3B82F6' : '#FDBA74';
                 const lerpPair = (a: string, b: string, t: number) => {
                   const ah = a.replace('#', ''); const bh = b.replace('#', '');
                   const ar = parseInt(ah.slice(0,2),16), ag = parseInt(ah.slice(2,4),16), ab = parseInt(ah.slice(4,6),16);
                   const br = parseInt(bh.slice(0,2),16), bg = parseInt(bh.slice(2,4),16), bb = parseInt(bh.slice(4,6),16);
                   return `rgb(${Math.round(ar+(br-ar)*t)},${Math.round(ag+(bg-ag)*t)},${Math.round(ab+(bb-ab)*t)})`;
                 };
-                const n = crossingDecades.length;
-                const springPts: [number, number, number, number, number][] = crossingDecades.map((d, i) => {
+                const n = decadesTrail.length;
+                const springPts: [number, number, number, number, number][] = decadesTrail.map((d, i) => {
                   const [x, y] = polar(r10, monthAngle(d.spring));
                   return [x, y, d.decade, n === 1 ? 1 : i / (n - 1), d.spring];
                 });
-                const autumnPts: [number, number, number, number, number][] = crossingDecades.map((d, i) => {
+                const autumnPts: [number, number, number, number, number][] = decadesTrail.map((d, i) => {
                   const [x, y] = polar(r10, monthAngle(d.autumn));
                   return [x, y, d.decade, n === 1 ? 1 : i / (n - 1), d.autumn];
                 });
-                const springPath = springPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join(' ');
-                const autumnPath = autumnPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join(' ');
+                // Use SVG arc segments instead of straight lines so the trail
+                // always follows the outer ring — straight lines create a visible
+                // chord cutting through the helix when consecutive decade dots are
+                // far apart (e.g. Mediterranean wet-season shifts).
+                const makeArcTrail = (pts: [number, number, number, number, number][]) =>
+                  pts.map((p, i) => {
+                    if (i === 0) return `M ${p[0].toFixed(2)} ${p[1].toFixed(2)}`;
+                    const prevM = pts[i - 1][4] as number;
+                    const curM  = p[4] as number;
+                    let ang = monthAngle(curM) - monthAngle(prevM);
+                    while (ang >  Math.PI) ang -= 2 * Math.PI;
+                    while (ang < -Math.PI) ang += 2 * Math.PI;
+                    const large = Math.abs(ang) > Math.PI ? 1 : 0;
+                    const sweep = ang > 0 ? 1 : 0;
+                    return `A ${r10} ${r10} 0 ${large} ${sweep} ${p[0].toFixed(2)} ${p[1].toFixed(2)}`;
+                  }).join(' ');
+                const springPath = makeArcTrail(springPts);
+                const autumnPath = makeArcTrail(autumnPts);
                 return (
                   <g transform={tilt3D} pointerEvents="none">
                     {/* Ghost 10°C ring in temp-absolute mode */}
-                    {metric === 'temp' && !anomaly && (() => { const r10real = valueToR(SHIFT_THRESHOLD, 3); return Number.isFinite(r10real) && r10real > 0 ? <circle cx={CX} cy={CY} r={r10real} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth={0.7} strokeDasharray="2 6" /> : null; })()}
+                    {metric === 'temp' && !anomaly && tempShiftThreshold != null && (() => { const r10real = valueToR(tempShiftThreshold, 3); return Number.isFinite(r10real) && r10real > 0 ? <circle cx={CX} cy={CY} r={r10real} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth={0.7} strokeDasharray="2 6" /> : null; })()}
                     <path d={springPath} fill="none" stroke={SPRING_LIGHT} strokeWidth={1.6} strokeLinecap="round" opacity={0.7} />
                     <path d={autumnPath} fill="none" stroke={AUTUMN_LIGHT} strokeWidth={1.6} strokeLinecap="round" opacity={0.7} />
                     {springPts.map(([x, y, dec, t, month]) => (
@@ -2042,9 +2647,8 @@ export default function ClimateSpiralCard({
                  regardless of responsive resize. */}
             {hover && (() => {
               // Reverse-map VB coords back to CSS % using the active viewBox
-              const [vbX, vbY, vbW, vbH] = view3D ? [68, 10, 664, 620] : [68, 100, 664, 600];
-              const pctX = (hover.sx - vbX) / vbW * 100;
-              const pctY = (hover.sy - vbY) / vbH * 100;
+              const pctX = (hover.sx - chartViewBox.x) / chartViewBox.width * 100;
+              const pctY = (hover.sy - chartViewBox.y) / chartViewBox.height * 100;
               const onLeft = pctX > 55;
               const anomalyVal = anomaly && Number.isFinite(meanBaseline[hover.monthIdx])
                 ? hover.value - meanBaseline[hover.monthIdx]
@@ -2131,8 +2735,16 @@ export default function ClimateSpiralCard({
               const mi = Math.min(11, Math.max(0, Math.floor(seasonHover.month)));
               const day = Math.round((seasonHover.month % 1) * 30) + 1;
               const dateStr = `~${MONTH_SHORT[mi]} ${day}`;
-              const color = seasonHover.kind === 'spring' ? '#86EFAC' : '#FDBA74';
-              const label = seasonHover.kind === 'spring' ? 'Spring crossing' : 'Autumn crossing';
+              const isWetActive = activeShiftSystem === 'wet-season';
+              const isWrappingTip = isWetActive && (seasonScheme.kind === 'mediterranean' || seasonScheme.kind === 'wet-dry-SH');
+              const color = isWetActive
+                ? (seasonHover.kind === 'spring' ? '#60A5FA' : '#3B82F6')
+                : (seasonHover.kind === 'spring' ? '#86EFAC' : '#FDBA74');
+              const label = isWetActive
+                ? (isWrappingTip
+                    ? (seasonHover.kind === 'spring' ? 'Wet end crossing' : 'Wet start crossing')
+                    : (seasonHover.kind === 'spring' ? 'Wet start crossing' : 'Wet end crossing'))
+                : (seasonHover.kind === 'spring' ? 'Spring crossing' : 'Autumn crossing');
               // seasonHover.sx/sy are already CSS percentages
               const pctX = seasonHover.sx;
               const pctY = seasonHover.sy;
@@ -2153,7 +2765,133 @@ export default function ClimateSpiralCard({
                 </div>
               );
             })()}
+            {chartOverlayAccessory && (
+              <div className="hidden sm:flex absolute bottom-2 right-2 z-20 items-center">
+                {chartOverlayAccessory}
+              </div>
+            )}
+            {/* Summer / Wet-season system picker.
+                Two render slots:
+                  · `sm:` and above — floating, pinned to the bottom-right of
+                    the chart so it sits visually next to the spiral itself.
+                  · mobile — rendered below the chart in normal flow (further
+                    down the JSX), because the floating position overlaps the
+                    spiral's edge labels on narrow widths.
+                Only shown when:
+                  · the region is seasonal,
+                  · the Seasons overlay is currently on, AND
+                  · both temperate (spring/autumn) and wet-season shifts are
+                    detectable — so the user has a real choice to make. */}
+            {!seasonScheme.isAseasonal && showSeasons && hasTempShift && hasWetShift && (() => {
+              const effectiveSystem: 'temperate' | 'wet-season' =
+                shiftSystem === 'auto'
+                  ? (seasonScheme.isWetDry ? 'wet-season' : 'temperate')
+                  : shiftSystem;
+              const segBase = 'inline-flex h-6 items-center gap-1 px-2 text-[11px] font-medium transition-colors hover:bg-white/[0.04]';
+              return (
+                <div
+                  className="hidden sm:inline-flex absolute bottom-2 right-2 z-20 items-center rounded-full border overflow-hidden backdrop-blur-sm"
+                  style={{ borderColor: '#86EFAC8c', background: 'rgba(11,14,22,0.72)' }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShiftSystem('temperate')}
+                    aria-pressed={effectiveSystem === 'temperate'}
+                    className={segBase}
+                    style={{ color: effectiveSystem === 'temperate' ? '#FFF5E7' : '#9CA3AF' }}
+                    title="Track the warm-season (spring/autumn) crossings"
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-2 w-2 rounded-full shrink-0"
+                      style={{
+                        background: effectiveSystem === 'temperate' ? '#FACC15' : 'transparent',
+                        border: `1px solid ${effectiveSystem === 'temperate' ? '#FACC15' : '#4B5563'}`,
+                      }}
+                    />
+                    <span className="leading-none whitespace-nowrap">Summer</span>
+                  </button>
+                  <div aria-hidden className="h-3.5 w-px self-center shrink-0" style={{ background: '#86EFAC55' }} />
+                  <button
+                    type="button"
+                    onClick={() => setShiftSystem('wet-season')}
+                    aria-pressed={effectiveSystem === 'wet-season'}
+                    className={segBase}
+                    style={{ color: effectiveSystem === 'wet-season' ? '#FFF5E7' : '#9CA3AF' }}
+                    title="Track the wet-season onset & end crossings"
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-2 w-2 rounded-full shrink-0"
+                      style={{
+                        background: effectiveSystem === 'wet-season' ? '#3B82F6' : 'transparent',
+                        border: `1px solid ${effectiveSystem === 'wet-season' ? '#3B82F6' : '#4B5563'}`,
+                      }}
+                    />
+                    <span className="leading-none whitespace-nowrap">Wet&nbsp;season</span>
+                  </button>
+                </div>
+              );
+            })()}
           </div>
+          {/* Mobile-only inline copy of the Summer / Wet-season picker.
+              On narrow widths the floating overlay overlaps the spiral's
+              outer month/decade labels, so we drop it down here in normal
+              flow instead. Hidden on sm+ where the overlay version above
+              has enough room. */}
+          {!seasonScheme.isAseasonal && showSeasons && hasTempShift && hasWetShift && (() => {
+            const effectiveSystem: 'temperate' | 'wet-season' =
+              shiftSystem === 'auto'
+                ? (seasonScheme.isWetDry ? 'wet-season' : 'temperate')
+                : shiftSystem;
+            const segBase = 'inline-flex h-6 items-center gap-1 px-2 text-[11px] font-medium transition-colors hover:bg-white/[0.04]';
+            return (
+              <div className="sm:hidden flex justify-end mt-2 translate-x-0">
+                <div
+                  className="inline-flex items-center rounded-full border overflow-hidden"
+                  style={{ borderColor: '#86EFAC8c', background: '#86EFAC1f' }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShiftSystem('temperate')}
+                    aria-pressed={effectiveSystem === 'temperate'}
+                    className={segBase}
+                    style={{ color: effectiveSystem === 'temperate' ? '#FFF5E7' : '#9CA3AF' }}
+                    title="Track the warm-season (spring/autumn) crossings"
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-2 w-2 rounded-full shrink-0"
+                      style={{
+                        background: effectiveSystem === 'temperate' ? '#FACC15' : 'transparent',
+                        border: `1px solid ${effectiveSystem === 'temperate' ? '#FACC15' : '#4B5563'}`,
+                      }}
+                    />
+                    <span className="leading-none whitespace-nowrap">Summer</span>
+                  </button>
+                  <div aria-hidden className="h-3.5 w-px self-center shrink-0" style={{ background: '#86EFAC55' }} />
+                  <button
+                    type="button"
+                    onClick={() => setShiftSystem('wet-season')}
+                    aria-pressed={effectiveSystem === 'wet-season'}
+                    className={segBase}
+                    style={{ color: effectiveSystem === 'wet-season' ? '#FFF5E7' : '#9CA3AF' }}
+                    title="Track the wet-season onset & end crossings"
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-2 w-2 rounded-full shrink-0"
+                      style={{
+                        background: effectiveSystem === 'wet-season' ? '#3B82F6' : 'transparent',
+                        border: `1px solid ${effectiveSystem === 'wet-season' ? '#3B82F6' : '#4B5563'}`,
+                      }}
+                    />
+                    <span className="leading-none whitespace-nowrap">Wet&nbsp;season</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
           </div>{/* end chart column */}
 
           {/* Sidebar: HUD + control panels */}
@@ -2194,6 +2932,11 @@ export default function ClimateSpiralCard({
               return valid.reduce((a, b) => a + b, 0);
             };
             const activeVal = metricValueFn(metric);
+          {chartInlineAccessory && (
+            <div className="sm:hidden flex justify-end mt-2 translate-x-0">
+              {chartInlineAccessory}
+            </div>
+          )}
             // Compute annual baseline average for any metric from annuals data
             const metricBaselineAvg = (m: SpaghettiMetric): number | null => {
               const arr = annuals[m];
@@ -2205,6 +2948,39 @@ export default function ClimateSpiralCard({
             const metricAnom = (m: SpaghettiMetric, v: number): number | null => {
               const base = metricBaselineAvg(m);
               return base !== null ? v - base : null;
+            };
+            /** Pearson r between this region's annual anomaly (vs baseline)
+             *  and that year's peak |ONI| signed anomaly. Returns null when
+             *  fewer than 8 overlapping years are available or variance is
+             *  zero. Sign convention:
+             *    temp:   r > 0 → warmer in El Niño (red), r < 0 → cooler (blue)
+             *    precip: r > 0 → wetter in El Niño (blue), r < 0 → drier (amber)
+             */
+            const metricCorrToOni = (m: SpaghettiMetric): number | null => {
+              const arr = annuals[m];
+              if (!arr || oniByYear.size === 0) return null;
+              const base = metricBaselineAvg(m);
+              if (base === null) return null;
+              const xs: number[] = [];
+              const ys: number[] = [];
+              for (const d of arr) {
+                const oni = oniByYear.get(d.year);
+                if (!Number.isFinite(oni as number)) continue;
+                xs.push(oni as number);
+                ys.push(d.value - base);
+              }
+              const n = xs.length;
+              if (n < 8) return null;
+              let sx = 0, sy = 0;
+              for (let i = 0; i < n; i++) { sx += xs[i]; sy += ys[i]; }
+              const mx = sx / n, my = sy / n;
+              let num = 0, dx2 = 0, dy2 = 0;
+              for (let i = 0; i < n; i++) {
+                const dx = xs[i] - mx, dy = ys[i] - my;
+                num += dx * dy; dx2 += dx * dx; dy2 += dy * dy;
+              }
+              const denom = Math.sqrt(dx2 * dy2);
+              return denom === 0 ? null : num / denom;
             };
             const allOthers: { m: SpaghettiMetric; icon: React.ReactNode }[] = [
               { m: 'temp' as const, icon: <Thermometer className="h-3 w-3" /> },
@@ -2284,8 +3060,33 @@ export default function ClimateSpiralCard({
                     );
                   })}
                   {/* ENSO — only shown for regions with a clear ENSO teleconnection */}
-                  {showEnso && (
-                  <div className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-center gap-2 h-[72px] xl:w-full flex-1 basis-0 min-w-0 xl:flex-none ${ensoCls}`}>
+                  {showEnso && (() => {
+                    // Per-metric correlation chips so the user can see how
+                    // tightly this region's annual anomaly tracks peak ONI.
+                    // Sign convention chosen so colour matches the rest of
+                    // the HUD palette (warm/wet = warm hue, cool/dry = cool hue):
+                    //   temp   : r > 0 → warmer in El Niño → rose
+                    //   precip : r > 0 → wetter in El Niño → sky (sign flipped)
+                    const corrChips = available
+                      .map((m) => {
+                        const r = metricCorrToOni(m);
+                        if (r === null) return null;
+                        // For precip we flip the sign so positive r still
+                        // means "responds with El Niño" but the colour code
+                        // tracks wetter (sky) vs drier (amber).
+                        const signed = m === 'precip' ? -r : r;
+                        const mag = Math.abs(r);
+                        let color = 'rgba(203,213,225,0.65)'; // weak/none
+                        if (mag >= 0.3) {
+                          if (m === 'temp') color = signed >= 0 ? '#fb7185' : '#38bdf8';
+                          else color = signed >= 0 ? '#38bdf8' : '#fbbf24';
+                        }
+                        const strength = mag >= 0.5 ? 'strong' : mag >= 0.3 ? 'moderate' : mag >= 0.15 ? 'weak' : 'minimal';
+                        return { m, r, color, strength };
+                      })
+                      .filter((c): c is { m: SpaghettiMetric; r: number; color: string; strength: string } => c !== null);
+                    return (
+                  <div ref={ensoCardRef} className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-center gap-2 h-[72px] xl:w-full flex-1 basis-0 min-w-0 xl:flex-none ${ensoCls}`}>
                     <div className="flex flex-col leading-tight w-[58px] shrink-0">
                       <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider whitespace-nowrap text-gray-400">
                         <span style={{ color: ensoIconColor }}><Waves className="h-3 w-3" /></span>
@@ -2298,21 +3099,40 @@ export default function ClimateSpiralCard({
                         ONI 3-mo mean
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                       {oniAnnual.length > 0 && <HudSparkline data={oniAnnual} current={displayYear} color="#cbd5e1" mode="bars" />}
+                      {showEnsoCorrelation && corrChips.length > 0 && (
+                        <div
+                          className="flex items-center justify-center gap-2 text-[9px] tabular-nums leading-none whitespace-nowrap"
+                          title={`Pearson correlation between this region's annual ${corrChips.map((c) => METRIC_LABEL[c.m].toLowerCase()).join(' & ')} anomaly and peak ONI (${corrChips[0].strength} link${corrChips.length > 1 ? '…' : ''}).`}
+                        >
+                          {corrChips.map((c) => (
+                            <span key={c.m} style={{ color: c.color }}>
+                              {METRIC_LABEL[c.m][0]} {c.r >= 0 ? '+' : ''}{c.r.toFixed(2)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
-                  )}
+                  );
+                  })()}
                 </div>
               </div>
             );
           })()}
           {/* Sidebar panels: 2-col on sm–lg, 1-col in xl sidebar */}
           <div className="mt-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
-          {/* Playbar panel */}
-          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Playback</span>
+          {/* Playbar panel.
+           *
+           * Under the chart we still allow wrapping. In the xl sidebar,
+           * the title moves above the transport row to match the Mode box,
+           * while the controls themselves stay on one compact line. */}
+          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 xl:px-2.5 py-2">
+            <span className="hidden xl:block mb-1 text-[10px] uppercase tracking-wider text-gray-500">Playback</span>
+            <div className="flex flex-wrap xl:flex-nowrap items-center content-start gap-2 xl:gap-1.5 min-w-0">
+            <div className="flex min-w-0 flex-nowrap items-center gap-1.5 sm:gap-2 xl:gap-1">
+            <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0 inline xl:hidden">Playback</span>
             <button
               type="button"
               onClick={() => {
@@ -2327,7 +3147,7 @@ export default function ClimateSpiralCard({
                   setPlayMonth(null);
                 }
               }}
-              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2 sm:px-1.5 xl:px-2 shrink-0`}
               title="Step one year (or month, in the finale) back"
               aria-label="Step back"
             >
@@ -2343,7 +3163,7 @@ export default function ClimateSpiralCard({
                 }
                 setPlaying(true);
               }}
-              className={`${TOGGLE_BASE} px-3 sm:px-4 font-semibold shrink-0 ${playing ? '' : ''}`}
+              className={`${TOGGLE_BASE} px-3 sm:px-2 xl:px-2.5 font-semibold shrink-0 ${playing ? '' : ''}`}
               style={playing
                 ? { borderColor: '#D0A65E', background: '#D0A65E22', color: '#FFF5E7' }
                 : { borderColor: '#D0A65E', background: '#D0A65E', color: '#0b0e16' }}
@@ -2354,7 +3174,7 @@ export default function ClimateSpiralCard({
               ) : (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7z"/></svg>
               )}
-              <span className="hidden sm:inline">{playing ? 'Pause' : 'Play'}</span>
+              <span className="hidden">{playing ? 'Pause' : 'Play'}</span>
             </button>
             <button
               type="button"
@@ -2370,7 +3190,7 @@ export default function ClimateSpiralCard({
                   else { setPlayYear(cur + 1); setPlayMonth(null); }
                 }
               }}
-              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2 sm:px-1.5 xl:px-2 shrink-0`}
               title="Step one year (or month, in the finale) forward"
               aria-label="Step forward"
             >
@@ -2379,15 +3199,16 @@ export default function ClimateSpiralCard({
             <button
               type="button"
               onClick={() => { setPlaying(false); setPlayYear(null); setPlayMonth(null); }}
-              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2.5 sm:px-3 shrink-0`}
+              className={`${TOGGLE_BASE} ${TOGGLE_INACTIVE} px-2 sm:px-1.5 xl:px-2 shrink-0`}
               title="Stop playback and show the full chart"
               disabled={playYear === null && !playing}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
-              <span className="hidden sm:inline">Reset</span>
+              <span className="hidden">Reset</span>
             </button>
-            <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
-              <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-gray-500">Speed</span>
+            </div>{/* end transport row */}
+            <div className="ml-auto flex min-w-0 items-center gap-2 xl:gap-1.5 shrink-0 h-7">
+              <span className="hidden text-[10px] uppercase tracking-wider text-gray-500">Speed</span>
               <input
                 type="range"
                 min={2}
@@ -2395,75 +3216,103 @@ export default function ClimateSpiralCard({
                 step={1}
                 value={playSpeed}
                 onChange={(e) => setPlaySpeed(Number(e.target.value))}
-                className="accent-[#D0A65E] w-12 sm:w-16 min-w-0"
+                className="accent-[#D0A65E] w-16 xl:w-12 min-w-0"
                 aria-label="Playback speed (years per second)"
               />
               <span className="font-mono text-[10px] sm:text-[11px] text-[#FFF5E7] min-w-[2.5ch] sm:min-w-[3ch] shrink-0">{playSpeed}×</span>
             </div>{/* end speed div */}
-            </div>{/* end playbar flex */}
+            </div>{/* end playbar row */}
           </div>{/* end Playbar panel */}
 
           {/* Mode panel */}
-          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 xl:px-2.5 py-2">
+            <div className={`xl:hidden flex flex-wrap items-center gap-2 ${seasonScheme.isAseasonal && metric === 'temp' && parisAnnualRef != null ? 'sm:flex-nowrap' : ''}`}>
               <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Mode</span>
-              <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
-                Anomaly <span className="text-[10px] text-gray-400">vs {baselineFrom}–{baselineTo}</span>
-              </ChipToggle>
-              <ChipToggle active={view3D} onChange={setView3D} color="#A78BFA">
-                3D
-              </ChipToggle>
-              {/* Seasons + Trail — segmented pill group. When Seasons is on,
-                  Trail appears as a nested segment sharing the same bordered
-                  container (Linear/Vercel "split button" pattern), which
-                  communicates the sub-option relationship through physical
-                  containment rather than a separate connector. */}
-              {showSeasons ? (
-                <div
-                  className="inline-flex h-7 items-center rounded-full border overflow-hidden"
-                  style={{ borderColor: '#86EFAC8c', background: '#86EFAC1f' }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => { setShowSeasons(false); setShowShiftTrail(false); }}
-                    aria-pressed
-                    className="inline-flex h-full items-center gap-1 px-2.5 text-[12px] font-medium text-[#FFF5E7] hover:bg-white/[0.04] transition-colors"
-                  >
-                    <span aria-hidden className="inline-block h-2 w-2 rounded-full shrink-0" style={{ background: '#86EFAC', border: '1px solid #86EFAC' }} />
-                    <span className="leading-none whitespace-nowrap">Seasons</span>
-                  </button>
-                  <div aria-hidden className="h-3.5 w-px self-center" style={{ background: '#86EFAC55' }} />
-                  <button
-                    type="button"
-                    onClick={() => setShowShiftTrail(!showShiftTrail)}
-                    aria-pressed={showShiftTrail}
-                    className="inline-flex h-full items-center gap-1 px-2.5 text-[12px] font-medium transition-colors hover:bg-white/[0.04]"
-                    style={{ color: showShiftTrail ? '#FFF5E7' : '#9CA3AF' }}
-                  >
-                    <span
-                      aria-hidden
-                      className="inline-block h-2 w-2 rounded-full shrink-0"
-                      style={{ background: showShiftTrail ? '#86EFAC' : 'transparent', border: `1px solid ${showShiftTrail ? '#86EFAC' : '#4B5563'}` }}
+                <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
+                  Anomaly
+                </ChipToggle>
+                <ChipToggle active={view3D} onChange={setView3D} color="#A78BFA">
+                  3D
+                </ChipToggle>
+                {/* Seasons + Trail — segmented pill group. When Seasons is on,
+                    Trail appears as a nested segment sharing the same bordered
+                    container (Linear/Vercel "split button" pattern), which
+                    communicates the sub-option relationship through physical
+                    containment rather than a separate connector.
+                    Hidden entirely for aseasonal regions (rainforest, polar)
+                    where the seasonal cycle isn't meaningful. The Summer /
+                    Wet-season system picker has been pulled out of the pill
+                    and rendered as a floating chip at the bottom-right of the
+                    chart (see Section 1) when both systems are detectable. */}
+                {!seasonScheme.isAseasonal && (showSeasons ? (() => {
+                  const effectiveSystem: 'temperate' | 'wet-season' =
+                    shiftSystem === 'auto'
+                      ? (seasonScheme.isWetDry ? 'wet-season' : 'temperate')
+                      : shiftSystem;
+                  return (
+                    <SeasonsPill
+                      showShiftTrail={showShiftTrail}
+                      setShowShiftTrail={setShowShiftTrail}
+                      setShowSeasons={setShowSeasons}
+                      shiftSystem={shiftSystem}
+                      setShiftSystem={setShiftSystem}
+                      effectiveSystem={effectiveSystem}
+                      showSystemPicker={false}
                     />
-                    <span className="leading-none whitespace-nowrap">Trail</span>
-                  </button>
-                </div>
-              ) : (
-                <ChipToggle active={false} onChange={(v) => { setShowSeasons(v); if (!v) setShowShiftTrail(false); }} color="#86EFAC">
-                  Seasons
+                  );
+                })() : (
+                  <ChipToggle active={false} onChange={(v) => { setShowSeasons(v); if (!v) setShowShiftTrail(false); }} color="#86EFAC">
+                    Seasons
+                  </ChipToggle>
+                ))}
+                {metric === 'temp' && parisAnnualRef != null && (
+                  <ChipToggle active={showParis} onChange={setShowParis} color="#FBBF24">
+                    Paris Rings
+                  </ChipToggle>
+                )}
+            </div>
+            <div className="hidden xl:flex xl:flex-col xl:gap-1">
+              <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Mode</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
+                  Anomaly
                 </ChipToggle>
-              )}
-              {metric === 'temp' && (
-                <ChipToggle active={showParis} onChange={setShowParis} color="#FBBF24">
-                  Paris Rings
+                <ChipToggle active={view3D} onChange={setView3D} color="#A78BFA">
+                  3D
                 </ChipToggle>
-              )}
+                {!seasonScheme.isAseasonal && (showSeasons ? (() => {
+                  const effectiveSystem: 'temperate' | 'wet-season' =
+                    shiftSystem === 'auto'
+                      ? (seasonScheme.isWetDry ? 'wet-season' : 'temperate')
+                      : shiftSystem;
+                  return (
+                    <SeasonsPill
+                      showShiftTrail={showShiftTrail}
+                      setShowShiftTrail={setShowShiftTrail}
+                      setShowSeasons={setShowSeasons}
+                      shiftSystem={shiftSystem}
+                      setShiftSystem={setShiftSystem}
+                      effectiveSystem={effectiveSystem}
+                      showSystemPicker={false}
+                    />
+                  );
+                })() : (
+                  <ChipToggle active={false} onChange={(v) => { setShowSeasons(v); if (!v) setShowShiftTrail(false); }} color="#86EFAC">
+                    Seasons
+                  </ChipToggle>
+                ))}
+                {metric === 'temp' && parisAnnualRef != null && (
+                  <ChipToggle active={showParis} onChange={setShowParis} color="#FBBF24">
+                    Paris Rings
+                  </ChipToggle>
+                )}
+              </div>
             </div>
           </div>{/* end Mode panel */}
 
           {/* Metric panel */}
-          {available.length > 1 && (
-          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
+          {available.length > 0 && (
+          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 xl:px-2.5 py-2">
             <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Metric</span>
                 {available.map((m) => (
@@ -2483,7 +3332,7 @@ export default function ClimateSpiralCard({
           )}{/* end Metric panel */}
 
           {/* Presets panel */}
-          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 py-2">
+          <div className="rounded-lg border border-[#D0A65E]/40 bg-gray-900/40 px-3 xl:px-2.5 py-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] uppercase tracking-wider text-gray-500 shrink-0">Presets</span>
               {(() => {
@@ -2541,7 +3390,7 @@ export default function ClimateSpiralCard({
                   setHighlightRecent(true);
                   setShowRecordHigh(true);
                   setShowRecordLow(true);
-                  setShowParis(metric === 'temp');
+                  setShowParis(metric === 'temp' && parisAnnualRef != null);
                   setShowHistoric(false);
                   setShowBaselineRing(true);
                   setShowRecentRing(true);
@@ -2580,38 +3429,48 @@ export default function ClimateSpiralCard({
             </button>
             {controlsOpen && (
             <div className="px-3 pt-3 pb-3 space-y-3 border-t border-[#D0A65E]/30">
-            <div className="flex flex-wrap items-center gap-3 text-[12px] text-gray-300">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500">From</span>
-              <div className="w-28 sm:w-36">
-                <SingleRangeSlider
-                  min={minYear}
-                  max={Math.max(minYear, maxYear - 10)}
-                  step={5}
-                  value={effectiveFromYear}
-                  onChange={setYearFrom}
-                  accent="#D0A65E"
-                />
+            {/* From-year + Spaghetti-boost are two independent slider
+                 groups. Wrap each in its own inline-flex so the slider
+                 stays glued to its label even when the row reflows on
+                 narrower viewports (previously the boost label could
+                 drop to its own row, orphaned from the slider). */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-gray-300">
+              <div className="inline-flex items-center gap-3 whitespace-nowrap">
+                <span className="uppercase tracking-wider text-[10px] text-gray-500">From</span>
+                <div className="w-28 sm:w-36">
+                  <SingleRangeSlider
+                    min={minYear}
+                    max={Math.max(minYear, maxYear - 10)}
+                    step={5}
+                    value={effectiveFromYear}
+                    onChange={setYearFrom}
+                    accent="#D0A65E"
+                  />
+                </div>
+                <span className="font-mono text-[#FFF5E7] min-w-[3ch]">{effectiveFromYear}</span>
               </div>
-              <span className="font-mono text-[#FFF5E7] min-w-[3ch]">{effectiveFromYear}</span>
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 ml-2">Spaghetti boost</span>
-              <div className="w-24 sm:w-28">
-                <SingleRangeSlider
-                  min={0}
-                  max={300}
-                  step={5}
-                  value={Math.round(lineAlpha * 100)}
-                  onChange={(v) => setLineAlpha(v / 100)}
-                  accent={palette.high}
-                />
+              <div className="inline-flex items-center gap-3 whitespace-nowrap">
+                <span className="uppercase tracking-wider text-[10px] text-gray-500">Spaghetti boost</span>
+                <div className="w-24 sm:w-28">
+                  <SingleRangeSlider
+                    min={0}
+                    max={300}
+                    step={5}
+                    value={Math.round(lineAlpha * 100)}
+                    onChange={(v) => setLineAlpha(v / 100)}
+                    accent={palette.high}
+                  />
+                </div>
+                <span className="font-mono text-[#FFF5E7] min-w-[3ch] tabular-nums">+{Math.round(lineAlpha * 100)}%</span>
               </div>
-              <span className="font-mono text-[#FFF5E7] min-w-[3ch] tabular-nums">+{Math.round(lineAlpha * 100)}%</span>
             </div>
 
             {/* Lines — per-year spaghetti + the highlighted recent decade
-                 + the warmest/coldest year rings. */}
-            <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-              <span className="uppercase tracking-wider text-[10px] text-gray-500 sm:mr-1 sm:w-12">Lines</span>
-              <div className="flex flex-wrap items-center gap-2">
+                 + the warmest/coldest year rings. Chips are direct flex
+                 children of the row so they can flow next to the LINES
+                 label and wrap individually instead of as one block. */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+              <span className="uppercase tracking-wider text-[10px] text-gray-500 mr-1 sm:w-12">Lines</span>
               <ChipToggle active={showSpaghetti} onChange={setShowSpaghetti} color={palette.high}>
                 Year Spaghetti
               </ChipToggle>
@@ -2624,7 +3483,6 @@ export default function ClimateSpiralCard({
               <ChipToggle active={showRecordLow} onChange={setShowRecordLow} color={palette.low}>
                 {palette.lowWord} Year
               </ChipToggle>
-              </div>
             </div>
 
             {/* Means — dashed reference rings. Baseline only meaningful
@@ -2664,21 +3522,6 @@ export default function ClimateSpiralCard({
             </button>
             {compareOpen && (
             <div className="px-3 pt-3 pb-3 border-t border-[#D0A65E]/30">
-            <div className="flex items-center justify-end mb-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setBaselineRange(defaultBaselineRange);
-                  setHistoricRange(defaultHistoricRange);
-                  setRecentRange(defaultRecentRange);
-                  setShowHistoric(false);
-                }}
-                className="inline-flex items-center gap-1 rounded border border-gray-700 bg-gray-800/60 px-2 py-0.5 text-[10px] text-gray-300 hover:bg-[#D0A65E]/20 hover:border-[#D0A65E]/60 hover:text-[#FFF5E7] transition-colors"
-              >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
-                Reset to Defaults
-              </button>
-            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-3">
               <div>
                 <div className="flex items-baseline justify-between mb-1">
@@ -2764,6 +3607,21 @@ export default function ClimateSpiralCard({
                 </>
               )}
             </p>
+            <div className="mt-3 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setBaselineRange(defaultBaselineRange);
+                  setHistoricRange(defaultHistoricRange);
+                  setRecentRange(defaultRecentRange);
+                  setShowHistoric(false);
+                }}
+                className="inline-flex items-center gap-1 rounded border border-gray-700 bg-gray-800/60 px-2 py-0.5 text-[10px] text-gray-300 hover:bg-[#D0A65E]/20 hover:border-[#D0A65E]/60 hover:text-[#FFF5E7] transition-colors"
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+                Reset to Defaults
+              </button>
+            </div>
             </div>
             )}
           </div>
@@ -2774,7 +3632,10 @@ export default function ClimateSpiralCard({
       </div>
 
       {dataSource && (
-        <p className="text-[11px] text-gray-500 mt-4">{dataSource} · Paris rings vs UK CET 1850–1900 baseline.</p>
+        <p className="text-[11px] text-gray-500 mt-4">
+          {dataSource}
+          {parisReference?.label ? ` · Paris rings vs ${parisReference.label}.` : ''}
+        </p>
       )}
 
       {share && !hideShare && (() => {

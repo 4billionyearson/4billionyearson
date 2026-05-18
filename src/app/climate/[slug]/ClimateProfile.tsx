@@ -7,6 +7,9 @@ import type { ClimateRegion } from '@/lib/climate/regions';
 import MonthlySpaghettiCard, { type SeriesMap } from '@/app/_components/monthly-spaghetti-card';
 import type { SpaghettiMetric } from '@/app/_components/monthly-spaghetti-chart';
 import ClimateSpiralCard, { buildYearMap, METRIC_PALETTE } from '@/app/_components/climate-spiral-card';
+import RecordsSection from '@/app/_components/climate-records-section';
+import { detectSeasonScheme } from '@/lib/climate/season-scheme';
+import { getEnsoImpactsForSlug } from '@/lib/climate/enso-impacts';
 import RecordsTable from '@/app/_components/climate-records-table';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
@@ -37,45 +40,6 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
-// ─── Records Section ─────────────────────────────────────────────────────────
-// Standalone wrapper that lives after the Shifting Seasons card. It builds its
-// own YearMaps from the raw series so the component is self-contained and the
-// Records table no longer lives inside the Climate Helix card.
-function RecordsSection({
-  series,
-  provisionalAfterMonth,
-}: {
-  series: SeriesMap;
-  provisionalAfterMonth?: { year: number; month: number } | null;
-}) {
-  const allYearMaps = useMemo(() => {
-    const out: Partial<Record<SpaghettiMetric, Map<number, number[]>>> = {};
-    const metrics: SpaghettiMetric[] = ['temp', 'precip', 'sunshine', 'frost'];
-    for (const m of metrics) {
-      const pts = series[m];
-      if (!pts?.length) continue;
-      out[m] = buildYearMap(pts, provisionalAfterMonth ?? null).yearMap;
-    }
-    return out;
-  }, [series, provisionalAfterMonth]);
-
-  const defaultMetric: SpaghettiMetric =
-    allYearMaps.temp ? 'temp' : ((Object.keys(allYearMaps)[0] as SpaghettiMetric | undefined) ?? 'temp');
-  const defaultYearMap = allYearMaps[defaultMetric];
-  if (!defaultYearMap?.size) return null;
-  const currentYear = Math.max(...defaultYearMap.keys());
-
-  return (
-    <RecordsTable
-      metric={defaultMetric}
-      yearMap={defaultYearMap}
-      currentYear={currentYear}
-      palette={METRIC_PALETTE[defaultMetric]}
-      allSeries={allYearMaps}
-      allPalettes={METRIC_PALETTE}
-    />
-  );
-}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1077,17 +1041,31 @@ export default function ClimateProfile({
                     {(monthlyAll?.length || rainfallMonthly?.length || sunshineMonthly?.length || frostMonthly?.length) ? (
                       <>
                         <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Trends" />
-                        {region.slug === 'uk' && (
-                          <ClimateSpiralCard
-                            series={spaghettiSeries}
-                            regionName={pageTitle}
-                            dataSource={chartSource}
-                            provisionalAfterMonth={pageSnapshotCut}
-                            embedSlug={slug}
-                            share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'climate-spiral' }}
-                            showEnso
-                          />
-                        )}
+                        {(() => {
+                          // Auto-detect the season-system for this region
+                          // from its monthly temperature + rainfall climatology.
+                          // Falls back to temperate-NH when there isn't enough
+                          // data (the legacy default).
+                          const seasonScheme = detectSeasonScheme({
+                            tempMonthly: monthlyAll,
+                            precipMonthly: rainfallMonthly,
+                          });
+                          // ENSO HUD: on when the region has documented
+                          // ENSO teleconnections in our impacts library.
+                          const ensoOn = getEnsoImpactsForSlug(region.slug).length > 0;
+                          return (
+                            <ClimateSpiralCard
+                              series={spaghettiSeries}
+                              regionName={pageTitle}
+                              dataSource={chartSource}
+                              provisionalAfterMonth={pageSnapshotCut}
+                              embedSlug={slug}
+                              share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'climate-spiral' }}
+                              showEnso={ensoOn}
+                              seasonScheme={seasonScheme}
+                            />
+                          );
+                        })()}
                         <MonthlySpaghettiCard
                           series={spaghettiSeries}
                           regionName={pageTitle}
@@ -1120,9 +1098,21 @@ export default function ClimateProfile({
                       <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
                         <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
                           <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
-                          <span className="min-w-0 flex-1">Records</span>
+                          <span className="min-w-0 flex-1">Records – {pageTitle}</span>
                         </h2>
                         <RecordsSection series={spaghettiSeries} provisionalAfterMonth={pageSnapshotCut} />
+                        {chartSource && (
+                          <p className="text-[11px] text-gray-500 mt-3">{chartSource}</p>
+                        )}
+                        <div className="mt-3">
+                          <ShareBar
+                            pageUrl={`https://4billionyearson.org/climate/${slug}#climate-records`}
+                            shareText={encodeURIComponent(`${pageTitle} climate records - 4 Billion Years On`)}
+                            emailSubject={`${pageTitle} climate records - 4 Billion Years On`}
+                            wrapperClassName="relative flex justify-end"
+                            align="right"
+                          />
+                        </div>
                       </div>
                     ) : null}
 

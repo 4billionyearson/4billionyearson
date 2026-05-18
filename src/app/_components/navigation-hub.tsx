@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Brain, Cpu, Zap, Sun, Wind, Thermometer, Globe, Waves,
   CloudLightning, Factory, Dna, Microscope, BookOpen, Flower2,
-  ChevronRight, Newspaper, BarChart3, PlugZap,
+  ChevronRight, Newspaper, BarChart3, PlugZap, Activity,
 } from "lucide-react";
 
 /* ─── Section data ───────────────────────────────────────────────────────── */
@@ -68,6 +68,7 @@ const SECTIONS: Section[] = [
       { group: "Monitor", href: "/climate/global", label: "Global Update", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Whole-planet temperature & trend update" },
       { group: "Monitor", href: "/climate", label: "Continent, Country, State & Region Updates", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "6 continents · 78 countries · 50 US states · 9 US climate regions · 17 UK regions" },
       { group: "Monitor", href: "/climate/rankings", label: "Rankings", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "League table of 144 regions + monthly trends" },
+      { group: "Monitor", href: "/climate/helix", label: "4BYO Climate Helix", icon: <Activity className="h-4 w-4" />, badge: "monthly", desc: "Year-on-year temperature spiral for any region" },
       { group: "Monitor", href: "/climate-dashboard", label: "Dashboard", icon: <Thermometer className="h-4 w-4" />, badge: "monthly", desc: "Global & local temperature anomalies" },
       { group: "Earth Systems", href: "/planetary-boundaries", label: "Planetary Boundaries", icon: <Globe className="h-4 w-4" />, badge: "monthly", desc: "Nine Earth-system thresholds" },
       { group: "Earth Systems", href: "/greenhouse-gases", label: "Greenhouse Gases", icon: <Wind className="h-4 w-4" />, badge: "monthly", desc: "CO₂, methane & N₂O levels" },
