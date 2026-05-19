@@ -23,7 +23,7 @@ import {
   type OverviewPanel,
   type OverviewRow,
 } from '../_shared/overview-grid';
-import { EnsoCard, GhgTile, SeaIceTile, ContinentalBar } from './ClimateSystemsPanel';
+import { EnsoCard, GhgTile, SeaIceTile } from './ClimateSystemsPanel';
 import GlobalRankingsTeaser from '@/app/_components/global-rankings-teaser';
 import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
 import ClimateMapCard from './ClimateMapCard';
@@ -104,7 +104,15 @@ interface GlobalData {
     anomalyPct: number | null;
     rankLowestOfSameMonth: number;
     totalYearsInMonth: number;
+    yearly?: { year: number; value: number }[];
     recent60: { year: number; month: number; extent: number }[];
+  } | null;
+  seaLevelStats?: {
+    label: string;
+    unit: string;
+    latest: { year: number; value: number };
+    rate: string;
+    yearly: { year: number; value: number }[];
   } | null;
   continentStats?: Array<{
     key: string;
@@ -151,6 +159,8 @@ interface GhgStat {
   preindustrial: number;
   vsPreindustrialPct: number | null;
   sparkline: { year: number; month: number; value: number }[];
+  yearly?: { year: number; value: number }[];
+  monthly?: { year: number; month: number; value: number }[];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -275,6 +285,7 @@ export default function GlobalProfile({
   const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>(initialSources);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [summaryRetryable, setSummaryRetryable] = useState(false);
+  const [summaryRegenerating, setSummaryRegenerating] = useState(summaryCacheMiss);
 
   const fetchSummary = async (forceFresh = false) => {
     setSummaryLoading(true);
@@ -287,6 +298,7 @@ export default function GlobalProfile({
       const res = await fetch(url);
       const payload: SummaryResponse | null = await res.json().catch(() => null);
       if (payload?.summary) {
+        setSummaryRegenerating(false);
         setSummary(payload.summary);
         setSummarySources(payload.sources || []);
         return;
@@ -492,7 +504,7 @@ export default function GlobalProfile({
                     </Link>
                   </div>
                 </div>
-              ) : summaryCacheMiss ? (
+              ) : summaryRegenerating ? (
                 <div className="rounded-xl border border-[#D0A65E]/40 bg-[#D0A65E]/5 px-4 py-3">
                   <p className="text-sm font-medium text-[#FFF5E7]">A fresh global climate update is being generated…</p>
                   <p className="mt-1 text-sm text-gray-300">
@@ -503,10 +515,13 @@ export default function GlobalProfile({
                   <div className="mt-3">
                     <button
                       type="button"
-                      onClick={() => { if (typeof window !== 'undefined') window.location.reload(); }}
+                      onClick={() => {
+                        setSummaryRegenerating(false);
+                        void fetchSummary();
+                      }}
                       className="inline-flex items-center gap-2 rounded-lg border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-3 py-2 text-sm font-semibold text-[#D0A65E] transition-colors hover:bg-[#D0A65E]/20 hover:text-[#E8C97A]"
                     >
-                      Refresh page
+                      Check again
                     </button>
                   </div>
                 </div>
@@ -607,6 +622,46 @@ export default function GlobalProfile({
                           label: `global 1850–1900 mean (${data.preIndustrialBaseline.toFixed(1)}°C)`,
                         }
                       : undefined;
+                    const worldViewSignals = [];
+                    if (data.ghgStats?.co2?.yearly?.length) {
+                      worldViewSignals.push({
+                        key: 'co2',
+                        label: 'Atmospheric CO2',
+                        shortLabel: 'CO2',
+                        unit: 'ppm',
+                        color: '#D0A65E',
+                        icon: 'co2' as const,
+                        series: data.ghgStats.co2.yearly,
+                        decimals: 0,
+                        note: 'Annual mean',
+                      });
+                    }
+                    if (data.seaLevelStats?.yearly?.length) {
+                      worldViewSignals.push({
+                        key: 'sea-level',
+                        label: 'Sea level',
+                        shortLabel: 'Sea level',
+                        unit: 'mm',
+                        color: '#14B8A6',
+                        icon: 'sea-level' as const,
+                        series: data.seaLevelStats.yearly,
+                        decimals: 0,
+                        note: 'Sat mean',
+                      });
+                    }
+                    if (data.seaIceStats?.yearly?.length) {
+                      worldViewSignals.push({
+                        key: 'sea-ice',
+                        label: 'Sea ice',
+                        shortLabel: 'Sea ice',
+                        unit: 'Mkm²',
+                        color: '#7DD3FC',
+                        icon: 'sea-ice' as const,
+                        series: data.seaIceStats.yearly,
+                        decimals: 0,
+                        note: 'Global mean',
+                      });
+                    }
                     if (data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0) {
                       tabs.push({
                         key: 'land-ocean',
@@ -616,6 +671,7 @@ export default function GlobalProfile({
                         dataSource: 'NOAA Climate at a Glance — Global Land+Ocean',
                         embedSlug: 'global-land-ocean',
                         parisReference: globalParisReference,
+                        ...(worldViewSignals.length > 0 && { supplementalHudMetrics: worldViewSignals }),
                       });
                     }
                     if (data.landMonthlyAll?.length > 0) {
@@ -626,6 +682,7 @@ export default function GlobalProfile({
                         regionName: 'Global Land',
                         dataSource: 'Our World in Data / ERA5',
                         embedSlug: 'global-land',
+                        ...(worldViewSignals.length > 0 && { supplementalHudMetrics: worldViewSignals }),
                       });
                     }
                     return <GlobalHelixCard tabs={tabs} provisionalAfterMonth={pageSnapshotCut} />;
@@ -788,8 +845,8 @@ export default function GlobalProfile({
                 )}
               </div>
 
-              {/* Climate systems - ENSO, GHG, sea ice, continents */}
-              {(data.enso || data.ghgStats || data.seaIceStats || data.continentStats?.length || data.previousLatestMonthStats) && (
+              {/* Climate systems - ENSO, greenhouse gases, sea ice */}
+              {(data.enso || data.ghgStats || data.seaIceStats) && (
                 <>
                   <Divider icon={<Wind className="h-5 w-5 text-sky-300" />} title="Climate Systems" />
                   {data.enso && <EnsoCard enso={data.enso} />}
@@ -799,11 +856,6 @@ export default function GlobalProfile({
                       {data.seaIceStats && <SeaIceTile seaIce={data.seaIceStats} />}
                     </div>
                   )}
-                  {data.continentStats?.length ? (
-                    <div className="mt-6">
-                      <ContinentalBar continents={data.continentStats} />
-                    </div>
-                  ) : null}
                 </>
               )}
 
