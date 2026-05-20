@@ -412,10 +412,11 @@ function ExploreCard() {
 // ─── Continent renderer ────────────────────────────────────────────────────
 
 async function ContinentBody({ region }: { region: ClimateRegion }) {
-  const [history, members, absolutes] = await Promise.all([
+  const [history, members, absolutes, continentPrecip] = await Promise.all([
     readJson<GlobalHistory>('global-history.json'),
     loadMembersForRegion(region),
     readJson<{ monthlyAll: { year: number; month: number; value: number }[] }>(`continent-absolutes/${region.slug}.json`),
+    readJson<{ monthlyAll: { year: number; month: number; value: number }[] }>(`continent-precip/${region.slug}.json`),
   ]);
   if (!history) {
     return <Card icon={<AlertTriangle className="h-5 w-5" />} title="Data unavailable">
@@ -550,10 +551,10 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             const forceKind = region.groupKind === 'continent'
               ? CONTINENT_SCHEME_OVERRIDES[region.slug]
               : undefined;
-            const scheme = detectSeasonScheme({ tempMonthly: absolutes.monthlyAll, forceKind });
+            const scheme = detectSeasonScheme({ tempMonthly: absolutes.monthlyAll, precipMonthly: continentPrecip?.monthlyAll, forceKind });
             return (
               <ClimateSpiralCard
-                series={{ temp: absolutes.monthlyAll }}
+                series={{ temp: absolutes.monthlyAll, precip: continentPrecip?.monthlyAll }}
                 regionName={region.name}
                 dataSource={aggregateSource}
                 embedSlug={region.slug}
@@ -564,7 +565,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             );
           })()}
           <MonthlySpaghettiCard
-            series={{ temp: absolutes.monthlyAll }}
+            series={{ temp: absolutes.monthlyAll, precip: continentPrecip?.monthlyAll }}
             regionName={region.name}
             dataSource={aggregateSource}
             embedSlug={region.slug}
@@ -575,7 +576,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
               <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
               <span className="min-w-0 flex-1">Records – {region.name}</span>
             </h2>
-            <RecordsSection series={{ temp: absolutes.monthlyAll }} />
+            <RecordsSection series={{ temp: absolutes.monthlyAll, precip: continentPrecip?.monthlyAll }} />
             <p className="text-[11px] text-gray-500 mt-3">{aggregateSource}</p>
             <div className="mt-3">
               <ShareBar
@@ -589,8 +590,9 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
           </div>
           <SeasonalShiftCard
             monthlyAll={absolutes.monthlyAll}
+            rainfallMonthly={continentPrecip?.monthlyAll}
             regionName={region.name}
-            dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures."
+            dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures &amp; rainfall."
             share={{
               pageUrl: `https://4billionyearson.org/climate/${region.slug}`,
               sectionId: 'shifting-seasons',

@@ -43,7 +43,8 @@ async function fetchRegionHelixData(region: ClimateRegion): Promise<RegionHelixD
       data.usClimateRegionData?.paramData?.pcp?.monthlyAll ||
       data.usStateData?.paramData?.pcp?.monthlyAll ||
       data.nationalData?.paramData?.pcp?.monthlyAll ||
-      data.countryPrecipData?.monthlyAll;
+      data.countryPrecipData?.monthlyAll ||
+      data.continentPrecipData?.monthlyAll;
 
     const sunshine =
       data.ukRegionData?.varData?.Sunshine?.monthlyAll ||
@@ -61,10 +62,11 @@ async function fetchRegionHelixData(region: ClimateRegion): Promise<RegionHelixD
         ? 'NOAA National Centers for Environmental Information'
         : 'Our World in Data / NOAA';
 
-    // Continent aggregates have no precipitation data so detectSeasonScheme
-    // can only use temperature, which produces 'aseasonal' for continents whose
-    // hemisphere-mixed/tropical average is near-flat (Africa: 2.4°C amp,
-    // South America: 3.9°C amp). Override editorially where we know better.
+    // Continental temperature aggregates can be near-flat in amplitude because
+    // they mix hemispheres/climate zones. Override editorially where we know
+    // the dominant wet/dry cycle (real precip data now also available via
+    // continentPrecipData, but forceKind ensures the correct scheme even if
+    // auto-detection happens to mis-classify).
     const CONTINENT_SCHEME_OVERRIDES: Partial<Record<string, SeasonSchemeKind>> = {
       'africa': 'wet-dry-NH',        // Sub-Saharan wet season falls in boreal summer (Apr–Sep)
       'south-america': 'wet-dry-SH', // Amazon/Cerrado wet season falls in SH summer (Oct–Mar)

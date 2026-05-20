@@ -125,7 +125,7 @@ export async function GET(
         if (now.getDate() < 21) prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${dataCacheKey}-v24`;
+  const cacheKey = `climate:profile:${slug}:${dataCacheKey}-v25`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
@@ -137,6 +137,7 @@ export async function GET(
     let countryData = null;
     let countryPrecipData = null; // World Bank CKP monthly precip (CRU TS 4.08)
     let continentData = null; // Berkeley Earth continent absolute temps
+    let continentPrecipData = null; // 4BYO continent rainfall aggregate (CRU TS)
     let usStateData = null;
     let usClimateRegionData = null;
     let ukRegionData = null;
@@ -184,7 +185,10 @@ export async function GET(
       usClimateRegionData = groupRes;
       nationalData = nationalRes;
     } else if (region.type === 'group' && region.groupKind === 'continent') {
-      continentData = await loadSnapshot(`continent-absolutes/${region.slug}.json`);
+      [continentData, continentPrecipData] = await Promise.all([
+        loadSnapshot(`continent-absolutes/${region.slug}.json`),
+        loadSnapshot(`continent-precip/${region.slug}.json`),
+      ]);
     }
 
     // Build key stats for the crawlable summary
@@ -200,6 +204,7 @@ export async function GET(
       countryData,
       countryPrecipData,
       continentData,
+      continentPrecipData,
       usStateData,
       usClimateRegionData,
       ukRegionData,
