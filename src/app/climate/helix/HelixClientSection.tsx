@@ -8,7 +8,7 @@ import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
 import RecordsSection from '@/app/_components/climate-records-section';
 import GlobalHelixCard, { type HelixSeriesTab } from '../global/GlobalHelixCard';
 import HelixRegionPicker from './HelixRegionPicker';
-import { detectSeasonScheme } from '@/lib/climate/season-scheme';
+import { detectSeasonScheme, type SeasonSchemeKind } from '@/lib/climate/season-scheme';
 import { shouldFeatureEnso } from '@/lib/climate/enso-impacts';
 
 // ─── Data fetching helpers ───────────────────────────────────────────────────
@@ -61,7 +61,18 @@ async function fetchRegionHelixData(region: ClimateRegion): Promise<RegionHelixD
         ? 'NOAA National Centers for Environmental Information'
         : 'Our World in Data / NOAA';
 
-    const seasonScheme = detectSeasonScheme({ tempMonthly: temp, precipMonthly: precip });
+    // Continent aggregates have no precipitation data so detectSeasonScheme
+    // can only use temperature, which produces 'aseasonal' for continents whose
+    // hemisphere-mixed/tropical average is near-flat (Africa: 2.4°C amp,
+    // South America: 3.9°C amp). Override editorially where we know better.
+    const CONTINENT_SCHEME_OVERRIDES: Partial<Record<string, SeasonSchemeKind>> = {
+      'africa': 'wet-dry-NH',        // Sub-Saharan wet season falls in boreal summer (Apr–Sep)
+      'south-america': 'wet-dry-SH', // Amazon/Cerrado wet season falls in SH summer (Oct–Mar)
+    };
+    const forceKind = region.type === 'group' && region.groupKind === 'continent'
+      ? CONTINENT_SCHEME_OVERRIDES[region.slug]
+      : undefined;
+    const seasonScheme = detectSeasonScheme({ tempMonthly: temp, precipMonthly: precip, forceKind });
     const ensoOn = shouldFeatureEnso(region);
 
     return { series, source, seasonScheme, ensoOn };
