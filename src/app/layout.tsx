@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Mono } from "next/font/google";
 import cn from "classnames";
 import CookieBanner from "./_components/cookie-banner";
+import ScrollRestoration from "./_components/scroll-restoration";
 import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
@@ -139,6 +140,7 @@ export default function RootLayout({
         />
       </head>
       <body className={cn(inter.variable, spaceMono.variable, inter.className, "bg-black")}>
+        <ScrollRestoration />
         <div 
           className="fixed inset-0 z-[-1]" 
           style={{
