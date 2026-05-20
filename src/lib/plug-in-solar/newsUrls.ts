@@ -18,6 +18,10 @@ function normaliseNewsUrl(url: string): string {
 const KNOWN_BROKEN_NEWS_SOURCE_URLS = new Set([
   'https://www.which.co.uk/news/article/plug-in-solar-panels-to-be-made-legal-in-uk-homes-axq0m9l3r1a7',
   'https://electrical.theiet.org/media/press-releases/2026/15-april-2026-iet-bsi-officially-publish-amendment-4-2026-to-bs-7671-2018-iet-wiring-regulations',
+  // Gemini-hallucinated URLs on trusted domains — Guardian returns 404,
+  // Independent redirects to an unrelated article (b2756347 football).
+  'https://www.theguardian.com/money/2026/may/19/energy-bills-to-rise-by-209-a-year-to-1850-from-july-forecaster-says',
+  'https://www.independent.co.uk/climate-change/news/lidl-iceland-plug-in-solar-panels-500-b2756034.html',
 ]);
 
 export function isKnownBrokenPlugInSolarNewsUrl(url: string): boolean {

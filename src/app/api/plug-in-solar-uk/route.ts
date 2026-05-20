@@ -8,7 +8,6 @@ import {
   FULLY_AVAILABLE_FALLBACK,
   LEGAL_IN_SHOPS_TIMELINE_TITLE,
 } from '@/app/plug-in-solar-uk/_data/static';
-import { isKnownBrokenPlugInSolarNewsUrl, sanitisePlugInSolarPayload } from '@/lib/plug-in-solar/newsUrls';
 import { sanitiseRetailerProductUrl } from '@/lib/plug-in-solar/retailerUrls';
 import { buildPlugInSolarPrompt, PLUG_IN_SOLAR_RESPONSE_SCHEMA } from '@/lib/plug-in-solar/prompt';
 import { buildSeedProductRows, SEED_PRODUCTS } from '@/lib/plug-in-solar/seedProducts';
@@ -85,7 +84,7 @@ function dateOffsetKey(daysAgo: number): string {
 export async function readMostRecentCache(): Promise<PlugInSolarLiveData | null> {
   for (let i = 0; i <= PREVIOUS_LOOKBACK_DAYS; i++) {
     const cached = await getCached<PlugInSolarLiveData>(dateOffsetKey(i));
-    if (cached) return sanitisePlugInSolarPayload(cached);
+    if (cached) return cached;
   }
   return null;
 }
@@ -369,10 +368,51 @@ async function validateUrl(url: string): Promise<boolean> {
 }
 
 /**
- * News publisher domains we trust without a live HEAD check.
+ * HEAD-check a URL on a trusted news domain with lenient failure handling.
+ * Only drops on a definitive HTTP 404 or a cross-domain redirect (which
+ * indicates the article ID resolved somewhere else, e.g. independent.co.uk
+ * silently redirecting a bad article ID to the-independent.com).
+ * All other outcomes — 403, 429, 503, timeouts — are treated as "valid"
+ * so that anti-bot measures on live articles don't cause false drops.
+ */
+async function validateTrustedNewsUrl(url: string): Promise<boolean> {
+  try {
+    const originalHost = new URL(url).hostname.toLowerCase();
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), URL_VALIDATION_TIMEOUT_MS);
+    const res = await fetch(url, {
+      method: 'HEAD',
+      redirect: 'follow',
+      signal: ctrl.signal,
+      headers: { 'User-Agent': URL_VALIDATION_USER_AGENT },
+    });
+    clearTimeout(timer);
+    if (res.status === 404) return false;
+    // Cross-domain redirect = article ID resolved elsewhere → broken link.
+    if (res.url && res.url !== url) {
+      try {
+        const finalHost = new URL(res.url).hostname.toLowerCase();
+        const h1 = originalHost.replace(/^www\./, '');
+        const h2 = finalHost.replace(/^www\./, '');
+        const sameDomain = h1 === h2 || h1.endsWith('.' + h2) || h2.endsWith('.' + h1);
+        if (!sameDomain) return false;
+      } catch {
+        // URL parse error — assume valid
+      }
+    }
+    return true;
+  } catch {
+    // Timeout or network error — assume valid
+    return true;
+  }
+}
+
+/**
+ * News publisher domains we trust without a full validateUrl check.
  * Major news sites routinely block server-side HEAD/GET requests with
  * 403/429 even when the article is live, which caused ALL news items to
- * be dropped after every Gemini run. Mirrors retailerUrlTrustedWithoutFetch.
+ * be dropped after every Gemini run. We still run a lenient HEAD check
+ * (validateTrustedNewsUrl) that only drops on 404 / cross-domain redirect.
  */
 const TRUSTED_NEWS_DOMAINS = [
   'bbc.co.uk',
@@ -387,6 +427,7 @@ const TRUSTED_NEWS_DOMAINS = [
   'express.co.uk',
   'sun.co.uk',
   'thisismoney.co.uk',
+  'which.co.uk',
   'moneysavingexpert.com',
   'solarpowerportal.co.uk',
   'theengineer.co.uk',
@@ -406,6 +447,7 @@ const TRUSTED_NEWS_DOMAINS = [
   'gov.uk',
   'parliament.uk',
   'ofgem.gov.uk',
+  'theiet.org',
   'bsigroup.com',
   'reuters.com',
   'apnews.com',
@@ -439,14 +481,12 @@ async function filterNewsBrokenLinks(
     parsed.news.map(async (item) => {
       const url = (item?.sourceUrl ?? '').trim();
       if (!url) return { item, valid: false };
-      if (isKnownBrokenPlugInSolarNewsUrl(url)) {
-        return { item, valid: false };
-      }
       if (groundingUris.has(url.toLowerCase())) {
         return { item, valid: true };
       }
       if (newsUrlTrustedWithoutFetch(url)) {
-        return { item, valid: true };
+        const valid = await validateTrustedNewsUrl(url);
+        return { item, valid };
       }
       const valid = await validateUrl(url);
       return { item, valid };
@@ -566,7 +606,7 @@ export async function GET(request: Request) {
   if (!skipCache) {
     const cached = await getCached<PlugInSolarLiveData>(cacheKey);
     if (cached) {
-      return NextResponse.json({ ...sanitisePlugInSolarPayload(cached), source: 'cache' });
+      return NextResponse.json({ ...cached, source: 'cache' });
     }
   }
 
