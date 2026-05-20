@@ -29,6 +29,7 @@ export default function Term({ id, className, children }: TermProps) {
 
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
+  const tooltipRef = useRef<HTMLSpanElement>(null);
   const tooltipId = useId();
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -60,7 +61,12 @@ export default function Term({ id, className, children }: TermProps) {
   useEffect(() => {
     if (!open) return;
     const onDocClick = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+      // Also check the portal tooltip so clicking links inside it doesn't
+      // close the popup before the link click fires.
+      if (
+        !ref.current?.contains(e.target as Node) &&
+        !tooltipRef.current?.contains(e.target as Node)
+      ) setOpen(false);
     };
     const onEsc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
     document.addEventListener('mousedown', onDocClick);
@@ -109,6 +115,7 @@ export default function Term({ id, className, children }: TermProps) {
       {open && mounted && coords &&
         createPortal(
           <span
+            ref={tooltipRef}
             id={tooltipId}
             role="tooltip"
             style={{ position: 'fixed', top: coords.top, left: coords.left, width: 'min(320px, calc(100vw - 16px))', zIndex: 9999 }}

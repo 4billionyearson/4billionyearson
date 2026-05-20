@@ -593,6 +593,14 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             rainfallMonthly={continentPrecip?.monthlyAll}
             regionName={region.name}
             dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures &amp; rainfall."
+            forceSeasonality={
+              // Continental equal-weight averages mix NH+SH wet seasons, flattening
+              // the wet/dry ratio below the auto-detection threshold.  Override
+              // editorially for continents with a clear dominant wet/dry cycle.
+              region.groupKind === 'continent' && (region.slug === 'africa' || region.slug === 'south-america')
+                ? 'wet-dry'
+                : undefined
+            }
             share={{
               pageUrl: `https://4billionyearson.org/climate/${region.slug}`,
               sectionId: 'shifting-seasons',

@@ -27,6 +27,9 @@ interface SeasonalShiftCardProps {
   sunshineMonthly?: MonthlyPoint[];
   regionName: string;
   dataSource?: string;
+  /** Override the auto-detected seasonality classification (e.g. for continents
+   *  whose equal-weight aggregate flattens wet/dry ratio below the threshold). */
+  forceSeasonality?: SeasonalityKind;
   /** Anchor + canonical URL for the ShareBar. When omitted the share button is hidden. */
   share?: { pageUrl: string; sectionId: string; embedUrl?: string; embedCode?: string };
 }
@@ -39,6 +42,7 @@ export default function SeasonalShiftCard({
   sunshineMonthly,
   regionName,
   dataSource,
+  forceSeasonality,
   share,
 }: SeasonalShiftCardProps) {
   const stats = useMemo(() => {
@@ -46,14 +50,14 @@ export default function SeasonalShiftCard({
     if (!res) return null;
     const rain = analyseRainfall(rainfallMonthly);
     const sunshine = analyseRainfall(sunshineMonthly); // reuse baseline/recent helper for hours
-    const seasonality: SeasonalityKind = classifySeasonality(res.temp, rain);
+    const seasonality: SeasonalityKind = forceSeasonality ?? classifySeasonality(res.temp, rain);
     const koppen = classifyKoppen(res.temp.baselineMonthly, rain?.baselineMonthly ?? null);
     return { ...res, rain, sunshine, seasonality, koppen };
-  }, [monthlyAll, rainfallMonthly, sunshineMonthly]);
+  }, [monthlyAll, rainfallMonthly, sunshineMonthly, forceSeasonality]);
 
   const defaultView: View = useMemo<View>(() => {
     if (!stats) return 'monthly';
-    if (stats.seasonality === 'wet-dry' && stats.rain) return 'wet-season';
+    if ((stats.seasonality === 'wet-dry' || stats.seasonality === 'mixed') && stats.rain) return 'wet-season';
     return 'monthly';
   }, [stats]);
 
@@ -198,8 +202,10 @@ export default function SeasonalShiftCard({
       />
 
       {hasTempSeasons ? (
-        <>
-        </>
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
+          <StatTile label={`${baselineStart}–${baselineEnd}`} value={temp.baselineLen.toFixed(1)} sub="months above annual mean" />
+          <StatTile label={`${recentStart}–${recentEnd}`} value={temp.recentLen.toFixed(1)} sub="months above annual mean" />
+        </div>
       ) : hasWetDry && rain ? (
         <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
           <StatTile label={`${baselineStart}–${baselineEnd}`} value={`${rain.baselineAnnualMm}`} sub="mm / yr" />
@@ -665,7 +671,7 @@ function WarmSeasonShiftBar({
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
         <div className="text-sm font-mono font-bold text-gray-200 uppercase tracking-wider inline-flex items-center gap-1.5">
           <Sun className="h-3.5 w-3.5" style={{ color: '#EAB308' }} />
-          Shifting summer
+          Shifting summer <span className="text-gray-500 normal-case font-normal tracking-normal">(spring earlier · autumn later)</span>
         </div>
         <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
           {deltaDays > 0 ? `+${deltaDays} days longer summer` : deltaDays < 0 ? `${Math.abs(deltaDays)} days shorter summer` : 'no change'}

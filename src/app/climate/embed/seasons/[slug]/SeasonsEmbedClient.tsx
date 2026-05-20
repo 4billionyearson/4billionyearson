@@ -10,6 +10,7 @@ type MA = { year: number; month: number; value: number }[];
 interface ProfileResponse {
   countryData?: { monthlyAll?: MA };
   countryPrecipData?: { monthlyAll?: MA };
+  continentPrecipData?: { monthlyAll?: MA };
   ukRegionData?: { region?: string; varData?: Record<string, { monthlyAll?: MA }> };
   nationalData?: {
     region?: string;
@@ -26,6 +27,10 @@ interface ContinentAbsolutesResponse {
   name?: string;
 }
 
+interface ContinentPrecipResponse {
+  monthlyAll?: MA;
+}
+
 interface UsRegionResponse {
   region?: string;
   paramData?: Record<string, { monthlyAll?: MA }>;
@@ -38,6 +43,7 @@ export default function SeasonsEmbedClient({ slug }: { slug: string }) {
     sunshineMonthly?: MA;
     regionName: string;
     dataSource: string;
+    forceSeasonality?: 'warm-cold' | 'wet-dry' | 'aseasonal' | 'mixed';
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,11 +58,22 @@ export default function SeasonsEmbedClient({ slug }: { slug: string }) {
         const continentRes = await fetch(`/data/climate/continent-absolutes/${slug}.json`, { cache: 'no-store' });
         if (continentRes.ok) {
           const json = (await continentRes.json()) as ContinentAbsolutesResponse;
+          // Also try to load rainfall data (may not exist yet, fail silently).
+          let precipMonthly: MA | undefined;
+          try {
+            const precipRes = await fetch(`/data/climate/continent-precip/${slug}.json`, { cache: 'no-store' });
+            if (precipRes.ok) {
+              const pjson = (await precipRes.json()) as ContinentPrecipResponse;
+              precipMonthly = pjson.monthlyAll;
+            }
+          } catch { /* ignore */ }
           if (cancelled) return;
           setSeries({
             monthlyAll: json.monthlyAll,
+            rainfallMonthly: precipMonthly,
             regionName: json.name ?? slug,
-            dataSource: '4BYO continent aggregate · OWID/CRU TS country monthly temperatures.',
+            dataSource: '4BYO continent aggregate · OWID/CRU TS country monthly temperatures &amp; rainfall.',
+            forceSeasonality: (slug === 'africa' || slug === 'south-america') ? 'wet-dry' : undefined,
           });
           return;
         }
@@ -131,11 +148,12 @@ export default function SeasonsEmbedClient({ slug }: { slug: string }) {
   }
   return (
     <SeasonalShiftCard
-      monthlyAll={series.monthlyAll}
+      monthlyAll={series.monthlyAll!}
       rainfallMonthly={series.rainfallMonthly}
       sunshineMonthly={series.sunshineMonthly}
       regionName={series.regionName}
       dataSource={series.dataSource}
+      forceSeasonality={series.forceSeasonality}
     />
   );
 }
