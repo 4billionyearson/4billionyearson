@@ -15208,10 +15208,10 @@
         "period": 0,
         "label": "MJJ",
         "seasonAnchorYear": 2026,
-        "mean": 1.12,
-        "dynMean": 1.27,
+        "mean": 1.1,
+        "dynMean": 1.24,
         "statMean": 0.9,
-        "modelCount": 22,
+        "modelCount": 24,
         "models": [
           {
             "name": "AUS-ACCESS",
@@ -15222,6 +15222,11 @@
             "name": "AUS-RELATIVE",
             "type": "Relative",
             "value": 1.38
+          },
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 0.84
           },
           {
             "name": "BCC_RZDM",
@@ -15289,6 +15294,11 @@
             "value": 1.5
           },
           {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 0.83
+          },
+          {
             "name": "SINTEX-F",
             "type": "Dynamical",
             "value": 1.14
@@ -15329,10 +15339,10 @@
         "period": 1,
         "label": "JJA",
         "seasonAnchorYear": 2026,
-        "mean": 1.42,
-        "dynMean": 1.59,
-        "statMean": 1.16,
-        "modelCount": 22,
+        "mean": 1.4,
+        "dynMean": 1.56,
+        "statMean": 1.14,
+        "modelCount": 24,
         "models": [
           {
             "name": "AUS-ACCESS",
@@ -15343,6 +15353,11 @@
             "name": "AUS-RELATIVE",
             "type": "Relative",
             "value": 1.8
+          },
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 1.26
           },
           {
             "name": "BCC_RZDM",
@@ -15410,6 +15425,11 @@
             "value": 1.99
           },
           {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 1
+          },
+          {
             "name": "SINTEX-F",
             "type": "Dynamical",
             "value": 1.47
@@ -15450,10 +15470,10 @@
         "period": 2,
         "label": "JAS",
         "seasonAnchorYear": 2026,
-        "mean": 1.68,
-        "dynMean": 1.86,
-        "statMean": 1.38,
-        "modelCount": 22,
+        "mean": 1.65,
+        "dynMean": 1.84,
+        "statMean": 1.35,
+        "modelCount": 24,
         "models": [
           {
             "name": "AUS-ACCESS",
@@ -15464,6 +15484,11 @@
             "name": "AUS-RELATIVE",
             "type": "Relative",
             "value": 2.17
+          },
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 1.63
           },
           {
             "name": "BCC_RZDM",
@@ -15531,6 +15556,11 @@
             "value": 2.4
           },
           {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 1.06
+          },
+          {
             "name": "SINTEX-F",
             "type": "Dynamical",
             "value": 1.73
@@ -15571,10 +15601,10 @@
         "period": 3,
         "label": "ASO",
         "seasonAnchorYear": 2026,
-        "mean": 1.9,
-        "dynMean": 2.09,
-        "statMean": 1.58,
-        "modelCount": 22,
+        "mean": 1.87,
+        "dynMean": 2.08,
+        "statMean": 1.55,
+        "modelCount": 24,
         "models": [
           {
             "name": "AUS-ACCESS",
@@ -15585,6 +15615,11 @@
             "name": "AUS-RELATIVE",
             "type": "Relative",
             "value": 2.47
+          },
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 1.97
           },
           {
             "name": "BCC_RZDM",
@@ -15652,6 +15687,11 @@
             "value": 2.79
           },
           {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 1.28
+          },
+          {
             "name": "SINTEX-F",
             "type": "Dynamical",
             "value": 1.91
@@ -15692,11 +15732,16 @@
         "period": 4,
         "label": "SON",
         "seasonAnchorYear": 2026,
-        "mean": 1.99,
+        "mean": 1.97,
         "dynMean": 2.2,
-        "statMean": 1.76,
-        "modelCount": 19,
+        "statMean": 1.73,
+        "modelCount": 21,
         "models": [
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 2.17
+          },
           {
             "name": "BCC_RZDM",
             "type": "Statistical",
@@ -15763,6 +15808,11 @@
             "value": 3.11
           },
           {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 1.43
+          },
+          {
             "name": "SINTEX-F",
             "type": "Dynamical",
             "value": 2.02
@@ -15798,11 +15848,16 @@
         "period": 5,
         "label": "OND",
         "seasonAnchorYear": 2026,
-        "mean": 2.04,
-        "dynMean": 2.23,
-        "statMean": 1.87,
-        "modelCount": 17,
+        "mean": 2.02,
+        "dynMean": 2.24,
+        "statMean": 1.83,
+        "modelCount": 19,
         "models": [
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 2.28
+          },
           {
             "name": "BCC_RZDM",
             "type": "Statistical",
@@ -15859,6 +15914,11 @@
             "value": 3.27
           },
           {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 1.45
+          },
+          {
             "name": "SINTEX-F",
             "type": "Dynamical",
             "value": 2.14
@@ -15894,11 +15954,16 @@
         "period": 6,
         "label": "NDJ",
         "seasonAnchorYear": 2026,
-        "mean": 2.05,
+        "mean": 2.03,
         "dynMean": 2.22,
-        "statMean": 1.93,
-        "modelCount": 16,
+        "statMean": 1.88,
+        "modelCount": 18,
         "models": [
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 2.25
+          },
           {
             "name": "BCC_RZDM",
             "type": "Statistical",
@@ -15950,6 +16015,11 @@
             "value": 3.13
           },
           {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 1.43
+          },
+          {
             "name": "SINTEX-F",
             "type": "Dynamical",
             "value": 2.21
@@ -15985,11 +16055,16 @@
         "period": 7,
         "label": "DJF",
         "seasonAnchorYear": 2027,
-        "mean": 1.89,
-        "dynMean": 1.96,
-        "statMean": 1.86,
-        "modelCount": 14,
+        "mean": 1.87,
+        "dynMean": 1.99,
+        "statMean": 1.8,
+        "modelCount": 16,
         "models": [
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 2.13
+          },
           {
             "name": "BCC_RZDM",
             "type": "Statistical",
@@ -16031,6 +16106,11 @@
             "value": 1.29
           },
           {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 1.32
+          },
+          {
             "name": "SINTEX-F",
             "type": "Dynamical",
             "value": 2.16
@@ -16066,11 +16146,16 @@
         "period": 8,
         "label": "JFM",
         "seasonAnchorYear": 2027,
-        "mean": 1.72,
-        "dynMean": 1.76,
-        "statMean": 1.7,
-        "modelCount": 14,
+        "mean": 1.7,
+        "dynMean": 1.8,
+        "statMean": 1.64,
+        "modelCount": 16,
         "models": [
+          {
+            "name": "BCC DIAP",
+            "type": "Dynamical",
+            "value": 2
+          },
           {
             "name": "BCC_RZDM",
             "type": "Statistical",
@@ -16110,6 +16195,11 @@
             "name": "LDEO",
             "type": "Dynamical",
             "value": 0.93
+          },
+          {
+            "name": "NTU CODA",
+            "type": "Statistical",
+            "value": 1.16
           },
           {
             "name": "SINTEX-F",
@@ -16267,5 +16357,5 @@
     "metOfficeImpactLaNinaTemp": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-temp.jpg",
     "metOfficeImpactLaNinaPrecip": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-precip.jpg"
   },
-  "generatedAt": "2026-05-19T05:31:43.111Z"
+  "generatedAt": "2026-05-20T05:32:14.605Z"
 }
