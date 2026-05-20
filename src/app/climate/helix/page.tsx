@@ -6,41 +6,76 @@ import type { HelixSeriesTab } from '../global/GlobalHelixCard';
 import HelixClientSection from './HelixClientSection';
 
 const HUB_URL = 'https://4billionyearson.org/climate/helix';
+const OG_API = 'https://4billionyearson.org/api/og/helix';
 
-export const metadata: Metadata = {
-  title: 'Climate Helix – Year-on-Year Temperature Spiral | 4 Billion Years On',
-  description:
-    'The Climate Helix is a radial year-on-year temperature dial: each loop is a year, the colour gradient is the long-term warming trend, and the global helix includes Paris 1.5°C and 2°C reference rings. Explore the global helix here, or open any country, US state or UK region to see its own.',
-  keywords: [
-    'climate helix',
-    'temperature spiral',
-    'global warming visualization',
-    'year on year temperature',
-    'climate change chart',
-    'climate spiral chart',
-    'Paris agreement 1.5°C',
-    'Paris agreement 2°C',
-    'global temperature anomaly',
-    'monthly temperature history',
-    'climate data visualization',
-    'animated temperature spiral',
-    'Ed Hawkins climate spiral',
-    'climate helix interactive',
-  ],
-  alternates: { canonical: HUB_URL },
-  openGraph: {
-    title: 'Climate Helix — Year-on-Year Temperature Spiral',
-    description:
-      'Radial year-on-year temperature dial with global Paris 1.5°C / 2°C reference rings, plus a region picker for every country, US state and UK region we track.',
-    type: 'website',
-    url: HUB_URL,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Climate Helix — Year-on-Year Temperature Spiral',
-    description: 'A radial year-on-year dial of every monthly temperature reading since records began.',
-  },
-};
+const BASE_KEYWORDS = [
+  'climate helix',
+  'temperature spiral',
+  'global warming visualization',
+  'year on year temperature',
+  'climate change chart',
+  'climate spiral chart',
+  'Paris agreement 1.5°C',
+  'Paris agreement 2°C',
+  'global temperature anomaly',
+  'monthly temperature history',
+  'climate data visualization',
+  'animated temperature spiral',
+  'Ed Hawkins climate spiral',
+  'climate helix interactive',
+];
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ region?: string }>;
+}): Promise<Metadata> {
+  const { region: regionSlug } = await searchParams;
+
+  const region = regionSlug ? CLIMATE_REGIONS.find((r) => r.slug === regionSlug) : null;
+  const regionName = region?.name ?? null;
+
+  const title = regionName
+    ? `${regionName} – Climate Helix | 4 Billion Years On`
+    : 'Climate Helix – Year-on-Year Temperature Spiral | 4 Billion Years On';
+
+  const ogTitle = regionName
+    ? `${regionName} – Climate Helix`
+    : 'Climate Helix — Year-on-Year Temperature Spiral';
+
+  const description = regionName
+    ? `The Climate Helix for ${regionName}: every monthly temperature reading since records began, wound into a radial year-on-year spiral. Watch ${regionName}'s warming trend emerge.`
+    : 'The Climate Helix is a radial year-on-year temperature dial: each loop is a year, the colour gradient is the long-term warming trend, and the global helix includes Paris 1.5°C and 2°C reference rings. Explore the global helix here, or open any country, US state or UK region to see its own.';
+
+  const canonicalUrl = regionSlug ? `${HUB_URL}?region=${encodeURIComponent(regionSlug)}` : HUB_URL;
+
+  const ogImageUrl = regionSlug
+    ? `${OG_API}?slug=${encodeURIComponent(regionSlug)}&name=${encodeURIComponent(regionName ?? regionSlug)}`
+    : OG_API;
+
+  return {
+    title,
+    description,
+    keywords: BASE_KEYWORDS,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title: ogTitle,
+      description: regionName
+        ? `Radial year-on-year temperature spiral for ${regionName}, with Paris 1.5°C / 2°C reference rings.`
+        : 'Radial year-on-year temperature dial with global Paris 1.5°C / 2°C reference rings, plus a region picker for every country, US state and UK region we track.',
+      type: 'website',
+      url: canonicalUrl,
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: ogTitle }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: ogTitle,
+      description: regionName
+        ? `Year-on-year temperature spiral for ${regionName} — every monthly reading since records began.`
+        : 'A radial year-on-year dial of every monthly temperature reading since records began.',
+    },
+  };
+}
 
 interface GlobalHistory {
   landOceanMonthlyAll?: { year: number; month: number; value: number }[];

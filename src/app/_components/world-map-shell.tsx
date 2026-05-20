@@ -248,6 +248,34 @@ function WorldFitter({ preset }: { preset: WorldMapPreset }) {
   return null;
 }
 
+// ─── Leaflet / React 18 Strict-Mode error boundary ─────────────────────────
+// React 18 Strict Mode double-invokes effects. react-leaflet v4 doesn't handle
+// this gracefully: layer components call addLayer on a map whose panes have
+// been cleaned up, causing "Cannot read properties of undefined (reading
+// 'appendChild')". Catch the error here and increment mountKey so that the
+// Fragment wrapper gets a new key, forcing the MapContainer to remount cleanly.
+class MapBoundary extends React.Component<
+  { children: React.ReactNode },
+  { mountKey: number }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { mountKey: 0 };
+  }
+  static getDerivedStateFromError(): { mountKey: number } {
+    return { mountKey: Date.now() };
+  }
+  render() {
+    // Keyed fragment: when mountKey changes React unmounts and remounts all
+    // children (including MapContainer), giving Leaflet a clean slate.
+    return (
+      <React.Fragment key={this.state.mountKey}>
+        {this.props.children}
+      </React.Fragment>
+    );
+  }
+}
+
 export function WorldMapShell({
   preset = 'world',
   theme = 'light',
@@ -269,6 +297,7 @@ export function WorldMapShell({
   const maxBounds = preset === 'pacific' ? pacificMaxBounds : WORLD_MAX_BOUNDS;
   return (
     <div className={`relative w-full overflow-hidden rounded-xl ${heightClass} ${className}`}>
+      <MapBoundary>
       <MapContainer
         // Initial center/zoom are placeholders — WorldFitter overrides on mount.
         center={[20, preset === 'pacific' ? PACIFIC_CENTER_LON : 0]}
@@ -302,6 +331,7 @@ export function WorldMapShell({
         ) : null}
         {children}
       </MapContainer>
+      </MapBoundary>
     </div>
   );
 }

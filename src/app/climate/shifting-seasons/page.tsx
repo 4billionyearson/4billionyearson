@@ -513,7 +513,7 @@ export default function ShiftingSeasonsPage() {
                   and notable Northern-Hemisphere records. Mirrors the
                   Shifting-Seasons block on /climate/global. */}
               <SectionCard icon={<Leaf className="text-emerald-400" />} title="Shifting Seasons Worldwide">
-                <GlobalSeasonalSummary hideExploreLink />
+                <GlobalSeasonalSummary hideExploreLink showHelixLink />
               </SectionCard>
 
               {/* ═══ THE GLOBAL PICTURE ═══ */}

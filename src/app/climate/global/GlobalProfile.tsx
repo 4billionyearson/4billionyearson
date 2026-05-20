@@ -964,6 +964,7 @@ export default function GlobalProfile({
                   <span className="min-w-0 flex-1">Explore Climate Data</span>
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <RelatedLink href="/climate/helix" label="Climate Helix" desc="Year-on-year temperature spiral for any region" />
                   <RelatedLink href="/climate/shifting-seasons" label="Shifting Seasons" desc="How the timing of the seasons is moving worldwide" />
                   <RelatedLink href="/climate/enso" label="El Niño / La Niña" desc="Live ENSO state, weekly Niño 3.4 SST and NOAA forecast" />
                   <RelatedLink href="/climate/rankings" label="Climate Rankings" desc="League table of anomalies across 144 regions" />

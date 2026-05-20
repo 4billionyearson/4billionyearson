@@ -121,6 +121,7 @@ export function ChipDropdown({
   ariaLabel,
   className = '',
   triggerClassName,
+  listClassName,
 }: {
   label?: string;
   options: SegmentedOption[];
@@ -129,6 +130,8 @@ export function ChipDropdown({
   ariaLabel?: string;
   className?: string;
   triggerClassName?: string;
+  /** Override the dropdown list's scroll/height classes (e.g. "max-h-none overflow-visible" to remove scrollbar). Defaults to "max-h-64 overflow-auto". */
+  listClassName?: string;
 }) {
   return (
     <div className={className}>
@@ -140,6 +143,7 @@ export function ChipDropdown({
         onChange={onChange}
         ariaLabel={ariaLabel ?? label}
         triggerClassName={triggerClassName}
+        listClassName={listClassName}
       />
     </div>
   );
@@ -161,6 +165,7 @@ function ListboxTrigger({
   onChange,
   ariaLabel,
   triggerClassName,
+  listClassName,
 }: {
   variant: 'select' | 'chip';
   label?: string;
@@ -169,6 +174,7 @@ function ListboxTrigger({
   onChange: (key: string) => void;
   ariaLabel?: string;
   triggerClassName?: string;
+  listClassName?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState<number>(() => {
@@ -274,7 +280,7 @@ function ListboxTrigger({
           tabIndex={-1}
           onKeyDown={onKeyDown}
           className={[
-            'absolute z-50 mt-1 max-h-64 overflow-auto rounded-lg border border-[#D0A65E]/40 bg-gray-950/95 backdrop-blur-md py-1 shadow-2xl ring-1 ring-black/40',
+            `absolute z-50 mt-1 ${listClassName ?? 'max-h-64 overflow-auto'} rounded-lg border border-[#D0A65E]/40 bg-gray-950/95 backdrop-blur-md py-1 shadow-2xl ring-1 ring-black/40`,
             variant === 'select' ? 'left-0 right-0' : 'left-0 min-w-full whitespace-nowrap',
           ].join(' ')}
         >

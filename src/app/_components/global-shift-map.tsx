@@ -785,6 +785,7 @@ export default function GlobalShiftMap() {
             value={metric}
             onChange={(id) => setMetric(id as MetricId)}
             options={metricOptions}
+            listClassName="max-h-none overflow-visible"
           />
         </div>
 

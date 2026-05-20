@@ -397,6 +397,7 @@ function ExploreCard() {
   return (
     <Card icon={<BookOpen className="h-5 w-5" />} title="Explore Climate Data">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <RelatedLink href="/climate/helix" label="Climate Helix" desc="Year-on-year temperature spiral for any region" />
         <RelatedLink href="/climate/shifting-seasons" label="Shifting Seasons" desc="How the timing of the seasons is moving worldwide" />
         <RelatedLink href="/climate/enso" label="El Niño / La Niña" desc="Live ENSO state, weekly Niño 3.4 SST and NOAA forecast" />
         <RelatedLink href="/climate/rankings" label="Climate Rankings" desc="League table of anomalies across 144 regions" />
@@ -558,7 +559,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
                 regionName={region.name}
                 dataSource={aggregateSource}
                 embedSlug={region.slug}
-                share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-spiral' }}
+                share={{ pageUrl: `https://4billionyearson.org/climate/helix?region=${encodeURIComponent(region.slug)}`, sectionId: 'climate-spiral' }}
                 seasonScheme={scheme}
                 showEnso={shouldFeatureEnso(region)}
               />
@@ -800,7 +801,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
             regionName={region.name}
             dataSource="NOAA Climate at a Glance — regional tavg / pcp (monthly absolutes)."
             embedSlug={region.slug}
-            share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-spiral' }}
+            share={{ pageUrl: `https://4billionyearson.org/climate/helix?region=${encodeURIComponent(region.slug)}`, sectionId: 'climate-spiral' }}
             seasonScheme={detectSeasonScheme({ tempMonthly: tavg.monthlyAll, precipMonthly: pcp?.monthlyAll })}
             showEnso={shouldFeatureEnso(region)}
           />

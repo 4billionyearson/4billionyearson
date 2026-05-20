@@ -98,9 +98,11 @@ type WetCohort = {
 
 export default function GlobalSeasonalSummary({
   hideExploreLink = false,
+  showHelixLink = false,
   share,
 }: {
   hideExploreLink?: boolean;
+  showHelixLink?: boolean;
   share?: { pageUrl: string; sectionId: string; embedUrl?: string; embedCode?: string };
 } = {}) {
   const [data, setData] = useState<GlobalShiftData | null>(null);
@@ -289,6 +291,7 @@ export default function GlobalSeasonalSummary({
     ...hemiRows.map(warmToRow),
     { kind: 'header', key: 'h2', label: 'By Köppen climate zone', accent: '#A3E635' },
     ...koppenWarmRows.map(warmToRow),
+    ...(wetRows.length > 0 ? [{ kind: 'header' as const, key: 'h2b', label: 'Wet-season onset shift', accent: '#38BDF8' }] : []),
     ...wetRows.map(wetToRow),
   ];
 
@@ -388,15 +391,26 @@ export default function GlobalSeasonalSummary({
             align="left"
           />
         ) : <span />}
-        {!hideExploreLink && (
-          <Link
-            href="/climate/shifting-seasons"
-            className="ml-auto inline-flex items-center gap-1 text-sm font-semibold text-teal-300 hover:text-teal-200 hover:underline transition-colors"
-          >
-            Explore Shifting Seasons worldwide
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        )}
+        <div className="flex items-center gap-4 flex-wrap ml-auto">
+          {showHelixLink && (
+            <Link
+              href="/climate/helix"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-teal-300 hover:text-teal-200 hover:underline transition-colors"
+            >
+              View the Climate Helix
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
+          {!hideExploreLink && (
+            <Link
+              href="/climate/shifting-seasons"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-teal-300 hover:text-teal-200 hover:underline transition-colors"
+            >
+              Explore Shifting Seasons worldwide
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
