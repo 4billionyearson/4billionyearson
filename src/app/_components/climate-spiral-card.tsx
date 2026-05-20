@@ -1152,11 +1152,15 @@ export default function ClimateSpiralCard({
     for (const monthIdx of NH_WET_MONTHS) nhRain += precipClimatology[monthIdx];
     let shRain = 0;
     for (const monthIdx of SH_WET_MONTHS) shRain += precipClimatology[monthIdx];
+    // If the season scheme was forced editorially (e.g. Africa / South America
+    // continental averages whose equal-weight aggregate falls below the ratio
+    // threshold), trust the scheme kind over the raw ratio.
+    const forcedWetDry = seasonScheme.kind === 'wet-dry-NH' || seasonScheme.kind === 'wet-dry-SH';
     return {
-      hasSeasonality: ratio >= WET_DRY_RATIO_THRESHOLD,
+      hasSeasonality: forcedWetDry || ratio >= WET_DRY_RATIO_THRESHOLD,
       isNH: nhRain >= shRain,
     };
-  }, [precipClimatology, seasonScheme.isNH]);
+  }, [precipClimatology, seasonScheme.isNH, seasonScheme.kind]);
   /** Approx days per month for shift-day computation. */
   const DAYS_PER_MONTH = 30.44;
 
