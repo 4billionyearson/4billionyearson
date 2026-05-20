@@ -15,7 +15,7 @@ import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
 import RecordsSection from '@/app/_components/climate-records-section';
 import { shouldFeatureEnso, shouldShowEnsoTracker } from '@/lib/climate/enso-impacts';
 import LiveEnsoCard from '@/app/climate/_components/LiveEnsoCard';
-import { detectSeasonScheme } from '@/lib/climate/season-scheme';
+import { detectSeasonScheme, type SeasonSchemeKind } from '@/lib/climate/season-scheme';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
 import EnergyMixCard from '@/app/_components/energy-mix-card';
@@ -541,7 +541,16 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             // typically classify them as aseasonal (Africa, Americas) or
             // temperate-NH (Europe, Asia, US regions). Helix renders without
             // season wedges when aseasonal.
-            const scheme = detectSeasonScheme({ tempMonthly: absolutes.monthlyAll });
+            // Editorial overrides for continents whose temp aggregate is too
+            // flat for auto-detection but whose climate is clearly wet/dry:
+            const CONTINENT_SCHEME_OVERRIDES: Partial<Record<string, SeasonSchemeKind>> = {
+              'africa': 'wet-dry-NH',        // Sub-Saharan wet season in boreal summer (Apr–Sep)
+              'south-america': 'wet-dry-SH', // Amazon/Cerrado wet season in SH summer (Oct–Mar)
+            };
+            const forceKind = region.groupKind === 'continent'
+              ? CONTINENT_SCHEME_OVERRIDES[region.slug]
+              : undefined;
+            const scheme = detectSeasonScheme({ tempMonthly: absolutes.monthlyAll, forceKind });
             return (
               <ClimateSpiralCard
                 series={{ temp: absolutes.monthlyAll }}
