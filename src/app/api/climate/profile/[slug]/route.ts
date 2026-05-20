@@ -104,6 +104,9 @@ export async function GET(
     const nationalSnap = await loadSnapshot('us-national.json');
     nationalMonth = nationalSnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
     nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+  } else if (region.type === 'group' && region.groupKind === 'continent') {
+    const primarySnap = await loadSnapshot(`continent-absolutes/${region.slug}.json`);
+    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
   }
 
   const dataCacheKeyParts = [
@@ -133,6 +136,7 @@ export async function GET(
   try {
     let countryData = null;
     let countryPrecipData = null; // World Bank CKP monthly precip (CRU TS 4.08)
+    let continentData = null; // Berkeley Earth continent absolute temps
     let usStateData = null;
     let usClimateRegionData = null;
     let ukRegionData = null;
@@ -179,6 +183,8 @@ export async function GET(
       ]);
       usClimateRegionData = groupRes;
       nationalData = nationalRes;
+    } else if (region.type === 'group' && region.groupKind === 'continent') {
+      continentData = await loadSnapshot(`continent-absolutes/${region.slug}.json`);
     }
 
     // Build key stats for the crawlable summary
@@ -193,6 +199,7 @@ export async function GET(
       dataSources: region.dataSources,
       countryData,
       countryPrecipData,
+      continentData,
       usStateData,
       usClimateRegionData,
       ukRegionData,

@@ -32,7 +32,8 @@ async function fetchRegionHelixData(region: ClimateRegion): Promise<RegionHelixD
       data.usClimateRegionData?.paramData?.tavg?.monthlyAll ||
       data.usStateData?.paramData?.tavg?.monthlyAll ||
       data.nationalData?.paramData?.tavg?.monthlyAll ||
-      data.countryData?.monthlyAll;
+      data.countryData?.monthlyAll ||
+      data.continentData?.monthlyAll;
 
     if (!temp?.length) return null;
 
