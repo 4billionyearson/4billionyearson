@@ -1056,7 +1056,7 @@ export default function ClimateProfile({
                               dataSource={chartSource}
                               provisionalAfterMonth={pageSnapshotCut}
                               embedSlug={slug}
-                              share={{ pageUrl: 'https://4billionyearson.org/climate/helix', sectionId: 'climate-spiral' }}
+                              share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'climate-spiral' }}
                               showEnso={shouldFeatureEnso(region)}
                               seasonScheme={seasonScheme}
                             />

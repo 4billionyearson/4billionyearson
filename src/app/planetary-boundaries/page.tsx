@@ -633,7 +633,7 @@ export default function PlanetaryBoundariesPage() {
                         </>
                       )}
                       {b.liveKey === "oceanWarming" &&
-                        liveData.oceanWarming && (
+                        liveData.oceanWarming && liveData.oceanWarming.anomaly != null && (
                           <LiveMetric
                             label={`Ocean anomaly (${liveData.oceanWarming.year})`}
                             value={`+${liveData.oceanWarming.anomaly.toFixed(
@@ -826,7 +826,7 @@ export default function PlanetaryBoundariesPage() {
                       </div>
                     </div>
                   )}
-                  {liveData.oceanWarming && (
+                  {liveData.oceanWarming && liveData.oceanWarming.anomaly != null && (
                     <div className="bg-gray-800/60 rounded-lg p-3">
                       <div className="text-xs text-gray-500 mb-1">
                         Ocean Warming ({liveData.oceanWarming.year})

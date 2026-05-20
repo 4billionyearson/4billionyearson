@@ -19,13 +19,31 @@ const ICE_YEARS = ["1979","1985","1990","1995","2000","2005","2010","2012","2015
 interface YearlyPoint { year: number; value: number }
 interface TempPoint { year: number; anomaly: number }
 
+interface SeaLevelStats {
+  latest: { year: number; value: number };
+  rate: string;
+  yearly: YearlyPoint[];
+}
+
 interface GHGData {
   co2: { current: { value: number }; yearly: YearlyPoint[] } | null;
   temperature: { current: { anomaly: number; date: string }; yearly: TempPoint[] } | null;
-  arcticIce: { current: { extent: number; anomaly: number; date: string }; yearly: YearlyPoint[] } | null;
-  oceanWarming: { current: { anomaly: number; year: string }; yearly: YearlyPoint[] } | null;
+  arcticIce: { current: { extent: number; anomaly: number | null; date: string }; yearly: YearlyPoint[] } | null;
+  oceanWarming: { current: { anomaly: number | null; year: string }; yearly: YearlyPoint[] } | null;
   seaLevel: { current: { value: number; year: string }; rate: string; yearly: YearlyPoint[] } | null;
   fetchedAt: string;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Convert a Berkeley Earth decimal year (e.g. 2026.29) to "Apr 2026". */
+function fmtDecimalYear(s: string): string {
+  const n = parseFloat(s);
+  if (isNaN(n)) return s;
+  const year = Math.floor(n);
+  const monthIdx = Math.min(Math.round((n - year) * 12), 11);
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${MONTHS[monthIdx]} ${year}`;
 }
 
 // ─── Chart config ────────────────────────────────────────────────────────────
@@ -324,6 +342,7 @@ function HemisphereSeaIceCard({ data, accent }: { data: HemisphereSeaIce; accent
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function SeaLevelsIcePage() {
+  const currentYear = new Date().getFullYear();
   const [data, setData] = useState<GHGData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -336,6 +355,7 @@ export default function SeaLevelsIcePage() {
   const [globalSeaIce, setGlobalSeaIce] = useState<any>(null);
   const [arcticSeaIce, setArcticSeaIce] = useState<HemisphereSeaIce | null>(null);
   const [antarcticSeaIce, setAntarcticSeaIce] = useState<HemisphereSeaIce | null>(null);
+  const [seaLevelStats, setSeaLevelStats] = useState<SeaLevelStats | null>(null);
 
   useEffect(() => {
     fetch('/api/climate/greenhouse-gases')
@@ -352,6 +372,7 @@ export default function SeaLevelsIcePage() {
         setGlobalSeaIce(d?.seaIceStats ?? null);
         setArcticSeaIce(d?.arcticSeaIce ?? null);
         setAntarcticSeaIce(d?.antarcticSeaIce ?? null);
+        setSeaLevelStats(d?.seaLevelStats ?? null);
       })
       .catch(() => {});
   }, []);
@@ -359,51 +380,56 @@ export default function SeaLevelsIcePage() {
   // ─── Correlation datasets ──────────────────────────────────────────────────
 
   const tempSeaLevelData = useMemo(() => {
-    if (!data?.temperature?.yearly || !data?.seaLevel?.yearly) return null;
-    const slMap = new Map(data.seaLevel.yearly.map(s => [s.year, s.value]));
+    if (!data?.temperature?.yearly || !seaLevelStats?.yearly) return null;
+    const currentYear = new Date().getFullYear();
+    const slMap = new Map(seaLevelStats.yearly.map(s => [s.year, s.value]));
     return data.temperature.yearly
-      .filter(t => slMap.has(t.year))
+      .filter(t => slMap.has(t.year) && t.year < currentYear)
       .map(t => ({ year: t.year, temp: t.anomaly, seaLevel: slMap.get(t.year)! }));
-  }, [data?.temperature, data?.seaLevel]);
+  }, [data?.temperature, seaLevelStats]);
 
   const iceSeaLevelData = useMemo(() => {
-    if (!data?.arcticIce?.yearly || !data?.seaLevel?.yearly) return null;
-    const slMap = new Map(data.seaLevel.yearly.map(s => [s.year, s.value]));
+    if (!data?.arcticIce?.yearly || !seaLevelStats?.yearly) return null;
+    const currentYear = new Date().getFullYear();
+    const slMap = new Map(seaLevelStats.yearly.map(s => [s.year, s.value]));
     return data.arcticIce.yearly
-      .filter(i => slMap.has(i.year))
+      .filter(i => slMap.has(i.year) && i.year < currentYear)
       .map(i => ({ year: i.year, ice: i.value, seaLevel: slMap.get(i.year)! }));
-  }, [data?.arcticIce, data?.seaLevel]);
+  }, [data?.arcticIce, seaLevelStats]);
 
   const tempIceData = useMemo(() => {
     if (!data?.temperature?.yearly || !data?.arcticIce?.yearly) return null;
+    const currentYear = new Date().getFullYear();
     const iceMap = new Map(data.arcticIce.yearly.map(i => [i.year, i.value]));
     return data.temperature.yearly
-      .filter(t => iceMap.has(t.year))
+      .filter(t => iceMap.has(t.year) && t.year < currentYear)
       .map(t => ({ year: t.year, temp: t.anomaly, ice: iceMap.get(t.year)! }));
   }, [data?.temperature, data?.arcticIce]);
 
   const oceanSeaLevelData = useMemo(() => {
-    if (!data?.oceanWarming?.yearly || !data?.seaLevel?.yearly) return null;
-    const slMap = new Map(data.seaLevel.yearly.map(s => [s.year, s.value]));
+    if (!data?.oceanWarming?.yearly || !seaLevelStats?.yearly) return null;
+    const currentYear = new Date().getFullYear();
+    const slMap = new Map(seaLevelStats.yearly.map(s => [s.year, s.value]));
     return data.oceanWarming.yearly
-      .filter(o => slMap.has(o.year))
+      .filter(o => slMap.has(o.year) && o.year < currentYear)
       .map(o => ({ year: o.year, ocean: o.value, seaLevel: slMap.get(o.year)! }));
-  }, [data?.oceanWarming, data?.seaLevel]);
+  }, [data?.oceanWarming, seaLevelStats]);
 
   const co2SeaLevelData = useMemo(() => {
-    if (!data?.co2?.yearly || !data?.seaLevel?.yearly) return null;
-    const slMap = new Map(data.seaLevel.yearly.map(s => [s.year, s.value]));
+    if (!data?.co2?.yearly || !seaLevelStats?.yearly) return null;
+    const currentYear = new Date().getFullYear();
+    const slMap = new Map(seaLevelStats.yearly.map(s => [s.year, s.value]));
     return data.co2.yearly
-      .filter(c => slMap.has(c.year))
+      .filter(c => slMap.has(c.year) && c.year < currentYear)
       .map(c => ({ year: c.year, co2: c.value, seaLevel: slMap.get(c.year)! }));
-  }, [data?.co2, data?.seaLevel]);
+  }, [data?.co2, seaLevelStats]);
 
   // ─── Anomaly data aligned to ice map years ──────────────────────────────
   const iceYearAnomalies = useMemo(() => {
     if (!data) return null;
     const tempMap = new Map(data.temperature?.yearly.map(t => [t.year, t.anomaly]));
     const oceanMap = new Map(data.oceanWarming?.yearly.map(o => [o.year, o.value]));
-    const slMap = new Map(data.seaLevel?.yearly.map(s => [s.year, s.value]));
+    const slMap = new Map(seaLevelStats?.yearly.map(s => [s.year, s.value]));
     return ICE_YEARS.map(y => {
       const yr = Number(y);
       return {
@@ -413,7 +439,7 @@ export default function SeaLevelsIcePage() {
         seaLevel: slMap.get(yr) ?? null,
       };
     }).filter(d => d.temp !== null || d.ocean !== null || d.seaLevel !== null);
-  }, [data]);
+  }, [data, seaLevelStats]);
 
   return (
     <main>
@@ -429,7 +455,7 @@ export default function SeaLevelsIcePage() {
             </div>
             <div className="bg-gray-950/90 backdrop-blur-md p-4">
               <p className="text-sm md:text-lg text-gray-300 leading-relaxed">
-                Tracking sea level rise and polar ice loss – two key indicators of a warming planet.
+                Satellite-measured sea level rise, Arctic and Antarctic sea ice extent since 1979, global ice anomalies, and ocean surface warming – tracking the clearest physical consequences of a changing climate.
               </p>
             </div>
           </div>
@@ -460,40 +486,40 @@ export default function SeaLevelsIcePage() {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {data.seaLevel && (
+                  {globalSeaIce && (
+                    <StatCard
+                      label="Global Sea Ice"
+                      value={globalSeaIce.latest.extent.toFixed(1)}
+                      unit="M km²"
+                      subtext={globalSeaIce.anomaly != null ? `${globalSeaIce.anomaly > 0 ? '+' : ''}${(globalSeaIce.anomaly as number).toFixed(1)} vs avg` : undefined}
+                      color="text-sky-300"
+                    />
+                  )}
+                  {seaLevelStats && (
                     <StatCard
                       label="Sea Level Rise"
-                      value={`+${data.seaLevel.current.value.toFixed(0)}`}
+                      value={`+${seaLevelStats.latest.value.toFixed(0)}`}
                       unit="mm"
-                      subtext={`Rising ${data.seaLevel.rate} since 1993`}
+                      subtext={`Rising ${seaLevelStats.rate} since 1993`}
                       color="text-teal-400"
                     />
                   )}
-                  {data.arcticIce && (
-                    <StatCard
-                      label="Arctic Sea Ice"
-                      value={data.arcticIce.current.extent.toFixed(1)}
-                      unit="M km²"
-                      subtext={`${data.arcticIce.current.anomaly > 0 ? '+' : ''}${data.arcticIce.current.anomaly.toFixed(1)} vs average`}
-                      color="text-cyan-400"
-                    />
-                  )}
-                  {data.temperature && (
-                    <StatCard
-                      label="Temperature Anomaly"
-                      value={`+${Math.abs(data.temperature.current.anomaly).toFixed(2)}`}
-                      unit="°C"
-                      subtext="vs 1951-1980 baseline"
-                      color="text-orange-400"
-                    />
-                  )}
-                  {data.oceanWarming && (
+                  {data.oceanWarming && data.oceanWarming.current.anomaly != null && (
                     <StatCard
                       label={`Ocean Warming (${data.oceanWarming.current.year})`}
                       value={`+${data.oceanWarming.current.anomaly.toFixed(2)}`}
                       unit="°C"
                       subtext="Sea surface anomaly"
                       color="text-blue-400"
+                    />
+                  )}
+                  {data.temperature && data.temperature.current.anomaly != null && (
+                    <StatCard
+                      label="Temp Anomaly"
+                      value={`+${data.temperature.current.anomaly.toFixed(2)}`}
+                      unit="°C"
+                      subtext={fmtDecimalYear(data.temperature.current.date)}
+                      color="text-orange-400"
                     />
                   )}
                 </div>
@@ -609,7 +635,7 @@ export default function SeaLevelsIcePage() {
               {/* ── Ice → Sea Level ── */}
               {iceSeaLevelData && iceSeaLevelData.length > 0 && (
                 <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Melting Ice, Rising Seas">
-                  <SubSection title="Arctic ice extent in M km² (left axis) vs sea level change in mm (right axis)">
+                  <SubSection title="Global sea ice extent in M km² (left axis) vs sea level change in mm (right axis)">
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={iceSeaLevelData} margin={CHART_MARGIN}>
@@ -619,7 +645,7 @@ export default function SeaLevelsIcePage() {
                           <YAxis yAxisId="sl" orientation="right" tick={{ fontSize: 11, fill: '#14b8a6' }} tickLine={false} axisLine={false} />
                           <Tooltip content={<CorrelationTooltip />} />
                           <Legend iconType="plainline" wrapperStyle={{ color: '#D3C8BB', fontSize: 12, paddingTop: 10, left: 0, right: 0 }} />
-                          <Line yAxisId="ice" type="monotone" dataKey="ice" name="Arctic Ice (M km²)" stroke="#22d3ee" strokeWidth={2} dot={false} />
+                          <Line yAxisId="ice" type="monotone" dataKey="ice" name="Global Sea Ice (M km²)" stroke="#22d3ee" strokeWidth={2} dot={false} />
                           <Line yAxisId="sl" type="monotone" dataKey="seaLevel" name="Sea Level (mm)" stroke="#14b8a6" strokeWidth={2} dot={false} />
                           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
                             <LineChart data={iceSeaLevelData}>
@@ -641,7 +667,7 @@ export default function SeaLevelsIcePage() {
               {/* ── Temperature → Ice ── */}
               {tempIceData && tempIceData.length > 0 && (
                 <SectionCard icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Warming Destroys Ice">
-                  <SubSection title="Temperature anomaly (left axis) vs Arctic ice extent in M km² (right axis)">
+                  <SubSection title="Temperature anomaly (left axis) vs global sea ice extent in M km² (right axis)">
                     <div className="h-[380px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={tempIceData} margin={CHART_MARGIN}>
@@ -654,7 +680,7 @@ export default function SeaLevelsIcePage() {
                           <ReferenceLine yAxisId="temp" y={1.5} stroke="#f59e0b" strokeDasharray="4 4" strokeWidth={1.5}
                             label={{ position: 'insideTopLeft', value: 'Paris +1.5°C', fill: '#f59e0b', fontSize: 10, fontWeight: 600 } as any} />
                           <Line yAxisId="temp" type="monotone" dataKey="temp" name="Temp Anomaly (°C)" stroke="#f59e0b" strokeWidth={2} dot={false} />
-                          <Line yAxisId="ice" type="monotone" dataKey="ice" name="Arctic Ice (M km²)" stroke="#22d3ee" strokeWidth={2} dot={false} />
+                          <Line yAxisId="ice" type="monotone" dataKey="ice" name="Global Sea Ice (M km²)" stroke="#22d3ee" strokeWidth={2} dot={false} />
                           <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
                             <LineChart data={tempIceData}>
                               <Line type="monotone" dataKey="temp" stroke="#f59e0b" dot={false} strokeWidth={1} />
@@ -739,13 +765,13 @@ export default function SeaLevelsIcePage() {
               {/* ═══ INDIVIDUAL DATA SERIES ═══ */}
 
               {/* ── Sea Level ── */}
-              {data.seaLevel && data.seaLevel.yearly.length > 0 && (
+              {seaLevelStats && seaLevelStats.yearly.length > 0 && (
                 <>
                   <Divider icon={<ArrowUp className="h-5 w-5" />} title="Global Sea Level" />
                   <SectionCard icon={<ArrowUp className="h-5 w-5 text-teal-400" />} title="Global Mean Sea Level">
                     <SubSection title="Annual average sea level change (mm) – satellite era">
                       <SimpleYearlyChart
-                        data={data.seaLevel.yearly}
+                        data={seaLevelStats.yearly}
                         dataKey="value"
                         label="Sea Level"
                         unit="mm"
@@ -761,15 +787,15 @@ export default function SeaLevelsIcePage() {
                 </>
               )}
 
-              {/* ── Arctic Ice ── */}
+              {/* ── Global Sea Ice ── */}
               {data.arcticIce && data.arcticIce.yearly.length > 0 && (
                 <>
-                  <Divider icon={<Snowflake className="h-5 w-5" />} title="Arctic Sea Ice" />
+                  <Divider icon={<Snowflake className="h-5 w-5" />} title="Global Sea Ice" />
 
-                  <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Arctic Sea Ice Extent">
+                  <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Global Sea Ice Extent">
                     <SubSection title="Annual average sea ice extent (million km²)">
                       <SimpleYearlyChart
-                        data={data.arcticIce.yearly}
+                        data={data.arcticIce.yearly.filter(d => d.year < currentYear)}
                         dataKey="value"
                         label="Sea Ice Extent"
                         unit="M km²"
@@ -778,7 +804,7 @@ export default function SeaLevelsIcePage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      Arctic ice reflects sunlight back into space. As it melts, darker ocean absorbs more heat – accelerating warming in a feedback loop. Source:{" "}
+                      Global sea ice (Arctic + Antarctic combined) reflects sunlight back into space. As it melts, darker ocean absorbs more heat – accelerating warming in a feedback loop. Source:{" "}
                       <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">NSIDC</a>{" "}/ NOAA via{" "}
                       <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">global-warming.org</a>.
                     </p>

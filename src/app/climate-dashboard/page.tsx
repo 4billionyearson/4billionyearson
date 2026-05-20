@@ -892,13 +892,14 @@ function ClimateDashboard() {
           const fmtSigned = (v: number | undefined, digits: number) => v == null ? null : `${v >= 0 ? '+' : ''}${v.toFixed(digits)}`;
           const monthHdr = keyFactsMonthLabel ? ` (${keyFactsMonthLabel})` : '';
           const yearHdr = keyFactsAnnualYear ? ` (${keyFactsAnnualYear})` : '';
+          const hasRainfall = keyFactsTiers.some((t) => t.rainMonth != null || t.rainYear != null);
           return (
             <div className="bg-gray-950/90 backdrop-blur-md rounded-2xl border-2 border-[#D0A65E] p-4 shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <Activity className="h-5 w-5 text-[#D0A65E]" />
                 <h2 className="text-lg font-bold font-mono text-white">Key Facts</h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className={`grid gap-3 ${hasRainfall ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2'}`}>
                 <ClimateStatCard
                   label={`Avg Temperature${monthHdr}`}
                   subtitle="Anomaly vs 1961-1990 baseline (actual value in brackets)."
@@ -914,21 +915,23 @@ function ClimateDashboard() {
                     };
                   })}
                 />
-                <ClimateStatCard
-                  label={`Rainfall${monthHdr}`}
-                  subtitle="Anomaly vs 1961-1990 baseline (actual value in brackets)."
-                  color="text-blue-400"
-                  tiers={keyFactsTiers.map((t) => {
-                    const anom = fmtSigned(t.rainMonth?.diff, 0);
-                    const val = fmt(t.rainMonth?.value, 0);
-                    return {
-                      name: t.name,
-                      primary: anom,
-                      primaryUnit: 'mm',
-                      secondary: val ? `${val}mm` : null,
-                    };
-                  })}
-                />
+                {hasRainfall && (
+                  <ClimateStatCard
+                    label={`Rainfall${monthHdr}`}
+                    subtitle="Anomaly vs 1961-1990 baseline (actual value in brackets)."
+                    color="text-blue-400"
+                    tiers={keyFactsTiers.map((t) => {
+                      const anom = fmtSigned(t.rainMonth?.diff, 0);
+                      const val = fmt(t.rainMonth?.value, 0);
+                      return {
+                        name: t.name,
+                        primary: anom,
+                        primaryUnit: 'mm',
+                        secondary: val ? `${val}mm` : null,
+                      };
+                    })}
+                  />
+                )}
                 <ClimateStatCard
                   label={`Avg Temperature${yearHdr}`}
                   subtitle="Anomaly vs 1961-1990 baseline (actual value in brackets)."
@@ -944,21 +947,23 @@ function ClimateDashboard() {
                     };
                   })}
                 />
-                <ClimateStatCard
-                  label={`Rainfall${yearHdr}`}
-                  subtitle="Anomaly vs 1961-1990 baseline (actual value in brackets)."
-                  color="text-cyan-400"
-                  tiers={keyFactsTiers.map((t) => {
-                    const anom = fmtSigned(t.rainYear?.diff ?? undefined, 0);
-                    const val = fmt(t.rainYear?.value, 0);
-                    return {
-                      name: t.name,
-                      primary: anom ?? val,
-                      primaryUnit: 'mm',
-                      secondary: anom && val ? `${val}mm` : null,
-                    };
-                  })}
-                />
+                {hasRainfall && (
+                  <ClimateStatCard
+                    label={`Rainfall${yearHdr}`}
+                    subtitle="Anomaly vs 1961-1990 baseline (actual value in brackets)."
+                    color="text-cyan-400"
+                    tiers={keyFactsTiers.map((t) => {
+                      const anom = fmtSigned(t.rainYear?.diff ?? undefined, 0);
+                      const val = fmt(t.rainYear?.value, 0);
+                      return {
+                        name: t.name,
+                        primary: anom ?? val,
+                        primaryUnit: 'mm',
+                        secondary: anom && val ? `${val}mm` : null,
+                      };
+                    })}
+                  />
+                )}
               </div>
               <p className="text-xs text-gray-400 mt-3">
                 Sources:{' '}

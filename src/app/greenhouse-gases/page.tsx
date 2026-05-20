@@ -246,11 +246,13 @@ const CorrelationTooltip = ({ active, payload, label }: any) => {
 // ─── Overview Section (combined cause & effect charts) ────────────────────────
 
 function OverviewSection({ data }: { data: GHGData }) {
+  const currentYear = new Date().getFullYear();
   // Merge datasets by year for combined views
   const normalisedGasData = useMemo(() => {
     const map = new Map<number, any>();
     if (data.co2?.yearly) {
       for (const p of data.co2.yearly) {
+        if (p.year >= currentYear) continue;
         const row = map.get(p.year) || { year: p.year };
         row.co2Pct = ((p.value - 280) / 280) * 100;
         map.set(p.year, row);
@@ -258,6 +260,7 @@ function OverviewSection({ data }: { data: GHGData }) {
     }
     if (data.methane?.yearly) {
       for (const p of data.methane.yearly) {
+        if (p.year >= currentYear) continue;
         const row = map.get(p.year) || { year: p.year };
         row.ch4Pct = ((p.value - 722) / 722) * 100;
         map.set(p.year, row);
@@ -265,37 +268,38 @@ function OverviewSection({ data }: { data: GHGData }) {
     }
     if (data.n2o?.yearly) {
       for (const p of data.n2o.yearly) {
+        if (p.year >= currentYear) continue;
         const row = map.get(p.year) || { year: p.year };
         row.n2oPct = ((p.value - 270) / 270) * 100;
         map.set(p.year, row);
       }
     }
     return Array.from(map.values()).sort((a, b) => a.year - b.year);
-  }, [data.co2, data.methane, data.n2o]);
+  }, [data.co2, data.methane, data.n2o, currentYear]);
 
   const co2TempData = useMemo(() => {
     if (!data.co2?.yearly || !data.temperature?.yearly) return null;
     const tempMap = new Map(data.temperature.yearly.map(t => [t.year, t.anomaly]));
     return data.co2.yearly
-      .filter(c => tempMap.has(c.year))
+      .filter(c => c.year < currentYear && tempMap.has(c.year))
       .map(c => ({ year: c.year, co2: c.value, temp: tempMap.get(c.year)! }));
-  }, [data.co2, data.temperature]);
+  }, [data.co2, data.temperature, currentYear]);
 
   const co2IceData = useMemo(() => {
     if (!data.co2?.yearly || !data.arcticIce?.yearly) return null;
     const iceMap = new Map(data.arcticIce.yearly.map(i => [i.year, i.value]));
     return data.co2.yearly
-      .filter(c => iceMap.has(c.year))
+      .filter(c => c.year < currentYear && iceMap.has(c.year))
       .map(c => ({ year: c.year, co2: c.value, ice: iceMap.get(c.year)! }));
-  }, [data.co2, data.arcticIce]);
+  }, [data.co2, data.arcticIce, currentYear]);
 
   const tempOceanData = useMemo(() => {
     if (!data.temperature?.yearly || !data.oceanWarming?.yearly) return null;
     const oceanMap = new Map(data.oceanWarming.yearly.map(o => [o.year, o.value]));
     return data.temperature.yearly
-      .filter(t => oceanMap.has(t.year))
+      .filter(t => t.year < currentYear && oceanMap.has(t.year))
       .map(t => ({ year: t.year, landTemp: t.anomaly, oceanTemp: oceanMap.get(t.year)! }));
-  }, [data.temperature, data.oceanWarming]);
+  }, [data.temperature, data.oceanWarming, currentYear]);
 
   const hasAnyData = normalisedGasData.length > 0 || co2TempData || co2IceData || tempOceanData;
   if (!hasAnyData) return null;
@@ -434,7 +438,7 @@ function OverviewSection({ data }: { data: GHGData }) {
       {/* ── CO₂ vs Arctic Ice ── */}
       {co2IceData && co2IceData.length > 0 && (
         <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Rising Carbon, Vanishing Ice">
-          <SubSection title="CO₂ concentration (left axis) vs Arctic sea ice extent (right axis)">
+          <SubSection title="CO₂ concentration (left axis) vs global sea ice extent (right axis)">
             <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={co2IceData} margin={CHART_MARGIN}>
@@ -449,7 +453,7 @@ function OverviewSection({ data }: { data: GHGData }) {
                   <ReferenceLine yAxisId="co2" y={280} stroke="#7A6E63" strokeDasharray="6 3" strokeWidth={1}
                     label={{ position: 'insideBottom', value: 'Pre-industrial: 280 ppm', fill: '#7A6E63', fontSize: 10 } as any} />
                   <Line yAxisId="co2" type="monotone" dataKey="co2" name="CO₂ (ppm)" stroke="#ef4444" strokeWidth={2} dot={false} />
-                  <Line yAxisId="ice" type="monotone" dataKey="ice" name="Arctic Ice (M km²)" stroke="#22d3ee" strokeWidth={2} dot={false} />
+                  <Line yAxisId="ice" type="monotone" dataKey="ice" name="Global Sea Ice (M km²)" stroke="#22d3ee" strokeWidth={2} dot={false} />
                   <Brush dataKey="year" height={BRUSH_HEIGHT} stroke="#4B5563" fill="#111827" travellerWidth={10}>
                     <LineChart data={co2IceData}>
                       <Line type="monotone" dataKey="co2" stroke="#ef4444" dot={false} strokeWidth={1} />
@@ -460,7 +464,7 @@ function OverviewSection({ data }: { data: GHGData }) {
             </div>
           </SubSection>
           <p className="text-sm text-gray-400 mt-3">
-            As CO₂ climbs, Arctic ice drops – lost ice exposes dark ocean, absorbing more heat and accelerating warming further. Sources:{" "}
+            As CO₂ climbs, global sea ice drops – lost ice exposes dark ocean, absorbing more heat and accelerating warming further. Sources:{" "}
             <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NOAA GML</a>{" "}(CO₂) ·{" "}
             <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NSIDC</a>{" "}via{" "}
             <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
@@ -476,6 +480,7 @@ function OverviewSection({ data }: { data: GHGData }) {
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function GreenhouseGasesPage() {
+  const currentYear = new Date().getFullYear();
   const [data, setData] = useState<GHGData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -688,14 +693,14 @@ export default function GreenhouseGasesPage() {
                 </>
               )}
 
-              {/* ═══ Arctic Ice ═══ */}
+              {/* ═══ Global Sea Ice ═══ */}
               {data.arcticIce && data.arcticIce.yearly.length > 0 && (
                 <>
-                  <Divider icon={<Snowflake className="h-5 w-5" />} title="Arctic Sea Ice" />
-                  <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Arctic Sea Ice Extent">
+                  <Divider icon={<Snowflake className="h-5 w-5" />} title="Global Sea Ice" />
+                  <SectionCard icon={<Snowflake className="h-5 w-5 text-cyan-400" />} title="Global Sea Ice Extent">
                     <SubSection title="Annual average sea ice extent (million km²)">
                       <SimpleYearlyChart
-                        data={data.arcticIce.yearly}
+                        data={data.arcticIce.yearly.filter(d => d.year < currentYear)}
                         dataKey="value"
                         label="Sea Ice Extent"
                         unit="M km²"
@@ -704,7 +709,7 @@ export default function GreenhouseGasesPage() {
                       />
                     </SubSection>
                     <p className="text-sm text-gray-400 mt-3">
-                      Arctic ice reflects sunlight back into space. As it melts, darker ocean absorbs more heat, accelerating warming in a feedback loop. Source:{" "}
+                      Global sea ice (Arctic + Antarctic combined) reflects sunlight back into space. As it melts, darker ocean absorbs more heat, accelerating warming in a feedback loop. Source:{" "}
                       <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">NSIDC</a>{" "}/ NOAA via{" "}
                       <a href="https://global-warming.org" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">global-warming.org</a>.
                     </p>

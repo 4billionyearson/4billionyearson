@@ -176,18 +176,16 @@ function SectionCard({
   icon,
   title,
   subtitle,
-  headerClassName,
   children,
 }: {
   icon?: React.ReactNode;
   title: string;
   subtitle?: string;
-  headerClassName?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="bg-gray-950/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border-2 border-[#D0A65E]">
-      <div className={headerClassName ?? 'mb-3'}>
+      <div className="mb-3">
         <h3 className="text-xl font-bold font-mono text-white flex items-start gap-2 [&>svg]:shrink-0 [&>svg]:mt-1 [&>svg]:h-5 [&>svg]:w-5">
           {icon}
           <span className="min-w-0 flex-1">{title}</span>
@@ -322,19 +320,15 @@ export default function EnsoPage() {
 
   // Scroll to the hashed section after data renders (the element doesn't exist
   // during the loading spinner phase, so the browser's native scroll fails).
-  // Two-pass: 150ms gets us close; 600ms corrects layout shifts from charts
-  // finishing paint (Recharts, heavy SVG sections, etc.).
   useEffect(() => {
     if (!data) return;
     const hash = window.location.hash;
     if (!hash) return;
-    const scroll = () => {
+    const id = setTimeout(() => {
       const el = document.querySelector(hash);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-    const id1 = setTimeout(scroll, 150);
-    const id2 = setTimeout(scroll, 600);
-    return () => { clearTimeout(id1); clearTimeout(id2); };
+    }, 150);
+    return () => clearTimeout(id);
   }, [data]);
 
   if (error) {
@@ -368,7 +362,7 @@ export default function EnsoPage() {
     );
   }
 
-  const { oni, weekly, mei, soi, generatedAt } = data;
+  const { oni, weekly, mei, soi, images, generatedAt } = data;
   const plume = data.plume;
 
   // Top-level forecast summary so the Current State header can hint at the
@@ -384,23 +378,10 @@ export default function EnsoPage() {
     const idx = SEASON_LABELS.indexOf(s.season);
     if (prevIdx >= 0 && idx >= 0 && idx < prevIdx) runYear += 1;
     if (idx >= 0) prevIdx = idx;
-    // Join the IRI plume value for this horizon, preferring the dynamical
-    // mean so the footprint uses the same plume number highlighted in the
-    // main Forecast section. Fall back to the all-model mean if needed.
-    const plumeMatch = plume?.periods.find((p) =>
-      p.label === s.season && p.seasonAnchorYear === runYear);
-    const modelOni = plumeMatch?.dynMean ?? plumeMatch?.mean ?? null;
-    return { ...s, anchorYear: runYear, modelOni };
+    return { ...s, anchorYear: runYear };
   });
   const forecastFirst50 = forecastWithYear.find((s) => s.pElNino >= 50) || null;
   const forecastFirst50La = forecastWithYear.find((s) => s.pLaNina >= 50) || null;
-  const weeklyAnom = weekly?.latest?.nino34?.anom ?? 0;
-  const oniAnom = oni?.anomaly ?? 0;
-  const neutralLabel = weeklyAnom >= 0.5 || oniAnom >= 0.5
-    ? 'El Niño-leaning · no sustained event forecast'
-    : weeklyAnom <= -0.5 || oniAnom <= -0.5
-      ? 'La Niña-leaning · no sustained event forecast'
-      : 'Neutral conditions favoured through the forecast window';
   const forecastVerdict: { phase: 'el-nino' | 'la-nina' | null; label: string | null } =
     forecastFirst50
       ? {
@@ -412,7 +393,7 @@ export default function EnsoPage() {
             phase: 'la-nina',
             label: `La Niña Predicted by ${seasonMiddleMonth(forecastFirst50La.season, forecastFirst50La.anchorYear)}`,
           }
-        : { phase: null, label: neutralLabel };
+        : { phase: null, label: 'Neutral conditions favoured through the forecast window' };
 
   return (
     <main>
@@ -565,46 +546,256 @@ export default function EnsoPage() {
       })()}
       </div>
 
-      {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
-      <div id="forecast" className="scroll-mt-24">
-      <Divider icon={<TrendingUp className="h-5 w-5" />} title={`Prediction (${ensoForecastYearLabel()})`} />
-      <ForecastSection data={data} />
-
-
-
-      </div>
-
-      {/* ═══ GLOBAL IMPACT ════════════════════════════ */}
-      <div id="impacts" className="scroll-mt-24">
-        <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impact" />
-      </div>
-
-      {/* ENSO Footprint tracker - first card in Global Impact */}
+      {/* ═══ GLOBAL IMPACT TRACKER ═════════════════════════════════════════ */}
       {oni && oni.history && oni.history.length > 0 && (
-      <div id="footprint" className="scroll-mt-24">
+      <div id="impact" className="scroll-mt-24">
+        <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impact Tracker (1950 → today)" />
         <SectionCard
           icon={<Globe2 className="text-[#D0A65E]" />}
-          title="ENSO's World Footprint"
-          headerClassName="mb-2"
+          title="ENSO's Footprint Around the World"
+          subtitle="Scrub the timeline below — colours show how each country's temperature or rainfall departed from its 1961–1990 baseline in that ENSO year. The four boxes over the equatorial Pacific mark the Niño SST regions."
         >
-          <EnsoImpactTracker
-            oniHistory={oni!.history}
-            forecast={forecastWithYear}
-            cnnForecast={data.cnnForecast}
-          />
-          <ShareBar
-            pageUrl="https://4billionyearson.org/climate/enso#footprint"
-            shareText={encodeURIComponent('Interactive ENSO global impact map - see how El Nino & La Nina affect every country\'s temperature & rainfall')}
-            emailSubject="ENSO Global Impact Tracker"
-            embedUrl="https://4billionyearson.org/climate/enso/embed/footprint-tracker"
-            embedCode={`<iframe\n  src="https://4billionyearson.org/climate/enso/embed/footprint-tracker"\n  width="100%" height="820"\n  style="border:none;"\n  title="ENSO Global Impact Tracker - 4 Billion Years On"\n></iframe>`}
-            align="right"
-          />
+          <EnsoImpactTracker oniHistory={oni.history} />
         </SectionCard>
       </div>
       )}
 
-      <div id="world-weather" className="scroll-mt-24">
+      {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
+      <div id="forecast" className="scroll-mt-24">
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title={`Prediction (${ensoForecastYearLabel()})`} />
+      <ForecastSection data={data} />
+      </div>
+
+
+      {/* ═══ INDICATOR CROSS-CHECK ═══════════════════════════════ */}
+      {(weekly || mei || soi) && (() => {
+        // Build a single time-aligned dataset combining the three most-watched
+        // ENSO indicators so the reader can see - at a glance - whether the
+        // ocean (Niño 3.4 SST) and the atmosphere (MEI v2, SOI) are all
+        // pointing the same way as the hero forecast above. SOI is plotted
+        // inverted (−SOI) because its sign is reversed relative to ENSO:
+        // negative SOI = El Niño-favourable, so flipping it lets all three
+        // lines rise together when El Niño is building.
+
+        const FIVE_YEARS_MS = 5 * 365.25 * 24 * 3600 * 1000;
+        const nowMs = Date.now();
+        const startMs = nowMs - FIVE_YEARS_MS;
+
+        // Niño 3.4 weekly anomaly
+        const ninoSeries = (weekly?.weekly ?? [])
+          .map((w) => ({ t: Date.parse(w.date), v: w.nino34.anom }))
+          .filter((p) => Number.isFinite(p.t) && p.t >= startMs);
+
+        // MEI v2 - seasonIndex 1..12 (DJ, JF, FM, …, ND); we map to the mid-
+        // month of the second month in the bi-monthly window.
+        const meiSeries = (mei?.history ?? [])
+          .map((m) => ({
+            t: Date.UTC(m.year, Math.max(0, Math.min(11, m.seasonIndex - 1)), 15),
+            v: m.value,
+            label: `${m.season} ${m.year}`,
+          }))
+          .filter((p) => p.t >= startMs);
+
+        // SOI monthly, plotted inverted so it lines up with Niño 3.4 / MEI.
+        const soiSeries = (soi?.history ?? [])
+          .map((s) => ({
+            t: Date.UTC(s.year, s.month - 1, 15),
+            v: -s.value,
+            raw: s.value,
+            label: `${MONTH_NAMES[s.month - 1]} ${s.year}`,
+          }))
+          .filter((p) => p.t >= startMs);
+
+        // X-axis ticks: one per year start over the last 5 years.
+        const startYear = new Date(startMs).getUTCFullYear();
+        const endYear = new Date(nowMs).getUTCFullYear();
+        const yearTicks: number[] = [];
+        for (let y = startYear; y <= endYear; y++) yearTicks.push(Date.UTC(y, 0, 1));
+
+        const fmtDate = (t: number) => {
+          const d = new Date(t);
+          return `${d.getUTCFullYear()}`;
+        };
+        const fmtFullDate = (t: number) => {
+          const d = new Date(t);
+          return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+        };
+
+        return (
+          <SectionCard
+            icon={<Activity className="h-5 w-5 text-amber-300" />}
+            title="Do the Indicators Agree?"
+            subtitle="Three ENSO indicators on one axis: Niño 3.4 (ocean), MEI v2 (ocean+atmosphere) and −SOI (sign-flipped so all three rise together for El Niño). When all three climb past +0.5, the forecast has independent support."
+          >
+            <div className="h-[340px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart margin={{ top: 10, right: 28, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis
+                    dataKey="t"
+                    type="number"
+                    domain={[startMs, nowMs]}
+                    ticks={yearTicks}
+                    tickFormatter={fmtDate}
+                    stroke="#9CA3AF"
+                    fontSize={10}
+                    allowDuplicatedCategory={false}
+                  />
+                  <YAxis
+                    stroke="#9CA3AF"
+                    fontSize={10}
+                    width={36}
+                    domain={[-3, 3]}
+                    ticks={[-3, -2, -1, 0, 1, 2, 3]}
+                    tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}`}
+                  />
+                  <Tooltip
+                    contentStyle={TT_CONTENT}
+                    labelStyle={TT_LABEL}
+                    itemStyle={TT_ITEM}
+                    cursor={TT_CURSOR}
+                    labelFormatter={(t: any) => (typeof t === 'number' ? fmtFullDate(t) : '')}
+                    formatter={(v: any, name: any) => [
+                      typeof v === 'number' ? fmtSigned(v, 2) : '-',
+                      name,
+                    ]}
+                  />
+                  <ReferenceLine
+                    y={0.5}
+                    stroke="#f43f5e"
+                    strokeDasharray="3 3"
+                  />
+                  <ReferenceLine
+                    y={-0.5}
+                    stroke="#0ea5e9"
+                    strokeDasharray="3 3"
+                  />
+                  <ReferenceLine y={0} stroke="#6B7280" />
+                  <Line
+                    data={ninoSeries}
+                    dataKey="v"
+                    name="Niño 3.4 SST anomaly (°C)"
+                    type="monotone"
+                    stroke="#fbbf24"
+                    strokeWidth={1.6}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                  <Line
+                    data={meiSeries}
+                    dataKey="v"
+                    name="MEI v2 (index)"
+                    type="monotone"
+                    stroke="#a78bfa"
+                    strokeWidth={1.8}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                  <Line
+                    data={soiSeries}
+                    dataKey="v"
+                    name="−SOI (sign-flipped)"
+                    type="monotone"
+                    stroke="#34d399"
+                    strokeWidth={1.6}
+                    strokeDasharray="4 2"
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+            {/* Legend + read-out */}
+            <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-4 h-[2px] bg-amber-400" /> Niño 3.4 weekly SST anomaly (°C)
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-4 h-[2px] bg-violet-400" /> MEI v2 (bi-monthly, 5 variables)
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block w-4 h-[2px] bg-emerald-400" style={{ borderTop: '2px dashed #34d399', height: 0 }} /> −SOI (sign-flipped)
+              </span>
+            </div>
+            {(() => {
+              const lastNino = ninoSeries[ninoSeries.length - 1];
+              const lastMei = meiSeries[meiSeries.length - 1];
+              const lastSoi = soiSeries[soiSeries.length - 1];
+              const agree = (v: number | undefined, side: 1 | -1) =>
+                typeof v === 'number' && Math.sign(v) === side && Math.abs(v) >= 0.3;
+              // What's the hero chart predicting? Check whether the most
+              // recent points are all leaning the same way (+ = El Niño-ward).
+              const leaningPos =
+                agree(lastNino?.v, 1) || agree(lastMei?.v, 1) || agree(lastSoi?.v, 1);
+              const leaningNeg =
+                agree(lastNino?.v, -1) || agree(lastMei?.v, -1) || agree(lastSoi?.v, -1);
+              const verdict = leaningPos && !leaningNeg
+                ? 'All three are currently above zero and trending toward the +0.5 El Niño threshold - the ocean (Niño 3.4) and the atmosphere (MEI, −SOI) are independently supporting the forecast above.'
+                : leaningNeg && !leaningPos
+                ? 'All three are currently below zero - the ocean and atmosphere are leaning La Niña-ward.'
+                : 'The three indicators are mixed right now - watch for them to converge before reading too much into the forecast above.';
+              return (
+                <p className="text-xs text-gray-400 mt-2">
+                  <strong className="text-gray-200">Latest:</strong>{' '}
+                  Niño 3.4 ={' '}
+                  <span className="font-mono text-amber-300">
+                    {typeof lastNino?.v === 'number' ? fmtSigned(lastNino.v) : '-'}
+                  </span>
+                  °C · MEI v2 ={' '}
+                  <span className="font-mono text-violet-300">
+                    {typeof lastMei?.v === 'number' ? fmtSigned(lastMei.v) : '-'}
+                  </span>
+                  {' · '}−SOI ={' '}
+                  <span className="font-mono text-emerald-300">
+                    {typeof lastSoi?.v === 'number' ? fmtSigned(lastSoi.v) : '-'}
+                  </span>
+                  {' '}(SOI raw ={' '}
+                  <span className="font-mono">
+                    {typeof (lastSoi as any)?.raw === 'number' ? fmtSigned((lastSoi as any).raw, 1) : '-'}
+                  </span>
+                  ). {verdict}
+                </p>
+              );
+            })()}
+            <p className="text-xs text-gray-500 mt-3">
+              Sources:{' '}
+              <a
+                href="https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D0A65E] hover:underline"
+              >
+                NOAA CPC weekly Niño-region SSTs
+              </a>
+              ,{' '}
+              <a
+                href="https://psl.noaa.gov/enso/mei/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D0A65E] hover:underline"
+              >
+                NOAA PSL MEI v2
+              </a>
+              , and{' '}
+              <a
+                href="https://www.cpc.ncep.noaa.gov/data/indices/soi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D0A65E] hover:underline"
+              >
+                NOAA CPC SOI
+              </a>
+              .
+            </p>
+          </SectionCard>
+        );
+      })()}
+
+      {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
+      <div id="impacts" className="scroll-mt-24">
+        <Divider icon={<Globe2 className="h-5 w-5" />} title="Global Impacts" />
+      </div>
+
       <SectionCard
         icon={<Globe2 className="text-[#D0A65E]" />}
         title="Impact on World Weather"
@@ -706,13 +897,50 @@ export default function EnsoPage() {
             })}
         </div>
         <ShareBar
-          pageUrl="https://4billionyearson.org/climate/enso#world-weather"
+          pageUrl="https://4billionyearson.org/climate/enso#impacts"
           shareText={encodeURIComponent('El Nino / La Nina regional weather impacts - ENSO Tracker')}
           emailSubject="El Nino / La Nina regional weather impacts - ENSO Tracker"
           embedUrl="https://4billionyearson.org/climate/enso/embed/impacts"
           embedCode={`<iframe\n  src="https://4billionyearson.org/climate/enso/embed/impacts"\n  width="100%" height="900"\n  style="border:none;"\n  title="ENSO Regional Weather Impacts - 4 Billion Years On"\n></iframe>`}
         />
       </SectionCard>
+
+      {/* Met Office schematic maps - the canonical reference */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SectionCard
+          icon={<Thermometer className="text-rose-300" />}
+          title={phase === 'el-nino' ? 'El Niño Temperature Impacts' : 'La Niña Temperature Impacts'}
+          subtitle="Met Office schematic, based on Davey et al. (2013). Coloured regions are likely warmer (red) or cooler (blue) than normal during the labelled season when the phase is active."
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={phase === 'el-nino' ? images.metOfficeImpactElNinoTemp : images.metOfficeImpactLaNinaTemp}
+            alt={`${phase === 'el-nino' ? 'El Niño' : 'La Niña'} temperature impacts schematic`}
+            className="w-full rounded-lg border border-gray-700/50 bg-white"
+            loading="lazy"
+          />
+          <p className="text-[11px] text-gray-500 mt-2">
+            Source:{' '}
+            <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office GPC outlooks (Davey et al. 2013)</a>. © Crown Copyright.
+          </p>
+        </SectionCard>
+        <SectionCard
+          icon={<CloudRain className="text-emerald-300" />}
+          title={phase === 'el-nino' ? 'El Niño Rainfall Impacts' : 'La Niña Rainfall Impacts'}
+          subtitle="Met Office schematic. Wetter regions in green, drier in brown. Precipitation teleconnections are noisier than temperature, so probabilities are typically lower."
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={phase === 'el-nino' ? images.metOfficeImpactElNinoPrecip : images.metOfficeImpactLaNinaPrecip}
+            alt={`${phase === 'el-nino' ? 'El Niño' : 'La Niña'} precipitation impacts schematic`}
+            className="w-full rounded-lg border border-gray-700/50 bg-white"
+            loading="lazy"
+          />
+          <p className="text-[11px] text-gray-500 mt-2">
+            Source:{' '}
+            <a href="https://www.metoffice.gov.uk/research/climate/seasonal-to-decadal/gpc-outlooks/el-nino-la-nina" target="_blank" rel="noopener noreferrer" className="text-[#D0A65E] hover:underline">Met Office GPC outlooks (Davey et al. 2013)</a>. © Crown Copyright.
+          </p>
+        </SectionCard>
       </div>
 
       {/* Met Office plume forecasts removed - the IRI/CCSR plume already
@@ -884,7 +1112,7 @@ export default function EnsoPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <RelatedLink href="/climate/global" label="Global Climate Update" desc="Whole-planet temperature & trend update" />
-          <RelatedLink href="/climate" label="Continent, Country, State & Region Updates" desc="160+ regions tracked monthly" />
+          <RelatedLink href="/climate" label="Regional Updates" desc="160+ regions tracked monthly" />
           <RelatedLink href="/climate/shifting-seasons" label="Shifting Seasons" desc="How season timing is moving worldwide" />
           <RelatedLink href="/climate/rankings" label="Climate Rankings" desc="League table of anomalies across 144 regions" />
           <RelatedLink href="/sea-levels-ice" label="Sea Levels & Ice" desc="Ocean heat, sea level rise & polar ice" />

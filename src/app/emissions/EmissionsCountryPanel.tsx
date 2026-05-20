@@ -12,6 +12,9 @@ import { CountryFuelChart } from './_components/fuel-chart';
 import { CountryConsumptionChart } from './_components/consumption-chart';
 import { CountryGhgPanel } from './_components/ghg-budget';
 import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
+import HelixRegionPicker from '@/app/climate/helix/HelixRegionPicker';
+import { CLIMATE_REGIONS } from '@/lib/climate/regions';
+import type { ClimateRegion } from '@/lib/climate/regions';
 
 /* ─── State deep-dive types ──────────────────────────────────────────────── */
 
@@ -114,9 +117,9 @@ const DarkTooltip = ({ active, payload, label, unit }: any) => {
 const CHART_MARGIN = { top: 10, right: 0, left: -15, bottom: 0 };
 const BRUSH_HEIGHT = 30;
 
-/* ─── Region Search (climate-hub styled) ─────────────────────────────────── */
+/* ─── Region Search (legacy – replaced by HelixRegionPicker) ─────────────── */
 
-function RegionSearch({ mode, onSelect, loading }: {
+function _RegionSearch_UNUSED({ mode, onSelect, loading }: {
   mode: 'country' | 'us-state';
   onSelect: (value: { name: string; code?: string }) => void;
   loading: boolean;
@@ -452,112 +455,42 @@ export default function EmissionsCountryPanel({
       ? stateData?.usState != null
       : country != null;
 
+  const isGlobalActive = !countryName && !stateSelection && !regionSlug;
+
+  const handleRegionSelect = useCallback((region: ClimateRegion) => {
+    if (region.type === 'country') {
+      setMode('country');
+      selectCountry(region.name);
+    } else if (region.type === 'us-state') {
+      const code = region.apiCode.startsWith('us-')
+        ? region.apiCode.slice(3).toUpperCase()
+        : region.apiCode.toUpperCase();
+      setMode('us-state');
+      selectState(region.name, code);
+    } else if (region.type === 'group' && region.groupKind === 'continent') {
+      setMode('continent');
+      selectCountry(region.name);
+    } else if (region.type === 'group' && region.groupKind === 'us-climate-region') {
+      setMode('us-region');
+      selectRegion(region.slug);
+    } else if (region.type === 'uk-region') {
+      setMode('country');
+      selectCountry('United Kingdom');
+    }
+  }, [selectCountry, selectState, selectRegion]);
+
   return (
     <div id="emissions-country-panel" className={wrapperClass}>
-      <div className="flex flex-col md:flex-row md:items-center gap-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Factory className="h-5 w-5 text-[#D0A65E]" />
-          <h2 className="text-lg font-bold font-mono text-white">Deep Dive</h2>
-          {hasSelection && (
-            <button
-              onClick={clearSelection}
-              className="ml-auto md:ml-2 text-xs text-gray-400 hover:text-white inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-700 hover:border-gray-500 transition-colors"
-            >
-              <X className="h-3 w-3" /> Clear
-            </button>
-          )}
-        </div>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 md:ml-auto md:flex-1 md:justify-end">
-          <ChipDropdown
-            label="Region"
-            ariaLabel="Region type"
-            value={mode}
-            onChange={(id) => {
-              if (id !== mode) {
-                setMode(id as Mode);
-                setCountryName(null);
-                setData(null);
-                setError(null);
-                setStateSelection(null);
-                setRegionSlug(null);
-                setStateData(null);
-                setStateError(null);
-                if (typeof window !== 'undefined') {
-                  const url = new URL(window.location.href);
-                  url.searchParams.delete('country');
-                  url.searchParams.delete('state');
-                  url.searchParams.delete('stateName');
-                  url.searchParams.delete('region');
-                  window.history.replaceState({}, '', url.toString());
-                }
-              }
-            }}
-            options={[
-              { key: 'continent', label: 'Continents' },
-              { key: 'country', label: 'Countries' },
-              { key: 'us-region', label: 'US Climate Regions' },
-              { key: 'us-state', label: 'US States' },
-            ]}
-          />
-          {(mode === 'country' || mode === 'us-state') && (
-            <div className="w-full sm:flex-1 sm:max-w-md">
-              <RegionSearch
-                mode={mode === 'us-state' ? 'us-state' : 'country'}
-                onSelect={(v) => {
-                  if (mode === 'us-state') {
-                    if (v.code) selectState(v.name, v.code);
-                  } else {
-                    selectCountry(v.name);
-                  }
-                }}
-                loading={mode === 'us-state' ? stateLoading : loading}
-              />
-            </div>
-          )}
-        </div>
+      <div className="flex items-center gap-2 mb-1">
+        <Factory className="h-5 w-5 text-[#D0A65E]" />
+        <h2 className="text-lg font-bold font-mono text-white">Deep Dive</h2>
       </div>
-
-      {mode === 'continent' ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {(['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'] as const).map((c) => {
-            const active = countryName === c;
-            return (
-              <button
-                key={c}
-                type="button"
-                onClick={() => selectCountry(c)}
-                className={`inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap ${
-                  active
-                    ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
-                    : 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
-                }`}
-              >
-                {c}
-              </button>
-            );
-          })}
-        </div>
-      ) : mode === 'us-region' ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {US_CLIMATE_REGIONS.map((r) => {
-            const active = regionSlug === r.slug;
-            return (
-              <button
-                key={r.slug}
-                type="button"
-                onClick={() => selectRegion(r.slug)}
-                className={`inline-flex h-7 items-center rounded-full border px-2.5 text-[12px] font-medium transition-colors whitespace-nowrap ${
-                  active
-                    ? 'border-[#D0A65E]/55 bg-[#D0A65E]/12 text-[#FFF5E7]'
-                    : 'border-gray-700 bg-gray-900/45 text-gray-300 hover:border-[#D0A65E]/25 hover:bg-white/[0.03] hover:text-[#FFF5E7]'
-                }`}
-              >
-                {r.name}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
+      <HelixRegionPicker
+        regions={CLIMATE_REGIONS}
+        onRegionSelect={handleRegionSelect}
+        onSelectGlobal={clearSelection}
+        isGlobalActive={isGlobalActive}
+      />
 
       {(mode === 'country' || mode === 'continent') && error && (
         <div className="mt-4 rounded-lg border border-red-800/50 bg-red-950/30 p-3 text-sm text-red-400">{error}</div>

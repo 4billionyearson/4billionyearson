@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Trophy } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import type { SeriesMap } from '@/app/_components/monthly-spaghetti-card';
@@ -90,12 +90,18 @@ export default function HelixClientSection({
   const [regionData, setRegionData] = useState<RegionHelixData | null>(null);
   const [regionLoading, setRegionLoading] = useState(false);
   const [regionError, setRegionError] = useState<string | null>(null);
+  const autoLoadedRef = useRef(false);
 
   const handleRegionSelect = useCallback(async (region: ClimateRegion) => {
     setSelectedRegion(region);
     setRegionData(null);
     setRegionError(null);
     setRegionLoading(true);
+
+    // Reflect the selected region in the URL without navigation
+    const url = new URL(window.location.href);
+    url.searchParams.set('region', region.slug);
+    window.history.replaceState(null, '', url.toString());
 
     const data = await fetchRegionHelixData(region);
     if (data) {
@@ -110,6 +116,23 @@ export default function HelixClientSection({
     setSelectedRegion(null);
     setRegionData(null);
     setRegionError(null);
+
+    // Remove region param from URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('region');
+    window.history.replaceState(null, '', url.toString());
+  }, []);
+
+  // On mount, auto-select a region if ?region= is present in the URL
+  useEffect(() => {
+    if (autoLoadedRef.current) return;
+    autoLoadedRef.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const regionSlug = params.get('region');
+    if (!regionSlug) return;
+    const match = regions.find((r) => r.slug === regionSlug);
+    if (match) void handleRegionSelect(match);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -179,7 +202,7 @@ export default function HelixClientSection({
                   embedSlug={selectedRegion.slug}
                   sectionId="region-helix"
                   share={{
-                    pageUrl: `https://4billionyearson.org/climate/helix`,
+                    pageUrl: `https://4billionyearson.org/climate/helix?region=${encodeURIComponent(selectedRegion.slug)}`,
                     sectionId: 'climate-spiral',
                   }}
                   seasonScheme={regionData.seasonScheme}

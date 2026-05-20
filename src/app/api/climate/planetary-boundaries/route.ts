@@ -6,7 +6,7 @@ import { getCached, setShortTerm } from '@/lib/climate/redis';
 // upstream fetches, so the function body only runs on cache miss.
 export const revalidate = 3600;
 
-const CACHE_KEY = 'climate:planetary-boundaries';
+const CACHE_KEY = 'climate:planetary-boundaries:v2';
 const CACHE_TTL_HOURS = 12;
 
 interface TempHistoryPoint {
@@ -118,10 +118,14 @@ async function fetchLiveData(): Promise<LiveData> {
   if (oceanRaw?.result) {
     const years = Object.keys(oceanRaw.result);
     const lastYear = years[years.length - 1];
-    oceanWarming = {
-      anomaly: oceanRaw.result[lastYear].anomaly,
-      year: lastYear,
-    };
+    const lastEntry = oceanRaw.result[lastYear];
+    const departure = lastEntry?.departure ?? lastEntry?.anomaly;
+    if (departure != null) {
+      oceanWarming = {
+        anomaly: departure,
+        year: lastYear,
+      };
+    }
   }
 
   return {

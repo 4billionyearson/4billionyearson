@@ -22,7 +22,8 @@ const GOLD_DIM = 'rgba(208,166,94,0.7)';
 const GOLD_BORDER = 'rgba(208,166,94,0.3)';
 
 export default async function OgImage() {
-  const [helixUrl, logoUrl] = await Promise.all([
+  const [bgUrl, helixUrl, logoUrl] = await Promise.all([
+    loadDataUrl('background.png', 'image/png'),
     loadDataUrl('Climate Helix.png', 'image/png'),
     loadDataUrl('header-logo.png', 'image/png'),
   ]);
@@ -34,18 +35,43 @@ export default async function OgImage() {
           display: 'flex',
           width: '100%',
           height: '100%',
+          position: 'relative',
           background: '#030712',
           fontFamily: 'system-ui, sans-serif',
         }}
       >
-        {/* Left content pane */}
+        {/* Site background image */}
+        {bgUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={bgUrl}
+            alt=""
+            width={1200}
+            height={630}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
+          />
+        ) : null}
+
+        {/* Dark overlay gradient */}
         <div
           style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            background: 'linear-gradient(135deg, rgba(3,7,18,0.90) 0%, rgba(15,23,42,0.82) 50%, rgba(3,7,18,0.94) 100%)',
+          }}
+        />
+
+        {/* Content */}
+        <div
+          style={{
+            position: 'relative',
             display: 'flex',
             flexDirection: 'column',
-            width: helixUrl ? '58%' : '100%',
+            width: '65%',
             height: '100%',
             padding: '48px 48px 40px 60px',
+            zIndex: 1,
           }}
         >
           {/* Logo */}
@@ -117,38 +143,25 @@ export default async function OgImage() {
           </div>
         </div>
 
-        {/* Right: helix screenshot */}
+        {/* Helix image — bottom-right */}
         {helixUrl ? (
-          <div
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={helixUrl}
+            alt=""
+            width={420}
+            height={420}
             style={{
-              display: 'flex',
-              width: '42%',
-              height: '100%',
-              position: 'relative',
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              width: 420,
+              height: 420,
+              objectFit: 'contain',
+              objectPosition: 'bottom right',
+              zIndex: 1,
             }}
-          >
-            {/* Fade-left gradient so text doesn't clash */}
-            <div
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: '60px',
-                display: 'flex',
-                background: 'linear-gradient(to right, #030712, transparent)',
-                zIndex: 1,
-              }}
-            />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={helixUrl}
-              alt=""
-              width={504}
-              height={630}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-            />
-          </div>
+          />
         ) : null}
       </div>
     ),

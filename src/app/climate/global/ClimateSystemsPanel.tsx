@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { LineChart, Line, BarChart, Bar, Cell, ComposedChart, Area, ReferenceArea, ReferenceDot, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
+import { LineChart, Line, BarChart, Bar, Cell, ComposedChart, Area, ReferenceArea, ReferenceDot, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine, Legend } from 'recharts';
 import { Waves, Snowflake, Flame, Wind, ExternalLink, ArrowUpRight } from 'lucide-react';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -601,9 +601,24 @@ const MONTH_NAMES = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
 
 export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats | null; variant?: 'tile' | 'section' }) {
   if (!seaIce) return null;
-  const chart = seaIce.recent60.map((p, i) => ({ i, label: `${MONTH_NAMES[p.month]} ${String(p.year).slice(-2)}`, extent: p.extent }));
-  const anomColor = seaIce.anomaly < 0 ? 'text-sky-300' : 'text-emerald-300';
+  const chart = seaIce.recent60.map((p, i, arr) => ({
+    i,
+    label: `${MONTH_NAMES[p.month]} ${String(p.year).slice(-2)}`,
+    extent: p.extent,
+    rolling: i >= 11
+      ? parseFloat((arr.slice(i - 11, i + 1).reduce((s, w) => s + w.extent, 0) / 12).toFixed(3))
+      : null,
+  }));
   const isSection = variant === 'section';
+  const isRecordLow = seaIce.rankLowestOfSameMonth === 1;
+  const rankLabel = (() => {
+    const r = seaIce.rankLowestOfSameMonth;
+    const n = seaIce.totalYearsInMonth;
+    if (r === 1) return 'lowest on record';
+    if (r === 2) return '2nd-lowest on record';
+    if (r === 3) return '3rd-lowest on record';
+    return `${r}th-lowest of ${n} years`;
+  })();
   return (
     <Tile className={isSection ? 'p-4 md:p-5' : ''}>
       {isSection ? (
@@ -621,24 +636,13 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
           subtitle={`Arctic + Antarctic combined · anomaly vs ${seaIce.baseline}`}
         />
       )}
-      <div className="flex items-baseline justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-3xl font-bold font-mono text-white">{seaIce.latest.extent.toFixed(2)}<span className="text-sm text-gray-400 font-normal"> Mkm²</span></p>
-          <p className="text-[11px] text-gray-400">{MONTH_NAMES[seaIce.latest.month]} {seaIce.latest.year}</p>
-        </div>
-        <div className="text-right">
-          <p className={`text-lg font-mono ${anomColor}`}>
-            {seaIce.anomaly > 0 ? '+' : ''}{seaIce.anomaly.toFixed(2)} Mkm²
-          </p>
-          {seaIce.anomalyPct != null && (
-            <p className="text-[11px] text-gray-400">{seaIce.anomalyPct > 0 ? '+' : ''}{seaIce.anomalyPct.toFixed(1)}% vs {seaIce.baseline}</p>
-          )}
-          <p className="text-[11px] text-gray-400 mt-0.5">
-            Rank: <span className="text-white font-semibold">{seaIce.rankLowestOfSameMonth}</span> lowest of {seaIce.totalYearsInMonth} {MONTH_NAMES[seaIce.latest.month]}s
-          </p>
-        </div>
+      <div className={`flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-3 px-3 py-2 rounded-lg border ${isRecordLow ? 'border-red-500/50 bg-red-950/30' : 'border-gray-800 bg-gray-900/50'}`}>
+        <span className="text-sm text-gray-300">{MONTH_NAMES[seaIce.latest.month]} {seaIce.latest.year}:</span>
+        <span className="text-xl font-bold font-mono text-white">{seaIce.latest.extent.toFixed(2)}<span className="text-sm text-gray-400 font-normal"> Mkm²</span></span>
+        <span className={`text-sm font-semibold ${isRecordLow ? 'text-red-300' : 'text-amber-300'}`}>{rankLabel}</span>
+        <span className="text-xs text-gray-400">· {seaIce.anomaly > 0 ? '+' : ''}{seaIce.anomaly.toFixed(2)} vs {seaIce.baseline}</span>
       </div>
-      <div className="h-28 mt-3 -ml-1">
+      <div className={`${isSection ? 'h-52' : 'h-36'} mt-3 -ml-1`}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chart} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -646,13 +650,15 @@ export function SeaIceTile({ seaIce, variant = 'tile' }: { seaIce: SeaIceStats |
             <YAxis stroke="#9CA3AF" fontSize={10} width={26} domain={[14, 26]} tickFormatter={(v) => `${v}`} />
             <Tooltip
               contentStyle={{ backgroundColor: '#111827', border: '1px solid #D0A65E', borderRadius: 8, fontSize: 12 }}
-              formatter={(v: any) => [typeof v === 'number' ? `${v.toFixed(2)} Mkm²` : '—', 'Extent']}
+              formatter={(v: any) => [typeof v === 'number' ? `${v.toFixed(2)} Mkm²` : '—']}
             />
-            <Line type="monotone" dataKey="extent" stroke="#38bdf8" strokeWidth={1.5} dot={false} isAnimationActive={false} />
+            <Legend iconType="plainline" wrapperStyle={{ color: '#9CA3AF', fontSize: 10, paddingTop: 4 }} />
+            <Line type="monotone" dataKey="rolling" name="12-month avg" stroke="#7dd3fc" strokeWidth={2.5} dot={false} connectNulls={false} isAnimationActive={false} />
+            <Line type="monotone" dataKey="extent" name="Monthly" stroke="#0ea5e9" strokeWidth={1} strokeOpacity={0.55} dot={false} isAnimationActive={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-[11px] text-gray-400 mt-1">Last 60 months. Long-term trend is down - Arctic loss exceeds Antarctic variability.</p>
+      <p className="text-[11px] text-gray-400 mt-1">Last 60 months. Thick line shows 12-month rolling average – Arctic loss exceeds Antarctic variability.</p>
       <p className="text-[11px] text-gray-400 mt-1">
         Source:&nbsp;
         <a href="https://nsidc.org/arcticseaicenews/" target="_blank" rel="noopener noreferrer" className="underline text-gray-400 hover:text-gray-300">

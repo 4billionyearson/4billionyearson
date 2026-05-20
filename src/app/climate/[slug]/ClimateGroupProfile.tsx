@@ -548,7 +548,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
                 regionName={region.name}
                 dataSource={aggregateSource}
                 embedSlug={region.slug}
-                share={{ pageUrl: 'https://4billionyearson.org/climate/helix', sectionId: 'climate-spiral' }}
+                share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-spiral' }}
                 seasonScheme={scheme}
                 showEnso={shouldFeatureEnso(region)}
               />
@@ -781,7 +781,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
             regionName={region.name}
             dataSource="NOAA Climate at a Glance — regional tavg / pcp (monthly absolutes)."
             embedSlug={region.slug}
-            share={{ pageUrl: 'https://4billionyearson.org/climate/helix', sectionId: 'climate-spiral' }}
+            share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-spiral' }}
             seasonScheme={detectSeasonScheme({ tempMonthly: tavg.monthlyAll, precipMonthly: pcp?.monthlyAll })}
             showEnso={shouldFeatureEnso(region)}
           />

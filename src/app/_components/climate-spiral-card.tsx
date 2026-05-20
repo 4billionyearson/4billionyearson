@@ -1311,35 +1311,31 @@ export default function ClimateSpiralCard({
     const yFor = (v: number) => h - ((v - lo) / range) * h;
     const pts = visible.map((d) => `${xFor(d.year).toFixed(1)},${yFor(d.value).toFixed(1)}`).join(' ');
     const last = visible[visible.length - 1];
-    // Quadratic best-fit curve via polynomial regression over visible data
+    // Smooth trend via Gaussian moving-average → Catmull-Rom cubic bezier path
     const nv = visible.length;
-    let trendPts: string | null = null;
+    let trendPath: string | null = null;
     if (nv >= 5) {
-      const yt0 = visible[0].year, yt1 = visible[nv - 1].year, ytspan = Math.max(1, yt1 - yt0);
-      const tv = visible.map((d) => (d.year - yt0) / ytspan);
-      const _s0 = nv;
-      const _s1 = tv.reduce((a, v) => a + v, 0);
-      const _s2 = tv.reduce((a, v) => a + v * v, 0);
-      const _s3 = tv.reduce((a, v) => a + v * v * v, 0);
-      const _s4 = tv.reduce((a, v) => a + v * v * v * v, 0);
-      const _ry = visible.reduce((a, d) => a + d.value, 0);
-      const _rty = visible.reduce((a, d, i) => a + tv[i] * d.value, 0);
-      const _rt2y = visible.reduce((a, d, i) => a + tv[i] * tv[i] * d.value, 0);
-      const M = [[_s0,_s1,_s2,_ry],[_s1,_s2,_s3,_rty],[_s2,_s3,_s4,_rt2y]];
-      for (let r = 0; r < 3; r++) {
-        let mx = r; for (let i = r+1; i < 3; i++) if (Math.abs(M[i][r]) > Math.abs(M[mx][r])) mx = i;
-        [M[r], M[mx]] = [M[mx], M[r]];
-        for (let i = r+1; i < 3; i++) { const f = M[i][r] / M[r][r]; for (let j = r; j <= 3; j++) M[i][j] -= f * M[r][j]; }
+      const win = Math.max(1, Math.round(nv * 0.06));
+      const smoothed: [number, number][] = visible.map((_, i) => {
+        const lo = Math.max(0, i - win);
+        const hi = Math.min(nv - 1, i + win);
+        const slice = visible.slice(lo, hi + 1);
+        const avg = slice.reduce((s, d) => s + d.value, 0) / slice.length;
+        return [xFor(visible[i].year), yFor(avg)] as [number, number];
+      });
+      let d = `M ${smoothed[0][0].toFixed(1)},${smoothed[0][1].toFixed(1)}`;
+      for (let i = 0; i < smoothed.length - 1; i++) {
+        const p0 = smoothed[Math.max(0, i - 1)];
+        const p1 = smoothed[i];
+        const p2 = smoothed[i + 1];
+        const p3 = smoothed[Math.min(smoothed.length - 1, i + 2)];
+        const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+        const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+        const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+        const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+        d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
       }
-      const c = [0, 0, 0];
-      for (let i = 2; i >= 0; i--) { c[i] = M[i][3]; for (let j = i+1; j < 3; j++) c[i] -= M[i][j] * c[j]; c[i] /= M[i][i]; }
-      if (c.every(Number.isFinite)) {
-        trendPts = Array.from({ length: 24 }, (_, i) => {
-          const ti = i / 23;
-          const v = c[0] + c[1] * ti + c[2] * ti * ti;
-          return `${xFor(yt0 + ti * ytspan).toFixed(1)},${yFor(v).toFixed(1)}`;
-        }).join(' ');
-      }
+      trendPath = d;
     }
     const lastDotX = (xFor(last.year) / w) * 100;
     const lastDotY = (yFor(last.value) / h) * 100;
@@ -1348,7 +1344,7 @@ export default function ClimateSpiralCard({
         <svg viewBox="0 0 70 22" width="100%" height={h} preserveAspectRatio="none" className="overflow-visible absolute inset-0">
           <polyline fill="none" stroke={`${color}33`} strokeWidth={0.7} points={data.map((d) => `${xFor(d.year).toFixed(1)},${yFor(d.value).toFixed(1)}`).join(' ')} />
           <polyline fill="none" stroke={`${color}66`} strokeWidth={1.3} strokeLinejoin="round" strokeLinecap="round" points={pts} />
-          {trendPts && <polyline fill="none" stroke={color} strokeWidth={2} opacity={0.95} strokeLinejoin="round" strokeLinecap="round" points={trendPts} />}
+          {trendPath && <path fill="none" stroke={color} strokeWidth={2} opacity={0.95} d={trendPath} />}
         </svg>
         {/* Dot rendered as HTML so it stays circular regardless of SVG aspect ratio */}
         <div
@@ -3142,7 +3138,7 @@ export default function ClimateSpiralCard({
               <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
                 Anomaly
               </ChipToggle>
-              <ChipToggle active={view3D} onChange={setView3D} color="#A78BFA">
+              <ChipToggle active={view3D} onChange={setView3D} color="#D0A65E">
                 3D
               </ChipToggle>
               {/* Seasons + Trail — segmented pill group. When Seasons is on,
@@ -3197,7 +3193,7 @@ export default function ClimateSpiralCard({
                 <ChipToggle active={anomaly} onChange={setAnomaly} color="#D0A65E">
                   Anomaly
                 </ChipToggle>
-                <ChipToggle active={view3D} onChange={setView3D} color="#A78BFA">
+                <ChipToggle active={view3D} onChange={setView3D} color="#D0A65E">
                   3D
                 </ChipToggle>
                 {seasonsAvailable && (showSeasons ? (

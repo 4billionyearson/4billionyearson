@@ -4,7 +4,7 @@ import { getCached, setShortTerm } from '@/lib/climate/redis';
 // CDN cache the full response for 1h; Redis still caches upstream data.
 export const revalidate = 3600;
 
-const CACHE_KEY = 'climate:greenhouse-gases:v3';
+const CACHE_KEY = 'climate:greenhouse-gases:v5';
 const CACHE_TTL_HOURS = 12;
 
 interface MonthlyPoint {
@@ -36,8 +36,8 @@ interface GHGData {
   methane: GasData | null;
   n2o: GasData | null;
   temperature: { current: { anomaly: number; date: string }; yearly: TempPoint[] } | null;
-  arcticIce: { current: { extent: number; anomaly: number; date: string }; yearly: YearlyPoint[] } | null;
-  oceanWarming: { current: { anomaly: number; year: string }; yearly: YearlyPoint[] } | null;
+  arcticIce: { current: { extent: number; anomaly: number | null; date: string }; yearly: YearlyPoint[] } | null;
+  oceanWarming: { current: { anomaly: number | null; year: string }; yearly: YearlyPoint[] } | null;
   seaLevel: { current: { value: number; year: string }; rate: string; yearly: YearlyPoint[] } | null;
   fetchedAt: string;
 }
@@ -251,7 +251,7 @@ async function fetchGHGData(): Promise<GHGData> {
     const keys = Object.keys(arcticRaw.arcticData.data);
     const lastKey = keys[keys.length - 1];
     const lastVal = arcticRaw.arcticData.data[lastKey];
-    if (lastVal && lastVal.value !== -9999) {
+    if (lastVal && lastVal.value != null && lastVal.value !== -9999) {
       arcticIce = {
         current: { extent: lastVal.value, anomaly: lastVal.anom, date: lastKey },
         yearly,
@@ -266,17 +266,19 @@ async function fetchGHGData(): Promise<GHGData> {
     for (const [y, val] of Object.entries(oceanRaw.result)) {
       const yr = parseInt(y, 10);
       const v = val as any;
-      if (!isNaN(yr) && v.anomaly != null) {
-        yearly.push({ year: yr, value: parseFloat(v.anomaly) });
+      if (!isNaN(yr) && v.departure != null) {
+        yearly.push({ year: yr, value: parseFloat(v.departure) });
       }
     }
     yearly.sort((a, b) => a.year - b.year);
-    const years = Object.keys(oceanRaw.result);
-    const lastYear = years[years.length - 1];
-    oceanWarming = {
-      current: { anomaly: parseFloat(oceanRaw.result[lastYear].anomaly), year: lastYear },
-      yearly,
-    };
+    // Use the last year with a valid (non-null) anomaly rather than the calendar-latest year
+    const lastValid = yearly[yearly.length - 1];
+    if (lastValid) {
+      oceanWarming = {
+        current: { anomaly: lastValid.value, year: String(lastValid.year) },
+        yearly,
+      };
+    }
   }
 
   // ── Sea Level (NOAA STAR satellite altimetry) ──
