@@ -5135,9 +5135,14 @@
       "year": 2026,
       "month": 3,
       "value": 24.96
+    },
+    {
+      "year": 2026,
+      "month": 4,
+      "value": 25.03
     }
   ],
   "method": "Equal-weight mean of OWID/CRU country monthly absolute temperatures across members reporting in a given month.",
   "note": "Aggregate built by 4BYO from country snapshots; not a direct continental product. Use as an indicative continental absolute series.",
-  "generatedAt": "2026-05-01T09:31:18.500Z"
+  "generatedAt": "2026-05-19T12:24:56.020Z"
 }

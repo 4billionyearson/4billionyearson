@@ -301,7 +301,9 @@ async function fetchGHGData(): Promise<GHGData> {
       // Take the first non-empty satellite value
       let val: number | null = null;
       for (let i = 1; i < cols.length; i++) {
-        const v = parseFloat(cols[i]);
+        const raw = cols[i]?.trim();
+        if (!raw) continue;
+        const v = parseFloat(raw);
         if (!isNaN(v)) { val = v; break; }
       }
       if (val === null) continue;

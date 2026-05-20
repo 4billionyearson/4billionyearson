@@ -81,6 +81,7 @@ export default function GroupSummaryPanel({
       const res = await fetch(url);
       const payload: SummaryResponse | null = await res.json().catch(() => null);
       if (payload?.summary) {
+        setRegenerating(false);
         setSummary(payload.summary);
         setSources(payload.sources || []);
         return;
@@ -114,10 +115,13 @@ export default function GroupSummaryPanel({
           monthly when new data lands. Reload in a minute to see the latest analysis.
         </p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => {
+            setRegenerating(false);
+            void load();
+          }}
           className="inline-flex items-center gap-1.5 rounded-full border border-[#D0A65E]/55 bg-[#D0A65E]/10 px-3 py-1 text-xs font-medium text-[#FFF5E7] hover:bg-[#D0A65E]/20"
         >
-          Refresh
+          Check again
         </button>
       </div>
     );

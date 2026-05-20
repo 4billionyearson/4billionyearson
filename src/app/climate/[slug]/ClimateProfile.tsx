@@ -1,16 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory, Globe2, Trophy } from 'lucide-react';
+import { Loader2, Thermometer, Sun, CloudRain, Snowflake, Droplets, ExternalLink, BookOpen, MapPin, Factory, Globe2, Trophy, Wind } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import MonthlySpaghettiCard, { type SeriesMap } from '@/app/_components/monthly-spaghetti-card';
-import type { SpaghettiMetric } from '@/app/_components/monthly-spaghetti-chart';
-import ClimateSpiralCard, { buildYearMap, METRIC_PALETTE } from '@/app/_components/climate-spiral-card';
+import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
 import RecordsSection from '@/app/_components/climate-records-section';
-import { detectSeasonScheme } from '@/lib/climate/season-scheme';
-import { getEnsoImpactsForSlug } from '@/lib/climate/enso-impacts';
-import RecordsTable from '@/app/_components/climate-records-table';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import ClimateRankPill from '@/app/_components/climate-rank-pill';
 import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
@@ -20,10 +16,13 @@ import ClimateMapCard, { type CountryAnomalyRow } from '../global/ClimateMapCard
 import type { ClimateMapPreset } from '../global/ClimateMapCard';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import { renderWithDriverTooltips, relabelSummaryHeading } from '@/lib/climate/driver-annotator';
+import { shouldFeatureEnso, shouldShowEnsoTracker } from '@/lib/climate/enso-impacts';
+import LiveEnsoCard from '@/app/climate/_components/LiveEnsoCard';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { RegionDataSourcesCard } from './RegionDataSourcesCard';
 import { buildRegionFAQ } from '@/lib/climate/region-faq';
 import { pickPageSnapshotMonth, pickStatsForMonth, parseMonthLabel } from '@/app/climate/_shared/overview-grid-types';
+import { detectSeasonScheme } from '@/lib/climate/season-scheme';
 
 // ─── Divider ─────────────────────────────────────────────────────────────────
 
@@ -39,7 +38,6 @@ function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
     </div>
   );
 }
-
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -685,6 +683,7 @@ export default function ClimateProfile({
   const [summarySources, setSummarySources] = useState<{ title: string; uri: string }[]>(initialSources);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [summaryRetryable, setSummaryRetryable] = useState(false);
+  const [summaryRegenerating, setSummaryRegenerating] = useState(summaryCacheMiss);
 
   const fetchSummary = async (forceFresh = false) => {
     setSummaryLoading(true);
@@ -699,6 +698,7 @@ export default function ClimateProfile({
       const payload: SummaryResponse | null = await res.json().catch(() => null);
 
       if (payload?.summary) {
+        setSummaryRegenerating(false);
         setSummary(payload.summary);
         setSummarySources(payload.sources || []);
         return;
@@ -879,7 +879,7 @@ export default function ClimateProfile({
                     </Link>
                   </div>
                 </div>
-              ) : summaryCacheMiss ? (
+              ) : summaryRegenerating ? (
                 <div>
                   {coverageLine && (
                     <div className="inline-flex items-start gap-2 px-3 py-2 rounded-lg border border-[#D0A65E]/30 bg-[#D0A65E]/5">
@@ -901,10 +901,13 @@ export default function ClimateProfile({
                     <div className="mt-3">
                       <button
                         type="button"
-                        onClick={() => { if (typeof window !== 'undefined') window.location.reload(); }}
+                        onClick={() => {
+                          setSummaryRegenerating(false);
+                          void fetchSummary();
+                        }}
                         className="inline-flex items-center gap-2 rounded-lg border border-[#D0A65E]/40 bg-[#D0A65E]/10 px-3 py-2 text-sm font-semibold text-[#D0A65E] transition-colors hover:bg-[#D0A65E]/20 hover:text-[#E8C97A]"
                       >
-                        Refresh page
+                        Check again
                       </button>
                     </div>
                   </div>
@@ -1041,18 +1044,11 @@ export default function ClimateProfile({
                     {(monthlyAll?.length || rainfallMonthly?.length || sunshineMonthly?.length || frostMonthly?.length) ? (
                       <>
                         <Divider icon={<Thermometer className="h-5 w-5 text-orange-400" />} title="Year-on-Year Trends" />
-                        {(() => {
-                          // Auto-detect the season-system for this region
-                          // from its monthly temperature + rainfall climatology.
-                          // Falls back to temperate-NH when there isn't enough
-                          // data (the legacy default).
+                        {monthlyAll?.length ? (() => {
                           const seasonScheme = detectSeasonScheme({
                             tempMonthly: monthlyAll,
                             precipMonthly: rainfallMonthly,
                           });
-                          // ENSO HUD: on when the region has documented
-                          // ENSO teleconnections in our impacts library.
-                          const ensoOn = getEnsoImpactsForSlug(region.slug).length > 0;
                           return (
                             <ClimateSpiralCard
                               series={spaghettiSeries}
@@ -1060,12 +1056,12 @@ export default function ClimateProfile({
                               dataSource={chartSource}
                               provisionalAfterMonth={pageSnapshotCut}
                               embedSlug={slug}
-                              share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'climate-spiral' }}
-                              showEnso={ensoOn}
+                              share={{ pageUrl: 'https://4billionyearson.org/climate/helix', sectionId: 'climate-spiral' }}
+                              showEnso={shouldFeatureEnso(region)}
                               seasonScheme={seasonScheme}
                             />
                           );
-                        })()}
+                        })() : null}
                         <MonthlySpaghettiCard
                           series={spaghettiSeries}
                           regionName={pageTitle}
@@ -1074,6 +1070,25 @@ export default function ClimateProfile({
                           provisionalAfterMonth={pageSnapshotCut}
                           share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'monthly-history' }}
                         />
+                        {monthlyAll?.length ? (
+                          <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+                            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
+                              <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
+                              <span className="min-w-0 flex-1">Records – {pageTitle}</span>
+                            </h2>
+                            <RecordsSection series={spaghettiSeries} provisionalAfterMonth={pageSnapshotCut} />
+                            <p className="text-[11px] text-gray-500 mt-3">{chartSource}</p>
+                            <div className="mt-3">
+                              <ShareBar
+                                pageUrl={`https://4billionyearson.org/climate/${slug}#climate-records`}
+                                shareText={encodeURIComponent(`${pageTitle} climate records - 4 Billion Years On`)}
+                                emailSubject={`${pageTitle} climate records - 4 Billion Years On`}
+                                wrapperClassName="relative flex justify-end"
+                                align="right"
+                              />
+                            </div>
+                          </div>
+                        ) : null}
                       </>
                     ) : null}
 
@@ -1091,29 +1106,6 @@ export default function ClimateProfile({
                           embedCode: `<iframe\n  src="https://4billionyearson.org/climate/embed/seasons/${encodeURIComponent(slug)}"\n  width="100%" height="720"\n  style="border:none;"\n  title="Shifting Seasons - ${pageTitle} - 4 Billion Years On"\n></iframe>`,
                         }}
                       />
-                    ) : null}
-
-                    {/* Records */}
-                    {(spaghettiSeries.temp?.length || spaghettiSeries.precip?.length || spaghettiSeries.sunshine?.length || spaghettiSeries.frost?.length) ? (
-                      <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
-                        <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
-                          <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
-                          <span className="min-w-0 flex-1">Records – {pageTitle}</span>
-                        </h2>
-                        <RecordsSection series={spaghettiSeries} provisionalAfterMonth={pageSnapshotCut} />
-                        {chartSource && (
-                          <p className="text-[11px] text-gray-500 mt-3">{chartSource}</p>
-                        )}
-                        <div className="mt-3">
-                          <ShareBar
-                            pageUrl={`https://4billionyearson.org/climate/${slug}#climate-records`}
-                            shareText={encodeURIComponent(`${pageTitle} climate records - 4 Billion Years On`)}
-                            emailSubject={`${pageTitle} climate records - 4 Billion Years On`}
-                            wrapperClassName="relative flex justify-end"
-                            align="right"
-                          />
-                        </div>
-                      </div>
                     ) : null}
 
                     {/* Sunshine + Frost - paired side-by-side on lg (both single-column) */}
@@ -1147,6 +1139,13 @@ export default function ClimateProfile({
               })()}
 
               {/* ─── Emissions & Energy ─── */}
+              {shouldShowEnsoTracker(region) && (
+                <>
+                  <Divider icon={<Wind className="h-5 w-5 text-sky-300" />} title="Climate Systems" />
+                  <LiveEnsoCard />
+                </>
+              )}
+
               {(region.type === 'country' || region.type === 'us-state' || region.type === 'uk-region') && (
                 <>
                   <Divider icon={<Factory className="h-5 w-5 text-rose-400" />} title="Emissions & Energy" />

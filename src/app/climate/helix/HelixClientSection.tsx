@@ -9,7 +9,7 @@ import RecordsSection from '@/app/_components/climate-records-section';
 import GlobalHelixCard, { type HelixSeriesTab } from '../global/GlobalHelixCard';
 import HelixRegionPicker from './HelixRegionPicker';
 import { detectSeasonScheme } from '@/lib/climate/season-scheme';
-import { getEnsoImpactsForSlug } from '@/lib/climate/enso-impacts';
+import { shouldFeatureEnso } from '@/lib/climate/enso-impacts';
 
 // ─── Data fetching helpers ───────────────────────────────────────────────────
 
@@ -29,6 +29,7 @@ async function fetchRegionHelixData(region: ClimateRegion): Promise<RegionHelixD
     const temp =
       data.ukRegionData?.varData?.Tmean?.monthlyAll ||
       data.nationalData?.varData?.Tmean?.monthlyAll ||
+      data.usClimateRegionData?.paramData?.tavg?.monthlyAll ||
       data.usStateData?.paramData?.tavg?.monthlyAll ||
       data.nationalData?.paramData?.tavg?.monthlyAll ||
       data.countryData?.monthlyAll;
@@ -38,6 +39,7 @@ async function fetchRegionHelixData(region: ClimateRegion): Promise<RegionHelixD
     const precip =
       data.ukRegionData?.varData?.Rainfall?.monthlyAll ||
       data.nationalData?.varData?.Rainfall?.monthlyAll ||
+      data.usClimateRegionData?.paramData?.pcp?.monthlyAll ||
       data.usStateData?.paramData?.pcp?.monthlyAll ||
       data.nationalData?.paramData?.pcp?.monthlyAll ||
       data.countryPrecipData?.monthlyAll;
@@ -54,12 +56,12 @@ async function fetchRegionHelixData(region: ClimateRegion): Promise<RegionHelixD
 
     const source = (data.ukRegionData || data.nationalData?.varData)
       ? 'Met Office UK Regional Series © Crown copyright'
-      : (data.usStateData || data.nationalData?.paramData)
+      : (data.usClimateRegionData || data.usStateData || data.nationalData?.paramData)
         ? 'NOAA National Centers for Environmental Information'
         : 'Our World in Data / NOAA';
 
     const seasonScheme = detectSeasonScheme({ tempMonthly: temp, precipMonthly: precip });
-    const ensoOn = getEnsoImpactsForSlug(region.slug).length > 0;
+    const ensoOn = shouldFeatureEnso(region);
 
     return { series, source, seasonScheme, ensoOn };
   } catch {
@@ -128,8 +130,8 @@ export default function HelixClientSection({
         <div className="bg-gray-950 px-4 py-3 md:px-6 md:py-4 space-y-2 rounded-b-2xl overflow-visible">
           <p className="text-sm md:text-base text-gray-300 leading-relaxed">
             A radial year-on-year temperature dial. Each loop is one year, the colour gradient encodes the
-            long-term warming trend, the dotted rings mark the Paris 1.5°C and 2°C reference lines, and an
-            optional ENSO heads-up highlights El Niño and La Niña years. Search or browse to load any
+            long-term warming trend, the global helix includes dotted Paris 1.5°C and 2°C reference rings,
+            and an optional ENSO heads-up highlights El Niño and La Niña years. Search or browse to load any
             region&rsquo;s helix below.
           </p>
           <HelixRegionPicker
@@ -177,7 +179,7 @@ export default function HelixClientSection({
                   embedSlug={selectedRegion.slug}
                   sectionId="region-helix"
                   share={{
-                    pageUrl: `https://4billionyearson.org/climate/${selectedRegion.slug}`,
+                    pageUrl: `https://4billionyearson.org/climate/helix`,
                     sectionId: 'climate-spiral',
                   }}
                   seasonScheme={regionData.seasonScheme}

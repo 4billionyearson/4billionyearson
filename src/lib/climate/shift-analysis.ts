@@ -113,6 +113,31 @@ function baselineRecent(years: { year: number; months: number[] }[]) {
   return { baseline, recent, baseMonthly, recMonthly };
 }
 
+function cumulativeRainfallCrossing(monthly: number[], total: number, fraction: number): number | null {
+  if (total <= 0) return null;
+  const target = total * fraction;
+  let running = 0;
+  for (let i = 0; i < 12; i++) {
+    const next = running + monthly[i];
+    if (next >= target) {
+      const frac = (target - running) / Math.max(monthly[i], 0.001);
+      const monthStart = MID_MONTH_DOY[i] - 15;
+      const monthEnd = MID_MONTH_DOY[i] + 15;
+      return monthStart + frac * (monthEnd - monthStart);
+    }
+    running = next;
+  }
+  return null;
+}
+
+function findRainfallCrossings(monthly: number[]): { onset: number | null; end: number | null } {
+  const total = monthly.reduce((sum, value) => sum + value, 0);
+  return {
+    onset: cumulativeRainfallCrossing(monthly, total, 0.25),
+    end: cumulativeRainfallCrossing(monthly, total, 0.75),
+  };
+}
+
 export type TempShift = {
   baselineAnnualMean: number;
   baselineAmplitudeC: number;
@@ -201,6 +226,10 @@ export function analyseTemperature(monthlyAll: MonthlyPoint[]): {
 }
 
 export type RainShift = {
+  baselineStartYear: number;
+  baselineEndYear: number;
+  recentStartYear: number;
+  recentEndYear: number;
   baselineAnnualMm: number;
   recentAnnualMm: number;
   baselineMonthly: number[];
@@ -215,6 +244,9 @@ export type RainShift = {
   wetSeasonOnsetDoyBaseline: number | null;
   wetSeasonOnsetDoyRecent: number | null;
   wetSeasonOnsetShiftDays: number | null;
+  wetSeasonEndDoyBaseline: number | null;
+  wetSeasonEndDoyRecent: number | null;
+  wetSeasonEndShiftDays: number | null;
   annualTotalShiftPct: number;
   biggestRainMonth: { month: string; diff: number; pctDiff: number };
 };
@@ -253,26 +285,12 @@ export function analyseRainfall(
   const peakBaseIdx = baseMonthly.reduce((bi, v, i, arr) => v > arr[bi] ? i : bi, 0);
   const peakRecIdx = recMonthly.reduce((bi, v, i, arr) => v > arr[bi] ? i : bi, 0);
 
-  // Wet-season onset: DOY where cumulative rainfall first passes 25% of annual
-  const cumulative = (monthly: number[], total: number): number | null => {
-    if (total <= 0) return null;
-    const target = total * 0.25;
-    let running = 0;
-    for (let i = 0; i < 12; i++) {
-      const next = running + monthly[i];
-      if (next >= target) {
-        const frac = (target - running) / Math.max(monthly[i], 0.001);
-        // Spread month uniformly across its days
-        const monthStart = MID_MONTH_DOY[i] - 15;
-        const monthEnd = MID_MONTH_DOY[i] + 15;
-        return monthStart + frac * (monthEnd - monthStart);
-      }
-      running = next;
-    }
-    return null;
-  };
-  const onsetBase = cumulative(baseMonthly, baselineAnnual);
-  const onsetRec = cumulative(recMonthly, recentAnnual);
+  const baseCrossings = findRainfallCrossings(baseMonthly);
+  const recCrossings = findRainfallCrossings(recMonthly);
+  const onsetBase = baseCrossings.onset;
+  const onsetRec = recCrossings.onset;
+  const endBase = baseCrossings.end;
+  const endRec = recCrossings.end;
 
   const diffs = recMonthly.map((v, i) => v - baseMonthly[i]);
   const biggestIdx = diffs.reduce((bi, v, i, arr) => Math.abs(v) > Math.abs(arr[bi]) ? i : bi, 0);
@@ -281,6 +299,10 @@ export function analyseRainfall(
     : 0;
 
   return {
+    baselineStartYear: baseline[0].year,
+    baselineEndYear: baseline[baseline.length - 1].year,
+    recentStartYear: recent[0].year,
+    recentEndYear: recent[recent.length - 1].year,
     baselineAnnualMm: +baselineAnnual.toFixed(0),
     recentAnnualMm: +recentAnnual.toFixed(0),
     baselineMonthly: baseMonthly.map((v) => +v.toFixed(1)),
@@ -296,6 +318,10 @@ export function analyseRainfall(
     wetSeasonOnsetDoyRecent: onsetRec === null ? null : +onsetRec.toFixed(1),
     wetSeasonOnsetShiftDays:
       onsetBase !== null && onsetRec !== null ? +(onsetRec - onsetBase).toFixed(1) : null,
+    wetSeasonEndDoyBaseline: endBase === null ? null : +endBase.toFixed(1),
+    wetSeasonEndDoyRecent: endRec === null ? null : +endRec.toFixed(1),
+    wetSeasonEndShiftDays:
+      endBase !== null && endRec !== null ? +(endRec - endBase).toFixed(1) : null,
     annualTotalShiftPct:
       baselineAnnual > 0
         ? +(((recentAnnual - baselineAnnual) / baselineAnnual) * 100).toFixed(1)

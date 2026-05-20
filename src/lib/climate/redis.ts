@@ -2,9 +2,13 @@ import { Redis } from '@upstash/redis';
 
 let redis: Redis | null = null;
 
+export function hasRedisCache(): boolean {
+  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
 export function getRedis(): Redis | null {
   if (redis) return redis;
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  if (hasRedisCache()) {
     redis = new Redis({
       url: process.env.KV_REST_API_URL,
       token: process.env.KV_REST_API_TOKEN,

@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import Link from 'next/link';
-import { BarChart3, ExternalLink, MapPin, Layers, Scale, AlertTriangle, FileText, BookOpen, TrendingUp, TrendingDown, Thermometer, CloudRain } from 'lucide-react';
+import { BarChart3, ExternalLink, MapPin, Layers, Scale, AlertTriangle, FileText, BookOpen, TrendingUp, TrendingDown, Thermometer, CloudRain, Trophy, Wind } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import { CLIMATE_REGIONS, getProfileSlugForLocation, getClimateUpdateDateLabel } from '@/lib/climate/regions';
 import { ALL_LOCATIONS } from '@/lib/climate/locations';
@@ -13,6 +13,8 @@ import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import MonthlySpaghettiCard from '@/app/_components/monthly-spaghetti-card';
 import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
 import RecordsSection from '@/app/_components/climate-records-section';
+import { shouldFeatureEnso, shouldShowEnsoTracker } from '@/lib/climate/enso-impacts';
+import LiveEnsoCard from '@/app/climate/_components/LiveEnsoCard';
 import { detectSeasonScheme } from '@/lib/climate/season-scheme';
 import SeasonalShiftCard from '@/app/_components/seasonal-shift-card';
 import EmissionsCard from '@/app/_components/emissions-card';
@@ -204,6 +206,19 @@ function Card({ icon, title, children }: { icon: React.ReactNode; title: string;
       </h2>
       {children}
     </section>
+  );
+}
+
+function Divider({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-4 my-6">
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+      <h2 className="text-lg font-bold font-mono text-[#FFF5E7] flex items-center gap-2 bg-gray-950 px-5 py-2 rounded-full border border-[#D0A65E]/50 shadow-lg [&>svg]:shrink-0">
+        {icon}
+        <span>{title}</span>
+      </h2>
+      <div className="h-px bg-[#D0A65E]/30 flex-1" />
+    </div>
   );
 }
 
@@ -439,6 +454,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
     if (sm > 12) { sm -= 12; sy += 1; }
     return `${monthShort[sm - 1]} ${sy}–${monthShort[lm.month - 1]} ${lm.year}`;
   })() : '');
+  const aggregateSource = `4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`;
 
   return (
     <>
@@ -530,21 +546,38 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
               <ClimateSpiralCard
                 series={{ temp: absolutes.monthlyAll }}
                 regionName={region.name}
-                dataSource={`4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`}
+                dataSource={aggregateSource}
                 embedSlug={region.slug}
-                share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'climate-spiral' }}
+                share={{ pageUrl: 'https://4billionyearson.org/climate/helix', sectionId: 'climate-spiral' }}
                 seasonScheme={scheme}
+                showEnso={shouldFeatureEnso(region)}
               />
             );
           })()}
           <MonthlySpaghettiCard
             series={{ temp: absolutes.monthlyAll }}
             regionName={region.name}
-            dataSource={`4BYO continent aggregate · equal-weight mean of ${row.memberCount ?? 'member'} country monthly absolute temperatures (OWID/CRU TS).`}
+            dataSource={aggregateSource}
             embedSlug={region.slug}
             share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'monthly-history' }}
           />
-          <RecordsSection series={{ temp: absolutes.monthlyAll }} />
+          <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
+              <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
+              <span className="min-w-0 flex-1">Records – {region.name}</span>
+            </h2>
+            <RecordsSection series={{ temp: absolutes.monthlyAll }} />
+            <p className="text-[11px] text-gray-500 mt-3">{aggregateSource}</p>
+            <div className="mt-3">
+              <ShareBar
+                pageUrl={`https://4billionyearson.org/climate/${region.slug}#climate-records`}
+                shareText={encodeURIComponent(`${region.name} climate records - 4 Billion Years On`)}
+                emailSubject={`${region.name} climate records - 4 Billion Years On`}
+                wrapperClassName="relative flex justify-end"
+                align="right"
+              />
+            </div>
+          </div>
           <SeasonalShiftCard
             monthlyAll={absolutes.monthlyAll}
             regionName={region.name}
@@ -556,6 +589,13 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
               embedCode: `<iframe\n  src="https://4billionyearson.org/climate/embed/seasons/${encodeURIComponent(region.slug)}"\n  width="100%" height="720"\n  style="border:none;"\n  title="Shifting Seasons - ${region.name} - 4 Billion Years On"\n></iframe>`,
             }}
           />
+        </>
+      ) : null}
+
+      {shouldShowEnsoTracker(region) ? (
+        <>
+          <Divider icon={<Wind className="h-5 w-5 text-sky-300" />} title="Climate Systems" />
+          <LiveEnsoCard />
         </>
       ) : null}
 
@@ -736,6 +776,15 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
       {/* Spaghetti chart + seasonal-shift card (NOAA regional tavg monthlyAll) */}
       {tavg.monthlyAll?.length ? (
         <>
+          <ClimateSpiralCard
+            series={{ temp: tavg.monthlyAll, precip: pcp?.monthlyAll }}
+            regionName={region.name}
+            dataSource="NOAA Climate at a Glance — regional tavg / pcp (monthly absolutes)."
+            embedSlug={region.slug}
+            share={{ pageUrl: 'https://4billionyearson.org/climate/helix', sectionId: 'climate-spiral' }}
+            seasonScheme={detectSeasonScheme({ tempMonthly: tavg.monthlyAll, precipMonthly: pcp?.monthlyAll })}
+            showEnso={shouldFeatureEnso(region)}
+          />
           <MonthlySpaghettiCard
             series={{ temp: tavg.monthlyAll, precip: pcp?.monthlyAll }}
             regionName={region.name}
@@ -743,6 +792,23 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
             embedSlug={region.slug}
             share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'monthly-history' }}
           />
+          <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+            <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
+              <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
+              <span className="min-w-0 flex-1">Records – {region.name}</span>
+            </h2>
+            <RecordsSection series={{ temp: tavg.monthlyAll, precip: pcp?.monthlyAll }} />
+            <p className="text-[11px] text-gray-500 mt-3">NOAA Climate at a Glance — regional tavg / pcp (monthly absolutes).</p>
+            <div className="mt-3">
+              <ShareBar
+                pageUrl={`https://4billionyearson.org/climate/${region.slug}#climate-records`}
+                shareText={encodeURIComponent(`${region.name} climate records - 4 Billion Years On`)}
+                emailSubject={`${region.name} climate records - 4 Billion Years On`}
+                wrapperClassName="relative flex justify-end"
+                align="right"
+              />
+            </div>
+          </div>
           <SeasonalShiftCard
             monthlyAll={tavg.monthlyAll}
             regionName={region.name}
@@ -789,6 +855,13 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
 
       {/* Hottest / coolest member states this month */}
       <MemberRankingsCard members={members} regionName={region.name} />
+
+      {shouldShowEnsoTracker(region) ? (
+        <>
+          <Divider icon={<Wind className="h-5 w-5 text-sky-300" />} title="Climate Systems" />
+          <LiveEnsoCard />
+        </>
+      ) : null}
 
       {/* Aggregate fossil-fuel CO₂ emissions across the region's member states */}
       <EmissionsCard

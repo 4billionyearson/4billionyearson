@@ -10,7 +10,7 @@ import {
   getClimateUpdateDateLabel,
   expandMonthLabel,
 } from '@/lib/climate/regions';
-import { getCached } from '@/lib/climate/redis';
+import { getCached, hasRedisCache } from '@/lib/climate/redis';
 import { getSummaryCacheKey } from '@/lib/climate/summary-cache-key';
 import GlobalProfile from './GlobalProfile';
 
@@ -161,7 +161,8 @@ function DatasetSchema() {
 
 export default async function ClimateGlobalPage() {
   const cached = await readCachedGlobalSummary();
-  const cacheMiss = !cached?.summary;
+  const canUseSummaryCache = hasRedisCache();
+  const cacheMiss = canUseSummaryCache && !cached?.summary;
 
   // On cache miss, kick off Gemini in the background. Subsequent requests
   // will SSR with the fresh summary (revalidatePath fires inside the API

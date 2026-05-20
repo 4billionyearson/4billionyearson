@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { CalendarDays } from 'lucide-react';
 
 const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -39,7 +40,14 @@ export default function NextSnapshotBadge({
   latestDataLabel?: string;
   windowDays?: string;
 }) {
-  const now = new Date();
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+  }, []);
+
+  if (!now) return null;
+
   const currentMonthIdx = now.getMonth(); // 0-based
   const currentYear     = now.getFullYear();
   const lastMonthIdx    = currentMonthIdx === 0 ? 11 : currentMonthIdx - 1;

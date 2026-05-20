@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
+import { getRankingsAnalysisCacheKey } from '@/lib/climate/rankings-analysis-cache-key';
 import { buildDriverVocabularySection } from '@/lib/climate/warming-drivers';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -325,17 +326,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Rankings data unavailable' }, { status: 503 });
   }
 
-  // Date-aware cache key (mirrors the summary route convention)
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  const cacheMonth = dayOfMonth >= 21
-    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    : (() => {
-        const prev = new Date(now);
-        prev.setMonth(prev.getMonth() - 1);
-        return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
-      })();
-  const cacheKey = `climate:rankings-analysis:${cacheMonth}-v3`;
+  const cacheKey = getRankingsAnalysisCacheKey(current.cacheMonth);
+  if (!cacheKey) {
+    return NextResponse.json({ error: 'Rankings cache key unavailable' }, { status: 503 });
+  }
 
   if (!skipCache) {
     const cached = await getCached<{ summary: string; sources?: GroundingSource[]; generatedAt: string }>(cacheKey);

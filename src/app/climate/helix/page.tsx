@@ -10,7 +10,7 @@ const HUB_URL = 'https://4billionyearson.org/climate/helix';
 export const metadata: Metadata = {
   title: 'Climate Helix – Year-on-Year Temperature Spiral | 4 Billion Years On',
   description:
-    'The Climate Helix is a radial year-on-year temperature dial: each loop is a year, the colour gradient is the long-term warming trend, and reference rings mark the Paris 1.5°C and 2°C limits. Explore the global helix here, or open any country, US state or UK region to see its own.',
+    'The Climate Helix is a radial year-on-year temperature dial: each loop is a year, the colour gradient is the long-term warming trend, and the global helix includes Paris 1.5°C and 2°C reference rings. Explore the global helix here, or open any country, US state or UK region to see its own.',
   keywords: [
     'climate helix',
     'temperature spiral',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Climate Helix — Year-on-Year Temperature Spiral',
     description:
-      'Radial year-on-year temperature dial with Paris 1.5°C / 2°C reference rings. Global, plus a region picker for every country, US state and UK region we track.',
+      'Radial year-on-year temperature dial with global Paris 1.5°C / 2°C reference rings, plus a region picker for every country, US state and UK region we track.',
     type: 'website',
     url: HUB_URL,
   },
@@ -115,7 +115,7 @@ export default async function ClimateHelixPage() {
                 url: HUB_URL,
                 name: 'Climate Helix – Year-on-Year Temperature Spiral',
                 description:
-                  'An interactive radial temperature spiral showing monthly global and regional temperatures since records began, with Paris Agreement 1.5°C and 2°C reference rings.',
+                  'An interactive radial temperature spiral showing monthly global and regional temperatures since records began, with Paris Agreement 1.5°C and 2°C reference rings on the global helix.',
                 isPartOf: { '@id': 'https://4billionyearson.org' },
                 about: {
                   '@type': 'Dataset',

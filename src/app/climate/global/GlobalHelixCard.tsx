@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from 'react';
-import ClimateSpiralCard from '@/app/_components/climate-spiral-card';
+import ClimateSpiralCard, { type ClimateSpiralHudMetric } from '@/app/_components/climate-spiral-card';
 import { DEFAULT_SCHEME } from '@/lib/climate/season-scheme';
 import type { SeriesMap } from '@/app/_components/monthly-spaghetti-card';
 
@@ -16,6 +16,14 @@ export interface HelixSeriesTab {
   regionName: string;
   embedSlug: string;
   parisReference?: { monthly: number[]; label?: string };
+  supplementalHudMetrics?: ClimateSpiralHudMetric[];
+  orbitalOverlay?: {
+    label: string;
+    unit: string;
+    color: string;
+    note?: string;
+    series: { year: number; month: number; value: number }[];
+  };
 }
 
 export default function GlobalHelixCard({
@@ -80,13 +88,15 @@ export default function GlobalHelixCard({
       dataSource={active.dataSource}
       provisionalAfterMonth={provisionalAfterMonth}
       embedSlug={active.embedSlug}
-      share={{ pageUrl: 'https://4billionyearson.org/climate/global', sectionId: 'climate-spiral' }}
+      share={{ pageUrl: 'https://4billionyearson.org/climate/helix', sectionId: 'climate-spiral' }}
       showEnso
       chartOverlayAccessory={tabs.length > 1 ? renderSeriesControl(true) : undefined}
       chartInlineAccessory={tabs.length > 1 ? renderSeriesControl(false) : undefined}
       seasonScheme={scheme}
       parisReference={active.parisReference}
       tempScaleMode="auto"
+      supplementalHudMetrics={active.supplementalHudMetrics}
+      orbitalOverlay={active.orbitalOverlay}
     />
   );
 }

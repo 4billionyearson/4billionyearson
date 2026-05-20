@@ -13,7 +13,7 @@ import {
   getClimateUpdateDateLabel,
   expandMonthLabel,
 } from '@/lib/climate/regions';
-import { getCached } from '@/lib/climate/redis';
+import { getCached, hasRedisCache } from '@/lib/climate/redis';
 import { getSummaryCacheKey } from '@/lib/climate/summary-cache-key';
 import ClimateProfile from './ClimateProfile';
 import ClimateGroupProfile from './ClimateGroupProfile';
@@ -95,12 +95,14 @@ async function getRegionDataLabels(
     if (region.type === 'country') filePath = resolve(base, 'country', `${region.apiCode}.json`);
     else if (region.type === 'us-state') filePath = resolve(base, 'us-state', `${region.apiCode}.json`);
     else if (region.type === 'uk-region') filePath = resolve(base, 'uk-region', `${region.apiCode}.json`);
+    else if (region.type === 'group' && region.groupKind === 'us-climate-region') filePath = resolve(base, 'us-climate-region', `${region.slug}.json`);
     if (!filePath) return { raw: null, expanded: getClimateUpdateDateLabel() };
     const d = JSON.parse(await readFile(filePath, 'utf8'));
     let label: string | undefined;
     if (region.type === 'country') label = d?.latestMonthStats?.label;
     else if (region.type === 'us-state') label = d?.paramData?.tavg?.latestMonthStats?.label;
     else if (region.type === 'uk-region') label = d?.varData?.Tmean?.latestMonthStats?.label;
+    else if (region.type === 'group' && region.groupKind === 'us-climate-region') label = d?.paramData?.tavg?.latestMonthStats?.label;
     if (label) {
       // Gate against NOAA global so metadata title matches the on-page title:
       // the page only flips to "April Update" once every cross-source row
@@ -198,7 +200,8 @@ export default async function ClimateProfilePage(
   if (!region) notFound();
 
   const cached = await readCachedSummary(slug);
-  const cacheMiss = !cached?.summary;
+  const canUseSummaryCache = hasRedisCache();
+  const cacheMiss = canUseSummaryCache && !cached?.summary;
 
   // On cache miss, kick off Gemini in the background. Subsequent requests
   // to this slug will SSR with the fresh summary baked in.

@@ -21,21 +21,9 @@ const GOLD = '#D0A65E';
 const GOLD_DIM = 'rgba(208,166,94,0.7)';
 const GOLD_BORDER = 'rgba(208,166,94,0.3)';
 
-// Concentric ring colours cold→warm matching the helix's own palette
-const RING_COLORS = [
-  '#7DD3FC', // ice blue  (earliest/coldest years)
-  '#67E8F9', // cyan
-  '#86EFAC', // spring green
-  '#BEF264', // yellow-green
-  '#FACC15', // warm yellow
-  '#F59E0B', // amber
-  '#F97316', // orange
-  '#EF4444', // hot red  (latest/warmest years)
-];
-
 export default async function OgImage() {
-  const [bgUrl, logoUrl] = await Promise.all([
-    loadDataUrl('background.png', 'image/png'),
+  const [helixUrl, logoUrl] = await Promise.all([
+    loadDataUrl('Climate Helix.png', 'image/png'),
     loadDataUrl('header-logo.png', 'image/png'),
   ]);
 
@@ -44,111 +32,58 @@ export default async function OgImage() {
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
           width: '100%',
           height: '100%',
-          position: 'relative',
           background: '#030712',
           fontFamily: 'system-ui, sans-serif',
         }}
       >
-        {/* Background image */}
-        {bgUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={bgUrl}
-            alt=""
-            width={1200}
-            height={630}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }}
-          />
-        ) : null}
-
-        {/* Dark overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            background: 'linear-gradient(135deg, rgba(3,7,18,0.92) 0%, rgba(11,14,22,0.88) 60%, rgba(3,7,18,0.95) 100%)',
-          }}
-        />
-
-        {/* Content layer */}
+        {/* Left content pane */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            width: '100%',
+            width: helixUrl ? '58%' : '100%',
             height: '100%',
-            padding: '48px 60px',
-            position: 'relative',
-            zIndex: 1,
+            padding: '48px 48px 40px 60px',
           }}
         >
-          {/* Top row: spiral icon + title | logo */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
-              {/* Helix rings icon */}
-              <svg width="90" height="90" viewBox="0 0 90 90" fill="none">
-                {RING_COLORS.map((col, i) => {
-                  const r = 8 + i * 9;
-                  return (
-                    <circle
-                      key={i}
-                      cx="45"
-                      cy="45"
-                      r={r}
-                      stroke={col}
-                      strokeWidth={i === RING_COLORS.length - 1 ? 3 : 2}
-                      strokeOpacity={0.75 + i * 0.033}
-                      fill="none"
-                    />
-                  );
-                })}
-                {/* 12 radial tick marks (months) */}
-                {Array.from({ length: 12 }, (_, i) => {
-                  const ang = (i / 12) * Math.PI * 2 - Math.PI / 2;
-                  const inner = 6;
-                  const outer = 10;
-                  const x1 = 45 + Math.cos(ang) * inner;
-                  const y1 = 45 + Math.sin(ang) * inner;
-                  const x2 = 45 + Math.cos(ang) * outer;
-                  const y2 = 45 + Math.sin(ang) * outer;
-                  return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,255,255,0.25)" strokeWidth="1" />;
-                })}
-              </svg>
-              <span
-                style={{
-                  fontSize: 62,
-                  fontWeight: 800,
-                  color: GOLD,
-                  textShadow: '0 2px 12px rgba(0,0,0,0.9)',
-                  lineHeight: 1.0,
-                  letterSpacing: '-1px',
-                }}
-              >
-                Climate Helix
-              </span>
-            </div>
+          {/* Logo */}
+          <div style={{ display: 'flex', marginBottom: '28px' }}>
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="4 Billion Years On" width={340} height={60} style={{ objectFit: 'contain', marginTop: '8px' }} />
+              <img src={logoUrl} alt="4 Billion Years On" width={280} height={50} style={{ objectFit: 'contain' }} />
             ) : (
-              <span style={{ fontSize: 22, fontWeight: 700, color: '#e5e7eb' }}>4billionyearson.org</span>
+              <span style={{ fontSize: 20, fontWeight: 700, color: '#e5e7eb' }}>4billionyearson.org</span>
             )}
           </div>
 
+          {/* Title */}
+          <div style={{ display: 'flex', marginBottom: '10px' }}>
+            <span
+              style={{
+                fontSize: 60,
+                fontWeight: 800,
+                color: GOLD,
+                textShadow: '0 2px 12px rgba(0,0,0,0.9)',
+                lineHeight: 1.05,
+                letterSpacing: '-1px',
+              }}
+            >
+              Climate Helix
+            </span>
+          </div>
+
           {/* Subtitle */}
-          <div style={{ display: 'flex', marginBottom: '18px' }}>
-            <span style={{ fontSize: 22, color: GOLD_DIM, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 600 }}>
+          <div style={{ display: 'flex', marginBottom: '20px' }}>
+            <span style={{ fontSize: 20, color: GOLD_DIM, letterSpacing: '2px', textTransform: 'uppercase', fontWeight: 600 }}>
               Year-on-Year Temperature Spiral
             </span>
           </div>
 
           {/* Description */}
-          <div style={{ display: 'flex', marginBottom: '28px', maxWidth: '800px' }}>
-            <span style={{ fontSize: 26, color: '#e2e8f0', lineHeight: 1.4, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+          <div style={{ display: 'flex', marginBottom: '28px' }}>
+            <span style={{ fontSize: 22, color: '#e2e8f0', lineHeight: 1.4, textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
               Every monthly temperature reading since records began, wound into a radial spiral.
               Each loop is one year — the warming trend emerges from the tightening coil.
             </span>
@@ -158,41 +93,63 @@ export default async function OgImage() {
           <div
             style={{
               display: 'flex',
-              flexDirection: 'row',
-              gap: '16px',
+              flexDirection: 'column',
+              gap: '8px',
               background: 'rgba(3,7,18,0.85)',
               border: '1px solid ' + GOLD_BORDER,
-              borderRadius: 16,
-              padding: '18px 24px',
+              borderRadius: 14,
+              padding: '14px 20px',
               marginTop: 'auto',
             }}
           >
             {[
-              { icon: '🌍', label: 'Global Land + Ocean' },
-              { icon: '📍', label: '300+ countries & regions' },
-              { icon: '📅', label: '150+ years of data' },
-              { icon: '🎯', label: 'Paris 1.5 °C / 2 °C rings' },
-              { icon: '▶', label: 'Animated playback' },
-            ].map(({ icon, label }) => (
-              <div
-                key={label}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  flex: 1,
-                  background: 'rgba(208,166,94,0.07)',
-                  border: '1px solid rgba(208,166,94,0.18)',
-                  borderRadius: 10,
-                  padding: '10px 14px',
-                }}
-              >
-                <span style={{ fontSize: 22 }}>{icon}</span>
-                <span style={{ fontSize: 18, color: '#FFF5E7', fontWeight: 600, lineHeight: 1.2 }}>{label}</span>
+              ['🌍', 'Global Land + Ocean'],
+              ['📍', '300+ countries & regions'],
+              ['📅', '150+ years of data'],
+              ['🎯', 'Paris 1.5 °C / 2 °C rings'],
+              ['▶', 'Animated playback'],
+            ].map(([icon, label]) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: 18 }}>{icon}</span>
+                <span style={{ fontSize: 16, color: '#FFF5E7', fontWeight: 600 }}>{label}</span>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Right: helix screenshot */}
+        {helixUrl ? (
+          <div
+            style={{
+              display: 'flex',
+              width: '42%',
+              height: '100%',
+              position: 'relative',
+            }}
+          >
+            {/* Fade-left gradient so text doesn't clash */}
+            <div
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: '60px',
+                display: 'flex',
+                background: 'linear-gradient(to right, #030712, transparent)',
+                zIndex: 1,
+              }}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={helixUrl}
+              alt=""
+              width={504}
+              height={630}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            />
+          </div>
+        ) : null}
       </div>
     ),
     { ...size },

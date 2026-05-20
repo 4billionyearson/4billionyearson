@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import ClimateSpiralCard, { type SeriesMap } from '@/app/_components/climate-spiral-card';
+import { getRegionBySlug } from '@/lib/climate/regions';
+import { shouldFeatureEnso } from '@/lib/climate/enso-impacts';
+import { detectSeasonScheme } from '@/lib/climate/season-scheme';
 
 interface ProfileResponse {
   countryData?: { monthlyAll?: { year: number; month: number; value: number }[] };
   countryPrecipData?: { monthlyAll?: { year: number; month: number; value: number }[] };
   ukRegionData?: { region?: string; varData?: Record<string, { monthlyAll?: { year: number; month: number; value: number }[] }> };
+  usClimateRegionData?: { region?: string; paramData?: Record<string, { monthlyAll?: { year: number; month: number; value: number }[] }> };
   nationalData?: {
     region?: string;
     state?: string;
@@ -29,6 +33,7 @@ export default function SpiralEmbedClient({ slug }: { slug: string }) {
   const [regionName, setRegionName] = useState<string>('');
   const [dataSource, setDataSource] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const region = getRegionBySlug(slug);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,11 +45,13 @@ export default function SpiralEmbedClient({ slug }: { slug: string }) {
         if (cancelled) return;
         const temp = json.ukRegionData?.varData?.Tmean?.monthlyAll
           || json.nationalData?.varData?.Tmean?.monthlyAll
+          || json.usClimateRegionData?.paramData?.tavg?.monthlyAll
           || json.usStateData?.paramData?.tavg?.monthlyAll
           || json.nationalData?.paramData?.tavg?.monthlyAll
           || json.countryData?.monthlyAll;
         const precip = json.ukRegionData?.varData?.Rainfall?.monthlyAll
           || json.nationalData?.varData?.Rainfall?.monthlyAll
+          || json.usClimateRegionData?.paramData?.pcp?.monthlyAll
           || json.usStateData?.paramData?.pcp?.monthlyAll
           || json.nationalData?.paramData?.pcp?.monthlyAll
           || json.countryPrecipData?.monthlyAll;
@@ -55,7 +62,7 @@ export default function SpiralEmbedClient({ slug }: { slug: string }) {
         setSeries({ temp, precip, sunshine, frost });
         setRegionName(json.name ?? slug);
         const isUk = !!(json.ukRegionData || json.nationalData?.varData);
-        const isUs = !!(json.usStateData || json.nationalData?.paramData);
+        const isUs = !!(json.usClimateRegionData || json.usStateData || json.nationalData?.paramData);
         setDataSource(
           isUk
             ? 'Data: Met Office UK Regional Series © Crown copyright'
@@ -81,7 +88,8 @@ export default function SpiralEmbedClient({ slug }: { slug: string }) {
       regionName={regionName || ''}
       dataSource={dataSource}
       hideShare
-      showEnso={slug === 'uk'}
+      seasonScheme={detectSeasonScheme({ tempMonthly: series.temp, precipMonthly: series.precip })}
+      showEnso={shouldFeatureEnso(region)}
     />
   );
 }

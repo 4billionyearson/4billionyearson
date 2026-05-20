@@ -96,6 +96,14 @@ export async function GET(
     const nationalSnap = await loadSnapshot('uk-region/uk-uk.json');
     nationalMonth = nationalSnap?.varData?.Tmean?.latestMonthStats?.label ?? null;
     nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+  } else if (region.type === 'group' && region.groupKind === 'us-climate-region') {
+    const primarySnap = await loadSnapshot(`us-climate-region/${region.slug}.json`);
+    primaryMonth = primarySnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
+    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
+
+    const nationalSnap = await loadSnapshot('us-national.json');
+    nationalMonth = nationalSnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
+    nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
   }
 
   const dataCacheKeyParts = [
@@ -114,7 +122,7 @@ export async function GET(
         if (now.getDate() < 21) prev.setMonth(prev.getMonth() - 1);
         return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
       })();
-  const cacheKey = `climate:profile:${slug}:${dataCacheKey}-v23`;
+  const cacheKey = `climate:profile:${slug}:${dataCacheKey}-v24`;
 
   // Check cache
   const cached = await getCached<any>(cacheKey);
@@ -126,6 +134,7 @@ export async function GET(
     let countryData = null;
     let countryPrecipData = null; // World Bank CKP monthly precip (CRU TS 4.08)
     let usStateData = null;
+    let usClimateRegionData = null;
     let ukRegionData = null;
     let nationalData = null; // UK-wide or US-national for sub-national regions
     let owidCountryData = null; // OWID country data (for sub-national comparison)
@@ -163,10 +172,17 @@ export async function GET(
       ukRegionData = regionRes;
       owidCountryData = countryRes;
       nationalData = ukNationalRes;
+    } else if (region.type === 'group' && region.groupKind === 'us-climate-region') {
+      const [groupRes, nationalRes] = await Promise.all([
+        loadSnapshot(`us-climate-region/${region.slug}.json`),
+        loadSnapshot('us-national.json'),
+      ]);
+      usClimateRegionData = groupRes;
+      nationalData = nationalRes;
     }
 
     // Build key stats for the crawlable summary
-    const keyStats = buildKeyStats(region.type, countryData, usStateData, ukRegionData);
+    const keyStats = buildKeyStats(region.type, countryData, usStateData, usClimateRegionData, ukRegionData);
 
     const result = {
       slug: region.slug,
@@ -178,6 +194,7 @@ export async function GET(
       countryData,
       countryPrecipData,
       usStateData,
+      usClimateRegionData,
       ukRegionData,
       nationalData,
       owidCountryData,
@@ -205,6 +222,7 @@ function buildKeyStats(
   type: string,
   countryData: any,
   usStateData: any,
+  usClimateRegionData: any,
   ukRegionData: any,
 ): KeyStats {
   const stats: KeyStats = {};
@@ -256,6 +274,31 @@ function buildKeyStats(
     }
     if (usStateData.paramData?.pcp?.yearly?.length > 0) {
       const pcpYearly = usStateData.paramData.pcp.yearly;
+      const latestPrecip = pcpYearly[pcpYearly.length - 1];
+      stats.latestPrecip = `${latestPrecip.value}mm (${latestPrecip.year})`;
+    }
+  }
+
+  if (type === 'group' && usClimateRegionData?.paramData?.tavg) {
+    const yearly = usClimateRegionData.paramData.tavg.yearly;
+    if (yearly?.length > 0) {
+      const latest = yearly[yearly.length - 1];
+      stats.latestTemp = `${latest.value}°C (${latest.year})`;
+      stats.dataRange = `${yearly[0].year}–${latest.year}`;
+      const warmest = yearly.reduce((a: any, b: any) => a.value > b.value ? a : b);
+      stats.warmestYear = `${warmest.year} (${warmest.value}°C)`;
+
+      const baseline = yearly.filter((y: any) => y.year >= 1961 && y.year <= 1990);
+      const recent = yearly.filter((y: any) => y.year >= latest.year - 9);
+      if (baseline.length > 0 && recent.length > 0) {
+        const baseAvg = baseline.reduce((a: number, b: any) => a + b.value, 0) / baseline.length;
+        const recentAvg = recent.reduce((a: number, b: any) => a + b.value, 0) / recent.length;
+        const diff = recentAvg - baseAvg;
+        stats.tempTrend = `${diff > 0 ? '+' : ''}${diff.toFixed(2)}°C vs 1961–1990 baseline`;
+      }
+    }
+    if (usClimateRegionData.paramData?.pcp?.yearly?.length > 0) {
+      const pcpYearly = usClimateRegionData.paramData.pcp.yearly;
       const latestPrecip = pcpYearly[pcpYearly.length - 1];
       stats.latestPrecip = `${latestPrecip.value}mm (${latestPrecip.year})`;
     }

@@ -13,6 +13,7 @@ import { CONTINENT_BY_ISO, US_REGION_BY_ID } from '@/lib/climate/editorial';
 import { StaticFAQPanel, FaqJsonLd } from '@/app/_components/seo/StaticFAQPanel';
 import { RANKINGS_FAQ } from './rankings-faq';
 import { getCached } from '@/lib/climate/redis';
+import { getRankingsAnalysisCacheKey } from '@/lib/climate/rankings-analysis-cache-key';
 import NextSnapshotBadge from '@/app/_components/next-snapshot-badge';
 
 // 24-hour ISR safety net; cache invalidation is event-driven via
@@ -249,17 +250,9 @@ interface CachedAnalysis {
   generatedAt?: string;
 }
 
-async function readCachedAnalysis(): Promise<CachedAnalysis | null> {
-  const now = new Date();
-  const dayOfMonth = now.getDate();
-  const cacheMonth = dayOfMonth >= 21
-    ? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    : (() => {
-        const prev = new Date(now);
-        prev.setMonth(prev.getMonth() - 1);
-        return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
-      })();
-  const cacheKey = `climate:rankings-analysis:${cacheMonth}-v3`;
+async function readCachedAnalysis(cacheMonth: string | null | undefined): Promise<CachedAnalysis | null> {
+  const cacheKey = getRankingsAnalysisCacheKey(cacheMonth);
+  if (!cacheKey) return null;
   try {
     return await getCached<CachedAnalysis>(cacheKey);
   } catch {
@@ -287,12 +280,12 @@ async function warmRankingsAnalysis(): Promise<void> {
 }
 
 export default async function RankingsPage() {
-  const [data, previous, countryAnomalies, cachedAnalysis] = await Promise.all([
+  const [data, previous, countryAnomalies] = await Promise.all([
     loadRankings(),
     loadPreviousRankings(),
     loadCountryAnomalies(),
-    readCachedAnalysis(),
   ]);
+  const cachedAnalysis = await readCachedAnalysis(data?.cacheMonth);
 
   const analysisCacheMiss = !cachedAnalysis?.summary;
   if (analysisCacheMiss) {

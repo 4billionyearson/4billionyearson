@@ -47,6 +47,7 @@ const NOAA_CO2_URL = 'https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.tx
 // NOAA GML CH4 + N2O global means
 const NOAA_CH4_URL = 'https://gml.noaa.gov/webdata/ccgg/trends/ch4/ch4_mm_gl.txt';
 const NOAA_N2O_URL = 'https://gml.noaa.gov/webdata/ccgg/trends/n2o/n2o_mm_gl.txt';
+const NOAA_SEA_LEVEL_URL = 'https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/slr/slr_sla_gbl_keep_all_66.csv';
 
 // NSIDC sea-ice monthly extent (via global-warming.org aggregator — same source
 // already used elsewhere on the site. Returns *global* sea-ice extent,
@@ -427,6 +428,22 @@ function parseGmlMonthly(text) {
   return monthly;
 }
 
+function buildYearlyAverageSeries(points, valueOf = (point) => point.value) {
+  if (!points?.length) return [];
+  const byYear = new Map();
+  for (const point of points) {
+    const year = point.year;
+    const value = valueOf(point);
+    if (!Number.isFinite(year) || !Number.isFinite(value)) continue;
+    const arr = byYear.get(year);
+    if (arr) arr.push(value);
+    else byYear.set(year, [value]);
+  }
+  return [...byYear.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([year, values]) => ({ year, value: round2(values.reduce((sum, value) => sum + value, 0) / values.length) }));
+}
+
 function buildGhgStats(monthly, label, unit, preindustrial) {
   if (!monthly?.length) return null;
   const latest = monthly[monthly.length - 1];
@@ -438,6 +455,7 @@ function buildGhgStats(monthly, label, unit, preindustrial) {
   const tenYr = decadeAgo ? round2(latest.value - decadeAgo.value) : null;
   // Simple monthly series trimmed to last 60 months for compact JSON
   const sparkline = monthly.slice(-60).map((p) => ({ year: p.year, month: p.month, value: Math.round(p.value * 100) / 100 }));
+  const yearly = buildYearlyAverageSeries(monthly);
   const vsPreindustrial = preindustrial ? round2(((latest.value - preindustrial) / preindustrial) * 100) : null;
   return {
     label,
@@ -448,6 +466,60 @@ function buildGhgStats(monthly, label, unit, preindustrial) {
     preindustrial,
     vsPreindustrialPct: vsPreindustrial,
     sparkline,
+    yearly,
+  };
+}
+
+function parseSeaLevelStats(text) {
+  if (!text) return null;
+  let rate = '3.4';
+  const rateMatch = text.match(/#trend\s*=\s*([\d.]+)\s*mm\/year/);
+  if (rateMatch) rate = rateMatch[1];
+
+  const byYear = new Map();
+  let latestValue = null;
+  let latestYearDecimal = -Infinity;
+
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('year')) continue;
+    const cols = trimmed.split(',');
+    if (cols.length < 2) continue;
+    const yearDecimal = Number(cols[0]);
+    if (!Number.isFinite(yearDecimal)) continue;
+    let value = null;
+    for (let i = 1; i < cols.length; i++) {
+      const raw = cols[i]?.trim();
+      if (!raw) continue;
+      const parsed = Number(raw);
+      if (Number.isFinite(parsed)) {
+        value = parsed;
+        break;
+      }
+    }
+    if (!Number.isFinite(value)) continue;
+    const year = Math.floor(yearDecimal);
+    const values = byYear.get(year);
+    if (values) values.push(value);
+    else byYear.set(year, [value]);
+    if (yearDecimal > latestYearDecimal) {
+      latestYearDecimal = yearDecimal;
+      latestValue = value;
+    }
+  }
+
+  const yearly = [...byYear.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([year, values]) => ({ year, value: round2(values.reduce((sum, value) => sum + value, 0) / values.length) }));
+
+  if (!yearly.length || !Number.isFinite(latestValue)) return null;
+
+  return {
+    label: 'Global mean sea level',
+    unit: 'mm',
+    latest: { year: Math.floor(latestYearDecimal), value: round2(latestValue) },
+    rate: `${rate} mm/year`,
+    yearly,
   };
 }
 
@@ -534,6 +606,7 @@ function parseGlobalSeaIce(json) {
     .sort((a, b) => (a.year - b.year) || (a.month - b.month));
   if (!monthly.length) return null;
   const latest = monthly[monthly.length - 1];
+  const yearly = buildYearlyAverageSeries(monthly, (point) => point.extent);
   const sameMonth = monthly.filter((p) => p.month === latest.month);
   const ranked = [...sameMonth].sort((a, b) => a.extent - b.extent);
   const rankLow = ranked.findIndex((p) => p.year === latest.year && p.month === latest.month) + 1;
@@ -548,6 +621,7 @@ function parseGlobalSeaIce(json) {
     anomalyPct,
     rankLowestOfSameMonth: rankLow,
     totalYearsInMonth: sameMonth.length,
+    yearly,
     recent60: monthly.slice(-60).map((p) => ({ year: p.year, month: p.month, extent: Math.round(p.extent * 100) / 100 })),
   };
 }
@@ -871,7 +945,7 @@ async function main() {
   const [
     noaaLoJson, noaaLandJson, noaaOceanJson, owidJson,
     oniText, co2Text, ch4Text, n2oText,
-    globalIceJson, _unused,
+    globalIceJson, seaLevelText,
     ...continentJsons
   ] = await Promise.all([
     fetchWithRetry(NOAA_LAND_OCEAN_URL, { label: 'NOAA land+ocean', timeoutMs: 60_000, attempts: 4 }),
@@ -883,7 +957,7 @@ async function main() {
     tryFetchText(NOAA_CH4_URL, { label: 'NOAA GML CH4', timeoutMs: 30_000, attempts: 3 }),
     tryFetchText(NOAA_N2O_URL, { label: 'NOAA GML N2O', timeoutMs: 30_000, attempts: 3 }),
     tryFetchJson(GLOBAL_SEA_ICE_URL, { label: 'Global sea ice', timeoutMs: 30_000, attempts: 3 }),
-    null,
+    tryFetchText(NOAA_SEA_LEVEL_URL, { label: 'NOAA sea level', timeoutMs: 30_000, attempts: 3 }),
     ...continentPromises,
   ]);
 
@@ -957,7 +1031,15 @@ async function main() {
     ch4: buildGhgStats(ch4Monthly, 'Methane', 'ppb', 722),
     n2o: buildGhgStats(n2oMonthly, 'Nitrous oxide', 'ppb', 270),
   };
+  if (ghgStats.co2 && co2Monthly?.length) {
+    ghgStats.co2.monthly = co2Monthly.map((point) => ({
+      year: point.year,
+      month: point.month,
+      value: round2(point.value),
+    }));
+  }
   const seaIceStats = parseGlobalSeaIce(globalIceJson);
+  const seaLevelStats = parseSeaLevelStats(seaLevelText);
 
   // Per-hemisphere spaghetti charts — fetch NSIDC Sea Ice Index v4 directly
   // (12 CSVs per hemisphere) so we get the full 1979-present series.
@@ -980,6 +1062,7 @@ async function main() {
   console.log(`ENSO state: ${enso ? `${enso.state} (${enso.anomaly}°C, ${enso.season} ${enso.seasonYear})` : '⚠ unavailable'}`);
   console.log(`GHG — CO2 latest: ${ghgStats.co2?.latest.value ?? '—'}ppm, CH4: ${ghgStats.ch4?.latest.value ?? '—'}ppb, N2O: ${ghgStats.n2o?.latest.value ?? '—'}ppb`);
   console.log(`Sea ice — ${seaIceStats ? `${seaIceStats.latest.extent}Mkm² (${seaIceStats.latest.year}-${String(seaIceStats.latest.month).padStart(2,'0')}, ${seaIceStats.anomaly > 0 ? '+' : ''}${seaIceStats.anomaly} vs 1991–2020)` : '⚠ unavailable'}`);
+  console.log(`Sea level — ${seaLevelStats ? `${seaLevelStats.latest.value}mm (${seaLevelStats.latest.year}, ${seaLevelStats.rate})` : '⚠ unavailable'}`);
   console.log(`Continents parsed: ${continentStats.length}/${NOAA_CONTINENTS.length}`);
 
   // Country-level anomalies — gathered from the already-built per-country
@@ -1029,6 +1112,7 @@ async function main() {
     enso,
     ghgStats,
     seaIceStats,
+    seaLevelStats,
     arcticSeaIce,
     antarcticSeaIce,
     continentStats,
@@ -1076,6 +1160,10 @@ async function main() {
       {
         label: 'NSIDC — Monthly sea-ice extent (Arctic + Antarctic)',
         url: 'https://nsidc.org/data/seaice_index',
+      },
+      {
+        label: 'NOAA STAR — Global mean sea level',
+        url: 'https://www.star.nesdis.noaa.gov/socd/lsa/SeaLevelRise/',
       },
       {
         label: 'NOAA Climate at a Glance — Continental land temperatures',

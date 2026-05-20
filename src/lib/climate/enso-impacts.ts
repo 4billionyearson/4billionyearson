@@ -1,3 +1,6 @@
+import { CONTINENT_BY_ISO } from './editorial';
+import { CLIMATE_REGIONS, type ClimateRegion } from './regions';
+
 /**
  * Structured ENSO impact data, derived from:
  *   - Met Office GPC ENSO impacts maps & Davey et al. (2013):
@@ -428,11 +431,103 @@ const SLUG_TO_IMPACT_IDS: Record<string, string[]> = {
 
 /** Look up REGION_IMPACTS entries that apply to a site region slug. */
 export function getEnsoImpactsForSlug(slug: string): RegionImpact[] {
-  const ids = SLUG_TO_IMPACT_IDS[slug];
+  const ids = SLUG_TO_IMPACT_IDS[slug]
+    ?? (slug.startsWith('us-') ? SLUG_TO_IMPACT_IDS[slug.slice(3)] : undefined);
   if (!ids?.length) return [];
   return ids
     .map((id) => REGION_IMPACTS.find((r) => r.id === id))
     .filter((r): r is RegionImpact => Boolean(r));
+}
+
+function dedupeImpacts(impacts: RegionImpact[]): RegionImpact[] {
+  const seen = new Set<string>();
+  return impacts.filter((impact) => {
+    if (seen.has(impact.id)) return false;
+    seen.add(impact.id);
+    return true;
+  });
+}
+
+const CONTINENT_SLUG_TO_NAME: Record<string, 'Africa' | 'Asia' | 'Europe' | 'North America' | 'South America' | 'Oceania'> = {
+  africa: 'Africa',
+  asia: 'Asia',
+  europe: 'Europe',
+  oceania: 'Oceania',
+  'north-america': 'North America',
+  'south-america': 'South America',
+};
+
+function getDerivedGroupMemberSlugs(
+  region?: Pick<ClimateRegion, 'slug' | 'type' | 'memberSlugs' | 'groupKind'> | null,
+): string[] {
+  if (!region || region.type !== 'group') return [];
+  if (region.memberSlugs?.length) return region.memberSlugs;
+  if (region.groupKind !== 'continent') return [];
+
+  const continent = CONTINENT_SLUG_TO_NAME[region.slug];
+  if (!continent) return [];
+
+  return CLIMATE_REGIONS
+    .filter((candidate) => candidate.type === 'country' && CONTINENT_BY_ISO[candidate.apiCode] === continent)
+    .map((candidate) => candidate.slug);
+}
+
+export function getEnsoImpactsForRegion(
+  region?: Pick<ClimateRegion, 'slug' | 'type' | 'memberSlugs' | 'groupKind'> | null,
+): RegionImpact[] {
+  if (!region) return [];
+
+  const direct = getEnsoImpactsForSlug(region.slug);
+  if (direct.length || region.type !== 'group') return direct;
+
+  return dedupeImpacts(
+    getDerivedGroupMemberSlugs(region).flatMap((memberSlug) => getEnsoImpactsForSlug(memberSlug)),
+  );
+}
+
+// Dedicated gate for the Climate Systems ENSO tracker card. This is narrower
+// than shouldFeatureEnso(): the tracker should only appear where the
+// teleconnection is strong and consistent enough to merit a standing panel.
+const STRONGLY_AFFECTED_IMPACT_IDS = new Set<string>([
+  'peru-ecuador',
+  'ne-brazil',
+  's-brazil-arg',
+  'amazonia',
+  'sw-us',
+  'nw-us-canada',
+  'se-us',
+  'central-america',
+  'caribbean',
+  'east-africa',
+  'southern-africa',
+  'india',
+  'sea-maritime',
+  'e-australia',
+  'n-australia',
+  'tropical-pacific-is',
+  'sw-pacific',
+]);
+
+export function getStrongEnsoImpactsForRegion(
+  region?: Pick<ClimateRegion, 'slug' | 'type' | 'memberSlugs' | 'groupKind'> | null,
+): RegionImpact[] {
+  return getEnsoImpactsForRegion(region).filter((impact) => STRONGLY_AFFECTED_IMPACT_IDS.has(impact.id));
+}
+
+export function shouldShowEnsoTracker(
+  region?: Pick<ClimateRegion, 'slug' | 'type' | 'memberSlugs' | 'groupKind'> | null,
+): boolean {
+  if (!region) return false;
+  if (region.slug === 'global') return true;
+  return getStrongEnsoImpactsForRegion(region).length > 0;
+}
+
+export function shouldFeatureEnso(
+  region?: Pick<ClimateRegion, 'slug' | 'type' | 'memberSlugs' | 'groupKind'> | null,
+): boolean {
+  if (!region) return false;
+  if (region.slug === 'global') return true;
+  return getEnsoImpactsForRegion(region).length > 0;
 }
 
 /* ─── Past major events ───────────────────────────────────────────── */

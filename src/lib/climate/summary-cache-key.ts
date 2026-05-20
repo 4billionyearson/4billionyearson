@@ -24,7 +24,12 @@ import type { ClimateRegion } from '@/lib/climate/regions';
 import { pickPageSnapshotMonth } from '@/app/climate/_shared/overview-grid-types';
 
 const SNAPSHOT_ROOT = resolve(process.cwd(), 'public', 'data', 'climate');
-const VERSION = 'v28';
+const VERSION = 'v30';
+
+interface SnapshotMeta {
+  label: string | null;
+  generatedAt: string | null;
+}
 
 async function readJson(rel: string): Promise<any | null> {
   try {
@@ -35,32 +40,56 @@ async function readJson(rel: string): Promise<any | null> {
   }
 }
 
-async function getPrimaryLabel(region: ClimateRegion): Promise<string | null> {
+function buildSnapshotToken(name: string, snapshot: SnapshotMeta): string | null {
+  if (!snapshot.label && !snapshot.generatedAt) return null;
+  return `${name}:${snapshot.label ?? 'na'}@${snapshot.generatedAt ?? 'na'}`;
+}
+
+async function getPrimarySnapshot(region: ClimateRegion): Promise<SnapshotMeta> {
   try {
     if (region.type === 'country') {
       const d = await readJson(`country/${region.apiCode}.json`);
-      return d?.latestMonthStats?.label ?? null;
+      return {
+        label: d?.latestMonthStats?.label ?? null,
+        generatedAt: d?.generatedAt ?? null,
+      };
     }
     if (region.type === 'us-state') {
       const d = await readJson(`us-state/${region.apiCode}.json`);
-      return d?.paramData?.tavg?.latestMonthStats?.label ?? null;
+      return {
+        label: d?.paramData?.tavg?.latestMonthStats?.label ?? null,
+        generatedAt: d?.generatedAt ?? null,
+      };
     }
     if (region.type === 'uk-region') {
       const d = await readJson(`uk-region/${region.apiCode}.json`);
-      return d?.varData?.Tmean?.latestMonthStats?.label ?? null;
+      return {
+        label: d?.varData?.Tmean?.latestMonthStats?.label ?? null,
+        generatedAt: d?.generatedAt ?? null,
+      };
+    }
+    if (region.type === 'group' && region.groupKind === 'us-climate-region') {
+      const d = await readJson(`us-climate-region/${region.slug}.json`);
+      return {
+        label: d?.paramData?.tavg?.latestMonthStats?.label ?? null,
+        generatedAt: d?.generatedAt ?? null,
+      };
     }
     // group regions: their primary label aligns with the global snapshot,
     // since the slowest source on those pages is NOAA itself. Returning
     // null here lets the global label drive the key.
-    return null;
+    return { label: null, generatedAt: null };
   } catch {
-    return null;
+    return { label: null, generatedAt: null };
   }
 }
 
-async function getGlobalLabel(): Promise<string | null> {
+async function getGlobalSnapshot(): Promise<SnapshotMeta> {
   const d = await readJson('global-history.json');
-  return d?.noaaStats?.landOcean?.latestMonthStats?.label ?? null;
+  return {
+    label: d?.noaaStats?.landOcean?.latestMonthStats?.label ?? null,
+    generatedAt: d?.generatedAt ?? null,
+  };
 }
 
 function calendarFallback(): string {
@@ -78,13 +107,20 @@ export async function getSummaryCacheKey(
   slug: string,
   region: ClimateRegion | null | undefined,
 ): Promise<string> {
+  const global = await getGlobalSnapshot();
   let pinnedMonth: string | null = null;
+  const freshnessTokens: string[] = [];
   if (region) {
-    const [primary, global] = await Promise.all([getPrimaryLabel(region), getGlobalLabel()]);
-    pinnedMonth = pickPageSnapshotMonth([primary, global]);
+    const primary = await getPrimarySnapshot(region);
+    pinnedMonth = pickPageSnapshotMonth([primary.label, global.label]);
+    const primaryToken = buildSnapshotToken('primary', primary);
+    if (primaryToken) freshnessTokens.push(primaryToken);
   } else {
-    pinnedMonth = await getGlobalLabel();
+    pinnedMonth = global.label;
   }
+  const globalToken = buildSnapshotToken('global', global);
+  if (globalToken) freshnessTokens.push(globalToken);
   const segment = pinnedMonth ?? calendarFallback();
-  return `climate:summary:${slug}:${segment}-${VERSION}`;
+  const freshness = freshnessTokens.length ? freshnessTokens.join('|') : segment;
+  return `climate:summary:${slug}:${segment}:${freshness}-${VERSION}`;
 }
