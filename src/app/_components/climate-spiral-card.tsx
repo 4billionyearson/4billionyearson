@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Thermometer, CloudRain, Sun, Snowflake, Waves, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Thermometer, CloudRain, Sun, Snowflake, Waves, Wind, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { MonthlyPoint, SpaghettiMetric } from './monthly-spaghetti-chart';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import { DEFAULT_SCHEME, type SeasonScheme } from '@/lib/climate/season-scheme';
@@ -2846,6 +2846,7 @@ export default function ClimateSpiralCard({
               return visible.length ? visible[visible.length - 1].value : null;
             };
             const supplementalIcon = (signal: ClimateSpiralHudMetric) => {
+              if (signal.icon === 'co2') return <Wind className="h-3 w-3" />;
               if (signal.icon === 'sea-level') return <Waves className="h-3 w-3" />;
               if (signal.icon === 'sea-ice') return <Snowflake className="h-3 w-3" />;
               return null;
@@ -2905,15 +2906,15 @@ export default function ClimateSpiralCard({
                       // Active metric: full card with sparkline, always visible
                       return (
                         <div key={o.m}
-                          className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-center gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
+                          className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
                           style={{ borderColor: `${c}66`, boxShadow: `0 0 14px -6px ${c}` }}
                         >
-                          <div className="flex flex-col leading-tight">
+                          <div className="flex flex-col justify-between shrink-0 w-[68px]">
                             <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-gray-400">
                               <span style={{ color: c }}>{METRIC_ICON[o.m]}</span>
                               {METRIC_LABEL[o.m]}
                             </div>
-                            <div className="font-mono text-base font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
+                            <div className="font-mono text-base font-bold tabular-nums whitespace-nowrap" style={{ color: '#FFF5E7' }}>
                               {fmt(v, d)} <span className="text-[10px] opacity-70">{METRIC_UNIT[o.m]}</span>
                             </div>
                             {anomLabel && (
@@ -2922,22 +2923,22 @@ export default function ClimateSpiralCard({
                               </div>
                             )}
                           </div>
-                          <div className="flex-1 min-w-0">{ann && ann.length > 1 && <HudSparkline data={ann} current={displayYear} color={c} />}</div>
+                          <div className="flex-1 min-w-0 flex items-center">{ann && ann.length > 1 && <HudSparkline data={ann} current={displayYear} color={c} />}</div>
                         </div>
                       );
                     }
                     // Non-active metrics: full card with sparkline on sm+, hidden on mobile
                     return (
                       <div key={o.m}
-                        className={`hidden sm:flex rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 items-center gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
+                        className={`hidden sm:flex rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
                         style={{ borderColor: `${c}40` }}
                       >
-                        <div className="flex flex-col leading-tight">
+                        <div className="flex flex-col justify-between shrink-0 w-[68px]">
                           <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-gray-400">
                             <span style={{ color: c }}>{METRIC_ICON[o.m]}</span>
                             {METRIC_LABEL[o.m]}
                           </div>
-                          <div className="font-mono text-sm font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
+                          <div className="font-mono text-sm font-bold tabular-nums whitespace-nowrap" style={{ color: '#FFF5E7' }}>
                             {fmt(v, d)} <span className="text-[10px] opacity-70">{METRIC_UNIT[o.m]}</span>
                           </div>
                           {anomLabel && (
@@ -2946,7 +2947,7 @@ export default function ClimateSpiralCard({
                             </div>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">{ann && ann.length > 1 && <HudSparkline data={ann} current={displayYear} color={c} />}</div>
+                        <div className="flex-1 min-w-0 flex items-center">{ann && ann.length > 1 && <HudSparkline data={ann} current={displayYear} color={c} />}</div>
                       </div>
                     );
                   })}
@@ -2956,22 +2957,22 @@ export default function ClimateSpiralCard({
                     const icon = supplementalIcon(signal);
                     return (
                       <div key={signal.key}
-                        className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-center gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
+                        className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
                         style={{ borderColor: `${signal.color}40` }}
                       >
-                        <div className="min-w-0 flex flex-col leading-tight">
-                          <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-gray-400">
+                        <div className="shrink-0 w-[68px] flex flex-col justify-between">
+                          <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-gray-400 whitespace-nowrap">
                             {icon ? <span style={{ color: signal.color }}>{icon}</span> : null}
                             {signal.shortLabel ?? signal.label}
                           </div>
-                          <div className="font-mono text-sm font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
+                          <div className="font-mono text-sm font-bold tabular-nums whitespace-nowrap" style={{ color: '#FFF5E7' }}>
                             {value !== null ? fmt(value, decimals) : '—'} <span className="text-[10px] opacity-70">{signal.unit}</span>
                           </div>
                           {signal.note && (
                             <div className="text-[9px] leading-tight text-gray-400 whitespace-nowrap">{signal.note}</div>
                           )}
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 flex items-center">
                           {signal.series.length > 1 && <HudSparkline data={signal.series} current={displayYear} color={signal.color} />}
                         </div>
                       </div>
@@ -2985,22 +2986,22 @@ export default function ClimateSpiralCard({
                         const icon = supplementalIcon(signal);
                         return (
                           <div key={signal.key}
-                            className={`flex-1 basis-0 rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-center gap-2.5 h-[72px] ${hudCardSizingClass}`}
+                            className={`flex-1 basis-0 xl:flex-none xl:w-full rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-stretch gap-2.5 h-[72px] ${hudCardSizingClass}`}
                             style={{ borderColor: `${signal.color}40` }}
                           >
-                            <div className="min-w-0 flex flex-col leading-tight">
-                              <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-gray-400">
+                            <div className="shrink-0 w-[68px] flex flex-col justify-between">
+                              <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-gray-400 whitespace-nowrap">
                                 {icon ? <span style={{ color: signal.color }}>{icon}</span> : null}
                                 {signal.shortLabel ?? signal.label}
                               </div>
-                              <div className="font-mono text-sm font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
+                              <div className="font-mono text-sm font-bold tabular-nums whitespace-nowrap" style={{ color: '#FFF5E7' }}>
                                 {value !== null ? fmt(value, decimals) : '—'} <span className="text-[10px] opacity-70">{signal.unit}</span>
                               </div>
                               {signal.note && (
                                 <div className="text-[9px] leading-tight text-gray-400 whitespace-nowrap">{signal.note}</div>
                               )}
                             </div>
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 flex items-center">
                               {signal.series.length > 1 && <HudSparkline data={signal.series} current={displayYear} color={signal.color} />}
                             </div>
                           </div>
@@ -3010,20 +3011,20 @@ export default function ClimateSpiralCard({
                   )}
                   {/* ENSO — only shown for regions with a clear ENSO teleconnection */}
                   {showEnso && (
-                  <div className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-center gap-2 h-[72px] ${hudCardClass} ${hudCardSizingClass} ${ensoCls}`}>
-                    <div className="flex flex-col leading-tight w-[58px] shrink-0">
+                  <div className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-stretch gap-2 h-[72px] ${hudCardClass} ${hudCardSizingClass} ${ensoCls}`}>
+                    <div className="flex flex-col justify-between w-[68px] shrink-0">
                       <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider whitespace-nowrap text-gray-400">
                         <span style={{ color: ensoIconColor }}><Waves className="h-3 w-3" /></span>
                         {enso?.state === 'El Niño' ? 'El Niño' : enso?.state === 'La Niña' ? 'La Niña' : 'ENSO'}
                       </div>
-                      <div className="font-mono text-base font-bold tabular-nums" style={{ color: '#FFF5E7' }}>
+                      <div className="font-mono text-base font-bold tabular-nums whitespace-nowrap" style={{ color: '#FFF5E7' }}>
                         {ensoAnom !== null ? `${ensoAnom >= 0 ? '+' : ''}${ensoAnom.toFixed(1)}°` : '—'}
                       </div>
                       <div className="text-[9.5px] tabular-nums leading-tight text-gray-400 whitespace-nowrap">
                         ONI 3-mo mean
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex items-center">
                       {oniAnnual.length > 0 && <HudSparkline data={oniAnnual} current={displayYear} color="#cbd5e1" mode="bars" />}
                     </div>
                   </div>

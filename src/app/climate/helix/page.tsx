@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { CLIMATE_REGIONS } from '@/lib/climate/regions';
 import type { HelixSeriesTab } from '../global/GlobalHelixCard';
+import type { ClimateSpiralHudMetric } from '@/app/_components/climate-spiral-card';
 import HelixClientSection from './HelixClientSection';
 
 const HUB_URL = 'https://4billionyearson.org/climate/helix';
@@ -81,6 +82,9 @@ interface GlobalHistory {
   landOceanMonthlyAll?: { year: number; month: number; value: number }[];
   landMonthlyAll?: { year: number; month: number; value: number }[];
   preIndustrialBaseline?: number;
+  ghgStats?: { co2?: { yearly?: { year: number; value: number }[] } };
+  seaLevelStats?: { yearly?: { year: number; value: number }[] };
+  seaIceStats?: { yearly?: { year: number; value: number }[] };
 }
 
 async function loadGlobalHistory(): Promise<GlobalHistory | null> {
@@ -102,6 +106,49 @@ export default async function ClimateHelixPage() {
       }
     : undefined;
 
+  // Build supplemental HUD signals (CO2, sea level, sea ice) — same as GlobalProfile
+  const worldViewSignals: ClimateSpiralHudMetric[] = [];
+  if (history?.ghgStats?.co2?.yearly?.length) {
+    worldViewSignals.push({
+      key: 'co2',
+      label: 'Atmospheric CO2',
+      shortLabel: 'CO2',
+      unit: 'ppm',
+      color: '#D0A65E',
+      icon: 'co2' as const,
+      series: history.ghgStats.co2.yearly,
+      decimals: 0,
+      note: 'Annual mean',
+    });
+  }
+  if (history?.seaLevelStats?.yearly?.length) {
+    worldViewSignals.push({
+      key: 'sea-level',
+      label: 'Sea level',
+      shortLabel: 'Sea level',
+      unit: 'mm',
+      color: '#14B8A6',
+      icon: 'sea-level' as const,
+      series: history.seaLevelStats.yearly,
+      decimals: 0,
+      note: 'Sat mean',
+    });
+  }
+  if (history?.seaIceStats?.yearly?.length) {
+    worldViewSignals.push({
+      key: 'sea-ice',
+      label: 'Sea ice',
+      shortLabel: 'Sea ice',
+      unit: 'Mkm²',
+      color: '#7DD3FC',
+      icon: 'sea-ice' as const,
+      series: history.seaIceStats.yearly,
+      decimals: 0,
+      note: 'Global mean',
+    });
+  }
+  const supplementalHudMetrics = worldViewSignals.length > 0 ? worldViewSignals : undefined;
+
   const tabs: HelixSeriesTab[] = [];
   if (history?.landOceanMonthlyAll?.length) {
     tabs.push({
@@ -112,6 +159,7 @@ export default async function ClimateHelixPage() {
       dataSource: 'NOAA Climate at a Glance — Global Land+Ocean',
       embedSlug: 'global-land-ocean',
       parisReference: globalParisReference,
+      supplementalHudMetrics,
     });
   }
   if (history?.landMonthlyAll?.length) {
@@ -122,6 +170,7 @@ export default async function ClimateHelixPage() {
       regionName: 'Global Land',
       dataSource: 'Our World in Data / ERA5',
       embedSlug: 'global-land',
+      supplementalHudMetrics,
     });
   }
 
