@@ -1293,12 +1293,12 @@ export default function ClimateSpiralCard({
       return (
         <div className="relative w-full" style={{ height: h }}>
           <svg viewBox="0 0 70 22" width="100%" height={h} preserveAspectRatio="none" className="overflow-visible absolute inset-0">
-            <line x1={0} y1={mid} x2={w} y2={mid} stroke="rgba(255,255,255,0.18)" strokeWidth={0.5} />
+            <line x1={0} y1={mid} x2={w} y2={mid} stroke="rgba(255,255,255,0.18)" strokeWidth={0.5} vectorEffect="non-scaling-stroke" />
             {visible.map((d, i) => {
               const x = xFor(d.year);
               const yTop = mid - (d.value / absMax) * (mid * 0.95);
               const c = d.value > 0.5 ? '#fb7185' : d.value < -0.5 ? '#38bdf8' : 'rgba(180,180,180,0.55)';
-              return <line key={i} x1={x} y1={mid} x2={x} y2={yTop} stroke={c} strokeWidth={1.1} strokeLinecap="round" />;
+              return <line key={i} x1={x} y1={mid} x2={x} y2={yTop} stroke={c} strokeWidth={1.1} strokeLinecap="round" vectorEffect="non-scaling-stroke" />;
             })}
           </svg>
           {/* Dot rendered as HTML so it stays circular regardless of SVG aspect ratio */}
@@ -1346,9 +1346,9 @@ export default function ClimateSpiralCard({
     return (
       <div className="relative w-full" style={{ height: h }}>
         <svg viewBox="0 0 70 22" width="100%" height={h} preserveAspectRatio="none" className="overflow-visible absolute inset-0">
-          <polyline fill="none" stroke={`${color}33`} strokeWidth={0.7} points={data.map((d) => `${xFor(d.year).toFixed(1)},${yFor(d.value).toFixed(1)}`).join(' ')} />
-          <polyline fill="none" stroke={`${color}66`} strokeWidth={1.3} strokeLinejoin="round" strokeLinecap="round" points={pts} />
-          {trendPath && <path fill="none" stroke={color} strokeWidth={2} opacity={0.95} d={trendPath} />}
+          <polyline fill="none" stroke={`${color}33`} strokeWidth={0.7} vectorEffect="non-scaling-stroke" points={data.map((d) => `${xFor(d.year).toFixed(1)},${yFor(d.value).toFixed(1)}`).join(' ')} />
+          <polyline fill="none" stroke={`${color}66`} strokeWidth={1.3} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" points={pts} />
+          {trendPath && <path fill="none" stroke={color} strokeWidth={2} opacity={0.95} vectorEffect="non-scaling-stroke" d={trendPath} />}
         </svg>
         {/* Dot rendered as HTML so it stays circular regardless of SVG aspect ratio */}
         <div
