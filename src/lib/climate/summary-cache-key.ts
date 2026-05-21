@@ -42,7 +42,10 @@ async function readJson(rel: string): Promise<any | null> {
 
 function buildSnapshotToken(name: string, snapshot: SnapshotMeta): string | null {
   if (!snapshot.label && !snapshot.generatedAt) return null;
-  return `${name}:${snapshot.label ?? 'na'}@${snapshot.generatedAt ?? 'na'}`;
+  // Truncate generatedAt to date-only (YYYY-MM-DD) so intra-day re-runs of
+  // build scripts don't produce a new timestamp and bust the Redis cache.
+  const dateStamp = snapshot.generatedAt ? snapshot.generatedAt.slice(0, 10) : 'na';
+  return `${name}:${snapshot.label ?? 'na'}@${dateStamp}`;
 }
 
 async function getPrimarySnapshot(region: ClimateRegion): Promise<SnapshotMeta> {
