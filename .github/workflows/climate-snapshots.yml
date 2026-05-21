@@ -200,19 +200,25 @@ jobs:
           if-no-files-found: warn
 
       # ── Commit only if data actually advanced ────────────────────────
-      # git diff --quiet exits 0 when nothing changed → no commit, no
-      # Vercel deploy, no wasted ISR bust.  When files do change, a push
-      # triggers a fresh Vercel deployment whose ISR cache starts cold, so
-      # users see updated data on the very next page load.
+      # Build scripts always write a fresh generatedAt timestamp, so a naive
+      # `git diff --quiet` would always detect a change and commit even when
+      # no real data has moved.  Instead we strip generatedAt lines from the
+      # diff and only commit when something substantive changed.  This keeps
+      # the repo quiet between real monthly data advances, avoids unnecessary
+      # Vercel redeploys, and prevents the ISR + Redis profile-API cache from
+      # being busted daily by a timestamp-only change.
       - name: Commit updated snapshots
         run: |
           git diff --stat -- public/data/climate/ public/data/seasons/
-          if git diff --quiet -- public/data/climate/ public/data/seasons/; then
-            echo "✓ No changes — all sources already current for this month."
+          NON_TS_CHANGES=$(git diff -- public/data/climate/ public/data/seasons/ \
+            | grep -E '^[-+]' | grep -vE '^(---|\+\+\+)' \
+            | grep -v '"generatedAt"' | wc -l | tr -d ' ')
+          if [ "$NON_TS_CHANGES" -eq 0 ]; then
+            echo "✓ No data changes — only timestamps differ, skipping commit."
             exit 0
           fi
           CHANGED=$(git diff --name-only -- public/data/climate/ public/data/seasons/ | wc -l | tr -d ' ')
-          echo "Committing $CHANGED changed file(s)…"
+          echo "Committing $CHANGED changed file(s) with real data updates…"
           git config user.name "climate-snapshot-bot"
           git config user.email "climate-snapshot-bot@users.noreply.github.com"
           git add public/data/climate/ public/data/seasons/
