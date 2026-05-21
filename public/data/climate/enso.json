@@ -15208,10 +15208,10 @@
         "period": 0,
         "label": "MJJ",
         "seasonAnchorYear": 2026,
-        "mean": 1.1,
-        "dynMean": 1.24,
+        "mean": 1.12,
+        "dynMean": 1.25,
         "statMean": 0.9,
-        "modelCount": 24,
+        "modelCount": 25,
         "models": [
           {
             "name": "AUS-ACCESS",
@@ -15272,6 +15272,11 @@
             "name": "JMA",
             "type": "Dynamical",
             "value": 1.3
+          },
+          {
+            "name": "KMA",
+            "type": "Dynamical",
+            "value": 1.49
           },
           {
             "name": "LDEO",
@@ -15339,10 +15344,10 @@
         "period": 1,
         "label": "JJA",
         "seasonAnchorYear": 2026,
-        "mean": 1.4,
-        "dynMean": 1.56,
+        "mean": 1.42,
+        "dynMean": 1.59,
         "statMean": 1.14,
-        "modelCount": 24,
+        "modelCount": 25,
         "models": [
           {
             "name": "AUS-ACCESS",
@@ -15403,6 +15408,11 @@
             "name": "JMA",
             "type": "Dynamical",
             "value": 1.65
+          },
+          {
+            "name": "KMA",
+            "type": "Dynamical",
+            "value": 1.95
           },
           {
             "name": "LDEO",
@@ -15470,10 +15480,10 @@
         "period": 2,
         "label": "JAS",
         "seasonAnchorYear": 2026,
-        "mean": 1.65,
-        "dynMean": 1.84,
+        "mean": 1.68,
+        "dynMean": 1.87,
         "statMean": 1.35,
-        "modelCount": 24,
+        "modelCount": 25,
         "models": [
           {
             "name": "AUS-ACCESS",
@@ -15534,6 +15544,11 @@
             "name": "JMA",
             "type": "Dynamical",
             "value": 2.03
+          },
+          {
+            "name": "KMA",
+            "type": "Dynamical",
+            "value": 2.35
           },
           {
             "name": "LDEO",
@@ -15601,10 +15616,10 @@
         "period": 3,
         "label": "ASO",
         "seasonAnchorYear": 2026,
-        "mean": 1.87,
-        "dynMean": 2.08,
+        "mean": 1.9,
+        "dynMean": 2.12,
         "statMean": 1.55,
-        "modelCount": 24,
+        "modelCount": 25,
         "models": [
           {
             "name": "AUS-ACCESS",
@@ -15665,6 +15680,11 @@
             "name": "JMA",
             "type": "Dynamical",
             "value": 2.47
+          },
+          {
+            "name": "KMA",
+            "type": "Dynamical",
+            "value": 2.6
           },
           {
             "name": "LDEO",
@@ -16236,99 +16256,99 @@
     ]
   },
   "cnnForecast": {
-    "issueYearMonth": 202604,
+    "issueYearMonth": 202605,
     "points": [
       {
-        "yyyymm": 202605,
-        "nino34": 0.63
-      },
-      {
         "yyyymm": 202606,
-        "nino34": 0.74
+        "nino34": 1.24
       },
       {
         "yyyymm": 202607,
-        "nino34": 0.98
+        "nino34": 1.1
       },
       {
         "yyyymm": 202608,
-        "nino34": 1.46
+        "nino34": 1.6
       },
       {
         "yyyymm": 202609,
-        "nino34": 2.04
+        "nino34": 2.1
       },
       {
         "yyyymm": 202610,
-        "nino34": 2.41
+        "nino34": 2.32
       },
       {
         "yyyymm": 202611,
-        "nino34": 2.72
+        "nino34": 2.73
       },
       {
         "yyyymm": 202612,
-        "nino34": 2.97
+        "nino34": 3.02
       },
       {
         "yyyymm": 202701,
-        "nino34": 3.08
+        "nino34": 3.13
       },
       {
         "yyyymm": 202702,
-        "nino34": 2.78
+        "nino34": 2.8
       },
       {
         "yyyymm": 202703,
-        "nino34": 2.47
+        "nino34": 2.51
       },
       {
         "yyyymm": 202704,
-        "nino34": 1.81
+        "nino34": 2.02
       },
       {
         "yyyymm": 202705,
-        "nino34": 1.4
+        "nino34": 1.56
       },
       {
         "yyyymm": 202706,
-        "nino34": 1.25
+        "nino34": 1.29
       },
       {
         "yyyymm": 202707,
-        "nino34": 0.86
+        "nino34": 1.01
       },
       {
         "yyyymm": 202708,
-        "nino34": 0.9
+        "nino34": 1.15
       },
       {
         "yyyymm": 202709,
-        "nino34": 0.96
+        "nino34": 0.81
       },
       {
         "yyyymm": 202710,
-        "nino34": 0.89
+        "nino34": 1.19
       },
       {
         "yyyymm": 202711,
-        "nino34": 0.5
+        "nino34": 0.46
       },
       {
         "yyyymm": 202712,
-        "nino34": 0.09
+        "nino34": 0.75
       },
       {
         "yyyymm": 202801,
-        "nino34": 0.23
+        "nino34": 0.58
       },
       {
         "yyyymm": 202802,
-        "nino34": 0.16
+        "nino34": 0.39
       },
       {
         "yyyymm": 202803,
-        "nino34": 0.32
+        "nino34": -0.07
+      },
+      {
+        "yyyymm": 202804,
+        "nino34": 0.08
       }
     ]
   },
@@ -16357,5 +16377,5 @@
     "metOfficeImpactLaNinaTemp": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-temp.jpg",
     "metOfficeImpactLaNinaPrecip": "https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/images/research/climate/global/la-nina-precip.jpg"
   },
-  "generatedAt": "2026-05-20T05:32:14.605Z"
+  "generatedAt": "2026-05-21T05:35:36.179Z"
 }
