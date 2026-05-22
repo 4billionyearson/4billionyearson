@@ -1,8 +1,8 @@
 import { headers } from 'next/headers';
 import { getCached } from '@/lib/climate/redis';
 import { getCountryCode } from '@/lib/amazon';
-import { sanitisePlugInSolarPayload } from '@/lib/plug-in-solar/newsUrls';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
+import { sanitisePlugInSolarPayload } from '@/lib/plug-in-solar/newsUrls';
 import PlugInSolarGuide from './PlugInSolarGuide';
 
 /**

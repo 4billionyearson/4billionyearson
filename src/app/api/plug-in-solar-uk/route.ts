@@ -9,6 +9,7 @@ import {
   LEGAL_IN_SHOPS_TIMELINE_TITLE,
 } from '@/app/plug-in-solar-uk/_data/static';
 import { sanitiseRetailerProductUrl } from '@/lib/plug-in-solar/retailerUrls';
+import { sanitisePlugInSolarNewsItems, SEED_NEWS_ITEMS } from '@/lib/plug-in-solar/newsUrls';
 import { buildPlugInSolarPrompt, PLUG_IN_SOLAR_RESPONSE_SCHEMA } from '@/lib/plug-in-solar/prompt';
 import { buildSeedProductRows, SEED_PRODUCTS } from '@/lib/plug-in-solar/seedProducts';
 import type { PlugInSolarLiveData } from '@/lib/plug-in-solar/types';
@@ -369,15 +370,18 @@ async function validateUrl(url: string): Promise<boolean> {
 
 /**
  * HEAD-check a URL on a trusted news domain with lenient failure handling.
- * Only drops on a definitive HTTP 404 or a cross-domain redirect (which
- * indicates the article ID resolved somewhere else, e.g. independent.co.uk
- * silently redirecting a bad article ID to the-independent.com).
- * All other outcomes — 403, 429, 503, timeouts — are treated as "valid"
- * so that anti-bot measures on live articles don't cause false drops.
+ * Only drops on a definitive HTTP 404 or a cross-domain redirect that
+ * goes to an *untrusted* domain or to a homepage (which indicates the
+ * article ID resolved somewhere else).
+ *
+ * Critically, legitimate domain migrations are allowed:
+ *   bbc.co.uk → bbc.com           (valid BBC article — both trusted)
+ *   independent.co.uk → theindependent.com  (domain migration — both trusted)
+ * Only redirects to non-trusted or homepage-only destinations are dropped.
+ * All other outcomes (403, 429, 503, timeouts) are treated as "valid".
  */
 async function validateTrustedNewsUrl(url: string): Promise<boolean> {
   try {
-    const originalHost = new URL(url).hostname.toLowerCase();
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), URL_VALIDATION_TIMEOUT_MS);
     const res = await fetch(url, {
@@ -388,14 +392,27 @@ async function validateTrustedNewsUrl(url: string): Promise<boolean> {
     });
     clearTimeout(timer);
     if (res.status === 404) return false;
-    // Cross-domain redirect = article ID resolved elsewhere → broken link.
+    // Cross-domain redirect check (lenient):
+    // Allow if the final domain is also a trusted news domain AND the
+    // path is substantive (not a homepage redirect like "/").
+    // This lets bbc.co.uk→bbc.com and independent.co.uk→theindependent.com
+    // pass while still dropping bad article IDs that land on a homepage.
     if (res.url && res.url !== url) {
       try {
-        const finalHost = new URL(res.url).hostname.toLowerCase();
-        const h1 = originalHost.replace(/^www\./, '');
+        const origHost = new URL(url).hostname.toLowerCase();
+        const finalUrl = new URL(res.url);
+        const finalHost = finalUrl.hostname.toLowerCase();
+        const h1 = origHost.replace(/^www\./, '');
         const h2 = finalHost.replace(/^www\./, '');
         const sameDomain = h1 === h2 || h1.endsWith('.' + h2) || h2.endsWith('.' + h1);
-        if (!sameDomain) return false;
+        if (!sameDomain) {
+          // Cross-domain: permit only if destination is a trusted news domain
+          // with a non-trivial article path.
+          const destTrusted = newsUrlTrustedWithoutFetch(res.url);
+          const destPath = finalUrl.pathname;
+          const hasArticlePath = destPath !== '/' && destPath.length > 2;
+          if (!destTrusted || !hasArticlePath) return false;
+        }
       } catch {
         // URL parse error — assume valid
       }
@@ -422,6 +439,8 @@ const TRUSTED_NEWS_DOMAINS = [
   'thetimes.co.uk',
   'ft.com',
   'independent.co.uk',
+  'theindependent.com',    // independent.co.uk migrated to this domain
+  'the-independent.com',  // redirect alias seen in some URLs
   'dailymail.co.uk',
   'mirror.co.uk',
   'express.co.uk',
@@ -444,10 +463,12 @@ const TRUSTED_NEWS_DOMAINS = [
   'energydigital.com',
   'businessgreen.com',
   'edie.net',
+  'energysavingtrust.org.uk',
   'gov.uk',
   'parliament.uk',
   'ofgem.gov.uk',
   'theiet.org',
+  'electrical.theiet.org',
   'bsigroup.com',
   'reuters.com',
   'apnews.com',
@@ -477,6 +498,16 @@ async function filterNewsBrokenLinks(
   if (!Array.isArray(parsed.news) || parsed.news.length === 0) {
     return { kept: 0, dropped: 0 };
   }
+  // Pre-filter URLs already confirmed broken in previous runs — no HEAD
+  // request needed for these.
+  const before = parsed.news.length;
+  parsed.news = sanitisePlugInSolarNewsItems(parsed.news);
+  if (parsed.news.length < before) {
+    console.warn(
+      `[plug-in-solar-uk] known-broken filter removed ${before - parsed.news.length} news item(s)`,
+    );
+  }
+  if (parsed.news.length === 0) return { kept: 0, dropped: before };
   const checks = await Promise.all(
     parsed.news.map(async (item) => {
       const url = (item?.sourceUrl ?? '').trim();
@@ -800,6 +831,30 @@ async function runRefresh(apiKey: string, cacheKey: string): Promise<NextRespons
         `[plug-in-solar-uk] news fallback: fresh run returned ${before} items, spliced in ${parsed.news.length - before} from previous cache`,
       );
     }
+  }
+
+  // Merge static seed news items — hand-verified URLs for key milestones.
+  // Seeds are added only when not already present (deduped by date + headline)
+  // and appended so Gemini's version takes precedence in the sorted list.
+  try {
+    if (SEED_NEWS_ITEMS.length > 0) {
+      const existingKeys = new Set(
+        (parsed.news ?? []).map((n) => `${n.date}|${n.headline}`.toLowerCase()),
+      );
+      const newSeeds = SEED_NEWS_ITEMS.filter(
+        (n) => !existingKeys.has(`${n.date}|${n.headline}`.toLowerCase()),
+      );
+      if (newSeeds.length > 0) {
+        parsed.news = [...(parsed.news ?? []), ...newSeeds].sort((a, b) =>
+          b.date.localeCompare(a.date),
+        );
+        console.log(
+          `[plug-in-solar-uk] seed news: merged ${newSeeds.length} item(s) (total now ${parsed.news.length})`,
+        );
+      }
+    }
+  } catch (err) {
+    console.warn('[plug-in-solar-uk] seed news merge threw:', err);
   }
 
   // Cache for 24 hours and tell Next.js to invalidate the SSR HTML +

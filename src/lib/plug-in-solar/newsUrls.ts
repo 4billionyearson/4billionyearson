@@ -38,3 +38,31 @@ export function sanitisePlugInSolarPayload(data: PlugInSolarLiveData | null): Pl
   const news = sanitisePlugInSolarNewsItems(data.news);
   return news.length === data.news.length ? data : { ...data, news };
 }
+
+/**
+ * Static seed news items — hand-verified URLs for key milestones.
+ * Merged into the live payload after URL validation so the news feed
+ * always contains the major events even when Gemini's grounding index
+ * is cold or all other generated links are hallucinated.
+ * Deduplication is by (date + lowercased headline) so Gemini's own
+ * version takes priority if present.
+ */
+export const SEED_NEWS_ITEMS: NewsItem[] = [
+  {
+    date: '2026-03-16',
+    headline: "Government to make 'plug-in solar' available within months",
+    summary:
+      'The UK government announced plans to legalise plug-in solar panels for homes, naming EcoFlow, Lidl and Iceland as delivery partners and citing savings of £70–£175 per year.',
+    sourceTitle: 'GOV.UK – DESNZ',
+    sourceUrl:
+      'https://www.gov.uk/government/news/government-to-make-plug-in-solar-available-within-months',
+  },
+  {
+    date: '2026-04-15',
+    headline: 'BS 7671 Amendment 4 published — plug-in solar now legal in UK wiring regulations',
+    summary:
+      'The IET and BSI published Amendment 4 to BS 7671:2018, creating the regulatory framework for sub-800 W plug-in solar. A two-year transition period runs to October 2026.',
+    sourceTitle: 'IET – BS 7671',
+    sourceUrl: 'https://electrical.theiet.org/bs-7671/',
+  },
+];
