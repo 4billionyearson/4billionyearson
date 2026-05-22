@@ -252,6 +252,7 @@ function parseNoaa(json, baseline) {
 // OWID → monthly land
 
 function parseOwid(owidData, now) {
+  if (!owidData) return [];
   const epoch = new Date(1950, 0, 1);
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
@@ -935,6 +936,54 @@ async function main() {
   const now = new Date();
   console.log(`Build started at ${now.toISOString()}`);
 
+  // Load the existing snapshot so we can fall back to its values when an
+  // upstream API returns nothing (transient outage, rate-limit, etc.).
+  // Monthly-cadence data (sea ice, sea level) only updates once a month so
+  // the previous day's values are always valid as a fallback.
+  let previousSnapshot = null;
+  try {
+    const { readFile } = await import('node:fs/promises');
+    const { resolve: pathResolve } = await import('node:path');
+    const raw = await readFile(pathResolve(process.cwd(), 'public', 'data', 'climate', 'global-history.json'), 'utf8');
+    previousSnapshot = JSON.parse(raw);
+    console.log('Previous snapshot loaded (will use as fallback for failed fetches)');
+  } catch {
+    console.warn('No previous snapshot found — no fallback available');
+  }
+
+  // Sea ice and sea level are monthly datasets — data for month M is published
+  // around the 10th–15th of month M+1.  Once we have it there is no point
+  // calling the APIs again until the next month's data can possibly exist.
+  // "Expected latest month" = the month before the current one (1-based).
+  const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const expectedMonth = prevMonthDate.getMonth() + 1; // 1-based
+  const expectedYear  = prevMonthDate.getFullYear();
+
+  const haveSeaIce =
+    previousSnapshot?.seaIceStats?.latest?.year  === expectedYear &&
+    previousSnapshot?.seaIceStats?.latest?.month === expectedMonth;
+  const haveArcticIce =
+    previousSnapshot?.arcticSeaIce?.latest?.year  === expectedYear &&
+    previousSnapshot?.arcticSeaIce?.latest?.month === expectedMonth;
+  const haveAntarcticIce =
+    previousSnapshot?.antarcticSeaIce?.latest?.year  === expectedYear &&
+    previousSnapshot?.antarcticSeaIce?.latest?.month === expectedMonth;
+  // Sea level series is annual; check we have the previous calendar year.
+  const haveSeaLevel =
+    previousSnapshot?.seaLevelStats?.latest?.year === expectedYear ||
+    previousSnapshot?.seaLevelStats?.latest?.year === now.getFullYear();
+  // OWID ERA5 land temperature — 10 MB download, monthly cadence.
+  // Skip if the last entry in landMonthlyAll already covers the expected month.
+  const lastLandPoint = previousSnapshot?.landMonthlyAll?.at?.(-1);
+  const haveOwid =
+    lastLandPoint?.year  === expectedYear &&
+    lastLandPoint?.month === expectedMonth;
+
+  if (haveSeaIce)    console.log(`Skipping global sea ice fetch — already have ${expectedYear}-${String(expectedMonth).padStart(2,'0')} data`);
+  if (haveArcticIce && haveAntarcticIce) console.log(`Skipping NSIDC hemisphere fetch — already have ${expectedYear}-${String(expectedMonth).padStart(2,'0')} data`);
+  if (haveSeaLevel)  console.log(`Skipping sea level fetch — already have data for ${previousSnapshot.seaLevelStats.latest.year}`);
+  if (haveOwid)      console.log(`Skipping OWID fetch — already have ${expectedYear}-${String(expectedMonth).padStart(2,'0')} land data`);
+
   // Fetch all sources in parallel. OWID gets a generous timeout because its
   // response is ~10MB. The three NOAA series are small.
   // Optional sources (ENSO, GHG, sea-ice, continents) are wrapped in tryFetch
@@ -951,20 +1000,22 @@ async function main() {
     fetchWithRetry(NOAA_LAND_OCEAN_URL, { label: 'NOAA land+ocean', timeoutMs: 60_000, attempts: 4 }),
     fetchWithRetry(NOAA_LAND_URL, { label: 'NOAA land', timeoutMs: 60_000, attempts: 4 }),
     fetchWithRetry(NOAA_OCEAN_URL, { label: 'NOAA ocean', timeoutMs: 60_000, attempts: 4 }),
-    fetchWithRetry(OWID_URL, { label: 'OWID', timeoutMs: 180_000, attempts: 4 }),
+    haveOwid    ? Promise.resolve(null) : fetchWithRetry(OWID_URL, { label: 'OWID', timeoutMs: 180_000, attempts: 4 }),
     tryFetchText(NOAA_ONI_URL, { label: 'NOAA ONI (ENSO)', timeoutMs: 30_000, attempts: 3 }),
     tryFetchText(NOAA_CO2_URL, { label: 'NOAA GML CO2', timeoutMs: 30_000, attempts: 3 }),
     tryFetchText(NOAA_CH4_URL, { label: 'NOAA GML CH4', timeoutMs: 30_000, attempts: 3 }),
     tryFetchText(NOAA_N2O_URL, { label: 'NOAA GML N2O', timeoutMs: 30_000, attempts: 3 }),
-    tryFetchJson(GLOBAL_SEA_ICE_URL, { label: 'Global sea ice', timeoutMs: 30_000, attempts: 3 }),
-    tryFetchText(NOAA_SEA_LEVEL_URL, { label: 'NOAA sea level', timeoutMs: 30_000, attempts: 3 }),
+    haveSeaIce  ? Promise.resolve(null) : tryFetchJson(GLOBAL_SEA_ICE_URL, { label: 'Global sea ice', timeoutMs: 30_000, attempts: 3 }),
+    haveSeaLevel ? Promise.resolve(null) : tryFetchText(NOAA_SEA_LEVEL_URL, { label: 'NOAA sea level', timeoutMs: 30_000, attempts: 3 }),
     ...continentPromises,
   ]);
 
   const noaaMonthly = parseNoaa(noaaLoJson, GLOBAL_BASELINE);
   const noaaLandMonthly = parseNoaa(noaaLandJson, GLOBAL_BASELINE);
   const noaaOceanMonthly = parseNoaa(noaaOceanJson, GLOBAL_BASELINE);
-  const landMonthly = parseOwid(owidJson, now);
+  const landMonthly = haveOwid
+    ? previousSnapshot.landMonthlyAll.map((p) => ({ date: `${p.year}-${String(p.month).padStart(2, '0')}`, year: p.year, month: p.month, temp: p.value }))
+    : parseOwid(owidJson, now);
   console.log(`NOAA land+ocean monthly points: ${noaaMonthly.length}`);
   console.log(`NOAA land-only monthly points:  ${noaaLandMonthly.length}`);
   console.log(`NOAA ocean-only monthly points: ${noaaOceanMonthly.length}`);
@@ -1038,19 +1089,30 @@ async function main() {
       value: round2(point.value),
     }));
   }
-  const seaIceStats = parseGlobalSeaIce(globalIceJson);
-  const seaLevelStats = parseSeaLevelStats(seaLevelText);
+  const seaIceStats = parseGlobalSeaIce(globalIceJson)
+    ?? (previousSnapshot?.seaIceStats ?? null);
+  const seaLevelStats = parseSeaLevelStats(seaLevelText)
+    ?? (previousSnapshot?.seaLevelStats ?? null);
+  if (!parseGlobalSeaIce(globalIceJson) && seaIceStats) console.warn('⚠ Global sea ice fetch failed — using previous snapshot as fallback');
+  if (!parseSeaLevelStats(seaLevelText) && seaLevelStats) console.warn('⚠ Sea level fetch failed — using previous snapshot as fallback');
 
   // Per-hemisphere spaghetti charts — fetch NSIDC Sea Ice Index v4 directly
   // (12 CSVs per hemisphere) so we get the full 1979-present series.
-  const [arcticMonthlyNsidc, antarcticMonthlyNsidc] = await Promise.all([
-    fetchNsidcHemisphere('north').catch((e) => { console.warn(`⚠ NSIDC north failed: ${e?.message ?? e}`); return []; }),
-    fetchNsidcHemisphere('south').catch((e) => { console.warn(`⚠ NSIDC south failed: ${e?.message ?? e}`); return []; }),
-  ]);
-  const arcticSeaIce = buildHemisphereSeaIce(arcticMonthlyNsidc, 'Arctic sea ice');
-  const antarcticSeaIce = buildHemisphereSeaIce(antarcticMonthlyNsidc, 'Antarctic sea ice');
+  // Skip if we already have this month's data.
+  const [arcticMonthlyNsidc, antarcticMonthlyNsidc] = (haveArcticIce && haveAntarcticIce)
+    ? [[], []]
+    : await Promise.all([
+        fetchNsidcHemisphere('north').catch((e) => { console.warn(`⚠ NSIDC north failed: ${e?.message ?? e}`); return []; }),
+        fetchNsidcHemisphere('south').catch((e) => { console.warn(`⚠ NSIDC south failed: ${e?.message ?? e}`); return []; }),
+      ]);
+  const freshArcticSeaIce = buildHemisphereSeaIce(arcticMonthlyNsidc, 'Arctic sea ice');
+  const freshAntarcticSeaIce = buildHemisphereSeaIce(antarcticMonthlyNsidc, 'Antarctic sea ice');
+  const arcticSeaIce = freshArcticSeaIce ?? (previousSnapshot?.arcticSeaIce ?? null);
+  const antarcticSeaIce = freshAntarcticSeaIce ?? (previousSnapshot?.antarcticSeaIce ?? null);
   if (arcticSeaIce) console.log(`Arctic sea ice — ${arcticSeaIce.latest.extent}Mkm² (${arcticSeaIce.latest.year}-${String(arcticSeaIce.latest.month).padStart(2,'0')}, rank ${arcticSeaIce.rankLowestOfSameMonth}/${arcticSeaIce.totalYearsInMonth} lowest, ${arcticMonthlyNsidc.length} points)`);
   if (antarcticSeaIce) console.log(`Antarctic sea ice — ${antarcticSeaIce.latest.extent}Mkm² (${antarcticSeaIce.latest.year}-${String(antarcticSeaIce.latest.month).padStart(2,'0')}, rank ${antarcticSeaIce.rankLowestOfSameMonth}/${antarcticSeaIce.totalYearsInMonth} lowest, ${antarcticMonthlyNsidc.length} points)`);
+  if (!freshArcticSeaIce && arcticSeaIce) console.warn('⚠ Arctic NSIDC fetch failed — using previous snapshot as fallback');
+  if (!freshAntarcticSeaIce && antarcticSeaIce) console.warn('⚠ Antarctic NSIDC fetch failed — using previous snapshot as fallback');
   const continentStats = continentJsons
     .map((json, i) => {
       if (!json) return null;
