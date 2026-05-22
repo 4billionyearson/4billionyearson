@@ -370,6 +370,20 @@ export const CLIMATE_GROUPS: LocationResult[] = [
 // All locations combined for search (sub-national first so they take priority over same-name countries)
 export const ALL_LOCATIONS = [...UK_REGIONS, ...US_STATES, ...COUNTRIES, ...CLIMATE_GROUPS];
 
+// Countries not in the CRU TS dataset (too small / island city-states) mapped to
+// their nearest climate-equivalent country. Shown in search as "Name → Proxy".
+const COUNTRY_PROXY_MAP: Record<string, { proxyId: string; label: string }> = {
+  'singapore':    { proxyId: 'c-mys', label: 'Singapore → Malaysia (nearest data)' },
+  'hong kong':    { proxyId: 'c-chn', label: 'Hong Kong → China (nearest data)' },
+  'macau':        { proxyId: 'c-chn', label: 'Macau → China (nearest data)' },
+  'macao':        { proxyId: 'c-chn', label: 'Macau → China (nearest data)' },
+  'monaco':       { proxyId: 'c-fra', label: 'Monaco → France (nearest data)' },
+  'liechtenstein':{ proxyId: 'c-che', label: 'Liechtenstein → Switzerland (nearest data)' },
+  'san marino':   { proxyId: 'c-ita', label: 'San Marino → Italy (nearest data)' },
+  'vatican':      { proxyId: 'c-ita', label: 'Vatican → Italy (nearest data)' },
+  'andorra':      { proxyId: 'c-esp', label: 'Andorra → Spain (nearest data)' },
+};
+
 // Search function with fuzzy matching
 export function searchLocations(query: string, limit = 10): LocationResult[] {
   const q = query.toLowerCase().trim();
@@ -390,6 +404,18 @@ export function searchLocations(query: string, limit = 10): LocationResult[] {
   const results: LocationResult[] = [];
   const seen = new Set<string>();
   const seenNames = new Set<string>();
+
+  // Check proxy map — exact and prefix matches (e.g. "sing" → Singapore → Malaysia)
+  for (const [alias, { proxyId, label }] of Object.entries(COUNTRY_PROXY_MAP)) {
+    if (alias.startsWith(q) || alias.includes(q)) {
+      const proxy = COUNTRIES.find(c => c.id === proxyId);
+      if (proxy && !seen.has(`proxy-${alias}`)) {
+        results.push({ ...proxy, name: label });
+        seen.add(`proxy-${alias}`);
+        seen.add(proxy.id);
+      }
+    }
+  }
 
   // If a UK city matches exactly, add the region
   if (ukCityExact) {

@@ -201,43 +201,6 @@ export default function SeasonalShiftCard({
         wetDryRatio={rain?.wetDryRatio}
       />
 
-      {hasTempSeasons ? (
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
-          <StatTile label={`${baselineStart}–${baselineEnd}`} value={temp.baselineLen.toFixed(1)} sub="months above annual mean" />
-          <StatTile label={`${recentStart}–${recentEnd}`} value={temp.recentLen.toFixed(1)} sub="months above annual mean" />
-        </div>
-      ) : hasWetDry && rain ? (
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
-          <StatTile label={`${baselineStart}–${baselineEnd}`} value={`${rain.baselineAnnualMm}`} sub="mm / yr" />
-          <StatTile label={`${recentStart}–${recentEnd}`} value={`${rain.recentAnnualMm}`} sub="mm / yr" />
-          <StatTile
-            label="Annual rain shift"
-            value={`${rain.annualTotalShiftPct > 0 ? '+' : ''}${rain.annualTotalShiftPct.toFixed(1)}%`}
-            sub="recent vs baseline"
-            valueClassName={
-              rain.annualTotalShiftPct > 2
-                ? 'text-sky-300'
-                : rain.annualTotalShiftPct < -2
-                ? 'text-amber-300'
-                : 'text-gray-300'
-            }
-            bordered
-          />
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
-          <StatTile label={`${baselineStart}–${baselineEnd}`} value={`${temp.baselineAnnualMean.toFixed(1)}°C`} sub="annual mean" />
-          <StatTile label="Temp range" value={`${temp.baselineAmplitudeC.toFixed(1)}°C`} sub="peak-to-peak" />
-          <StatTile
-            label="Biggest warming"
-            value={`+${temp.biggestMonthWarmingC.toFixed(1)}°C`}
-            sub={`in ${temp.biggestMonth}`}
-            valueClassName="text-orange-300"
-            bordered
-          />
-        </div>
-      )}
-
       {hasTempSeasons &&
         temp.baselineSpringDoy !== null &&
         temp.recentSpringDoy !== null &&

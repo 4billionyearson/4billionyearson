@@ -546,6 +546,12 @@ export default function EnsoPage() {
       })()}
       </div>
 
+      {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
+      <div id="forecast" className="scroll-mt-24">
+      <Divider icon={<TrendingUp className="h-5 w-5" />} title={`Prediction (${ensoForecastYearLabel()})`} />
+      <ForecastSection data={data} />
+      </div>
+
       {/* ═══ GLOBAL IMPACT TRACKER ═════════════════════════════════════════ */}
       {oni && oni.history && oni.history.length > 0 && (
       <div id="impact" className="scroll-mt-24">
@@ -559,12 +565,6 @@ export default function EnsoPage() {
         </SectionCard>
       </div>
       )}
-
-      {/* ═══ PREDICTION (forecast vs. history + indicator cross-check) ═══ */}
-      <div id="forecast" className="scroll-mt-24">
-      <Divider icon={<TrendingUp className="h-5 w-5" />} title={`Prediction (${ensoForecastYearLabel()})`} />
-      <ForecastSection data={data} />
-      </div>
 
 
       {/* ═══ GLOBAL IMPACTS ════════════════════════════ */}
