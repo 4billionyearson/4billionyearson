@@ -497,7 +497,7 @@ function UnifiedSearchResults({ query, regions }: { query: string; regions: Clim
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {items.map((r) => (
-                    <ResultCard key={r.slug} region={r} />
+                    <ResultCard key={r.slug} region={r} query={q} />
                   ))}
                 </div>
               </div>
@@ -534,7 +534,20 @@ function typeAccent(region: ClimateRegion): { card: string; hover: string } {
   };
 }
 
-function ResultCard({ region }: { region: ClimateRegion }) {
+// Countries with no direct CRU TS data that proxy to a neighbouring country.
+const PROXY_PLACE_NAMES = new Set([
+  'singapore', 'hong kong', 'macau', 'macao',
+  'monaco', 'liechtenstein', 'san marino', 'vatican', 'andorra',
+]);
+
+function ResultCard({ region, query }: { region: ClimateRegion; query?: string }) {
+  // Show a proxy badge when the match came from a known proxy place in coveragePlaces
+  const matchedPlace = query
+    ? (region.coveragePlaces ?? []).find(p => {
+        const pLower = p.toLowerCase();
+        return PROXY_PLACE_NAMES.has(pLower) && pLower.includes(query);
+      })
+    : undefined;
   const accent = typeAccent(region);
   return (
     <Link
@@ -548,7 +561,17 @@ function ResultCard({ region }: { region: ClimateRegion }) {
         <h4 className="flex-1 min-w-0 text-sm font-semibold text-[#FFF5E7] group-hover:text-white leading-tight truncate">
           {region.name}
         </h4>
+        {matchedPlace && (
+          <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-amber-400/80 bg-amber-400/10 border border-amber-400/20 rounded px-1.5 py-0.5">
+            nearest data
+          </span>
+        )}
       </div>
+      {matchedPlace && (
+        <p className="text-[11px] text-amber-300/70 mb-1">
+          No direct data for {matchedPlace} — showing nearest match
+        </p>
+      )}
       <p className="text-[12px] text-gray-400 line-clamp-2 flex-1">{region.tagline}</p>
       <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[#D0A65E]/80 group-hover:text-[#D0A65E]">
         Open climate update <ChevronRight className="h-3 w-3" />

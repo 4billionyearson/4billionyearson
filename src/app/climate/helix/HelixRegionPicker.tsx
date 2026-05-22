@@ -15,6 +15,13 @@ import {
 } from 'lucide-react';
 import type { ClimateRegion } from '@/lib/climate/regions';
 import type { CountryAnomalyRow, ClimateMapPreset } from '../global/ClimateMapCard';
+
+// Countries with no direct CRU TS data that proxy to a neighbouring country.
+// Only these should ever show the NEAREST DATA badge in search results.
+const PROXY_PLACE_NAMES = new Set([
+  'singapore', 'hong kong', 'macau', 'macao',
+  'monaco', 'liechtenstein', 'san marino', 'vatican', 'andorra',
+]);
 import ClimateMapCard from '../global/ClimateMapCard';
 import { ChipDropdown } from '@/app/_components/responsive-segmented-control';
 
@@ -401,30 +408,48 @@ export default function HelixRegionPicker({
                           {SECTION_META[group.key].label}
                         </span>
                       </div>
-                      {group.items.map((region) => (
-                        <button
-                          key={region.slug}
-                          type="button"
-                          role="option"
-                          aria-selected={false}
-                          onClick={() => {
-                            setQuery('');
-                            if (onRegionSelect) {
-                              handleSelect(region);
-                            } else {
-                              router.push(`/climate/${region.slug}#climate-spiral`);
-                            }
-                          }}
-                          className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[#D0A65E]/10"
-                        >
-                          <span className="text-lg leading-none shrink-0">{region.emoji}</span>
-                          <span className="flex-1 min-w-0">
-                            <span className="block text-sm font-medium text-[#FFF5E7] truncate">{region.name}</span>
-                            <span className="block text-[11px] text-gray-500 truncate">{region.tagline}</span>
-                          </span>
-                          <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#D0A65E]/60" />
-                        </button>
-                      ))}
+                      {group.items.map((region) => {
+                        const q = trimmedQuery.toLowerCase();
+                        const matchedPlace = (region.coveragePlaces ?? []).find(
+                          (p) => {
+                            const pLower = p.toLowerCase();
+                            return PROXY_PLACE_NAMES.has(pLower) && pLower.includes(q);
+                          }
+                        );
+                        return (
+                          <button
+                            key={region.slug}
+                            type="button"
+                            role="option"
+                            aria-selected={false}
+                            onClick={() => {
+                              setQuery('');
+                              if (onRegionSelect) {
+                                handleSelect(region);
+                              } else {
+                                router.push(`/climate/${region.slug}#climate-spiral`);
+                              }
+                            }}
+                            className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[#D0A65E]/10"
+                          >
+                            <span className="text-lg leading-none shrink-0">{region.emoji}</span>
+                            <span className="flex-1 min-w-0">
+                              <span className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-[#FFF5E7] truncate">{region.name}</span>
+                                {matchedPlace && (
+                                  <span className="shrink-0 text-[10px] font-semibold tracking-wide bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded">NEAREST DATA</span>
+                                )}
+                              </span>
+                              {matchedPlace ? (
+                                <span className="block text-[11px] text-amber-400/70 truncate">No direct data for {matchedPlace}</span>
+                              ) : (
+                                <span className="block text-[11px] text-gray-500 truncate">{region.tagline}</span>
+                              )}
+                            </span>
+                            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#D0A65E]/60" />
+                          </button>
+                        );
+                      })}
                     </div>
                   ))}
                 </div>

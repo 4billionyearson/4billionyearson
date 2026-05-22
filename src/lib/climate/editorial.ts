@@ -183,9 +183,9 @@ export function locationIdToSlug(
  */
 export const COUNTRY_TOP_CITIES: Record<string, string[]> = {
   // Europe
-  FRA: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice'],
-  ITA: ['Rome', 'Milan', 'Naples', 'Turin', 'Palermo'],
-  ESP: ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza'],
+  FRA: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Monaco'],
+  ITA: ['Rome', 'Milan', 'Naples', 'Turin', 'Palermo', 'San Marino', 'Vatican'],
+  ESP: ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Andorra'],
   POL: ['Warsaw', 'Kraków', 'Łódź', 'Wrocław', 'Poznań'],
   NLD: ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven'],
   BEL: ['Brussels', 'Antwerp', 'Ghent', 'Charleroi', 'Liège'],
@@ -196,7 +196,7 @@ export const COUNTRY_TOP_CITIES: Record<string, string[]> = {
   PRT: ['Lisbon', 'Porto', 'Braga', 'Coimbra', 'Funchal'],
   GRC: ['Athens', 'Thessaloniki', 'Patras', 'Piraeus', 'Larissa'],
   AUT: ['Vienna', 'Graz', 'Linz', 'Salzburg', 'Innsbruck'],
-  CHE: ['Zurich', 'Geneva', 'Basel', 'Bern', 'Lausanne'],
+  CHE: ['Zurich', 'Geneva', 'Basel', 'Bern', 'Lausanne', 'Liechtenstein'],
   UKR: ['Kyiv', 'Kharkiv', 'Odesa', 'Dnipro', 'Lviv'],
   ROU: ['Bucharest', 'Cluj-Napoca', 'Timișoara', 'Iași', 'Constanța'],
   HUN: ['Budapest', 'Debrecen', 'Szeged', 'Miskolc', 'Pécs'],
@@ -218,11 +218,12 @@ export const COUNTRY_TOP_CITIES: Record<string, string[]> = {
   SUR: ['Paramaribo', 'Lelydorp', 'Nieuw Nickerie', 'Moengo', 'Albina'],
   JAM: ['Kingston', 'Montego Bay', 'Spanish Town', 'Portmore', 'Mandeville'],
   // Asia
+  CHN: ['Beijing', 'Shanghai', 'Guangzhou', 'Shenzhen', 'Chengdu', 'Hong Kong', 'Macau', 'Macao'],
   JPN: ['Tokyo', 'Osaka', 'Yokohama', 'Nagoya', 'Sapporo'],
   KOR: ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon'],
   PRK: ['Pyongyang', 'Hamhung', 'Chongjin', 'Nampo', 'Wonsan'],
   IDN: ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang'],
-  MYS: ['Kuala Lumpur', 'Johor Bahru', 'Ipoh', 'Kuching', 'George Town'],
+  MYS: ['Kuala Lumpur', 'Johor Bahru', 'Ipoh', 'Kuching', 'George Town', 'Singapore'],
   THA: ['Bangkok', 'Chiang Mai', 'Pattaya', 'Phuket', 'Nonthaburi'],
   VNM: ['Hanoi', 'Ho Chi Minh City', 'Hai Phong', 'Da Nang', 'Can Tho'],
   PHL: ['Manila', 'Quezon City', 'Davao', 'Cebu', 'Caloocan'],

@@ -194,6 +194,8 @@ interface LocationSuggestion {
   type: 'country' | 'us-state';
   value: string; // country name or state code
   stateName?: string;
+  isProxy?: boolean;
+  proxyFor?: string;
 }
 
 function LocationSearch({ onSelect, loading, error }: {
@@ -220,17 +222,29 @@ function LocationSearch({ onSelect, loading, error }: {
         const seen = new Set<string>();
         for (const r of data.results) {
           if (r.owidCode === 'OWID_WRL') continue;
+          if (r.name.includes(' → ')) {
+            if (r.type !== 'country') continue;
+            const [proxyFrom, rest] = r.name.split(' → ');
+            const proxyTo = rest.replace(' (nearest data)', '');
+            if (seen.has(`proxy-${proxyFrom}`)) continue;
+            seen.add(`proxy-${proxyFrom}`);
+            mapped.push({
+              label: `${countryFlag(r.owidCode)} ${proxyTo}`,
+              type: 'country',
+              value: proxyTo,
+              isProxy: true,
+              proxyFor: proxyFrom,
+            });
+            continue;
+          }
           // Skip city-mapped results (e.g. "london → ...")
-          const isCityMapping = r.name.includes(' → ');
           if (r.type === 'uk-region') {
-            // Map UK regions/countries to United Kingdom, but skip city mappings
-            if (isCityMapping) continue;
+            // Map UK regions/countries to United Kingdom
             if (!seen.has('United Kingdom')) {
               mapped.push({ label: '🇬🇧 United Kingdom', type: 'country', value: 'United Kingdom' });
               seen.add('United Kingdom');
             }
           } else if (r.type === 'country' || r.type === 'us-state') {
-            if (isCityMapping) continue;
             const key = r.type === 'us-state' ? r.id : r.name;
             if (seen.has(key)) continue;
             seen.add(key);
@@ -299,10 +313,22 @@ function LocationSearch({ onSelect, loading, error }: {
               className="w-full text-left px-4 py-3 hover:bg-gray-800 text-sm text-gray-200 border-b border-gray-800 last:border-0 transition-colors flex items-center gap-2"
               type="button"
             >
-              <span>{s.label}</span>
-              <span className="text-xs text-gray-400 ml-auto">
-                {s.type === 'us-state' ? 'US State' : 'Country'}
-              </span>
+              {s.isProxy ? (
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span>{s.label}</span>
+                    <span className="text-[10px] font-semibold tracking-wide bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded">NEAREST DATA</span>
+                  </div>
+                  <span className="text-xs text-gray-400">No direct energy data for {s.proxyFor}</span>
+                </div>
+              ) : (
+                <>
+                  <span>{s.label}</span>
+                  <span className="text-xs text-gray-400 ml-auto">
+                    {s.type === 'us-state' ? 'US State' : 'Country'}
+                  </span>
+                </>
+              )}
             </button>
           ))}
         </div>

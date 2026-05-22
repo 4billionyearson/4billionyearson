@@ -430,7 +430,7 @@ export const CURATED_CLIMATE_REGIONS: ClimateRegion[] = [
     emoji: '🇨🇳',
     dataSources: ['owid-temp', 'owid-emissions'],
     keywords: ['China climate data', 'China emissions', 'China renewable energy', 'China coal', 'China solar'],
-    coveragePlaces: ['Beijing', 'Shanghai', 'Guangzhou', 'Shenzhen', 'Chengdu'],
+    coveragePlaces: ['Beijing', 'Shanghai', 'Guangzhou', 'Shenzhen', 'Chengdu', 'Hong Kong', 'Macau', 'Macao'],
   },
   {
     slug: 'germany',

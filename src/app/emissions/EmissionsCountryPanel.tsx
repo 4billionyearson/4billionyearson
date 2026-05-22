@@ -71,6 +71,8 @@ interface LocationSuggestion {
   label: string;
   value: string;
   owidCode?: string;
+  isProxy?: boolean;
+  proxyFor?: string;
 }
 
 /* ─── Helpers ────────────────────────────────────────────────────────────── */
@@ -152,7 +154,21 @@ function _RegionSearch_UNUSED({ mode, onSelect, loading }: {
       for (const r of data.results) {
         if (r.owidCode === 'OWID_WRL') continue;
         if (mode === 'country') {
-          if (r.name.includes(' → ')) continue;
+          if (r.name.includes(' → ')) {
+            if (r.type !== 'country') continue;
+            const [proxyFrom, rest] = r.name.split(' → ');
+            const proxyTo = rest.replace(' (nearest data)', '');
+            if (seen.has(`proxy-${proxyFrom}`)) continue;
+            seen.add(`proxy-${proxyFrom}`);
+            mapped.push({
+              label: `${countryFlag(r.owidCode)} ${proxyTo}`,
+              value: proxyTo,
+              owidCode: r.owidCode,
+              isProxy: true,
+              proxyFor: proxyFrom,
+            });
+            continue;
+          }
           if (r.type === 'uk-region') {
             if (!seen.has('United Kingdom')) {
               mapped.push({ label: '🇬🇧 United Kingdom', value: 'United Kingdom' });
@@ -249,7 +265,15 @@ function _RegionSearch_UNUSED({ mode, onSelect, loading }: {
               className="w-full text-left px-4 py-3 hover:bg-gray-800 text-sm text-gray-200 border-b border-gray-800 last:border-0 transition-colors"
               type="button"
             >
-              {s.label}
+              {s.isProxy ? (
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-2">
+                    <span>{s.label}</span>
+                    <span className="text-[10px] font-semibold tracking-wide bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded">NEAREST DATA</span>
+                  </div>
+                  <span className="text-xs text-gray-400">No direct CO₂ data for {s.proxyFor}</span>
+                </div>
+              ) : s.label}
             </button>
           ))}
         </div>

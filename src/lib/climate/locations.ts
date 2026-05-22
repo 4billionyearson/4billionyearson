@@ -371,7 +371,7 @@ export const CLIMATE_GROUPS: LocationResult[] = [
 export const ALL_LOCATIONS = [...UK_REGIONS, ...US_STATES, ...COUNTRIES, ...CLIMATE_GROUPS];
 
 // Countries not in the CRU TS dataset (too small / island city-states) mapped to
-// their nearest climate-equivalent country. Shown in search as "Name → Proxy".
+// their nearest climate-equivalent country. Shown in search dropdowns as "Name → Proxy (nearest data)".
 const COUNTRY_PROXY_MAP: Record<string, { proxyId: string; label: string }> = {
   'singapore':    { proxyId: 'c-mys', label: 'Singapore → Malaysia (nearest data)' },
   'hong kong':    { proxyId: 'c-chn', label: 'Hong Kong → China (nearest data)' },

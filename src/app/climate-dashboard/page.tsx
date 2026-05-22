@@ -808,31 +808,47 @@ function ClimateDashboard() {
 
               {showDropdown && searchResults.length > 0 && (
                 <div className="absolute z-50 w-full mt-2 bg-gray-950 border border-gray-700 rounded-xl shadow-2xl overflow-hidden max-h-80 overflow-y-auto">
-                  {searchResults.map((result, i) => (
-                    <button
-                      key={result.id + i}
-                      onClick={() => { setSearchInput(result.name.split(' → ')[0]); handleSelectLocation(result); }}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-800 flex items-center gap-3 border-b border-gray-800 last:border-0 transition-colors"
-                      type="button"
-                    >
-                      <span className="text-lg">
-                        {result.type === 'us-state' ? '🇺🇸'
-                          : result.type === 'uk-region' ? '🇬🇧'
-                          : result.type === 'group' ? (result.groupKind === 'us-climate-region' ? '🇺🇸' : '🌍')
-                          : countryFlag(result.owidCode)}
-                      </span>
-                      <div>
-                        <span className="font-medium text-gray-200">{result.name}</span>
-                        <span className="text-xs text-gray-400 ml-2">
-                          {result.type === 'country' ? 'Country'
-                            : result.type === 'us-state' ? 'US State'
-                            : result.type === 'uk-region' ? 'UK Region'
-                            : result.groupKind === 'us-climate-region' ? 'US Climate Region'
-                            : 'Continent'}
+                  {searchResults.map((result, i) => {
+                    const isProxy = result.name.includes(' → ');
+                    const [displaySearched, displayProxy] = isProxy ? result.name.split(' → ') : [result.name, null];
+                    // Strip "(nearest data)" suffix from proxy label for cleaner display
+                    const proxyName = displayProxy?.replace(' (nearest data)', '');
+                    return (
+                      <button
+                        key={result.id + i}
+                        onClick={() => { setSearchInput(result.name.split(' → ')[0]); handleSelectLocation(result); }}
+                        className="w-full text-left px-4 py-3 hover:bg-gray-800 flex items-center gap-3 border-b border-gray-800 last:border-0 transition-colors"
+                        type="button"
+                      >
+                        <span className="text-lg">
+                          {result.type === 'us-state' ? '🇺🇸'
+                            : result.type === 'uk-region' ? '🇬🇧'
+                            : result.type === 'group' ? (result.groupKind === 'us-climate-region' ? '🇺🇸' : '🌍')
+                            : countryFlag(result.owidCode)}
                         </span>
-                      </div>
-                    </button>
-                  ))}
+                        <div className="flex-1 min-w-0">
+                          {isProxy ? (
+                            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                              <span className="font-medium text-gray-400 line-through decoration-gray-600">{displaySearched}</span>
+                              <span className="text-gray-500 text-xs">→</span>
+                              <span className="font-medium text-gray-200">{proxyName}</span>
+                              <span className="text-[10px] font-semibold uppercase tracking-wide text-amber-400/80 bg-amber-400/10 border border-amber-400/20 rounded px-1.5 py-0.5 ml-1">nearest data</span>
+                            </div>
+                          ) : (
+                            <span className="font-medium text-gray-200">{result.name}</span>
+                          )}
+                          <span className="text-xs text-gray-400 ml-2">
+                            {isProxy ? `No direct data for ${displaySearched}`
+                              : result.type === 'country' ? 'Country'
+                              : result.type === 'us-state' ? 'US State'
+                              : result.type === 'uk-region' ? 'UK Region'
+                              : result.groupKind === 'us-climate-region' ? 'US Climate Region'
+                              : 'Continent'}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
