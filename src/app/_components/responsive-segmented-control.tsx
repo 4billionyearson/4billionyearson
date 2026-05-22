@@ -122,6 +122,7 @@ export function ChipDropdown({
   className = '',
   triggerClassName,
   listClassName,
+  labelClassName,
 }: {
   label?: string;
   options: SegmentedOption[];
@@ -132,6 +133,8 @@ export function ChipDropdown({
   triggerClassName?: string;
   /** Override the dropdown list's scroll/height classes (e.g. "max-h-none overflow-visible" to remove scrollbar). Defaults to "max-h-64 overflow-auto". */
   listClassName?: string;
+  /** Extra classes applied to the eyebrow label span (e.g. "hidden sm:inline" to hide on mobile). */
+  labelClassName?: string;
 }) {
   return (
     <div className={className}>
@@ -144,6 +147,7 @@ export function ChipDropdown({
         ariaLabel={ariaLabel ?? label}
         triggerClassName={triggerClassName}
         listClassName={listClassName}
+        labelClassName={labelClassName}
       />
     </div>
   );
@@ -166,6 +170,7 @@ function ListboxTrigger({
   ariaLabel,
   triggerClassName,
   listClassName,
+  labelClassName,
 }: {
   variant: 'select' | 'chip';
   label?: string;
@@ -175,6 +180,7 @@ function ListboxTrigger({
   ariaLabel?: string;
   triggerClassName?: string;
   listClassName?: string;
+  labelClassName?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState<number>(() => {
@@ -262,7 +268,7 @@ function ListboxTrigger({
       >
         {variant === 'chip' && label ? (
           <span className="flex items-baseline gap-1.5">
-            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-gray-500">{label}</span>
+            <span className={`text-[10px] font-medium uppercase tracking-[0.12em] text-gray-500${labelClassName ? ' ' + labelClassName : ''}`}>{label}</span>
             <span className="font-medium truncate max-w-[14rem]">{current?.label ?? '—'}</span>
           </span>
         ) : (

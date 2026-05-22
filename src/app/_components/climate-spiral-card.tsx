@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Thermometer, CloudRain, Sun, Snowflake, Waves, Wind, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { MonthlyPoint, SpaghettiMetric } from './monthly-spaghetti-chart';
+import { ChipDropdown } from './responsive-segmented-control';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import { DEFAULT_SCHEME, type SeasonScheme } from '@/lib/climate/season-scheme';
 import { analyseRainfall, WET_DRY_RATIO_THRESHOLD } from '@/lib/climate/shift-analysis';
@@ -91,7 +92,7 @@ interface Props {
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const NH_WET_MONTHS = [3, 4, 5, 6, 7, 8] as const;
 const SH_WET_MONTHS = [9, 10, 11, 0, 1, 2] as const;
-const PRECIP_SCALE_CEILINGS = [5, 10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 300, 400, 500, 750, 1000] as const;
+const PRECIP_SCALE_CEILINGS = [5, 10, 20, 25, 30, 40, 50, 60, 75, 80, 100, 120, 125, 150, 175, 200, 225, 250, 275, 300, 400, 500, 750, 1000] as const;
 const MONTH_DAY_COUNTS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const;
 
 function choosePrecipScaleCeiling(value: number): number {
@@ -107,7 +108,7 @@ function choosePrecipTickStep(range: number): number {
   if (range <= 20) return 5;
   if (range <= 50) return 10;
   if (range <= 120) return 20;
-  if (range <= 250) return 50;
+  if (range <= 275) return 25;
   if (range <= 500) return 100;
   return 200;
 }
@@ -2198,16 +2199,19 @@ export default function ClimateSpiralCard({
               {gridTicks.map((t, i) => {
                 const r = tickToR(t);
                 const isZero = anomaly && Math.abs(t) < 0.0001;
+                const labelStride = anomaly ? 2 : (metric === 'precip' && gridTicks.length > 5 ? 2 : 1);
                 const showLabel = metric === 'temp' && effectiveTempScaleMode === 'auto'
                   ? true
-                  : isZero || i % (anomaly ? 2 : 1) === 0 || i === gridTicks.length - 1;
+                  : isZero || i % labelStride === 0 || i === gridTicks.length - 1;
                 if (!showLabel) return null;
                 const labelY = view3D ? CY - 2 : CY - 3;
+                const atOuterEdge = r >= R_OUTER - 1;
                 return (
                   <text
                     key={`ring-label-${t}`}
-                    x={CX + r + 6}
+                    x={CX + r + (atOuterEdge ? -4 : 6)}
                     y={labelY}
+                    textAnchor={atOuterEdge ? 'end' : 'start'}
                     fontSize={9}
                     fontWeight={500}
                     fill="rgba(255,255,255,0.45)"
@@ -2650,6 +2654,18 @@ export default function ClimateSpiralCard({
                 </div>
               );
             })()}
+            {/* Metric overlay chip — top-right of chart */}
+            {available.length > 0 && (
+              <ChipDropdown
+                className="absolute top-1 sm:top-2 right-0 z-20"
+                label="Metric"
+                labelClassName="hidden sm:inline"
+                ariaLabel="Chart metric"
+                value={metric}
+                onChange={(k) => setMetric(k as SpaghettiMetric)}
+                options={available.map((m) => ({ key: m, label: METRIC_LABEL[m] }))}
+              />
+            )}
             {chartOverlayAccessory && (
               <div className="hidden sm:flex absolute bottom-2 right-2 z-20 items-center">
                 {chartOverlayAccessory}
@@ -2706,60 +2722,7 @@ export default function ClimateSpiralCard({
                 </div>
               );
             })()}
-            {!seasonScheme.isAseasonal && showSeasons && hasTempShift && hasWetShift && (() => {
-              const effectiveSystem: 'temperate' | 'wet-season' =
-                shiftSystem === 'auto'
-                  ? (seasonScheme.isWetDry ? 'wet-season' : 'temperate')
-                  : shiftSystem;
-              const segBase = 'inline-flex h-6 items-center gap-1 px-2 text-[11px] font-medium transition-colors hover:bg-white/[0.04]';
-              return (
-                <div className="sm:hidden flex justify-end mt-2 translate-x-0">
-                  <div
-                    className="inline-flex items-center rounded-full border overflow-hidden"
-                    style={{ borderColor: '#86EFAC8c', background: '#86EFAC1f' }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setShiftSystem('temperate')}
-                      aria-pressed={effectiveSystem === 'temperate'}
-                      className={segBase}
-                      style={{ color: effectiveSystem === 'temperate' ? '#FFF5E7' : '#9CA3AF' }}
-                      title="Track the warm-season (spring/autumn) crossings"
-                    >
-                      <span
-                        aria-hidden
-                        className="inline-block h-2 w-2 rounded-full shrink-0"
-                        style={{
-                          background: effectiveSystem === 'temperate' ? '#FACC15' : 'transparent',
-                          border: `1px solid ${effectiveSystem === 'temperate' ? '#FACC15' : '#4B5563'}`,
-                        }}
-                      />
-                      <span className="leading-none whitespace-nowrap">Summer</span>
-                    </button>
-                    <div aria-hidden className="h-3.5 w-px self-center shrink-0" style={{ background: '#86EFAC55' }} />
-                    <button
-                      type="button"
-                      onClick={() => setShiftSystem('wet-season')}
-                      aria-pressed={effectiveSystem === 'wet-season'}
-                      className={segBase}
-                      style={{ color: effectiveSystem === 'wet-season' ? '#FFF5E7' : '#9CA3AF' }}
-                      title="Track the wet-season onset & end crossings"
-                    >
-                      <span
-                        aria-hidden
-                        className="inline-block h-2 w-2 rounded-full shrink-0"
-                        style={{
-                          background: effectiveSystem === 'wet-season' ? '#3B82F6' : 'transparent',
-                          border: `1px solid ${effectiveSystem === 'wet-season' ? '#3B82F6' : '#4B5563'}`,
-                        }}
-                      />
-                      <span className="leading-none whitespace-nowrap">Wet&nbsp;season</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
-            {/* Mobile: rotation buttons + inline pill in one row, naturally aligned */}
+            {/* Mobile: rotation buttons + season pill (if any) + chartInlineAccessory — all one row */}
             <div className="sm:hidden flex items-center justify-between mt-2">
               <div className="flex items-center gap-1">
                 <button
@@ -2779,7 +2742,60 @@ export default function ClimateSpiralCard({
                   <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
-              {chartInlineAccessory}
+              <div className="flex items-center gap-2">
+                {!seasonScheme.isAseasonal && showSeasons && hasTempShift && hasWetShift && (() => {
+                  const effectiveSystem: 'temperate' | 'wet-season' =
+                    shiftSystem === 'auto'
+                      ? (seasonScheme.isWetDry ? 'wet-season' : 'temperate')
+                      : shiftSystem;
+                  const segBase = 'inline-flex h-6 items-center gap-1 px-2 text-[11px] font-medium transition-colors hover:bg-white/[0.04]';
+                  return (
+                    <div
+                      className="inline-flex items-center rounded-full border overflow-hidden"
+                      style={{ borderColor: '#86EFAC8c', background: '#86EFAC1f' }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setShiftSystem('temperate')}
+                        aria-pressed={effectiveSystem === 'temperate'}
+                        className={segBase}
+                        style={{ color: effectiveSystem === 'temperate' ? '#FFF5E7' : '#9CA3AF' }}
+                        title="Track the warm-season (spring/autumn) crossings"
+                      >
+                        <span
+                          aria-hidden
+                          className="inline-block h-2 w-2 rounded-full shrink-0"
+                          style={{
+                            background: effectiveSystem === 'temperate' ? '#FACC15' : 'transparent',
+                            border: `1px solid ${effectiveSystem === 'temperate' ? '#FACC15' : '#4B5563'}`,
+                          }}
+                        />
+                        <span className="leading-none whitespace-nowrap">Summer</span>
+                      </button>
+                      <div aria-hidden className="h-3.5 w-px self-center shrink-0" style={{ background: '#86EFAC55' }} />
+                      <button
+                        type="button"
+                        onClick={() => setShiftSystem('wet-season')}
+                        aria-pressed={effectiveSystem === 'wet-season'}
+                        className={segBase}
+                        style={{ color: effectiveSystem === 'wet-season' ? '#FFF5E7' : '#9CA3AF' }}
+                        title="Track the wet-season onset & end crossings"
+                      >
+                        <span
+                          aria-hidden
+                          className="inline-block h-2 w-2 rounded-full shrink-0"
+                          style={{
+                            background: effectiveSystem === 'wet-season' ? '#3B82F6' : 'transparent',
+                            border: `1px solid ${effectiveSystem === 'wet-season' ? '#3B82F6' : '#4B5563'}`,
+                          }}
+                        />
+                        <span className="leading-none whitespace-nowrap">Wet&nbsp;season</span>
+                      </button>
+                    </div>
+                  );
+                })()}
+                {chartInlineAccessory}
+              </div>
             </div>
             {/* Desktop: rotation buttons absolute bottom-left, aligned with overlay pill */}
             <div className="hidden sm:flex absolute bottom-2 left-0 z-20 items-center gap-1">
@@ -2853,15 +2869,16 @@ export default function ClimateSpiralCard({
             };
             const hasSupplementalHudMetrics = supplementalHudMetrics.length > 0;
             const hudCardSizingClass = 'min-w-0';
-            const hudRowClass = hasSupplementalHudMetrics
-              ? 'flex flex-col md:flex-row xl:flex-col gap-3'
-              : 'flex flex-row xl:flex-col gap-3';
-            const hudCardClass = hasSupplementalHudMetrics
-              ? 'w-full md:flex-1 md:basis-0 xl:w-full xl:flex-none'
-              : 'flex-1 basis-0 xl:w-full xl:flex-none';
+            const hudRowClass = 'grid grid-cols-2 md:flex md:flex-row xl:flex xl:flex-col gap-3';
+            const hudCardClass = 'w-full md:flex-1 md:basis-0 xl:w-full xl:flex-none';
             const pairedSupplementalKeys = new Set(['sea-level', 'sea-ice']);
             const unpairedSupplemental = supplementalHudMetrics.filter((s) => !pairedSupplementalKeys.has(s.key));
             const pairedSupplemental = supplementalHudMetrics.filter((s) => pairedSupplementalKeys.has(s.key));
+            // Mobile grid pairing rules (grid-cols-2):
+            // - Solo metric (global) with CO2 → TEMP+CO2 share a row; CO2 gets no col-span-2
+            // - Even number of non-active metrics (UK: 4 total → 3 non-active = odd) → ENSO fills orphaned cell
+            const supplementalColSpan = available.length <= 1 ? '' : 'col-span-2';
+            const ensoColSpan = available.length > 2 && available.length % 2 === 0 ? '' : 'col-span-2';
             // Compute annual baseline average for any metric from annuals data
             const metricBaselineAvg = (m: SpaghettiMetric): number | null => {
               const arr = annuals[m];
@@ -2885,14 +2902,15 @@ export default function ClimateSpiralCard({
               <div className="mb-3">
                 {/* All cards in one row (horizontal on mobile/tablet, vertical stack on xl) */}
                 <div className={hudRowClass}>
-                  {allOthers.filter((x) => available.includes(x.m)).map((o) => {
+                  {[...allOthers.filter((x) => available.includes(x.m))]
+                    .sort((a, b) => a.m === metric ? -1 : b.m === metric ? 1 : 0)
+                    .map((o) => {
                     const isActive = o.m === metric;
                     const v = metricValueFn(o.m);
-                    if (v === null) return null;
                     const c = METRIC_PALETTE[o.m].current;
                     const d = o.m === 'temp' ? 1 : 0;
                     const ann = annuals[o.m];
-                    const anom = metricAnom(o.m, v);
+                    const anom = v !== null ? metricAnom(o.m, v) : null;
                     const anomPositive = anom !== null && anom >= 0;
                     // for temp: warm=rose, cold=sky; for precip: more=sky, less=amber; for sunshine/frost: more=amber, less=sky
                     const anomColor = anom === null ? '' :
@@ -2902,11 +2920,16 @@ export default function ClimateSpiralCard({
                     const anomLabel = anom !== null
                       ? `${anom >= 0 ? '+' : ''}${fmt(anom, d)}${o.m === 'temp' ? '°' : ''} vs base`
                       : null;
+                    // Solo metric + CO2 → pair them (no col-span-2). Solo alone → full-width.
+                    // 2 metrics: share a row. 3+ metrics: active is full-width at top.
+                    const colSpanClass = available.length <= 1 && unpairedSupplemental.length === 0 ? 'col-span-2' :
+                      available.length <= 1 ? '' :
+                      available.length > 2 && isActive ? 'col-span-2' : '';
                     if (isActive) {
                       // Active metric: full card with sparkline, always visible
                       return (
                         <div key={o.m}
-                          className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
+                          className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass} ${colSpanClass}`}
                           style={{ borderColor: `${c}66`, boxShadow: `0 0 14px -6px ${c}` }}
                         >
                           <div className="flex flex-col justify-between shrink-0 w-[68px]">
@@ -2915,7 +2938,7 @@ export default function ClimateSpiralCard({
                               {METRIC_LABEL[o.m]}
                             </div>
                             <div className="font-mono text-base font-bold tabular-nums whitespace-nowrap" style={{ color: '#FFF5E7' }}>
-                              {fmt(v, d)} <span className="text-[10px] opacity-70">{METRIC_UNIT[o.m]}</span>
+                              {v !== null ? fmt(v, d) : '—'} <span className="text-[10px] opacity-70">{METRIC_UNIT[o.m]}</span>
                             </div>
                             {anomLabel && (
                               <div className="text-[9.5px] tabular-nums leading-tight">
@@ -2930,7 +2953,7 @@ export default function ClimateSpiralCard({
                     // Non-active metrics: full card with sparkline on sm+, hidden on mobile
                     return (
                       <div key={o.m}
-                        className={`hidden sm:flex rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
+                        className={`flex rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass} ${colSpanClass}`}
                         style={{ borderColor: `${c}40` }}
                       >
                         <div className="flex flex-col justify-between shrink-0 w-[68px]">
@@ -2939,7 +2962,7 @@ export default function ClimateSpiralCard({
                             {METRIC_LABEL[o.m]}
                           </div>
                           <div className="font-mono text-sm font-bold tabular-nums whitespace-nowrap" style={{ color: '#FFF5E7' }}>
-                            {fmt(v, d)} <span className="text-[10px] opacity-70">{METRIC_UNIT[o.m]}</span>
+                            {v !== null ? fmt(v, d) : '—'} <span className="text-[10px] opacity-70">{METRIC_UNIT[o.m]}</span>
                           </div>
                           {anomLabel && (
                             <div className="text-[9.5px] tabular-nums leading-tight">
@@ -2957,7 +2980,7 @@ export default function ClimateSpiralCard({
                     const icon = supplementalIcon(signal);
                     return (
                       <div key={signal.key}
-                        className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
+                        className={`${supplementalColSpan} rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2.5 py-1.5 flex items-stretch gap-2.5 h-[72px] ${hudCardClass} ${hudCardSizingClass}`}
                         style={{ borderColor: `${signal.color}40` }}
                       >
                         <div className="shrink-0 w-[68px] flex flex-col justify-between">
@@ -2979,7 +3002,7 @@ export default function ClimateSpiralCard({
                     );
                   })}
                   {pairedSupplemental.length > 0 && (
-                    <div className="flex flex-row gap-3 md:[display:contents]">
+                    <div className="col-span-2 flex flex-row gap-3 md:[display:contents]">
                       {pairedSupplemental.map((signal) => {
                         const value = supplementalValueFn(signal);
                         const decimals = signal.decimals ?? 1;
@@ -3011,7 +3034,7 @@ export default function ClimateSpiralCard({
                   )}
                   {/* ENSO — only shown for regions with a clear ENSO teleconnection */}
                   {showEnso && (
-                  <div className={`rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-stretch gap-2 h-[72px] ${hudCardClass} ${hudCardSizingClass} ${ensoCls}`}>
+                  <div className={`${ensoColSpan} rounded-lg border bg-[#0b0e16]/85 backdrop-blur-sm px-2 py-1.5 flex items-stretch gap-2 h-[72px] ${hudCardClass} ${hudCardSizingClass} ${ensoCls}`}>
                     <div className="flex flex-col justify-between w-[68px] shrink-0">
                       <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider whitespace-nowrap text-gray-400">
                         <span style={{ color: ensoIconColor }}><Waves className="h-3 w-3" /></span>
