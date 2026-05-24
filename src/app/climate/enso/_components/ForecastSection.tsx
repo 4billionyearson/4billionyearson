@@ -722,7 +722,7 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
       </div>
 
       {/* Legend strip */}
-      <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
+      <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[10px] text-gray-300">
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block w-5 h-0.5 bg-[#fef3c7]" /> Weekly Niño 3.4
         </span>
