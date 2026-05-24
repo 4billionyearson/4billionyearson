@@ -424,7 +424,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
 
       {/* Legend */}
       {chartData.length > 0 && (
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-gray-300">
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[10px] text-gray-300">
           <span className="inline-flex items-center gap-1.5"><span className="inline-block w-5 h-0.5 bg-[#fef3c7]" /> Weekly Niño 3.4</span>
           <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(244,63,94,0.55)' }} /> El Niño shading</span>
           <span className="inline-flex items-center gap-1.5"><span className="inline-block w-4 h-3 rounded-sm" style={{ background: 'rgba(14,165,233,0.55)' }} /> La Niña shading</span>
