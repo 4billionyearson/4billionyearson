@@ -92,15 +92,19 @@ interface Props {
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const NH_WET_MONTHS = [3, 4, 5, 6, 7, 8] as const;
 const SH_WET_MONTHS = [9, 10, 11, 0, 1, 2] as const;
-const PRECIP_SCALE_CEILINGS = [5, 10, 20, 25, 30, 40, 50, 60, 75, 80, 100, 120, 125, 150, 175, 200, 225, 250, 275, 300, 400, 500, 750, 1000] as const;
 const MONTH_DAY_COUNTS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const;
 
-function choosePrecipScaleCeiling(value: number): number {
-  const target = Math.max(5, value);
-  for (const ceiling of PRECIP_SCALE_CEILINGS) {
-    if (target <= ceiling) return ceiling;
-  }
-  return Math.ceil(target / 250) * 250;
+/** Pick a nice round floor at or below `value` for the precip scale.
+ *  Used when the wettest-region driest-month value is meaningfully above
+ *  zero so the spiral can fill the disc instead of wasting the inner area. */
+function choosePrecipScaleFloor(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  if (value < 10) return 0;
+  if (value < 25) return Math.floor(value / 5) * 5;
+  if (value < 100) return Math.floor(value / 10) * 10;
+  if (value < 300) return Math.floor(value / 25) * 25;
+  if (value < 1000) return Math.floor(value / 50) * 50;
+  return Math.floor(value / 100) * 100;
 }
 
 function choosePrecipTickStep(range: number): number {
@@ -794,11 +798,12 @@ export default function ClimateSpiralCard({
   >(null);
 
   /* Value→radius scale: derive from data extent across all years to be drawn. */
-  const { rMin, rMax, currentYear, recordYear, oppositeYear } = useMemo(() => {
-    if (!yearMap.size) return { rMin: 0, rMax: 1, currentYear: 0, recordYear: 0, oppositeYear: 0 };
+  const { rMin, rMax, rP05, rP95, currentYear, recordYear, oppositeYear } = useMemo(() => {
+    if (!yearMap.size) return { rMin: 0, rMax: 1, rP05: 0, rP95: 1, currentYear: 0, recordYear: 0, oppositeYear: 0 };
     const calYear = new Date().getFullYear();
     const calMonth = new Date().getMonth() + 1;
     let lo = Infinity, hi = -Infinity;
+    const all: number[] = [];
     for (const [y, arr] of yearMap.entries()) {
       if (y < effectiveFromYear) continue;
       arr.forEach((v, mi) => {
@@ -810,7 +815,21 @@ export default function ClimateSpiralCard({
         const adj = anomaly && Number.isFinite(meanBaselineForScale[mi]) ? v - meanBaselineForScale[mi] : v;
         if (adj < lo) lo = adj;
         if (adj > hi) hi = adj;
+        all.push(adj);
       });
+    }
+    // Robust percentiles used by precip auto-fit so extreme month-year
+    // outliers don't blow out the scale.
+    let p05 = lo === Infinity ? 0 : lo;
+    let p95 = hi === -Infinity ? 1 : hi;
+    if (all.length >= 20) {
+      all.sort((a, b) => a - b);
+      const pick = (q: number) => {
+        const idx = Math.min(all.length - 1, Math.max(0, Math.round(q * (all.length - 1))));
+        return all[idx];
+      };
+      p05 = pick(0.05);
+      p95 = pick(0.95);
     }
     // Pick record-high and record-low year by metric's annual aggregate.
     const annual = annualAggregate(yearMap, METRIC_AGG[metric]);
@@ -824,6 +843,8 @@ export default function ClimateSpiralCard({
     return {
       rMin: lo === Infinity ? 0 : lo,
       rMax: hi === -Infinity ? 1 : hi,
+      rP05: p05,
+      rP95: p95,
       currentYear: calYear,
       recordYear: bestY,
       oppositeYear: worstY,
@@ -919,8 +940,28 @@ export default function ClimateSpiralCard({
 
   const precipAbsoluteScaleMax = useMemo(() => {
     if (metric !== 'precip' || anomaly) return null;
-    return choosePrecipScaleCeiling(rMax * 1.08);
-  }, [metric, anomaly, rMax]);
+    // Tight padding (matches temp's auto-fit) so the wettest month touches
+    // the outer ring instead of being pushed inward by ceiling rounding.
+    const span = Math.max(rMax - rP05, 1);
+    const pad = Math.max(2, span * 0.04);
+    return rMax + pad;
+  }, [metric, anomaly, rMax, rP05]);
+
+  /** Auto-fit floor for precip absolute mode. When the *typical* dry-month
+   *  value (5th-percentile across all years drawn) is meaningfully above
+   *  zero, anchor the inner radius near that floor so the spiral fills the
+   *  disc instead of wasting the inner third. Uses a percentile rather than
+   *  rMin so a single drought-month outlier doesn't drag the floor to ~0. */
+  const precipAbsoluteScaleMin = useMemo(() => {
+    if (metric !== 'precip' || anomaly) return null;
+    const ceiling = precipAbsoluteScaleMax ?? rMax * 1.05;
+    if (!Number.isFinite(rP05) || rP05 <= 0) return 0;
+    if (rP05 < ceiling * 0.12) return 0;
+    const span = Math.max(rMax - rP05, 1);
+    const pad = Math.max(2, span * 0.04);
+    const padded = rP05 - pad;
+    return Math.max(0, choosePrecipScaleFloor(padded));
+  }, [metric, anomaly, rP05, rMax, precipAbsoluteScaleMax]);
 
   const tempAbsolutePad = Math.max(0.15, (rMax - rMin) * 0.08);
   const tempAnomalyPad = Math.max(0.12, (rMax - rMin) * 0.1);
@@ -932,7 +973,8 @@ export default function ClimateSpiralCard({
       ? effectiveTempScaleMode === 'auto'
         ? rMin - tempAbsolutePad
         : Math.min(rMin - 0.5, -1)
-      : 0;
+    : metric === 'precip' ? (precipAbsoluteScaleMin ?? 0)
+    : 0;
   const scaleMax = anomaly
     ? metric === 'temp' && effectiveTempScaleMode === 'auto'
       ? Math.max(rMax + tempAnomalyPad, 0)
@@ -942,7 +984,7 @@ export default function ClimateSpiralCard({
         ? rMax + tempAbsolutePad
         : rMax * 1.05
     : metric === 'frost'  ? Math.max(rMax * 1.05, 12)
-    : metric === 'precip' ? (precipAbsoluteScaleMax ?? choosePrecipScaleCeiling(rMax * 1.08))
+    : metric === 'precip' ? (precipAbsoluteScaleMax ?? rMax * 1.05)
     : rMax * 1.05;
 
   function valueToR(v: number, monthIdx: number): number {
@@ -1049,6 +1091,15 @@ export default function ClimateSpiralCard({
     else if (metric === 'sunshine') step = 50;
     else step = 5; // frost days
     const first = Math.ceil(scaleMin / step) * step;
+    // For precip absolute with a non-zero auto-fit floor, surface the floor
+    // value itself so users can read the inner-radius baseline.
+    if (
+      metric === 'precip' && !anomaly && scaleMin > 0
+      && Math.abs(first - scaleMin) > 0.0001
+      && (first - scaleMin) >= step * 0.4
+    ) {
+      ticks.push(Number(scaleMin.toFixed(4)));
+    }
     for (let v = first; v <= scaleMax; v += step) {
       ticks.push(Number(v.toFixed(4)));
     }
@@ -2195,35 +2246,56 @@ export default function ClimateSpiralCard({
 
               {/* Grid tick labels — rendered above the spaghetti so values
                    remain readable in dense global views. In 3D mode the
-                   text stays upright (not tilted with the floor). */}
-              {gridTicks.map((t, i) => {
-                const r = tickToR(t);
-                const isZero = anomaly && Math.abs(t) < 0.0001;
-                const labelStride = anomaly ? 2 : (metric === 'precip' && gridTicks.length > 5 ? 2 : 1);
-                const showLabel = metric === 'temp' && effectiveTempScaleMode === 'auto'
-                  ? true
-                  : isZero || i % labelStride === 0 || i === gridTicks.length - 1;
-                if (!showLabel) return null;
-                const labelY = view3D ? CY - 2 : CY - 3;
-                const atOuterEdge = r >= R_OUTER - 1;
-                return (
-                  <text
-                    key={`ring-label-${t}`}
-                    x={CX + r + (atOuterEdge ? -4 : 6)}
-                    y={labelY}
-                    textAnchor={atOuterEdge ? 'end' : 'start'}
-                    fontSize={9}
-                    fontWeight={500}
-                    fill="rgba(255,255,255,0.45)"
-                    fontFamily="ui-monospace, monospace"
-                    paintOrder="stroke fill"
-                    stroke="rgba(11,14,22,0.85)"
-                    strokeWidth={2.5}
-                  >
-                    {anomaly && t > 0 ? '+' : ''}{t}{metric === 'temp' ? '°' : ''}
-                  </text>
-                );
-              })}
+                   text stays upright (not tilted with the floor). Labels
+                   are centre-anchored on each tick so spacing reads
+                   symmetric around 0° and around 0 mm. The very last
+                   label is nudged inward when its right edge would
+                   overflow the outer ring. */}
+              {(() => {
+                const labelTextOf = (t: number) =>
+                  `${anomaly && t > 0 ? '+' : ''}${t}${metric === 'temp' ? '°' : ''}`;
+                const widthOf = (label: string) => label.length * 5.5 + 4;
+                return gridTicks.map((t, i) => {
+                  const r = tickToR(t);
+                  const isZero = anomaly && Math.abs(t) < 0.0001;
+                  const labelStride = anomaly ? 2 : (metric === 'precip' && gridTicks.length > 5 ? 2 : 1);
+                  const isLast = i === gridTicks.length - 1;
+                  const lastWouldCrowd = isLast
+                    && labelStride > 1
+                    && gridTicks.length >= 2
+                    && ((gridTicks.length - 1) % labelStride !== 0)
+                    && ((gridTicks.length - 2) % labelStride === 0);
+                  const showLabel = metric === 'temp' && effectiveTempScaleMode === 'auto'
+                    ? true
+                    : isZero
+                      || i % labelStride === 0
+                      || (isLast && !lastWouldCrowd);
+                  if (!showLabel) return null;
+                  const labelY = view3D ? CY - 2 : CY - 3;
+                  const labelText = labelTextOf(t);
+                  const halfWidth = widthOf(labelText) / 2;
+                  // Clamp the label center inward so the right edge stays
+                  // inside the outer ring.
+                  const cx = Math.min(r, R_OUTER - halfWidth - 2);
+                  return (
+                    <text
+                      key={`ring-label-${t}`}
+                      x={CX + cx}
+                      y={labelY}
+                      textAnchor="middle"
+                      fontSize={9}
+                      fontWeight={500}
+                      fill="rgba(255,255,255,0.45)"
+                      fontFamily="ui-monospace, monospace"
+                      paintOrder="stroke fill"
+                      stroke="rgba(11,14,22,0.85)"
+                      strokeWidth={2.5}
+                    >
+                      {labelText}
+                    </text>
+                  );
+                });
+              })()}
 
               {/* Hovered line: full ring highlight + marker dot. Sits above
                    the spaghetti but below the month labels. Works for both

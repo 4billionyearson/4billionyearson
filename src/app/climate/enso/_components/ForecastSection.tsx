@@ -601,7 +601,7 @@ export default function ForecastSection({ data }: { data: EnsoSnapshot }) {
     >
       <div className="h-[380px]">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 0, bottom: 0 }}>
+          <ComposedChart data={chartData} margin={{ top: 24, right: 3, left: -14, bottom: 0 }}>
             <defs>
               <pattern id="enso-forecast-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
                 <rect width="6" height="6" fill="rgba(244,63,94,0.12)" />

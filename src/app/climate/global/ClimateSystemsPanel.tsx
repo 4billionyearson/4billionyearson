@@ -362,7 +362,7 @@ export function EnsoCard({ enso }: { enso: EnsoData | null }) {
       {chartData.length > 0 && (
         <div className="h-[260px] -ml-1">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 16, right: 20, left: 0, bottom: 0 }}>
+            <ComposedChart data={chartData} margin={{ top: 16, right: 3, left: -4, bottom: 0 }}>
               <defs>
                 <pattern id="enso-card-stripes" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
                   <rect width="6" height="6" fill="rgba(244,63,94,0.12)" />
