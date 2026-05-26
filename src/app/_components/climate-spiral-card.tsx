@@ -87,6 +87,8 @@ interface Props {
   supplementalHudMetrics?: ClimateSpiralHudMetric[];
   /** Optional outer annulus overlay, used by the global World View helix. */
   orbitalOverlay?: ClimateSpiralOrbitalOverlay;
+  /** If true, hide the update link and align share right (for update pages). */
+  hideUpdateLink?: boolean;
 }
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -612,6 +614,7 @@ export default function ClimateSpiralCard({
   tempScaleMode = 'zero-anchored',
   supplementalHudMetrics = [],
   orbitalOverlay,
+  hideUpdateLink = false,
 }: Props) {
   const available = METRIC_ORDER.filter((m) => (series[m]?.length ?? 0) > 0);
   const fallback: SpaghettiMetric = available[0] ?? 'temp';
@@ -3671,14 +3674,51 @@ export default function ClimateSpiralCard({
         const embedCode = embedUrl
           ? `<iframe\n  src="${embedUrl}"\n  width="100%" height="900"\n  style="border:none;"\n  title="${title} - 4 Billion Years On"\n></iframe>`
           : undefined;
+        // Determine the link target for the selected region
+        let regionLink = null;
+        if (embedSlug && embedSlug !== 'global-land-ocean' && embedSlug !== 'global-land') {
+          regionLink = `/climate/${embedSlug}#climate-update`;
+        } else {
+          regionLink = '/climate/global#climate-update';
+        }
+        if (hideUpdateLink) {
+          // Only show the share bar, right-aligned
+          return (
+            <div className="mt-3 flex items-baseline justify-end gap-3 flex-wrap">
+              <ShareBar
+                pageUrl={`${share.pageUrl}#${share.sectionId}`}
+                shareText={encodeURIComponent(`${title} - live data on 4 Billion Years On`)}
+                emailSubject={`${title} - 4 Billion Years On`}
+                embedUrl={embedUrl}
+                embedCode={embedCode}
+                align="right"
+              />
+            </div>
+          );
+        }
+        // Default: show share left, link right
         return (
-          <ShareBar
-            pageUrl={`${share.pageUrl}#${share.sectionId}`}
-            shareText={encodeURIComponent(`${title} - live data on 4 Billion Years On`)}
-            emailSubject={`${title} - 4 Billion Years On`}
-            embedUrl={embedUrl}
-            embedCode={embedCode}
-          />
+          <div className="mt-3 flex items-baseline justify-between gap-3 flex-wrap">
+            <ShareBar
+              pageUrl={`${share.pageUrl}#${share.sectionId}`}
+              shareText={encodeURIComponent(`${title} - live data on 4 Billion Years On`)}
+              emailSubject={`${title} - 4 Billion Years On`}
+              embedUrl={embedUrl}
+              embedCode={embedCode}
+              align="left"
+            />
+            <a
+              href={regionLink}
+              className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors ml-auto"
+              style={{ minWidth: 0 }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {regionName === 'Global Land + Ocean' || regionName === 'Global Land'
+                ? 'Full Global Climate Update →'
+                : `Full Climate Update for ${regionName} →`}
+            </a>
+          </div>
         );
       })()}
     </div>

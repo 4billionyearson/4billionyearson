@@ -221,6 +221,7 @@ export default function HelixClientSection({
                   }}
                   seasonScheme={regionData.seasonScheme}
                   showEnso={regionData.ensoOn}
+                  hideUpdateLink={false}
                 />
                 <div
                   id="region-records"

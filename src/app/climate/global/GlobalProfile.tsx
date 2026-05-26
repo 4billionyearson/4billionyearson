@@ -685,7 +685,7 @@ export default function GlobalProfile({
                         ...(worldViewSignals.length > 0 && { supplementalHudMetrics: worldViewSignals }),
                       });
                     }
-                    return <GlobalHelixCard tabs={tabs} provisionalAfterMonth={pageSnapshotCut} />;
+                    return <GlobalHelixCard tabs={tabs} provisionalAfterMonth={pageSnapshotCut} hideUpdateLink={true} />;
                   })()}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {data.landOceanMonthlyAll && data.landOceanMonthlyAll.length > 0 && (

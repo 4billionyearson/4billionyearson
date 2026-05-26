@@ -1059,6 +1059,7 @@ export default function ClimateProfile({
                               share={{ pageUrl: `https://4billionyearson.org/climate/helix?region=${encodeURIComponent(slug)}`, sectionId: 'climate-spiral' }}
                               showEnso={shouldFeatureEnso(region)}
                               seasonScheme={seasonScheme}
+                              hideUpdateLink={true}
                             />
                           );
                         })() : null}

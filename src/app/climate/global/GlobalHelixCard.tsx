@@ -29,9 +29,11 @@ export interface HelixSeriesTab {
 export default function GlobalHelixCard({
   tabs,
   provisionalAfterMonth,
+  hideUpdateLink = false,
 }: {
   tabs: HelixSeriesTab[];
   provisionalAfterMonth?: { year: number; month: number } | null;
+  hideUpdateLink?: boolean;
 }) {
   const [activeKey, setActiveKey] = useState(tabs[0]?.key ?? '');
   const active = useMemo(() => tabs.find((t) => t.key === activeKey) ?? tabs[0], [tabs, activeKey]);
@@ -97,6 +99,7 @@ export default function GlobalHelixCard({
       tempScaleMode="auto"
       supplementalHudMetrics={active.supplementalHudMetrics}
       orbitalOverlay={active.orbitalOverlay}
+      hideUpdateLink={hideUpdateLink}
     />
   );
 }

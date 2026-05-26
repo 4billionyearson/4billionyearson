@@ -562,6 +562,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
                 share={{ pageUrl: `https://4billionyearson.org/climate/helix?region=${encodeURIComponent(region.slug)}`, sectionId: 'climate-spiral' }}
                 seasonScheme={scheme}
                 showEnso={shouldFeatureEnso(region)}
+                hideUpdateLink={true}
               />
             );
           })()}
@@ -804,6 +805,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
             share={{ pageUrl: `https://4billionyearson.org/climate/helix?region=${encodeURIComponent(region.slug)}`, sectionId: 'climate-spiral' }}
             seasonScheme={detectSeasonScheme({ tempMonthly: tavg.monthlyAll, precipMonthly: pcp?.monthlyAll })}
             showEnso={shouldFeatureEnso(region)}
+            hideUpdateLink={true}
           />
           <MonthlySpaghettiCard
             series={{ temp: tavg.monthlyAll, precip: pcp?.monthlyAll }}
