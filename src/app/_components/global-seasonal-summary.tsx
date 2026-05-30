@@ -92,7 +92,12 @@ type WetCohort = {
   count: number;
   baselineDoy: number;
   recentDoy: number;
+  /** Mean end DOYs across the cohort (75% crossing). Null when the
+   *  prebuilt data didn't include end DOYs for enough regions. */
+  baselineEndDoy: number | null;
+  recentEndDoy: number | null;
   meanShiftDays: number;
+  meanEndShiftDays: number | null;
   meanRainPct: number;
 };
 
@@ -181,6 +186,21 @@ export default function GlobalSeasonalSummary({
       const bDoy = circularMeanDoy(rows.map((r) => r.rain!.wetSeasonOnsetDoyBaseline as number));
       const rDoy = circularMeanDoy(rows.map((r) => r.rain!.wetSeasonOnsetDoyRecent as number));
       if (bDoy === null || rDoy === null) return null;
+      // Wet-season end DOYs (75% crossing). Only include rows that have both
+      // values so the circular mean is well-defined.
+      const endRows = rows.filter(
+        (r) => r.rain!.wetSeasonEndDoyBaseline !== null && r.rain!.wetSeasonEndDoyBaseline !== undefined
+            && r.rain!.wetSeasonEndDoyRecent !== null && r.rain!.wetSeasonEndDoyRecent !== undefined,
+      );
+      const bEnd = endRows.length
+        ? circularMeanDoy(endRows.map((r) => r.rain!.wetSeasonEndDoyBaseline as number))
+        : null;
+      const rEnd = endRows.length
+        ? circularMeanDoy(endRows.map((r) => r.rain!.wetSeasonEndDoyRecent as number))
+        : null;
+      const meanEndShift = endRows.length
+        ? meanOf(endRows.map((r) => r.rain!.wetSeasonEndShiftDays))
+        : null;
       return {
         key: label,
         label,
@@ -188,7 +208,10 @@ export default function GlobalSeasonalSummary({
         count: rows.length,
         baselineDoy: bDoy,
         recentDoy: rDoy,
+        baselineEndDoy: bEnd,
+        recentEndDoy: rEnd,
         meanShiftDays: meanOf(rows.map((r) => r.rain!.wetSeasonOnsetShiftDays)) ?? 0,
+        meanEndShiftDays: meanEndShift,
         meanRainPct: meanOf(rows.map((r) => r.rain!.annualTotalShiftPct)) ?? 0,
       };
     }
@@ -272,12 +295,46 @@ export default function GlobalSeasonalSummary({
   }
 
   function wetToRow(w: WetCohort): TimelineRow {
+    const hasSpan = w.baselineEndDoy !== null && w.recentEndDoy !== null;
+    const ONSET_HUE = '#7DD3FC';
+    const END_HUE = '#FBBF24';
+    const onsetText = `${fmtShift(w.meanShiftDays)} onset`;
+    const endText = w.meanEndShiftDays === null ? null : `${fmtShift(w.meanEndShiftDays)} end`;
+    const rainText = `${w.meanRainPct > 0 ? '+' : ''}${w.meanRainPct.toFixed(1)}% rain`;
+    const delta = (
+      <>
+        <span style={{ color: ONSET_HUE }}>{onsetText}</span>
+        {endText && (
+          <>
+            <span className="text-gray-500">·</span>
+            <span style={{ color: END_HUE }}>{endText}</span>
+          </>
+        )}
+        <span className="text-gray-500">·</span>
+        <span>{rainText}</span>
+      </>
+    );
+    if (hasSpan) {
+      return {
+        kind: 'bar',
+        key: w.key,
+        title: w.label,
+        sub: `${w.count} regions · ${doyToLabel(w.baselineDoy)} → ${doyToLabel(w.baselineEndDoy!)}`,
+        delta,
+        deltaColor: w.color,
+        recentColor: w.color,
+        baselineSpringDoy: w.baselineDoy,
+        baselineAutumnDoy: w.baselineEndDoy!,
+        recentSpringDoy: w.recentDoy,
+        recentAutumnDoy: w.recentEndDoy!,
+      };
+    }
     return {
       kind: 'point',
       key: w.key,
       title: w.label,
       sub: `${w.count} regions · onset ${doyToLabel(w.baselineDoy)} → ${doyToLabel(w.recentDoy)}`,
-      delta: `${fmtShift(w.meanShiftDays)} onset · ${w.meanRainPct > 0 ? '+' : ''}${w.meanRainPct.toFixed(1)}% annual rainfall`,
+      delta,
       deltaColor: w.color,
       color: w.color,
       baselineDoy: w.baselineDoy,
@@ -291,7 +348,7 @@ export default function GlobalSeasonalSummary({
     ...hemiRows.map(warmToRow),
     { kind: 'header', key: 'h2', label: 'By Köppen climate zone', accent: '#A3E635' },
     ...koppenWarmRows.map(warmToRow),
-    ...(wetRows.length > 0 ? [{ kind: 'header' as const, key: 'h2b', label: 'Wet-season onset shift', accent: '#38BDF8' }] : []),
+    ...(wetRows.length > 0 ? [{ kind: 'header' as const, key: 'h2b', label: 'Wet-season shift (onset → end)', accent: '#38BDF8' }] : []),
     ...wetRows.map(wetToRow),
   ];
 

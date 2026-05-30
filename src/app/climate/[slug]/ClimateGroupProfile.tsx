@@ -573,7 +573,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             embedSlug={region.slug}
             share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'monthly-history' }}
           />
-          <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+          <div id="climate-records" className="bg-gray-950/90 backdrop-blur-md p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
             <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
               <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
               <span className="min-w-0 flex-1">Records – {region.name}</span>
@@ -814,7 +814,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
             embedSlug={region.slug}
             share={{ pageUrl: `https://4billionyearson.org/climate/${region.slug}`, sectionId: 'monthly-history' }}
           />
-          <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+          <div id="climate-records" className="bg-gray-950/90 backdrop-blur-md p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
             <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
               <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
               <span className="min-w-0 flex-1">Records – {region.name}</span>

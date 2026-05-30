@@ -106,17 +106,12 @@ export default function HelixClientSection({
   const [regionError, setRegionError] = useState<string | null>(null);
   const autoLoadedRef = useRef(false);
 
-  const handleRegionSelect = useCallback(async (region: ClimateRegion) => {
+  // ── Internal: update React state only, no history side-effects ──
+  const loadRegion = useCallback(async (region: ClimateRegion) => {
     setSelectedRegion(region);
     setRegionData(null);
     setRegionError(null);
     setRegionLoading(true);
-
-    // Reflect the selected region in the URL without navigation
-    const url = new URL(window.location.href);
-    url.searchParams.set('region', region.slug);
-    window.history.replaceState(null, '', url.toString());
-
     const data = await fetchRegionHelixData(region);
     if (data) {
       setRegionData(data);
@@ -126,16 +121,26 @@ export default function HelixClientSection({
     setRegionLoading(false);
   }, []);
 
-  const handleClearRegion = useCallback(() => {
+  const clearRegion = useCallback(() => {
     setSelectedRegion(null);
     setRegionData(null);
     setRegionError(null);
+  }, []);
 
-    // Remove region param from URL
+  // ── Public: also push a history entry so back/forward works ──
+  const handleRegionSelect = useCallback(async (region: ClimateRegion) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('region', region.slug);
+    window.history.pushState(null, '', url.toString());
+    await loadRegion(region);
+  }, [loadRegion]);
+
+  const handleClearRegion = useCallback(() => {
     const url = new URL(window.location.href);
     url.searchParams.delete('region');
-    window.history.replaceState(null, '', url.toString());
-  }, []);
+    window.history.pushState(null, '', url.toString());
+    clearRegion();
+  }, [clearRegion]);
 
   // On mount, auto-select a region if ?region= is present in the URL
   useEffect(() => {
@@ -145,9 +150,25 @@ export default function HelixClientSection({
     const regionSlug = params.get('region');
     if (!regionSlug) return;
     const match = regions.find((r) => r.slug === regionSlug);
-    if (match) void handleRegionSelect(match);
+    if (match) void loadRegion(match); // state-only — URL already correct on mount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Handle browser back/forward navigation — re-sync the region from the URL
+  useEffect(() => {
+    const onPopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const regionSlug = params.get('region');
+      if (!regionSlug) {
+        clearRegion(); // URL already updated by browser — just reset state
+        return;
+      }
+      const match = regions.find((r) => r.slug === regionSlug);
+      if (match) void loadRegion(match); // URL already updated by browser — just load data
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [regions, loadRegion, clearRegion]);
 
   return (
     <>
@@ -225,7 +246,7 @@ export default function HelixClientSection({
                 />
                 <div
                   id="region-records"
-                  className="mt-6 bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24"
+                  className="mt-6 bg-gray-950/90 backdrop-blur-md p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24"
                 >
                   <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
                     <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
@@ -246,7 +267,7 @@ export default function HelixClientSection({
                 {globalRecordsSeries && (
                   <div
                     id="climate-records"
-                    className="mt-6 bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24"
+                    className="mt-6 bg-gray-950/90 backdrop-blur-md p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24"
                   >
                     <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
                       <Trophy className="h-5 w-5 shrink-0 text-amber-400" />

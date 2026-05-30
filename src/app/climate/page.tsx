@@ -82,7 +82,7 @@ export default async function ClimateProfilesIndex() {
   const usStates = CLIMATE_REGIONS.filter(r => r.type === 'us-state');
   const UK_NATION_API_CODES = new Set(['uk-eng', 'uk-wal', 'uk-sco', 'uk-ni']);
   const ukCountriesNations = CLIMATE_REGIONS.filter(r =>
-    (r.type === 'uk-region' && UK_NATION_API_CODES.has(r.apiCode)) || r.slug === 'ireland'
+    r.type === 'uk-region' && UK_NATION_API_CODES.has(r.apiCode)
   );
   const ukSubRegions = CLIMATE_REGIONS.filter(r =>
     r.type === 'uk-region' && !UK_NATION_API_CODES.has(r.apiCode)

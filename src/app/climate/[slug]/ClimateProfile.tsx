@@ -753,18 +753,62 @@ export default function ClimateProfile({
   // month with dashed/provisional points; tables and headings never do.
   const pageSnapshotMonth = (() => {
     if (!data) return null;
+    // If the server computed a preferred page snapshot month, use it
+    if ((data as any).pageSnapshotMonth) return (data as any).pageSnapshotMonth;
+    const preferTempLabel = (obj?: any) => {
+      if (!obj || typeof obj !== 'object') return null;
+
+      // Quick checks for common structured keys
+      const direct = obj?.varData?.Tmean?.latestMonthStats?.label
+        ?? obj?.varData?.tmean?.latestMonthStats?.label
+        ?? obj?.paramData?.tavg?.latestMonthStats?.label
+        ?? obj?.paramData?.Tmean?.latestMonthStats?.label;
+      if (direct) return direct;
+
+      // If the object itself has latestMonthStats at top-level, prefer that
+      if (obj?.latestMonthStats?.label) return obj.latestMonthStats.label;
+
+      // Otherwise scan child objects: prefer any child that contains a
+      // temperature-style series (has `recentTemp` in its monthlyComparison)
+      for (const k of Object.keys(obj)) {
+        const child = obj[k];
+        if (child && typeof child === 'object') {
+          if (Array.isArray(child?.monthlyComparison) && child.monthlyComparison.length > 0) {
+            const sample = child.monthlyComparison[child.monthlyComparison.length - 1];
+            if (sample && Object.prototype.hasOwnProperty.call(sample, 'recentTemp')) {
+              const lbl = child.latestMonthStats?.label ?? null;
+              if (lbl) return lbl;
+            }
+          }
+        }
+      }
+
+      // Fallback: any child with latestMonthStats
+      for (const k of Object.keys(obj)) {
+        const child = obj[k];
+        if (child && typeof child === 'object') {
+          const lbl = child.latestMonthStats?.label ?? null;
+          if (lbl) return lbl;
+        }
+      }
+
+      return null;
+    };
+
     const localLabel =
-      data.ukRegionData?.varData?.Tmean?.latestMonthStats?.label
-      ?? data.usStateData?.paramData?.tavg?.latestMonthStats?.label
-      ?? data.countryData?.latestMonthStats?.label;
-    const nationalLbl =
-      data.nationalData?.varData?.Tmean?.latestMonthStats?.label
-      ?? data.nationalData?.paramData?.tavg?.latestMonthStats?.label;
+      preferTempLabel(data?.ukRegionData)
+      ?? preferTempLabel(data?.usStateData)
+      ?? preferTempLabel(data?.countryData);
+
+    const nationalLbl = preferTempLabel(data?.nationalData);
+
     const globalLabel =
       data.globalData?.noaaStats?.landOcean?.latestMonthStats?.label
       ?? data.globalData?.landLatestMonthStats?.label;
+
     return pickPageSnapshotMonth([localLabel, nationalLbl, globalLabel]);
   })();
+
   // Parsed form for chart "dash everything after this month" cutoff.
   const pageSnapshotCut = pageSnapshotMonth ? parseMonthLabel(pageSnapshotMonth) : null;
 
@@ -1036,7 +1080,7 @@ export default function ClimateProfile({
                   ? 'Data: Met Office UK Regional Series © Crown copyright'
                   : (data.usStateData || data.nationalData?.paramData)
                     ? 'Data: NOAA National Centers for Environmental Information'
-                    : 'Data: Our World in Data / NOAA (rainfall: World Bank CCKP / CRU TS 4.08)';
+                    : 'Data: Our World in Data / NOAA (rainfall: World Bank CCKP / CRU TS 4.08). Baseline: first 30 yrs on record.';
 
                 return (
                   <>
@@ -1072,7 +1116,7 @@ export default function ClimateProfile({
                           share={{ pageUrl: `https://4billionyearson.org/climate/${slug}`, sectionId: 'monthly-history' }}
                         />
                         {monthlyAll?.length ? (
-                          <div id="climate-records" className="bg-[#0b0e16] p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
+                          <div id="climate-records" className="bg-gray-950/90 backdrop-blur-md p-3 sm:p-5 rounded-2xl shadow-xl border-2 border-[#D0A65E] scroll-mt-24">
                             <h2 className="text-xl font-bold font-mono text-white mb-4 flex items-center gap-2">
                               <Trophy className="h-5 w-5 shrink-0 text-amber-400" />
                               <span className="min-w-0 flex-1">Records – {pageTitle}</span>

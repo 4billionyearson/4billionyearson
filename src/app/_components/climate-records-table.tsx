@@ -130,17 +130,16 @@ interface StatCardProps {
 function StatCard({ label, year, value, rankInfo, accentClass, accentHex, isCurrent = false, decimals, unit }: StatCardProps) {
   return (
     <div
-      className="rounded-xl border bg-gray-800/40 backdrop-blur-md px-4 py-3 flex flex-col gap-1 flex-1 overflow-hidden"
+      className="rounded-xl border bg-gray-800/40 backdrop-blur-md px-3 py-2 sm:px-4 sm:py-3 flex flex-col gap-1 flex-1 overflow-hidden"
       style={{ borderColor: `${accentHex}55` }}
     >
-      <div className="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-bold font-mono">{label}</div>
+      <div className="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-bold font-mono min-h-[2.5em]">{label}</div>
       {year !== undefined && (
         <div className={`font-mono text-3xl font-black tabular-nums leading-none ${accentClass}`} style={{ textShadow: `0 0 18px ${accentHex}55` }}>{year}</div>
       )}
       {isCurrent && rankInfo && (
-        <div className={`inline-flex items-baseline gap-1 whitespace-nowrap font-mono text-3xl font-black tabular-nums leading-none ${accentClass}`} style={{ textShadow: `0 0 18px ${accentHex}55` }}>
-          <span>#{rankInfo.rank}</span>
-          <span className="text-sm font-normal text-gray-500">of {rankInfo.total}</span>
+        <div className={`font-mono text-3xl font-black tabular-nums leading-none ${accentClass}`} style={{ textShadow: `0 0 18px ${accentHex}55` }}>
+          #{rankInfo.rank}<span className="text-base font-semibold text-gray-500 align-bottom">/{rankInfo.total}</span>
         </div>
       )}
       <div className="font-mono text-[15px] tabular-nums text-gray-200">{value.toFixed(decimals)}<span className="text-gray-500 text-xs ml-0.5">{unit}</span></div>

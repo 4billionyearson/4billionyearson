@@ -140,10 +140,10 @@ export default function HelixRegionPicker({
   const [mapError, setMapError] = useState<string | null>(null);
 
   const sections = useMemo(() => {
-    const countries = regions.filter((r) => r.type === 'country' && r.slug !== 'ireland');
+    const countries = regions.filter((r) => r.type === 'country');
     const usStates = regions.filter((r) => r.type === 'us-state');
     const ukCountries = regions.filter(
-      (r) => (r.type === 'uk-region' && UK_NATION_API_CODES.has(r.apiCode)) || r.slug === 'ireland',
+      (r) => r.type === 'uk-region' && UK_NATION_API_CODES.has(r.apiCode),
     );
     const ukRegions = regions.filter(
       (r) => r.type === 'uk-region' && !UK_NATION_API_CODES.has(r.apiCode),

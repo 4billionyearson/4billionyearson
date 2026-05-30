@@ -355,7 +355,15 @@ export default function ShiftingSeasonsPage() {
           Math.abs(a.rain?.wetSeasonOnsetShiftDays ?? 0),
       )
       .slice(0, 8);
-    return { spring, autumn, net, annualRainUp, annualRainDown, onsetShift };
+    const endShift = [...wetRegions]
+      .filter((r) => r.rain?.wetSeasonEndShiftDays !== null && r.rain?.wetSeasonEndShiftDays !== undefined)
+      .sort(
+        (a, b) =>
+          Math.abs(b.rain?.wetSeasonEndShiftDays ?? 0) -
+          Math.abs(a.rain?.wetSeasonEndShiftDays ?? 0),
+      )
+      .slice(0, 8);
+    return { spring, autumn, net, annualRainUp, annualRainDown, onsetShift, endShift };
   }, [globalShift]);
 
   /* Kyoto derived series */
@@ -568,17 +576,27 @@ export default function ShiftingSeasonsPage() {
                     <SubSection title="Where the Wet/Dry Rhythm Is Shifting Most (Köppen A + B Regions)">
                       <p className="text-[11px] text-gray-500 mb-2">
                         For tropical (A) and arid (B) climates the rains define
-                        the year. Onset shift (when the wet season now starts
-                        vs baseline) and annual-total change are the signals
-                        that matter most for agriculture.
+                        the year. Onset (25% of annual rain) and end (75%)
+                        shifts together describe whether the wet window is
+                        moving, lengthening or shrinking; annual-total change
+                        is the signal that matters most for agriculture.
                       </p>
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid md:grid-cols-3 gap-4">
                         <Leaderboard
                           title="Biggest Wet-Season Onset Shift"
                           accent="text-sky-300"
                           rows={leaderboards.onsetShift}
                           format={(r) => {
                             const d = r.rain?.wetSeasonOnsetShiftDays ?? 0;
+                            return `${d > 0 ? '+' : ''}${d.toFixed(0)} d`;
+                          }}
+                        />
+                        <Leaderboard
+                          title="Biggest Wet-Season End Shift"
+                          accent="text-amber-300"
+                          rows={leaderboards.endShift}
+                          format={(r) => {
+                            const d = r.rain?.wetSeasonEndShiftDays ?? 0;
                             return `${d > 0 ? '+' : ''}${d.toFixed(0)} d`;
                           }}
                         />

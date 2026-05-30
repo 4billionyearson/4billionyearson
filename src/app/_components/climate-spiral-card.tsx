@@ -6,7 +6,7 @@ import type { MonthlyPoint, SpaghettiMetric } from './monthly-spaghetti-chart';
 import { ChipDropdown } from './responsive-segmented-control';
 import ShareBar from '@/app/climate/enso/_components/ShareBar';
 import { DEFAULT_SCHEME, type SeasonScheme } from '@/lib/climate/season-scheme';
-import { analyseRainfall, WET_DRY_RATIO_THRESHOLD } from '@/lib/climate/shift-analysis';
+import { analyseRainfall, analyseTemperature, WET_DRY_RATIO_THRESHOLD } from '@/lib/climate/shift-analysis';
 
 /* ────────────────────────────────────────────────────────────────────────────
  * The 4BYO Climate Helix
@@ -139,24 +139,33 @@ function computeRainfallQuarterCrossings(values: number[]): { spring: number; au
   if (values.length !== 12 || values.some((value) => !Number.isFinite(value))) return null;
   const total = values.reduce((sum, value) => sum + value, 0);
   if (!(total > 0)) return null;
+  // Start from the driest month so the 25%/75% crossings land at the correct
+  // part of the year for both NH (dry ≈ Jan) and SH (dry ≈ Jun/Jul) regions.
+  // Without this, SH regions have onset detected in Feb (mid-wet) instead of Nov.
+  const dryStart = values.reduce((mi, v, i) => v < values[mi] ? i : mi, 0);
   const t25 = total * 0.25;
   const t75 = total * 0.75;
-  let onset = NaN;
-  let end = NaN;
+  let onset = NaN; // fractional month of 25% crossing = wet season onset
+  let end = NaN;   // fractional month of 75% crossing = wet season end
   let running = 0;
-  for (let monthIdx = 0; monthIdx < 12; monthIdx++) {
-    const next = running + values[monthIdx];
+  for (let step = 0; step < 12; step++) {
+    const m = (dryStart + step) % 12;
+    const next = running + values[m];
     if (!Number.isFinite(onset) && next >= t25) {
-      const frac = (t25 - running) / Math.max(values[monthIdx], 0.001);
-      onset = monthIdx + frac;
+      const frac = (t25 - running) / Math.max(values[m], 0.001);
+      onset = (dryStart + step + frac) % 12;
     }
     if (!Number.isFinite(end) && next >= t75) {
-      const frac = (t75 - running) / Math.max(values[monthIdx], 0.001);
-      end = monthIdx + frac;
+      const frac = (t75 - running) / Math.max(values[m], 0.001);
+      end = (dryStart + step + frac) % 12;
     }
     running = next;
   }
-  return Number.isFinite(onset) && Number.isFinite(end) ? { spring: onset, autumn: end } : null;
+  if (!Number.isFinite(onset) || !Number.isFinite(end)) return null;
+  // Always return spring = calendar-early crossing, autumn = calendar-late.
+  // NH: onset(May) < end(Sep) → spring=May, autumn=Sep.
+  // SH: onset(Nov) > end(Mar) → spring=Mar, autumn=Nov.
+  return onset <= end ? { spring: onset, autumn: end } : { spring: end, autumn: onset };
 }
 
 /** Major ENSO events through history — coarse "year → state/strength"
@@ -1265,12 +1274,48 @@ export default function ClimateSpiralCard({
     };
   }, [rainShiftAnalysis, wetSeasonMeta.isNH]);
 
+  // Single source of truth for the temperate (warm/cold) shift numbers — same
+  // 30-year-baseline-vs-last-10y windowing used by the Shifting Seasons section,
+  // so the Helix callout "Spr Start −X days" / "Aut End +X days" labels match
+  // the SeasonalShiftCard tiles exactly.
+  const tempShiftAnalysis = useMemo(() => {
+    const pts = series.temp;
+    return pts?.length ? analyseTemperature(pts) : null;
+  }, [series.temp]);
+
+  const tempShiftCalloutReference = useMemo(() => {
+    if (
+      !tempShiftAnalysis
+      || tempShiftAnalysis.temp.baselineSpringDoy === null
+      || tempShiftAnalysis.temp.baselineAutumnDoy === null
+      || tempShiftAnalysis.temp.recentSpringDoy === null
+      || tempShiftAnalysis.temp.recentAutumnDoy === null
+    ) {
+      return null;
+    }
+    const { temp, windows } = tempShiftAnalysis;
+    return {
+      baselineStart: doyToMonthCoord(temp.baselineSpringDoy!),
+      baselineEnd:   doyToMonthCoord(temp.baselineAutumnDoy!),
+      recentStart:   doyToMonthCoord(temp.recentSpringDoy!),
+      recentEnd:     doyToMonthCoord(temp.recentAutumnDoy!),
+      springShiftDays: temp.springShiftDays ?? 0,
+      autumnShiftDays: temp.autumnShiftDays ?? 0,
+      baselineLabel: formatYearWindowLabel(windows.baselineStart, windows.baselineEnd),
+      recentLabel:   formatYearWindowLabel(windows.recentStart,   windows.recentEnd),
+    };
+  }, [tempShiftAnalysis]);
+
   const wetSeasonSpan = useMemo(() => {
     if (wetSeasonCalloutReference) {
-      return {
-        wetStart: wetSeasonCalloutReference.recentStart,
-        wetEnd: wetSeasonCalloutReference.recentEnd,
-      };
+      const { recentStart, recentEnd } = wetSeasonCalloutReference;
+      // The callout reference stores positions in spring/autumn convention:
+      // recentStart = calendar-early (wet END for SH, e.g. Mar),
+      // recentEnd   = calendar-late  (wet START for SH, e.g. Nov).
+      // For the background wedge we need wetStart = actual onset position.
+      return wetSeasonMeta.isNH
+        ? { wetStart: recentStart, wetEnd: recentEnd }
+        : { wetStart: recentEnd, wetEnd: recentStart };
     }
     const latest = wetSeasonCrossingDecades[wetSeasonCrossingDecades.length - 1];
     if (latest) {
@@ -1294,7 +1339,14 @@ export default function ClimateSpiralCard({
   const activeShiftSystem: 'temperate' | 'wet-season' | null = (() => {
     if (shiftSystem === 'temperate') return hasTempShift ? 'temperate' : null;
     if (shiftSystem === 'wet-season') return hasWetShift ? 'wet-season' : null;
+    // Explicit wet-dry scheme always prefers wet-season.
     if (seasonScheme.isWetDry && hasWetShift) return 'wet-season';
+    // For auto mode when both systems have data, prefer whichever has more
+    // decades — prevents a jarring mid-playback wedge-colour flip for
+    // regions like Australia.
+    if (hasTempShift && hasWetShift) {
+      return wetSeasonCrossingDecades.length >= crossingDecades.length ? 'wet-season' : 'temperate';
+    }
     if (hasTempShift) return 'temperate';
     if (hasWetShift) return 'wet-season';
     return null;
@@ -1483,7 +1535,9 @@ export default function ClimateSpiralCard({
               const displayYear = playYear === currentYear && playMonth !== null
                 ? currentYear
                 : playYear !== null ? Math.max(effectiveFromYear, playYear) : currentYear;
-              const monthIdx = playYear === currentYear && playMonth !== null ? playMonth : null;
+              const monthIdx = playYear === currentYear && playMonth !== null
+                ? playMonth
+                : (playYear === null && latestRealMonthIdx >= 0 ? latestRealMonthIdx : null);
               const inMonthPhase = monthIdx !== null;
               // Count steps since the record: each year = 1 step, each month = 1 step.
               // In year phase: steps = displayYear - recordYear.
@@ -2403,18 +2457,55 @@ export default function ClimateSpiralCard({
                 const decades = activeShiftSystem === 'wet-season' ? wetSeasonCrossingDecades : crossingDecades;
                 if (decades.length < 2) return null;
                 const isWet = activeShiftSystem === 'wet-season';
-                const first = isWet && wetSeasonCalloutReference
-                  ? { spring: wetSeasonCalloutReference.baselineStart, autumn: wetSeasonCalloutReference.baselineEnd }
+                // Use SSoT (Shifting Seasons windows: 1941–70 / 2016–25)
+                // whenever the playhead is at the latest year, whether the
+                // animation is running, paused, or never started. As soon as
+                // the playhead drops below the latest year (step back, scrub,
+                // mid-playback), fall back to per-decade buckets so the
+                // callout follows the trail being built up year by year.
+                const atLatest = playYear === null || playYear >= currentYear;
+                const useStaticWet  =  isWet && wetSeasonCalloutReference && atLatest;
+                const useStaticTemp = !isWet && tempShiftCalloutReference && atLatest;
+                const first = useStaticWet
+                  ? { spring: wetSeasonCalloutReference!.baselineStart, autumn: wetSeasonCalloutReference!.baselineEnd }
+                  : useStaticTemp
+                  ? { spring: tempShiftCalloutReference!.baselineStart, autumn: tempShiftCalloutReference!.baselineEnd }
                   : decades[0];
-                const last = isWet && wetSeasonCalloutReference
-                  ? { spring: wetSeasonCalloutReference.recentStart, autumn: wetSeasonCalloutReference.recentEnd }
+                const last = useStaticWet
+                  ? { spring: wetSeasonCalloutReference!.recentStart, autumn: wetSeasonCalloutReference!.recentEnd }
+                  : useStaticTemp
+                  ? { spring: tempShiftCalloutReference!.recentStart, autumn: tempShiftCalloutReference!.recentEnd }
                   : decades[decades.length - 1];
-                const oldPeriodLabel = isWet && wetSeasonCalloutReference
-                  ? wetSeasonCalloutReference.baselineLabel
+                const oldPeriodLabel = useStaticWet
+                  ? wetSeasonCalloutReference!.baselineLabel
+                  : useStaticTemp
+                  ? tempShiftCalloutReference!.baselineLabel
                   : `${decades[0].decade}s`;
-                const newPeriodLabel = isWet && wetSeasonCalloutReference
-                  ? wetSeasonCalloutReference.recentLabel
+                const newPeriodLabel = useStaticWet
+                  ? wetSeasonCalloutReference!.recentLabel
+                  : useStaticTemp
+                  ? tempShiftCalloutReference!.recentLabel
                   : `${decades[decades.length - 1].decade}s`;
+                // Shift days (signed; positive = later, negative = earlier).
+                // At rest these come from analyseTemperature / analyseRainfall
+                // so the labels match the Shifting Seasons tiles to the day.
+                // For wet: the 'spring' position is the wet START in NH and
+                // the wet END in SH (and vice versa for 'autumn'), because
+                // wetSeasonCalloutReference swaps onset/end for SH wrap.
+                const springShiftDays = useStaticWet
+                  ? (wetSeasonMeta.isNH
+                      ? (rainShiftAnalysis?.wetSeasonOnsetShiftDays ?? 0)
+                      : (rainShiftAnalysis?.wetSeasonEndShiftDays ?? 0))
+                  : useStaticTemp
+                  ? tempShiftCalloutReference!.springShiftDays
+                  : (last.spring - first.spring) * DAYS_PER_MONTH;
+                const autumnShiftDays = useStaticWet
+                  ? (wetSeasonMeta.isNH
+                      ? (rainShiftAnalysis?.wetSeasonEndShiftDays ?? 0)
+                      : (rainShiftAnalysis?.wetSeasonOnsetShiftDays ?? 0))
+                  : useStaticTemp
+                  ? tempShiftCalloutReference!.autumnShiftDays
+                  : (last.autumn - first.autumn) * DAYS_PER_MONTH;
                 const isWrappingWetSeason = isWet && !wetSeasonMeta.isNH;
                 const TINY_SHIFT_DAYS = 3;
                 const r10 = R_OUTER;
@@ -2428,7 +2519,7 @@ export default function ClimateSpiralCard({
                   header: string,
                   oldAng: number,
                   newAng: number,
-                  shiftMonths: number,
+                  shiftDays: number,
                 ) => {
                   const newCol = isWet
                     ? (key === 'spring' ? '#60A5FA' : '#3B82F6')
@@ -2436,13 +2527,10 @@ export default function ClimateSpiralCard({
                   const oldCol = isWet
                     ? (key === 'spring' ? '#1E40AF' : '#1D4ED8')
                     : (key === 'spring' ? '#5DB585' : '#C47A35');
-                  const days = Math.round(Math.abs(shiftMonths) * DAYS_PER_MONTH);
-                  const direction = header.includes('Start')
-                    ? (shiftMonths > 0 ? 'earlier' : 'later')
-                    : (shiftMonths > 0 ? 'later' : 'earlier');
+                  const days = Math.round(Math.abs(shiftDays));
                   const signedDays = days === 0
                     ? '~0 days'
-                    : `${direction === 'earlier' ? '−' : '+'}${days} days`;
+                    : `${shiftDays < 0 ? '−' : '+'}${days} days`;
                   let delta = newAng - oldAng;
                   while (delta > Math.PI) delta -= 2 * Math.PI;
                   while (delta < -Math.PI) delta += 2 * Math.PI;
@@ -2515,13 +2603,13 @@ export default function ClimateSpiralCard({
                   <g transform={tilt3D} pointerEvents="none">
                     {isWrappingWetSeason ? (
                       <>
-                        {renderGroup('autumn', 'Wet Start', monthAngle(first.autumn), monthAngle(last.autumn), first.autumn - last.autumn)}
-                        {renderGroup('spring', 'Wet End', monthAngle(first.spring), monthAngle(last.spring), last.spring - first.spring)}
+                        {renderGroup('autumn', 'Wet Start', monthAngle(first.autumn), monthAngle(last.autumn), autumnShiftDays)}
+                        {renderGroup('spring', 'Wet End',   monthAngle(first.spring), monthAngle(last.spring), springShiftDays)}
                       </>
                     ) : (
                       <>
-                        {renderGroup('spring', isWet ? 'Wet Start' : 'Spr Start', monthAngle(first.spring), monthAngle(last.spring), first.spring - last.spring)}
-                        {renderGroup('autumn', isWet ? 'Wet End' : 'Aut End', monthAngle(first.autumn), monthAngle(last.autumn), last.autumn - first.autumn)}
+                        {renderGroup('spring', isWet ? 'Wet Start' : 'Spr Start', monthAngle(first.spring), monthAngle(last.spring), springShiftDays)}
+                        {renderGroup('autumn', isWet ? 'Wet End'   : 'Aut End',   monthAngle(first.autumn), monthAngle(last.autumn), autumnShiftDays)}
                       </>
                     )}
                   </g>
@@ -2747,10 +2835,9 @@ export default function ClimateSpiralCard({
               </div>
             )}
             {!seasonScheme.isAseasonal && showSeasons && hasTempShift && hasWetShift && (() => {
+              // Mirror activeShiftSystem so the highlighted button always matches the chart.
               const effectiveSystem: 'temperate' | 'wet-season' =
-                shiftSystem === 'auto'
-                  ? (seasonScheme.isWetDry ? 'wet-season' : 'temperate')
-                  : shiftSystem;
+                shiftSystem !== 'auto' ? shiftSystem : (activeShiftSystem ?? 'temperate');
               const segBase = 'inline-flex h-6 items-center gap-1 px-2 text-[11px] font-medium transition-colors hover:bg-white/[0.04]';
               return (
                 <div
@@ -2792,7 +2879,7 @@ export default function ClimateSpiralCard({
                         border: `1px solid ${effectiveSystem === 'wet-season' ? '#3B82F6' : '#4B5563'}`,
                       }}
                     />
-                    <span className="leading-none whitespace-nowrap">Wet&nbsp;season</span>
+                    <span className="leading-none whitespace-nowrap">Wet&nbsp;Season</span>
                   </button>
                 </div>
               );
@@ -2819,10 +2906,9 @@ export default function ClimateSpiralCard({
               </div>
               <div className="flex items-center gap-2">
                 {!seasonScheme.isAseasonal && showSeasons && hasTempShift && hasWetShift && (() => {
+                  // Mirror activeShiftSystem so the highlighted button always matches the chart.
                   const effectiveSystem: 'temperate' | 'wet-season' =
-                    shiftSystem === 'auto'
-                      ? (seasonScheme.isWetDry ? 'wet-season' : 'temperate')
-                      : shiftSystem;
+                    shiftSystem !== 'auto' ? shiftSystem : (activeShiftSystem ?? 'temperate');
                   const segBase = 'inline-flex h-6 items-center gap-1 px-2 text-[11px] font-medium transition-colors hover:bg-white/[0.04]';
                   return (
                     <div
@@ -2864,7 +2950,7 @@ export default function ClimateSpiralCard({
                             border: `1px solid ${effectiveSystem === 'wet-season' ? '#3B82F6' : '#4B5563'}`,
                           }}
                         />
-                        <span className="leading-none whitespace-nowrap">Wet&nbsp;season</span>
+                        <span className="leading-none whitespace-nowrap">Wet&nbsp;Season</span>
                       </button>
                     </div>
                   );
@@ -2901,7 +2987,9 @@ export default function ClimateSpiralCard({
             const displayYear = playYear === currentYear && playMonth !== null
               ? currentYear
               : playYear !== null ? Math.max(effectiveFromYear, playYear) : currentYear;
-            const monthIdx = playYear === currentYear && playMonth !== null ? playMonth : null;
+            const monthIdx = playYear === currentYear && playMonth !== null
+              ? playMonth
+              : (playYear === null && latestRealMonthIdx >= 0 ? latestRealMonthIdx : null);
             const fmt = (v: number, dp = 1) => v.toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp });
             const enso = ensoForYear(displayYear);
             const liveOni = oniByYear.get(displayYear);
@@ -3684,7 +3772,7 @@ export default function ClimateSpiralCard({
         if (hideUpdateLink) {
           // Only show the share bar, right-aligned
           return (
-            <div className="mt-3 flex items-baseline justify-end gap-3 flex-wrap">
+            <div className="flex items-baseline justify-end gap-3 flex-wrap">
               <ShareBar
                 pageUrl={`${share.pageUrl}#${share.sectionId}`}
                 shareText={encodeURIComponent(`${title} - live data on 4 Billion Years On`)}
@@ -3698,7 +3786,7 @@ export default function ClimateSpiralCard({
         }
         // Default: show share left, link right
         return (
-          <div className="mt-3 flex items-baseline justify-between gap-3 flex-wrap">
+          <div className="flex items-baseline justify-between gap-3 flex-wrap">
             <ShareBar
               pageUrl={`${share.pageUrl}#${share.sectionId}`}
               shareText={encodeURIComponent(`${title} - live data on 4 Billion Years On`)}

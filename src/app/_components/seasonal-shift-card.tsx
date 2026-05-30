@@ -201,37 +201,52 @@ export default function SeasonalShiftCard({
         wetDryRatio={rain?.wetDryRatio}
       />
 
-      {hasTempSeasons &&
-        temp.baselineSpringDoy !== null &&
-        temp.recentSpringDoy !== null &&
-        temp.baselineAutumnDoy !== null &&
-        temp.recentAutumnDoy !== null && (
-          <WarmSeasonShiftBar
-            baselineSpringDoy={temp.baselineSpringDoy}
-            recentSpringDoy={temp.recentSpringDoy}
-            baselineAutumnDoy={temp.baselineAutumnDoy}
-            recentAutumnDoy={temp.recentAutumnDoy}
-            baselineLabel={`${baselineStart}–${baselineEnd}`}
-            recentLabel={`${recentStart}–${recentEnd}`}
-            springShiftDays={temp.springShiftDays ?? 0}
-            autumnShiftDays={temp.autumnShiftDays ?? 0}
-          />
-        )}
+      {(hasTempSeasons || hasWetDry) && (
+        <div
+          className={
+            hasTempSeasons && hasWetDry
+              ? 'grid md:grid-cols-2 gap-3'
+              : 'block'
+          }
+        >
+          {hasTempSeasons &&
+            temp.baselineSpringDoy !== null &&
+            temp.recentSpringDoy !== null &&
+            temp.baselineAutumnDoy !== null &&
+            temp.recentAutumnDoy !== null && (
+              <WarmSeasonShiftBar
+                baselineSpringDoy={temp.baselineSpringDoy}
+                recentSpringDoy={temp.recentSpringDoy}
+                baselineAutumnDoy={temp.baselineAutumnDoy}
+                recentAutumnDoy={temp.recentAutumnDoy}
+                baselineLabel={`${baselineStart}–${baselineEnd}`}
+                recentLabel={`${recentStart}–${recentEnd}`}
+                springShiftDays={temp.springShiftDays ?? 0}
+                autumnShiftDays={temp.autumnShiftDays ?? 0}
+              />
+            )}
 
-      {hasWetDry && rain &&
-        rain.wetSeasonOnsetDoyBaseline !== null &&
-        rain.wetSeasonOnsetDoyRecent !== null && (
-          <WetSeasonShiftBar
-            baselineDoy={rain.wetSeasonOnsetDoyBaseline}
-            recentDoy={rain.wetSeasonOnsetDoyRecent}
-            shiftDays={rain.wetSeasonOnsetShiftDays ?? 0}
-            annualRainPct={rain.annualTotalShiftPct}
-          />
-        )}
+          {hasWetDry && rain &&
+            rain.wetSeasonOnsetDoyBaseline !== null &&
+            rain.wetSeasonOnsetDoyRecent !== null && (
+              <WetSeasonShiftBar
+                baselineOnsetDoy={rain.wetSeasonOnsetDoyBaseline}
+                recentOnsetDoy={rain.wetSeasonOnsetDoyRecent}
+                baselineEndDoy={rain.wetSeasonEndDoyBaseline}
+                recentEndDoy={rain.wetSeasonEndDoyRecent}
+                onsetShiftDays={rain.wetSeasonOnsetShiftDays ?? 0}
+                endShiftDays={rain.wetSeasonEndShiftDays ?? 0}
+                baselineLabel={`${baselineStart}–${baselineEnd}`}
+                recentLabel={`${recentStart}–${recentEnd}`}
+                annualRainPct={rain.annualTotalShiftPct}
+              />
+            )}
+        </div>
+      )}
 
       <div className="flex gap-2 text-xs flex-wrap mt-4 mb-2">
         <TabButton active={effectiveView === 'monthly'} onClick={() => setView('monthly')}>
-          Month-by-month
+          Month-by-Month
         </TabButton>
         {hasTempSeasons && (
           <TabButton active={effectiveView === 'length'} onClick={() => setView('length')}>
@@ -240,7 +255,7 @@ export default function SeasonalShiftCard({
         )}
         {hasWetDry && (
           <TabButton active={effectiveView === 'wet-season'} onClick={() => setView('wet-season')}>
-            Wet / dry season
+            Wet / Dry Season
           </TabButton>
         )}
         {rain && !hasWetDry && (
@@ -256,7 +271,7 @@ export default function SeasonalShiftCard({
       </div>
 
       {hasWetDry && rain && effectiveView === 'wet-season' && (
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mb-4">
           <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-2.5">
             <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono mb-1">Wet-season onset</div>
             <div className="flex items-baseline justify-between gap-2 flex-wrap">
@@ -292,6 +307,42 @@ export default function SeasonalShiftCard({
               )}
             </div>
             <div className="text-[10px] text-gray-500 mt-1">When 25% of annual rain has fallen</div>
+          </div>
+          <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-2.5">
+            <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono mb-1">Wet-season end</div>
+            <div className="flex items-baseline justify-between gap-2 flex-wrap">
+              <div className="text-sm text-gray-300">
+                {rain.wetSeasonEndDoyBaseline !== null ? (
+                  <>
+                    <span className="text-gray-500">{doyToLabel(rain.wetSeasonEndDoyBaseline)}</span>
+                    <span className="mx-1 text-gray-600">→</span>
+                    <span className="text-[#FFF5E7] font-mono font-bold">
+                      {doyToLabel(rain.wetSeasonEndDoyRecent ?? rain.wetSeasonEndDoyBaseline)}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-gray-500">n/a</span>
+                )}
+              </div>
+              {rain.wetSeasonEndShiftDays !== null && (
+                <div
+                  className={`text-sm font-mono font-bold ${
+                    rain.wetSeasonEndShiftDays > 1
+                      ? 'text-sky-300'
+                      : rain.wetSeasonEndShiftDays < -1
+                      ? 'text-amber-300'
+                      : 'text-gray-300'
+                  }`}
+                >
+                  {rain.wetSeasonEndShiftDays > 0
+                    ? `${rain.wetSeasonEndShiftDays.toFixed(0)} days later`
+                    : rain.wetSeasonEndShiftDays < 0
+                    ? `${Math.abs(rain.wetSeasonEndShiftDays).toFixed(0)} days earlier`
+                    : 'no change'}
+                </div>
+              )}
+            </div>
+            <div className="text-[10px] text-gray-500 mt-1">When 75% of annual rain has fallen</div>
           </div>
           <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-2.5">
             <div className="text-[11px] uppercase tracking-wider text-gray-500 font-mono mb-1">Peak-rain month</div>
@@ -640,7 +691,7 @@ function WarmSeasonShiftBar({
           {deltaDays > 0 ? `+${deltaDays} days longer summer` : deltaDays < 0 ? `${Math.abs(deltaDays)} days shorter summer` : 'no change'}
         </div>
       </div>
-      <CalendarTimeline rows={rows} labelColPx={150} />
+      <CalendarTimeline rows={rows} labelColPx={210} stacked />
       {(springText || autumnText) && (
         <div className="mt-2 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-xs font-mono">
           {springText && (
@@ -656,40 +707,82 @@ function WarmSeasonShiftBar({
 }
 
 function WetSeasonShiftBar({
-  baselineDoy,
-  recentDoy,
-  shiftDays,
+  baselineOnsetDoy,
+  recentOnsetDoy,
+  baselineEndDoy,
+  recentEndDoy,
+  onsetShiftDays,
+  endShiftDays,
+  baselineLabel,
+  recentLabel,
   annualRainPct,
 }: {
-  baselineDoy: number;
-  recentDoy: number;
-  shiftDays: number;
+  baselineOnsetDoy: number;
+  recentOnsetDoy: number;
+  baselineEndDoy: number | null;
+  recentEndDoy: number | null;
+  onsetShiftDays: number;
+  endShiftDays: number;
+  baselineLabel: string;
+  recentLabel: string;
   annualRainPct: number;
 }) {
-  // Directional flip keyed to the wet-season palette:
-  // earlier = #7DD3FC (matches the "Now:" pill), later = amber, no change = gray.
-  const shiftColor = shiftDays > 1 ? '#FBBF24' : shiftDays < -1 ? '#7DD3FC' : '#9CA3AF';
-  const WET_BLUE = '#7DD3FC';
-  const rows: TimelineRow[] = [
-    {
-      kind: 'point',
-      key: 'wet',
-      title: 'Wet-season onset',
-      sub: `Baseline: ${doyToLabel(baselineDoy)} · 25% of annual rain`,
-      delta: `Now: ${doyToLabel(recentDoy)}`,
-      deltaColor: WET_BLUE,
-      color: '#38BDF8',
-      baselineDoy,
-      recentDoy,
-      pointStyle: 'wet',
-    },
-  ];
-  const onsetText = shiftDays === 0
-    ? 'no change'
-    : shiftDays > 0
-      ? `${Math.round(shiftDays)} days later`
-      : `${Math.abs(Math.round(shiftDays))} days earlier`;
+  // Length helper - wet season can wrap the year (e.g. SH Nov→Mar).
+  const lenOf = (start: number, end: number) =>
+    start > end ? 365 - start + end : end - start;
+  const hasSpan =
+    baselineEndDoy !== null && recentEndDoy !== null;
+  const baselineLen = hasSpan ? lenOf(baselineOnsetDoy, baselineEndDoy!) : 0;
+  const recentLen = hasSpan ? lenOf(recentOnsetDoy, recentEndDoy!) : 0;
+  const deltaDays = hasSpan ? Math.round(recentLen - baselineLen) : 0;
+  const lengthColor = deltaDays > 0 ? '#7DD3FC' : deltaDays < 0 ? '#FBBF24' : '#9CA3AF';
+
+  // Per-edge colours: onset = sky (rain arriving), end = amber (drying out).
+  const ONSET_HUE = '#7DD3FC';
+  const END_HUE = '#FBBF24';
+  const onsetText = onsetShiftDays === 0
+    ? null
+    : onsetShiftDays < 0
+      ? `Onset ${Math.abs(Math.round(onsetShiftDays))} days earlier`
+      : `Onset ${Math.round(onsetShiftDays)} days later`;
+  const endText = endShiftDays === 0
+    ? null
+    : endShiftDays > 0
+      ? `End ${Math.round(endShiftDays)} days later`
+      : `End ${Math.abs(Math.round(endShiftDays))} days earlier`;
   const rainText = `${annualRainPct > 0 ? '+' : ''}${annualRainPct.toFixed(1)}% annual rain`;
+
+  const rows: TimelineRow[] = hasSpan
+    ? [
+        {
+          kind: 'bar',
+          key: 'wet',
+          title: 'Wet season',
+          sub: `${baselineLabel} baseline: ${doyToLabel(baselineOnsetDoy)} → ${doyToLabel(baselineEndDoy!)} · ${Math.round(baselineLen)} days`,
+          delta: `${recentLabel} now: ${doyToLabel(recentOnsetDoy)} → ${doyToLabel(recentEndDoy!)} · ${Math.round(recentLen)} days`,
+          deltaColor: '#BAE6FD',
+          recentColor: '#38BDF8',
+          baselineSpringDoy: baselineOnsetDoy,
+          baselineAutumnDoy: baselineEndDoy!,
+          recentSpringDoy: recentOnsetDoy,
+          recentAutumnDoy: recentEndDoy!,
+        },
+      ]
+    : [
+        {
+          kind: 'point',
+          key: 'wet',
+          title: 'Wet-season onset',
+          sub: `${baselineLabel} baseline: ${doyToLabel(baselineOnsetDoy)} · 25% of annual rain`,
+          delta: `${recentLabel} now: ${doyToLabel(recentOnsetDoy)}`,
+          deltaColor: ONSET_HUE,
+          color: '#38BDF8',
+          baselineDoy: baselineOnsetDoy,
+          recentDoy: recentOnsetDoy,
+          pointStyle: 'wet',
+        },
+      ];
+
   return (
     <div className="bg-gray-800/60 border border-gray-700/50 rounded-lg p-3 mb-4">
       <div className="flex items-baseline justify-between gap-2 flex-wrap mb-3">
@@ -698,12 +791,24 @@ function WetSeasonShiftBar({
           Shifting wet season
           <span className="text-gray-500 normal-case font-normal tracking-normal">(rain timing &amp; total)</span>
         </div>
-        <div className="text-sm font-mono font-bold" style={{ color: shiftColor }}>
-          {onsetText}
-        </div>
+        {hasSpan && (
+          <div className="text-sm font-mono font-bold" style={{ color: lengthColor }}>
+            {deltaDays > 0
+              ? `+${deltaDays} days longer wet season`
+              : deltaDays < 0
+                ? `${Math.abs(deltaDays)} days shorter wet season`
+                : 'no change'}
+          </div>
+        )}
       </div>
-      <CalendarTimeline rows={rows} labelColPx={150} />
-      <div className="mt-2 text-xs font-mono text-center" style={{ color: shiftColor }}>
+      <CalendarTimeline rows={rows} labelColPx={210} stacked />
+      {(onsetText || endText) && (
+        <div className="mt-2 flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-xs font-mono">
+          {onsetText && <span style={{ color: ONSET_HUE }}>{onsetText}</span>}
+          {endText && <span style={{ color: END_HUE }}>{endText}</span>}
+        </div>
+      )}
+      <div className="mt-1 text-xs font-mono text-center text-gray-400">
         {rainText}
       </div>
     </div>

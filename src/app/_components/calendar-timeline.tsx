@@ -203,7 +203,7 @@ function RowLabel({
   return (
     <div className="cal-row-label flex flex-col justify-center min-w-0">
       <div className="text-sm font-mono font-medium text-gray-100 leading-snug">{title}</div>
-      {sub && <div className="text-[11px] text-gray-500 mt-0.5 leading-snug whitespace-nowrap">{sub}</div>}
+      {sub && <div className="text-[11px] text-gray-500 mt-0.5 leading-snug break-words">{sub}</div>}
       {delta && (
         <div className="mt-1.5 min-w-0">
           <span
@@ -634,27 +634,39 @@ function TrackBackdrop() {
 /* ───────────────────────── Month axis ───────────────────────── */
 
 function MonthAxisRow() {
+  // Tick + label at start-of-month (cumulative DOY / 365), matching
+  // doyToFrac() so bars line up with the conventional reading of the axis
+  // (e.g. the "Apr" label marks Apr 1, so Apr 21 sits ~2/3 of the way
+  // between the Apr and May labels).
+  const starts: number[] = [];
+  {
+    let acc = 0;
+    for (let i = 0; i < 12; i++) {
+      starts.push(acc / 365);
+      acc += MONTH_DAYS[i];
+    }
+  }
   return (
     <div className="cal-row cal-row-axis">
       <div /> {/* spacer for label column on sm+ */}
       <div className="relative h-7 mt-1 border-t border-gray-700">
         {MONTH_NAMES.map((m, i) => {
-          const left = ((i + 0.5) / 12) * 100;
+          const left = starts[i] * 100;
           return (
             <React.Fragment key={m}>
               <div
                 className="absolute top-0 w-px h-1.5 bg-gray-600"
-                style={{ left: `${left}%`, transform: 'translateX(-50%)' }}
+                style={{ left: `${left}%` }}
               />
               <span
                 className="hidden sm:block absolute text-[10px] text-gray-400 font-mono"
-                style={{ left: `${left}%`, top: 6, transform: 'translateX(-50%)' }}
+                style={{ left: `${left}%`, top: 6, transform: 'translateX(2px)' }}
               >
                 {m}
               </span>
               <span
                 className="sm:hidden absolute text-[10px] text-gray-400 font-mono"
-                style={{ left: `${left}%`, top: 6, transform: 'translateX(-50%)' }}
+                style={{ left: `${left}%`, top: 6, transform: 'translateX(1px)' }}
               >
                 {m[0]}
               </span>

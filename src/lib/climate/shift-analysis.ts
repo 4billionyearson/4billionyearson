@@ -113,11 +113,12 @@ function baselineRecent(years: { year: number; months: number[] }[]) {
   return { baseline, recent, baseMonthly, recMonthly };
 }
 
-function cumulativeRainfallCrossing(monthly: number[], total: number, fraction: number): number | null {
+function cumulativeRainfallCrossing(monthly: number[], total: number, fraction: number, startMonth = 0): number | null {
   if (total <= 0) return null;
   const target = total * fraction;
   let running = 0;
-  for (let i = 0; i < 12; i++) {
+  for (let step = 0; step < 12; step++) {
+    const i = (startMonth + step) % 12;
     const next = running + monthly[i];
     if (next >= target) {
       const frac = (target - running) / Math.max(monthly[i], 0.001);
@@ -132,9 +133,14 @@ function cumulativeRainfallCrossing(monthly: number[], total: number, fraction: 
 
 function findRainfallCrossings(monthly: number[]): { onset: number | null; end: number | null } {
   const total = monthly.reduce((sum, value) => sum + value, 0);
+  // Start from the driest month so the 25%/75% crossings land at the correct
+  // part of the year for both NH (dry = Jan) and SH (dry = Jun/Jul) regions.
+  // Without this, SH regions like Australia have onset detected in Feb (mid-wet)
+  // instead of the actual onset in Nov.
+  const dryStart = monthly.reduce((mi, v, i) => v < monthly[mi] ? i : mi, 0);
   return {
-    onset: cumulativeRainfallCrossing(monthly, total, 0.25),
-    end: cumulativeRainfallCrossing(monthly, total, 0.75),
+    onset: cumulativeRainfallCrossing(monthly, total, 0.25, dryStart),
+    end: cumulativeRainfallCrossing(monthly, total, 0.75, dryStart),
   };
 }
 

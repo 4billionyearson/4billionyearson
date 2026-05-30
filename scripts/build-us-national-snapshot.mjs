@@ -125,18 +125,24 @@ async function fetchNationalParam(param) {
 }
 
 // Mark the latest monthly data point as provisional, but only if it falls in
-// the previous calendar month - i.e. it was just published by NOAA and hasn't
-// yet been QC-revised in a subsequent monthly update. Older points are
-// treated as final.
+// the previous calendar month AND we are still within the early-month
+// publication window (day ≤ 10). NOAA typically publishes national data on
+// the 6th–8th; after the 10th we treat the data as QC-confirmed and clear
+// the flag. This mirrors the logic in build-uk-region-snapshots.mjs.
+const NOAA_PROVISIONAL_WINDOW_END_UTC = 10;
+
 function tagLatestProvisional(points) {
   if (!points.length) return points;
   const sorted = [...points].sort((a, b) => a.year - b.year || a.month - b.month);
   const last = sorted[sorted.length - 1];
   const now = new Date();
-  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const prevYear = prev.getFullYear();
-  const prevMonth = prev.getMonth() + 1;
-  const isProvisional = last.year === prevYear && last.month === prevMonth;
+  const utcDay = now.getUTCDate();
+  const prev = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+  const prevYear = prev.getUTCFullYear();
+  const prevMonth = prev.getUTCMonth() + 1;
+  const isProvisional = utcDay <= NOAA_PROVISIONAL_WINDOW_END_UTC
+    && last.year === prevYear
+    && last.month === prevMonth;
   return sorted.map((p) =>
     isProvisional && p.year === last.year && p.month === last.month
       ? { ...p, provisional: true }

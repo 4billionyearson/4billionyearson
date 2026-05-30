@@ -98,11 +98,22 @@ async function getRegionDataLabels(
     else if (region.type === 'group' && region.groupKind === 'us-climate-region') filePath = resolve(base, 'us-climate-region', `${region.slug}.json`);
     if (!filePath) return { raw: null, expanded: getClimateUpdateDateLabel() };
     const d = JSON.parse(await readFile(filePath, 'utf8'));
+    // Prefer temperature-style labels when available so the SSR heading
+    // matches the client/API preference (avoids 'provisional' mismatches).
+    const preferTemp = (snap: any): string | undefined => {
+      if (!snap) return undefined;
+      return snap?.varData?.Tmean?.latestMonthStats?.label
+        ?? snap?.paramData?.tavg?.latestMonthStats?.label
+        ?? snap?.paramData?.Tmean?.latestMonthStats?.label
+        ?? snap?.latestMonthStats?.label
+        ?? undefined;
+    };
+
     let label: string | undefined;
-    if (region.type === 'country') label = d?.latestMonthStats?.label;
-    else if (region.type === 'us-state') label = d?.paramData?.tavg?.latestMonthStats?.label;
-    else if (region.type === 'uk-region') label = d?.varData?.Tmean?.latestMonthStats?.label;
-    else if (region.type === 'group' && region.groupKind === 'us-climate-region') label = d?.paramData?.tavg?.latestMonthStats?.label;
+    if (region.type === 'country') label = preferTemp(d);
+    else if (region.type === 'us-state') label = preferTemp(d);
+    else if (region.type === 'uk-region') label = preferTemp(d);
+    else if (region.type === 'group' && region.groupKind === 'us-climate-region') label = preferTemp(d);
     if (label) {
       // Gate against NOAA global so metadata title matches the on-page title:
       // the page only flips to "April Update" once every cross-source row

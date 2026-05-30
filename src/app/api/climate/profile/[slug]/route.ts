@@ -9,6 +9,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { getCached, setShortTerm } from '@/lib/climate/redis';
 import { getRegionBySlug } from '@/lib/climate/regions';
+import { pickPageSnapshotMonth } from '@/app/climate/_shared/overview-grid-types';
 
 const SNAPSHOT_ROOT = resolve(process.cwd(), 'public', 'data', 'climate');
 
@@ -24,6 +25,30 @@ async function loadSnapshot(relativePath: string): Promise<any | null> {
 function buildSnapshotToken(name: string, label: string | null | undefined, generatedAt: string | null | undefined): string | null {
   if (!label && !generatedAt) return null;
   return `${name}:${label ?? 'na'}@${generatedAt ?? 'na'}`;
+}
+
+function preferTemperatureLabelFromSnapshot(snap: any): string | null {
+  if (!snap) return null;
+  // Common explicit locations
+  const t1 = snap?.varData?.Tmean?.latestMonthStats?.label;
+  if (t1) return t1;
+  const t2 = snap?.paramData?.tavg?.latestMonthStats?.label;
+  if (t2) return t2;
+  // Root-level temperature block (many country snapshots expose monthlyComparison + latestMonthStats)
+  if (snap?.monthlyComparison && snap?.latestMonthStats?.label) return snap.latestMonthStats.label;
+
+  // Fallback: scan for any child object whose key hints at temperature and has latestMonthStats
+  const keys = Object.keys(snap || {});
+  for (const k of keys) {
+    const v = snap[k];
+    if (v && typeof v === 'object') {
+      if (/tmean|tavg|temp|monthlyComparison/i.test(k) && v.latestMonthStats?.label) return v.latestMonthStats.label;
+      if (v.varData?.Tmean?.latestMonthStats?.label) return v.varData.Tmean.latestMonthStats.label;
+      if (v.paramData?.tavg?.latestMonthStats?.label) return v.paramData.tavg.latestMonthStats.label;
+    }
+  }
+
+  return null;
 }
 
 export async function GET(
@@ -56,7 +81,7 @@ export async function GET(
 
   if (region.type === 'country') {
     const primarySnap = await loadSnapshot(`country/${region.apiCode}.json`);
-    primaryMonth = primarySnap?.latestMonthStats?.label ?? null;
+    primaryMonth = preferTemperatureLabelFromSnapshot(primarySnap) ?? primarySnap?.latestMonthStats?.label ?? null;
     primaryGeneratedAt = primarySnap?.generatedAt ?? null;
 
     const precipSnap = await loadSnapshot(`country-precip/${region.apiCode}.json`);
@@ -78,7 +103,7 @@ export async function GET(
     primaryGeneratedAt = primarySnap?.generatedAt ?? null;
 
     const supportSnap = await loadSnapshot('country/USA.json');
-    supportMonth = supportSnap?.latestMonthStats?.label ?? null;
+    supportMonth = preferTemperatureLabelFromSnapshot(supportSnap) ?? supportSnap?.latestMonthStats?.label ?? null;
     supportGeneratedAt = supportSnap?.generatedAt ?? null;
 
     const nationalSnap = await loadSnapshot('us-national.json');
@@ -90,7 +115,7 @@ export async function GET(
     primaryGeneratedAt = primarySnap?.generatedAt ?? null;
 
     const supportSnap = await loadSnapshot('country/GBR.json');
-    supportMonth = supportSnap?.latestMonthStats?.label ?? null;
+    supportMonth = preferTemperatureLabelFromSnapshot(supportSnap) ?? supportSnap?.latestMonthStats?.label ?? null;
     supportGeneratedAt = supportSnap?.generatedAt ?? null;
 
     const nationalSnap = await loadSnapshot('uk-region/uk-uk.json');
@@ -127,10 +152,14 @@ export async function GET(
       })();
   const cacheKey = `climate:profile:${slug}:${dataCacheKey}-v25`;
 
-  // Check cache
-  const cached = await getCached<any>(cacheKey);
-  if (cached) {
-    return NextResponse.json({ ...cached, source: 'cache' });
+  // Check cache. Pass `_t=<anything>` in the URL to bypass the cache.
+  const url = new URL(request.url);
+  const bypassCache = Boolean(url.searchParams.get('_t'));
+  if (!bypassCache) {
+    const cached = await getCached<any>(cacheKey);
+    if (cached) {
+      return NextResponse.json({ ...cached, source: 'cache' });
+    }
   }
 
   try {
@@ -214,6 +243,22 @@ export async function GET(
       keyStats,
       lastUpdated: dataCacheKey,
     };
+
+    // Compute a server-side page snapshot month (prefer temperature series)
+    try {
+      const serverLocal = countryData ? preferTemperatureLabelFromSnapshot(countryData) : (
+        usStateData ? preferTemperatureLabelFromSnapshot(usStateData) : (
+          ukRegionData ? preferTemperatureLabelFromSnapshot(ukRegionData) : null
+        )
+      );
+      const serverNational = preferTemperatureLabelFromSnapshot(nationalData) ?? null;
+      const serverGlobal = globalData?.noaaStats?.landOcean?.latestMonthStats?.label ?? globalData?.landLatestMonthStats?.label ?? null;
+      const serverPageSnapshot = pickPageSnapshotMonth([serverLocal, serverNational, serverGlobal]);
+      // attach to payload so client can use it for SSR-consistent cutoff
+      (result as any).pageSnapshotMonth = serverPageSnapshot;
+    } catch (e) {
+      // ignore - non-critical
+    }
 
     await setShortTerm(cacheKey, result);
     return NextResponse.json({ ...result, source: 'fresh' });
