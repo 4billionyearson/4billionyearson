@@ -327,6 +327,7 @@ export default function GlobalSeasonalSummary({
         baselineAutumnDoy: w.baselineEndDoy!,
         recentSpringDoy: w.recentDoy,
         recentAutumnDoy: w.recentEndDoy!,
+        wetPalette: true,
       };
     }
     return {

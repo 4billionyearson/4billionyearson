@@ -108,10 +108,10 @@ export default function SeasonsEmbedClient({ slug }: { slug: string }) {
         const sunshineMonthly = json.ukRegionData?.varData?.Sunshine?.monthlyAll
           || json.nationalData?.varData?.Sunshine?.monthlyAll;
         const dataSource = (json.ukRegionData || json.nationalData?.varData)
-          ? 'Data: Met Office UK Regional Series © Crown copyright'
+          ? 'Data: Met Office UK Regional Series © Crown copyright. Baseline: first 30 yrs on record.'
           : (json.usStateData || json.nationalData?.paramData)
-            ? 'Data: NOAA National Centers for Environmental Information'
-            : 'Data: Our World in Data / NOAA';
+            ? 'Data: NOAA National Centers for Environmental Information. Baseline: first 30 yrs on record.'
+            : 'Data: Our World in Data / NOAA. Baseline: first 30 yrs on record.';
         setSeries({
           monthlyAll,
           rainfallMonthly,

@@ -420,7 +420,7 @@ async function buildContinentGroups(): Promise<GroupRow[]> {
     if (!c?.label) continue;
     rows.push({
       key: c.key ?? c.label,
-      slug: c.key ?? String(c.label).toLowerCase().replace(/\s+/g, '-'),
+      slug: String(c.label).toLowerCase().replace(/\s+/g, '-'),
       label: c.label,
       kind: 'continent',
       memberCount: typeof c.memberCount === 'number' ? c.memberCount : null,

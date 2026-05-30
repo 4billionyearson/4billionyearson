@@ -594,7 +594,7 @@ async function ContinentBody({ region }: { region: ClimateRegion }) {
             monthlyAll={absolutes.monthlyAll}
             rainfallMonthly={continentPrecip?.monthlyAll}
             regionName={region.name}
-            dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures &amp; rainfall."
+            dataSource="4BYO continent aggregate · OWID/CRU TS country monthly temperatures &amp; rainfall. Baseline: first 30 yrs on record."
             forceSeasonality={
               // Continental equal-weight averages mix NH+SH wet seasons, flattening
               // the wet/dry ratio below the auto-detection threshold.  Override
@@ -834,7 +834,7 @@ async function UsClimateRegionBody({ region }: { region: ClimateRegion }) {
           <SeasonalShiftCard
             monthlyAll={tavg.monthlyAll}
             regionName={region.name}
-            dataSource="NOAA Climate at a Glance — regional tavg."
+            dataSource="NOAA Climate at a Glance — regional tavg. Baseline: first 30 yrs on record."
             share={{
               pageUrl: `https://4billionyearson.org/climate/${region.slug}`,
               sectionId: 'shifting-seasons',

@@ -19,7 +19,7 @@
  */
 
 import React from 'react';
-import { Flower2, Leaf, Droplet, Sun } from 'lucide-react';
+import { Flower2, Leaf, Droplet, CloudRain, CloudOff, Sun } from 'lucide-react';
 
 const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -68,6 +68,8 @@ export type TimelineRow =
       /** When true, render the recent bar with a spring-green → summer-yellow
        *  → autumn-russet gradient and add flower / leaf icons at its ends. */
       seasonalPalette?: boolean;
+      /** When true, render droplet / cloud-rain / sun icons under the wet-season bar. */
+      wetPalette?: boolean;
     }
   | {
       kind: 'fixed-bar';
@@ -80,6 +82,8 @@ export type TimelineRow =
       baselineFrac: { start: number; end: number };
       recentFrac: { start: number; end: number };
       seasonalPalette?: boolean;
+      /** When true, render droplet / cloud-rain / sun icons under the wet-season bar. */
+      wetPalette?: boolean;
     }
   | {
       kind: 'point';
@@ -141,6 +145,7 @@ export default function CalendarTimeline({
                 recentFracEnd={doyToFrac(row.recentAutumnDoy)}
                 recentWraps={row.recentSpringDoy > row.recentAutumnDoy}
                 seasonalPalette={row.seasonalPalette}
+                wetPalette={row.wetPalette}
               />
             );
           case 'fixed-bar':
@@ -159,6 +164,7 @@ export default function CalendarTimeline({
                 recentFracEnd={row.recentFrac.end}
                 recentWraps={row.recentFrac.start > row.recentFrac.end}
                 seasonalPalette={row.seasonalPalette}
+                wetPalette={row.wetPalette}
               />
             );
           case 'point':
@@ -244,7 +250,7 @@ function BarRow({
   title, sub, delta, deltaColor, recentColor,
   baselineFracStart, baselineFracEnd, baselineWraps,
   recentFracStart, recentFracEnd, recentWraps,
-  seasonalPalette,
+  seasonalPalette, wetPalette,
 }: {
   title: string;
   sub?: string;
@@ -258,6 +264,7 @@ function BarRow({
   recentFracEnd: number;
   recentWraps: boolean;
   seasonalPalette?: boolean;
+  wetPalette?: boolean;
 }) {
   return (
     <div className="cal-row">
@@ -280,6 +287,7 @@ function BarRow({
           color: recentColor,
           top: RECENT_TOP,
           seasonalPalette,
+          wetPalette,
         })}
       </div>
     </div>
@@ -328,8 +336,42 @@ function seasonalGradient(t0: number, t1: number): string {
   return `linear-gradient(90deg, ${stops.join(', ')})`;
 }
 
+/** Parched earth → lush growth → open water/sky */
+const WET_SEASON_STOPS: Array<[number, [number, number, number]]> = [
+  [0.00, [180, 120, 70]],   // #B47846 dry ochre earth
+  [0.28, [74, 222, 128]],   // #4ADE80 fresh burst of growth
+  [0.60, [16, 185, 129]],   // #10B981 deep emerald at peak
+  [1.00, [34, 211, 238]],   // #22D3EE aqua / clear skies
+];
+function wetSeasonColorAt(t: number): string {
+  const x = Math.max(0, Math.min(1, t));
+  for (let i = 1; i < WET_SEASON_STOPS.length; i++) {
+    const [t0, c0] = WET_SEASON_STOPS[i - 1];
+    const [t1, c1] = WET_SEASON_STOPS[i];
+    if (x <= t1) {
+      const u = (x - t0) / (t1 - t0);
+      const r = Math.round(c0[0] + (c1[0] - c0[0]) * u);
+      const g = Math.round(c0[1] + (c1[1] - c0[1]) * u);
+      const b = Math.round(c0[2] + (c1[2] - c0[2]) * u);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+  }
+  const [, last] = WET_SEASON_STOPS[WET_SEASON_STOPS.length - 1];
+  return `rgb(${last[0]}, ${last[1]}, ${last[2]})`;
+}
+function wetSeasonGradient(t0: number, t1: number): string {
+  const stops: string[] = [];
+  const n = 8;
+  for (let i = 0; i <= n; i++) {
+    const u = i / n;
+    const t = t0 + (t1 - t0) * u;
+    stops.push(`${wetSeasonColorAt(t)} ${Math.round(u * 100)}%`);
+  }
+  return `linear-gradient(90deg, ${stops.join(', ')})`;
+}
+
 function renderBarSegments({
-  start, end, wraps, variant, color, top, seasonalPalette,
+  start, end, wraps, variant, color, top, seasonalPalette, wetPalette,
 }: {
   start: number;
   end: number;
@@ -338,6 +380,7 @@ function renderBarSegments({
   color: string;
   top: number;
   seasonalPalette?: boolean;
+  wetPalette?: boolean;
 }) {
   const baseStyle: React.CSSProperties = {
     position: 'absolute',
@@ -358,6 +401,13 @@ function renderBarSegments({
         ...baseStyle,
         backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 38%, rgba(0,0,0,0.18) 100%), ${seasonalGradient(progressFrom, progressTo)}`,
         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 0 0 1px rgba(0,0,0,0.25), 0 0 18px rgba(250,204,21,0.28)',
+      };
+    }
+    if (wetPalette) {
+      return {
+        ...baseStyle,
+        backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 38%, rgba(0,0,0,0.18) 100%), ${wetSeasonGradient(progressFrom, progressTo)}`,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 0 0 1px rgba(0,0,0,0.25), 0 0 18px rgba(16,185,129,0.30)',
       };
     }
     return {
@@ -401,6 +451,13 @@ function renderBarSegments({
             top={top}
           />
         )}
+        {wetPalette && (
+          <WetSeasonEndcaps
+            startPct={segStart * 100}
+            endPct={segEnd * 100}
+            top={top}
+          />
+        )}
       </>
     );
   }
@@ -428,6 +485,13 @@ function renderBarSegments({
       />
       {seasonalPalette && (
         <SeasonalEndcaps
+          startPct={start * 100}
+          endPct={end * 100}
+          top={top}
+        />
+      )}
+      {wetPalette && (
+        <WetSeasonEndcaps
           startPct={start * 100}
           endPct={end * 100}
           top={top}
@@ -483,6 +547,52 @@ function SeasonalEndcaps({
         aria-hidden
       >
         <Leaf width={iconSize} height={iconSize} strokeWidth={2.25} />
+      </span>
+    </>
+  );
+}
+
+/** Droplet (onset) / cloud-rain (peak) / sun (dry-season end) icons placed
+ *  under the recent wet-season bar, mirroring SeasonalEndcaps for warm bars. */
+function WetSeasonEndcaps({
+  startPct, endPct, top,
+}: { startPct: number; endPct: number; top: number }) {
+  const iconSize = 15;
+  const cy = top + BAR_H + 14;
+  const midPct = endPct >= startPct
+    ? (startPct + endPct) / 2
+    : ((startPct + endPct + 100) / 2) % 100;
+  const iconStyle = (leftPct: number, color: string, glow: string): React.CSSProperties => ({
+    position: 'absolute',
+    left: `${leftPct}%`,
+    top: cy,
+    transform: 'translate(-50%, -50%)',
+    color,
+    filter: `drop-shadow(0 0 3px ${glow}) drop-shadow(0 0 1px rgba(0,0,0,0.8))`,
+    lineHeight: 0,
+  });
+  return (
+    <>
+      <span
+        className="pointer-events-none"
+        style={iconStyle(startPct, '#B47846', 'rgba(180,120,70,0.60)')}
+        aria-hidden
+      >
+        <Droplet width={iconSize} height={iconSize} fill="#D4A574" strokeWidth={2.25} />
+      </span>
+      <span
+        className="pointer-events-none"
+        style={iconStyle(midPct, '#10B981', 'rgba(16,185,129,0.65)')}
+        aria-hidden
+      >
+        <CloudRain width={iconSize} height={iconSize} strokeWidth={2.25} />
+      </span>
+      <span
+        className="pointer-events-none"
+        style={iconStyle(endPct, '#22D3EE', 'rgba(34,211,238,0.55)')}
+        aria-hidden
+      >
+        <CloudOff width={iconSize} height={iconSize} strokeWidth={2.25} />
       </span>
     </>
   );

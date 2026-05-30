@@ -1077,9 +1077,9 @@ export default function ClimateProfile({
                   frost: frostMonthly,
                 };
                 const chartSource = (data.ukRegionData || data.nationalData?.varData)
-                  ? 'Data: Met Office UK Regional Series © Crown copyright'
+                  ? 'Data: Met Office UK Regional Series © Crown copyright. Baseline: first 30 yrs on record.'
                   : (data.usStateData || data.nationalData?.paramData)
-                    ? 'Data: NOAA National Centers for Environmental Information'
+                    ? 'Data: NOAA National Centers for Environmental Information. Baseline: first 30 yrs on record.'
                     : 'Data: Our World in Data / NOAA (rainfall: World Bank CCKP / CRU TS 4.08). Baseline: first 30 yrs on record.';
 
                 return (
