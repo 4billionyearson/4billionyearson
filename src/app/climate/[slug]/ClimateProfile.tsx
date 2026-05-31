@@ -717,8 +717,10 @@ export default function ClimateProfile({
   };
 
   useEffect(() => {
-    // Add cache buster to bypass Next.js client caching
-    fetch(`/api/climate/profile/${slug}?_t=${Date.now()}`)
+    // cache:'no-store' stops the browser's own navigation cache from returning
+    // a stale in-memory response, while still allowing the CDN and Redis caches
+    // on the server to serve the response (unlike ?_t= which busted all layers).
+    fetch(`/api/climate/profile/${slug}`, { cache: 'no-store' })
       .then(res => {
         if (!res.ok) throw new Error('Failed to load data');
         return res.json();
