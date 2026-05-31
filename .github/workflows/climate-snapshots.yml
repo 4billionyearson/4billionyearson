@@ -25,6 +25,7 @@ name: Daily — refresh climate snapshots
 on:
   schedule:
     - cron: '0 4 3-25 * *'
+    - cron: '0 4 26-31 * *'  # ENSO only: NOAA weekly SSTs update every Monday
   workflow_dispatch:
 
 jobs:
@@ -78,12 +79,14 @@ jobs:
         continue-on-error: true
 
       # ── ENSO / Pacific oceans (NOAA CPC: same window as NOAA global) ─
+      # Window extends to 31 because NOAA weekly SST data updates every
+      # Monday and can land on any day through the end of the month.
       - name: Rebuild ENSO snapshot
         run: >
           node scripts/climate-step-log.mjs run
           --name "Rebuild ENSO snapshot"
           --window-start 10
-          --window-end 25
+          --window-end 31
           --outputs "public/data/climate/enso.json"
           --log-path "$CLIMATE_RUN_LOG"
           --
