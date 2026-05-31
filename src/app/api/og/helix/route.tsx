@@ -4,6 +4,9 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 export const runtime = 'nodejs';
+// OG images change at most once a month (when climate data refreshes).
+// Cache on Vercel's CDN for 24 h; allow stale-while-revalidate for a further 24 h.
+export const revalidate = 86400;
 
 async function loadDataUrl(relativePath: string, mime: string): Promise<string | null> {
   try {

@@ -1,4 +1,7 @@
-export const maxDuration = 60;
+// maxDuration: Redis cache hits complete in < 200 ms. A full cold build
+// (reading several JSON snapshot files) takes 1–3 s. 15 s gives ample
+// headroom without opting into Fluid CPU billing for every request.
+export const maxDuration = 15;
 // CDN-cache the response for 1h. The route reads only the `slug` path
 // param and a Redis-backed snapshot keyed by data month, so caching is
 // safe; cache busts automatically when the data month advances because
@@ -62,13 +65,21 @@ export async function GET(
     return NextResponse.json({ error: 'Region not found' }, { status: 404 });
   }
 
-  // Build the cache key from both the latest month labels and the generatedAt
-  // stamps of every snapshot that can affect the combined page payload. Using
-  // labels alone is not enough: a same-month rebuild can change monthlyAll
-  // values or provisional flags without advancing the month label.
+  // Load all snapshots needed for this region upfront — once. The loaded
+  // objects are used both to build the data-versioned cache key AND (on a
+  // cache miss) to construct the full response. This avoids reading the
+  // same files twice on every uncached request.
   const globalSnap0 = await loadSnapshot('global-history.json');
   const globalMonth = globalSnap0?.noaaStats?.landOcean?.latestMonthStats?.label ?? null;
   const globalGeneratedAt = globalSnap0?.generatedAt ?? null;
+
+  // Pre-loaded snapshots (reused below if cache misses)
+  let preCountry: any = null;
+  let prePrecip: any = null;
+  let preNational: any = null;
+  let preSupport: any = null;
+  let prePrimary: any = null; // continent-absolutes or us-climate-region
+  let preContinentPrecip: any = null;
 
   let primaryMonth: string | null = null;
   let primaryGeneratedAt: string | null = null;
@@ -80,58 +91,63 @@ export async function GET(
   let precipGeneratedAt: string | null = null;
 
   if (region.type === 'country') {
-    const primarySnap = await loadSnapshot(`country/${region.apiCode}.json`);
-    primaryMonth = preferTemperatureLabelFromSnapshot(primarySnap) ?? primarySnap?.latestMonthStats?.label ?? null;
-    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
-
-    const precipSnap = await loadSnapshot(`country-precip/${region.apiCode}.json`);
-    precipMonth = precipSnap?.latestMonthStats?.label ?? null;
-    precipGeneratedAt = precipSnap?.generatedAt ?? null;
+    [preCountry, prePrecip] = await Promise.all([
+      loadSnapshot(`country/${region.apiCode}.json`),
+      loadSnapshot(`country-precip/${region.apiCode}.json`),
+    ]);
+    primaryMonth = preferTemperatureLabelFromSnapshot(preCountry) ?? preCountry?.latestMonthStats?.label ?? null;
+    primaryGeneratedAt = preCountry?.generatedAt ?? null;
+    precipMonth = prePrecip?.latestMonthStats?.label ?? null;
+    precipGeneratedAt = prePrecip?.generatedAt ?? null;
 
     if (region.apiCode === 'GBR') {
-      const nationalSnap = await loadSnapshot('uk-region/uk-uk.json');
-      nationalMonth = nationalSnap?.varData?.Tmean?.latestMonthStats?.label ?? null;
-      nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+      preNational = await loadSnapshot('uk-region/uk-uk.json');
+      nationalMonth = preNational?.varData?.Tmean?.latestMonthStats?.label ?? null;
+      nationalGeneratedAt = preNational?.generatedAt ?? null;
     } else if (region.apiCode === 'USA') {
-      const nationalSnap = await loadSnapshot('us-national.json');
-      nationalMonth = nationalSnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
-      nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+      preNational = await loadSnapshot('us-national.json');
+      nationalMonth = preNational?.paramData?.tavg?.latestMonthStats?.label ?? null;
+      nationalGeneratedAt = preNational?.generatedAt ?? null;
     }
   } else if (region.type === 'us-state') {
-    const primarySnap = await loadSnapshot(`us-state/${region.apiCode}.json`);
-    primaryMonth = primarySnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
-    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
-
-    const supportSnap = await loadSnapshot('country/USA.json');
-    supportMonth = preferTemperatureLabelFromSnapshot(supportSnap) ?? supportSnap?.latestMonthStats?.label ?? null;
-    supportGeneratedAt = supportSnap?.generatedAt ?? null;
-
-    const nationalSnap = await loadSnapshot('us-national.json');
-    nationalMonth = nationalSnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
-    nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+    [prePrimary, preSupport, preNational] = await Promise.all([
+      loadSnapshot(`us-state/${region.apiCode}.json`),
+      loadSnapshot('country/USA.json'),
+      loadSnapshot('us-national.json'),
+    ]);
+    primaryMonth = prePrimary?.paramData?.tavg?.latestMonthStats?.label ?? null;
+    primaryGeneratedAt = prePrimary?.generatedAt ?? null;
+    supportMonth = preferTemperatureLabelFromSnapshot(preSupport) ?? preSupport?.latestMonthStats?.label ?? null;
+    supportGeneratedAt = preSupport?.generatedAt ?? null;
+    nationalMonth = preNational?.paramData?.tavg?.latestMonthStats?.label ?? null;
+    nationalGeneratedAt = preNational?.generatedAt ?? null;
   } else if (region.type === 'uk-region') {
-    const primarySnap = await loadSnapshot(`uk-region/${region.apiCode}.json`);
-    primaryMonth = primarySnap?.varData?.Tmean?.latestMonthStats?.label ?? null;
-    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
-
-    const supportSnap = await loadSnapshot('country/GBR.json');
-    supportMonth = preferTemperatureLabelFromSnapshot(supportSnap) ?? supportSnap?.latestMonthStats?.label ?? null;
-    supportGeneratedAt = supportSnap?.generatedAt ?? null;
-
-    const nationalSnap = await loadSnapshot('uk-region/uk-uk.json');
-    nationalMonth = nationalSnap?.varData?.Tmean?.latestMonthStats?.label ?? null;
-    nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+    [prePrimary, preSupport, preNational] = await Promise.all([
+      loadSnapshot(`uk-region/${region.apiCode}.json`),
+      loadSnapshot('country/GBR.json'),
+      loadSnapshot('uk-region/uk-uk.json'),
+    ]);
+    primaryMonth = prePrimary?.varData?.Tmean?.latestMonthStats?.label ?? null;
+    primaryGeneratedAt = prePrimary?.generatedAt ?? null;
+    supportMonth = preferTemperatureLabelFromSnapshot(preSupport) ?? preSupport?.latestMonthStats?.label ?? null;
+    supportGeneratedAt = preSupport?.generatedAt ?? null;
+    nationalMonth = preNational?.varData?.Tmean?.latestMonthStats?.label ?? null;
+    nationalGeneratedAt = preNational?.generatedAt ?? null;
   } else if (region.type === 'group' && region.groupKind === 'us-climate-region') {
-    const primarySnap = await loadSnapshot(`us-climate-region/${region.slug}.json`);
-    primaryMonth = primarySnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
-    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
-
-    const nationalSnap = await loadSnapshot('us-national.json');
-    nationalMonth = nationalSnap?.paramData?.tavg?.latestMonthStats?.label ?? null;
-    nationalGeneratedAt = nationalSnap?.generatedAt ?? null;
+    [prePrimary, preNational] = await Promise.all([
+      loadSnapshot(`us-climate-region/${region.slug}.json`),
+      loadSnapshot('us-national.json'),
+    ]);
+    primaryMonth = prePrimary?.paramData?.tavg?.latestMonthStats?.label ?? null;
+    primaryGeneratedAt = prePrimary?.generatedAt ?? null;
+    nationalMonth = preNational?.paramData?.tavg?.latestMonthStats?.label ?? null;
+    nationalGeneratedAt = preNational?.generatedAt ?? null;
   } else if (region.type === 'group' && region.groupKind === 'continent') {
-    const primarySnap = await loadSnapshot(`continent-absolutes/${region.slug}.json`);
-    primaryGeneratedAt = primarySnap?.generatedAt ?? null;
+    [prePrimary, preContinentPrecip] = await Promise.all([
+      loadSnapshot(`continent-absolutes/${region.slug}.json`),
+      loadSnapshot(`continent-precip/${region.slug}.json`),
+    ]);
+    primaryGeneratedAt = prePrimary?.generatedAt ?? null;
   }
 
   const dataCacheKeyParts = [
@@ -163,61 +179,21 @@ export async function GET(
   }
 
   try {
-    let countryData = null;
-    let countryPrecipData = null; // World Bank CKP monthly precip (CRU TS 4.08)
-    let continentData = null; // Berkeley Earth continent absolute temps
-    let continentPrecipData = null; // 4BYO continent rainfall aggregate (CRU TS)
-    let usStateData = null;
-    let usClimateRegionData = null;
-    let ukRegionData = null;
-    let nationalData = null; // UK-wide or US-national for sub-national regions
-    let owidCountryData = null; // OWID country data (for sub-national comparison)
-    // Re-use the already-loaded global snapshot rather than reading it again.
+    // Reuse already-loaded snapshots — no second filesystem reads needed.
+    let countryData: any = preCountry;
+    let countryPrecipData: any = prePrecip;
+    let continentData: any = region.type === 'group' && region.groupKind === 'continent' ? prePrimary : null;
+    let continentPrecipData: any = preContinentPrecip;
+    let usStateData: any = region.type === 'us-state' ? prePrimary : null;
+    let usClimateRegionData: any = region.type === 'group' && region.groupKind === 'us-climate-region' ? prePrimary : null;
+    let ukRegionData: any = region.type === 'uk-region' ? prePrimary : null;
+    let nationalData: any = preNational;
+    let owidCountryData: any = preSupport;
     let globalData: any = globalSnap0;
 
     if (region.type === 'country') {
-      const [cRes, pRes] = await Promise.all([
-        loadSnapshot(`country/${region.apiCode}.json`),
-        loadSnapshot(`country-precip/${region.apiCode}.json`),
-      ]);
-      countryData = cRes;
-      countryPrecipData = pRes;
-      // For UK/USA countries, also load national Met Office / NOAA data
-      if (region.apiCode === 'GBR') {
-        nationalData = await loadSnapshot('uk-region/uk-uk.json');
-      } else if (region.apiCode === 'USA') {
-        nationalData = await loadSnapshot('us-national.json');
-      }
-    } else if (region.type === 'us-state') {
-      const [stateRes, countryRes, nationalRes] = await Promise.all([
-        loadSnapshot(`us-state/${region.apiCode}.json`),
-        loadSnapshot('country/USA.json'),
-        loadSnapshot('us-national.json'),
-      ]);
-      usStateData = stateRes;
-      owidCountryData = countryRes;
-      nationalData = nationalRes;
-    } else if (region.type === 'uk-region') {
-      const [regionRes, countryRes, ukNationalRes] = await Promise.all([
-        loadSnapshot(`uk-region/${region.apiCode}.json`),
-        loadSnapshot('country/GBR.json'),
-        loadSnapshot('uk-region/uk-uk.json'),
-      ]);
-      ukRegionData = regionRes;
-      owidCountryData = countryRes;
-      nationalData = ukNationalRes;
-    } else if (region.type === 'group' && region.groupKind === 'us-climate-region') {
-      const [groupRes, nationalRes] = await Promise.all([
-        loadSnapshot(`us-climate-region/${region.slug}.json`),
-        loadSnapshot('us-national.json'),
-      ]);
-      usClimateRegionData = groupRes;
-      nationalData = nationalRes;
-    } else if (region.type === 'group' && region.groupKind === 'continent') {
-      [continentData, continentPrecipData] = await Promise.all([
-        loadSnapshot(`continent-absolutes/${region.slug}.json`),
-        loadSnapshot(`continent-precip/${region.slug}.json`),
-      ]);
+      // For UK/USA countries, nationalData may need a continent-precip load (not pre-loaded above).
+      // All other data is already in preCountry / prePrecip / preNational.
     }
 
     // Build key stats for the crawlable summary

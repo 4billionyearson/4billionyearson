@@ -6,6 +6,11 @@ import type { HelixSeriesTab } from '../global/GlobalHelixCard';
 import type { ClimateSpiralHudMetric } from '@/app/_components/climate-spiral-card';
 import HelixClientSection from './HelixClientSection';
 
+// ISR: revalidate every 24 h — same as other climate hub pages. The page
+// reads searchParams only to customise metadata; the heavy climate data is
+// loaded client-side via the profile API (which has its own 1 h CDN cache).
+export const revalidate = 86400;
+
 const HUB_URL = 'https://4billionyearson.org/climate/helix';
 const OG_API = 'https://4billionyearson.org/api/og/helix';
 
