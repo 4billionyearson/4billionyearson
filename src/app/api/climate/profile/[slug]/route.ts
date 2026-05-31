@@ -2,11 +2,16 @@
 // (reading several JSON snapshot files) takes 1–3 s. 15 s gives ample
 // headroom without opting into Fluid CPU billing for every request.
 export const maxDuration = 15;
-// CDN-cache the response for 1h. The route reads only the `slug` path
-// param and a Redis-backed snapshot keyed by data month, so caching is
-// safe; cache busts automatically when the data month advances because
-// the Redis cache key includes the month label.
-export const revalidate = 3600;
+// CDN-cache the response for 24 h. The data only changes when a new snapshot
+// is deployed (monthly), at which point Vercel automatically purges the CDN
+// cache as part of the deployment. The Redis cache is self-busting via a
+// data-versioned key (includes generatedAt stamp), so old entries become
+// unreachable as soon as the snapshot advances — the 30-day TTL is just
+// a safety net for cleanup. Together these mean: CDN serves 100% of repeat
+// requests between deployments at zero function cost, and the very first
+// request after a new deployment hits Redis (fast) or disk (1–3 s) once
+// per region before being cached again for the next 24 h.
+export const revalidate = 86400;
 import { NextResponse } from 'next/server';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
