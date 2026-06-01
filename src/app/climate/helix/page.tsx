@@ -224,6 +224,12 @@ export default async function ClimateHelixPage() {
                     { '@type': 'PropertyValue', name: 'Paris Agreement progress vs 1.5°C limit', unitText: '°C' },
                     { '@type': 'PropertyValue', name: 'Paris Agreement progress vs 2.0°C limit', unitText: '°C' },
                   ],
+                  creator: {
+                    '@type': 'Organization',
+                    name: '4 Billion Years On',
+                    url: 'https://4billionyearson.org',
+                  },
+                  license: 'https://creativecommons.org/licenses/by/4.0/',
                 },
               },
               {

@@ -170,6 +170,15 @@ function DatasetSchema({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
     'arctic-ice': 'global-warming.org',
   };
 
+  const sourceUrls: Record<string, string> = {
+    'owid-temp': 'https://ourworldindata.org/temperature-anomaly',
+    'owid-emissions': 'https://ourworldindata.org/co2-emissions',
+    'met-office': 'https://www.metoffice.gov.uk/hadobs/haduk-grid/',
+    'noaa-state': 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/statewide/time-series',
+    'noaa-national': 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/national/time-series',
+    'arctic-ice': 'https://global-warming.org/',
+  };
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
@@ -189,6 +198,8 @@ function DatasetSchema({ region }: { region: typeof CLIMATE_REGIONS[number] }) {
     distribution: region.dataSources.map(src => ({
       '@type': 'DataDownload',
       name: sourceNames[src] || src,
+      contentUrl: sourceUrls[src] || 'https://4billionyearson.org',
+      encodingFormat: 'text/html',
     })),
     isAccessibleForFree: true,
     license: 'https://creativecommons.org/licenses/by/4.0/',
